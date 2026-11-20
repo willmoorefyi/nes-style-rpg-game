@@ -1,6 +1,6 @@
 /**
  * NW-2 (docs/NATURAL_WORLD_PLAN.md 0.1.1, 3.1, 5.2, 2.6): the generated 256x256 world source,
- * `assets-src/maps-nw/overworld.yaml` (written by `layouts/world_v2.py`; committed source only, as every
+ * `assets-src/maps/overworld.yaml` (written by `layouts/world.py`; committed source only, as every
  * `tests/nw/` test). G-NW1 and G-NW3 runs over 6 edges lie only at the composer's stamps (entrances, doors, docks,
  * patches: the exemption list of 0.1.1, measured here by distance), G-NW2's coast index is at least 30, the land is
  * D-NW12's 28,874 +- 10 %, and every spot, dock and entrance stands on a cell of its kind.
@@ -20,7 +20,7 @@ interface Src {
   world: { basins: Record<string, XY> };
 }
 
-const src = parse(readFileSync('assets-src/maps-nw/overworld.yaml', 'utf-8')) as Src;
+const src = parse(readFileSync('assets-src/maps/overworld.yaml', 'utf-8')) as Src;
 const g = src.ground.replace(/\n$/, '').split('\n').map((r) => [...r]);
 const N = 256;
 const BLOCK = new Set(['o', 'm', 'r', '≈']);

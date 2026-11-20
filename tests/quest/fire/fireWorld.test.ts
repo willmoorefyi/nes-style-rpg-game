@@ -26,10 +26,10 @@ interface FireSrc {
 const src = nw as unknown as Omit<typeof nw, 'objects' | 'world'> & FireSrc;
 const g = grid(nw);
 const E = nw.entrances;
-const anchors = (parse(readFileSync('assets-src/maps-nw/world-anchors.yaml', 'utf-8')) as
+const anchors = (parse(readFileSync('assets/data/world-anchors.yaml', 'utf-8')) as
   { anchors: Array<{ entrance: string; target: XY; region: string }> }).anchors;
 const cutscenes = parse(readFileSync('assets/data/cutscenes.yaml', 'utf-8')) as Array<{ id: string; steps: Array<Record<string, unknown>> }>;
-const today = parse(readFileSync('assets-src/maps/overworld.yaml', 'utf-8')) as { encounterZones: Zone[] };
+const today = parse(readFileSync('tests/fixtures/passW/overworld.yaml', 'utf-8')) as { encounterZones: Zone[] };
 
 const BLOCK = new Set(['o', 'm', 'r', '≈']);
 const CANOE = new Set(['r', '≈']);

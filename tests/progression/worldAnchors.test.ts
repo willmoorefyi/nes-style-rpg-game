@@ -1,6 +1,6 @@
 /**
  * NW-1 (docs/NATURAL_WORLD_PLAN.md 4.2, 2.2): the re-fitted anchors of the 256x256 world,
- * `assets-src/maps-nw/world-anchors.yaml` (committed source only, as every `tests/nw/` test). Act 1's four anchors are
+ * `assets/data/world-anchors.yaml` (committed source only, as every NW world test, moved from `tests/nw/` at NW-5). Act 1's four anchors are
  * today's cells + (54, 44); every other target is CORNELIA_NW (146, 155) + s* x ref at s* 0.86; the bands moved with
  * the scale; proof (g) passes at the targets, at NW-0's nudged pins, and at 20,000 random +-2 placements of the
  * non-act-1 anchors (at most 0.05 % may fail).
@@ -10,8 +10,8 @@ import { loadLateData, type GeoData } from '../../src/progression/questLateData.
 import { geoCheck } from '../../src/progression/questGeo.js';
 
 type XY = [number, number];
-const nw = loadLateData(process.cwd(), { anchors: 'assets-src/maps-nw/world-anchors.yaml' }).geo!;
-const today = loadLateData().geo!;
+const nw = loadLateData(process.cwd(), { anchors: 'assets/data/world-anchors.yaml' }).geo!;
+const today = loadLateData(process.cwd(), { anchors: 'tests/fixtures/passW/world-anchors.yaml' }).geo!;  // pass W's, frozen at NW-5
 const A1 = new Set(['cornelia', 'temple', 'matoya', 'pravoka']);
 const CORNELIA_NW: XY = [146, 155];
 const S_STAR = 0.86;

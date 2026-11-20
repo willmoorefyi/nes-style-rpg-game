@@ -24,9 +24,6 @@ export interface TravelRow {
   basins?: { holds: string[]; lacks: string[] };
 }
 
-/** WORLD 2.6 `BASIN_SEEDS`. */
-export const BASIN_SEEDS: Readonly<Record<string, [number, number]>> = { aldi: [92, 121], ocean: [2, 2] };
-
 /** Anchors the airship alone reaches (ORDEAL, WATER, WIND have no dock; 2.8). */
 export const AIRSHIP_ONLY = ['ord_citadel', 'ord_bahamut', 'wat_onrac', 'wat_waterfall', 'wat_caravan', 'wnd_gaia',
   'wnd_mirage', 'wnd_lufenia'];

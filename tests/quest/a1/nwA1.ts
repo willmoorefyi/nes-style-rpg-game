@@ -1,6 +1,6 @@
 /**
  * Shared reads for the NW act-1 tests (docs/NATURAL_WORLD_PLAN.md 3.6, 7; NW-3). Committed sources only: today's world
- * source `assets-src/maps/overworld.yaml` and the NW world source `assets-src/maps-nw/overworld.yaml`, both as legend
+ * source `assets-src/maps/overworld.yaml` and the NW world source `assets-src/maps/overworld.yaml`, both as legend
  * chars. Act 1's pins keep today's cells relative to Cornelia: an act-1 cell p of today's world is p + DELTA on the
  * NW world (CORNELIA_NW (146, 155) = today's (92, 111) + (54, 44)).
  */
@@ -38,8 +38,8 @@ export const inAct1 = ([x, y]: XY): boolean => x >= 64 && x <= 141 && y >= 64 &&
 export const pin = ([x, y]: XY): XY => [x + DELTA[0], y + DELTA[1]];
 
 const read = (path: string): Src => parse(readFileSync(path, 'utf-8')) as Src;
-export const today = read('assets-src/maps/overworld.yaml');
-export const nw = read('assets-src/maps-nw/overworld.yaml');
+export const today = read('tests/fixtures/passW/overworld.yaml');
+export const nw = read('assets-src/maps/overworld.yaml');
 
 /** NW-RINT: an NW world cell holds act 1's content when it lies in today's act-1 box moved by (54, 44) and on no land
  * another region's content claims (`regions.<r>.land`, e.g. ELF's Elfheim shore): the other regions' dressing

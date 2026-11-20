@@ -1,6 +1,6 @@
 /**
  * NW-4 (docs/NATURAL_WORLD_PLAN.md 3.4, 3.8, 4.5): what the composer v2 writes for the gates and for `--region`,
- * read from the committed source `assets-src/maps-nw/overworld.yaml` (as every `tests/nw/` test).
+ * read from the committed source `assets-src/maps/overworld.yaml` (as every NW world test, moved from `tests/nw/` at NW-5).
  * - `regions.<r>.raster`: chunk-aligned rects per region whose union is every chunk of the 256x256 world;
  * - `world.cuts`: the walls' and barriers' minimal cuts. Each one, and only it, opens its gate: a wall's cut set to
  *   Water joins the Aldi to the ocean (every patch off), a barrier's set to grass joins its seeds on foot; the spine's
@@ -19,7 +19,7 @@ interface Src {
   world: { basins: Record<string, XY>; cuts: Record<string, XY[]> };
 }
 
-const src = parse(readFileSync('assets-src/maps-nw/overworld.yaml', 'utf-8')) as Src;
+const src = parse(readFileSync('assets-src/maps/overworld.yaml', 'utf-8')) as Src;
 const N = 256;
 const C = 16;
 const ground = (): string[][] => src.ground.replace(/\n$/, '').split('\n').map((r) => [...r]);

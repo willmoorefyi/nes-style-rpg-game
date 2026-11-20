@@ -12,7 +12,7 @@ import { globMatch } from './questData.js';
 import { Saturator } from './questSaturate.js';
 import { fail, result, type QuestContext } from './questProofs.js';
 import { lateOf } from './questLateData.js';
-import { AIRSHIP_ONLY, BASIN_SEEDS, type TravelRow } from './questTravelRows.js';
+import { AIRSHIP_ONLY, type TravelRow } from './questTravelRows.js';
 
 interface RowState {
   flags: Set<string>;
@@ -129,8 +129,9 @@ function basinRow(ctx: QuestContext, map: MapData, row: TravelRow, vehicles: Veh
       out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} ship docks ${got.join(' ') || '-'} (want ${row.docks.join(' ')})`));
     }
   }
-  // the composer writes the seeds into the map (`world.basins`, NW-1); a map without them (a fixture) has pass W's
-  const seeds = map.world?.basins ?? BASIN_SEEDS;
+  // the composer writes the seeds into the map (`world.basins`, NW-1); NW-5 dropped pass W's copy: a map without
+  // them holds no basin, so a basin row on it fails
+  const seeds: Record<string, [number, number]> = map.world?.basins ?? {};
   const inComp = (b: string): boolean => {
     if (!seeds[b]) return false;
     const [x, y] = seeds[b];

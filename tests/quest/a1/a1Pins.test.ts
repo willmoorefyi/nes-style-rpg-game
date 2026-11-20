@@ -1,7 +1,8 @@
 /**
  * NW-3 (docs/NATURAL_WORLD_PLAN.md 3.6.2, 3.6.3, 3.10): act 1's pins and promises on the NW world source. The pins
- * (`layouts/a1/world_a1_pins.py`, derived by `a1/world_a1_derive.py` from today's world) keep every act-1 entrance,
- * door, gate, patch cell, spot and placed object at today's cell + (54, 44); each pin cell has its material; the
+ * (`layouts/a1/world_a1_pins.py`, derived by NW-3 from pass W's world, the source since NW-5) keep every act-1
+ * entrance, door, gate, patch cell, spot and placed object at pass W's cell + (54, 44) ("today" below is pass W's
+ * world, frozen at NW-5 in `tests/fixtures/passW/overworld.yaml`); each pin cell has its material; the
  * bridge is the only way off the peninsula; the tomb is reached only over the east footbridge; the temple before the
  * bridge, Matoya and Pravoka after it; Pravoka's channel keeps 6 Water cells per row; exactly 2 key-item gates; the
  * land beyond the bridge is larger than the peninsula (OW-15); the boulders stand on grass; and the roads are one
@@ -9,7 +10,6 @@
  * Replaces `tests/quest/a1/frozenCore.test.ts` for the NW world (moved into `tests/quest/a1/` at NW-5).
  */
 import { describe, it, expect } from 'vitest';
-import { execFileSync } from 'node:child_process';
 import {
   ACT1, act1Cell, inAct1, key, nw, pin, reach, size, steps, today, withBridge, walkable, grid, type XY,
 } from './nwA1.js';
@@ -28,10 +28,6 @@ for (let y = 99; y <= 122; y++) for (let x = 100; x <= 118; x++) if (tg[y][x] ==
 const tombEnd = nw.road_check!.ends[0];
 
 describe('act 1 pins (NW-3, 3.6.2)', () => {
-  it('the pins file is derived from today\'s world and is current', () => {
-    const out = execFileSync('python3', ['-I', 'assets-src/tools/layouts/a1/world_a1_derive.py', '--check'], { encoding: 'utf-8' });
-    expect(out.trim()).toBe('world_a1_pins: OK');
-  });
 
   it('every act-1 entrance, door, gate, patch cell, dock and spot is today\'s cell + (54, 44)', () => {
     for (const e of ACT1) expect(E[e], e).toEqual(pin(today.entrances[e]));

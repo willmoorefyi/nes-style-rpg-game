@@ -32,7 +32,7 @@ export interface Dock {
   id: string;
   x: number;
   y: number;
-  /** The basin the dock lies in (`world_api.BASIN_SEEDS`: `aldi` or `ocean`). */
+  /** The basin the dock lies in (the composer's basin seeds, `world.basins`: `aldi` or `ocean`). */
   basin: string;
 }
 
@@ -69,7 +69,7 @@ export type ParkedVehicle = VehicleState | SpotVehicle;
 
 /** `MapData.world`: the composer's records of the world map (pass NW has no act-1 frame: NATURAL_WORLD 3.6.5). */
 export interface MapWorld {
-  /** The basin seeds (`world_api.BASIN_SEEDS`, written by the composer since NW-1): the verifier's proof (h). */
+  /** The basin seeds (the composer's, from `layouts/world_api.py`, written since NW-1): the verifier's proof (h). */
   basins?: Record<string, CellXY>;
   /** The composer's wall and barrier cuts by name (the mutation rows GT-13 / GT-35). */
   cuts?: Record<string, CellXY[]>;

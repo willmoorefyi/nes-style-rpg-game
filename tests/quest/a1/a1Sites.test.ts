@@ -2,7 +2,7 @@
  * NW-3 (docs/NATURAL_WORLD_PLAN.md 3.6.5): today's act-1 world tests rewritten against the NW world source
  * (committed sources only; `tests/quest/a1/a1_o_sites`, `bridgePatch`, `pravokaChannel`, `tests/data/act1Flow` and
  * `overworldLayout` keep testing today's compiled world until NW-5). Matoya and Pravoka sit at their act-1 pins within
- * 2 cells of `maps-nw/world-anchors.yaml`'s targets with their doors one cell off; the brig waits at the Pravoka quay
+ * 2 cells of `assets/data/world-anchors.yaml`'s targets with their doors one cell off; the brig waits at the Pravoka quay
  * for BIKKE_DEFEATED; the cairn blocks and is read from the pass; the north bridge's patch and gates (GT-2) and its
  * foreman; the quay dock in the Aldi; and from Cornelia the temple door and both bridge gates are reachable, the
  * north shore is not (act1Flow).
@@ -14,7 +14,7 @@ import { grid, nw, reach, steps, walkable, withBridge, type XY } from './nwA1.js
 
 const g = grid(nw);
 const E = nw.entrances;
-const anchors = (parse(readFileSync('assets-src/maps-nw/world-anchors.yaml', 'utf-8')) as {
+const anchors = (parse(readFileSync('assets/data/world-anchors.yaml', 'utf-8')) as {
   anchors: Array<{ entrance: string; target: XY }>;
 }).anchors;
 const patch = nw.patches.find((p) => p.id === 'north_bridge')!;
