@@ -16,6 +16,7 @@ import { FlightBillboards, type BillboardFrame } from './FlightBillboards.js';
 import { NearDetail } from './NearDetail.js';
 import { nearProfile, type ChunkHost, type NearWindow } from './FlightStream.js';
 import { horizonY, type ViewParams } from './mode7Math.js';
+import { watchFlightContext, type ContextEvent } from './FlightContext.js';
 
 export interface FlightRendererOptions {
   parent: Container;
@@ -25,6 +26,8 @@ export interface FlightRendererOptions {
   webgl2: boolean;
   renderer: Renderer;
   hasFlag: (flag: string) => boolean;
+  /** The WebGL context was lost, restored and redrawn, or could not be redrawn (M7-6, 7). */
+  onContext?: (event: ContextEvent, err?: unknown) => void;
 }
 
 export interface FlightFrame extends BillboardFrame {
@@ -44,11 +47,22 @@ export class FlightRenderer {
   private horizon = -1;
   private fogY = NaN;
   private destroyed = false;
+  private readonly unwatch: () => void;
 
   constructor(private readonly opts: FlightRendererOptions) {
     this.container.label = 'mode7';
     this.container.visible = false;
     opts.parent.addChildAt(this.container, Math.min(opts.at, opts.parent.children.length));
+    this.unwatch = watchFlightContext(opts.renderer?.canvas, () => this.restore(),
+      (event, err) => opts.onContext?.(event, err));
+  }
+
+  /** After a context restore the render textures are blank: the atlas reloads its freed source and recomposes, and
+   *  the near detail redraws its whole window at the next draw. Rejects when the atlas cannot be reloaded. */
+  async restore(): Promise<void> {
+    if (this.destroyed || !this.atlas?.texture) return;   // not loaded yet: the load composes after the restore
+    await this.atlas.restore();
+    this.near?.invalidate();
   }
 
   /** The atlas (composed, its source freed) and the vehicle sheet; rejects when the atlas is missing. */
@@ -114,6 +128,7 @@ export class FlightRenderer {
 
   destroy(): void {
     this.destroyed = true;
+    this.unwatch();
     this.strips?.destroy();
     this.sky?.destroy();
     this.billboards?.destroy();

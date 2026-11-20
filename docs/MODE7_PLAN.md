@@ -522,6 +522,10 @@ There is no new key. Cancel opens the field menu as today: the menu scene is not
   3. **The setting.** `topdown` gives `off`; otherwise `full`.
 - **The frame-time switch.** A steady-flight frame-time p95 above 20 ms over 120 frames sets `slow` for the session
   with `console.warn`. Re-choosing Mode 7 in Config clears it. The frames excluded are those of section 9's p95 window.
+  M7-6 reads "over 120 frames" as *staying* above: the p95 of the last 120 steady frames must be above 20 ms on 120
+  steady frames in a row, so a hitch of 10 slow frames or fewer never fires it (a rolling p95 alone fired 6 slow
+  frames, about 0.25 s, into a slowdown). Under `?mode7=1` (or `?mode7=low`) it still sets `slow` and warns, but the
+  view stays on.
 - **Context loss.** On `webglcontextlost` the view marks both render textures dirty and shows the world container (the
   diagnostics banner stays until the restore). On `webglcontextrestored`, `WorldAtlas` reloads the source and
   recomposes (3.1), and `NearDetail` redraws its window. If that throws, the view logs `console.error`, sets `failed`,
@@ -837,7 +841,25 @@ Still open, each with a proposed default that the plan builds unless you say oth
   instead of black); each tilt 42 frames; Up held through a take-off moves on frame 43; frame p95 9.1 ms, update p95
   0.4 ms (120 Hz display); the tilt frames' p95 9.1 ms, max 9.3 ms; artefacts in `~/temp/ff-game/m7_4/`
 - [ ] M7-5 billboards and clouds (priority: medium, effort: 4 h)
-- [ ] M7-6 fallbacks (priority: high, effort: 3 h)
+- [x] M7-6 fallbacks (priority: high, effort: 3 h). Result: `FlightContext.ts` (new, no PixiJS:
+  `watchFlightContext` on the canvas, and `FlightFallback`, the view's `lost` flag and the log lines);
+  `FlightRenderer` watches the canvas and on a restore reloads the atlas (`WorldAtlas.restore` now rejects on a
+  failure) and invalidates the near detail; `FlightView` hides the view while the context is lost or the restore runs
+  (the top-down world shows), and on a failed restore logs one `console.error`, sets `failed` and frees the renderer.
+  The frame-time switch: `SlowRule` in `mode7Toggle.ts` (a 120-frame ring with an over-limit count, no sort per
+  frame), fed by `FlightStats`'s steady frames (the settle and upload frames left out); a session flag
+  (`slowThisSession`, read by `mode7Enabled`'s `slow`), cleared by `ConfigScene` when Mode 7 is chosen again; on a
+  switch the renderer is freed unless the URL keeps the view. `needed()` moved to `mode7Toggle.flightMayCome` (the
+  250-line ceiling). Tests: `tests/scenes/mode7/mode7Fallback.test.ts` (the rule against `p95` over random sequences,
+  the excluded frames, the watcher, the atlas reload, and the field: loss and restore mid-flight, a failed restore,
+  the switch with the setting and with `?mode7=1`, Config clearing it). Browser (headed Chromium, ANGLE Metal, Apple
+  M4 Pro, w_s18_start): `loseContext` mid-flight shows the banner, the hero flies on (75,17 to 68,17), `restoreContext`
+  is back in Mode 7 58 ms later and a further flight north recentres and streams; the only error is the banner's
+  "WebGL context lost". A restore with `mode7*.png` answering 404: one `console.error`, `failed`, top-down flight (with
+  `?mode7=1` too). A 30 ms busy-wait per frame: the switch fires 3.9 s later (p95 34.7 ms) and the flight goes
+  top-down; with `?mode7=1` it warns "the URL keeps the view on" and stays. Precedence: setting Top-down off,
+  `?mode7=1` over it full, `?mode7=0` off, `?mode7=1` with a faked MAX_TEXTURE_SIZE 1024 off, 2048 low, a faked WebGL 1
+  VERSION low. Artefacts in `~/temp/ff-game/m7_6/`
 - [ ] M7-INT (priority: high, effort: 2 h)
 - [ ] M7-7 quarter turns (not scheduled)
 - [ ] M7-8 landmark billboards (optional, Q4)

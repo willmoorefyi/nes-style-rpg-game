@@ -5,6 +5,7 @@
  */
 
 import type { AirshipView } from '../../../core/Settings.js';
+import type { Game } from '../../../core/Game.js';
 
 export type Mode7Profile = 'off' | 'full' | 'low';
 
@@ -43,6 +44,60 @@ export function mode7Enabled(search: string, settings: { airshipView: AirshipVie
   if (url === 'low') return 'low';
   if (caps.slow) return 'off';
   return settings.airshipView === 'topdown' ? 'off' : fit;
+}
+
+/** An airship is raised, parked on `map` or ridden: a flight may come, so the view loads (behind the fade-in, 4.3). */
+export function flightMayCome(g: Pick<Game, 'fieldMode' | 'gameFlags' | 'vehicles'>, map: string): boolean {
+  return g.fieldMode === 'airship' || g.gameFlags.has('AIRSHIP_RAISED')
+    || (g.vehicles ?? []).some((v) => v.type === 'airship' && v.map === map);
+}
+
+/** The frame-time switch (7, M7-6): the p95 frame time of the last `SLOW_WINDOW` steady-flight frames (flightStats
+ *  leaves out the 60 settle frames after the view shows or a tilt ends, and every recentre and upload frame) stays
+ *  above `SLOW_P95_MS` for a whole window, i.e. on `SLOW_WINDOW` steady frames in a row: `slow` for the session, the
+ *  flight goes top-down. A short hitch (10 slow frames or fewer) never fires it. Re-choosing Mode 7 in Config clears
+ *  it. */
+export const SLOW_WINDOW = 120;
+export const SLOW_P95_MS = 20;
+/** p95 is `sorted[floor(0.95 n)]` (flightStats.p95): over the limit exactly when this many frames are over it. */
+export const SLOW_OVER = SLOW_WINDOW - Math.floor(SLOW_WINDOW * 0.95);
+
+let slowSession = false;
+/** The frame-time switch fired this session (page lifetime, not stored). */
+export function slowThisSession(): boolean { return slowSession; }
+export function setSlowSession(slow: boolean): void { slowSession = slow; }
+
+/** The rule over a rolling window of steady frame times: a ring with a count of the frames over the limit, so a
+ *  frame costs no sort and no allocation; `run` counts the frames in a row whose full window was over. */
+export class SlowRule {
+  private readonly ring = new Float64Array(SLOW_WINDOW);
+  private n = 0;
+  private at = 0;
+  private over = 0;
+  private run = 0;
+
+  reset(): void {
+    this.n = 0;
+    this.at = 0;
+    this.over = 0;
+    this.run = 0;
+  }
+
+  /** One steady frame's time in ms; true once a full window's p95 has stayed above the limit for a whole window. */
+  push(ms: number): boolean {
+    if (this.n === SLOW_WINDOW) { if (this.ring[this.at] > SLOW_P95_MS) this.over--; } else this.n++;
+    this.ring[this.at] = ms;
+    if (ms > SLOW_P95_MS) this.over++;
+    this.at = (this.at + 1) % SLOW_WINDOW;
+    this.run = this.n === SLOW_WINDOW && this.over >= SLOW_OVER ? this.run + 1 : 0;
+    return this.run >= SLOW_WINDOW;
+  }
+
+  /** The window's p95 (for the log line; this one sorts). */
+  p95(): number {
+    const s = Array.from(this.ring.subarray(0, this.n)).sort((a, b) => a - b);
+    return s.length ? s[Math.min(s.length - 1, Math.floor(s.length * 0.95))] : 0;
+  }
 }
 
 interface GlLike {

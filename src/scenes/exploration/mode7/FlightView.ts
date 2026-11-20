@@ -22,7 +22,8 @@ import { AIRSHIP_LIFT, TAKEOFF_MS, nativeScale } from '../vehicleLayout.js';
 import { cellToScreen, screenToCell, type ViewParams } from './mode7Math.js';
 import { FLIGHT_VIEW, SHIP_FOOT_Y, TILT_HOLDOFF_FRAMES, TILT_MS, TiltMachine, tiltParams,
   type TiltStart } from './mode7Tilt.js';
-import { capsOf, mode7Enabled, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
+import { capsOf, flightMayCome, mode7Enabled, slowThisSession, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
+import { FlightFallback } from './FlightContext.js';
 import { FlightStream, chunkHost, nearProfile } from './FlightStream.js';
 import { FlightStats } from './flightStats.js';
 
@@ -66,6 +67,7 @@ export class FlightView {
   private readonly stream = new FlightStream();
   private near = nearProfile('full');
   private readonly stats = new FlightStats();
+  private readonly fallback = new FlightFallback(() => { this.failed = true; this.drop(); });   // M7-6 (7)
   readonly report: Record<string, unknown> = { state: 'off', history: this.machine.history };
 
   constructor(private readonly deps: FlightViewDeps) {
@@ -104,27 +106,20 @@ export class FlightView {
     this.renderer?.destroy();
     this.renderer = null;
     this.loadStarted = false;
-    this.ready = false;
+    this.ready = this.fallback.lost = false;   // a lost context belonged to the dropped renderer's listeners
   }
 
   private profile(): Mode7Profile {
     this.caps ??= capsOf((this.deps.game.app as { renderer?: unknown } | undefined)?.renderer);
     this.search ??= typeof location === 'undefined' ? '' : location.search;
-    return mode7Enabled(this.search, getSettings(), { ...this.caps, failed: this.failed });
-  }
-
-  /** An airship is raised, parked here or ridden: the flight may come, so load now (behind the map's fade-in). */
-  private needed(): boolean {
-    const g = this.deps.game;
-    return g.fieldMode === 'airship' || g.gameFlags.has('AIRSHIP_RAISED')
-      || (g.vehicles ?? []).some((v) => v.type === 'airship' && v.map === WORLD_MAP);
+    return mode7Enabled(this.search, getSettings(), { ...this.caps, failed: this.failed, slow: slowThisSession() });
   }
 
   private ensureLoad(): void {
     const map = this.map;
     if (!map || map.id !== WORLD_MAP || this.loadStarted || this.failed) return;
     const profile = this.profile();
-    if (profile === 'off' || !this.needed()) return;
+    if (profile === 'off' || !flightMayCome(this.deps.game, WORLD_MAP)) return;
     this.loadStarted = true;
     this.near = nearProfile(profile === 'low' ? 'low' : 'full');
     const gen = this.generation;
@@ -132,7 +127,8 @@ export class FlightView {
     import('./FlightRenderer.js').then((m) => {
       if (gen !== this.generation) return undefined;
       this.renderer = m.createFlightRenderer({ parent: this.deps.parent, at: this.deps.at, map, profile,
-        webgl2: !!this.caps?.webgl2, renderer: game.app.renderer, hasFlag: (f) => game.gameFlags.has(f) });
+        webgl2: !!this.caps?.webgl2, renderer: game.app.renderer, hasFlag: (f) => game.gameFlags.has(f),
+        onContext: (event, err) => { if (gen === this.generation) this.fallback.context(event, err); } });
       return this.renderer.load();
     }).then(() => {
       if (gen === this.generation && this.renderer) this.ready = true;
@@ -173,7 +169,7 @@ export class FlightView {
     // the tilt ended: a held confirm must not land or board again at once; a held direction moves on (4.3). The
     // steady-flight p95s leave the tilt out and settle again from here
     if (wasBusy && !m.busy) { game.input.holdOff(TILT_HOLDOFF_FRAMES); this.stats.reset(); }
-    const drawn = this.machine.drawn && this.ready && !!this.renderer && !!player;
+    const drawn = this.machine.drawn && this.ready && !!this.renderer && !!player && !this.fallback.lost;
     this.show(drawn);
     if (drawn && player && this.renderer) this.renderer.draw(this.frame(map, player));
     else this.report.marker = false;
@@ -237,9 +233,13 @@ export class FlightView {
     const ms = (this.deps.game.app as { ticker?: { deltaMS: number } } | undefined)?.ticker?.deltaMS;
     this.stats.push(drawn && !this.machine.busy, !!this.renderer?.heavy, performance.now() - t0, ms);
     const s = this.stats;
+    // the frame-time switch (7): top-down for the session and the textures freed, unless the URL keeps the view on
+    const slow = s.slow && !slowThisSession() && !this.fallback.slow(s.slowP95(), () => this.profile() !== 'off');
+    if (slow) { this.show(false); this.drop(); }
     Object.assign(this.report, {
       state: this.machine.state, reason: this.machine.reason, profile: this.profile(), ready: this.ready,
-      failed: this.failed, busy: this.machine.busy, gl: this.caps?.gl ?? '', samples: s.samples,
+      failed: this.failed, slow: slowThisSession(), lost: this.fallback.lost, busy: this.machine.busy,
+      gl: this.caps?.gl ?? '', samples: s.samples,
       textures: this.renderer
         ? { ...this.renderer.textures, chunks: chunkHost(this.deps.tilemap())?.residentTextures ?? 0 } : null,
       heavy: { frames: s.heavyFrames, frameMax: +s.heavyFrameMax.toFixed(2), updateMax: +s.heavyUpdateMax.toFixed(3) },

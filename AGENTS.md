@@ -432,6 +432,16 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `rowOffMap`), so the near detail draws by a clamped edge too. Tests: `tests/scenes/mode7/mode7Tilt.test.ts` (the
   t 0 match corner by corner against a real `Camera`), `mode7TiltScene.test.ts`, the parity tests (each tilt 42 held
   frames, the end state equal).
+- **Mode 7 fallbacks (M7-6, `docs/MODE7_PLAN.md` 7).** Context loss: `FlightRenderer` watches the canvas
+  (`watchFlightContext`, `FlightContext.ts`); while the context is lost or the restore runs, `FlightView` hides the
+  view and the top-down world shows; on `webglcontextrestored` the atlas reloads its freed source and recomposes
+  (`WorldAtlas.restore`, which rejects on a failure) and the near detail redraws its window; a failed restore logs one
+  `console.error`, sets `failed` and the airship flies top-down. The frame-time switch (`SlowRule` in `mode7Toggle.ts`,
+  fed by `FlightStats`'s steady frames): the p95 of the last 120 steady frames above 20 ms for 120 steady frames in a
+  row sets `slow` for the session (`slowThisSession`) with `console.warn`, and the view ends and frees its textures;
+  `?mode7=1` / `?mode7=low` keep the view (they still warn), and choosing Mode 7 again in Config clears it. Tests:
+  `tests/scenes/mode7/mode7Fallback.test.ts`. Browser check: `WEBGL_lose_context` (`loseContext`, `restoreContext`)
+  on `app.renderer.gl`; a slow GPU can be faked from the page with a busy-wait `requestAnimationFrame` callback.
 - **LM5-INT.** A third sheet `landmarks_lm5.*` (SPEC5, pass LM5): `western_keep` 2x3 at (59, 122) (door (60, 124),
   the stair foot at the bottom right; anchor `elf_keep` (60, 125); its top two rows on the watchtower's rock `m`, the
   moat at x 61) and `citadel` 3x3 at (74, 25) (door (75, 27) bottom centre; anchor `ord_citadel` (75, 28); the broken
