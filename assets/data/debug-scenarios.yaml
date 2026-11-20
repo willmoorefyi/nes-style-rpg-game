@@ -2593,12 +2593,12 @@
   enemies: [death_eye, iron_golem]
   background: assets/backgrounds/fiend_hall.webp
 # === end PST ===
-# SMOKE: the volcano smoke experiment (?mute=1&scenario=smoke_volcano&smoke=a..f), the hero just south-east of the crater
+# SMOKE: the volcano smoke check (?mute=1&scenario=smoke_volcano), the hero at the volcano door's entrance
 - id: smoke_volcano
   name: SMOKE - the volcano's smoke (overworld, at the crater's foot)
   mode: field
   map: overworld
-  spawn: [123, 150]
+  entrance: fir_volcano
   fieldMode: walking
   party:
     - { class: warrior, name: WAR, level: 20, equipment: [iron_sword, chain_mail], spells: [] }
