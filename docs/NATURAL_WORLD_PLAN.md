@@ -1516,3 +1516,11 @@ Expected after NW-5:
 - 3: only the pure math tests' synthetic maps.
 - 4: none.
 - 5: only synthetic fixtures, each listed in the NW-5 result.
+
+### Integrator ruling after NW-4 (2026-11-20): the `--region` limit
+
+NW-4 measured every region's raster at 37-55 chunks (85-120 with the ring), so the 70-chunk limit of 3.4 refused every
+`--region` run. Since NW-2's banded painting, a full 256x256 compile peaks at 14.8 GB (under the 26 GB machine limit)
+and `--region a1` with 49 painted chunks at 6.0 GB, so the limit no longer guards memory, only time. `PAINT_LIMIT` is
+now 160 painted chunks, ring included (`terrain/region_chunks.py`); the 24-chunk total-drift refresh rule stands. World
+compiles stay one at a time under the lock.

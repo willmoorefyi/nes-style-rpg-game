@@ -13,7 +13,8 @@ from .frame import CHUNK
 
 OBJ_REACH = 3            # cells: an object's art reaches at most this far outside its footprint (raster windows)
 RING_PAD = 4             # cells beyond a raster window's 1-chunk ring (what a ring chunk's placements read)
-PAINT_LIMIT = 70         # at most this many painted chunks, ring included (the 10 GB `--region` limit, 3.4)
+PAINT_LIMIT = 160        # painted chunks, ring included (3.4; integrator 2026-11-20: a full 256x256 compile now peaks
+                         # at 14.8 GB with banded painting, so this caps time, not memory; NW-4 measured 49 painted at 6.0 GB)
 PAINT_KEYS = ("id", "kit", "kits", "materials", "terrain", "carpet_trim")   # map-wide keys that change pixels
 
 Rect = tuple[int, int, int, int]
