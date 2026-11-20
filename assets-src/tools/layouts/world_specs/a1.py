@@ -102,3 +102,10 @@ def spec() -> RegionSpec:
         template=template(),
         barrier_seeds={"spine": ("cornelia", ("a1_pravoka",), True, True)},
     )
+
+
+def content(g, meta, _ctx=None) -> dict:
+    """Act 1's content beyond its kept pins (NW-RINT: its zones, the map default, Pravoka's lighthouse):
+    `a1/world_a1_nw.py`, for `world_v2_content.merge`."""
+    from a1 import world_a1_nw
+    return world_a1_nw.content(g, meta)

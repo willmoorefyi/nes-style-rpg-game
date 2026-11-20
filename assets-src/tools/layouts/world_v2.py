@@ -58,7 +58,7 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)], **rc["regions"].get(r, {})}
                       for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err + rc["errors"], blocked)
-    ch["coverage"] = RC.coverage(g, meta, doc.get("encounterZones") or [], rc["zones_of"])
+    ch["coverage"] = RC.coverage(g, meta, doc.get("encounterZones") or [], rc["zones_of"], rc["fallback"])
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
 

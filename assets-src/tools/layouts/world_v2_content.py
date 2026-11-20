@@ -13,7 +13,9 @@ owns is in one of its walking zones, every River and Lake cell in one of its can
 Keys of a region's dict (all optional): CONTENT_LISTS; `backdrops` {zone id: {default?, terrain?}}; `checks` (its
 map_checks_region options, written as `regions.<r>.checks`); `region` (more `regions.<r>` keys, e.g. ELF's `land`);
 `patches` {patch id: extra keys} (EARTH's canal dressing). `errors` join the `pins` check; `road_islands` (a cell
-of each of a region's own road networks) become `road_check.islands_ok`.
+of each of a region's own road networks) become `road_check.islands_ok`. Act 1 only: `map` (the map-level keys of
+its fields: `encounters`, `encounterRate`, the default `battleBackgrounds`) and `fallback` (the rects the map
+default holds, for `coverage`).
 """
 from __future__ import annotations
 
@@ -39,7 +41,7 @@ class Ctx:
 
 def merge(g: np.ndarray, meta: dict, ctx: Ctx) -> dict:
     out: dict = {k: [] for k in CONTENT_LISTS}
-    out.update(backdrops={}, regions={}, patches={}, zones_of={})
+    out.update(backdrops={}, regions={}, patches={}, zones_of={}, map={}, fallback={})
     for r in meta["regions"]:
         fn = getattr(importlib.import_module(f"world_specs.{r}"), "content", None)
         if fn is None:
@@ -57,6 +59,11 @@ def merge(g: np.ndarray, meta: dict, ctx: Ctx) -> dict:
             out["patches"].setdefault(pid, {}).update(extra)
         if c.get("encounterZones"):
             out["zones_of"][r] = [z["id"] for z in c["encounterZones"]]
+        if c.get("map"):
+            assert r == "a1", f"{r}: only act 1 sets map-level keys (the fields are the map default)"
+            out["map"] = dict(c["map"])
+        if c.get("fallback"):
+            out["fallback"][r] = list(c["fallback"])
     return out
 
 
@@ -67,17 +74,20 @@ def _mask(shape: tuple[int, int], rects: list) -> np.ndarray:
     return m
 
 
-def coverage(g: np.ndarray, meta: dict, zones: list[dict], zones_of: dict) -> dict:
+def coverage(g: np.ndarray, meta: dict, zones: list[dict], zones_of: dict, fallback: dict | None = None) -> dict:
     """3.8 `coverage` (patches off), for each region that places zones: its walkable cells in a walking zone of its
     own, its River and Lake cells in a canoe zone of its own, and, when it places ship zones (FIRE), each of its sea
-    cells in exactly one of them. `regions` lists each checked region with its covered cells; the others are
-    pending."""
+    cells in exactly one of them. `fallback` {region: rects}: the cells the map default holds by design (act 1's
+    fields). `regions` lists each checked region with its covered cells; the others are pending."""
     walk, wet, sea = gates.walk(g), np.isin(g, ["r", "≈"]), g == "o"
     why, done = [], []
     for r, ids in zones_of.items():
         mine = meta["region"] == meta["regions"].index(r)
         wz, cz = np.zeros(g.shape, bool), np.zeros(g.shape, bool)
         sz, ships = np.zeros(g.shape, np.int16), False
+        if r in (fallback or {}):            # act 1's fields: the map default holds them on foot and by canoe
+            wz |= _mask(g.shape, fallback[r])
+            cz |= _mask(g.shape, fallback[r])
         for z in zones:
             if z["id"] in ids:
                 m, modes = _mask(g.shape, z["rects"]), z.get("modes") or DEFAULT_MODES

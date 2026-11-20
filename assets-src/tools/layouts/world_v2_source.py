@@ -133,9 +133,12 @@ def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spo
     }
     if rc["road_islands"]:                   # a region's own road network (on its own land) is not a stray one
         doc["road_check"]["islands_ok"] = [list(c) for c in rc["road_islands"]]
+    m = dict(rc["map"])                      # act 1's fields: the map default (encounters, rate, backdrops)
+    bb = m.pop("battleBackgrounds", {})
+    doc.update(m)
     doc.update({k: rc[k] for k in ("ambient", "hazards", "encounterZones") if rc[k]})
-    if rc["backdrops"]:
-        doc["battleBackgrounds"] = {"zones": rc["backdrops"]}
+    if bb or rc["backdrops"]:
+        doc["battleBackgrounds"] = {**bb, **({"zones": rc["backdrops"]} if rc["backdrops"] else {})}
     return doc
 
 
