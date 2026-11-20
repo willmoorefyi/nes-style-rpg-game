@@ -48,8 +48,10 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
     blocked |= {tuple(v) for v in meta["entrances"].values()}
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
+    rc = SRC.region_content(g, meta, door_off, blocked | set(docks.values()))   # NW-R: the regions' content
+    objs, insp = objs + rc["objects"], insp + rc["inspect"]
     sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
-    doc = SRC.document(g, meta, trans, objs, insp, sp)
+    doc = SRC.document(g, meta, trans, objs, insp, sp, rc)
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}

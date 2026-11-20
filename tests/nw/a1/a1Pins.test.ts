@@ -77,7 +77,9 @@ describe('act 1 pins (NW-3, 3.6.2)', () => {
     expect(at([sx, sy])).toBe('o');
     const dock = nw.docks.find((d) => d.id === 'a1_pravoka')!;
     expect(at([dock.x, dock.y])).toBe('o');
-    const boulders = (nw.objects ?? []).filter((o) => JSON.stringify(o).includes('"boulder"') && o.name !== 'cairn');
+    // act 1's boulders only (NW-R: other regions' town dressing has stones too)
+    const boulders = (nw.objects ?? []).filter((o) => JSON.stringify(o).includes('"boulder"') && o.name !== 'cairn'
+      && inAct1([o.x - 54, o.y - 44]));
     expect(boulders).toHaveLength(3);
     for (const b of boulders) expect(at([b.x, b.y]), `boulder (${b.x}, ${b.y})`).toBe('.');
     // the city's moat ponds and its stream under the town are today's cells

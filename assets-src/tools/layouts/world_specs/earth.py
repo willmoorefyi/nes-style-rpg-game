@@ -4,8 +4,18 @@ The Duergar isthmus (a curved neck west of the Aldi with its hogback, walls W_we
 pass on it) and the western continent: the western range from sea cliff to sea cliff (barrier `western_range`, the
 giant's tunnel the only crossing), Melmond on its east shore in the range's rain shadow (the badlands), Sarda's wet
 coast west of it, Melmond's strait to the ocean, islands off Sarda.
+
+NW-R EARTH: the giant's two mouths sit 9 cells apart (the west mouth at rel (-87, 3), the east one +1 x inside its
+anchor window), so the ridge between them is 3 rock cells thick where it was 1 (at (64, 157)); the range's line is
+NW-0's (moving it shifts the world-wide forest quantile and so repaints far chunks, 12's locality note), and the
+range is thickened where its cut is thinner than 3 by `earth/world_earth_nw.thicken` (rock on the flanks of its
+thinnest cells, inside its mask). The content (icons, zones, backdrops, the canal's dressing) is
+`earth/world_earth_nw.py`, with the design note.
 """
 from __future__ import annotations
+
+import sys
+from pathlib import Path
 
 from worldgen.bundle import (Barrier, ClimateHint, Continent, Corridor, Dock, IsleField, Pass, RegionSpec, Ridge,
                              SeaLine, SpotDef, WallLine)
@@ -34,7 +44,8 @@ def spec() -> RegionSpec:
                    SeaLine(((-57.5, -14), (-54.5, -14)), 1.7), SeaLine(((-44.5, -14), (-41.5, -14)), 1.7)],
         isles=[IsleField((-118, 8), 10, 4, 104)],
         climate=[ClimateHint("arid", (-70, 18), 10), ClimateHint("wet", (-98, 4), 9)],
-        sites=sites("earth", nudges={"ert_melmond": (-2, 0)}, extra={"ert_giant_west": (-85, 3)}),
+        sites=sites("earth", nudges={"ert_melmond": (-2, 0), "ert_giant": (1, 0)},
+                    extra={"ert_giant_west": (-87, 3)}),
         towns=("ert_melmond",),
         docks=[Dock("ert_dwarf", DWARF_DOCK, "aldi", "ert_dwarf"),
                Dock("ert_melmond", MELMOND_DOCK, "ocean", "ert_melmond")],
@@ -55,3 +66,13 @@ def spec() -> RegionSpec:
                SpotDef("ert_s_melmond_ship", "dock:ert_melmond", (0, 0), "dock"),
                SpotDef("ert_s_melmond_airship", "ert_melmond", (-2, -3), "landing")],
     )
+
+
+def content(g, meta: dict, doors: dict, taken: set) -> dict:
+    """EARTH's content on the generated ground (objects, inspect cells, zones, backdrops, the canal's dressing, its
+    map checks): `earth/world_earth_nw.py` (NW-R EARTH)."""
+    here = str(Path(__file__).resolve().parents[1] / "earth")
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import world_earth_nw  # noqa: PLC0415
+    return world_earth_nw.content(g, meta, doors, taken)

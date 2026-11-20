@@ -76,6 +76,28 @@ def act1_people(g: np.ndarray, keep: np.ndarray) -> tuple[list[dict], list[dict]
     return npcs, ships
 
 
+CONTENT_KEYS = ("objects", "inspect", "npcs", "encounterZones", "ambient")
+
+
+def region_content(g: np.ndarray, meta: dict, door_off: dict, taken: set) -> dict:
+    """NW-R: each region spec module's optional `content(g, meta, doors, taken)` (its objects, inspect cells, NPCs,
+    zones, ambient, zone backdrops and patch dressing by patch id), merged in REGIONS order. A region may stamp its
+    own cells of `g` (its icon footprints, rock)."""
+    import importlib
+    out: dict = {**{k: [] for k in CONTENT_KEYS}, "backdrops": {}, "patches": {}}
+    for r in meta["regions"]:
+        fn = getattr(importlib.import_module(f"world_specs.{r}"), "content", None)
+        if fn is None:
+            continue
+        c = fn(g, meta, door_off, taken)
+        for k in CONTENT_KEYS:
+            out[k] += c.get(k, [])
+        out["backdrops"].update(c.get("backdrops", {}))
+        for pid, extra in c.get("patches", {}).items():
+            out["patches"].setdefault(pid, {}).update(extra)
+    return out
+
+
 def covered(objs: list[dict]) -> set:
     """Every cell of an object's parts box (no spot is resolved under an icon or a deco)."""
     out = set()
@@ -107,10 +129,20 @@ def reach_roots(g: np.ndarray, ents: dict, cover: set) -> list:
     return roots
 
 
-def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict) -> dict:
+def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict,
+             rc: dict | None = None) -> dict:
     ents = dict(meta["entrances"])
     ents = {"cornelia": ents.pop("cornelia"), **ents}       # the first entrance is the reachability root
     npcs, ships = act1_people(g, meta["keep"])
+    rc = rc or {}
+    extra = {k: rc[k] for k in ("encounterZones", "ambient") if rc.get(k)}
+    if rc.get("backdrops"):
+        extra["battleBackgrounds"] = {"zones": rc["backdrops"]}
+    return {**_document(g, meta, trans, objs, insp, spots, ents, npcs + rc.get("npcs", []), ships,
+                        rc.get("patches", {})), **extra}
+
+
+def _document(g, meta, trans, objs, insp, spots, ents, npcs, ships, pextra) -> dict:
     return {
         "id": "overworld", "name": "World Map", "kits": ["overworld", "town", "temple"], "music": "overworld",
         "camp": True, "terrain": "organic", "sealed_edges": True,
@@ -122,7 +154,8 @@ def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spo
         "npcs": npcs, "vehicles": ships,
         "patches": [{"id": "north_bridge", "flag": "BRIDGE_BUILT", "ground": "=",
                      "cells": [list(c) for c in meta["bridge"]]},
-                    {"id": "canal", "flag": "CANAL_OPEN", "ground": "o", "cells": [list(c) for c in meta["canal"]]}],
+                    {"id": "canal", "flag": "CANAL_OPEN", "ground": "o", "cells": [list(c) for c in meta["canal"]],
+                     **pextra.get("canal", {})}],
         "docks": meta["docks"], "spots": spots,
         "world": {"basins": {k: list(v) for k, v in meta["seeds"].items()}},
     }
