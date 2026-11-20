@@ -62,13 +62,20 @@ def _road_check(src: dict, c, spec: dict) -> list[str]:
     for x, y in marks:
         if 0 <= x < c.width and 0 <= y < c.height:
             allowed[y, x] = True
-    bad = []
+    bad, stubs = [], []
     for cap in road_caps(road, spec.get("cap_width", 2)):
-        if any(c.mat[y, x] == "bridge" or allowed[y, x] for x, y in cap) or _touches(allowed, cap):
+        if any(c.mat[y, x] == "bridge" or allowed[y, x] for x, y in cap):
+            continue
+        if _touches(allowed, cap):
+            if spec.get("no_stubs"):             # NW 3.10: a road ends on its gate / end cell, never one cell off it
+                stubs.append(cap[0])
             continue
         bad.append(cap[0])
     if bad:
         errors.append(f"road_check: dead ends that reach no gate, door, bridge or listed end: {_cells(bad, 10)}")
+    if stubs:
+        errors.append("road_check: stubs ending one cell off a gate, door or listed end (no_stubs): "
+                      + _cells(stubs, 10))
     # icons hiding roads (opt-in: towns have stalls and fountains on cobble on purpose)
     under = [(x, y) for (x, y) in c.owner if road[y, x] and int(c.collision[y, x]) in BLOCKED] if spec.get("check_under") else []
     if under:

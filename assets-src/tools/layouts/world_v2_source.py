@@ -1,10 +1,11 @@
 """The composer v2's content and writer (docs/NATURAL_WORLD_PLAN.md 3.1 `stamps` / `source`, 3.3, 5.2; NW-2).
 
 On the generated ground the composer places the world's content: every overworld transition and key-item gate at its
-entrance's new cell (act 1's by the pin rule, the others at their door offset from today's world), act 1's objects
-and inspect cells where they lie wholly in its kept cells (NW-0's rule; the other regions' icons and dressing are
-their NW-R work), the patches, the docks and the spots. `write` emits `assets-src/maps-nw/overworld.yaml` in the
-map-source format of `common.write_map` (header, the head keys, the ground block, the rest).
+entrance's new cell (act 1's from its pins, `a1/world_a1_pins.py`; the others at their door offset from today's
+world, `world_specs/today_doors.py`), act 1's objects, inspect cells, NPCs and its vehicle where they lie wholly in
+its kept cells (NW-0's rule; the other regions' icons and dressing are their NW-R work), the patches, the docks and
+the spots. `write` emits `assets-src/maps-nw/overworld.yaml` in the map-source format of `common.write_map` (header,
+the head keys, the ground block, the rest).
 """
 from __future__ import annotations
 
@@ -13,8 +14,9 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from world_api_v2 import A1_DELTA
-from world_specs import a1_today as T
+from a1 import world_a1_pins as P
+from world_specs import today_doors as TD
+from worldgen import spec as S
 from worldgen.gates import BLOCK
 from worldgen.geom import components, flood
 
@@ -22,35 +24,31 @@ OUT = Path(__file__).resolve().parents[2] / "maps-nw" / "overworld.yaml"
 HEAD = ("id", "name", "kits", "music")
 
 
-def _a1(x: int, y: int) -> tuple[int, int]:
-    return (x + A1_DELTA[0], y + A1_DELTA[1])
+def _a1(o: dict) -> dict:
+    """An act-1 record (Cornelia-relative x, y) at its world cell."""
+    x, y = S.world((o["x"], o["y"]))
+    return {**o, "x": x, "y": y}
 
 
 def doors() -> tuple[dict, dict]:
-    """(entrance -> door offset, entrance -> door targetMap), from today's transitions."""
-    d = T.door_of()
+    """(entrance -> door offset, entrance -> door targetMap): act 1's from its pins, the rest from today's world."""
+    d = {**TD.door_of(P.ENTRANCES, P.TRANSITIONS), **TD.door_of(TD.entrances(), TD.transitions())}
     return {e: off for e, (off, _t) in d.items()}, {e: t["targetMap"] for e, (_o, t) in d.items()}
 
 
 def transitions(sites: dict) -> list[dict]:
-    """Today's overworld transitions at their entrances' new cells (each once, in today's order)."""
-    ents = T.entrances()
-    out = []
-    for t in T.transitions():
-        near = sorted((abs(t["x"] - x) + abs(t["y"] - y), e) for e, (x, y) in ents.items()
-                      if abs(t["x"] - x) + abs(t["y"] - y) <= 1)
-        e = near[0][1]
-        if e in T.ENTRANCES:
-            x, y = _a1(t["x"], t["y"])
-        else:
-            ex, ey = ents[e]
-            x, y = sites[e][0] + t["x"] - ex, sites[e][1] + t["y"] - ey
-        out.append({**t, "x": int(x), "y": int(y)})
+    """Every overworld transition at its entrance's new cell: act 1's pins, then today's others (today's order)."""
+    out = [_a1(t) for t in P.TRANSITIONS]
+    ents = TD.entrances()
+    for t in TD.transitions():
+        e = t.pop("_entrance")
+        ex, ey = ents[e]
+        out.append({**t, "x": int(sites[e][0] + t["x"] - ex), "y": int(sites[e][1] + t["y"] - ey)})
     return out
 
 
 def gates() -> list[dict]:
-    return [{**g, "x": _a1(g["x"], g["y"])[0], "y": _a1(g["x"], g["y"])[1]} for g in T.gates()]
+    return [_a1(g) for g in P.GATES]
 
 
 def _inside(keep: np.ndarray, x: int, y: int, w: int, h: int) -> bool:
@@ -62,17 +60,20 @@ def _inside(keep: np.ndarray, x: int, y: int, w: int, h: int) -> bool:
 def act1_content(keep: np.ndarray) -> tuple[list[dict], list[dict]]:
     """Act 1's objects and inspect cells that lie wholly (with a one-cell ring) in its kept cells."""
     objs = []
-    for o in T.objects():
-        x, y = _a1(o["x"], o["y"])
+    for o in map(_a1, P.OBJECTS):
         parts = o.get("parts") or [[None]]
-        if _inside(keep, x, y, max(len(r) for r in parts), len(parts)):
-            objs.append({**o, "x": x, "y": y})
-    insp = []
-    for i in T.inspect():
-        x, y = _a1(i["x"], i["y"])
-        if _inside(keep, x, y, 1, 1):
-            insp.append({**i, "x": x, "y": y})
+        if _inside(keep, o["x"], o["y"], max(len(r) for r in parts), len(parts)):
+            objs.append(o)
+    insp = [i for i in map(_a1, P.INSPECT) if _inside(keep, i["x"], i["y"], 1, 1)]
     return objs, insp
+
+
+def act1_people(g: np.ndarray, keep: np.ndarray) -> tuple[list[dict], list[dict]]:
+    """Act 1's NPCs (the bridge workers, the tomb chest) on their kept walkable cells, and its vehicle (the brig at
+    the `a1_pravoka` dock) on its kept Water cell."""
+    npcs = [n for n in map(_a1, P.NPCS) if _inside(keep, n["x"], n["y"], 1, 1) and g[n["y"], n["x"]] not in BLOCK]
+    ships = [v for v in map(_a1, P.VEHICLES) if keep[v["y"], v["x"]] and g[v["y"], v["x"]] == "o"]
+    return npcs, ships
 
 
 def covered(objs: list[dict]) -> set:
@@ -109,12 +110,16 @@ def reach_roots(g: np.ndarray, ents: dict, cover: set) -> list:
 def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict) -> dict:
     ents = dict(meta["entrances"])
     ents = {"cornelia": ents.pop("cornelia"), **ents}       # the first entrance is the reachability root
+    npcs, ships = act1_people(g, meta["keep"])
     return {
         "id": "overworld", "name": "World Map", "kits": ["overworld", "town", "temple"], "music": "overworld",
         "camp": True, "terrain": "organic", "sealed_edges": True,
         "no_unreachable_walkable": {"reach_roots": reach_roots(g, ents, covered(objs))},
         "unreachable_ok": unreachable(g, ents),
+        "road_check": {"materials": ["dirt"], "ends": [list(S.world(P.TOMB_END))], "check_under": True,
+                       "no_stubs": True},             # act 1's roads (3.10: no stub by Cornelia's gates)
         "entrances": ents, "transitions": trans, "keyItemGates": gates(), "objects": objs, "inspect": insp,
+        "npcs": npcs, "vehicles": ships,
         "patches": [{"id": "north_bridge", "flag": "BRIDGE_BUILT", "ground": "=",
                      "cells": [list(c) for c in meta["bridge"]]},
                     {"id": "canal", "flag": "CANAL_OPEN", "ground": "o", "cells": [list(c) for c in meta["canal"]]}],

@@ -8,7 +8,8 @@ reachable exit. Opt-in per source map:
                                              road cells (and bridges) form one 4-connected component; every road end
                                              (a 1-wide tip or a cap of a road up to cap_width wide) touches a
                                              transition, an entrance, a key-item gate, a bridge or a listed end;
-                                             no road cell is under a blocked object cell
+                                             no road cell is under a blocked object cell; `no_stubs: true` (NW 3.10):
+                                             an end must hold such a cell itself, not merely touch one
   warp_leaves: true                          every transition cell has at most one walkable 4-neighbour outside its
                                              own object (no junction is a warp)
   min_blob: {mountain: 3, sand: 3, forest: 3, ocean_inlet: 2}

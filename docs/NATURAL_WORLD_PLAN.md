@@ -1170,7 +1170,7 @@ uses an entrance name.
 - [ ] User answers Q3, Q4a, Q7, Q8, Q9 (priority: medium, effort: 0.5h)
 - [x] NW-1 contract and spots, with today's world recompiled (2026-11-20; result in 11)
 - [x] NW-2 generator (2026-11-20; result in 12)
-- [ ] NW-3 act 1 regenerated and re-pinned (priority: high, effort: 9h)
+- [x] NW-3 act 1 regenerated and re-pinned (2026-11-20; result in 13)
 - [ ] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (priority: high, effort: 11h)
 - [ ] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND (priority: medium, effort: 42h)
 - [ ] M7-5, M7-6, M7-INT merged before NW-5 (priority: medium, effort: external)
@@ -1359,6 +1359,62 @@ everything under `assets/maps` and `assets-src/maps` are unchanged.
   `build_map.write()`: the peak is in the painting.
 - The per-continent knobs (`Continent.knobs`: `detail`, `finger`, `fjord`) are in `shape.py`; no spec sets one yet
   (NW-R tunes WIND, ORDEAL and WATER), so B is untouched.
+
+## 13. NW-3 result (act 1)
+
+Branch `nw-3` from `mainline` 4415002d. Today's world is unchanged (`git diff --exit-code assets/maps
+assets-src/maps` clean); `world_specs/a1_today.py` is deleted and nothing of act 1 is read from today's source at
+compose time.
+
+- **The pins (3.6.2).** `layouts/a1/world_a1_derive.py` (243 lines; `--check` exits 1 when stale) reads today's
+  source and `overworld_consts.py` and writes `layouts/a1/world_a1_pins.py` (163 lines, generated), every cell
+  Cornelia-relative (rel = p_today - (92, 111); world = CORNELIA_NW (146, 155) + rel, delta (+54, +44)). From the
+  source: 9 entrances, 7 transitions, the 2 bridge gates, 15 objects, 4 inspect cells, 3 NPCs (the two bridge
+  workers, the tomb chest), the brig, 13 spots, the 6 `north_bridge` cells, the `a1_pravoka` dock, the Aldi seed and
+  the 3 jetty cells above it; from the consts: the city icon (20 cells), Pravoka's (9) and the temple's (6), the 8
+  moat ponds, both footbridges, the tomb and TOMB_END, the 3 boulders, the spine (7 points) and the road network
+  (8 roads); NW-0's design parameters: the template grid (74 x 82 from rel (-28, -47): 750 kept cells, 2,798 land
+  cells), the 3 kept rects, the sound's line and the channel rect; and `TODAY_WALKS`, 3.6.3's table measured on
+  today's ground. With NW-0's roads the composed source was byte-identical to NW-2's (checked before the road fix).
+  The other regions' doors are read from today's source by `world_specs/today_doors.py` until their NW-R tranches.
+- **The checks (3.6.3).** `a1/world_a1_checks.py` (128 lines): `act1` adds `spine_only_bridge`, `two_bridge_gates`,
+  `tomb_end_on_road`, `stubs` and `pins_bad` (every pin cell's material) to NW-0's promises; `walks` reads today's
+  figures from the pins. `world_v2.py` prints `act1: OK`, `walks: OK` and every other line OK; G-NW1-3, the land,
+  the exemptions, the jogs and every NW-2 figure are unchanged but the grass share (42.4 -> 42.5 %, the road ring).
+- **Cornelia's road stubs (3.10).** Today's kept roads by the gates are gone (`road_keep` radius 0); the roads are
+  today's network routed through its points: the N, W, E and S gate roads start on their warp cells, the ring joins
+  them, the temple road, the east road over the footbridge into the tomb road, the S road to the jetty and the
+  footbridge road. Every road tip is now a gate, door, entrance, bridge or TOMB_END cell. `road_check` gains
+  `no_stubs: true` (`map_checks_terrain`: a dead end must hold such a cell, not touch one; `map_selftest` +2 cases)
+  and the NW source carries `road_check: {materials: [dirt], ends: [TOMB_END], check_under: true, no_stubs: true}`;
+  the scratch compile passes it. On NW-2's roads the new check fails on the stubs round the city ((150, 148), (151, 149), ...).
+- **Walks** (BFS on foot, `tests/nw/a1/a1Walks.test.ts`): gate -> bridge 22 / 22, Cornelia -> Temple 23 / 23,
+  bridge -> Pravoka 59 / 61 (+3.4 %), bridge -> Matoya 39 / 39 (today / NW; NW-0's 22 / 23 / 61 / 39).
+- **Tests** (`tests/nw/a1/`, committed sources only): `a1Pins` (the pins derived and current; every act-1 entrance,
+  door, gate, patch cell, dock, spot, object, inspect cell, NPC and the brig at today + (54, 44); the pin materials;
+  the promises; the roads: `no_stubs`, every tip a mark, one network), `a1Walks`, `a1Sites` (a1_o_sites,
+  bridgePatch, pravokaChannel and act1Flow against the NW source), helper `nwA1.ts`.
+- **Compile and review.** `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/nw-3/out`: OK (every map
+  check, `road_check` with `no_stubs` included), 231 s, peak footprint 14.8 GB (max RSS 13.3 GB). Matoya's cave mouth
+  is drawn again (NW-2's world had none). `build_map.py --check-determinism overworld --src-dir assets-src/maps-nw`:
+  `overworld: deterministic`; the source is identical under PYTHONHASHSEED 0 and 1 (`worldgen/selftest.py`).
+  Images in `~/temp/ff-game/nw_3/`: `NW3_side_by_side_cornelia.png`, `NW3_side_by_side_mainland.png` (today beside
+  NW, 1x) and the four single crops.
+
+**Deviations from the plan text:**
+
+- `world_a1_pins.py` is generated by a separate script (`world_a1_derive.py`) rather than hand-kept, so "derived by
+  script" is checkable (`--check`, run by `a1Pins.test.ts`). It reads today's source, so at NW-5 (when today's source
+  is replaced) the derive script and its test retire and the pins file becomes the source.
+- Two NW-0 keep parameters grew so act 1's content fits its kept cells: Matoya's disc 2.5 -> 3.0 (her cave-mouth
+  icon is now placed) and the jetty rect y 121 -> 122 (the pier's inspect cell). 5 ground cells round Matoya changed;
+  no figure moved. The lighthouse (on the range strip, regenerated as W_east) is still not placed.
+- Act 1's NPCs and the brig are placed (`world_v2_source.act1_people`) on kept cells; the plan left NPCs to NW-R,
+  but act 1 has no NW-R tranche.
+- The landing spot `a1_s_temple_airship` resolves one cell north of its pin (the routed temple road now runs over
+  the pin cell); the tests allow a landing spot within 2 cells of its pin.
+- Not done here (NW-5 or a follow-up): act 1's zone areas and the coverage rule (3.6.4; the NW source still has no
+  zones), and the move of `tests/nw/a1/` into `tests/quest/a1/`.
 
 ## Appendix A. Coordinate-inventory checklist (gates NW-5, G-NW10)
 
