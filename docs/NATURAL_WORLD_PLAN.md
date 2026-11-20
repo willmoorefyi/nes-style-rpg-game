@@ -1396,7 +1396,8 @@ compose time.
   bridgePatch, pravokaChannel and act1Flow against the NW source), helper `nwA1.ts`.
 - **Compile and review.** `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/nw-3/out`: OK (every map
   check, `road_check` with `no_stubs` included), 231 s, peak footprint 14.8 GB (max RSS 13.3 GB). Matoya's cave mouth
-  is drawn again (NW-2's world had none).
+  is drawn again (NW-2's world had none). `build_map.py --check-determinism overworld --src-dir assets-src/maps-nw`:
+  `overworld: deterministic`; the source is identical under PYTHONHASHSEED 0 and 1 (`worldgen/selftest.py`).
   Images in `~/temp/ff-game/nw_3/`: `NW3_side_by_side_cornelia.png`, `NW3_side_by_side_mainland.png` (today beside
   NW, 1x) and the four single crops.
 
