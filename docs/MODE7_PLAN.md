@@ -785,6 +785,7 @@ Closed by the rulings of 2026-11-19:
 - **Q6 Speed:** unchanged, 10 cells/s (user: faster flight not wanted in the first version).
 - **Q8 Clouds:** sky clouds only, no cloud shadows (user).
 - **Q9 Landing marker:** on (user).
+- **M7-0 preset:** A, classic (18 deg, h 6, kappa 1/600, horizon row 390), the plan's flight values (user, 2026-11-19).
 
 Still open, each with a proposed default that the plan builds unless you say otherwise:
 
@@ -797,7 +798,7 @@ Still open, each with a proposed default that the plan builds unless you say oth
 - [x] Rev 2: the rulings and momus's 12 items (2026-11-19)
 - [x] Rev 3: momus re-review, 3 items and the suggestions (2026-11-19)
 - [x] Momus review of rev 3: OKAY; rev 3.1 fixed its last item (2026-11-19)
-- [ ] M7-0 pilot; the user picks a preset (priority: high, effort: 6 h)
+- [x] M7-0 pilot; the user picked preset A (priority: high, effort: 6 h)
 - [ ] M7-1 atlas pipeline (priority: high, effort: 3 h)
 - [ ] M7-2 flight, default still top-down (priority: high, effort: 7 h)
 - [ ] M7-3 near detail, default on; the user's live test (priority: high, effort: 6 h)
