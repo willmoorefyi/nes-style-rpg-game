@@ -1524,3 +1524,39 @@ NW-4 measured every region's raster at 37-55 chunks (85-120 with the ring), so t
 and `--region a1` with 49 painted chunks at 6.0 GB, so the limit no longer guards memory, only time. `PAINT_LIMIT` is
 now 160 painted chunks, ring included (`terrain/region_chunks.py`); the 24-chunk total-drift refresh rule stands. World
 compiles stay one at a time under the lock.
+
+## NW-R ORDEAL result
+
+Branch `nw-r-ordeal` from `mainline` 966edbf1. Today's world is unchanged (`world.py` re-run: `git diff --exit-code
+assets/maps assets-src/maps` clean).
+
+- **Spec** (`world_specs/ordeal.py`): the Citadel is a crescent arc (midline knots with an outer and an inner
+  half-width, `_arc`) whose bay opens south-east toward Cardia, held clear of Onrac and Gaia (NW-4's polygon had
+  grown into one landmass with both); the spine along its outer side and a crag spur for the gate; the bay as a sea
+  disc and a mouth line; two `warm` climate hints (the heath and Cardia). Cardia: Bahamut's isle (radius 5.2, a bite
+  for its east bay) and five named islets at fixed cells, plus three look-only islets at fixed cells (no random
+  field): 9 islets, none joined. Pins: `ord_citadel` and `ord_bahamut` at their targets (dx, dy 0).
+- **Content** (`ordeal/world_ordeal_nw.py`, its docstring the design note): the Citadel's 3x3 icon over its door with
+  its top row and the two broken pillars' tops on the crag, the meadow path grass; Bahamut's cave mouth in a notch of
+  rock; the hermit's hut and slate (today's text); 3 heath boulders. Zones `ord_heath` / `ord_isles` (walking and
+  canoe: the arc has streams and a tarn) and `ord_sea` (ship) from the owner grid, today's ids, names and rosters,
+  every walkable and canoe cell covered. Backdrops: heath grassland, isles shoreline, sea ocean; `tundra` grassland,
+  `snow` ice_cave (staged ids; no snow source exists to stage). No dock, NPC, boat or smoke in ORDEAL today.
+- **Metrics**: ORDEAL's coast index 20.1 (NW-4 13.4); world land 27,583 (in band), G2 32.6, G-NW1 / G-NW3 0
+  failing runs, exempt 427, jogs 38; every check line OK. `worldgen/selftest.py`'s B figures updated.
+- **Compile**: `--region ordeal` over a clone of the base: 106 painted chunks, 7.4 GB peak. **Verifier**
+  (`--strict --stage S18 / S19 --maps <compile>`): both `quest-verify: OK` (dragon_zombie L25.1, S19 L24.2).
+
+**Changes outside ORDEAL's files (the integrator's):**
+
+- `worldgen/climate.py`: a `warm` hint kind (cold lowered before the height term, cut at 1.5 radii), and **the forest
+  and sand thresholds fixed** (`Q_FOREST`, `Q_SAND`) at the NW-4 world's quantile values. With global quantiles,
+  ORDEAL's edit moved sand and forest cells in EARTH, FIRE and WIND and made 134 chunks change: `--region` refused
+  (223 painted). With the constants the NW-4 world composes byte-identically and the edit changes 80 chunks.
+- `world_v2.py` / `world_v2_source.py`: the hook `region_content` (each spec module's optional `content(g, meta)`:
+  objects, inspect, NPCs, zones, zone backdrops).
+- `tests/nw/a1/a1Pins.test.ts`: the boulder count limited to act 1's.
+- The base at `base/latest/` is stale against `mainline` (its compiler digest predates 966edbf1's PAINT_LIMIT edit,
+  the only compiler difference): the scratch clone's `build.compiler` was rewritten to today's digest.
+- Still non-local (geography, not thresholds): removing the land bridge wets WIND's west (the westerly sweep), about
+  48 Mirage sand cells become grass; WATER's east coast loses the land NW-4 had joined to ORDEAL.

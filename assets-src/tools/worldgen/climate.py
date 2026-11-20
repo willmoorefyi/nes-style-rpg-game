@@ -2,8 +2,9 @@
 biome table and the tidy.
 
 Moisture is a westerly sweep per row that refills over the sea and drains slowly over land and fast over high ground
-(rain shadow), smoothed across rows, plus a coast term, fbm and the hand climate hints (arid, wet, mild; ragged, never
-discs). Temperature is latitude (cold from about row COLD_Y north) minus elevation, with a noisy cut-off. The biome
+(rain shadow), smoothed across rows, plus a coast term, fbm and the hand climate hints (arid, wet, mild, warm;
+ragged, never discs). Temperature is latitude (cold from about row COLD_Y north) minus elevation, with a noisy cut-off
+and the `warm` hints (NW-R). The biome
 table on (moisture, temperature, elevation) writes the legend chars: ocean `o`, grass `.`, forest `f` (stands), sand
 `s` (deserts and low hot beaches), swamp `w` (wet lowland), tundra `t`, snow `n`, mountain `m`, river `r`, lake `≈`.
 The tidy merges patches under `min_blob` into their neighbours and fills one-cell ocean inlets. NW-0's pilot math;
@@ -24,8 +25,9 @@ TIE = "fstwn."                               # the tidy's tie-break among equall
 # The forest and desert thresholds: NW-0 / NW-2 took them per compose as quantiles over all the land (forest above
 # the 0.72 quantile of `mf`, sand below the 0.05 quantile of `moist`), so any region's land edit moved every
 # region's forest and desert edges (NW-R ELF: its T2 strait alone, 48 land cells, flipped sand in 44 chunks across
-# the world, past `--region`'s PAINT_LIMIT). NW-R ELF froze them at those quantiles of the NW-4 world, bit for bit
-# (the NW-4 world is reproduced exactly), so a region's edit stays local (2.5).
+# the world, past `--region`'s PAINT_LIMIT). NW-R ELF, ORDEAL and WIND each froze them at those quantiles of the NW-4
+# world, bit for bit and with the same values (the NW-4 world is reproduced exactly), so a region's edit stays local
+# (2.5). Integrator ruling (NW-RINT, docs/NATURAL_WORLD_PLAN.md 15): fixed thresholds, one pair, these names.
 Q_FOREST, Q_SAND = 0.8816931895841574, 0.14384668557967306
 
 
@@ -59,6 +61,10 @@ def climate(b: RegionSpec, land: np.ndarray, elev: np.ndarray, field: np.ndarray
     wet = wet * np.clip(1 + 2.2 * fbm(seed + 64, (8, 4, 2)), 0, 2)
     moist += 0.8 * wet
     cold = np.clip((COLD_Y - YY - 40 * fbm(seed + 71, (32, 16, 8, 4))) / 26, 0, 1)
+    for h in b.climate:                      # NW-R ORDEAL: a sheltered lee (cold lowered before the height term,
+        if h.kind == "warm":                 # so its peaks stay snowy; cut at 1.5 radii: nothing far moves)
+            gw = _gauss(h.centre, h.radius)
+            cold = np.clip(cold - 0.9 * gw * np.clip(hn, 0.8, 2) * (gw > np.exp(-6.75 / S.S_STAR ** 2)), 0, 1)
     cold = np.clip(cold + 0.6 * np.clip(elev - 0.45, 0, 1) * (cold > 0.05), 0, 1)
     return moist, cold, wet
 

@@ -114,7 +114,9 @@ describe('NW-R WATER: the anchors, the landings and no dock', () => {
     expect(src.docks.filter((d) => d.id.startsWith('wat') || north.has(key([d.x, d.y])))).toEqual([]);
     for (const d of src.docks) for (const [dx, dy] of DIRS) expect(north.has(key([d.x + dx, d.y + dy]))).toBe(false);
     const on = Object.entries(src.entrances).filter(([, c]) => north.has(key(c))).map(([e]) => e.split('_')[0]);
-    expect([...new Set(on)].sort()).toEqual(['ord', 'wat', 'wnd']);
+    // only the north's (NW-RINT: since NW-R ORDEAL parted the Citadel's crescent from Onrac, WATER's component
+    // may hold WATER's entrances alone)
+    expect([...new Set(on)].every((p) => ['ord', 'wat', 'wnd'].includes(p)) && on.includes('wat')).toBe(true);
     const mine = Object.entries(src.entrances).filter(([, c]) => continent.has(key(c))).map(([e]) => e).sort();
     expect(mine).toEqual(['wat_caravan', 'wat_onrac', 'wat_waterfall']);
   });
