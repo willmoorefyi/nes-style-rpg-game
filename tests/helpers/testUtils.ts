@@ -18,6 +18,7 @@ import { Container, Texture } from 'pixi.js';
 import type { CharacterClassData, EnemyData, MapData } from '../../src/types/index.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
 import { Inventory } from '../../src/entities/Inventory.js';
+import { defaultBoosts } from '../../src/core/Boosts.js';
 import type { BattleSceneDeps } from '../../src/scenes/BattleScene.js';
 
 export function createMockAudio() {
@@ -62,6 +63,7 @@ export function createMockGame(mapData?: MapData) {
     pendingBattle: null,
     gameFlags: new GameFlags(),
     inventory: new Inventory(),
+    boosts: defaultBoosts(),
   };
 }
 

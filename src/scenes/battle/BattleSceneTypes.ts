@@ -5,6 +5,7 @@ import type { Character } from '../../entities/Character.js';
 import type { EnemyData, SpellData } from '../../types/index.js';
 import type { Inventory } from '../../entities/Inventory.js';
 import type { StatusEffect } from '../../battle/StatusEffects.js';
+import type { BattleBoosts } from '../../core/Boosts.js';
 
 export interface BattleSceneDeps {
   input: InputManager;
@@ -31,6 +32,8 @@ export interface BattleSceneConfig {
   rng?: () => number;
   /** The boss form records reachable from `enemies` (CHAOS_FORMS_PLAN 2.2), passed on to the battle logic. */
   forms?: EnemyData[];
+  /** The player's boosts (src/core/Boosts.ts): rewards and escape go to the battle logic, `speed` scales the scene. */
+  boosts?: BattleBoosts;
 }
 
 /** Weighted actions an enemy may take, keyed by enemy id (e.g. make a boss cast). */

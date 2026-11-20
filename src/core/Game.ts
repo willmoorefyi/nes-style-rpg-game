@@ -22,6 +22,7 @@ import { setUiEventBus } from '../ui/uiSounds.js';
 import { wireAudioEvents } from './audioEvents.js';
 import { GAME_WIDTH, GAME_HEIGHT } from './LayoutConstants.js';
 import { HALTED_TEXT, TraceLog, traceEnabled, type Overlay } from './diagnostics.js';
+import { defaultBoosts, type Boosts } from './Boosts.js';
 
 export const WIDTH = GAME_WIDTH;
 export const HEIGHT = GAME_HEIGHT;
@@ -57,6 +58,8 @@ export class Game {
   vehicles: VehicleState[] = [];
   /** `a1`: `playerPosition` is an act-1 overworld cell from a version-1 save, translated on the next field enter. */
   pendingFrame: 'a1' | null = null;
+  /** The playthrough's boosts (src/core/Boosts.ts; save v3): defaults on a new game and for an older save. */
+  boosts: Boosts = defaultBoosts();
 
   /** The scene / error trace, on with `?trace=1` (off by default; src/core/diagnostics.ts). */
   readonly trace: TraceLog | null;
@@ -168,6 +171,8 @@ export class Game {
     fieldMode?: FieldMode;
     vehicles?: VehicleState[];
     frame?: 'a1' | null;
+    /** Missing keeps the current boosts (a retry: they cannot change in battle). */
+    boosts?: Boosts;
   }): void {
     (this as { party: PartyManager }).party = data.party;
     (this as { inventory: Inventory }).inventory = data.inventory;
@@ -178,6 +183,7 @@ export class Game {
     this.fieldMode = data.fieldMode ?? 'walking';
     this.vehicles = data.vehicles ?? [];
     this.pendingFrame = data.frame ?? null;
+    if (data.boosts) this.boosts = { ...data.boosts };
   }
 
   /** A brand-new game: empty party, no gold, items or flags, no map yet, play time 0. */
@@ -189,6 +195,7 @@ export class Game {
       currentMap: '',
       playerPosition: { x: 0, y: 0 },
       playTime: 0,
+      boosts: defaultBoosts(),
     });
     this.pendingEntrance = null;
     this.battleRetry = null;

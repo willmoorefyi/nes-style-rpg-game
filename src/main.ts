@@ -76,6 +76,10 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
     const { LoadScene } = await import('./scenes/LoadScene.js');
     return new LoadScene(game);
   });
+  game.scenes.registerLazy('boosts', async () => {
+    const { BoostsScene } = await import('./scenes/BoostsScene.js');
+    return new BoostsScene(game);
+  });
   game.scenes.registerLazy('config', async () => {
     const { ConfigScene } = await import('./scenes/ConfigScene.js');
     return new ConfigScene(game);

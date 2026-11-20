@@ -42,12 +42,12 @@ const SHIP: VehicleState = { type: 'ship', map: 'overworld', x: 92, y: 121 };
 beforeEach(() => { for (const k of Object.keys(store)) delete store[k]; });
 
 describe('save v2: mode and vehicles', () => {
-  it('saves version 2 with the mode and the parked vehicles, and loads them back', () => {
-    expect(SAVE_VERSION).toBe(2);
+  it('saves (version 3 since pass CHT) with the mode and the parked vehicles, and loads them back', () => {
+    expect(SAVE_VERSION).toBe(3);
     SaveManager.save(0, new PartyManager(), new Inventory(), new GameFlags(), 'overworld', { x: 100, y: 120 }, 9,
       'World', { mode: 'ship', vehicles: [SHIP, { type: 'airship', map: 'overworld', x: 143, y: 160 }] });
     const raw = JSON.parse(store.ff1_save_0);
-    expect(raw.version).toBe(2);
+    expect(raw.version).toBe(3);
     expect(raw.mode).toBe('ship');
     const loaded = SaveManager.load(0)!;
     expect(loaded.fieldMode).toBe('ship');

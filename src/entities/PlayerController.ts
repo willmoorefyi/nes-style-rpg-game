@@ -52,6 +52,8 @@ export class PlayerController {
   /** Pixels the sprite is lifted so a taller-than-tile frame keeps its feet on the tile. */
   private spriteOffsetY = 0;
   private frameHeight = TILE_SIZE;
+  /** The Walk speed boost (src/core/Boosts.ts): multiplies every mode's step speed, on foot and in vehicles. */
+  speedBoost = 1;
 
   constructor(config: PlayerControllerConfig) {
     this.tileX = config.startX;
@@ -91,7 +93,7 @@ export class PlayerController {
     if (this.state === 'moving') {
       const terrain = this.collisionMap.getTerrainType(this.targetX, this.targetY);
       const speedMultiplier = this._currentMode.getSpeedMultiplier(terrain);
-      const effectiveSpeed = this.moveSpeed / Math.max(0.1, speedMultiplier);
+      const effectiveSpeed = this.moveSpeed / Math.max(0.1, speedMultiplier * this.speedBoost);
       this.moveProgress += (dt * 16.67) / effectiveSpeed;
       if (this.moveProgress >= 1) {
         this.tileX = this.targetX;

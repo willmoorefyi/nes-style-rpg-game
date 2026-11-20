@@ -11,6 +11,8 @@ const WHITE = 0xffffff;
 export const FALLEN_GREY = 0x808080;
 const LINE_GAP = 40;
 const BAR_HEIGHT = 16;
+/** The boost indicator's colour (src/core/Boosts.ts `boostSummary`). */
+export const BOOST_TAG_COLOUR = 0xf8d878;
 
 /** What one party row shows (MS-7). Strings are complete labels, ready to draw. */
 export interface PartyRowData {
@@ -63,13 +65,26 @@ export class PartyPanel extends Window {
   private readonly rowsContainer = new Container();
   private readonly rowHeight: number;
   private data: PartyRowData[] = [];
+  private readonly boostTag: BitmapText;
 
   constructor(config: PartyPanelConfig) {
     super({ x: config.x, y: config.y, width: config.width, height: config.rows * config.rowHeight + 48 });
     this.rowHeight = config.rowHeight;
     this.rowsContainer.position.set(this.contentX, this.contentY);
     this.addChild(this.rowsContainer);
+    this.boostTag = new BitmapText({ text: '', style: { fontFamily: NES_FONT, fontSize: FONT_SIZE, fill: BOOST_TAG_COLOUR } });
+    this.boostTag.anchor.set(1, 0);   // right-aligned at the content's bottom-right corner
+    this.boostTag.position.set(this.contentX + this.contentWidth, this.contentY + this.contentHeight - FONT_SIZE);
+    this.addChild(this.boostTag);
   }
+
+  /** The bottom-right indicator of the boosts off their defaults ('' hides it): `BOOST G x4 ENC Off`. */
+  setBoostTag(summary: string): void {
+    this.boostTag.text = summary ? `BOOST ${summary}` : '';
+  }
+
+  /** The indicator as drawn now ('' when every boost is at its default). */
+  get boostText(): string { return this.boostTag.text; }
 
   /** The rows drawn by the last refresh. */
   get rows(): readonly PartyRowData[] { return this.data; }

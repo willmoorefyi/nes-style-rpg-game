@@ -402,6 +402,32 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 - **Ambient smoke (SMOKE):** a map's `ambient: [{kind: smoke, x, y, ox, oy}]` (validated by `schemaValidationAmbient.ts`; the volcano's is `world_fire_data.SMOKE` at (120, 149), art px (26, 12)) is drawn by `FieldAmbient.ts` as `SmokeColumn`s (`src/scenes/exploration/smoke/`) in the style `VOLCANO_SMOKE` (`smokeStyles.ts`; the user's pick, option e of the SMOKE experiment): 7 white cauliflower billows with a dark outline, lit from the top left, r 10 -> 26 art px, rising 110 art px and spreading at the top on a 5.2 s loop, fading by a Bayer dither (binary alpha, 15-bit colours, whole art px). The shapes are `smokeShapes.ts`, the pure motion `smokeMotion.ts`; the bitmaps are shared `GraphicsContext`s built once per art scale, so a frame allocates nothing. Check it with `?mute=1&scenario=smoke_volcano` (Debug on the title screen).
 - **Diagnostics** (`src/core/diagnostics.ts`): `?trace=1` (or `localStorage.ff1_trace = '1'`) logs every scene change, error, rejection, page unload and Vite full reload to the console and `window.__trace`; off by default. A lost WebGL context and a halted game loop always show a banner over the page. The dev server ignores `.claude/` (`vite.config.ts`), which stopped agent worktrees from reloading the page.
 
+### Boosts (pass CHT)
+
+Player-side "cheats" in the Pixel Remaster style: field menu > **Boosts** (`src/scenes/BoostsScene.ts`, lazy `boosts`;
+up / down move, left / right change and stop at the ends, confirm steps forward and wraps, cancel closes). Rules and
+steps live in the pure `src/core/Boosts.ts` (no PixiJS); the values are `Game.boosts`.
+- **Options** (defaults x1, Escape Off): Gold and Experience x0 / x0.5 / x1 / x2 / x3 / x4 (the x0.5 steps go beyond
+  the user's "x0 to x4"); Encounters Off / x0.5 / x1 / x2; Battle speed x1 / x2 / x4; Walk speed x1 / x2; Escape
+  Off / On.
+- **Hook points:** gold and XP in `BattleStateMachine.finish` (`BattleConfig.boosts`, `scaleReward` rounds down: x0.5
+  of 7 G is 3 G; the victory line shows the boosted numbers, `BattleTrigger.onBattleEnd` grants them); the encounter
+  rate in `ExplorationScene` (`EncounterSystem.setRateMultiplier(mode x boost)`; Off rolls no random battle, scripted
+  and boss battles still start); battle speed as one time scale on `BattleScene.update`'s `dt` (messages, waits and
+  animations); walk speed in `PlayerController.speedBoost` (every mode, vehicles too); escape in the Run check of
+  `BattleStateMachine.executeCommand` (certain, but `canRun` false still refuses: bosses, the Chaos form chain).
+  `BattleTrigger` passes `battleBoosts(game.boosts)` in the scene config.
+- **Storage:** per playthrough in the save (v3, `SaveData.boosts`, `parseBoosts`; a v1 / v2 save loads the defaults,
+  a malformed value logs and takes its default). A new game (`Game.resetState`) starts from the defaults; a battle
+  retry keeps them (`restoreState` without `boosts` leaves them, they cannot change in battle).
+- **Indicator:** any value off its default shows `BOOST G x4 ENC Off ...` (`boostSummary`) at the bottom right of the
+  field menu's party panel (`PartyPanel.setBoostTag`).
+- **Verifier:** the progression verifier and the curve model (`src/progression/`, `questCurve.ts`) assume the default
+  rates and never read the boosts; balance tests (`tests/balance/`) run without them. Leave them so.
+- **Tests:** `tests/core/Boosts.test.ts`, `tests/battle/boostsBattle.test.ts`, `tests/systems/boostsSave.test.ts`,
+  `tests/scenes/BoostsScene.test.ts`, `tests/scenes/boostsField.test.ts`. A game mock that reaches the field menu, the
+  field update or a battle trigger needs `boosts: defaultBoosts()` (`createMockGame` has it).
+
 ### Game Over
 
 `GameOverScene` offers **Retry Battle** and **Return to Field** (both restore the pre-battle snapshot `game.battleRetry`; Return to Field puts the party where the fight began with no battle queued), then Load Game and Title. With no snapshot only the last two show. `retryAdvice()` (`src/systems/BattleRetry.ts`) calls the party weak when anyone was fallen or under 25 % HP; then a hint shows and the cursor starts on Return to Field.

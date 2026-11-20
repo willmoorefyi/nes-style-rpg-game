@@ -5,6 +5,7 @@ import type { Game } from '../../src/core/Game.js';
 import type { InputManager } from '../../src/core/InputManager.js';
 import { allTexts, tapInput } from '../helpers/realData.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
+import { defaultBoosts } from '../../src/core/Boosts.js';
 
 const GREY = 0x808080;
 const WHITE = 0xffffff;
@@ -33,6 +34,7 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
       input,
       party: new PartyManager(),
       playTime: 0,
+      boosts: defaultBoosts(),
       scenes: { get: vi.fn(() => ({ canSave: () => canSave, getMapName: () => '' })), push: vi.fn(), pop: vi.fn() },
     };
     const scene = new FieldMenuScene(game as unknown as Game);
@@ -60,6 +62,7 @@ describe('MS-4: Save is drawn enabled where the map allows saving', () => {
       input: tapInput(),
       party: new PartyManager(),
       playTime: 0,
+      boosts: defaultBoosts(),
       scenes: { get: vi.fn(() => ({ canSave: () => allowed, getMapName: () => '' })), push: vi.fn(), pop: vi.fn() },
     };
     const scene = new FieldMenuScene(game as unknown as Game);

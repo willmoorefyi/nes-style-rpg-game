@@ -14,6 +14,7 @@ import { GameFlags } from '../../src/core/GameFlags.js';
 import type { Game } from '../../src/core/Game.js';
 import { loadRealRegistries } from '../helpers/realData.js';
 import { testClass, testEnemy } from '../helpers/testUtils.js';
+import { defaultBoosts } from '../../src/core/Boosts.js';
 
 const DATA = parse(readFileSync('assets/data/debug-sandbox.yaml', 'utf-8')) as SandboxData;
 const KITS = parse(readFileSync('assets/data/kits.yaml', 'utf-8')) as Kits;
@@ -38,6 +39,7 @@ function fakeGame() {
     battleRetry: null as unknown,
     data: { loadEnemies: vi.fn().mockResolvedValue([testEnemy()]), loadSpells: vi.fn().mockResolvedValue([]) },
     input: { isJustPressed: vi.fn(() => false), isPressed: vi.fn(() => false) },
+    boosts: defaultBoosts(),
   };
 }
 
