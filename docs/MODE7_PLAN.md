@@ -781,23 +781,22 @@ Closed by the rulings of 2026-11-19:
   question.
 - **Q3 Default:** Mode 7, with Top-down in Config and `?mode7=0` (D-M8).
 - **Q7 Filtering:** smooth, mipmaps and fog (D-M10).
+- **Q4 Landmarks:** flattened; M7-8 not scheduled (user, 2026-11-19).
+- **Q6 Speed:** unchanged, 10 cells/s (user: faster flight not wanted in the first version).
+- **Q8 Clouds:** sky clouds only, no cloud shadows (user).
+- **Q9 Landing marker:** on (user).
 
 Still open, each with a proposed default that the plan builds unless you say otherwise:
 
-4. **Q4 Landmarks.** Flattened towns and landmarks, or tall ones as upright billboards (M7-8)? **Default:** flattened;
-   M7-8 not scheduled.
 5. **Q5 Ship art.** Is b_7's side view acceptable while flying north (judge at the live test after M7-3)? Try the squash stopgap? Bring T-2
    back now or later? **Default:** b_7, stopgap off, T-2 revisited after the live test after M7-3.
-6. **Q6 Speed.** Keep 10 cells/s in flight, or a faster flight in Mode 7 only? **Default:** unchanged.
-7. **Q8 Clouds.** Code-drawn clouds in the sky band; cloud shadows on the land too? **Default:** sky clouds only.
-8. **Q9 Landing marker.** An outline on the cell under the ship when it can land? **Default:** on.
 9. **Q10 Tilt time.** 700 ms each way, or shorter? **Default:** 700 ms.
 
 ## TODOs
 
 - [x] Rev 2: the rulings and momus's 12 items (2026-11-19)
 - [x] Rev 3: momus re-review, 3 items and the suggestions (2026-11-19)
-- [ ] Momus review of rev 3 (priority: high, effort: 1 h)
+- [x] Momus review of rev 3: OKAY; rev 3.1 fixed its last item (2026-11-19)
 - [ ] M7-0 pilot; the user picks a preset (priority: high, effort: 6 h)
 - [ ] M7-1 atlas pipeline (priority: high, effort: 3 h)
 - [ ] M7-2 flight, default still top-down (priority: high, effort: 7 h)
