@@ -37,9 +37,13 @@ def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> Non
     lab = {m: label == i for i, m in enumerate(names)}
     none = np.zeros((H, W), bool)
     get = lambda m: lab.get(m, none)  # noqa: E731
-    tex = {m: _tile(kit.material(TEX.get(m, m)), H, W) for m in names}
+    mtex = None                                    # NW-2 (G-NW8): one tiled texture alive at a time, not one each
     for m in names:
-        below[lab[m]] = tex[m][lab[m]]
+        tex = _tile(kit.material(TEX.get(m, m)), H, W)
+        below[lab[m]] = tex[lab[m]]
+        if m == "mountain":
+            mtex = tex                             # the foothills read it below
+        del tex
     bayer, core = _bayer(H, W), _core(H, W)
     road_cells = _up(np.isin(mat, ROADS))
     grass, sand = get("grass").copy(), get("sand").copy()
@@ -50,7 +54,7 @@ def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> Non
     grass, sand = beach(below, ocean, grass, sand, core, road_cells, bayer, sand_tex, seed)
     grass, sand = sand_band(below, grass, sand, core, bayer, sand_tex, grass_tex)
     grass = banks(below, get("river") | get("lake"), grass, sand, core, bayer, soil)
-    foothills(below, get("mountain"), grass, ocean, core, bayer, tex.get("mountain"), seed)
+    foothills(below, get("mountain"), grass, ocean, core, bayer, mtex, seed)
     paint_roads(below, mat, kit, seed)
     _forest(below, get("forest"), (grass | sand) & ~road_cells & ~core, kit)
     shallows(below, [get(m) for m in WATERS], {m: get(m) for m in WATERS}, bayer, seed)

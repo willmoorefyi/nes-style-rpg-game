@@ -1169,7 +1169,7 @@ uses an entrance name.
 - [x] Rev 3.2: the pilot's results and fixes (2026-11-20)
 - [ ] User answers Q3, Q4a, Q7, Q8, Q9 (priority: medium, effort: 0.5h)
 - [x] NW-1 contract and spots, with today's world recompiled (2026-11-20; result in 11)
-- [ ] NW-2 generator (priority: high, effort: 16h)
+- [x] NW-2 generator (2026-11-20; result in 12)
 - [ ] NW-3 act 1 regenerated and re-pinned (priority: high, effort: 9h)
 - [ ] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (priority: high, effort: 11h)
 - [ ] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND (priority: medium, effort: 42h)
@@ -1272,6 +1272,93 @@ changes only `overworld.yaml`.
 - debug-scenarios.yaml has 36 world vehicles, not 38.
 - 4.2's "at most 0.05 % of placements may fail" holds with act 1's pins fixed (0 of 20,000); moving act 1's four too
   gives 11.1 %, against today's file's 8.2 % by the same measure, all from act 1's compressed pairs.
+
+## 12. NW-2 result (the generator)
+
+Branch `nw-2` from `mainline` 12e1c511. `python3 -I assets-src/tools/layouts/world_v2.py` (the composer v2) writes
+`assets-src/maps-nw/overworld.yaml`, the 256x256 world at preset B, seed 1987, from the seven region specs
+(`layouts/world_specs/`), with every site, door, dock, patch and the 41 spots placed; today's world, `world.py` and
+everything under `assets/maps` and `assets-src/maps` are unchanged.
+
+- **Files** (every one under 250 lines; `questCeilings.test.ts` finds them): `tools/worldgen/` `geom.py` 171,
+  `bundle.py` 163 (the RegionSpec and the records spec.py lacked), `shape.py` 166, `relief.py` 67, `hydro.py` 147,
+  `climate.py` 99, `roads.py` 65, `stamps.py` 76, `finish.py` 99 (seal, the jog pass), `compose.py` 104,
+  `owners.py` 76, `metrics.py` 136, `gates.py` 184, `prewalk.py` 96, `spots.py` 52, `selftest.py` 170,
+  `selftest_gates.py` 96 (`spec.py` +2: `WallLine.wobble`, `IsleField.owner`); `layouts/world_v2.py` 159,
+  `world_v2_source.py` 140, `world_specs/` (`a1.py` 93, `a1_today.py` 141, `elf.py` 38, `earth.py` 57, `fire.py`
+  52, `ordeal.py` 36, `water.py` 35, `wind.py` 37, `common.py` 37), `a1/world_a1_checks.py` 85;
+  `tools/nw2_selftest.py` 42, `assets-src/tiles_cold.py` 37; `tests/nw/worldSource.test.ts`.
+- **B reproduced.** The pipeline is NW-0's, split by stage. At seed 1987 it gives NW-0's B figure for figure: land
+  28,874, coast edges 5,204, coast index 30.6, G-NW1 0 failing runs (longest non-exempt 6), G-NW3 0 (longest 6 by
+  NW-0's measure, 5 by rev 3.2's land-class measure), 427 exempt cells, 33 jogs, 0 ford cuts (the 4 fords on
+  `a1_pravoka`'s corridor), the shares (grass 42.4, forest 16.8, mountain 15.1, snow 9.2, tundra 6.0, sand 4.9, river
+  2.4, lake 2.4, swamp 0.5 %), the coast index by region (fire 19.4, water 18.3, earth 10.7, ordeal 10.5, a1 9.2, elf
+  8.6, wind 5.7), the anchor table and every check of `B_classic_metrics.json` (basins aldi 3,177 / ocean 33,485,
+  docks, walls, barriers, routes, north, landings, straits, prewalk S0-S14, act1 (2,578 beyond the bridge, 954 on the
+  peninsula), walks 22 / 23 / 61 / 39, detours). Generation 2.35 s. `world_v2.py` prints one line per check and gate;
+  `selftest.py` asserts these figures.
+- **Selftests.** `worldgen/selftest.py` 8 of 8: a square continent ends with no straight run over 6 (the bare square
+  has 80); a ridge becomes mountain along its line with high flanks; every river ends in the sea or a lake; a pinned
+  route connects; 3 corridor crossings give 2 fords and 1 cut; locality; determinism; preset B. `selftest_gates.py`
+  7 of 7: the world passes every check; a river across `western_range` fails `barriers` (the former GT-38); a river
+  from Onrac to Melmond's coast fails `north` (GT-39); a ford on R-ice fails `routes`; a Water cell in W_isthmus fails
+  `walls`; a sea lane from the dwarves' dock to Melmond's fails `basins`; Elfheim's gate ringed with rock passes rev
+  3's prewalk and fails the corrected one with `S4 elf_elfheim`.
+- **Locality (2.5, measured).** Moving one vertex of Gaia's polygon changes 31 land cells, none outside its box plus
+  24 (asserted). On the whole ground 71 cells change and 10 of them lie outside the margin (forest or sand to grass, no
+  land / sea change): the forest and desert thresholds are quantiles over all the land, and the moisture sweep runs
+  the whole row. Reported, not gated; a region tranche that needs strict locality makes those per continent.
+- **Snow and tundra, Python side (2.6).** `build_map.py` LEGEND `t` / `n`, TerrainType 12 / 13 (`TUNDRA`, `SNOW`),
+  `SOFT` and `terrain/base.WILD` appended, `ROUNDED`, and `FALLBACK_MATERIALS` (tundra from grass hue +20, sat 0.45,
+  val 0.95; snow from sand sat 0.08, val 1.25), added only to a map whose ground has them, so today's maps take the
+  same kit; `terrain/metrics.FID_MATS`; `map_checks_spots` lands on Grass or Tundra; `world_geom.WALKABLE`; the legacy
+  sheet `tiles.py` gets rows 11-13 (lake, tundra, snow; `tiles_cold.py`; rows 0-10 of `terrain.png` / `-6x.png` are
+  byte-identical). Selftests: `nw2_selftest.py` (in `build_map.py --selftest`: legend, TerrainType, walking, a landing
+  on tundra, none on snow) and `terrain/selftest.py`'s `_cold_case` (the organic blend: no straight run, every centre
+  its own material).
+- **G-NW8 (the 12 px bake).** The first compile, painted in one window, peaked at **27.8 GB** and failed (over 26 GB):
+  the organic painter tiled every material's texture at full size at once, and tundra and snow are two more
+  materials. Two byte-identical changes fixed it: `terrain.paint_soft` tiles one texture at a time, and a map over
+  192x192 cells is painted in bands of 64 rows each with its ring (`build_map.BAND_*`; checked byte-equal against the
+  one-window paint on two 64x96 and 80x96 crops of this world; today's 192x192 world keeps one window). The full
+  scratch compile `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/nw-2/out` then took **223 s** with a
+  **peak footprint of 14.6 GB** (max RSS 13.1 GB): 256 chunks, the patches, `mode7.png` 3072² at cellPx 12,
+  `mode7_low.png` 1536² at 6, 45 MB in all.
+- **Determinism (G-NW5).** `world_v2.py` writes the same source under PYTHONHASHSEED 0 and 1 (`selftest.py`); `build_map.py
+  --check-determinism overworld --src-dir assets-src/maps-nw` prints `overworld: deterministic` (two full compiles,
+  353 s);
+  `mode7_atlas.py --check-determinism overworld --maps /tmp/nw-2/out` passes; `world.py` re-run leaves `git diff
+  --exit-code assets/maps assets-src/maps` clean.
+- **Review images** (`~/temp/ff-game/nw_2/`): `NW2_overview_vs_NW0_B.png` (the compiled overview beside NW-0's),
+  `NW2_compiled_overview.png`, and the four 1x crops `NW2_crop_aldi_cornelia.png`, `NW2_crop_isthmus.png`,
+  `NW2_crop_onrac_river.png`, `NW2_crop_volcanic_arc.png` (NW-0's rects).
+
+**Deviations from the plan text:**
+
+- The composer v2 is `layouts/world_v2.py` (+ `world_v2_source.py`), not a rewritten `world.py`: `mainline` still
+  builds today's world with `world.py` until NW-5, which renames it. Its source writer emits the act-1 objects and
+  inspect cells wholly inside the kept cells (NW-0's rule); the other regions' icons, dressing, NPCs and zones are
+  NW-R's, so the rough world has no encounter zones yet. Every transition and key-item gate is placed (at its
+  entrance's new cell), and `no_unreachable_walkable.reach_roots` lists every entrance plus one cell of each
+  look-only island, so the compiler reaches every door from its own land.
+- Act 1's template is still read from today's source (`world_specs/a1_today.py`, NW-0's `today.py`) until NW-3
+  derives `a1/world_a1_pins.py`. Two of its keep rects had an edge on a chunk line (0.1.1's kept-rect rule); they are
+  one cell narrower (Pravoka's shore x 124-136, the jetty x 91-94 today). One ground cell differs from NW-0's grid;
+  every figure above is unchanged. `world_v2.py` prints the rule as `kept: OK`.
+- The checks of 3.8 that NW-0 ran are in `worldgen/gates.py` and `prewalk.py` now (NW-4 hardens them: the cuts, the
+  owner-grid `world_checks`, the cells in each message, the G-NW4 lines in `world.py`); act 1's in
+  `a1/world_a1_checks.py` (NW-3 extends it). Prewalk's starts come from quest.yaml's `entry.at` spots (NW-1's
+  rewrite) instead of NW-0's cell table, and its multi-entrance join accumulates its starts (the pilot's re-flood kept
+  only the last map's). The `regions.<r>.raster` key is not written (NW-4); `owners.raster` and
+  `world_v2.py --owned-chunks <r>` compute it.
+- Two small additions to NW-0's pipeline: `climate.tidy_blobs` breaks ties among equally common neighbours by a
+  fixed order (`TIE`) where the pilot iterated a set (its output changed with PYTHONHASHSEED; the order chosen is the
+  one that gives the pilot's committed figures), and `hydro.tarns` ends each of the 4 rivers that reached neither the
+  sea nor a lake in a one-cell tarn (2.4 rule 4; the selftest's "a river reaches the sea"). Neither moves a figure.
+- The low-memory fallback of 3.9 is in the painter (`paint_soft`, the bands of `compile_map`), not in
+  `build_map.write()`: the peak is in the painting.
+- The per-continent knobs (`Continent.knobs`: `detail`, `finger`, `fjord`) are in `shape.py`; no spec sets one yet
+  (NW-R tunes WIND, ORDEAL and WATER), so B is untouched.
 
 ## Appendix A. Coordinate-inventory checklist (gates NW-5, G-NW10)
 

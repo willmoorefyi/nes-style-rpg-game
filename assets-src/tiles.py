@@ -8,12 +8,14 @@ import random
 from PIL import Image
 
 import snes_palette as P
+import tiles_cold
 
 T = 16
 VARIANTS = 4
 TERRAIN_ORDER = [
     "grass", "wall", "water", "mountain", "forest", "desert",
     "swamp", "river", "road", "bridge", "counter",
+    "lake", "tundra", "snow",                  # 11-13: pass NW gives them rows (tiles_cold.py)
 ]
 
 
@@ -298,6 +300,7 @@ GENERATORS = {
     "grass": grass, "wall": wall, "water": water, "mountain": mountain,
     "forest": forest, "desert": desert, "swamp": swamp, "river": river,
     "road": road, "bridge": bridge, "counter": counter,
+    "lake": lambda v, rng: water(v, rng), "tundra": tiles_cold.tundra, "snow": tiles_cold.snow,
 }
 
 

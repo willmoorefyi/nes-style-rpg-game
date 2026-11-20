@@ -287,4 +287,5 @@ def run(B) -> int:
     ok += 2
     ok += __import__("recolor_selftest").run(B)     # W8: the restyled north-bridge debris matches the stubs
     ok += __import__("nw1_selftest").run(B)         # NW-1: spots (passthrough, kinds), the atlas cell size
+    ok += __import__("nw2_selftest").run(B)         # NW-2: tundra and snow (legend, TerrainType, walk, landing)
     return ok
