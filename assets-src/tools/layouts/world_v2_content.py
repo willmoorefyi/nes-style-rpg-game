@@ -69,22 +69,30 @@ def _mask(shape: tuple[int, int], rects: list) -> np.ndarray:
 
 def coverage(g: np.ndarray, meta: dict, zones: list[dict], zones_of: dict) -> dict:
     """3.8 `coverage` (patches off), for each region that places zones: its walkable cells in a walking zone of its
-    own, its River and Lake cells in a canoe zone of its own. The other regions are listed as pending."""
-    walk, wet = gates.walk(g), np.isin(g, ["r", "≈"])
+    own, its River and Lake cells in a canoe zone of its own, and, when it places ship zones (FIRE), each of its sea
+    cells in exactly one of them. `regions` lists each checked region with its covered cells; the others are
+    pending."""
+    walk, wet, sea = gates.walk(g), np.isin(g, ["r", "≈"]), g == "o"
     why, done = [], []
     for r, ids in zones_of.items():
         mine = meta["region"] == meta["regions"].index(r)
         wz, cz = np.zeros(g.shape, bool), np.zeros(g.shape, bool)
+        sz, ships = np.zeros(g.shape, np.int16), False
         for z in zones:
             if z["id"] in ids:
                 m, modes = _mask(g.shape, z["rects"]), z.get("modes") or DEFAULT_MODES
                 wz |= m if "walking" in modes else False
                 cz |= m if "canoe" in modes else False
+                if "ship" in modes:
+                    sz, ships = sz + m, True
         miss = (mine & walk & ~wz) | (mine & wet & ~cz)
+        if ships:                            # a region with ship zones (FIRE's rule): each of its sea cells in one
+            miss |= mine & sea & (sz != 1)
         if miss.any():
             ys, xs = np.nonzero(miss)
-            why.append(f"coverage: {r}: {int(miss.sum())} walkable or canoe cells in no zone of {r}, first "
+            why.append(f"coverage: {r}: {int(miss.sum())} walkable, canoe{' or sea' if ships else ''} cells in no "
+                       f"zone of {r} (or a sea cell in two), first "
                        + ", ".join(f"({x}, {y})" for y, x in list(zip(ys, xs))[:6]))
-        done.append(r)
+        done.append(f"{r} {int((mine & (walk | wet | (sea if ships else False))).sum())}")
     pending = [r for r in meta["regions"] if r not in zones_of]
     return {"ok": not why, "why": why, "regions": done, "pending": pending}
