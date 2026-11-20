@@ -18,6 +18,8 @@ export default defineConfig({
     },
   },
   test: {
+    // per-file timings and the fast-tier guard (tests/timingReporter.ts; tiers: vitest.workspace.ts, tests/tiers.ts)
+    reporters: ['default', './tests/timingReporter.ts'],
     // agent worktrees (.claude/worktrees/*) are full repo copies; their tests are not this checkout's
     exclude: [...configDefaults.exclude, '.claude/**'],
   },

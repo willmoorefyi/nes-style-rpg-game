@@ -61,12 +61,12 @@ function stageBlind(ctx: QuestContext, row: GateRow, stage: string): boolean {
   return otherSkips || (row.stages[0] !== stage && ancestorsOf(ctx.world.stages, stage).has(row.stages[0]));
 }
 
-function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement): MutationResult {
-  const mctx = mutatedContext(ctx, el.apply(ctx.world));
+/** `id`: the element's place in the base world's mutation list (Baseline.freshFor). */
+function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement, id: string): MutationResult {
   const stages = rowStages(row);
   const keys: CheckKey[] = row.nlb ? [{ proof: 'a' }, ...stages.map((s) => ({ proof: 'b' as const, stage: s })), { proof: 'e' }]
     : keysFor(row);
-  const fresh = base.fresh(mctx, keys);
+  const fresh = base.freshFor(id, () => mutatedContext(ctx, el.apply(ctx.world)), keys);
   const out: MutationResult = { row: row.row, element: `${row.element}: ${el.label}`, mutation: row.mutation, caught: false, failures: fresh };
   if (row.nlb) {
     if (fresh.length) return { ...out, caught: true };
@@ -101,7 +101,7 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement)
 export function runGateRows(ctx: QuestContext, only?: ReadonlySet<string>): MutationResult[] {
   const base = new Baseline(ctx);
   const out: MutationResult[] = [];
-  for (const row of GATE_ROWS) {
+  for (const [ri, row] of GATE_ROWS.entries()) {
     if (only && !only.has(row.row)) continue;
     if (ctx.stage && !row.stages.includes(ctx.stage)) continue;
     if (row.probe) { out.push(probe(ctx, row)); continue; }
@@ -113,7 +113,7 @@ export function runGateRows(ctx: QuestContext, only?: ReadonlySet<string>): Muta
           : { failures: [{ proof: 'b', code: 'MISSING', message: `MISSING ${row.row} ${row.element}: not found` }] }) });
       continue;
     }
-    for (const el of els) out.push(runRow(ctx, base, row, el));
+    els.forEach((el, i) => out.push(runRow(ctx, base, row, el, `${ri} ${row.row}#${i} ${el.key} ${el.label}`)));
   }
   return out;
 }
@@ -130,9 +130,9 @@ export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>): Mutat
   const own = ctx.stage ? ctx.world.stages.get(ctx.stage)! : null;
   const mine = (el: MutElement): boolean => !own || own.maps.some((g) => globMatch(el.map, g))
     || (el.map === ctx.world.worldMap && (el.reads ?? []).some((r) => [...own.grants.flags, ...own.grants.items].includes(r)));
-  for (const el of genericElements(ctx)) {
+  for (const [i, el] of genericElements(ctx).entries()) {
     if (named.has(spot(el)) || !mine(el)) continue;
-    const fresh: ProofFailure[] = base.fresh(mutatedContext(ctx, el.apply(ctx.world)), keys);
+    const fresh: ProofFailure[] = base.freshFor(`G#${i} ${el.key} ${el.label}`, () => mutatedContext(ctx, el.apply(ctx.world)), keys);
     const r: MutationResult = { row: `G ${el.map}`, element: el.label, mutation: 'remove', caught: fresh.length > 0, failures: fresh };
     if (!r.caught) {
       const reason = nonLoadBearingFor(ctx, el) ?? pendingReason(ctx, el);

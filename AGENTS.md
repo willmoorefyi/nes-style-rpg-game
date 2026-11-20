@@ -10,10 +10,13 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm test             # Run all tests (9195 tests, 367 files, Vitest; measured at LM4-INT; the real-world mutation suite makes a full run take about an hour)
+npm run test:fast    # Every test but the heavy tier: 368 files, about 2 min (128 s) with 2 workers (the agent's handoff check)
+npm run test:full    # Everything, both tiers: 369 files, 9197 tests, about 30 min (1772 s; before TST 58 min, 3507 s) with 2 workers (the integrator's check)
+npm run test:world   # The heavy tier alone (tests/tiers.ts): the real-world mutation suite, about 28 min (1673 s: the plain run 1637 s, the --strict run 36 s)
+npm test             # = test:full (unchanged meaning: all tests)
 ```
 
-**Always run `npm run build` and `npm test` after making changes.** Both must pass clean before any work is considered complete.
+**Always run `npm run build` and `npm run test:fast` after making changes**, plus the tests of what you touched; both must pass clean before any work is considered complete. Run `npm run quest -- --strict --mutate` (in the background) only when you change world or quest data (maps, layouts, `quest.yaml`, the progression code). The integrator runs `npm run test:full` once per merge batch. Times: measured at TST on this machine (14 cores) with `--maxWorkers=2`, see "Test tiers" under Testing.
 
 ---
 
@@ -156,7 +159,7 @@ All game content is in YAML. **Never hardcode game data in TypeScript.**
 - Spell `element` values → must be valid ElementType
 - Spell status effects → must be valid StatusEffect
 
-**If you add/rename/remove any ID in a data file, run `npm test` to catch broken references.** The validation suite will pinpoint exactly which reference is broken.
+**If you add/rename/remove any ID in a data file, run `npm run test:fast` to catch broken references.** The validation suite will pinpoint exactly which reference is broken.
 
 ### YAML Gotchas
 
@@ -205,10 +208,27 @@ Some tests are co-located with source:
 - **No private member access**: Don't use `as unknown as` to access private fields. Test through public API.
 - **Schema validation tests**: `tests/core/schemaValidation.test.ts` tests the data validators.
 
+### Test tiers (TST)
+
+Two vitest projects (`vitest.workspace.ts`) built from one list, `tests/tiers.ts`:
+
+| Tier | Command | What | Time (2 workers, at TST) |
+|------|---------|------|------|
+| fast | `npm run test:fast` | every test file not listed in `HEAVY_TESTS` | 2 min (128 s) (368 files) |
+| world | `npm run test:world` | the files in `HEAVY_TESTS`: only `tests/progression/questMutateWorld.test.ts` | 28 min (1673 s: the plain run 1637 s, the --strict run 36 s) |
+| full | `npm run test:full` = `npm test` = `vitest run` | both | 30 min (1772 s; before TST 58 min, 3507 s) |
+
+- **Who runs what.** An agent runs `npm run build`, `npm run test:fast` and the tests of what it touched (`npx vitest run <paths>`) before a handoff, and `npm run quest -- --strict --mutate` only when it changes world or quest data. The integrator runs `npm run test:full` once per merge batch. Pass `-- --maxWorkers=2 --minWorkers=1` when other heavy processes share the machine.
+- **Why one file is heavy.** Before TST, a full run took 58 min (3507 s with 2 workers), and one file was 57 of them: `questMutate.test.ts` ran the real-world mutation suite (`quest --mutate`) twice, plain at collect time and `--strict` in a test, about 28 min each (69 s of gate-table rows, the rest the generic elements, each re-proving (a), (b) for every stage, (c) and (e) on the 192x192 world). Every other file is small: the next slowest are `questGraph.test.ts` 35 s (the real world's (a)-(c)), `questLate.test.ts` 10 s, `questCurve.test.ts` 8 s, then nothing over 6 s; the region walks (`tests/quest/**`) take 1-4 s each and the balance suites (`chaos.test.ts`, 400 seeds per policy, included) under 1 s each. So the whole-world proofs, the region walks and the balance bounds all stay in the fast tier.
+- **What changed.** The mini-world half of the mutation tests stays in `questMutate.test.ts` (fast); the real-world half moved to `questMutateWorld.test.ts` (world). There the `--strict` run reuses the plain run's mutated checks: `Baseline.freshFor` (`questMutateCheck.ts`) caches each element's mutated proof results by base world, late data, stage, state cap, element and check (exact: a mutated context is never strict and is built only from those), while each run's own baseline still decides what is fresh. No assertion, bound or seed count changed.
+- **The guard.** `tests/timingReporter.ts` (a reporter in `vite.config.ts`) counts each file's collect + setup + run time (vitest's JSON reporter leaves out collect, where top-level `describe` work runs) and fails the run when a `fast` file is over `FAST_FILE_BUDGET_S` (90 s; `TEST_FILE_BUDGET_S=<s>` overrides, `0` turns it off). A new heavy file must be listed in `HEAVY_TESTS` with its reason; `tests/tiers.test.ts` checks the listed files exist. `TEST_TIMINGS=/tmp/<agent>/t.json` writes every file's timings, slowest first.
+- **Pools.** The default `threads` pool with isolation is kept, and no script forces a worker count. `--no-isolate` was measured on the fast tier: 98 s instead of 128 s, but 15 tests in 6 files fail on state shared between files, so it is not used.
+
 ### Running Tests
 
 ```bash
-npm test                                    # All tests
+npm run test:fast                           # The fast tier (before a handoff)
+npm test                                    # All tests (= test:full)
 npx vitest run tests/battle/               # Just battle tests
 npx vitest run tests/data/crossFileValidation.test.ts  # Just data validation
 npx vitest --watch                          # Watch mode
@@ -222,19 +242,19 @@ npx vitest --watch                          # Watch mode
 
 1. Add entry to `assets/data/items.yaml`
 2. If sold in a shop, add the item ID to the shop's `inventory` in `assets/data/shops.yaml`
-3. Run `npm test` — cross-file validation will catch any broken references
+3. Run `npm run test:fast` — cross-file validation will catch any broken references
 
 ### New Spell
 
 1. Add entry to `assets/data/spells.yaml` with `id`, `name`, `level`, `type` (white/black), `effect`, `targeting`, `power`, `element`
 2. If sold in a magic shop, add the spell ID to the shop's `inventory` in `assets/data/shops.yaml`
-3. Run `npm test`
+3. Run `npm run test:fast`
 
 ### New Enemy
 
 1. Add entry to `assets/data/enemies.yaml` with stats, rewards, elemental profile
 2. Add the enemy ID to encounter tables in the relevant map YAML (`assets/maps/*.yaml`)
-3. Run `npm test`
+3. Run `npm run test:fast`
 
 ### Editing a 2x Map (generated sources)
 
@@ -326,8 +346,9 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
 - **Commands.** `npm run quest` (assume mode: a pending stage's grants are synthetic), `npm run quest -- --strict
   --mutate` (INT's gate), `--stage S11` (from the stage's `entry`, with its ancestors' grants; the search fires only the
   events of the stage and its ancestors, `outOfScopeEvents`, and the full run covers the other orderings), `--only abc`,
-  `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes well over
-  an hour and a few GB: run it in the background.
+  `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes about half
+  an hour and a few GB: run it in the background, and only when world or quest data changed. Its test,
+  `tests/progression/questMutateWorld.test.ts`, is the heavy tier (`npm run test:world`, "Test tiers" under Testing).
 - **Landmark art (LM-INT, LM4-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from two sheets
   (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2) and `landmarks_lm4.*`
   (pass LM4); cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache key, model, seed, pass and the cut
@@ -614,7 +635,7 @@ The title screen shows a **Debug** option in dev mode (`npm run dev`). It loads 
 
 3. Selecting Debug runs the first scenario; pick another with `?scenario=<id>` in the dev URL (e.g. `http://localhost:5173/?scenario=knight_party`). Add `&art=ai` to preview approved AI battle art
 4. Class IDs must match `assets/data/classes.yaml`, item IDs must match `assets/data/items.yaml`, spell IDs must match `assets/data/spells.yaml`, enemy IDs must match `assets/data/enemies.yaml`
-5. Run `npm test` to verify cross-file references are valid
+5. Run `npm run test:fast` to verify cross-file references are valid
 
 Scenario families (see the comments in `assets/data/debug-scenarios.yaml`; field scenarios start on a map, battle ones from **Debug**):
 - `r_*` (35, R): Garland and temple balance, battle checks (heal, DARK/MUTE, shoreline), the 99 cap, shops, menus, Tent, and field starts in every act-1 map (castle, town, shops, houses, cellar, tower, overworld spots).
@@ -634,7 +655,7 @@ Scenario families (see the comments in `assets/data/debug-scenarios.yaml`; field
 
 1. **Silent error swallowing** — Never write `catch { }` or `catch { /* ignore */ }`. Always log or surface errors. This caused a critical white-screen bug early in development.
 
-2. **Data file mismatches** — If you add an item to a shop but forget to add it to `items.yaml`, the game breaks at runtime. Always run `npm test` after editing data files.
+2. **Data file mismatches** — If you add an item to a shop but forget to add it to `items.yaml`, the game breaks at runtime. Always run `npm run test:fast` after editing data files.
 
 3. **Scene stack lifecycle** — When pushing a scene, the previous scene's `onPause()` fires (and it is hidden unless the pushed scene is `transparent`). When popping, `onResume()` fires. Forgetting to implement these causes bugs like encounters not pausing during menus.
 

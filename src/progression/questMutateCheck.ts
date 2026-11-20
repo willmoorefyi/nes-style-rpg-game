@@ -10,7 +10,8 @@
  */
 import type { QuestStage } from '../types/index.js';
 import type { ProofFailure, ProofId } from './questTypes.js';
-import { ancestorsOf, globMatch } from './questData.js';
+import { ancestorsOf, globMatch, type QuestWorld } from './questData.js';
+import { lateOf, type LateData } from './questLateData.js';
 import { withheld, type WithheldGrants } from './questStates.js';
 import { bossEvents, eventsGranting, saturate, type Saturator } from './questSaturate.js';
 import { fail, grantsText, proofOrder, reachedStage, without, type QuestContext } from './questProofs.js';
@@ -101,11 +102,46 @@ export function runCheck(ctx: QuestContext, k: CheckKey): ProofFailure[] {
   }
 }
 
+/**
+ * The checks of mutated worlds, by base world and late data, then by stage, state cap, element and check key. A
+ * mutated context is built from exactly those (`mutatedContext`: never strict), so a second suite on the same world
+ * (questMutateWorld.test.ts: plain, then --strict, each about half an hour) reuses the first one's runs; its own
+ * baseline still decides what is fresh.
+ */
+const RUNS = new WeakMap<QuestWorld, WeakMap<LateData, Map<string, ProofFailure[]>>>();
+
+function runsOf(ctx: QuestContext): Map<string, ProofFailure[]> {
+  let byLate = RUNS.get(ctx.world);
+  if (!byLate) RUNS.set(ctx.world, byLate = new WeakMap());
+  const late = lateOf(ctx);
+  let runs = byLate.get(late);
+  if (!runs) byLate.set(late, runs = new Map());
+  return runs;
+}
+
 /** The checks of the unmutated world, cached by key (a failure already there catches nothing). */
 export class Baseline {
   private cache = new Map<string, Set<string>>();
 
   constructor(private readonly ctx: QuestContext) {}
+
+  /**
+   * The failures the baseline lacks of the mutated context `make` builds (lazily) for element `id` (unique in the
+   * base world's mutation list); the mutated checks are cached in RUNS.
+   */
+  freshFor(id: string, make: () => QuestContext, keys: CheckKey[]): ProofFailure[] {
+    const runs = runsOf(this.ctx);
+    const scope = `${this.ctx.stage ?? ''}|${this.ctx.maxStates}|${id}|`;
+    let mctx: QuestContext | undefined;
+    const out: ProofFailure[] = [];
+    for (const k of keys) {
+      const key = scope + keyText(k);
+      let got = runs.get(key);
+      if (!got) runs.set(key, got = runCheck(mctx ??= make(), k));
+      for (const f of got) if (!this.has(k, f.message)) out.push(f);
+    }
+    return out;
+  }
 
   has(k: CheckKey, message: string): boolean {
     const key = keyText(k);
@@ -115,13 +151,6 @@ export class Baseline {
       this.cache.set(key, set);
     }
     return set.has(message);
-  }
-
-  /** The failures of a mutated context the baseline lacks. */
-  fresh(mctx: QuestContext, keys: CheckKey[]): ProofFailure[] {
-    const out: ProofFailure[] = [];
-    for (const k of keys) for (const f of runCheck(mctx, k)) if (!this.has(k, f.message)) out.push(f);
-    return out;
   }
 }
 

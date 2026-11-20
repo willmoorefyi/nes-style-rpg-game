@@ -1,15 +1,14 @@
 /**
  * The no-skip mutation suite (docs/WORLD_PLAN.md 6.3, docs/QUEST_PLAN.md 5.4): every gate-table row GT-1 to GT-37
  * (with GT-5b) on the mini world, by name, with its expected proof and message prefix; the non-load-bearing rows
- * with their reasons; a RED run (an uncaught element without a `nonLoadBearing` entry fails); and the real world
- * (`npm run quest -- --mutate`), where the rows of pending stages are reported as pending.
+ * with their reasons; and a RED run (an uncaught element without a `nonLoadBearing` entry fails). The real world
+ * (`npm run quest -- --mutate`) is questMutateWorld.test.ts, in the heavy tier (tests/tiers.ts).
  */
 import { describe, expect, it } from 'vitest';
 import type { MutationResult } from '../../src/progression/questTypes.js';
-import { loadQuestWorld } from '../../src/progression/questData.js';
 import { createQuestContext } from '../../src/progression/questProofs.js';
 import { runCoreProofs, mutationLine } from '../../src/progression/questReport.js';
-import { runGateRows, runMutations } from '../../src/progression/questMutate.js';
+import { runGateRows } from '../../src/progression/questMutate.js';
 import { GATE_ROWS } from '../../src/progression/questMutateRows.js';
 import { proofEarlyShops } from '../../src/progression/questShops.js';
 import { proofTravel } from '../../src/progression/questTravel.js';
@@ -108,35 +107,5 @@ describe('questMutate: non-load-bearing rows (GT-1, GT-5, GT-6, GT-14, GT-16, th
     expect(r[0]).toMatchObject({ caught: false });
     expect(r[0].nonLoadBearing).toBeUndefined();
     expect(mutationLine(r)).toBe('mutations: FAIL  (1 of 1 elements not caught)');
-  });
-});
-
-describe('questMutate: the real world (npm run quest -- --mutate)', () => {
-  const real = createQuestContext(loadQuestWorld());
-  const all = runMutations(real);
-
-  it('every element is caught or reported (non-load-bearing or pending)', () => {
-    const missed = all.filter((m) => !m.caught && m.nonLoadBearing === undefined);
-    expect(missed.map((m) => `${m.row} ${m.element}`)).toEqual([]);
-    expect(mutationLine(all)).toMatch(/^mutations: OK {2}\(/);
-  });
-
-  it('GT-1: the act-1 bridge gate cells are S0\'s non-load-bearing entries; GT-12 (the canal) is caught now that EARTH is built', () => {
-    expect(all.filter((m) => m.row === 'GT-1').map((m) => m.nonLoadBearing)).toEqual([
-      'redundant with north_bridge; the gap is water without the flag', 'redundant with north_bridge; the gap is water without the flag']);
-    // INT-W2c: every region is built, so no row is pending any more
-    expect(all.find((m) => m.row === 'GT-12')?.caught).toBe(true);
-  });
-
-  it('act 1\'s generic elements are caught: the King and the princess wait for Garland, the ship spawn needs its flag', () => {
-    const caught = all.filter((m) => m.row.startsWith('G ') && m.caught).map((m) => m.element);
-    expect(caught).toEqual(expect.arrayContaining([expect.stringMatching(/npc king needs PRINCESS_RESCUED/),
-      expect.stringMatching(/npc princess needs PRINCESS_RESCUED/)]));
-  });
-
-  it('no row is pending any more, so --strict reports every element too (INT)', () => {
-    expect(all.filter((m) => m.nonLoadBearing?.startsWith('pending')).map((m) => `${m.row} ${m.element}`)).toEqual([]);
-    const strict = runMutations(createQuestContext(real.world, { strict: true }));
-    expect(strict.filter((m) => !m.caught && m.nonLoadBearing === undefined).map((m) => `${m.row} ${m.element}`)).toEqual([]);
   });
 });
