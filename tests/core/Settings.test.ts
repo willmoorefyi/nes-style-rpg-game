@@ -1,6 +1,6 @@
 /** F0 (docs/FEEDBACK_PLAN_2026-11-14.md §2 item 2): global settings in localStorage `ff.settings`, read once. */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { DEFAULT_MESSAGE_SPEED, SETTINGS_KEY, getSettings, resetSettingsCache, setMessageSpeed, type MessageSpeed } from '../../src/core/Settings.js';
+import { DEFAULT_AIRSHIP_VIEW, DEFAULT_MESSAGE_SPEED, SETTINGS_KEY, getSettings, resetSettingsCache, setAirshipView, setMessageSpeed, type AirshipView, type MessageSpeed } from '../../src/core/Settings.js';
 
 function fakeStore(initial: Record<string, string> = {}) {
   const data = { ...initial };
@@ -71,7 +71,7 @@ describe('Settings', () => {
     vi.stubGlobal('localStorage', store);
     setMessageSpeed(4);
     expect(getSettings().messageSpeed).toBe(4);
-    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 4 });
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toMatchObject({ messageSpeed: 4 });
     resetSettingsCache();
     expect(getSettings().messageSpeed).toBe(4);
   });
@@ -87,6 +87,39 @@ describe('Settings', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     setMessageSpeed(Number('7') as MessageSpeed);
     expect(getSettings().messageSpeed).toBe(1);
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+
+  // M7-2 (docs/MODE7_PLAN.md 7, 9): the airship view; M7-3 turns the default and this expected value to 'mode7'
+  it("airshipView defaults to 'topdown' until M7-3", () => {
+    expect(DEFAULT_AIRSHIP_VIEW).toBe('topdown');
+    vi.stubGlobal('localStorage', fakeStore());
+    expect(getSettings().airshipView).toBe('topdown');
+  });
+
+  it('airshipView: older settings without it take the default silently; round trip', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = fakeStore({ [SETTINGS_KEY]: '{"messageSpeed":2}' });
+    vi.stubGlobal('localStorage', store);
+    expect(getSettings()).toEqual({ messageSpeed: 2, airshipView: DEFAULT_AIRSHIP_VIEW });
+    expect(warn).not.toHaveBeenCalled();
+    setAirshipView('mode7');
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 2, airshipView: 'mode7' });
+    resetSettingsCache();
+    expect(getSettings().airshipView).toBe('mode7');
+    setAirshipView('topdown');
+    resetSettingsCache();
+    expect(getSettings().airshipView).toBe('topdown');
+  });
+
+  it('airshipView: an invalid stored value warns once and takes the default; an invalid set is refused', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.stubGlobal('localStorage', fakeStore({ [SETTINGS_KEY]: '{"messageSpeed":4,"airshipView":"sideways"}' }));
+    expect(getSettings()).toEqual({ messageSpeed: 4, airshipView: DEFAULT_AIRSHIP_VIEW });
+    expect(warn).toHaveBeenCalledTimes(1);
+    setAirshipView('sideways' as AirshipView);
+    expect(getSettings().airshipView).toBe(DEFAULT_AIRSHIP_VIEW);
     expect(error).toHaveBeenCalledTimes(1);
   });
 });

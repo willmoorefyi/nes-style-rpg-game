@@ -36,6 +36,7 @@ import { playFieldCutscene } from './exploration/ExplorationCutscenes.js';
 import { npcPresenceChanges } from './exploration/NpcPresence.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
+import { FlightView } from './exploration/mode7/FlightView.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -68,6 +69,7 @@ export class ExplorationScene implements Scene {
   private vehicles: FieldVehicles;
   private ambient = new FieldAmbient(); // the volcano's smoke (LM-INT)
   private npcActions: FieldNpcActions;
+  private flight: FlightView; // the Mode 7 airship view (docs/MODE7_PLAN.md)
   private walkingMode: MovementMode = new WalkingMode();
   /** NPC in conversation (faces the heroes until the dialog closes). */
   private talkingNpc: NPC | null = null;
@@ -113,6 +115,7 @@ export class ExplorationScene implements Scene {
     });
     this.bindGameState();
     this.container.addChild(this.worldContainer);
+    this.flight = new FlightView({ game, world: this.worldContainer, parent: this.container, at: 1, player: () => this.player, tilemap: () => this.tilemap, camera: this.camera, vehicles: this.vehicles });
     this.container.addChild(this.uiContainer);
     this.fieldHUD = new FieldHUD(game.party);
     this.container.addChild(this.fieldHUD.container);
@@ -309,6 +312,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setInput(this.game.input);
     this.mapTransition.setTransitions(mapData.transitions);
     this.vehicles.setMap(mapData);
+    this.flight.setMap(mapData);
     this.ambient.setMap(mapData, this.worldContainer);
     this.camera.update();
     tilemap.render();
@@ -345,7 +349,7 @@ export class ExplorationScene implements Scene {
 
   /** Loading, changing maps or in a cutscene: no walking, talking, menu or monsters (S1, S2). */
   private get fieldBusy(): boolean {
-    return this.loading || this.fieldTransition.active || this.cutsceneRunning;
+    return this.loading || this.fieldTransition.active || this.cutsceneRunning || this.flight.busy;
   }
 
   update(dt: number): void {
@@ -362,6 +366,7 @@ export class ExplorationScene implements Scene {
     if (this.endCard.active) { this.endCard.update(this.game.input); return; }
     // B5: Update HUD each frame
     this.fieldHUD.update(this.game.party);
+    this.flight.update(dt);
     if (this.dialogManager.isActive) {
       this.fieldHUD.container.visible = false;
       this.dialogManager.update(dt, this.game.input);
@@ -481,6 +486,7 @@ export class ExplorationScene implements Scene {
     this.game.events.off('battleEnd', this.handleBattleEnd);
     this.game.events.off('showDialog', this.handleShowDialog);
     this.ambient.clear();
+    this.flight.clear();
     this.worldContainer.removeChildren();
   }
 

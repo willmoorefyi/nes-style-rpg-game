@@ -1,6 +1,6 @@
 /** Pass F item 6 (docs/FEEDBACK_PLAN_2026-11-14.md §3.6): the Config screen sets and persists the message speed. */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ConfigScene, SAMPLE_LINES, speedRow } from '../../src/scenes/ConfigScene.js';
+import { ConfigScene, SAMPLE_LINES, airshipRow, speedRow } from '../../src/scenes/ConfigScene.js';
 import { SETTINGS_KEY, getSettings, resetSettingsCache } from '../../src/core/Settings.js';
 import { RESULT_FRAMES, holdFrames } from '../../src/scenes/battle/battleTiming.js';
 import type { Game } from '../../src/core/Game.js';
@@ -36,7 +36,7 @@ describe('ConfigScene: message speed 1-5', () => {
     game.input.tap('right', () => scene.update(1));
     expect(getSettings().messageSpeed).toBe(4);
     expect(scene.speedLine).toContain('[4]');
-    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 4 });
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toMatchObject({ messageSpeed: 4 });
     for (let i = 0; i < 3; i++) game.input.tap('right', () => scene.update(1));
     expect(getSettings().messageSpeed).toBe(5);
     for (let i = 0; i < 6; i++) game.input.tap('left', () => scene.update(1));
@@ -74,5 +74,27 @@ describe('ConfigScene: message speed 1-5', () => {
     const { scene } = open();
     expect(scene.speedLine).toContain('[3]');
     expect(warn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ConfigScene: the airship view row (M7-2, docs/MODE7_PLAN.md 7)', () => {
+  it('down picks the row; left / right switch Top-down and Mode 7 and write it through; the speed is untouched', () => {
+    const store = memoryStore();
+    vi.stubGlobal('localStorage', store);
+    const { scene, game } = open();
+    expect(scene.airshipLine).toContain(airshipRow('topdown'));
+    expect(scene.speedLine.startsWith('>')).toBe(true);
+    game.input.tap('down', () => scene.update(1));
+    expect(scene.airshipLine.startsWith('>')).toBe(true);
+    expect(scene.helpLine).toContain('Airship view');
+    game.input.tap('right', () => scene.update(1));
+    expect(getSettings()).toEqual({ messageSpeed: 3, airshipView: 'mode7' });
+    expect(scene.airshipLine).toContain('[Mode 7]');
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 3, airshipView: 'mode7' });
+    game.input.tap('left', () => scene.update(1));
+    expect(getSettings().airshipView).toBe('topdown');
+    game.input.tap('up', () => scene.update(1));
+    game.input.tap('right', () => scene.update(1));
+    expect(getSettings()).toEqual({ messageSpeed: 4, airshipView: 'topdown' });
   });
 });
