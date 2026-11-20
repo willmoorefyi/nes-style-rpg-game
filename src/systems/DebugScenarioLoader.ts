@@ -29,8 +29,6 @@ export interface DebugScenario {
   spawn?: [number, number];
   entrance?: string;
   spot?: string;
-  /** `a1`: `spawn` is an act-1 cell, translated by the loaded map's `world.frames.a1.origin` (GAP-18; W1-B). */
-  frame?: 'a1';
   /** Parked vehicles and the party's field mode at the start (QUEST 4.1; W1-A); on the world map a vehicle names
    *  a spot (`at`, NW-1), resolved to its cell when the scenario starts. */
   vehicles?: ParkedVehicle[];
@@ -73,20 +71,6 @@ export function enemyHpOf(scenario: Pick<DebugScenario, 'id' | 'enemies' | 'enem
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
-/** The origin of a map's act-1 frame (`world.frames.a1.origin`, GAP-17), or [0, 0] on the act-1 map itself. */
-export function a1Origin(map: Pick<MapData, 'world'>): [number, number] {
-  const o = map.world?.frames?.a1?.origin;
-  return o ? [o[0], o[1]] : [0, 0];
-}
-
-/** A scenario's spawn cell on `map`: a `frame: a1` spawn is an act-1 cell, moved by the map's a1 origin (GAP-18). */
-export function scenarioSpawn(scenario: Pick<DebugScenario, 'spawn' | 'frame'>, map: Pick<MapData, 'world'>): [number, number] {
-  const [x, y] = scenario.spawn ?? [0, 0];
-  if (scenario.frame !== 'a1') return [x, y];
-  const [ox, oy] = a1Origin(map);
-  return [x + ox, y + oy];
-}
-
 export class DebugScenarioLoader {
   private game: Game;
 
@@ -115,10 +99,7 @@ export class DebugScenarioLoader {
     this.game.vehicles = spots.vehicles; // W1-A: parked vehicles (cells only), the field mode
     this.game.fieldMode = scenario.fieldMode ?? 'walking';
     if (spots.spawn) this.game.playerPosition = { x: spots.spawn[0], y: spots.spawn[1] };
-    else if (scenario.spawn) {
-      const [x, y] = scenario.frame ? await this.framedSpawn(scenario) : scenario.spawn;
-      this.game.playerPosition = { x, y };
-    }
+    else if (scenario.spawn) this.game.playerPosition = { x: scenario.spawn[0], y: scenario.spawn[1] };
     this.game.scenes.switchTo('exploration');
   }
 
@@ -139,17 +120,6 @@ export class DebugScenarioLoader {
       vehicles.push({ type: v.type, map: v.map, x, y });
     }
     return { spawn: scenario.spot ? await cell(scenario.map ?? '', scenario.spot) : undefined, vehicles };
-  }
-
-  /** A `frame: a1` spawn on the map the field will load (GAP-18); a map that fails to load keeps the raw cell. */
-  private async framedSpawn(scenario: DebugScenario): Promise<[number, number]> {
-    try {
-      const map = await fieldMapLoader(this.game.data)(scenario.map ?? '');
-      return scenarioSpawn(scenario, map);
-    } catch (e) {
-      console.error(`Debug scenario ${scenario.id}: could not read ${scenario.map}'s world frame`, e);
-      return scenario.spawn ?? [0, 0];
-    }
   }
 
   async applyAndBattle(scenario: DebugScenario): Promise<void> {

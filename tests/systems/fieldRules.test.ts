@@ -15,17 +15,13 @@ import {
 } from '../../src/systems/fieldRules.js';
 import { validateMapData } from '../../src/core/schemaValidation.js';
 import { createMapData } from '../helpers/testUtils.js';
-import { a1At, translateA1 } from '../helpers/worldFrame.js';
+import { entrance, gate, patchCells, spot } from '../helpers/worldSpots.js';
 
 const load = (id: string): MapData => validateMapData(parse(readFileSync(`assets/maps/ai/${id}.yaml`, 'utf-8')));
 
-// W1-B (GAP-17): the compiled overworld is the act-1 map or the 192x192 world with `world.frames.a1`; the act-1 cases
-// run on it and on the act-1 block translated into the world frame (the same map when it already is the world)
-const compiledOverworld = load('overworld');
-const translated = translateA1(compiledOverworld);
-const overworlds: [string, MapData][] = translated === compiledOverworld
-  ? [['the compiled world', compiledOverworld]]
-  : [['the act-1 overworld', compiledOverworld], ['the act-1 block in the world frame', translated]];
+// NW-5: the act-1 cases on the compiled world, by name (its spots, entrances, gates and patches), so they hold on any
+// world the composer writes (docs/NATURAL_WORLD_PLAN.md 3.6.5)
+const overworlds: [string, MapData][] = [['the compiled world', load('overworld')]];
 
 const state = (flags: string[] = [], items: string[] = [], mode: FieldMode = 'walking'): FieldState =>
   ({ flags: new Set(flags), items: new Set(items), mode, vehicles: [] });
@@ -36,10 +32,15 @@ const npc = (map: MapData, id: string): MapNPC => {
   return found;
 };
 
+// NW-5 (D-NW9): tundra and snow, where the TerrainType has them, are walked like grass
+const COLD = ['Tundra', 'Snow'].map((n) => (TerrainType as unknown as Record<string, number | undefined>)[n])
+  .filter((v): v is TerrainType => v !== undefined);
+
 describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMode, AirshipMode)', () => {
   const all = Object.values(TerrainType).filter((v): v is TerrainType => typeof v === 'number');
   it.each([
-    ['walking', [TerrainType.Grass, TerrainType.Forest, TerrainType.Desert, TerrainType.Swamp, TerrainType.Road, TerrainType.Bridge]],
+    ['walking', [TerrainType.Grass, TerrainType.Forest, TerrainType.Desert, TerrainType.Swamp, TerrainType.Road, TerrainType.Bridge,
+      ...COLD]],
     ['ship', [TerrainType.Water]],
     ['canoe', [TerrainType.River, TerrainType.Lake]], // W1-A: the canoe never touches Water (QUEST 3.3)
     ['airship', all],
@@ -48,7 +49,7 @@ describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMod
   });
 
   it('reads the compiled terrain; outside the map and unknown values are Wall, 11 is Lake; no patches in act 1', () => {
-    const map = createMapData({ width: 4, height: 1, collision: [0, 10, 11, 12] });
+    const map = createMapData({ width: 4, height: 1, collision: [0, 10, 11, 14] });
     expect(patchedTerrain(map, 0, 0, new Set())).toBe(TerrainType.Grass);
     expect(patchedTerrain(map, 1, 0, new Set())).toBe(TerrainType.Wall);
     expect(patchedTerrain(map, 2, 0, new Set())).toBe(TerrainType.Lake); // W1-A: the canoe's lakes
@@ -56,46 +57,56 @@ describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMod
     expect(patchedTerrain(map, -1, 0, new Set())).toBe(TerrainType.Wall);
   });
 
-  it.each(overworlds)('has no landing and no docks in act 1 (%s)', (_name, ow) => {
-    expect(canLand(ow, a1At(ow, 28, 47), state([], [], 'airship'))).toBe(false);
-    expect(dockFor(ow, a1At(ow, 28, 57))).toBeNull();
+  it.each(overworlds)('has no landing on Cornelia\'s arrival and no dock on land (%s)', (_name, ow) => {
+    expect(canLand(ow, entrance(ow, 'cornelia'), state([], [], 'airship'))).toBe(false);
+    expect(dockFor(ow, entrance(ow, 'cornelia'))).toBeNull();
+    expect(dockFor(ow, spot(ow, 'a1_s_pravoka_ship'))?.id).toBe('a1_pravoka');
   });
 });
 
 describe.each(overworlds)('fieldRules: the north bridge (%s)', (_name, ow) => {
-  const at = (x: number, y: number): { x: number; y: number } => a1At(ow, x, y);
+  const gates = [gate(ow, 'a1_bridge_gate_w'), gate(ow, 'a1_bridge_gate_e')];
+  const gap = patchCells(ow, 'north_bridge');
+  // the walkable cell beside a gate on the side away from the gap (the south stub), and the gap cell beside it
+  const off = (g: { x: number; y: number }, sign: number): { x: number; y: number } => {
+    const n = gap.find((c) => Math.abs(c.x - g.x) + Math.abs(c.y - g.y) === 1)!;
+    return { x: g.x + sign * (n.x - g.x), y: g.y + sign * (n.y - g.y) };
+  };
+  const south = (i: number): { x: number; y: number } => off(gates[i], -1);
+  const north = (i: number): { x: number; y: number } => off(gates[i], 1);
   const before = 'The bridge has collapsed into the sea. Only the King\'s builders could repair it.';
   const after = 'The King\'s builders are at work on the bridge, but it isn\'t finished yet.';
 
-  it.each([[29], [30]])('the gate at (%i, 32) is shut without BRIDGE_BUILT, with the act-1 message', (x) => {
-    const step = fieldStep(ow, at(x, 33), at(x, 32), state());
+  it.each([[0], [1]])('bridge gate %i is shut without BRIDGE_BUILT, with the act-1 message', (i) => {
+    const step = fieldStep(ow, south(i), gates[i], state());
     expect(step).toEqual({ ok: false, mode: 'walking', setFlags: [], message: before });
-    expect(canEnter(ow, at(x, 32), 'walking', state())).toBe(false);
+    expect(canEnter(ow, gates[i], 'walking', state())).toBe(false);
   });
 
   it('after the King\'s order (INTRO_COMPLETE) the message changes and the gate stays shut', () => {
-    const step = fieldStep(ow, at(29, 33), at(29, 32), state(['INTRO_COMPLETE']));
+    const step = fieldStep(ow, south(0), gates[0], state(['INTRO_COMPLETE']));
     expect(step.ok).toBe(false);
     expect(step.message).toBe(after);
   });
 
   it('BRIDGE_BUILT opens the gate cells (not permanent: no flag is set)', () => {
-    const step = fieldStep(ow, at(29, 33), at(29, 32), state(['BRIDGE_BUILT']));
+    const step = fieldStep(ow, south(0), gates[0], state(['BRIDGE_BUILT']));
     expect(step).toEqual({ ok: true, mode: 'walking', setFlags: [] });
-    expect(canEnter(ow, at(29, 32), 'walking', state(['BRIDGE_BUILT']))).toBe(true);
+    expect(canEnter(ow, gates[0], 'walking', state(['BRIDGE_BUILT']))).toBe(true);
   });
 
   it('the gap north of the stubs is water until the north_bridge patch (BRIDGE_BUILT, A1-O) lays the span', () => {
-    expect(canEnter(ow, at(29, 31), 'walking', state(['INTRO_COMPLETE']))).toBe(false);
-    // the legacy 72x72 map has no patch; the compiled world carries north_bridge
-    expect(canEnter(ow, at(29, 31), 'walking', state(['BRIDGE_BUILT']))).toBe((ow.patches ?? []).some((p) => p.id === 'north_bridge'));
+    expect(canEnter(ow, north(0), 'walking', state(['INTRO_COMPLETE']))).toBe(false);
+    expect(canEnter(ow, north(0), 'walking', state(['BRIDGE_BUILT']))).toBe(true);
   });
 
   it('a step must be to a 4-neighbour; land, sea and the temple door', () => {
-    expect(fieldStep(ow, at(28, 47), at(30, 47), state()).ok).toBe(false);
-    expect(canEnter(ow, at(28, 47), 'walking', state())).toBe(true);
-    expect(canEnter(ow, at(0, 0), 'walking', state())).toBe(false);
-    expect(canEnter(ow, at(0, 0), 'ship', state([], [], 'ship'))).toBe(true);
+    const c = entrance(ow, 'cornelia');
+    const sea = spot(ow, 'a1_s_pravoka_ship');
+    expect(fieldStep(ow, c, { x: c.x + 2, y: c.y }, state()).ok).toBe(false);
+    expect(canEnter(ow, c, 'walking', state())).toBe(true);
+    expect(canEnter(ow, sea, 'walking', state())).toBe(false);
+    expect(canEnter(ow, sea, 'ship', state([], [], 'ship'))).toBe(true);
     const door = ow.transitions.find((t) => t.targetMap === 'temple-of-fiends');
     expect(door).toBeDefined();
     if (!door) return;

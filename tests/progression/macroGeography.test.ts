@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { loadQuestWorld } from '../../src/progression/questData.js';
 import { createQuestContext } from '../../src/progression/questProofs.js';
 import { attachLate, buildLateData, loadLateData, type GeoData } from '../../src/progression/questLateData.js';
-import { anchorCells, bearing, geoCheck, proofGeo, worldOffsetOf } from '../../src/progression/questGeo.js';
+import { anchorCells, bearing, geoCheck, proofGeo } from '../../src/progression/questGeo.js';
 import { loadFixture } from '../fixtures/quest/loadFixture.js';
 
 const geo = loadLateData().geo!;
@@ -100,12 +100,13 @@ describe('macroGeography: the RED fixtures of step 7', () => {
 describe('macroGeography: the repository', () => {
   const ctx = createQuestContext(loadQuestWorld());
 
-  it('the legacy 72x72 world map is read at the A1 origin; Cornelia and the temple are placed', () => {
+  it('the world map\'s cells are world cells; Cornelia and the temple are placed at their entrances', () => {
     const map = ctx.world.maps.get('overworld')!;
-    if (map.width === 72) expect(worldOffsetOf(map)).toEqual([64, 64]);
     const cells = anchorCells(ctx, geo);
-    expect(cells.get('cornelia')).toEqual([92, 111]);
-    expect(cells.get('temple')).toEqual([79, 103]);
+    for (const name of ['cornelia', 'temple']) {
+      const a = geo.anchors.find((x) => x.name === name)!;
+      expect(cells.get(name), name).toEqual(map.entrances![a.entrance]);
+    }
   });
 
   it('(g) passes, the unbuilt anchors assumed; --strict fails each assumed anchor', () => {

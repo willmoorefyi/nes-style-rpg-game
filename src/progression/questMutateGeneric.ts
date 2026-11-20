@@ -7,7 +7,7 @@
 import type { QuestContext } from './questProofs.js';
 import { stageOfMap } from './questCatalog.js';
 import {
-  dropFlagAt, dropItemAt, editMap, flagsOf, forcePatch, npcDropFlag, worldAt, type MutElement,
+  dropFlagAt, dropItemAt, editMap, flagsOf, forcePatch, npcDropFlag, type MutElement,
 } from './questMutateOps.js';
 
 const STATE_KINDS = new Set(['gift', 'trade', 'battle', 'cutscene', 'chest']);
@@ -16,7 +16,7 @@ export function genericElements(ctx: QuestContext): MutElement[] {
   const out: MutElement[] = [];
   const add = (map: string, kind: MutElement['kind'], x: number, y: number, label: string, reads: string[],
     apply: MutElement['apply']): void => {
-    const at = worldAt(ctx.world, map, x, y);
+    const at: [number, number] = [x, y];
     out.push({ map, kind, at, label: `${map} ${label}`, key: `${map}:${kind}:${at[0]},${at[1]}:${label}`, reads, apply });
   };
   for (const m of [...ctx.world.maps.values()].sort((a, b) => a.id.localeCompare(b.id))) {

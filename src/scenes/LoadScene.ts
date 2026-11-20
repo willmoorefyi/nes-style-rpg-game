@@ -5,6 +5,7 @@ import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { ConfirmBox } from '../ui/ConfirmBox.js';
 import { SaveManager, type SlotSummary } from '../systems/SaveManager.js';
+import { RESET_ENTRANCE, RESET_NOTICE } from '../systems/worldReset.js';
 import { SLOT_RECTS, detailWindow, slotLabel, titleWindow } from './save/slotView.js';
 import { MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 
@@ -105,7 +106,11 @@ export class LoadScene implements Scene {
       return;
     }
     this.game.restoreState(data);
-    this.game.pendingEntrance = null;
+    // NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): a pre-NW save moved to Cornelia arrives at its south gate, facing
+    // south, and the field says so once
+    this.game.pendingEntrance = data.reset ? RESET_ENTRANCE : null;
+    this.game.pendingFacing = data.reset ? 'down' : null;
+    this.game.pendingNotice = data.reset ? RESET_NOTICE : null;
     this.game.battleRetry = null;
     this.game.pendingBattle = null;
     this.game.scenes.switchTo('exploration');

@@ -11,7 +11,7 @@ import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
 import { validateMapData } from '../../src/core/schemaValidation.js';
 import { createMapData } from '../helpers/testUtils.js';
-import { a1At, translateA1 } from '../helpers/worldFrame.js';
+import { gate, patchCells } from '../helpers/worldSpots.js';
 
 const state = (flags: string[] = []): FieldState => ({ flags: new Set(flags), items: new Set(), mode: 'walking', vehicles: [] });
 
@@ -79,19 +79,17 @@ describe('patches: the field step and the collision map', () => {
   });
 });
 
-describe('patches: an act-1 north-bridge span in both frames', () => {
+describe('patches: the north-bridge span of the compiled world', () => {
   const ow = validateMapData(parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')));
-  // the act-1 cells of the gap north of the stubs (29-30, 31): what A1-O's `north_bridge` patch spans
-  const withSpan = (m: MapData): MapData => ({
-    ...m, patches: [{ id: 'north_bridge', flag: 'BRIDGE_BUILT', terrain: TerrainType.Bridge,
-      cells: [[29, 31], [30, 31]].map(([x, y]) => { const c = a1At(m, x, y); return [c.x, c.y] as [number, number]; }) }],
-  });
+  // the gap north of the bridge gates, by the world's own `north_bridge` patch (NW-5: by name, not by cell)
+  const gap = patchCells(ow, 'north_bridge');
 
-  it.each([['the act-1 map', ow], ['the world frame', translateA1(ow)]])('the span opens the gap on BRIDGE_BUILT (%s)', (_n, base) => {
-    const map = withSpan(base as MapData);
-    const gap = a1At(map, 29, 31);
-    expect(canEnter(map, gap, 'walking', state())).toBe(false);
-    expect(canEnter(map, gap, 'walking', state(['BRIDGE_BUILT']))).toBe(true);
-    expect(fieldStep(map, a1At(map, 29, 32), gap, state(['BRIDGE_BUILT'])).ok).toBe(true);
+  it('the span opens the gap on BRIDGE_BUILT, from the gate beside it', () => {
+    const g = gate(ow, 'a1_bridge_gate_w');
+    const cell = gap.find((c) => Math.abs(c.x - g.x) + Math.abs(c.y - g.y) === 1)!;
+    expect(cell).toBeDefined();
+    expect(canEnter(ow, cell, 'walking', state())).toBe(false);
+    expect(canEnter(ow, cell, 'walking', state(['BRIDGE_BUILT']))).toBe(true);
+    expect(fieldStep(ow, g, cell, state(['BRIDGE_BUILT'])).ok).toBe(true);
   });
 });

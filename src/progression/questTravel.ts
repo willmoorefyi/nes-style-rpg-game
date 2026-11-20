@@ -12,7 +12,6 @@ import { globMatch } from './questData.js';
 import { Saturator } from './questSaturate.js';
 import { fail, result, type QuestContext } from './questProofs.js';
 import { lateOf } from './questLateData.js';
-import { worldOffsetOf } from './questGeo.js';
 import { AIRSHIP_ONLY, BASIN_SEEDS, type TravelRow } from './questTravelRows.js';
 
 interface RowState {
@@ -130,13 +129,12 @@ function basinRow(ctx: QuestContext, map: MapData, row: TravelRow, vehicles: Veh
       out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} ship docks ${got.join(' ') || '-'} (want ${row.docks.join(' ')})`));
     }
   }
-  const [ox, oy] = worldOffsetOf(map);
   // the composer writes the seeds into the map (`world.basins`, NW-1); a map without them (a fixture) has pass W's
   const seeds = map.world?.basins ?? BASIN_SEEDS;
   const inComp = (b: string): boolean => {
     if (!seeds[b]) return false;
     const [x, y] = seeds[b];
-    return comp.cellSet.has((y - oy) * w + (x - ox));
+    return comp.cellSet.has(y * w + x);
   };
   for (const b of row.basins?.holds ?? []) if (!inComp(b)) out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} the ship's water lacks ${b}`));
   for (const b of row.basins?.lacks ?? []) if (inComp(b)) out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} the ship's water holds ${b}`));

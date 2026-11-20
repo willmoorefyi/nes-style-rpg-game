@@ -11,7 +11,7 @@ import type { QuestEventSpec } from './questEvents.js';
 import { townKeepers } from './questCatalog.js';
 import { globMatch } from './questData.js';
 import {
-  dropFlagAt, dropItemAt, editMap, editQuest, flagsOf, forcePatch, mapCell, npcDropFlag, npcFlags, setCells, worldAt,
+  dropFlagAt, dropItemAt, editMap, editQuest, flagsOf, forcePatch, npcDropFlag, npcFlags, setCells,
   type MutElement,
 } from './questMutateOps.js';
 import { openState } from './questGeo.js';
@@ -23,9 +23,9 @@ export function worldCuts(ctx: QuestContext): Record<string, XY[]> {
   return (m?.world as (MapWorld & { cuts?: Record<string, XY[]> }) | undefined)?.cuts ?? {};
 }
 
-const el = (ctx: QuestContext, map: string, kind: MutElement['kind'], x: number, y: number, label: string,
+const el = (_ctx: QuestContext, map: string, kind: MutElement['kind'], x: number, y: number, label: string,
   apply: MutElement['apply']): MutElement => {
-  const at = worldAt(ctx.world, map, x, y);
+  const at: [number, number] = [x, y];
   return { map, kind, at, label, key: `${map}:${kind}:${at[0]},${at[1]}:${label}`, apply };
 };
 
@@ -139,7 +139,7 @@ export function canoeCut(ctx: QuestContext, from: string, to: string): MutElemen
   if (!map || !a || !b) return [];
   const cells = minimalCut(ctx, map, { x: a[0], y: a[1] }, { x: b[0], y: b[1] });
   if (!cells.length) return [];
-  const wc = cells.map(([x, y]) => worldAt(world, map.id, x, y));
+  const wc = cells.map(([x, y]): [number, number] => [x, y]);
   return [{ map: map.id, kind: 'cut', at: wc[0], label: `canoe cut ${from}-${to} made grass (${wc.length} cells)`,
     key: `canoecut:${from}:${to}`, apply: (w) => setCells(w, wc, TerrainType.Grass) }];
 }
@@ -237,4 +237,3 @@ export function townOpensAfter(ctx: QuestContext, townId: string, after: string[
     key: `quest:town:${townId}`, apply: (w) => editQuest(w, (q) => { q.towns.find((t) => t.id === townId)!.opensAfter = after; }) }];
 }
 
-export { mapCell };

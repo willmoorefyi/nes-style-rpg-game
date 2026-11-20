@@ -14,14 +14,14 @@ import { Inventory } from '../../src/entities/Inventory.js';
 import { GameFlags } from '../../src/core/GameFlags.js';
 import type { FieldMode, MapData, ParkedVehicle, VehicleState } from '../../src/types/index.js';
 
-type Retry = RetryState & { fieldMode: FieldMode; vehicles: ParkedVehicle[]; pendingFrame: 'a1' | null };
+type Retry = RetryState & { fieldMode: FieldMode; vehicles: ParkedVehicle[] };
 
 /** The parts of Game the snapshot uses, restoring the way Game.restoreState does (missing mode: on foot). */
 function game(mode: FieldMode, x: number, y: number, vehicles: VehicleState[]): Retry {
   const g: Retry = {
     party: new PartyManager(), inventory: new Inventory(), gameFlags: new GameFlags(),
     currentMapId: 'test-dock', playerPosition: { x, y }, playTime: 3, pendingEntrance: null,
-    fieldMode: mode, vehicles, pendingFrame: null,
+    fieldMode: mode, vehicles,
     restoreState(d) {
       g.party = d.party; g.inventory = d.inventory; g.gameFlags = d.flags; g.currentMapId = d.currentMap;
       g.playerPosition = d.playerPosition; g.playTime = d.playTime;

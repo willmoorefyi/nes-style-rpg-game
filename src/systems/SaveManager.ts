@@ -4,17 +4,19 @@ import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
 import { parseBoosts, type Boosts } from '../core/Boosts.js';
+import { NW_SAVE_VERSION, resetSave } from './worldReset.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
 /**
  * Version 2 (pass W, W1-A) adds the party's field `mode` and the parked `vehicles`; a version-1 save loads on foot
- * with no vehicles, and its overworld position is an act-1 cell (GAP-17: `frame: 'a1'`, translated by the world's
- * `world.frames.a1.origin` on the next field enter). Old saves load through `Character.fromJSON`, which clamps
- * charges and recomputes the level (T4). Version 3 (pass CHT) adds the playthrough's `boosts`; an older save loads
- * with the default boosts (`parseBoosts`).
+ * with no vehicles. Old saves load through `Character.fromJSON`, which clamps charges and recomputes the level (T4).
+ * Version 3 (pass CHT) adds the playthrough's `boosts`; an older save loads with the default boosts (`parseBoosts`).
+ * Version 4 (pass NW) is the 256x256 world: a version 1-3 save goes through `resetSave` (worldReset.ts,
+ * docs/NATURAL_WORLD_PLAN.md 5.3), so a party on the world map, or one owning a ship or the airship, starts again
+ * before Cornelia with its vehicles at their milestone spots.
  */
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = NW_SAVE_VERSION;
 
 /** The field part of a save (v2): the party's mode and the parked vehicles of every map; the boosts (v3). */
 export interface SaveField {
@@ -33,10 +35,11 @@ export interface LoadedSave {
   playerPosition: { x: number; y: number };
   playTime: number;
   fieldMode: FieldMode;
-  vehicles: VehicleState[];
+  /** Cells, plus the reset's spot vehicles (resolved when their map loads). */
+  vehicles: ParkedVehicle[];
   boosts: Boosts;
-  /** `a1`: a version-1 save on `overworld`, whose position is an act-1 cell (GAP-17). */
-  frame: 'a1' | null;
+  /** A pre-NW save moved to Cornelia (worldReset.ts): the loader sets `pendingEntrance = 'cornelia'`. */
+  reset: boolean;
 }
 
 const VEHICLE_TYPES = ['canoe', 'ship', 'airship'];
@@ -134,11 +137,12 @@ export class SaveManager {
       const raw = localStorage.getItem(`${SAVE_KEY_PREFIX}${slotId}`);
       if (!raw) return null;
       
-      const data: SaveData = JSON.parse(raw);
-      const v1 = data.version === 1;
-      if (!v1 && data.version !== 2 && data.version !== SAVE_VERSION) {
-        console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${data.version}`);
+      const stored: SaveData = JSON.parse(raw);
+      const v1 = stored.version === 1;
+      if (![1, 2, 3, SAVE_VERSION].includes(stored.version)) {
+        console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${stored.version}`);
       }
+      const { data, vehicles, moved } = resetSave({ ...stored, vehicles: v1 ? [] : savedVehicles(stored.vehicles) });
       return {
         party: PartyManager.fromJSON(data.party),
         inventory: Inventory.fromJSON(data.inventory),
@@ -147,9 +151,9 @@ export class SaveManager {
         playerPosition: data.playerPosition,
         playTime: data.playTime,
         fieldMode: v1 ? 'walking' : savedMode(data.mode),
-        vehicles: v1 ? [] : savedVehicles(data.vehicles),
+        vehicles,
         boosts: parseBoosts(data.boosts),   // v1 / v2: none saved, the defaults
-        frame: v1 && data.currentMap === 'overworld' ? 'a1' : null,
+        reset: moved,
       };
     } catch (e) {
       console.error(`Failed to load save slot ${slotId}:`, e);

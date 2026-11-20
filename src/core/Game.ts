@@ -56,8 +56,8 @@ export class Game {
   /** The party's field mode and the parked vehicles of every map (save v2, the retry snapshot; FieldVehicles). */
   fieldMode: FieldMode = 'walking';
   vehicles: ParkedVehicle[] = [];
-  /** `a1`: `playerPosition` is an act-1 overworld cell from a version-1 save, translated on the next field enter. */
-  pendingFrame: 'a1' | null = null;
+  /** A line the field shows once on its first frame (the world reset of a pre-NW save, worldReset.ts). */
+  pendingNotice: string | null = null;
   /** The playthrough's boosts (src/core/Boosts.ts; save v3): defaults on a new game and for an older save. */
   boosts: Boosts = defaultBoosts();
 
@@ -170,7 +170,6 @@ export class Game {
     playTime: number;
     fieldMode?: FieldMode;
     vehicles?: ParkedVehicle[];
-    frame?: 'a1' | null;
     /** Missing keeps the current boosts (a retry: they cannot change in battle). */
     boosts?: Boosts;
   }): void {
@@ -182,7 +181,6 @@ export class Game {
     this.playTime = data.playTime;
     this.fieldMode = data.fieldMode ?? 'walking';
     this.vehicles = data.vehicles ?? [];
-    this.pendingFrame = data.frame ?? null;
     if (data.boosts) this.boosts = { ...data.boosts };
   }
 

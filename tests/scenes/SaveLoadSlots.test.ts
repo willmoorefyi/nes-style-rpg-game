@@ -228,3 +228,39 @@ describe('U6: the Load prompt defaults to No only during a game', () => {
     expect(load.confirmPrompt).toContain('lost');
   });
 });
+
+describe('NW-5: loading a pre-NW save on the world map (docs/NATURAL_WORLD_PLAN.md 5.3)', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('arrives at Cornelia\'s entrance facing south, with the world-change notice once; a v4 save does not', async () => {
+    const { loadRealRegistries } = await import('../helpers/realData.js');
+    await loadRealRegistries();
+    const { RESET_NOTICE } = await import('../../src/systems/worldReset.js');
+    const g = game();
+    g.currentMapId = 'overworld';
+    const save = new SaveScene(g as unknown as Game);
+    save.enter();
+    g.pressed.add('confirm');
+    save.update(1);
+    g.pressed.clear();
+    const lg = { ...g, restoreState: vi.fn(), pendingEntrance: null as string | null, pendingFacing: null as string | null,
+      pendingNotice: null as string | null, battleRetry: null, pendingBattle: null };
+    const loadSlot = (): void => {
+      const load = new LoadScene(lg as unknown as Game);
+      load.enter();
+      load.openedFromTitle();
+      for (let i = 0; i < 2; i++) { g.pressed.add('confirm'); load.update(1); g.pressed.clear(); }
+    };
+    loadSlot();                                       // the v4 save just written: no reset
+    expect(lg.restoreState).toHaveBeenCalledTimes(1);
+    expect(lg.pendingEntrance).toBeNull();
+    expect(lg.pendingNotice).toBeNull();
+    store.ff1_save_0 = JSON.stringify({ ...JSON.parse(store.ff1_save_0), version: 3 });
+    loadSlot();
+    expect(lg.restoreState).toHaveBeenCalledTimes(2);
+    expect(lg.pendingEntrance).toBe('cornelia');
+    expect(lg.pendingFacing).toBe('down');
+    expect(lg.pendingNotice).toBe(RESET_NOTICE);
+    expect(g.scenes.switchTo).toHaveBeenCalledWith('exploration');
+  });
+});

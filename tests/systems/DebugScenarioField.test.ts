@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { DebugScenarioLoader, scenarioSpawn, type DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
+import { DebugScenarioLoader, type DebugScenario } from '../../src/systems/DebugScenarioLoader.js';
 import type { Game } from '../../src/core/Game.js';
 import { isKnownFlag } from '../../src/core/GameFlags.js';
 import type { MapData } from '../../src/types/index.js';
@@ -89,11 +89,11 @@ describe('DebugScenarioLoader field mode', () => {
       expect(variants.length, `${s.id}: map ${s.map} exists`).toBeGreaterThan(0);
       for (const f of variants) {
         const map = parse(readFileSync(resolve(root, f), 'utf-8')) as
-          { width: number; collision: number[]; entrances?: Record<string, [number, number]> } & Pick<MapData, 'world' | 'spots'>;
+          { width: number; collision: number[]; entrances?: Record<string, [number, number]> } & Pick<MapData, 'spots'>;
         if (s.entrance && !map.entrances?.[s.entrance]) throw new Error(`${s.id}: ${f} has no entrance ${s.entrance}`);
         if (s.spot && !map.spots?.[s.spot]) throw new Error(`${s.id}: ${f} has no spot ${s.spot}`);
-        // GAP-18 (W1-B): a `frame: a1` spawn is an act-1 cell, moved by the map's world.frames.a1.origin; NW-1: a spot
-        const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spot ? map.spots![s.spot].at : scenarioSpawn(s, map);
+        // NW-1: a spot; NW-5: a raw spawn is a plain cell (pass W's act-1 frame is gone)
+        const [x, y] = s.entrance ? map.entrances![s.entrance] : s.spot ? map.spots![s.spot].at : s.spawn ?? [0, 0];
         expect([1, 2], `${s.id} spawn in ${f}`).not.toContain(map.collision[y * map.width + x]);
       }
     }

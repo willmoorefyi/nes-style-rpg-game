@@ -67,16 +67,8 @@ export interface SpotVehicle {
 /** A parked vehicle as the game holds it: a cell, or a spot not resolved yet. A save stores cells only. */
 export type ParkedVehicle = VehicleState | SpotVehicle;
 
-/** A frame of the compiled world: the act-1 block's origin and size in world cells (GAP-17). */
-export interface MapWorldFrame {
-  origin: CellXY;
-  size: CellXY;
-}
-
-/** `MapData.world` (GAP-17; written by W1-C2's compiler, read by W1-A's save and W1-B's debug loader). */
+/** `MapData.world`: the composer's records of the world map (pass NW has no act-1 frame: NATURAL_WORLD 3.6.5). */
 export interface MapWorld {
-  /** Optional since NW-1: the 256x256 world has no act-1 frame (docs/NATURAL_WORLD_PLAN.md 3.6.5). */
-  frames?: { a1?: MapWorldFrame };
   /** The basin seeds (`world_api.BASIN_SEEDS`, written by the composer since NW-1): the verifier's proof (h). */
   basins?: Record<string, CellXY>;
   /** The composer's wall and barrier cuts by name (the mutation rows GT-13 / GT-35). */
