@@ -94,7 +94,10 @@ window.onunhandledrejection = (e) => showError(`Unhandled: ${e.reason}`);
       return new DebugSandboxScene(game);
     });
   }
-  await game.scenes.switchTo('title');
+  // dev only: ?mode7=pilot opens the Mode 7 pilot's static render instead of the title (docs/MODE7_PLAN.md 10, M7-0)
+  const pilot = import.meta.env.DEV && new URLSearchParams(location.search).get('mode7') === 'pilot';
+  if (pilot) game.scenes.registerLazy('mode7Pilot', async () => new (await import('./scenes/exploration/mode7/Mode7PilotScene.js')).Mode7PilotScene(game));
+  await game.scenes.switchTo(pilot ? 'mode7Pilot' : 'title');
   game.app.renderer.background.color = 0x102040;
 })().catch((e) => {
   console.error(e);
