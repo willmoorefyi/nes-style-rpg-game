@@ -1,11 +1,19 @@
 /**
- * The Mode 7 ground as scanline strips (docs/MODE7_PLAN.md 2.3, R5): one `Mesh` of fixed row quads, one per screen
- * row, whose UVs (and, for rows that miss the ground, collapsed positions) are rewritten from the pure row table each
- * update and re-uploaded with `buffer.update()`. M7-0 builds the far mesh only (the whole ground from the atlas); the
- * near mesh and the 8 seam meshes come in M7-3.
+ * The Mode 7 ground as scanline strips (docs/MODE7_PLAN.md 2.3, 2.5, R5): fixed row quads, one per screen row, whose
+ * UVs (and, for rows that do not draw, collapsed positions) are rewritten from the pure row table each update and
+ * re-uploaded with `buffer.update()`. Three parts, one texture and one `alpha` each (Pixi 8's mesh shader has no
+ * vertex alpha):
+ * - the far mesh: the rows farther than the split, from the far atlas (the whole map);
+ * - the near mesh: the rows from the split down, from the near detail (the window's square);
+ * - 8 one-row seam meshes just above the split, from the near detail at alpha 1/9 to 8/9, over the far mesh.
+ * Without a near window (no streamed chunks) the far mesh draws every row.
  */
-import { Mesh, MeshGeometry, type Texture } from 'pixi.js';
-import { SCREEN_H, SCREEN_W, fillStrips, rowTable, type RowTable, type ViewParams } from './mode7Math.js';
+import { Container, Mesh, MeshGeometry, type Texture } from 'pixi.js';
+import { SCREEN_H, SCREEN_W, collapseRows, fillStrips, nearSplit, rowFits, rowTable, type RowTable,
+  type ViewParams } from './mode7Math.js';
+
+/** One-row seam meshes between the far and the near ground (2.5). */
+export const SEAM_ROWS = 8;
 
 /** Index buffer of `rows` quads (two triangles each over the 4 vertices of `fillStrips`). */
 export function quadIndices(rows: number): Uint32Array {
@@ -17,38 +25,101 @@ export function quadIndices(rows: number): Uint32Array {
   return out;
 }
 
-export class GroundStrips {
-  readonly far: Mesh;
-  private readonly geometry: MeshGeometry;
-  private readonly positions: Float32Array;
-  private readonly uvs: Float32Array;
-  private uploads = 0;
+/** Where the near texture covers: its square's origin and side in cells, and the split distance. */
+export interface NearSquare { x0: number; y0: number; cells: number; dSplit: number }
 
-  constructor(texture: Texture, private readonly mapW: number, private readonly mapH: number,
-    private readonly rows = SCREEN_H, private readonly width = SCREEN_W) {
+class Strip {
+  readonly mesh: Mesh;
+  readonly positions: Float32Array;
+  readonly uvs: Float32Array;
+  private readonly geometry: MeshGeometry;
+
+  constructor(texture: Texture, readonly rows: number) {
     this.positions = new Float32Array(rows * 8);
     this.uvs = new Float32Array(rows * 8);
     this.geometry = new MeshGeometry({ positions: this.positions, uvs: this.uvs, indices: quadIndices(rows) });
-    this.far = new Mesh({ geometry: this.geometry, texture });
-    // 4320 vertices: never batched, so the texture's own style (mips, anisotropy) samples it
+    this.mesh = new Mesh({ geometry: this.geometry, texture });
+    // never batched, so the texture's own style (mips, anisotropy, nearest) samples it
     this.geometry.batchMode = 'no-batch';
   }
+
+  upload(): void {
+    this.geometry.getBuffer('aPosition').update();
+    this.geometry.getBuffer('aUV').update();
+  }
+
+  destroy(): void {
+    this.mesh.destroy();
+    this.geometry.destroy();
+  }
+}
+
+export class GroundStrips {
+  /** The meshes in draw order (far, seams, near), in one container. */
+  readonly view = new Container();
+  private readonly farStrip: Strip;
+  private readonly nearStrip: Strip | null;
+  private readonly seams: Strip[] = [];
+  private uploads = 0;
+  /** The near mesh's first row of the last update (`rows` when the near mesh draws nothing). */
+  split: number;
+
+  constructor(texture: Texture, private readonly mapW: number, private readonly mapH: number,
+    near: Texture | null = null, private readonly rows = SCREEN_H, private readonly width = SCREEN_W) {
+    this.split = rows;
+    this.farStrip = new Strip(texture, rows);
+    this.view.addChild(this.farStrip.mesh);
+    this.nearStrip = near ? new Strip(near, rows) : null;
+    if (!near || !this.nearStrip) return;
+    for (let k = 1; k <= SEAM_ROWS; k++) {
+      const seam = new Strip(near, 1);
+      seam.mesh.alpha = k / (SEAM_ROWS + 1);
+      this.seams.push(seam);
+      this.view.addChild(seam.mesh);
+    }
+    this.view.addChild(this.nearStrip.mesh);
+  }
+
+  /** The far mesh (the pilot draws it alone). */
+  get far(): Mesh { return this.farStrip.mesh; }
 
   /** How many times the buffers were uploaded (the pilot's dynamic-buffer check reads it). */
   get uploadCount(): number { return this.uploads; }
 
-  /** Rewrite and upload both buffers for view `p`; returns the row table it drew. */
-  update(p: ViewParams): RowTable {
+  /** Rewrite and upload the buffers for view `p` and the near square (none: the far mesh draws all); the table drawn. */
+  update(p: ViewParams, sq: NearSquare | null = null): RowTable {
     const table = rowTable(p, this.rows);
-    fillStrips(p, table, 0, this.rows, this.mapW, this.mapH, this.positions, this.uvs, this.width);
-    this.geometry.getBuffer('aPosition').update();
-    this.geometry.getBuffer('aUV').update();
+    const { rows, width } = this;
+    const far = this.farStrip;
+    fillStrips(p, table, 0, rows, this.mapW, this.mapH, far.positions, far.uvs, width);
+    const near = this.nearStrip;
+    this.split = near && sq ? nearSplit(p, table, sq.dSplit, sq.x0, sq.y0, sq.cells, rows, width) : rows;
+    if (near && sq) {
+      collapseRows(far.positions, this.split, rows);
+      fillStrips(p, table, 0, rows, sq.cells, sq.cells, near.positions, near.uvs, width, sq.x0, sq.y0);
+      collapseRows(near.positions, 0, this.split);
+      near.upload();
+      this.seams.forEach((seam, i) => {
+        const r = this.split - SEAM_ROWS + i;   // alpha 1/9 farthest, 8/9 next to the near mesh
+        seam.mesh.visible = r >= 0 && this.split < rows && rowFits(p, table, r, sq.x0, sq.y0, sq.cells, width);
+        if (!seam.mesh.visible) return;
+        fillStrips(p, table, r, r + 1, sq.cells, sq.cells, seam.positions, seam.uvs, width, sq.x0, sq.y0);
+        seam.upload();
+      });
+    } else {
+      if (near) collapseRows(near.positions, 0, rows);
+      for (const seam of this.seams) seam.mesh.visible = false;
+      near?.upload();
+    }
+    far.upload();
     this.uploads++;
     return table;
   }
 
   destroy(): void {
-    this.far.destroy();
-    this.geometry.destroy();
+    this.farStrip.destroy();
+    this.nearStrip?.destroy();
+    for (const s of this.seams) s.destroy();
+    this.view.destroy();
   }
 }

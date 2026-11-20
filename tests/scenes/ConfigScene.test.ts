@@ -82,19 +82,19 @@ describe('ConfigScene: the airship view row (M7-2, docs/MODE7_PLAN.md 7)', () =>
     const store = memoryStore();
     vi.stubGlobal('localStorage', store);
     const { scene, game } = open();
-    expect(scene.airshipLine).toContain(airshipRow('topdown'));
+    expect(scene.airshipLine).toContain(airshipRow('mode7'));   // the default since M7-3 (D-M8)
     expect(scene.speedLine.startsWith('>')).toBe(true);
     game.input.tap('down', () => scene.update(1));
     expect(scene.airshipLine.startsWith('>')).toBe(true);
     expect(scene.helpLine).toContain('Airship view');
     game.input.tap('right', () => scene.update(1));
-    expect(getSettings()).toEqual({ messageSpeed: 3, airshipView: 'mode7' });
-    expect(scene.airshipLine).toContain('[Mode 7]');
-    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 3, airshipView: 'mode7' });
+    expect(getSettings()).toEqual({ messageSpeed: 3, airshipView: 'topdown' });
+    expect(scene.airshipLine).toContain('[Top-down]');
+    expect(JSON.parse(store.data[SETTINGS_KEY])).toEqual({ messageSpeed: 3, airshipView: 'topdown' });
     game.input.tap('left', () => scene.update(1));
-    expect(getSettings().airshipView).toBe('topdown');
+    expect(getSettings().airshipView).toBe('mode7');
     game.input.tap('up', () => scene.update(1));
     game.input.tap('right', () => scene.update(1));
-    expect(getSettings()).toEqual({ messageSpeed: 4, airshipView: 'topdown' });
+    expect(getSettings()).toEqual({ messageSpeed: 4, airshipView: 'mode7' });
   });
 });

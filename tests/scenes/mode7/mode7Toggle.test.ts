@@ -4,7 +4,7 @@ import { capsOf, mode7Enabled, type Mode7Caps } from '../../../src/scenes/explor
 /** M7-2: the Mode 7 gate (docs/MODE7_PLAN.md 7): the precedence table and the capabilities read from a stub `gl`. */
 const FULL: Mode7Caps = { webgl: true, webgl2: true, maxTexture: 16384, anisotropy: true, failed: false, slow: false };
 
-const URLS = ['', '?mode7=0', '?mode7=1', '?mode7=pilot'] as const;
+const URLS = ['', '?mode7=0', '?mode7=1', '?mode7=low', '?mode7=pilot'] as const;
 const CAPS: Record<string, Mode7Caps> = {
   full: FULL,
   noWebgl: { ...FULL, webgl: false, webgl2: false },
@@ -22,6 +22,7 @@ function expected(url: string, cap: string, setting: string): string {
   if (cap === 'noWebgl' || cap === 'failed' || cap === 'tiny') return 'off';
   const fit = cap === 'small' || cap === 'webgl1' ? 'low' : 'full';
   if (url === '?mode7=1') return fit;
+  if (url === '?mode7=low') return 'low';
   if (cap === 'slow') return 'off';
   return setting === 'topdown' ? 'off' : fit;
 }

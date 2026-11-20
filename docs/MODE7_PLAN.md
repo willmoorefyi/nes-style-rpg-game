@@ -807,7 +807,15 @@ Still open, each with a proposed default that the plan builds unless you say oth
   Tests: `mode7Toggle`, `mode7Tilt`, `mode7Activation`, `mode7Parity` (on / off / no renderer, the loading variant and
   a streamed 192x192 variant with a late chunk). Browser, headed Chromium on ANGLE Metal (Apple M4 Pro), w_s18_start
   `?mode7=1`: 600 steady flight frames, frame p95 10.0 ms, update p95 0.2 ms; artefacts in `~/temp/ff-game/m7_2/`
-- [ ] M7-3 near detail, default on; the user's live test (priority: high, effort: 6 h)
+- [x] M7-3 near detail, default on (priority: high, effort: 6 h). Result: `NearDetail` (4x4 chunks at 48 px, 3072²;
+  low 3x3 at 32 px, 1536²; underlay, chunks, patches; recentre / flag change / late chunk redraws), `FlightStream`
+  (the window and cap to the streamer), `flightStats` (p95s without the upload frames), the near and 8 seam meshes in
+  `GroundStrips` (the split moves down past rows the window does not cover: near the clamped map edges), the fog in
+  `FlightSky`; `StreamedChunks.setWindow` / `onChunkLoaded` / `textureOf`, `ChunkStreamer.setCap` (+ `flightWindow`),
+  the flight `stepHeld`; `?mode7=low` (an addition, for the low-end review); the default `mode7` (D-M8). Browser
+  (headed Chromium, ANGLE Metal, Apple M4 Pro), w_s18_start with the default settings: frame p95 9.9 ms, update p95
+  0.5 ms over 600 steady frames (low: 10.0 / 0.3); resident chunks at most 36 (low 16); measured GPU memory 172.9 MB
+  (low 59.7 MB) plus the sky, fog and meshes; artefacts in `~/temp/ff-game/m7_3/`. The user's live test is next
 - [ ] M7-4 tilt and landing (priority: high, effort: 4 h)
 - [ ] M7-5 billboards and clouds (priority: medium, effort: 4 h)
 - [ ] M7-6 fallbacks (priority: high, effort: 3 h)

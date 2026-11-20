@@ -2,8 +2,8 @@ import { Sprite, Texture, type Container } from 'pixi.js';
 import type { BakedMapArt, MapData } from '../types/index.js';
 import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from './Camera.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
-import { chunkRect, ChunkStreamer, dominantColour, MISS_HOLD_FRAMES, STREAM_TEXTURE_CAP, viewSpan, type ChunkRect,
-  type ChunkSource } from './chunkStreaming.js';
+import { chunkRect, ChunkStreamer, dominantColour, flightWindow, MISS_HOLD_FRAMES, STREAM_TEXTURE_CAP, viewSpan,
+  type ChunkRect, type ChunkSource } from './chunkStreaming.js';
 
 interface Slot {
   below: Sprite | null;
@@ -34,12 +34,16 @@ export class StreamedChunks {
   private last: { x: number; y: number } | null = null;
   private readonly dir = { x: 0, y: 0 };
   private waiters: (() => void)[] = [];
+  /** The Mode 7 flight window (docs/MODE7_PLAN.md 3.3), its size in chunks, and the late-chunk listeners. */
+  private override: ChunkRect | null = null;
+  private flightN = 0;
+  private readonly listeners = new Set<(i: number) => void>();
 
   constructor(private readonly map: MapData, private readonly art: BakedMapArt, source: ChunkSource,
     private readonly below: Container, private readonly above: Container, private readonly sprite: ChunkSpriteFactory) {
     this.cols = Math.ceil(map.width / art.chunk);
     this.rows = Math.ceil(map.height / art.chunk);
-    this.streamer = new ChunkStreamer(source, STREAM_TEXTURE_CAP, (url) => this.evicted(url), () => this.checkReady());
+    this.streamer = new ChunkStreamer(source, STREAM_TEXTURE_CAP, (url) => this.evicted(url), (url) => this.arrived(url));
     art.below.forEach((url, i) => {
       this.slots.push({ below: null, above: null, placeholder: null, missAt: null, logged: false });
       this.urlSlot.set(url, { i, layer: 'below' });
@@ -51,6 +55,29 @@ export class StreamedChunks {
   /** Resident chunk textures (loaded or loading), both layers. */
   get count(): number { return this.streamer.count; }
 
+  /** In flight, `rect` (an n x n `flightWindow`) replaces the view's window and `cap` the texture cap (trimmed at once);
+   *  `setWindow(null, STREAM_TEXTURE_CAP)` restores today's. */
+  setWindow(rect: ChunkRect | null, cap: number): void {
+    this.override = rect;
+    this.flightN = rect ? rect.c1 - rect.c0 + 1 : 0;
+    this.streamer.setCap(cap);
+  }
+
+  /** `cb(i)` runs each time chunk i finishes loading (all its layers); returns the unsubscribe. */
+  onChunkLoaded(cb: (i: number) => void): () => void {
+    this.listeners.add(cb);
+    return () => { this.listeners.delete(cb); };
+  }
+
+  /** Chunk i's loaded textures (below, then above when it has one), or null while any is missing. */
+  textureOf(i: number): Texture[] | null {
+    if (!this.loaded(i)) return null;
+    const below = this.streamer.texture(this.art.below[i]);
+    const up = this.art.above[i];
+    const above = up ? this.streamer.texture(up) : null;
+    return below ? (above ? [below, above] : [below]) : null;
+  }
+
   /** One frame: `vis` is the chunks in view, (`camX`, `camY`) the camera, whose motion gives the direction of travel. */
   update(vis: ChunkRect, camX: number, camY: number): void {
     this.frame++;
@@ -59,9 +86,11 @@ export class StreamedChunks {
       if (camY !== this.last.y) this.dir.y = Math.sign(camY - this.last.y);
     }
     this.last = { x: camX, y: camY };
+    const src = this.override ?? vis;   // in flight: the window, plus 1 chunk ahead (no ring)
+    const ring = this.override ? 0 : 1;
     const win: ChunkRect = {
-      c0: Math.max(0, vis.c0 - 1 - (this.dir.x < 0 ? 1 : 0)), c1: Math.min(this.cols - 1, vis.c1 + 1 + (this.dir.x > 0 ? 1 : 0)),
-      r0: Math.max(0, vis.r0 - 1 - (this.dir.y < 0 ? 1 : 0)), r1: Math.min(this.rows - 1, vis.r1 + 1 + (this.dir.y > 0 ? 1 : 0)),
+      c0: Math.max(0, src.c0 - ring - (this.dir.x < 0 ? 1 : 0)), c1: Math.min(this.cols - 1, src.c1 + ring + (this.dir.x > 0 ? 1 : 0)),
+      r0: Math.max(0, src.r0 - ring - (this.dir.y < 0 ? 1 : 0)), r1: Math.min(this.rows - 1, src.r1 + ring + (this.dir.y > 0 ? 1 : 0)),
     };
     const isVisible = (i: number): boolean => inRect(vis, i % this.cols, Math.floor(i / this.cols));
     const order: number[] = [];
@@ -76,12 +105,11 @@ export class StreamedChunks {
     this.checkReady();
   }
 
-  /** A step onto (x, y) waits while a window chunk the view there needs is missing, for at most MISS_HOLD_FRAMES. */
+  /** A step onto (x, y) waits while a window chunk the view there needs is missing, for at most MISS_HOLD_FRAMES. In
+   *  flight the view there is the window recentring would choose for (x, y) (D-M11). */
   stepHeld(x: number, y: number): boolean {
     if (!this.visible) return false;
-    const [x0, x1] = viewSpan(x, VIEWPORT_WIDTH / TILE_SIZE, this.map.width);
-    const [y0, y1] = viewSpan(y, VIEWPORT_HEIGHT / TILE_SIZE, this.map.height);
-    const r = chunkRect(x0, y0, x1, y1, this.art.chunk, this.cols, this.rows);
+    const r = this.override ? flightWindow(x, y, this.flightN, this.art.chunk, this.cols, this.rows) : this.viewAt(x, y);
     let held = false;
     for (let row = r.r0; row <= r.r1; row++) {
       for (let col = r.c0; col <= r.c1; col++) {
@@ -93,6 +121,12 @@ export class StreamedChunks {
       }
     }
     return held;
+  }
+
+  private viewAt(x: number, y: number): ChunkRect {
+    const [x0, x1] = viewSpan(x, VIEWPORT_WIDTH / TILE_SIZE, this.map.width);
+    const [y0, y1] = viewSpan(y, VIEWPORT_HEIGHT / TILE_SIZE, this.map.height);
+    return chunkRect(x0, y0, x1, y1, this.art.chunk, this.cols, this.rows);
   }
 
   /** Resolves once every chunk in view is loaded. */
@@ -159,6 +193,16 @@ export class StreamedChunks {
     const slot = this.slots[at.i];
     slot[at.layer]?.destroy();
     slot[at.layer] = null;
+  }
+
+  /** A texture arrived: wake `ready` waiters, and tell the listeners once the whole chunk is loaded. */
+  private arrived(url: string): void {
+    this.checkReady();
+    const at = this.urlSlot.get(url);
+    if (!at || !this.loaded(at.i)) return;
+    for (const cb of this.listeners) {
+      try { cb(at.i); } catch (err) { console.error(`Map ${this.map.id}: a chunk-loaded listener failed`, err); }
+    }
   }
 
   private checkReady(): void {

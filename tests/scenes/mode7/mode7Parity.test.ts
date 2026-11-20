@@ -153,7 +153,7 @@ describe('M7-2: parity, Mode 7 on and off', () => {
   });
 });
 
-describe('M7-2: parity on a streamed world (192x192, a late chunk on the route)', () => {
+describe('M7-2 / M7-3: parity on a streamed world (192x192, late chunks on the route)', () => {
   beforeEach(() => resetStub());
   afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
@@ -198,12 +198,22 @@ describe('M7-2: parity on a streamed world (192x192, a late chunk on the route)'
   it('in both modes a held step waits at most MISS_HOLD_FRAMES, then goes on; the end state is equal', async () => {
     const off = await streamedRun('off');
     const on = await streamedRun('on');
-    expect(on.f.outcome()).toEqual(off.f.outcome());
-    expect(on.perStep).toEqual(off.perStep);
+    const { frames: offFrames, ...offEnd } = off.f.outcome();
+    const { frames: onFrames, ...onEnd } = on.f.outcome();
+    expect(onEnd).toEqual(offEnd);
     expect(on.f.game.playerPosition).toEqual({ x: 100, y: 80 });
     expect(on.f.game.fieldMode).toBe('walking');
-    const base = Math.min(...on.perStep);
-    expect(Math.max(...on.perStep)).toBeGreaterThan(base);                     // the late chunk held a step
-    expect(Math.max(...on.perStep)).toBeLessThanOrEqual(base + MISS_HOLD_FRAMES + 1);
+    const base = Math.min(...off.perStep);
+    expect(Math.min(...on.perStep)).toBe(base);
+    const held = (per: number[]): number[] => per.flatMap((n, i) => (n > base ? [i] : []));
+    for (const per of [off.perStep, on.perStep]) {
+      expect(Math.max(...per)).toBeLessThanOrEqual(base + MISS_HOLD_FRAMES + 1);   // at most one hold per miss
+    }
+    // M7-3 (D-M11): in flight the hold reads the flight window, which reaches farther north than the top-down view:
+    // top-down holds once, as chunk row 4 enters the view (step 9); the flight window (4x4 chunks, the ship 24 or more
+    // cells from its edges, plus 1 ahead) holds at the take-off's first step (row 4) and again at step 13 (row 3)
+    expect(held(off.perStep)).toEqual([8]);
+    expect(held(on.perStep)).toEqual([0, 12]);
+    expect(onFrames - offFrames).toBe(on.perStep.reduce((a, n) => a + n, 0) - off.perStep.reduce((a, n) => a + n, 0));
   });
 });

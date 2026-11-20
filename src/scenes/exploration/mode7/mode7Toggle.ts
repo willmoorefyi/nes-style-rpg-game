@@ -23,7 +23,7 @@ export interface Mode7Caps {
 export const MIN_TEXTURE = 2048;
 export const FULL_TEXTURE = 4096;
 
-/** The `?mode7=` value: '0', '1', 'pilot' or null. */
+/** The `?mode7=` value: '0', '1', 'low' (M7-3: like '1', but always the low profile), 'pilot' or null. */
 export function mode7Param(search: string): string | null {
   return new URLSearchParams(search).get('mode7');
 }
@@ -31,7 +31,8 @@ export function mode7Param(search: string): string | null {
 /**
  * The profile. Precedence (7): the URL (`?mode7=0` off always; `?mode7=1` full, or low on a small texture limit or
  * without WebGL2, over the setting and `slow` but never over `!webgl`, `failed` or a texture limit under 2048), then
- * the caps, then the setting (`topdown` is off).
+ * the caps, then the setting (`topdown` is off). `?mode7=low` is `?mode7=1` forced to the low profile (the review
+ * and measurements of the low end on a full GPU).
  */
 export function mode7Enabled(search: string, settings: { airshipView: AirshipView }, caps: Mode7Caps): Mode7Profile {
   const url = mode7Param(search);
@@ -39,6 +40,7 @@ export function mode7Enabled(search: string, settings: { airshipView: AirshipVie
   if (!caps.webgl || caps.failed || caps.maxTexture < MIN_TEXTURE) return 'off';
   const fit: Mode7Profile = caps.maxTexture < FULL_TEXTURE || !caps.webgl2 ? 'low' : 'full';
   if (url === '1') return fit;
+  if (url === 'low') return 'low';
   if (caps.slow) return 'off';
   return settings.airshipView === 'topdown' ? 'off' : fit;
 }

@@ -23,6 +23,8 @@ import { cellToScreen, screenToCell, type ViewParams } from './mode7Math.js';
 import { PILOT_PRESETS, presetView } from './pilotPresets.js';
 import { TiltMachine } from './mode7Tilt.js';
 import { capsOf, mode7Enabled, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
+import { FlightStream, chunkHost, nearProfile } from './FlightStream.js';
+import { FlightStats } from './flightStats.js';
 
 /** The only map Mode 7 draws (D-M7). */
 export const WORLD_MAP = 'overworld';
@@ -30,9 +32,6 @@ export const WORLD_MAP = 'overworld';
 export const FLIGHT_VIEW: ViewParams = presetView(PILOT_PRESETS[0], 0, 0);
 /** The airship's foot on screen in flight once lifted (4.2): 70 px above its shadow row. */
 export const SHIP_FOOT_Y = 750;
-/** Steady-flight samples kept for the p95s, and the frames left out after `flying` starts (9). */
-const SAMPLES = 600;
-const SETTLE_FRAMES = 60;
 
 export interface FlightViewDeps {
   game: Game;
@@ -45,12 +44,7 @@ export interface FlightViewDeps {
   vehicles: FieldVehicles;
 }
 
-/** The 95th percentile (0 when empty). */
-export function p95(xs: readonly number[]): number {
-  if (xs.length === 0) return 0;
-  const sorted = [...xs].sort((a, b) => a - b);
-  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))];
-}
+export { p95 } from './flightStats.js';
 
 export class FlightView {
   private readonly machine = new TiltMachine();
@@ -70,10 +64,9 @@ export class FlightView {
   private boardAt = -Infinity;
   private facing: 'left' | 'right' = 'right';
   private mismatchLogged = false;
-  private steady = 0;
-  private sampled = 0;
-  private readonly frames: number[] = [];
-  private readonly updates: number[] = [];
+  private readonly stream = new FlightStream();
+  private near = nearProfile('full');
+  private readonly stats = new FlightStats();
   readonly report: Record<string, unknown> = { state: 'off', history: this.machine.history };
 
   constructor(private readonly deps: FlightViewDeps) {
@@ -134,6 +127,7 @@ export class FlightView {
     const profile = this.profile();
     if (profile === 'off' || !this.needed()) return;
     this.loadStarted = true;
+    this.near = nearProfile(profile === 'low' ? 'low' : 'full');
     const gen = this.generation;
     const game = this.deps.game;
     import('./FlightRenderer.js').then((m) => {
@@ -176,6 +170,7 @@ export class FlightView {
     this.show(drawn);
     if (drawn && player && this.renderer) this.renderer.draw(this.frame(map, player));
     else this.report.marker = false;
+    if (this.machine.busy) this.deps.tilemap()?.render();   // a tilt: the scene's own render is skipped (3.3)
     this.measure(t0, drawn);
   }
 
@@ -185,7 +180,8 @@ export class FlightView {
     this.shown = drawn;
     this.renderer?.setVisible(drawn);
     this.deps.world.visible = !drawn;
-    this.steady = 0;
+    if (!drawn) this.stream.release();   // the streamer wants the top-down view again
+    this.stats.reset();
   }
 
   private frame(map: MapData, player: PlayerController): FlightFrame {
@@ -210,30 +206,24 @@ export class FlightView {
       corner(here.x, here.y + 1)] : null;
     Object.assign(this.report, { shadowCell: cell, marker: !!marker });
     const now = performance.now();
-    return { view, marker, shadow, ship: { x: view.cx, footY: SHIP_FOOT_Y, facing: this.facing, tMs: now,
+    const chunks = chunkHost(this.deps.tilemap());
+    const near = this.stream.follow(chunks, map, this.near, view.px, view.py);
+    return { view, near: chunks ? near : null, chunks, marker, shadow, ship: { x: view.cx, footY: SHIP_FOOT_Y, facing: this.facing, tMs: now,
       sinceBoard: Number.isFinite(this.boardAt) ? now - this.boardAt : TAKEOFF_MS } };
   }
 
-  /** The report and the steady-flight p95s (the first 60 frames after the view shows are left out). */
+  /** The report and the steady-flight p95s (flightStats: the settle frames and the upload frames are left out). */
   private measure(t0: number, drawn: boolean): void {
-    if (drawn && ++this.steady > SETTLE_FRAMES) {
-      this.push(this.updates, performance.now() - t0);
-      this.sampled++;
-      const ms = (this.deps.game.app as { ticker?: { deltaMS: number } } | undefined)?.ticker?.deltaMS;
-      if (ms !== undefined) this.push(this.frames, ms);
-    }
+    const ms = (this.deps.game.app as { ticker?: { deltaMS: number } } | undefined)?.ticker?.deltaMS;
+    this.stats.push(drawn, !!this.renderer?.heavy, performance.now() - t0, ms);
+    const s = this.stats;
     Object.assign(this.report, {
       state: this.machine.state, reason: this.machine.reason, profile: this.profile(), ready: this.ready,
-      failed: this.failed, busy: this.machine.busy, gl: this.caps?.gl ?? '', samples: this.frames.length,
-      textures: this.renderer?.textures ?? null,
+      failed: this.failed, busy: this.machine.busy, gl: this.caps?.gl ?? '', samples: s.samples,
+      textures: this.renderer
+        ? { ...this.renderer.textures, chunks: chunkHost(this.deps.tilemap())?.residentTextures ?? 0 } : null,
+      heavy: { frames: s.heavyFrames, frameMax: +s.heavyFrameMax.toFixed(2), updateMax: +s.heavyUpdateMax.toFixed(3) },
     });
-    if (this.sampled % 60 === 1) {   // the sort is not free: refresh the p95s once a second of samples
-      Object.assign(this.report, { frameP95: +p95(this.frames).toFixed(2), updateP95: +p95(this.updates).toFixed(3) });
-    }
-  }
-
-  private push(list: number[], v: number): void {
-    list.push(v);
-    if (list.length > SAMPLES) list.shift();
+    if (s.due) Object.assign(this.report, s.summary());
   }
 }
