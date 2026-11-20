@@ -9,12 +9,15 @@ the head keys, the ground block, the rest).
 """
 from __future__ import annotations
 
+import importlib
+import importlib.util
 from pathlib import Path
 
 import numpy as np
 import yaml
 
 from a1 import world_a1_pins as P
+from world_api_v2 import PREFIXES, REGIONS
 from world_specs import today_doors as TD
 from worldgen import spec as S
 from worldgen.gates import BLOCK
@@ -105,6 +108,56 @@ def reach_roots(g: np.ndarray, ents: dict, cover: set) -> list:
             y, x = np.argwhere(lab == k)[0]
             roots.append([int(x), int(y)])
     return roots
+
+
+def region_content(g: np.ndarray, meta: dict, doors: dict) -> dict:
+    """The regions' own content (NW-R, 3.3, 3.5): each region with a module `layouts/<r>/world_nw.py` has its
+    `content(g, meta, doors)` stamp its ground in place (inside its pins) and return its objects, inspect cells,
+    zones, backdrops, region record (`regions.<r>` keys: map checks, ...), errors and `road_islands` (a cell of each
+    of its own road networks, `road_check.islands_ok`); merged in REGIONS order."""
+    out: dict = {"objects": [], "inspect": [], "zones": [], "backdrops": {}, "regions": {}, "errors": [],
+                 "road_islands": []}
+    for r in REGIONS:
+        if importlib.util.find_spec(f"{r}.world_nw") is None:
+            continue
+        c = importlib.import_module(f"{r}.world_nw").content(g, meta, doors)
+        for k in ("objects", "inspect", "zones", "errors", "road_islands"):
+            out[k] += c.get(k, [])
+        out["backdrops"].update(c.get("backdrops", {}))
+        out["regions"][r] = c.get("region", {})
+    return out
+
+
+def merge_regions(doc: dict, reg: dict) -> None:
+    """The regions' zones, backdrops and region records into the document (after the rasters are written)."""
+    doc["encounterZones"] = reg["zones"]
+    if reg["backdrops"]:
+        doc["battleBackgrounds"] = {"zones": reg["backdrops"]}
+    for r, rec in reg["regions"].items():
+        doc["regions"][r].update(rec)
+    if reg["road_islands"]:                  # a region's own road network (on its own land) is not a stray one
+        doc["road_check"]["islands_ok"] = [list(c) for c in reg["road_islands"]]
+
+
+def coverage(g: np.ndarray, meta: dict, zones: list[dict]) -> dict:
+    """3.8 `coverage`, for every region with zones: each of its walkable or canoe cells (River, Lake) lies in one of
+    its walking zones (a zone of its prefix that applies on foot)."""
+    why, done = [], []
+    for i, r in enumerate(REGIONS):
+        mine = [z for z in zones if z["id"].startswith(PREFIXES[r] + "_")
+                and (not z.get("modes") or "walking" in z["modes"])]
+        if not mine:
+            continue
+        held = np.zeros(g.shape, bool)
+        for z in mine:
+            for a, b, c, d in z["rects"]:
+                held[b:d + 1, a:c + 1] = True
+        lost = np.argwhere((meta["region"] == i) & ~np.isin(g, ["o", "m"]) & ~held)
+        done.append(r)
+        if len(lost):
+            why.append(f"{r}: {len(lost)} walkable or canoe cells in no {r} zone, e.g. "
+                       + ", ".join(str((int(x), int(y))) for y, x in lost[:5]))
+    return {"ok": not why, "why": why, "regions": done}
 
 
 def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict) -> dict:

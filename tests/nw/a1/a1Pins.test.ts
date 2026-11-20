@@ -57,10 +57,14 @@ describe('act 1 pins (NW-3, 3.6.2)', () => {
   });
 
   it('every placed act-1 object, inspect cell and NPC is today\'s, moved by (54, 44)', () => {
+    const regions = nw.regions ?? {};
+    const otherLand = (x: number, y: number): boolean => Object.entries(regions).some(([r, v]) => r !== 'a1'
+      && (v.land ?? []).some(([a, b, c, d]) => x >= a && x <= c && y >= b && y <= d));
     const was = (list: { x: number; y: number }[] | undefined) => new Set((list ?? []).filter((o) => inAct1([o.x, o.y])).map((o) => key(pin([o.x, o.y]))));
     for (const [name, now, then] of [['objects', nw.objects, today.objects], ['inspect', nw.inspect, today.inspect],
       ['npcs', nw.npcs, today.npcs], ['vehicles', nw.vehicles, today.vehicles]] as const) {
-      const mine = (now ?? []).filter((o) => inAct1([o.x - 54, o.y - 44]));
+      // act 1's box, less the land another region's content owns (NW-R: `regions.<r>.land`, ELF's Elfheim shore)
+      const mine = (now ?? []).filter((o) => inAct1([o.x - 54, o.y - 44]) && !otherLand(o.x, o.y));
       expect(mine.length, name).toBeGreaterThan(0);
       for (const o of mine) expect(was(then).has(key([o.x, o.y])), `${name} at (${o.x}, ${o.y})`).toBe(true);
     }

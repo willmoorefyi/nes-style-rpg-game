@@ -23,6 +23,9 @@ export interface Src {
   spots: Record<string, { at: XY; kind: string }>;
   road_check?: { materials: string[]; ends: XY[]; no_stubs?: boolean };
   world: { basins: Record<string, XY> };
+  /** NW-R: a region's land on the owner grid as row rects (`regions.<r>.land`, written by the regions that place
+   * content) */
+  regions?: Record<string, { land?: [number, number, number, number][] }>;
 }
 
 export const DELTA: XY = [54, 44];

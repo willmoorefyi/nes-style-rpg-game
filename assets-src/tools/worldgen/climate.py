@@ -21,6 +21,12 @@ from .noise import N, XX, YY, fbm
 COLD_Y = 62                                  # world row: cold from about here north (2.4 rule 5)
 H_M = 0.46                                   # mountain above this elevation
 TIE = "fstwn."                               # the tidy's tie-break among equally common neighbours (first wins)
+# The forest and desert thresholds: NW-0 / NW-2 took them per compose as quantiles over all the land (forest above
+# the 0.72 quantile of `mf`, sand below the 0.05 quantile of `moist`), so any region's land edit moved every
+# region's forest and desert edges (NW-R ELF: its T2 strait alone, 48 land cells, flipped sand in 44 chunks across
+# the world, past `--region`'s PAINT_LIMIT). NW-R ELF froze them at those quantiles of the NW-4 world, bit for bit
+# (the NW-4 world is reproduced exactly), so a region's edit stays local (2.5).
+Q_FOREST, Q_SAND = 0.8816931895841574, 0.14384668557967306
 
 
 def _gauss(c0, r: float) -> np.ndarray:
@@ -64,7 +70,7 @@ def biomes(land, elev, moist, cold, wet, river, lake, seed: int, h_m: float = H_
     coast1 = land & ~(np.roll(land, 1, 0) & np.roll(land, -1, 0) & np.roll(land, 1, 1) & np.roll(land, -1, 1))
     g[land] = "."
     mf = moist + 0.35 * fbm(seed + 92, (10, 5, 2.5))     # forests come in stands, not sheets
-    qf, qs = np.quantile(mf[land], 0.72), np.quantile(moist[land], 0.05)
+    qf, qs = Q_FOREST, Q_SAND
     g[land & (mf > qf)] = "f"
     g[land & (moist < qs)] = "s"
     g[land & coast1 & (cold < 0.1) & (elev < 0.14) & (beachn > 0.18)] = "s"

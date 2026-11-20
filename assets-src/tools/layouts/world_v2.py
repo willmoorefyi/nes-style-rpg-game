@@ -34,7 +34,7 @@ from worldgen import bundle, compose, gates, gates_reach, metrics, owners, prewa
 from worldgen import spec as S  # noqa: E402
 
 CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
-          "walks", "detours", "pins")
+          "walks", "detours", "pins", "coverage")
 
 
 def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
@@ -43,15 +43,18 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     b = bundle.merge(world_specs.load())
     door_off, ent_map = SRC.doors()
     g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
+    reg = SRC.region_content(g, meta, door_off)           # NW-R: the regions' content (stamps in place)
     trans = SRC.transitions(b.sites)
     objs, insp = SRC.act1_content(meta["keep"])
+    objs, insp = objs + reg["objects"], insp + reg["inspect"]
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
     blocked |= {tuple(v) for v in meta["entrances"].values()}
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
     doc = SRC.document(g, meta, trans, objs, insp, sp)
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
-    ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
+    SRC.merge_regions(doc, reg)
+    ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err + reg["errors"], blocked)
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
 
@@ -75,7 +78,8 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "landings": gates_reach.landings(g, meta, b.north, sp, taken), "straits": gates.straits(g, meta),
             "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
             "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),
-            "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad}}
+            "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad},
+            "coverage": SRC.coverage(g, meta, doc["encounterZones"])}
 
 
 def figures(g, meta, ch) -> dict:
@@ -139,6 +143,8 @@ def _ok_note(k: str, v: dict) -> str:
         return " (walk, canoe; cuts " + ", ".join(f"{b} {len(c)}" for b, c in v["cuts"].items()) + ")"
     if k == "prewalk":
         return f" ({prewalk.STAGES[0]}-{prewalk.STAGES[-1]})"
+    if k == "coverage":
+        return f" ({', '.join(v['regions']) or 'no region has zones yet'})"
     return ""
 
 
