@@ -3,7 +3,7 @@
  *
  *   npm run quest -- [--strict] [--mutate] [--stage S11] [--json /tmp/<agent>/quest.json] [--only abc] [--root DIR]
  *     [--maps DIR] [--anchors FILE] [--worst-canoe]   (NW-1: a scratch world compile, its anchors, proof (h)'s worst run)
- *     [--from-reset]   (NW-5: proof (c) again from every stage's save-reset state, docs/NATURAL_WORLD_PLAN.md 5.3)
+ *     [--from-reset] [--reset-samples N]   (NW-5: proof (c) again from every stage's save-reset state, docs/NATURAL_WORLD_PLAN.md 5.3)
  *
  * Proofs (a)-(c) are W1-H's (src/progression/questProofs.ts). Proofs (d)-(h) and `--mutate` come from W1-I's
  * questProofsLate.ts and questMutate.ts, loaded when present: without them the default run reports (a)-(c) only,
@@ -43,7 +43,7 @@ async function main(): Promise<number> {
     if (isLateProofModule(late)) proofs.push(...late.runLateProofs(ctx, new Set(lateWanted)));
     else if (args.only) proofs.push(...lateWanted.map((p) => missingProof(p, 'questProofsLate.ts')));
   }
-  if (args.fromReset) proofs.push(proofFromReset(ctx).result);
+  if (args.fromReset) proofs.push(proofFromReset(ctx, args.resetSamples, (line) => console.error(line)).result);
   let mutations: MutationResult[] | undefined;
   if (args.mutate) {
     const mod = await loadModule(root, 'questMutate');

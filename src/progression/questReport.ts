@@ -46,10 +46,12 @@ export interface VerifyArgs {
   worstCanoe: boolean;
   /** NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): proof (c) again from every stage's reset state and mid-stage samples. */
   fromReset: boolean;
+  /** `--reset-samples N`: mid-stage samples per stage of `--from-reset` (default questReset.RESET_SAMPLES). */
+  resetSamples?: number;
 }
 
 /** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR] [--maps DIR] [--anchors FILE]
- *  [--worst-canoe] [--from-reset]`. Throws on a bad argument. */
+ *  [--worst-canoe] [--from-reset] [--reset-samples N]`. Throws on a bad argument. */
 export function parseArgs(argv: readonly string[]): VerifyArgs {
   const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false, fromReset: false };
   for (let i = 0; i < argv.length; i++) {
@@ -68,6 +70,7 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     else if (a === '--anchors') out.anchors = value();
     else if (a === '--worst-canoe') out.worstCanoe = true;
     else if (a === '--from-reset') out.fromReset = true;
+    else if (a === '--reset-samples') out.resetSamples = Number(value());
     else if (a === '--only') {
       const letters = value();
       const bad = [...letters].filter((c) => !(ALL_PROOFS as readonly string[]).includes(c));
@@ -77,6 +80,9 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
   }
   if (out.stage && !/^S\d+$/.test(out.stage)) throw new Error(`--stage: expected S<n>, got ${out.stage}`);
   if (out.stage && out.fromReset) throw new Error('--from-reset runs every stage: it takes no --stage');
+  if (out.resetSamples !== undefined && !(Number.isInteger(out.resetSamples) && out.resetSamples >= 0)) {
+    throw new Error('--reset-samples: expected a whole number');
+  }
   return out;
 }
 

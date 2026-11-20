@@ -11,8 +11,8 @@ import type { VehicleState } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestPlace, QuestState } from './questTypes.js';
 import { globMatch, stageOrder } from './questData.js';
 import { canReach, pathTo } from './questChecks.js';
-import { fail, result, stateGraph, type QuestContext } from './questProofs.js';
-import { assumedState, exploreStates, settle, type QuestModel } from './questSearch.js';
+import { fail, outOfScopeEvents, result, stateGraph, type QuestContext } from './questProofs.js';
+import { assumedState, exploreStates, settle, type QuestModel, type StateNode } from './questSearch.js';
 import { Saturator } from './questSaturate.js';
 import { stageMark } from './questStates.js';
 import { spotCell } from './questSpots.js';
@@ -111,41 +111,73 @@ export interface ResetRun {
   states: number;
 }
 
-/** Proof (c) from every reset state (the main search's graph first: its states are the known good ones). */
-export function proofFromReset(ctx: QuestContext, samples = 50): ResetRun {
-  if (ctx.stage) throw new Error('--from-reset runs on the full quest, not one --stage');
+interface Scope { target: string; known: ReadonlySet<string>; stopAt?: string; disabled?: ReadonlySet<string> }
+
+/** Proof (c) from one reset state: every state reached reaches the target (or a known good state) and, on foot, has a
+ *  way back to the world map. Returns the failures and the new states searched. */
+function checkFrom(ctx: QuestContext, label: string, state: QuestState, sc: Scope):
+  { failures: ProofFailure[]; states: number; good: string[] } {
   const { world } = ctx;
-  const goal = world.quest.goal;
+  const failures: ProofFailure[] = [];
+  const g = exploreStates(ctx, { start: state, maxStates: ctx.maxStates, known: sc.known, stopAt: sc.stopAt, disabled: sc.disabled });
+  if (g.limited) failures.push(fail('c', 'LIMIT', `LIMIT reset ${label}: the search stopped at ${ctx.maxStates} states`));
+  if (!g.nodes.length) return { failures: [fail('c', 'SOFTLOCK', `SOFTLOCK reset ${label}: Cornelia's arrival is no place`)], states: 0, good: [] };
+  const done = (n: StateNode): boolean => sc.known.has(n.key) || n.state.flags.has(sc.target);
+  const ok = canReach(g, done);
+  const bad = ok.findIndex((v) => !v);
+  if (bad >= 0) {
+    const p = g.nodes[bad].state.place;
+    failures.push(fail('c', 'SOFTLOCK', `SOFTLOCK reset ${label}: ${p.map} (${p.x},${p.y}) ${p.mode} cannot reach ${sc.target}`
+      + ` (${ok.filter((v) => !v).length} states)`, pathTo(g, bad)));
+  }
+  const back = canReach(g, (n) => n.comp.map === world.worldMap || done(n));
+  const lost = g.nodes.findIndex((n, i) => !back[i] && n.comp.mode === 'walking');
+  if (lost >= 0) {
+    const p = g.nodes[lost].state.place;
+    failures.push(fail('c', 'STRANDED', `STRANDED reset ${label}: ${p.map} (${p.x},${p.y}) has no route back`, pathTo(g, lost)));
+  }
+  const good = failures.length ? [] : g.nodes.filter((n) => !sc.known.has(n.key)).map((n) => n.key);
+  return { failures, states: g.nodes.filter((n) => !sc.known.has(n.key)).length, good };
+}
+
+/** Mid-stage samples per stage by default. The plan (5.3) asks up to 50; measured on the NW world, an airship-era
+ *  sample searches 0.3-0.5 million states (40-70 s), so 50 per stage is about 12 hours: `--reset-samples N` asks more. */
+export const RESET_SAMPLES = 5;
+
+/**
+ * Proof (c) from every reset state. A stage's reset state is searched as `--stage` searches its entry (its scope: the
+ * stage's marker the target, the other stages' events off); a mid-stage sample on the full quest, the main search's
+ * states (all proven) known good, so a sample's search ends where it rejoins them. A passing sample's states join the
+ * known good ones (each reaches the goal), so the next samples, whose vehicles stand at the same reset spots, end
+ * sooner.
+ */
+export function proofFromReset(ctx: QuestContext, samples = RESET_SAMPLES, log: (line: string) => void = () => {}): ResetRun {
+  if (ctx.stage) throw new Error('--from-reset runs on the full quest, not one --stage');
+  const goal = ctx.world.quest.goal;
   const main = stateGraph(ctx);
   const good = canReach(main, (n) => n.state.flags.has(goal));
   const known = new Set(main.nodes.filter((_n, i) => good[i]).map((n) => n.key));
   const failures: ProofFailure[] = [];
   if (main.limited) failures.push(fail('c', 'LIMIT', `LIMIT the main search stopped at ${ctx.maxStates} states`));
-  const starts = [...stageResetStates(ctx), ...midStageStates(ctx, samples)];
   let states = 0;
-  for (const { label, state } of starts) {
-    const g = exploreStates(ctx, { start: state, maxStates: ctx.maxStates, known });
-    if (g.limited) failures.push(fail('c', 'LIMIT', `LIMIT reset ${label}: the search stopped at ${ctx.maxStates} states`));
-    if (!g.nodes.length) {
-      failures.push(fail('c', 'SOFTLOCK', `SOFTLOCK reset ${label}: Cornelia's arrival is no place`));
-      continue;
-    }
-    states += g.nodes.filter((n) => !known.has(n.key)).length;
-    const ok = canReach(g, (n) => known.has(n.key) || n.state.flags.has(goal));
-    const bad = ok.findIndex((v) => !v);
-    if (bad >= 0) {
-      const p = g.nodes[bad].state.place;
-      failures.push(fail('c', 'SOFTLOCK', `SOFTLOCK reset ${label}: ${p.map} (${p.x},${p.y}) ${p.mode} cannot reach ${goal}`
-        + ` (${ok.filter((v) => !v).length} states)`, pathTo(g, bad)));
-    }
-    const back = canReach(g, (n) => n.comp.map === world.worldMap || known.has(n.key) || n.state.flags.has(goal));
-    const lost = g.nodes.findIndex((n, i) => !back[i] && n.comp.mode === 'walking');
-    if (lost >= 0) {
-      const p = g.nodes[lost].state.place;
-      failures.push(fail('c', 'STRANDED', `STRANDED reset ${label}: ${p.map} (${p.x},${p.y}) has no route back`, pathTo(g, lost)));
-    }
+  let starts = 0;
+  const none = new Set<string>();
+  const run = (label: string, state: QuestState, sc: Scope): void => {
+    const t0 = Date.now();
+    const r = checkFrom(ctx, label, state, sc);
+    failures.push(...r.failures);
+    states += r.states;
+    if (sc.known !== none) r.good.forEach((k) => known.add(k));
+    starts++;
+    log(`from-reset ${label}: ${r.states} states, ${Date.now() - t0} ms${r.failures.length ? ' FAIL' : ''}`);
+  };
+  for (const { label, state } of stageResetStates(ctx)) {
+    const id = label.split(' ')[0];
+    run(label, state, { target: stageMark(id), known: none, stopAt: stageMark(id), disabled: outOfScopeEvents(ctx, id) });
   }
+  for (const { label, state } of midStageStates(ctx, samples)) run(label, state, { target: goal, known });
+  const n = stageOrder(ctx.world.quest).length;
   const res = result('c', 'from reset', failures,
-    `(${starts.length} reset states: ${stageOrder(world.quest).length} stage entries, mid-stage samples; ${states} new states, every one reaches ${goal})`);
-  return { result: res, starts: starts.length, states };
+    `(${starts} reset states: ${n} stage entries, ${starts - n} mid-stage samples; ${states} states searched)`);
+  return { result: res, starts, states };
 }
