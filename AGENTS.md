@@ -399,7 +399,7 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   (it takes the world-compile lock when it writes into the map folder).
 - **Mode 7 flight view (M7-2, `docs/MODE7_PLAN.md` 4, 7, 8).** On `overworld` in the airship, `FlightView`
   (`src/scenes/exploration/mode7/`, no PixiJS) follows `game.fieldMode` through the states of `mode7Tilt.ts` (`off`,
-  `loading` with its `takeoff` / `restore` reason, `tiltIn`, `flying`, `tiltOut`; M7-2 switches instantly) and draws
+  `loading` with its `takeoff` / `restore` reason, `tiltIn`, `flying`, `tiltOut`; the tilts since M7-4) and draws
   through the lazily imported `FlightRenderer` (far atlas strips, sky, ship, shadow, landing marker). The profile is
   `mode7Toggle.mode7Enabled`: `?mode7=0` / `?mode7=1`, then the GPU caps (`capsOf(game.app.renderer)`; a mock game has
   none, so older scene tests never load the renderer), then Config's "Airship view" (`Settings.airshipView`, default
@@ -420,6 +420,18 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   36 / 16, trimmed least recently wanted first), and the step hold reads the flight window of the target cell
   (D-M11); hiding the view restores the top-down window and the cap of 60. Tests: `tests/rendering/streamWindow.test.ts`,
   `tests/scenes/mode7/nearDetail.test.ts`, `flightStats.test.ts`, and the streamed parity variant.
+- **Mode 7 tilt (M7-4, `docs/MODE7_PLAN.md` 4.3).** A take-off and a landing tilt for 42 frames of `dt` (700 ms,
+  `TILT_FRAMES`; `t += dt / 42`, the first frame drawn at t 0 in, 1 out): `tiltParams(t, start, tileSize)`
+  (`mode7Tilt.ts`, eased in-out) takes theta 90 deg to 18, kappa 0 to 1/600, h `f / tileSize` to 6, `back` 0 to 11.3,
+  (cx, cy) from the hero's screen point in the live `Camera` (clamped at the map edges too) to the flight values, and
+  the ship from its top-down foot to (960, 750); at t 0 the projection is the top-down camera's mapping, so the switch
+  is pixel-identical (browser: 100 % of the field above the HUD band at the meadow and two clamped edges). While a
+  tilt plays `FlightView.busy` holds the field (the one behavioural change; a held direction moves on the frame it
+  ends), the marker hides, the shadow check holds; at its end `holdOff(TILT_HOLDOFF_FRAMES)` (8). The near mesh's
+  square is open on the map's edges and rows wholly off the map are the far atlas's (`rowFits(..., map)`,
+  `rowOffMap`), so the near detail draws by a clamped edge too. Tests: `tests/scenes/mode7/mode7Tilt.test.ts` (the
+  t 0 match corner by corner against a real `Camera`), `mode7TiltScene.test.ts`, the parity tests (each tilt 42 held
+  frames, the end state equal).
 - **LM5-INT.** A third sheet `landmarks_lm5.*` (SPEC5, pass LM5): `western_keep` 2x3 at (59, 122) (door (60, 124),
   the stair foot at the bottom right; anchor `elf_keep` (60, 125); its top two rows on the watchtower's rock `m`, the
   moat at x 61) and `citadel` 3x3 at (74, 25) (door (75, 27) bottom centre; anchor `ord_citadel` (75, 28); the broken

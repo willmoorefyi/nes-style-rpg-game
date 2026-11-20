@@ -18,20 +18,16 @@ import type { FlightFrame, FlightRenderer } from './FlightRenderer.js';
 import { TILE_SIZE } from '../../../core/LayoutConstants.js';
 import { getSettings } from '../../../core/Settings.js';
 import { canLand } from '../../../systems/fieldRules.js';
-import { TAKEOFF_MS } from '../vehicleLayout.js';
+import { AIRSHIP_LIFT, TAKEOFF_MS, nativeScale } from '../vehicleLayout.js';
 import { cellToScreen, screenToCell, type ViewParams } from './mode7Math.js';
-import { PILOT_PRESETS, presetView } from './pilotPresets.js';
-import { TiltMachine } from './mode7Tilt.js';
+import { FLIGHT_VIEW, SHIP_FOOT_Y, TILT_HOLDOFF_FRAMES, TILT_MS, TiltMachine, tiltParams,
+  type TiltStart } from './mode7Tilt.js';
 import { capsOf, mode7Enabled, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
 import { FlightStream, chunkHost, nearProfile } from './FlightStream.js';
 import { FlightStats } from './flightStats.js';
 
 /** The only map Mode 7 draws (D-M7). */
 export const WORLD_MAP = 'overworld';
-/** The flight view: the user's pick, preset A "classic" (18 deg, h 6, kappa 1/600, horizon row 390), P on row 820. */
-export const FLIGHT_VIEW: ViewParams = presetView(PILOT_PRESETS[0], 0, 0);
-/** The airship's foot on screen in flight once lifted (4.2): 70 px above its shadow row. */
-export const SHIP_FOOT_Y = 750;
 
 export interface FlightViewDeps {
   game: Game;
@@ -64,6 +60,9 @@ export class FlightView {
   private boardAt = -Infinity;
   private facing: 'left' | 'right' = 'right';
   private mismatchLogged = false;
+  /** The playing tilt's start (from the live camera) and the machine's state count when it began. */
+  private tilt: TiltStart | null = null;
+  private tiltAt = -1;
   private readonly stream = new FlightStream();
   private near = nearProfile('full');
   private readonly stats = new FlightStats();
@@ -156,22 +155,38 @@ export class FlightView {
     const on = airship && !this.failed && this.profile() !== 'off';
     const player = this.deps.player();
     const idle = !player?.isMoving;
+    const m = this.machine;
+    const entered = m.entered;
+    const wasBusy = m.busy;
     if (on && !this.on) {
       this.boardAt = this.fresh ? -Infinity : performance.now();
-      this.machine.start(this.fresh ? 'restore' : 'takeoff', this.ready, idle);
+      m.start(this.fresh ? 'restore' : 'takeoff', this.ready, idle);
     } else if (!on && this.on) {
-      if (this.airship && !airship) this.machine.land(); else this.machine.end();
+      if (this.airship && !airship) m.land(); else m.end();
     }
     this.fresh = false;
     this.on = on;
     this.airship = airship;
-    this.machine.tick(dt, this.ready, idle);
+    // a tilt that began this frame draws its first point (t 0 in, 1 out); `loading` -> `tiltIn` happens in the tick
+    if (!(m.busy && m.entered !== entered)) m.tick(dt, this.ready, idle);
+    if (m.busy && m.entered !== this.tiltAt && player) this.beginTilt(player);
+    // the tilt ended: a held confirm must not land or board again at once; a held direction moves on (4.3). The
+    // steady-flight p95s leave the tilt out and settle again from here
+    if (wasBusy && !m.busy) { game.input.holdOff(TILT_HOLDOFF_FRAMES); this.stats.reset(); }
     const drawn = this.machine.drawn && this.ready && !!this.renderer && !!player;
     this.show(drawn);
     if (drawn && player && this.renderer) this.renderer.draw(this.frame(map, player));
     else this.report.marker = false;
     if (this.machine.busy) this.deps.tilemap()?.render();   // a tilt: the scene's own render is skipped (3.3)
     this.measure(t0, drawn);
+  }
+
+  /** A tilt starts from the hero's screen point in the live top-down camera (clamped at the map edges, too). */
+  private beginTilt(player: PlayerController): void {
+    this.tiltAt = this.machine.entered;
+    const anchor = this.deps.camera.worldToScreen(player.x, player.y);
+    this.tilt = { anchor, ship: { x: anchor.x, y: anchor.y + TILE_SIZE / 2 } };
+    this.report.tiltStart = this.tilt;
   }
 
   /** Show the Mode 7 view (and hide the top-down world) or the reverse; only on a change. */
@@ -186,9 +201,13 @@ export class FlightView {
 
   private frame(map: MapData, player: PlayerController): FlightFrame {
     if (player.direction === 'left' || player.direction === 'right') this.facing = player.direction;
-    const view: ViewParams = { ...FLIGHT_VIEW, px: player.x / TILE_SIZE, py: player.y / TILE_SIZE };
-    const shadow = cellToScreen(view, view.px, view.py) ?? { x: view.cx, y: 0, scale: TILE_SIZE };
-    const seen = screenToCell(view, shadow.x, shadow.y);
+    const m = this.machine;
+    const tilt = m.busy && this.tilt ? tiltParams(m.t, this.tilt, TILE_SIZE) : null;
+    const view: ViewParams = { ...(tilt?.view ?? FLIGHT_VIEW), px: player.x / TILE_SIZE, py: player.y / TILE_SIZE };
+    const atP = cellToScreen(view, view.px, view.py) ?? { x: view.cx, y: 0, scale: TILE_SIZE };
+    // the drawn shadow starts on the cell's bottom edge, as the top-down one; the check reads P itself
+    const shadow = tilt ? cellToScreen(view, view.px, view.py + tilt.shadowSouth) ?? atP : atP;
+    const seen = screenToCell(view, atP.x, atP.y);
     const cell = seen ? { x: Math.floor(seen.x), y: Math.floor(seen.y) } : null;
     const idle = !player.isMoving;
     if (idle && cell && (cell.x !== player.gridX || cell.y !== player.gridY) && !this.mismatchLogged) {
@@ -196,26 +215,27 @@ export class FlightView {
       console.error(`Mode 7: the shadow shows (${cell.x}, ${cell.y}) but the hero is at (${player.gridX}, ${player.gridY})`);
     }
     const here = { x: player.gridX, y: player.gridY };
-    const landable = idle && canLand(map, here, this.deps.vehicles.fieldState('airship'))
+    const landable = idle && !m.busy && canLand(map, here, this.deps.vehicles.fieldState('airship'))
       && !map.npcs.some((n) => n.x === here.x && n.y === here.y);
-    const corner = (x: number, y: number): { x: number; y: number } => {
-      const p = cellToScreen(view, x, y);
-      return p ? { x: p.x, y: p.y } : { x: 0, y: 0 };
-    };
+    const corner = (x: number, y: number) => { const p = cellToScreen(view, x, y); return { x: p?.x ?? 0, y: p?.y ?? 0 }; };
     const marker = landable ? [corner(here.x, here.y), corner(here.x + 1, here.y), corner(here.x + 1, here.y + 1),
       corner(here.x, here.y + 1)] : null;
-    Object.assign(this.report, { shadowCell: cell, marker: !!marker });
+    Object.assign(this.report, { shadowCell: cell, marker: !!marker, t: m.t });
     const now = performance.now();
     const chunks = chunkHost(this.deps.tilemap());
     const near = this.stream.follow(chunks, map, this.near, view.px, view.py);
-    return { view, near: chunks ? near : null, chunks, marker, shadow, ship: { x: view.cx, footY: SHIP_FOOT_Y, facing: this.facing, tMs: now,
-      sinceBoard: Number.isFinite(this.boardAt) ? now - this.boardAt : TAKEOFF_MS } };
+    // the ship's foot once lifted (the sprite adds the lift back and subtracts the eased one); landing, the lift eases
+    // down over the tilt's last 400 ms
+    const footY = tilt ? tilt.ship.y - AIRSHIP_LIFT * nativeScale(TILE_SIZE) : SHIP_FOOT_Y;
+    const sinceBoard = m.state === 'tiltOut' ? m.t * TILT_MS : Number.isFinite(this.boardAt) ? now - this.boardAt : TAKEOFF_MS;
+    return { view, near: chunks ? near : null, chunks, marker, shadow,
+      ship: { x: tilt?.ship.x ?? view.cx, footY, facing: this.facing, tMs: now, sinceBoard } };
   }
 
   /** The report and the steady-flight p95s (flightStats: the settle frames and the upload frames are left out). */
   private measure(t0: number, drawn: boolean): void {
     const ms = (this.deps.game.app as { ticker?: { deltaMS: number } } | undefined)?.ticker?.deltaMS;
-    this.stats.push(drawn, !!this.renderer?.heavy, performance.now() - t0, ms);
+    this.stats.push(drawn && !this.machine.busy, !!this.renderer?.heavy, performance.now() - t0, ms);
     const s = this.stats;
     Object.assign(this.report, {
       state: this.machine.state, reason: this.machine.reason, profile: this.profile(), ready: this.ready,

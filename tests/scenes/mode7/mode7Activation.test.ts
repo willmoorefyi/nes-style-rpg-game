@@ -22,14 +22,22 @@ describe('M7-2: activation', () => {
     expect(stub.opts?.at).toBe(1);
     await f.confirm();
     await f.frame();
-    expect(f.report().state).toBe('flying');
+    expect(f.report().state).toBe('tiltIn');             // M7-4: the 700 ms tilt, drawn in Mode 7 from its first frame
     expect(stub.visible).toBe(true);
     expect(world(f).visible).toBe(false);
+    await f.idle(42);
+    expect(f.report().state).toBe('flying');
     await f.step('up');
     await f.frame();
     await f.confirm();
     await f.frame();
     expect(f.game.fieldMode).toBe('walking');
+    expect(f.report().state).toBe('tiltOut');            // the world (the hero on foot, the parked ship) waits under it
+    expect(stub.visible).toBe(true);
+    expect(world(f).visible).toBe(false);
+    await f.idle(41);
+    expect(f.report().state).toBe('tiltOut');
+    await f.frame();
     expect(f.report().state).toBe('off');
     expect(stub.visible).toBe(false);
     expect(world(f).visible).toBe(true);

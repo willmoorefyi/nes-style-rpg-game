@@ -816,7 +816,26 @@ Still open, each with a proposed default that the plan builds unless you say oth
   (headed Chromium, ANGLE Metal, Apple M4 Pro), w_s18_start with the default settings: frame p95 9.9 ms, update p95
   0.5 ms over 600 steady frames (low: 10.0 / 0.3); resident chunks at most 36 (low 16); measured GPU memory 172.9 MB
   (low 59.7 MB) plus the sky, fog and meshes; artefacts in `~/temp/ff-game/m7_3/`. The user's live test is next
-- [ ] M7-4 tilt and landing (priority: high, effort: 4 h)
+- [x] M7-4 tilt and landing (priority: high, effort: 4 h). Result: `tiltParams`, `ease`, `TILT_FRAMES` 42 and
+  `TILT_HOLDOFF_FRAMES` 8 in `mode7Tilt.ts` (with `FLIGHT_VIEW` and `SHIP_FOOT_Y`, moved there from `FlightView`); in
+  `FlightView` the tilt's start from the live camera, its first frame drawn at t 0 (in) or 1 (out) before any tick,
+  the ship from its top-down foot (its lift easing up inside the take-off and down over the landing's last 400 ms),
+  the shadow from the cell's bottom edge (the top-down shadow's) to P while the check reads P, no marker while a tilt
+  plays, the hold-off at its end, and the tilt frames left out of the steady p95s (they settle again after it). Also:
+  a tilt ends within 1e-6 of its end (a ticker's 1000/60 ms steps sum to 42 frames only up to rounding: one frame
+  more without it), the fog follows the horizon above the screen (`horizonY`, off screen at t 0), and the near
+  mesh's square is open on the map's edges with rows wholly off the map left to the far atlas (`rowFits(..., map)`,
+  `rowOffMap`): without it the rows under the HUD band at the south edge (off the map) dropped the whole near mesh,
+  so the t 0 frame there was the blurry far atlas. Tests: `mode7Tilt.test.ts` (the t 0 match: every cell corner in
+  view within 1e-6 px of `Camera.worldToScreen`, within 0.5 px of the drawn, rounded camera, at 48 and 96 px per cell,
+  at the centre, the 4 clamped edges and 2 corners; 42 / 21 frames; the near split through every frame by the edges),
+  `mode7TiltScene.test.ts`, the parity tests (each tilt 42 held frames with the hero still, end states equal, the run
+  83 frames longer: the 'up' held through the take-off steps on the frame the tilt ends; the loading variant's held
+  step waits 41 frames more). Browser (headed Chromium, ANGLE Metal, Apple M4 Pro, w_s18_start, frame-stepped 60 Hz
+  captures): the t 0 frame drawn by Mode 7 and by the top-down world is pixel-identical at the meadow, at the west
+  edge (x clamped) and over the south edge's field (y clamped; only the off-map band under the HUD differs: sea
+  instead of black); each tilt 42 frames; Up held through a take-off moves on frame 43; frame p95 9.1 ms, update p95
+  0.4 ms (120 Hz display); the tilt frames' p95 9.1 ms, max 9.3 ms; artefacts in `~/temp/ff-game/m7_4/`
 - [ ] M7-5 billboards and clouds (priority: medium, effort: 4 h)
 - [ ] M7-6 fallbacks (priority: high, effort: 3 h)
 - [ ] M7-INT (priority: high, effort: 2 h)
