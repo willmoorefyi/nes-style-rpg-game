@@ -71,7 +71,7 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "walls": gates.walls(g, meta, doors),
             "barriers": gates_reach.barriers(g, meta, {"barriers": b.barrier_seeds, "links": b.links}, CANOE_BARRIERS,
                                              doors),
-            "routes": gates.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
+            "routes": gates_reach.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
             "landings": gates_reach.landings(g, meta, b.north, sp, taken), "straits": gates.straits(g, meta),
             "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
             "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),

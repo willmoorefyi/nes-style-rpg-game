@@ -5,6 +5,9 @@ routes, the canal, the docks and their coves, and the exemption list.
   and door cells grass; a town's 3x3 footprint round its door is exempt, any other site's door cell.
 - The lakes and the pinned canoe routes are stamped (`≈`, `r`); the canal's patch cells are grass (Water when
   CANAL_OPEN) and exempt.
+- A canoe-only site (`RegionSpec.ledges`, the waterfall; 4.1) is a ledge: its entrance and door cells sand, joined
+  to its nearest pinned route cell by river, and every other cell within LEDGE_R rock, so the ledge touches only
+  rock and river (NW-4; today's world draws it so).
 - A dock's cell is Water with one grass cell toward its town; its cove opens the water away from the town (at most 8
   cells) until the basin's forced sea. Every dock cell is exempt.
 """
@@ -17,6 +20,7 @@ from .bundle import RegionSpec
 from .geom import disc
 
 CLEAR_R = 1.6                                # a site's grass clearing
+LEDGE_R = 2                                  # a ledge's rock ring (Chebyshev cells round its entrance)
 COVE_MAX = 8
 
 
@@ -43,6 +47,23 @@ def lakes_routes(g: np.ndarray, b: RegionSpec, routes: dict) -> None:
         for x, y in cells:
             if g[y, x] != "≈":
                 g[y, x] = "r"
+
+
+def ledges(g: np.ndarray, b: RegionSpec, routes: dict, doors: dict) -> None:
+    on_route = {c for cells in routes.values() for c in cells}
+    for e in b.ledges:
+        x, y = b.sites[e]
+        dx, dy = doors.get(e, (0, -1))
+        rx, ry = min(on_route, key=lambda c: (abs(c[0] - x) + abs(c[1] - y), c[1], c[0]))
+        for yy in range(y - LEDGE_R, y + LEDGE_R + 1):
+            for xx in range(x - LEDGE_R, x + LEDGE_R + 1):
+                if (xx, yy) not in on_route:
+                    g[yy, xx] = "m"
+        cx, cy = x, y                        # the ledge to the route: river, x first then y
+        while (cx, cy) != (rx, ry):
+            cx, cy = (cx + int(np.sign(rx - cx)), cy) if cx != rx else (cx, cy + int(np.sign(ry - cy)))
+            g[cy, cx] = "r"
+        g[y, x] = g[y + dy, x + dx] = "s"     # sand: walkable, and never an airship landing
 
 
 def canal_cells(b: RegionSpec) -> list[tuple[int, int]]:

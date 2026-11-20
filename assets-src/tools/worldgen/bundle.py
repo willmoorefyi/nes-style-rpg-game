@@ -130,6 +130,7 @@ class RegionSpec:
     canal: tuple[tuple[int, ...], tuple[int, int]] | None = None  # (rel rows, rel x range) of the canal patch
     template: Template | None = None
     north: tuple[str, ...] = ()             # airship-only anchors (3.8 `landings`)
+    ledges: tuple[str, ...] = ()            # canoe-only sites: a ledge on their pinned route (4.1, `stamps.ledges`)
     # 3.8 `barriers`: barrier -> (seed entrance, [entrances beyond], closed by canoe too, cut by the bridge patch)
     barrier_seeds: dict[str, tuple[str, tuple[str, ...], bool, bool]] = field(default_factory=dict)
     links: dict[str, tuple[str, str]] = field(default_factory=dict)   # pairs that must join on foot (patches on)
@@ -153,6 +154,7 @@ def merge(specs: list[RegionSpec]) -> RegionSpec:
         out.towns += s.towns
         out.dock_links += s.dock_links
         out.north += s.north
+        out.ledges += s.ledges
         out.canal = out.canal or s.canal
         out.template = out.template or s.template
     return out

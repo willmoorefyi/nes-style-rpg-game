@@ -35,8 +35,10 @@ RIDGE = Ridge(((-50, -20), (10, -24)), 1.0, 3.0, "a test range")
 ROUTE = ((-30, 0), (-10, 4), (8, 10))
 B_FIGURES = {"land": 28874, "coast_edges": 5204, "G2_index": 30.6, "G1_fail_runs_gt6": 0, "G1_longest_nonexempt": 6,
              "G3_fail_runs_gt6": 0, "G3_longest": 6, "exempt": 427, "jogs": 33, "ford_cuts": 0,
-             "shares": {"mountain": 15.1, "forest": 16.8, "sand": 4.9, "swamp": 0.5, "tundra": 6.0, "snow": 9.2,
-                        "river": 2.4, "lake": 2.4, "grass": 42.5},     # NW-3: act 1's routed road ring (B 42.4)
+             # NW-3: act 1's routed road ring (grass B 42.4 -> 42.5); NW-4: the waterfall's ledge, a rock ring on
+             # R-waterfall (B mountain 15.1, tundra 6.0, snow 9.2, grass 42.5)
+             "shares": {"mountain": 15.2, "forest": 16.8, "sand": 4.9, "swamp": 0.5, "tundra": 5.9, "snow": 9.1,
+                        "river": 2.4, "lake": 2.4, "grass": 42.4},
              # the coast index by region on NW-4's owner grid (a landmass shared by regions split along their
              # fields; NW-0 / NW-2 gave each landmass to its majority region: a1 9.2, elf 8.6, earth 10.7, fire 19.4,
              # ordeal 10.5, water 18.3, wind 5.7). Reported, not gated (0.1.1).

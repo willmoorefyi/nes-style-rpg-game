@@ -9,8 +9,8 @@ boxes, for the composer v2 (`world_v2.py`), which prints them as one line, `worl
      one of act 1's legacy ids (LEGACY) on an a1 cell;
   3. docks: exactly the DOCKS_ALLOWED ids, each once (the gate checks place them, `gates.docks`);
   4. anchors: every anchor of `assets-src/maps-nw/world-anchors.yaml` is an entrance within its tolerance;
-  5. reach: with every patch on, every entrance is walkable from an arrival the game offers: Cornelia, a dock, or a
-     cell the airship lands on (grass or tundra), so no door stands in a sealed pocket.
+  5. reach: with every patch on, every entrance is reachable on foot or by canoe from an arrival the game offers:
+     Cornelia, a dock, or a cell the airship lands on (grass or tundra), so no door stands in a sealed pocket.
 Each check returns error strings; [] means OK.
 """
 from __future__ import annotations
@@ -113,14 +113,14 @@ def anchors(entrances: dict, path: Path = ANCHORS) -> list[str]:
 
 def reach(g: np.ndarray, meta: dict, root: str = "cornelia") -> list[str]:
     h = gates.with_patches(g, meta)
-    lab, _ = components(gates.walk(h))
+    lab, _ = components(gates.canoe(h))      # on foot, or by canoe once it is held (the waterfall's ledge)
     good = {int(lab[meta["entrances"][root][1], meta["entrances"][root][0]])}
     for d in meta["docks"]:
         good |= {int(lab[d["y"] + dy, d["x"] + dx]) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))}
     good |= {int(k) for k in np.unique(lab[np.isin(h, LANDING)])}
     good.discard(0)
-    return [f"reach: entrance {e} at {tuple(c)} ({gates.owner(meta, *c)}) is walkable from no arrival (Cornelia, a "
-            "dock, a landing cell)" for e, c in meta["entrances"].items() if int(lab[c[1], c[0]]) not in good]
+    return [f"reach: entrance {e} at {tuple(c)} ({gates.owner(meta, *c)}) is reachable from no arrival (Cornelia, "
+            "a dock, a landing cell)" for e, c in meta["entrances"].items() if int(lab[c[1], c[0]]) not in good]
 
 
 def check(g: np.ndarray, meta: dict, doc: dict, legacy: tuple[str, ...]) -> tuple[list[str], str]:

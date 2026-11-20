@@ -7,7 +7,8 @@ document), and every exported cut opens the leak its gate prevents.
 - the composed world: every check of 3.8 OK;
 - the former GT-38: a river across `western_range` (Melmond to Sarda) fails `barriers` (by canoe);
 - the former GT-39: a river joining a northern island to a southern coast (a walk+canoe link) fails `north`;
-- a ford on a pinned canoe route fails `routes`; a river joining R-waterfall to R-ice (two regions) fails it too;
+- a ford on a pinned canoe route fails `routes`; a river joining R-waterfall to R-ice (two regions) fails it too,
+  and so does a grass path onto the waterfall's ledge (canoe only);
 - a Water cell across a wall line fails `walls`; a sea lane joining the Aldi to the ocean fails `basins`; a canal
   cell turned to rock fails it (the canal pass);
 - a second way across the spine (a land bridge beside the north bridge) fails `barriers`;
@@ -76,6 +77,12 @@ def main() -> int:
     r = gates.routes(_line(g, wf[-1], ice[0], "r"), meta)
     case("a river joining R-waterfall (water) to R-ice (fire) fails routes",
          not r["ok"] and any("one River / Lake system" in w for w in r["why"]), f"{r['why'][-1:]}")
+    h = g.copy()                             # the waterfall's ledge given a grass path to the snowfield
+    x, y = E["wat_waterfall"]
+    h[y, x - 1] = h[y, x - 2] = h[y, x - 3] = "."
+    r = gates_reach.routes(h, meta)
+    case("a grass path onto the waterfall's ledge fails routes (canoe only, 4.1)",
+         not r["ok"] and any("ledge wat_waterfall" in w for w in r["why"]), f"{r['why'][-1:]}")
     m = meta["wall_masks"]["W_isthmus"]
     h = g.copy()
     ys, xs = m.nonzero()

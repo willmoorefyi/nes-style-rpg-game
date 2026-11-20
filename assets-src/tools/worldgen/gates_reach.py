@@ -10,16 +10,18 @@ foot and by canoe with their minimal cuts (`world.cuts`), north isolation, airsh
   avoids the patch is longer. The `links` (pairs that must join on foot) are checked too.
 - **north** (all on): every walk+canoe component holding a cell owned by WATER, ORDEAL or WIND holds only such
   cells, and no dock touches one.
+- **routes**: `gates.routes` plus the ledge rule (a canoe-only site is reached only by its route's river).
 - **landings** (all on): every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance,
-  transition, gate or NPC) within 8 walking steps, and every `landing` spot is such a cell.
+  transition, gate or NPC) within 8 walking steps (a ledge's by canoe), and every `landing` spot is such a cell.
 """
 from __future__ import annotations
 
 import numpy as np
 
 from .cuts import min_cut, vertex_cut
+from . import gates
 from .gates import LANDING, WALL_GROW, canoe, cells, grow, joined, mask_cells, owner, walk, with_patches
-from .geom import bfs_dist, components
+from .geom import bfs_dist, components, ring1
 
 LANDING_STEPS = 8
 # WORLD 6.1's walking detour hops (2.5; melmond-sarda through the tunnel 3.0)
@@ -121,6 +123,31 @@ def _spine(g, meta, name, a, bs, on, off, cut, cuts, r) -> list[str]:
     return why
 
 
+def routes(g, meta) -> dict:
+    """`gates.routes` plus 4.1's ledge rule: a canoe-only site (`meta["ledges"]`, the waterfall) is walkable only
+    on its ledge, which touches only rock and its route's river: its walk component (every patch on) holds no cell
+    the airship lands on and borders a pinned route cell."""
+    res = gates.routes(g, meta)
+    h = with_patches(g, meta)
+    lab, _ = components(walk(h))
+    wet = np.isin(h, ["r", "≈"])
+    wlab, _ = components(wet)
+    routed = {int(wlab[y, x]) for cs in meta["routes"].values() for x, y in cs if wlab[y, x]}
+    for e in meta.get("ledges") or []:
+        x, y = meta["entrances"][e]
+        mine = lab == lab[y, x]
+        ring = ring1(mine) & ~mine
+        other = ring & ~wet & (h != "m")
+        touches = bool(set(np.unique(wlab[ring & wet]).tolist()) & routed)
+        res[f"{e}_ledge"] = {"cells": int(mine.sum()), "other_neighbours": int(other.sum()), "on_route": touches}
+        if other.any() or not touches:
+            res["why"].append(f"ledge {e}: its walk component ({int(mine.sum())} cells) borders "
+                              f"{cells(meta, mask_cells(other)) or 'only rock and river'}; on its route's river: "
+                              f"{touches} (want only rock and river, and the route)")
+    res["ok"] = not res["why"]
+    return res
+
+
 def north(g, meta, north_regions: tuple[str, ...]) -> dict:
     h = with_patches(g, meta)
     boat = canoe(h)
@@ -147,8 +174,9 @@ def landings(g, meta, anchors: tuple[str, ...], spots: dict | None = None, taken
     taken = set(taken or ()) | {tuple(v) for v in meta["entrances"].values()}
     land = np.isin(h, LANDING)
     res, why = {}, []
+    boat = canoe(h)                          # a ledge (canoe-only site) counts its steps by canoe
     for e in anchors:
-        d = bfs_dist(w, [tuple(meta["entrances"][e])])
+        d = bfs_dist(boat if e in (meta.get("ledges") or []) else w, [tuple(meta["entrances"][e])])
         near = [c for c in mask_cells(land & (d >= 0) & (d <= LANDING_STEPS)) if c not in taken]
         res[e] = bool(near)
         if not near:
@@ -179,4 +207,4 @@ def detours(g, meta) -> dict:
     return {"ok": not why, **out, "why": why}
 
 
-__all__ = ["barriers", "north", "landings", "detours", "owner"]
+__all__ = ["barriers", "routes", "north", "landings", "detours", "owner"]
