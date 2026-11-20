@@ -109,6 +109,19 @@ export function horizonRow(p: ViewParams, rows = SCREEN_H): number {
   return rowTable(p, rows).firstRow;
 }
 
+/**
+ * The continuous screen y of the horizon, where the rays stop hitting the ground (`b^2 = 2 h kappa a^2`, so
+ * `b = q a` with `q = sqrt(2 h kappa)`): the first ground row is its ceiling while it is on screen. Looking straight
+ * down at a flat plane (a tilt's start) it is -Infinity: no ray misses.
+ */
+export function horizonY(p: ViewParams): number {
+  const q = Math.sqrt(2 * p.h * p.kappa);
+  const c = Math.cos(p.theta);
+  const sn = Math.sin(p.theta);
+  const den = c + q * sn;
+  return den <= 1e-12 ? -Infinity : p.cy + (p.f * (q * c - sn)) / den;
+}
+
 /** The `cy` that puts the horizon (the first ground row) at `row`, all other parameters kept. */
 export function cyForHorizon(p: ViewParams, row: number): number {
   let lo = -4 * p.f;
@@ -161,9 +174,17 @@ export function collapseRows(positions: Float32Array, from: number, to: number, 
   }
 }
 
-/** Whether row r hits the ground and its whole span lies inside the cell square [x0, x0 + cells) x [y0, y0 + cells). */
+/** The map's size in cells: a near square's side on the map's edge is open (`rowFits`). */
+export interface MapCells { w: number; h: number }
+
+/**
+ * Whether row r hits the ground and its whole span lies inside the cell square [x0, x0 + cells) x [y0, y0 + cells).
+ * With `map`, a side of the square on the map's edge is open: beyond it the near texture clamps to its edge texels,
+ * the map's edge sea, as the far atlas does (2.5), so a row may run past it (a tilt's start by a clamped edge, where
+ * the rows under the HUD band lie south of the map).
+ */
 export function rowFits(p: ViewParams, table: RowTable, r: number, x0: number, y0: number, cells: number,
-  width = SCREEN_W): boolean {
+  width = SCREEN_W, map?: MapCells): boolean {
   const sTop = table.s[r];
   const sBot = table.s[r + 1];
   if (Number.isNaN(sTop) || Number.isNaN(sBot)) return false;
@@ -172,16 +193,34 @@ export function rowFits(p: ViewParams, table: RowTable, r: number, x0: number, y
   const right = p.px + ((width - p.cx) * s) / p.f;
   const far = p.py + p.back - Math.max(table.d[r], table.d[r + 1]);
   const near = p.py + p.back - Math.min(table.d[r], table.d[r + 1]);
-  return left >= x0 && right <= x0 + cells && far >= y0 && near <= y0 + cells;
+  return (left >= x0 || (!!map && x0 <= 0)) && (right <= x0 + cells || (!!map && x0 + cells >= map.w))
+    && (far >= y0 || (!!map && y0 <= 0)) && (near <= y0 + cells || (!!map && y0 + cells >= map.h));
+}
+
+/** Whether row r hits the ground wholly outside the map (beyond a world edge, or under the HUD band of a top-down view
+ *  clamped at the south edge): only the edge sea's clamped texels show there, softest from the far atlas, which draws
+ *  such a row even below the split; it never holds the near mesh back (`nearSplit`). */
+export function rowOffMap(p: ViewParams, table: RowTable, r: number, map: MapCells, width = SCREEN_W): boolean {
+  const sTop = table.s[r];
+  const sBot = table.s[r + 1];
+  if (Number.isNaN(sTop) || Number.isNaN(sBot)) return false;
+  const s = Math.max(sTop, sBot);
+  const north = p.py + p.back - Math.max(table.d[r], table.d[r + 1]);
+  const south = p.py + p.back - Math.min(table.d[r], table.d[r + 1]);
+  return north >= map.h || south <= 0 || p.px + ((width - p.cx) * s) / p.f <= 0 || p.px - (p.cx * s) / p.f >= map.w;
 }
 
 /**
  * The near mesh's first row (3.2): the first row nearer than `dist` cells ahead of C, moved down past any row whose
- * span leaves the window (so the near texture is never sampled outside its square); `rows` when no row qualifies.
+ * span leaves the window (so the near texture is never sampled outside its square; with `map`, past its open sides
+ * only into the map's clamped edge sea), except rows wholly off the map (`rowOffMap`, the far mesh's); `rows` when no
+ * row qualifies.
  */
 export function nearSplit(p: ViewParams, table: RowTable, dist: number, x0: number, y0: number, cells: number,
-  rows = SCREEN_H, width = SCREEN_W): number {
+  rows = SCREEN_H, width = SCREEN_W, map?: MapCells): number {
   const from = splitRow(p, dist, rows);
-  for (let r = rows - 1; r >= from; r--) if (!rowFits(p, table, r, x0, y0, cells, width)) return r + 1;
+  for (let r = rows - 1; r >= from; r--) {
+    if (!rowFits(p, table, r, x0, y0, cells, width, map) && !(map && rowOffMap(p, table, r, map, width))) return r + 1;
+  }
   return from;
 }

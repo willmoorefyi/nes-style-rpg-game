@@ -9,18 +9,83 @@
  * | `flying`  | Mode 7             | false |
  * | `tiltOut` | Mode 7, t 1 -> 0   | true  |
  *
- * A tilt lasts `frames` 60 Hz frames of `dt`. M7-2 builds the states with an instant switch (`frames` 0: `tiltIn` and
- * `tiltOut` are entered and left on the same call, so `busy` is never seen true); M7-4 gives them the 42-frame (700 ms)
- * tilt and its parameters. `history` lists every state entered, transient ones included, for the tests.
+ * A tilt lasts `frames` 60 Hz frames of `dt` (M7-4: 42, 700 ms; `t += dt / 42`); `frames` 0 is an instant switch
+ * (M7-2's). `tiltParams` gives the view and the ship's spot at a point `t` of the tilt (4.3). `history` lists every
+ * state entered, transient ones included, for the tests.
  */
+import { AIRSHIP_LIFT, nativeScale } from '../vehicleLayout.js';
+import { PILOT_PRESETS, presetView } from './pilotPresets.js';
+import type { ViewParams } from './mode7Math.js';
 
 export type TiltState = 'off' | 'loading' | 'tiltIn' | 'flying' | 'tiltOut';
 /** Why a flight is waiting in `loading`: a confirm on a parked airship, or a load / retry already in flight. */
 export type LoadReason = 'takeoff' | 'restore';
 
-/** M7-2: the switch is instant. M7-4 sets the tilt's 42 frames (700 ms at 60 Hz). */
-export const TILT_FRAMES = 0;
-export const TILT_FRAMES_FULL = 42;
+/** A tilt's length: 42 frames of `dt` (700 ms at 60 Hz; Q10's default). */
+export const TILT_FRAMES = 42;
+export const TILT_MS = (TILT_FRAMES * 1000) / 60;
+/** The input hold-off when a tilt ends (= `SCENE_ENTRY_HOLDOFF_FRAMES`, pinned by mode7Tilt.test.ts; not imported, so
+ *  this pure module never loads `Game.ts` and PixiJS). */
+export const TILT_HOLDOFF_FRAMES = 8;
+
+/** The flight view: the user's pick, preset A "classic" (18 deg, h 6, kappa 1/600, horizon row 390), P on row 820. */
+export const FLIGHT_VIEW: ViewParams = presetView(PILOT_PRESETS[0], 0, 0);
+/** The airship's foot on screen in flight once lifted (4.2): 70 px above its shadow row. */
+export const SHIP_FOOT_Y = 750;
+const TOP_DOWN = Math.PI / 2;
+const EPS = 1e-6;
+
+/** Where a tilt starts (4.3), read from the live top-down `Camera`: the hero's screen point (the cell centre P;
+ *  (960, 480) away from the map edges, off centre where the camera clamps) and the airship's foot on the ground there
+ *  (the anchor plus half a tile: where `FieldVehicleSprites` draws it before its lift). */
+export interface TiltStart {
+  anchor: { x: number; y: number };
+  ship: { x: number; y: number };
+}
+
+/** One point of a tilt: the view (P at the origin; set `px`, `py`), the ship's ground foot (its lift and bob are
+ *  added by the sprite) and where its shadow falls, in cells south of P (the top-down shadow lies on the cell's bottom
+ *  edge: half a cell at t = 0, 0 in flight). */
+export interface TiltFrame {
+  view: ViewParams;
+  ship: { x: number; y: number };
+  shadowSouth: number;
+}
+
+/** The tilt's easing: in-out (a half cosine), 0 at t <= 0 and 1 at t >= 1. */
+export function ease(t: number): number {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return (1 - Math.cos(Math.PI * t)) / 2;
+}
+
+const mix = (a: number, b: number, e: number): number => a + (b - a) * e;
+
+/**
+ * The view at point `t` of a tilt (0 top-down, 1 the flight view), eased: theta 90 deg to 18 deg, kappa 0 to 1/600,
+ * h from `f / tileSize` (12.5 at 96 px per cell) to 6, `back` 0 to 11.3, (cx, cy) from the hero's screen point to the
+ * flight values, and the ship from its top-down foot to (960, 750) plus its lift. At t = 0 a pinhole looking straight
+ * down at a flat plane is a uniform scale of f / h = tileSize px per cell centred on the anchor: exactly the top-down
+ * camera's mapping, so the switch from the top-down view is invisible (mode7Tilt.test.ts measures it).
+ */
+export function tiltParams(t: number, start: TiltStart, tileSize: number, flight: ViewParams = FLIGHT_VIEW,
+  shipFootY = SHIP_FOOT_Y): TiltFrame {
+  const e = ease(t);
+  const view: ViewParams = {
+    h: mix(flight.f / tileSize, flight.h, e),
+    theta: mix(TOP_DOWN, flight.theta, e),
+    f: flight.f,
+    cx: mix(start.anchor.x, flight.cx, e),
+    cy: mix(start.anchor.y, flight.cy, e),
+    kappa: mix(0, flight.kappa, e),
+    back: mix(0, flight.back, e),
+    px: 0,
+    py: 0,
+  };
+  const lift = AIRSHIP_LIFT * nativeScale(tileSize);
+  return { view, ship: { x: mix(start.ship.x, flight.cx, e), y: mix(start.ship.y, shipFootY + lift, e) },
+    shadowSouth: mix(0.5, 0, e) };
+}
 
 export class TiltMachine {
   private cur: TiltState = 'off';
@@ -37,6 +102,8 @@ export class TiltMachine {
   get t(): number { return this.progress; }
   /** A tilt is playing: the field holds the hero (4.3). */
   get busy(): boolean { return this.cur === 'tiltIn' || this.cur === 'tiltOut'; }
+  /** How many states were entered (a change since the last look means a new state, e.g. a tilt that just began). */
+  get entered(): number { return this.history.length; }
   /** Whether the field draws the Mode 7 view (otherwise top-down). */
   get drawn(): boolean { return this.cur === 'tiltIn' || this.cur === 'flying' || this.cur === 'tiltOut'; }
 
@@ -98,11 +165,12 @@ export class TiltMachine {
 
   private advance(dt: number): void {
     const step = this.frames > 0 ? dt / this.frames : Infinity;
+    // a ticker's dt sums to the tilt's frames only up to rounding (42 frames of 1000/60 ms): within EPS counts as done
     if (this.cur === 'tiltIn') {
-      this.progress = Math.min(1, this.progress + step);
+      this.progress = this.progress + step >= 1 - EPS ? 1 : this.progress + step;
       if (this.progress >= 1) this.go('flying');
     } else if (this.cur === 'tiltOut') {
-      this.progress = Math.max(0, this.progress - step);
+      this.progress = this.progress - step <= EPS ? 0 : this.progress - step;
       if (this.progress <= 0) this.go('off');
     }
   }

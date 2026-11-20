@@ -9,7 +9,7 @@
  * Without a near window (no streamed chunks) the far mesh draws every row.
  */
 import { Container, Mesh, MeshGeometry, type Texture } from 'pixi.js';
-import { SCREEN_H, SCREEN_W, collapseRows, fillStrips, nearSplit, rowFits, rowTable, type RowTable,
+import { SCREEN_H, SCREEN_W, collapseRows, fillStrips, nearSplit, rowFits, rowOffMap, rowTable, type RowTable,
   type ViewParams } from './mode7Math.js';
 
 /** One-row seam meshes between the far and the near ground (2.5). */
@@ -93,15 +93,19 @@ export class GroundStrips {
     const far = this.farStrip;
     fillStrips(p, table, 0, rows, this.mapW, this.mapH, far.positions, far.uvs, width);
     const near = this.nearStrip;
-    this.split = near && sq ? nearSplit(p, table, sq.dSplit, sq.x0, sq.y0, sq.cells, rows, width) : rows;
+    const map = { w: this.mapW, h: this.mapH };
+    this.split = near && sq ? nearSplit(p, table, sq.dSplit, sq.x0, sq.y0, sq.cells, rows, width, map) : rows;
     if (near && sq) {
-      collapseRows(far.positions, this.split, rows);
       fillStrips(p, table, 0, rows, sq.cells, sq.cells, near.positions, near.uvs, width, sq.x0, sq.y0);
       collapseRows(near.positions, 0, this.split);
+      // below the split the near mesh draws, but a row wholly off the map stays the far atlas's (its softer edge sea)
+      for (let r = this.split; r < rows; r++) {
+        collapseRows(rowOffMap(p, table, r, map, width) ? near.positions : far.positions, r, r + 1);
+      }
       near.upload();
       this.seams.forEach((seam, i) => {
         const r = this.split - SEAM_ROWS + i;   // alpha 1/9 farthest, 8/9 next to the near mesh
-        seam.mesh.visible = r >= 0 && this.split < rows && rowFits(p, table, r, sq.x0, sq.y0, sq.cells, width);
+        seam.mesh.visible = r >= 0 && this.split < rows && rowFits(p, table, r, sq.x0, sq.y0, sq.cells, width, map);
         if (!seam.mesh.visible) return;
         fillStrips(p, table, r, r + 1, sq.cells, sq.cells, seam.positions, seam.uvs, width, sq.x0, sq.y0);
         seam.upload();

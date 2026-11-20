@@ -10,15 +10,35 @@ vi.mock('../../../src/scenes/exploration/mode7/FlightRenderer.js', async () => (
 /**
  * M7-2 parity (docs/MODE7_PLAN.md 9): the same inputs with Mode 7 on and off give the same position, mode, vehicles,
  * flags, dialog lines and encounters. The script: take-off, 20 steps, a confirm over forest (CANT_LAND), 5 steps, a
- * landing. M7-2's switch is instant (M7-4 adds the 700 ms tilt), so the two runs match frame for frame.
+ * landing. M7-4: with Mode 7 on, each tilt holds the field for 42 frames (700 ms, the one behavioural change of 0):
+ * the hero does not move through them, even with a direction held, and the end state is the same.
  */
 type Run = Awaited<ReturnType<typeof flightField>>;
 
-async function script(f: Run, between: { afterTakeoff?: () => void; duringStep?: (i: number) => Promise<void> } = {}) {
+/** Frames while a tilt plays (`busy`), with `held` pressed; asserts the hero never moves. Returns how many. */
+async function throughTilt(f: Run, held: string | null = null): Promise<number> {
+  const at = { ...f.game.playerPosition };
+  let n = 0;
+  f.keys.held = held;
+  while (f.report().busy === true) {
+    await f.frame();
+    expect(f.game.playerPosition).toEqual(at);
+    n++;
+  }
+  f.keys.held = null;
+  return n;
+}
+
+interface Played { tilts: number[]; right: number[] }
+
+async function script(f: Run, between: { afterTakeoff?: () => void; duringStep?: (i: number) => Promise<void> } = {}):
+  Promise<Played> {
+  const tilts: number[] = [];
   await f.idle(2);
   await f.confirm();                                   // take off from the parked airship at (6, 20)
   await f.idle(1);
   between.afterTakeoff?.();
+  tilts.push(await throughTilt(f, 'up'));              // a held direction waits for the tilt
   for (let i = 0; i < 10; i++) {
     if (between.duringStep) {
       f.keys.held = 'up';
@@ -30,7 +50,7 @@ async function script(f: Run, between: { afterTakeoff?: () => void; duringStep?:
       await f.step('up');
     }
   }
-  await f.steps('right', 10);                          // (16, 10): forest
+  const right = await f.steps('right', 10);            // (16, 10): forest
   await f.idle(1);
   await f.confirm();                                   // CANT_LAND
   await f.closeDialog();
@@ -38,7 +58,10 @@ async function script(f: Run, between: { afterTakeoff?: () => void; duringStep?:
   await f.steps('down', 2);                            // (19, 12): grass
   await f.idle(1);
   await f.confirm();                                   // land
-  await f.idle(3);
+  await f.idle(1);
+  tilts.push(await throughTilt(f));
+  await f.idle(2);
+  return { tilts, right };
 }
 
 /** Every idle flight frame: the shadow's cell is the hero's cell (6). */
@@ -46,7 +69,7 @@ function watchShadow(f: Run): { checked: number } {
   const seen = { checked: 0 };
   f.setOnFrame(() => {
     const r = f.report();
-    if (r.state === 'flying' && r.shadowCell) {
+    if ((r.state === 'flying' || r.busy === true) && r.shadowCell) {
       const c = r.shadowCell as { x: number; y: number };
       const p = f.game.playerPosition;
       // between steps the hero is idle; mid-step the shadow is on the origin or the target cell
@@ -59,8 +82,8 @@ function watchShadow(f: Run): { checked: number } {
 
 async function run(mode7: Mode7Setup, map?: MapData) {
   const f = await flightField({ mode7, map });
-  await script(f);
-  return f;
+  const played = await script(f);
+  return Object.assign(f, { played });
 }
 
 describe('M7-2: parity, Mode 7 on and off', () => {
@@ -73,8 +96,16 @@ describe('M7-2: parity, Mode 7 on and off', () => {
     const error = vi.spyOn(console, 'error');           // FlightView logs an idle shadow / hero mismatch
     const seen = watchShadow(on);
     let shownAfterTakeoff = false;
-    await script(on, { afterTakeoff: () => { shownAfterTakeoff = stub.visible; } });
-    expect(off.outcome()).toEqual(on.outcome());
+    const played = await script(on, { afterTakeoff: () => { shownAfterTakeoff = stub.visible; } });
+    const { frames: offFrames, ...offEnd } = off.outcome();
+    const { frames: onFrames, ...onEnd } = on.outcome();
+    expect(offEnd).toEqual(onEnd);
+    expect(played.tilts).toEqual([42, 42]);             // 700 ms each, the hero still through both
+    expect(off.played.tilts).toEqual([0, 0]);
+    // the only difference: the two holds of 42 frames each (the tilt's first frame plus 41); the 'up' held through the
+    // take-off steps on the frame the tilt ends, as after a dialog, so its step has already begun there: 42 + 42 - 1
+    expect(onFrames - offFrames).toBe(83);
+    expect(played.right).toEqual(off.played.right);
     expect(on.outcome().playerPosition).toEqual({ x: 19, y: 12 });
     expect(on.outcome().fieldMode).toBe('walking');
     expect(on.outcome().dialogs).toEqual([CANT_LAND]);
@@ -93,13 +124,22 @@ describe('M7-2: parity, Mode 7 on and off', () => {
     const none = await run('none');
     const off = await run('off');
     expect(none.outcome()).toEqual(off.outcome());
+    expect(none.played).toEqual(off.played);
   });
 
   it('the landing marker shows over grass and not over the forest; the frame follows the hero', async () => {
     const on = await flightField({ mode7: 'on' });
     await on.idle(1);
     await on.confirm();
-    await on.idle(2);
+    await on.idle(1);
+    for (let i = 0; i < 42; i++) {                     // no marker while the tilt plays
+      expect(on.report().busy).toBe(true);
+      expect(on.report().marker).toBe(false);
+      expect(stub.last?.marker).toBeNull();
+      await on.frame();
+    }
+    await on.idle(1);
+    expect(on.report().state).toBe('flying');
     expect(on.report().marker).toBe(true);
     expect(stub.last?.marker).toHaveLength(4);
     expect(stub.last?.view.px).toBeCloseTo(6.5);
@@ -119,7 +159,7 @@ describe('M7-2: parity, Mode 7 on and off', () => {
     stub.gate = deferred();
     const on = await flightField({ mode7: 'on' });
     const states: string[] = [];
-    await script(on, {
+    const played = await script(on, {
       afterTakeoff: () => {
         expect(on.report().state).toBe('loading');
         expect(on.report().reason).toBe('takeoff');
@@ -148,7 +188,11 @@ describe('M7-2: parity, Mode 7 on and off', () => {
     const { frames: _b, ...onEnd } = on.outcome();
     expect(onEnd).toEqual(offEnd);
     expect(states.slice(0, -1).every((s) => s === 'loading')).toBe(true);  // never mid-step
-    expect(states[states.length - 1]).toBe('flying');
+    expect(states[states.length - 1]).toBe('tiltIn');      // the first idle frame after the ready: the tilt begins
+    expect(played.tilts).toEqual([0, 42]);                // the take-off flew top-down; the landing tilts out
+    // the held direction (0): the next step east waited out the 42-frame tilt (it began on that idle frame), then went
+    expect(played.right[0]).toBe(played.right[1] + 41);
+    expect(off.played.right[0]).toBe(off.played.right[1]);
     expect(on.report().history).toEqual(['off', 'loading', 'tiltIn', 'flying', 'tiltOut', 'off']);
   });
 });
@@ -187,12 +231,15 @@ describe('M7-2 / M7-3: parity on a streamed world (192x192, late chunks on the r
     await f.idle(4);
     await f.confirm();
     await f.idle(1);
+    let tilted = await throughTilt(f);
     const perStep = await f.steps('up', 20);
     await f.idle(1);
     await f.confirm();
-    await f.idle(2);
+    await f.idle(1);
+    tilted += await throughTilt(f);
+    await f.idle(1);
     vi.restoreAllMocks();
-    return { f, perStep };
+    return { f, perStep, tilted };
   }
 
   it('in both modes a held step waits at most MISS_HOLD_FRAMES, then goes on; the end state is equal', async () => {
@@ -214,6 +261,8 @@ describe('M7-2 / M7-3: parity on a streamed world (192x192, late chunks on the r
     // cells from its edges, plus 1 ahead) holds at the take-off's first step (row 4) and again at step 13 (row 3)
     expect(held(off.perStep)).toEqual([8]);
     expect(held(on.perStep)).toEqual([0, 12]);
-    expect(onFrames - offFrames).toBe(on.perStep.reduce((a, n) => a + n, 0) - off.perStep.reduce((a, n) => a + n, 0));
+    expect(off.tilted).toBe(0);
+    expect(on.tilted).toBe(84);
+    expect(onFrames - offFrames - on.tilted).toBe(on.perStep.reduce((a, n) => a + n, 0) - off.perStep.reduce((a, n) => a + n, 0));
   });
 });

@@ -9,13 +9,13 @@
  */
 import { Container, type Renderer } from 'pixi.js';
 import type { MapData } from '../../../types/index.js';
-import { FlightSky } from './FlightSky.js';
+import { FOG_ROWS, FlightSky } from './FlightSky.js';
 import { GroundStrips } from './GroundStrips.js';
 import { WorldAtlas, type AtlasProfile } from './WorldAtlas.js';
 import { FlightBillboards, type BillboardFrame } from './FlightBillboards.js';
 import { NearDetail } from './NearDetail.js';
 import { nearProfile, type ChunkHost, type NearWindow } from './FlightStream.js';
-import type { ViewParams } from './mode7Math.js';
+import { horizonY, type ViewParams } from './mode7Math.js';
 
 export interface FlightRendererOptions {
   parent: Container;
@@ -42,6 +42,7 @@ export class FlightRenderer {
   private billboards: FlightBillboards | null = null;
   private near: NearDetail | null = null;
   private horizon = -1;
+  private fogY = NaN;
   private destroyed = false;
 
   constructor(private readonly opts: FlightRendererOptions) {
@@ -101,7 +102,12 @@ export class FlightRenderer {
     if (table.firstRow !== this.horizon) {
       this.horizon = table.firstRow;
       this.sky.draw(table.firstRow);
-      this.sky.placeFog(table.firstRow);
+    }
+    // the fog follows the horizon, above the screen too while a tilt looks down (4.3): off screen at its start
+    const fogY = table.firstRow > 0 ? table.firstRow : Math.max(-FOG_ROWS, Math.min(0, horizonY(frame.view)));
+    if (fogY !== this.fogY) {
+      this.fogY = fogY;
+      this.sky.placeFog(fogY);
     }
     this.billboards.draw(frame);
   }
