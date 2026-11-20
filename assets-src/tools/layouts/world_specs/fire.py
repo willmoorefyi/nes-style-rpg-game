@@ -5,6 +5,17 @@ coast, the volcanic arc (Gurgu's cone; Crescent's caldera ring, barrier `crescen
 Crescent Lake in the caldera with the pinned canoe routes R-volcano and R-ice down the outer slope, the north hills,
 the Lykion desert in the south-east lee, an island group off the east coast. Crescent's harbour (`fir_crescent`)
 is on the outer fjord.
+
+Design note (NW-R FIRE). Concept: a lake country walled off by a fold of mountains, whose two outlets carry the canoe
+south through the fold into ash, frost and dune (today's FIRE, pass W, on the natural ground). Distinct: Crescent
+Lake is bent into its crescent by a spur of the ring that carries the Circle's standing stones; Gurgu's cone stands
+over the ash fields with its vents; the Ice Cavern opens in a rock ledge at the ring's south foot over a hollow of
+pines; the buried hull lies in the dunes. Topology: Crescent's shore (dock, town, lake) | the ring | the south
+lands (ash -> Gurgu; frost -> the Ice Cavern; dunes -> the hull and the airship's grass), one land on foot (the
+corridors `fir_south` and `fir_ash` keep the generated rivers off those walks, a ford at most each); R-volcano and R-ice the only ways
+through, by canoe (S14 -> S15, S16); the hatch takes the levistone (S17). The neck to Elfland's east fells is rock
+(`fire/world_fire_nw.neck`), so no river at the seam carries an early canoe in (NW-4's T2 row). Content, zones and
+stamps: `fire/world_fire_nw.py`; the tables: `fire/fire_tables.py`.
 """
 from __future__ import annotations
 
@@ -40,7 +51,9 @@ def spec() -> RegionSpec:
         sites=sites("fire", nudges={"fir_crescent": (2, 0)}),
         towns=("fir_crescent",),
         docks=[Dock("fir_crescent", DOCK, "ocean", "fir_crescent")],
-        corridors=[Corridor("fir_crescent", (DOCK, "fir_crescent"))],
+        corridors=[Corridor("fir_crescent", (DOCK, "fir_crescent")),
+                   Corridor("fir_south", ("fir_ice", (37, 48), (46, 49), "fir_desert")),
+                   Corridor("fir_ash", ("fir_volcano", "fir_ice"))],
         dock_links=("fir_crescent",),
         barrier_seeds={"crescent_ring": ("fir_crescent", ("fir_volcano", "fir_ice", "fir_desert"), False, False)},
         spots=[SpotDef("fir_s_crescent", "fir_crescent", (0, 0), "land"),
@@ -50,3 +63,9 @@ def spec() -> RegionSpec:
                SpotDef("fir_s_crescent_ship", "dock:fir_crescent", (0, 0), "dock"),
                SpotDef("fir_s_airship", "fir_desert", (6, 2), "landing")],
     )
+
+
+def content(g, meta, b, trans) -> dict:
+    """NW-R FIRE: the region's content on the composed ground (`fire/world_fire_nw.py`), for `world_v2_source`."""
+    from fire import world_fire_nw
+    return world_fire_nw.content(g, meta, b, trans)

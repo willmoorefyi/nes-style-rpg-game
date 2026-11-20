@@ -44,13 +44,18 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     door_off, ent_map = SRC.doors()
     g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
     trans = SRC.transitions(b.sites)
+    extra = SRC.region_content(g, meta, b, trans)       # NW-R: the regions' content (stamps their sites in g)
     objs, insp = SRC.act1_content(meta["keep"])
+    objs, insp = objs + extra.get("objects", []), insp + extra.get("inspect", [])
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
     blocked |= {tuple(v) for v in meta["entrances"].values()}
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
-    sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
-    doc = SRC.document(g, meta, trans, objs, insp, sp)
+    people = {(n["x"], n["y"]) for n in extra.get("npcs", [])}
+    sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs) | people)
+    doc = SRC.document(g, meta, trans, objs, insp, sp, extra)
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
+    for r, opts in extra.get("checks", {}).items():
+        doc["regions"][r]["checks"] = opts
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
