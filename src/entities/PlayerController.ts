@@ -40,6 +40,8 @@ export class PlayerController {
   private targetX: number;
   private targetY: number;
   private moveProgress = 0;
+  /** The part of a frame's step left over when the last tile ended (0 when the hero stopped). */
+  private carry = 0;
   private moveSpeed: number;
   /** Tiles walked so far; alternates the stepping foot from tile to tile. */
   private stepsTaken = 0;
@@ -91,11 +93,10 @@ export class PlayerController {
 
   update(dt: number): void {
     if (this.state === 'moving') {
-      const terrain = this.collisionMap.getTerrainType(this.targetX, this.targetY);
-      const speedMultiplier = this._currentMode.getSpeedMultiplier(terrain);
-      const effectiveSpeed = this.moveSpeed / Math.max(0.1, speedMultiplier * this.speedBoost);
-      this.moveProgress += (dt * 16.67) / effectiveSpeed;
+      this.moveProgress += this.stepRate(dt);
       if (this.moveProgress >= 1) {
+        // the time past the tile's end is carried into the next step, so a held direction loses no frame per tile
+        this.carry = Math.min(0.5, this.moveProgress - 1);
         this.tileX = this.targetX;
         this.tileY = this.targetY;
         this.moveProgress = 0;
@@ -108,17 +109,25 @@ export class PlayerController {
       }
       this.updateSpritePosition();
     } else {
-      this.handleInput();
+      this.handleInput(dt);
     }
   }
 
-  private handleInput(): void {
+  /** The share of a tile walked in `dt` toward the target (the mode's terrain speed times the Walk speed boost). */
+  private stepRate(dt: number): number {
+    const speedMultiplier = this._currentMode.getSpeedMultiplier(this.collisionMap.getTerrainType(this.targetX, this.targetY));
+    return (dt * 16.67) / (this.moveSpeed / Math.max(0.1, speedMultiplier * this.speedBoost));
+  }
+
+  private handleInput(dt: number): void {
     let dir: Direction | null = null;
     if (this.input.isPressed('up')) dir = 'up';
     else if (this.input.isPressed('down')) dir = 'down';
     else if (this.input.isPressed('left')) dir = 'left';
     else if (this.input.isPressed('right')) dir = 'right';
 
+    const carry = this.carry;
+    this.carry = 0;                              // a carry only joins a step taken on the very next frame
     if (dir) {
       this.animation.setDirection(dir);
       const { dx, dy } = DIRECTION_VECTORS[dir];
@@ -128,7 +137,11 @@ export class PlayerController {
         this.targetX = newX;
         this.targetY = newY;
         this.state = 'moving';
-        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, 0, this.walkPhases));
+        // the step starts moving on this frame (plus the last tile's carry), never finishing here: the scene sees
+        // every arrival on its own frame (fieldStep, encounters)
+        this.moveProgress = Math.min(0.99, carry + this.stepRate(dt));
+        this.animation.setWalkFrame(walkCycleIndex(this.stepsTaken, this.moveProgress, this.walkPhases));
+        this.updateSpritePosition();
       }
     }
   }
@@ -156,6 +169,7 @@ export class PlayerController {
     this.targetX = x;
     this.targetY = y;
     this.moveProgress = 0;
+    this.carry = 0;
     this.state = 'idle';
     this.updateSpritePosition();
   }

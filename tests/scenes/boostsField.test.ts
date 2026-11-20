@@ -93,16 +93,36 @@ describe('the Walk speed boost', () => {
     const player = new PlayerController({ startX: 1, startY: 1, texture: Texture.WHITE, collisionMap: new CollisionMap(map),
       input, events: new EventBus(), moveSpeed: 200, ...(ship ? { movementMode: new ShipMode() } : {}) });
     player.speedBoost = boost;
-    player.update(1);                 // starts the step
+    // a held direction over 4 tiles: no idle frame between tiles (the step's carry), so the mean is exact
     let frames = 0;
-    while (player.gridX === 1 && frames < 100) { player.update(1); frames++; }
-    return frames;
+    while (player.gridX < 5 && frames < 400) { player.update(1); frames++; }
+    return frames / 4;
   }
 
-  it('x2 takes half the frames per tile on foot', () => {
+  it('x2 takes half the frames per tile on foot, with no idle frame between held steps', () => {
     const base = framesPerTile(1);
-    expect(base).toBe(12);
+    expect(base).toBe(12);            // moveSpeed 200 at 16.67 ms frames: 12 frames a tile, not 12 + 1
     expect(framesPerTile(2)).toBe(6);
+  });
+
+  it('a held walk emits one playerMove per tile, each on its own frame, and a step never ends on its start frame', () => {
+    const input = new InputManager();
+    vi.spyOn(input, 'isPressed').mockImplementation((a) => a === 'right');
+    const map = createMapData({ id: 't', width: 8, height: 8, collision: Array(64).fill(TerrainType.Grass) });
+    const events = new EventBus();
+    const player = new PlayerController({ startX: 1, startY: 1, texture: Texture.WHITE, collisionMap: new CollisionMap(map),
+      input, events, moveSpeed: 200 });
+    player.speedBoost = 4;
+    const moves: number[] = [];
+    let frame = 0;
+    events.on('playerMove', () => moves.push(frame));
+    for (; frame < 40 && player.gridX < 6; frame++) {
+      const before = player.isMoving;
+      player.update(1);
+      if (!before) expect(player.isMoving || player.gridX === 6).toBe(true);
+    }
+    expect(moves).toHaveLength(5);
+    expect(new Set(moves).size).toBe(5);
   });
 
   it('x2 takes half the frames per tile by ship', () => {
