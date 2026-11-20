@@ -1,9 +1,23 @@
-# Natural world plan (pass NW), rev 3.1
+# Natural world plan (pass NW), rev 3.2
 
-Status: rev 3.1 (momus OKAY on rev 3, 4 of 5; rev 3.1 folds in its last small items), planning only. Nothing is implemented. Pass NW replaces the world map's geography and its generator,
+Status: rev 3.2. Momus passed rev 3 (OKAY, 4 of 5) and rev 3.1 folded in its last small items. Rev 3.2 records NW-0's pilot results, the user's pick (preset B) and the fixes the pilot found (3.10). Planning only. Nothing is implemented. Pass NW replaces the world map's geography and its generator,
 act 1's overworld included. It keeps the progression of `docs/WORLD_PLAN.md` rev 3 (pass W: stages S0-S31, the
 gates, the verifier proofs) and every site, dungeon, town, interior and landmark. The facts in 1 and 5.1 were checked
 at `150c0138` (M7-4 merged at `065a6474`); rev 3's at `d1a3ca54`.
+
+**Rev 3.2 changes** (NW-0's pilot; the user's rulings of 2026-11-20):
+
+| # | Item | Resolution |
+|---|---|---|
+| P-1 | Rulings | Q5 closed: **preset B (classic)**, G2_MIN = 30 (D-NW11). Land target: B's measured **28,874 ± 10 %**, not 36-42k (D-NW12; user agreed). B's parameters are recorded, and the pilot scripts seed NW-2 (3.10) |
+| P-2.1 | Prewalk was vacuous | starts take only exits of the **ancestors'** maps; a multi-entrance map of S joins its entrances once one is reached (a fixed point). The pilot's sealed-Elfheim case becomes a selftest (3.8) |
+| P-2.2 | `crescent_ring` | closed **on foot only**; the canoe rule applies to `spine` and `western_range`, since R-volcano and R-ice cross the ring by design (3.8) |
+| P-2.3 | The exemption cap | 3x3 footprints for the 8 towns and single cells for the caves came to 427 cells; the 600 cap stays, and the footprint rule is stated (0.1.1) |
+| P-2.4 | G-NW3 | counts only boundaries between **two land classes**; beach sand counts as grass-class, so a beach strip along a chunk line doesn't count; land against water is G-NW1's. No kept rectangle may have an edge on a chunk line, and the jog pass and the pins avoid them (0.1.1) |
+| P-2.5 | G-NW8 | measured **25.2 GB, 208 s** with the 16 px 4096² bake. The budget is set from that; NW-2's 12 px bake should lower it and is re-measured there. Over 26 GB, the fallbacks are the chunk-digest `--region` quadrants or a lower-memory compile (3.4, 3.9) |
+| P-2.6 | The jog pass | recorded (2.4 rule 9): 33 jogs in B, reported by `--metrics` |
+| P-2.7 | Visual fixes | Cornelia's road stubs (NW-3) and the lumpy northern coasts (NW-2 knobs, NW-R) (3.10) |
+| P-2.8 | The act-1 delta | **(+54, +44)**, Cornelia at **(146, 155)**; two anchor nudges, Melmond -2 x and Crescent +2 x, both inside ±2 (2.2, 3.10) |
 
 **Rev 3 changes** (momus's re-review of rev 2, REJECT, 6 blocking items):
 
@@ -128,7 +142,7 @@ overall map size and the terrain and coastline variability."
     "G-NW5 build_map.py --check-determinism and mode7_atlas.py --check-determinism pass; re-running every layout script leaves git diff --exit-code assets-src/maps clean",
     "G-NW6 npm run quest -- --strict --mutate passes, with (g) re-fitted and (h) unchanged in rows",
     "G-NW7 npm run build, npm run test:full and the balance suite pass; the questCurve bosses in band",
-    "G-NW8 a full-world compile peaks at <= 26 GB (estimate 20 GB) under the lock, measured with the bake it runs: NW-0 with the 16 px 4096² bake, NW-2 onwards with 12 px 3072²",
+    "G-NW8 a full-world compile peaks at <= 26 GB under the lock, measured with the bake it runs: NW-0 measured 25.2 GB in 208 s with the 16 px 4096² bake; NW-2 re-measures with the 12 px 3072² bake (expected lower). Over 26 GB: the chunk-digest --region quadrants or a lower-memory compile (3.9)",
     "G-NW9 the user approves the pilot image (NW-0) and the final overview (NW-INT)",
     "G-NW10 Appendix A's coordinate-inventory checklist has every hit resolved before NW-5 merges"
   ]
@@ -152,13 +166,23 @@ All three are measured on the world source's `ground` (legend chars), with every
   - The index is (the number of coast edges) / sqrt(the number of land cells).
   - Today 19.7; the classic reference about 36 (measured on the image at 4 px per tile, label boxes included, so an
     upper estimate); the concept sketch 22.1.
-  - The gate is G2_MIN: 30, or the user-approved pilot preset's value - 1 if that is lower. NW-1 writes it into
+  - The gate is **G2_MIN = 30** (D-NW11). The approved preset B measured 30.6 in NW-0. NW-1 writes it into
     `world_api.py`.
   - Per-continent values are reported, not gated.
 - **G-NW3 (no box edges).**
-  - Every char has a material class: sea `o`; inland water `≈ r`; mountain `m`; forest `f`; sand `s`; swamp `w`;
-    snow; tundra; and the grass class (`. , : =`, so roads and bridges never make a boundary).
-  - A boundary edge is a unit edge between two cells of different classes.
+  - G-NW3 counts **only boundaries between two land classes** (rev 3.2). Sea `o` and inland water (`≈`, `r`) take
+    part in no G-NW3 edge: land against water is G-NW1's job (coasts), and river and lake banks follow the
+    hydrology.
+  - The land classes:
+    - mountain `m`;
+    - forest `f`;
+    - sand `s`, except **beach sand** (a sand cell 4-adjacent to sea, lake or river), which is grass-class, so a beach
+      strip along a chunk line never counts;
+    - swamp `w`;
+    - snow `n`;
+    - tundra `t`;
+    - the grass class (`. , : =` and beach sand, so roads and bridges never make a boundary either).
+  - A boundary edge is a unit edge between two land cells of different classes.
   - A chunk-line run is a maximal sequence of boundary edges that lie on a chunk line (between cells 16k-1 and 16k),
     consecutive along it.
   - A run fails when it is longer than 6 edges, unless every edge of it touches an exempt cell.
@@ -168,8 +192,13 @@ All three are measured on the world source's `ground` (legend chars), with every
     footprints);
   - the one-cell ring round them.
   - Roads need no exemption: they are grass-class.
-  - The total is capped at 600 cells (a check), so the list cannot hide a coast.
-  - NW-0 places pins off chunk lines where the anchors' ±2 window allows it.
+  - **The footprint rule:** a town is a 3x3 footprint (its icon box; 8 towns), and a cave, dungeon or site door is
+    its single door cell; quays, docks, the canal and bridges are their stamp cells. Each comes with the one-cell
+    ring. In NW-0 this came to **427 cells** (preset B).
+  - The total is capped at **600 cells** (a check), so the list cannot hide a coast.
+  - Pins are placed off chunk lines where the anchors' ±2 window allows it.
+  - **No kept rectangle** (a forced `keep_land` / `keep_water` / stamp rect of a spec) may have an edge on a chunk
+    line (a check). The jog pass (2.4 rule 9) never jogs a pin, stamp or exempt cell.
 
 ### 0.2 Decisions
 
@@ -185,6 +214,8 @@ All three are measured on the world source's `ground` (legend chars), with every
 | D-NW8 | **saves reset to Cornelia**: a pre-NW save on the world map, or one owning a ship or airship, reloads at Cornelia's world entrance on foot; the vehicles go to milestone spots (`BIKKE_DEFEATED` → `a1_pravoka` dock, `AIRSHIP_RAISED` → `a1_s_airship`) | **user ruling 2026-11-20 (Q4)**; momus R3-2 (5.3) |
 | D-NW9 | **snow and tundra** as new terrains; the airship lands on tundra, not on snow | **user ruling 2026-11-20 (Q6)** (2.6) |
 | D-NW10 | `quest.yaml`, the scenarios and the cutscene name their overworld places (`at: <spot>`, `ref:`) from NW-1 on, so one file serves both worlds | momus M5 (5.2) |
+| D-NW11 | **preset B (classic)**, `G2_MIN = 30`; B's parameters and seed 1987 seed NW-2 | **user ruling 2026-11-20 (Q5)**; NW-0 (3.10) |
+| D-NW12 | **land about 28,874 cells ± 10 %** (B's measured land), not 36-42k: more land smooths the coasts, and the coast index is the gate | **user agreement 2026-11-20**; NW-0 (3.10) |
 
 ## 1. Diagnosis
 
@@ -232,7 +263,7 @@ All three are measured on the world source's `ground` (legend chars), with every
 | coast index | 19.7 | 22.1 | >= G2_MIN (G-NW2) |
 | Pravoka's range: rows with rock in x 136-141 | 66 consecutive rows | n/a | a ridge with spurs, no column |
 | mountain share of land | 28 % | 23 % | 15-22 %, in ranges |
-| land cells | 21,089 | 22,698 | about 36,000-42,000 |
+| land cells | 21,089 | 22,698 | **28,874 ± 10 %** (about 26,000-31,800; preset B, D-NW12) |
 
 ### 1.3 Continent by continent (now / classic / natural)
 
@@ -255,7 +286,7 @@ All three are measured on the world source's `ground` (legend chars), with every
 | Option | Cells, chunks | Area vs today | s\* with margins | Compile peak (11.3 GB x area; W1-C1 measured 11.26 GB for 192²) | Mode 7 far atlas | Verdict |
 |---|---|---|---|---|---|---|
 | 224² | 196 | 1.36x | about 0.77 | about 15 GB | 14 px, 3136² | too little room |
-| **256²** | **256** | **1.78x** | **about 0.86** | **about 20 GB** | **12 px, 3072² (unchanged)** | **ruled** |
+| **256²** | **256** | **1.78x** | **about 0.86** | **25.2 GB measured** (NW-0, 16 px bake; the 20 GB estimate was low) | **12 px, 3072² (unchanged)** | **ruled** |
 | 288² | 324 | 2.25x | about 0.97 | about 25 GB, at the 26 GB limit | 12 px = 3456² | rejected |
 
 Other costs at 256²:
@@ -270,7 +301,7 @@ Other costs at 256²:
 
 - **New targets.** `target = CORNELIA_NW + s* x ref_offset`.
   - The reference offsets are `world-anchors.yaml`'s, in classic tiles from Cornelia.
-  - `CORNELIA_NW` is about (150, 156); NW-0 fixes it.
+  - `CORNELIA_NW` is **(146, 155)**, fixed by NW-0. The act-1 delta from today's world is **(+54, +44)**.
   - s\* is fitted (NW-1, 4.2).
 - **Act 1 keeps today's relative layout.** Its pins sit at `CORNELIA_NW + (p_today - (92, 111))`. Cornelia to
   Pravoka stays 40 cells, the bridge and the temple stay a short walk away, and Matoya stays north-north-west of the
@@ -278,6 +309,9 @@ Other costs at 256²:
   - Pinned this way, act 1 is about 0.82 of the new scale. That is inside the long-pair band [0.70, 1.30] for every
     act-1 pair except cornelia-temple, which is distance-exempt today and stays so.
   - pravoka-matoya measures 0.73 against a band edge of 0.70: NW-1 computes it in the full table (4.2).
+- **Anchor nudges (NW-0).** Two anchors sit off their s\* targets, each inside the ±2 window: Melmond -2 x
+  (82, 158 against 84, 158) and Crescent +2 x (206, 172 against 204, 172). The act-1 pins are their act-1 cells by
+  rule, not targets: the Temple, Matoya and Pravoka sit where today's relative layout puts them.
 - **No act-1 frame.** The act-1 block, `A1_ORIGIN`, `A1_SIZE`, `FROZEN_CORE`, `FROZEN_EXCEPTIONS`,
   `PRAVOKA_ICON_CELLS` and `world.frames.a1` all go. Act 1's cells are world cells like every other region's (3.6).
 
@@ -367,7 +401,13 @@ Other costs at 256²:
    - Costs: grass 1, sand or forest 2, swamp 4.
    - Mountain, water and river cells are refused except at a bridge or ford stamp.
    - Ties are broken by (y, x).
-   - `road_check` (its materials and ends) runs as today.
+   - `road_check` (its materials and ends) runs as today, plus `no_stubs` (3.10).
+9. **The jog pass** (the last tidy, from NW-0's `finish.jog`). After the biomes and stamps, any coast run (G-NW1) or
+   chunk-line land-class run (G-NW3) longer than 6 edges outside the exemptions gets a one-cell jog at its midpoint.
+   A sea cell becomes land of its neighbour's char, or a land cell becomes sea where the sea side is forced sea. It
+   runs at most 10 rounds and never touches a pin, stamp, exempt or forced cell. The count is reported by
+   `--metrics` (NW-0 preset B: **33 jogs**). A count over 100 is a warning that a spec has a straight edge to fix at
+   its source.
 
 ### 2.5 Variability and determinism
 
@@ -523,7 +563,7 @@ continent specs (polygons, ridges, walls, passes, corridors, roads, climate hint
 
 | Job | Peak (estimate; NW-0 and NW-2 measure) | Who | When |
 |---|---|---|---|
-| full compile, 256², with the Mode 7 bake | about 20 GB + 1-2 GB for the bake (the 16 px 4096² bake in NW-0; 12 px 3072² after NW-1); limit 26 GB (G-NW8) | NW integrator only (NW-0's agent for its pilot compile) | NW-0, NW-2, NW-4, each base refresh, NW-5, NW-INT |
+| full compile, 256², with the Mode 7 bake | **25.2 GB measured** (NW-0, 208 s, the 16 px 4096² bake); NW-2 re-measures with 12 px 3072²; limit 26 GB (G-NW8) | NW integrator only (NW-0's agent for its pilot compile) | NW-0, NW-2, NW-4, each base refresh, NW-5, NW-INT |
 | `--region <r>` over a base | about 7 GB, limit 10 GB | NW-R agents, NW-3 | any time, under the lock |
 | Vitest per worktree (`--maxWorkers=2 --minWorkers=1`) | about 2 GB | every agent | any time |
 | dev server | about 0.5 GB | browser checks | NW-INT, M7 |
@@ -677,7 +717,7 @@ Every check runs on the composed world with the stated patches. A failure names 
 | **basins** | off, then `canal` on | with every patch off, `aldi` and `ocean` are disjoint and each one component; with `canal` on they are one; every dock lies in its basin (with every patch on but `canal`); no Water cell is in neither (WORLD 2.6, kept). Seeds: `world.basins` (written by the composer: the cell below Cornelia's jetty for `aldi`, (2, 2) for `ocean`) |
 | **docks** | all on | every dock is in `DOCKS_ALLOWED` and on a Water cell 4-adjacent to a walkable cell; no other dock exists (WORLD 2.6) |
 | **walls** | all off | each wall line (W_west, W_isthmus, W_arm, W_south, W_east) is unbroken land at least 3 cells wide along its whole polyline, with no River, Lake or Water cell across it; exported as `world.cuts` for the GT rows |
-| **barriers** | all on | `spine` (bridge patch off), `western_range` and `crescent_ring`: the two seeds are not joined **on foot** nor **on foot plus canoe** (River and Lake passable, as the canoe ability allows); the minimal cut is exported (`world.cuts`). For `spine`, the minimal cut with the bridge patch on must be exactly the patch cells |
+| **barriers** | all on | `spine` (bridge patch off) and `western_range`: the two seeds are joined neither **on foot** nor **on foot plus canoe** (River and Lake passable, as the canoe ability allows). **`crescent_ring`: on foot only**, because R-volcano and R-ice cross the ring by design (the canoe is the gate), and `routes` guards them. The minimal cut is exported (`world.cuts`). For `spine`, the minimal cut with the bridge patch on must be exactly the patch cells |
 | **routes** | all on | every pinned canoe route (R-volcano, R-ice, R-waterfall, the lake crossings) connects its two ends by 4-connected River / Lake cells; **no route cell is a bridge or ford `=`**; no unpinned river joins two regions' routes |
 | **prewalk** | per stage, below | for each stage S in S0-S14 (the canoe is granted inside Crescent at S14, so its dock-to-gate walk is included): every **required entrance** of S is reachable on foot from one of S's **starts**, with S's **open patches** on |
 | **north** | all on | every walk+canoe component (walkable cells plus River and Lake, 4-connected) that holds a cell owned by WATER, ORDEAL or WIND holds only cells owned by those three; and none of them holds a dock |
@@ -698,20 +738,95 @@ Every check runs on the composed world with the stated patches. A failure names 
   transition whose `targetMap` matches one of S's `maps` globs.
 - **Starts of S:**
   - S's `entry.at` spot, if S's entry is on `overworld`;
-  - every overworld entrance that is the target of an exit or transition of a map in S's or an ancestor's `maps`
-    (e.g. `ert_giant_west`, the giant tunnel's west mouth);
+  - every overworld entrance that is the target of an exit or transition of a map in **an ancestor's** `maps`, never
+    S's own (rev 3.2: with S's own maps, a required entrance was its own start and prewalk passed vacuously);
   - every dock in `DOCKS_ALLOWED` reachable by ship for S: those of `aldi` if the ship is granted to an ancestor,
     plus those of `ocean` if `CANAL_OPEN` is too.
+- **Multi-entrance maps.** A map of S with several overworld entrances (the giant's tunnel: `ert_giant` and
+  `ert_giant_west`) joins them: once one is reached on foot, the others count as reached. The joins are iterated to a
+  fixed point.
+- **The vacuity selftest** (`selftest_gates.py`, from NW-0's `run.py vacuity_demo`): ring Elfheim's gate with rock.
+  Prewalk must fail with `S4 elf_elfheim`. The rev 3 wording passed this case.
 - A required entrance reached from no start fails with the stage, the entrance and the nearest blocking river or
   ridge cell. The verifier's proof (a) stays the authority; prewalk catches a geography cut before it runs.
 
 ### 3.9 Compile cost
 
 - The generator is cheap: the concept sketch runs in under 1 s at 256²; the real one, with the flood, about 2-5 s.
-- The compile dominates: about 20 GB and 150-340 s for a full world, under the world-compile lock (3.4). A
-  `--region` compile is about 7 GB.
-- NW-0 and NW-2 measure both (G-NW8). If the full compile is over 26 GB, the fallback is 4 quadrant compiles in the
-  chunk-digest mode under the lock, byte-equal by GAP-14 locality.
+- The compile dominates. **NW-0 measured 25.2 GB peak and 208 s** for preset B's full world with the 16 px 4096²
+  Mode 7 bake, under the world-compile lock (3.4); that is 0.8 GB under the 26 GB limit. The generator itself took
+  2.23 s.
+- NW-2 re-measures with the 12 px 3072² bake (NW-1). The bake's stitched image and its box sums shrink, so the peak
+  should drop. G-NW8 holds the NW-2 figure.
+- If a full compile tops 26 GB, there are two fallbacks:
+  1. 4 quadrant compiles in the chunk-digest `--region` mode under the lock, byte-equal by GAP-14 locality;
+  2. a lower-memory compile in `build_map.write()`: chunks written and freed row by row, and the bake stitched from
+     the files on disk instead of from memory.
+- A `--region` compile is about 7 GB (estimate; NW-4 measures it).
+
+### 3.10 Pilot results (NW-0, preset B) and what NW-2 / NW-3 take from them
+
+- **Where.** The results are in `~/temp/ff-game/worldplan/nw0/`: `summary.json`, the per-preset `*_metrics.json`, the
+  maps, the side-by-sides, B's compiled overview and its four crops.
+- **The user's pick:** preset **B (classic)** (Q5, D-NW11).
+- **The seed of NW-2.** NW-2 starts from the pilot scripts in `~/temp/ff-game/worldplan/nw0/scripts/`:
+  - `spec.py`, `shape.py`, `hydro.py`, `noise.py`, `geom.py`, `finish.py`, `checks.py`, `metrics.py`, `compose.py`;
+  - B's source, `B_source_overworld.yaml`.
+  - NW-2 splits them into 3.2's files under the 250-line rule. Its first gate is that NW-2 reproduces B's
+    `B_classic_metrics.json` gates and checks at the same seed.
+- **Preset B's parameters** (`spec.PRESETS["B_classic"]`, world seed `SEED = 1987`):
+
+  | Knob | B | (A calm / C rugged) | What it does |
+  |---|---|---|---|
+  | `warp` | 12 | 9 / 15 | continent-scale domain warp amplitude (cells) |
+  | `swarp` | 6.0 | 3.0 / 8.0 | small-scale second warp (fjords, fingers) |
+  | `coast` | 12 | 9 / 15 | fbm amplitude on the polygon distance |
+  | `mid` | 14 | 8 / 18 | mid-scale bay and cape amplitude |
+  | `detail` | 22 | 12 / 30 | coast-only detail amplitude (faded inland) |
+  | `finger` | 14 | 6 / 20 | peninsula / finger strength |
+  | `fjord` | 9.0 | 3.0 / 14.0 | fjord carving on high-relief coasts |
+  | `grow` | 6.5 | 6.5 / 6.5 | polygon growth (land amount) |
+  | `isles` | 1.0 | 0.7 / 1.4 | island density multiplier |
+  | `a1` | 0.35 | 0.25 / 0.45 | coast roughness on act 1's spec polygon (kept low near its pins) |
+
+- **B's measured figures:**
+
+  | Figure | Value |
+  |---|---|
+  | generation | 2.23 s |
+  | land cells | 28,874 |
+  | coast edges | 5,204 |
+  | coast index (G-NW2) | **30.6** (A 24.5, C 34.8) |
+  | G-NW1 | 0 failing runs; longest non-exempt run 6 |
+  | G-NW3 | 0 failing runs; longest 6 |
+  | exempt cells | 427 (cap 600) |
+  | jogs | 33 |
+  | ford cuts | 0 (4 fords, all on `a1_pravoka`'s corridor) |
+  | shares of land | grass 42.4 %, forest 16.8 %, mountain 15.1 %, snow 9.2 %, tundra 6.0 %, sand 4.9 %, river 2.4 %, lake 2.4 %, swamp 0.5 % |
+  | coast index by region | fire 19.4, water 18.3, earth 10.7, ordeal 10.5, a1 9.2, elf 8.6, wind 5.7 |
+  | checks | basins (aldi 3,177 cells, ocean 33,485; the canal joins), docks, walls, barriers, routes, north, landings, straits, prewalk S0-S14, act1 (beyond the bridge 2,578 cells, peninsula 954), walks, detours: all OK |
+  | act-1 walks | gate → bridge 22 (today 22), Cornelia → Temple 23 (23), bridge → Pravoka 61 (59, +3.4 %), bridge → Matoya 39 (39) |
+  | full compile | 25.2 GB peak, 208 s (16 px bake) |
+
+- **Why the land target dropped (D-NW12).** Rev 1-3's 36-42k assumed today's land density at 1.78x the area. In the
+  pilot, more land smoothed the coasts: growing the polygons merges bays and fills fingers, and the coast index fell
+  below 30. Since the coast index is the gate the user cares about, the user agreed to about 29k land cells. That is
+  still 1.37x today's 21,089.
+- **Problems the pilot found, and their fixes in this plan:**
+  - prewalk was vacuous (3.8);
+  - `crescent_ring`'s canoe rule (3.8);
+  - the exemption footprint rule (0.1.1);
+  - G-NW3's classes and the kept rectangles (0.1.1);
+  - G-NW8's measured peak (3.9);
+  - the jog pass (2.4 rule 9).
+- **Visual fixes, seen in B's crops:**
+  - **Cornelia's road stubs (NW-3).** The routed roads left short dead-end stubs by the city gates, where a gate's
+    road meets the icon one cell off. The fix: each road's end is the gate cell itself, and a check fails a road
+    component with a dead end that is not a declared end (`road_check` gains `no_stubs: true`).
+  - **The lumpy northern coasts (NW-2 knobs, NW-R).** WIND (index 5.7), ORDEAL (10.5) and ELF (8.6) read as smooth
+    lumps. NW-2 makes `detail`, `finger` and `fjord` per-continent knobs, and WIND, ORDEAL and WATER tune theirs in
+    NW-R. The target is each region's coast index at least 12, a reported figure, not a gate. G-NW2 stays
+    whole-world.
 
 ## 4. The progression map
 
@@ -988,8 +1103,8 @@ uses an entrance name.
 |---|---|---|---|---|---|
 | **NW-0 Pilot** | a generator agent | Offline only; nothing committed but the result note. A scratch generator in `/tmp/<agent>/nw/` (the concept sketch grown to 3.1's stages, with the flood, hydrology, climate, corridors and gates), act 1 included and pinned by 3.6.2's rule, sites from the anchors. Outputs, for 3 presets (A calm, B classic, C rugged): (1) a flat-colour map at 4 px per cell with sites and the chunk grid; (2) the same beside the classic reference and `now.png`; (3) one full scratch compile of preset B (`build_map.py overworld --src-dir <scratch> --out <scratch>`, under the lock, with today's 16 px bake), a 0.15 overview and four 1x crops (Cornelia's peninsula and the bridge, Onrac's river, the volcanic arc, the isthmus); (4) the 0.1.1 metrics and the act-1 walk table | the user picks a preset and approves the arrangement and act 1's look (G-NW9); measured: generation time, compile peak (G-NW8, 16 px bake) and time | none | 12 h |
 | NW-1 Contract and spots | NW integrator | `world_api.py` v2 beside v1 (3.2; `G2_MIN` from the pilot); `worldgen/spec.py`, `noise.py`; spots on today's world and the `at:` / `ref:` rewrite of `quest.yaml`, the scenarios and the cutscene, with the schema (5.2); the verifier's `--maps`, `--anchors`, `--worst-canoe`; `questLateData` / `questTravelRows` read data; the re-fitted `assets-src/maps-nw/world-anchors.yaml` and the 31-pair table (4.2); the size-derived `CELL_PX` (6.1); **every spot change of 5.2** (the table: region output, composer, `passthrough`, map checks, `MapData`, both schemas, the quest entries, `questEvents`, `DebugScenarioLoader` `spot:`, `VehicleManager` / `FieldVehicles` `at`, `ExplorationCutscenes` / `CutsceneRegistry`, the data rewrite) and **today's world recompiled** with spots (chunks byte-identical) | `npm run quest -- --strict` unchanged on today's world; `mode7Atlas.test.ts` unchanged; `test:fast` | NW-0 | 11 h |
-| NW-2 Generator | generator agent | `worldgen/` shape, relief, hydro (corridors, fords), climate, roads, owners, metrics, selftests (3.2); the Python side of snow and tundra (2.6); the composer v2 writing `assets-src/maps-nw/overworld.yaml` from the 7 region specs (a first cut from the pilot), with every site and spot as a pin: a complete but rough world | `worldgen/selftest.py` and `selftest_gates.py` OK; G-NW1-3; determinism (G-NW5); a full scratch compile with the 12 px bake (G-NW8) | NW-1 | 16 h |
-| NW-3 Act 1 | A1 agent | `a1/world_a1_pins.py` (derived by script from today's source), `world_a1_checks.py`, the A1 spec (peninsula, spine, mainland, Pravoka's range); `tests/nw/a1/` (`a1Pins`, `a1Walks`, the rewritten act-1 tests of 3.6.5 against the source) | 3.6.3's checks; the walks within ±10 %; an image review of act 1 at 1x | NW-2 | 9 h |
+| NW-2 Generator | generator agent | `worldgen/` shape, relief, hydro (corridors, fords), climate, roads, owners, metrics, selftests (3.2); the Python side of snow and tundra (2.6); the composer v2 writing `assets-src/maps-nw/overworld.yaml` from the 7 region specs, with every site and spot as a pin: a complete but rough world. **Seeded from the NW-0 scripts and preset B** (3.10), split to 3.2's files; the jog pass (2.4 rule 9); per-continent `detail` / `finger` / `fjord` knobs for the lumpy northern coasts | B's NW-0 gates and checks reproduced at seed 1987 (`B_classic_metrics.json`); `worldgen/selftest.py` and `selftest_gates.py` OK (the sealed-Elfheim prewalk case included); G-NW1-3; determinism (G-NW5); a full scratch compile with the 12 px bake (G-NW8) | NW-1 | 16 h |
+| NW-3 Act 1 | A1 agent | `a1/world_a1_pins.py` (derived by script from today's source), `world_a1_checks.py`, the A1 spec (peninsula, spine, mainland, Pravoka's range); `tests/nw/a1/` (`a1Pins`, `a1Walks`, the rewritten act-1 tests of 3.6.5 against the source); the pins at `CORNELIA_NW` (146, 155), delta (+54, +44); **Cornelia's road stubs fixed** (road ends on the gate cells, `road_check.no_stubs`, 3.10) | 3.6.3's checks; the walks within ±10 % (NW-0: 22 / 23 / 61 / 39); no road stub; an image review of act 1 at 1x | NW-2 | 9 h |
 | NW-4 Gates | NW integrator | `worldgen/gates.py`, `prewalk.py`: walls, the canal pass, barriers on foot and by canoe, routes, north, landings, straits, prewalk (3.8); `world_checks` on the owner grid; `regions.<r>.raster`, `--owned-chunks`; the first compiled base and the chunk-digest mode of `check_base` with its selftest (3.4) | `world.py` prints the G-NW4 lines; the verifier `--strict --maps` on the base | NW-2 | 11 h |
 | NW-R x6 Regions | one agent per region: ELF, EARTH, FIRE, ORDEAL, WATER, WIND | the region's spec tuned (coast, ridges, corridors, climate hints, islands), its pins and spots at the targets and for their stages, its zones (same ids), barriers, backdrops (snow and tundra for WATER, WIND, ORDEAL), dressing; its design note; its `<r>_o_world` test rewritten against the owner grid in `tests/nw/<r>/` | per-region metrics; `--region <r>` over the base and an image review; `npm run quest -- --strict --stage <S> --maps` for its stages; `test:fast` | NW-3, NW-4 | 7 h each, 42 h |
 | NW-5 Cutover and balance | NW integrator | (1) `assets-src/maps-nw/` replaces `assets-src/maps/overworld.yaml` and `world-anchors.yaml`; v1 of `world_api` and the retired act-1 files deleted (3.6.1); (2) the full compile and the 12 px bake; (3) the runtime side of snow and tundra (2.6), `pilotGl`; (4) the frame removal (3.6.5), `worldOffsetOf`; (5) save v4, the reset, `--from-reset` and `resetStates.test.ts` (5.3); (6) `tests/nw/` into `tests/`, the act-1 and box-copy tests replaced, Appendix A cleared; (7) **balance** (former NW-6): the step-mean scaling per stage from both worlds' witnesses, then `questCurve`, `fieldCampaign`, `fieldPacing` and `zones` re-measured; (8) AGENTS.md "The world (pass W)" rewritten as "The world (pass NW)" | `npm run build`; `npm run test:full` (balance included); `npm run quest -- --strict`; `--mutate` started in the background; the 8 save cases; `--from-reset` passes for S0-S31; Appendix A empty (G-NW10) | NW-R (all), M7-INT | 19 h |
@@ -1008,7 +1123,7 @@ uses an entrance name.
 
 | # | Risk | Mitigation |
 |---|---|---|
-| R1 | The generated rivers or lakes open a canoe skip across a barrier | the barrier check runs by canoe too (3.8); the worst-case matrix run (4.3); the former GT-38 as a selftest |
+| R1 | The generated rivers or lakes open a canoe skip across a barrier | the barrier check runs by canoe too for `spine` and `western_range`, and `routes` guards `crescent_ring`'s two rivers (3.8); the worst-case matrix run (4.3); the former GT-38 as a selftest |
 | R2 | A river cuts a pre-canoe walk (momus M1) | corridors with fords (2.4 rule 4b); `prewalk` (3.8) |
 | R3 | A generated coast or strait breaks a sea lane or leaks the Aldi | wall lines are forced land; the straits check (3 cells); basins on every compose |
 | R4 | The look is still "generated" (blobby continents, uniform noise) | the pilot with 3 presets and the user's pick; the per-continent knobs; G-NW2 |
@@ -1035,7 +1150,7 @@ uses an entrance name.
 | Q3 | How close to the classic arrangement: (a) the same continents and relative positions with original coasts (today's rule), or (b) the same plus closer outlines (the Citadel arc, Lufenia's long tail, the river maze of the south-east)? | open; default (a), with the shape language of (b) where a gate needs it |
 | Q4 | Old saves? | **closed 2026-11-20: reset to Cornelia (D-NW8, 5.3)** |
 | Q4a | D-NW8 also resets a pre-NW save **inside another map** (a town, a dungeon) when it owns a ship or airship, so no party walks out to a vehicle that has moved. Is that acceptable, or should such saves keep their place and have their vehicles' reachability proven instead? | **closed 2026-11-20 (user): yes, reset those to Cornelia too** (D-NW8, 5.3) |
-| Q5 | Coast roughness preset (from the pilot's A / B / C)? | open; default B |
+| Q5 | Coast roughness preset (from the pilot's A / B / C)? | **closed 2026-11-20: preset B (classic), G2_MIN = 30 (D-NW11)** |
 | Q6 | Snow and tundra; landing on snow? | **closed 2026-11-20: both added; the airship lands on tundra only (D-NW9, 2.6)** |
 | Q7 | Mode 7: the 12 px far atlas (same memory, a little softer far away), or 16 px at 4096² (sharper, +39 MB, more machines fall to `low`)? | open; default 12 px |
 | Q8 | Balance: keep the fight count per stage (scale the step means), or let the bigger world mean more grinding? | open; default keep the count (±10 %) |
@@ -1050,8 +1165,9 @@ uses an entrance name.
 - [x] Inventory every world-coordinate consumer (5.1, Appendix A) (2026-11-20)
 - [x] Rev 2: user rulings Q1, Q2, Q4, Q6; momus M1-M10; suggestions (2026-11-20)
 - [x] Rev 3: momus R3-1 to R3-6 and suggestions (2026-11-20)
-- [ ] User answers Q3, Q5 (at the pilot), Q7, Q8, Q9 (priority: medium, effort: 0.5h)
-- [ ] NW-0 pilot images and the user's pick (priority: high, effort: 12h)
+- [x] NW-0 pilot; the user picked preset B (2026-11-20)
+- [x] Rev 3.2: the pilot's results and fixes (2026-11-20)
+- [ ] User answers Q3, Q4a, Q7, Q8, Q9 (priority: medium, effort: 0.5h)
 - [ ] NW-1 contract and spots, with today's world recompiled (priority: high, effort: 11h)
 - [ ] NW-2 generator (priority: high, effort: 16h)
 - [ ] NW-3 act 1 regenerated and re-pinned (priority: high, effort: 9h)
