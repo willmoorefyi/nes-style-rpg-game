@@ -546,3 +546,75 @@
 {"event": "result", "key": "96a9de5baa82700907023131", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
 {"event": "request", "ts": "2026-11-19T14:35:47", "tool": "lmgen4.py", "model": "ultra", "purpose": "lm4_gen", "seed": 6, "key": "fbdaada43cd52db49ea216ef", "pass": "LM4"}
 {"event": "result", "key": "fbdaada43cd52db49ea216ef", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:54:49", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "b09d5aa7bfdc205ed315b5e7", "pass": "LM5"}
+{"event": "request", "ts": "2026-11-19T21:54:51", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "fd7e6ba1fe8d14b7d60685b6", "pass": "LM5"}
+{"event": "result", "key": "fd7e6ba1fe8d14b7d60685b6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:04", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "016f6acc84338750de3bbd18", "pass": "LM5"}
+{"event": "result", "key": "b09d5aa7bfdc205ed315b5e7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:06", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "f76f0d6f786521488de9ce09", "pass": "LM5"}
+{"event": "result", "key": "016f6acc84338750de3bbd18", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:17", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "8147b1a74371004e39ef9e54", "pass": "LM5"}
+{"event": "result", "key": "f76f0d6f786521488de9ce09", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:18", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "225fa61b7ed0c64c9476ea2b", "pass": "LM5"}
+{"event": "result", "key": "8147b1a74371004e39ef9e54", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:29", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "5a3f49e7ae40f40188fd576f", "pass": "LM5"}
+{"event": "result", "key": "225fa61b7ed0c64c9476ea2b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:29", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "9031d58243d86f24f969d053", "pass": "LM5"}
+{"event": "result", "key": "5a3f49e7ae40f40188fd576f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:40", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "779d98a5659cf98447cef55d", "pass": "LM5"}
+{"event": "result", "key": "9031d58243d86f24f969d053", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:40", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "2228347213a6e8586d02598e", "pass": "LM5"}
+{"event": "result", "key": "779d98a5659cf98447cef55d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:51", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "fbbd5c69f2eeadb690911678", "pass": "LM5"}
+{"event": "result", "key": "2228347213a6e8586d02598e", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:55:52", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "802f3990577e8cd818aac674", "pass": "LM5"}
+{"event": "result", "key": "802f3990577e8cd818aac674", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:02", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "ed093c84e032dfd9199eb694", "pass": "LM5"}
+{"event": "result", "key": "fbbd5c69f2eeadb690911678", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:03", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 1, "key": "88776e8bbd6d762a93dd2d97", "pass": "LM5"}
+{"event": "result", "key": "ed093c84e032dfd9199eb694", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:14", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "3db38715c32ab57d1d8c29df", "pass": "LM5"}
+{"event": "result", "key": "88776e8bbd6d762a93dd2d97", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:15", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 2, "key": "fb87bbd4354e0ab4de594758", "pass": "LM5"}
+{"event": "result", "key": "3db38715c32ab57d1d8c29df", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:24", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "205e0567d9af971010856cd5", "pass": "LM5"}
+{"event": "result", "key": "fb87bbd4354e0ab4de594758", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:56:26", "tool": "lm5gen.py", "model": "ultra", "purpose": "lm5_gen", "seed": 3, "key": "58f50fa7e45ad0721379b645", "pass": "LM5"}
+{"event": "result", "key": "205e0567d9af971010856cd5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "58f50fa7e45ad0721379b645", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-19T21:57:03", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "f6ecefab4bcdb00b89b4e6ce", "pass": "LM5"}
+{"event": "result", "key": "f6ecefab4bcdb00b89b4e6ce", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:57:14", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "69cb1077b7364593e409491a", "pass": "LM5"}
+{"event": "result", "key": "69cb1077b7364593e409491a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:57:24", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "ede989852145d4f2aa06e4c5", "pass": "LM5"}
+{"event": "result", "key": "ede989852145d4f2aa06e4c5", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:57:34", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "46b6fb34ec92fdf3e92257a1", "pass": "LM5"}
+{"event": "result", "key": "46b6fb34ec92fdf3e92257a1", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:57:45", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "15197428a317cdcf77bea468", "pass": "LM5"}
+{"event": "result", "key": "15197428a317cdcf77bea468", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:57:55", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "3b22ad64de5d86d32e06b9f5", "pass": "LM5"}
+{"event": "result", "key": "3b22ad64de5d86d32e06b9f5", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:58:39", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "7a81ff15eca2448660a33f56", "pass": "LM5"}
+{"event": "result", "key": "7a81ff15eca2448660a33f56", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:59:05", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "750d3146eefbf9dd8fa64647", "pass": "LM5"}
+{"event": "result", "key": "750d3146eefbf9dd8fa64647", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:59:16", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 3, "key": "2831075ad7b51ca1f360c5eb", "pass": "LM5"}
+{"event": "result", "key": "2831075ad7b51ca1f360c5eb", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:59:26", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "1e701f711771fbaa25f44298", "pass": "LM5"}
+{"event": "result", "key": "1e701f711771fbaa25f44298", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:59:42", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "e548d24d687f0b224dcb1b58", "pass": "LM5"}
+{"event": "result", "key": "e548d24d687f0b224dcb1b58", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T21:59:52", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 3, "key": "22e144f4b0e8de7e13f0a2f9", "pass": "LM5"}
+{"event": "result", "key": "22e144f4b0e8de7e13f0a2f9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:00:00", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 3, "key": "be2b56d1354400efa5f926d1", "pass": "LM5"}
+{"event": "result", "key": "be2b56d1354400efa5f926d1", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:00:44", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "8b6fc3f777b5f682a1d0dd75", "pass": "LM5"}
+{"event": "result", "key": "8b6fc3f777b5f682a1d0dd75", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:01:02", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "55afcbfcdb8d28b8934a18b8", "pass": "LM5"}
+{"event": "result", "key": "55afcbfcdb8d28b8934a18b8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:01:12", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 3, "key": "1c452bb5673dd88645313183", "pass": "LM5"}
+{"event": "result", "key": "1c452bb5673dd88645313183", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:01:22", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 1, "key": "ce780b620690778443074287", "pass": "LM5"}
+{"event": "result", "key": "ce780b620690778443074287", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-19T22:01:31", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "29148efc7c6f4be2535f594a", "pass": "LM5"}
+{"event": "result", "key": "29148efc7c6f4be2535f594a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}

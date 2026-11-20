@@ -229,6 +229,20 @@
       "note": "User 2026-11-19: larger Melmond and Onrac town icons, unique brig / fishing boat / submarine art, the no-reuse audit; no Gemini. gemini_before as LM3 (the Gemini ledger is unchanged). One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 57,
       "closed": "2026-11-19, 57 of 80 (LM4 done: Melmond, Onrac and four more town icons, brig, fishing boat, submarine, bell tower, lighthouse, Mirage Tower, standing stones, Lufenia, hermit's hut rendered; awaiting the user's review)"
+    },
+    {
+      "pass": "LM5",
+      "cap": 80,
+      "per_purpose_caps": {
+        "lm5_gen": 60,
+        "lm5_nobg": 10,
+        "reserve": 10
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-19: Western Keep and citadel icons, fairy and mermaid field sprites; no Gemini. gemini_before as LM4 (the Gemini ledger is unchanged). One row per logical request in cache/bedrock_ledger.jsonl. structure (control-structure, pixel-art preset, approved field sheets as shape guides) ran under lm5_gen for the NPC sheets.",
+      "used": 36,
+      "closed": "2026-11-19, 36 of 80 (LM5 done: Western Keep and citadel icons, fairy and mermaid field sheets rendered; awaiting the user's review; no remove_bg, no reserve)"
     }
   ]
 }
