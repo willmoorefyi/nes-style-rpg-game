@@ -155,8 +155,10 @@ POST = [[landmark_parts("dock_post")[0][0]]]
 for (x, y) in [(11, 35), (11, 38), (14, 35), (28, 36), (28, 39), (31, 36), (31, 39)]:
     deco(POST, x, y, on_water=True)
 # LM4-INT: the approved boats (before, both were the buried hull)
-deco(landmark_parts("fishing_boat"), 14, 37, on_water=True, collide="alpha")      # the moored fishing boat, 3x2
-deco(landmark_parts("submarine"), *HULL, on_water=True, collide="alpha")          # the iron submarine, 4x2
+# WL: both sit in the water (waterline: art px from the top; the fishing boat's hull a little under, the submarine
+# mostly under, its conning tower and upper hull above)
+deco(landmark_parts("fishing_boat"), 14, 37, on_water=True, collide="alpha", waterline=84)   # the fishing boat, 3x2
+deco(landmark_parts("submarine"), *HULL, on_water=True, collide="alpha", waterline=62)       # the submarine, 4x2
 
 INSPECT = [
     {"x": SIGNPOST[0], "y": SIGNPOST[1], "text": P.SIGNPOST_TEXT},

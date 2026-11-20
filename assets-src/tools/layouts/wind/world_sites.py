@@ -2,7 +2,8 @@
 entrances, the inspect cells and the encounter zones, in world cells.
 
 - Gaia (WND-T's site file `wind/town_gaia_site.py`): its door, gate and icon are read from the site, so a change
-  there moves them. The icon is a town roof beside a stilled windmill, the door between them.
+  there moves them. The icon (LM4-INT's `town_gaia`) draws its own windmill; WL dropped the two windmill decos
+  beside it and put a tree clump on the door's west side, so the door keeps one way in, from its gate.
 - The Mirage Tower (anchor `wnd_mirage`): a tower on the sands' west spit, its door the tower's bottom-right cell and
   a fallen block of its masonry beside the door; the door leads to `mirage-1f` entrance `arrival` (the vestibule,
   WND-D1's chime door is inside it).
@@ -30,7 +31,7 @@ MIRAGE_OPEN = not is_stub(MAPS / "mirage-1f.yaml")
 
 WALKABLE = frozenset(".,:fs=%w_+-")
 LAKE, OCEAN = "≈", "o"
-LANDMARK_SIZE = {"windmill": (2, 3), "town_gaia": (3, 2), "mirage_tower": (2, 3), "lufenia": (4, 2)}  # kit.LANDMARKS
+LANDMARK_SIZE = {"town_gaia": (3, 2), "mirage_tower": (2, 3), "lufenia": (4, 2)}  # kit.LANDMARKS
 
 # a rocky knoll behind Gaia's door: the hall's roof row stands on it, so the door has one way out (south)
 KNOLL = [(GAIA.DOOR[0] + i, GAIA.DOOR[1] - j) for j in (1, 2) for i in (0, 1)]
@@ -87,15 +88,13 @@ INSPECT = [  # (x, y, lines): each on a blocked boulder with a walkable neighbou
 def objects() -> list[dict]:
     dx, dy = GAIA_DOOR
     return [
-        # Gaia: a stilled windmill west of the door, the approved town icon `town_gaia` (3x2, LM4-INT; before, the
-        # walled-town icon 2x2) over and east of it, the door its bottom-left cell
-        # (collide: alpha, the art's top rows are partly sky: an open cell there is walked behind)
+        # Gaia: the approved town icon `town_gaia` (3x2, LM4-INT; before, the walled-town icon 2x2), the door its
+        # bottom-left cell (collide: alpha, the art's top rows are partly sky: an open cell there is walked behind).
+        # WL: the icon draws its own windmill, so the two windmill decos beside it are gone; a tree clump stands
+        # where the west one blocked the door's west side (OW-2: the door's one way in is from its gate)
         {"type": "deco", "name": "gaia", "parts": landmark_parts("town_gaia"),
          "x": dx, "y": dy - 1, "walk_cells": [[0, 1]], "collide": "alpha"},
-        {"type": "deco", "name": "gaia_mill", "parts": landmark_parts("windmill"), "x": dx - 2, "y": dy - 2,
-         "collide": "alpha"},
-        {"type": "deco", "name": "gaia_mill_east", "parts": landmark_parts("windmill"), "x": 146, "y": 8,
-         "collide": "alpha"},
+        {"type": "deco", "name": "gaia_door_west", "parts": [["tree_clump"]], "x": dx - 1, "y": dy},
         # the Mirage Tower (LM4-INT: its own approved art, was the generic tower), with a fallen block beside the door
         {"type": "deco", "name": "mirage", "parts": landmark_parts("mirage_tower"), "x": MIRAGE_DOOR[0] - 1,
          "y": MIRAGE_DOOR[1] - 2, "walk_cells": [[1, 2]] if MIRAGE_OPEN else [], "collide": "alpha"},

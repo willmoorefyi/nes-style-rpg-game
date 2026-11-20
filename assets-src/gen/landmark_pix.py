@@ -9,6 +9,8 @@ Added in LM-INT: `smoke_y` (drop the grey smoke over a crater: the engine animat
 (a remove_bg base kept solid: a lower alpha threshold below soft_y, holes closed).
 Added in LM4-INT: `sea_y` (drop the painted sea round a town's walls: water-hued pixels joined to the background,
 below sea_y) and `drop` (fractional rects cut out of the figure: Pravoka's pier).
+Added in WL: `oval` / `oval_top` (the ground outside an ellipse round a walled town, below a row: a render whose ground
+runs off its frame, Melmond and Crescent).
 """
 from __future__ import annotations
 
@@ -36,7 +38,8 @@ def hsv(rgb):
 
 
 def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, base_y=None, green_y=None,
-          smoke_y=None, smoke_sat=0.3, sea_y=None, sea_hue=(170, 215), sea_sat=0.25, sea_grow=2, drop=()):
+          smoke_y=None, smoke_sat=0.3, sea_y=None, sea_hue=(170, 215), sea_sat=0.25, sea_grow=2, drop=(),
+          oval=None, oval_top=0.0):
     """rim: peel up to `rim` px of light, low-saturation pixels inward from the background (a sticker rim);
     pocket: erase near-white blobs >= `pocket` px wide trapped inside the figure (background seen through gaps);
     base_y / green_y / smoke_y: fractions of the render height: drop every row from base_y, grass-green pixels from
@@ -72,7 +75,21 @@ def clean(rgb, fg, rim=0, rim_lum=170, rim_sat=0.16, pocket=0, pocket_min=236, b
     for x0, y0, x1, y1 in drop:
         fg = fg.copy(); W = fg.shape[1]
         fg[int(y0 * H):int(y1 * H), int(x0 * W):int(x1 * W)] = False
+    if oval is not None:
+        fg = fg & ~outside_oval(fg.shape, oval, oval_top)
     return fg
+
+
+def outside_oval(shape, oval, top=0.0):
+    """WL: the pixels outside the ellipse oval = [cx, cy, rx, ry] (fractions of the render's width / height), from
+    row top * H down: the ground a render runs off its frame (flat-cut sides) and a cliff slab under a walled town
+    are cut to a round lip round the walls; the towers and roofs above row `top` are kept."""
+    H, W = shape
+    cx, cy, rx, ry = oval[0] * W, oval[1] * H, oval[2] * W, oval[3] * H
+    yy, xx = np.mgrid[0:H, 0:W]
+    out = ((xx + 0.5 - cx) / rx) ** 2 + ((yy + 0.5 - cy) / ry) ** 2 > 1.0
+    out[:int(top * H)] = False
+    return out
 
 
 def sea(rgb, fg, h, s, v, sea_y, hue, sat, grow):

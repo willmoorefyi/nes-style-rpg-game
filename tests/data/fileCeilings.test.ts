@@ -30,6 +30,8 @@ const NEW_FILES = [
   // SMOKE: the volcano smoke (option e of the experiment)
   'src/scenes/exploration/smoke/smokeShapes.ts', 'src/scenes/exploration/smoke/smokeStyles.ts',
   'src/scenes/exploration/smoke/smokeMotion.ts', 'src/scenes/exploration/smoke/SmokeColumn.ts',
+  // WL: the boats' waterline blend
+  'assets-src/tools/waterline.py',
 ];
 
 describe('file-size ceilings', () => {

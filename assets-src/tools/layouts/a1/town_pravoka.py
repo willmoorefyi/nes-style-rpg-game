@@ -114,7 +114,8 @@ for x in range(31, 42):
 for y in (15, 17):
     deco([[landmark_parts("dock_post")[0][0]]], 42, y, on_water=True)
 BRIG = (34, 35)                                     # the pirates' brig, moored along the south side of its pier
-deco(landmark_parts("brig"), *BRIG, on_water=True, collide="alpha")     # LM4-INT: the approved brig, 4x3 (was the hull)
+deco(landmark_parts("brig"), *BRIG, on_water=True, collide="alpha",
+     waterline=134)                                 # LM4-INT: the approved brig, 4x3; WL: its hull a little under water
 for (x, y) in [(28, 16), (28, 22), (28, 27), (28, 31)]:
     obj(type="barrel", x=x, y=y)
 for (x, y) in [(28, 17), (28, 21), (28, 28), (28, 36), (28, 37)]:

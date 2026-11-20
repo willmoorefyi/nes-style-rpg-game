@@ -282,6 +282,7 @@ The `*_common.py`, `*_people.py`, `*_homes.py`, `*_shops.py` and `*_site.py` fil
 `temple-of-fiends.yaml` is still hand-written. Object options added in R and U:
 - deco `passage: true` — the deco's above rows may cover a walkable cell (a gate arch over a road); only the arch's drawn opening is walkable, the jambs block.
 - deco `style` — a `RECOLOR` entry in `build_map.py`, e.g. `pale_stone` (the bridge debris), `bright`, `brighter` (value x1.5, the temple icon).
+- deco `waterline: n` (WL) — a moored boat partly under water: on an `on_water` deco with no above rows, the art below native px row n (from the top of its parts grid) is baked as a 4x4 ordered dither (8 of 16 pixels kept, thinning to 4 of 16 by 24 px down) of the art mixed toward its shape in the water's hue, with a 1 px light ripple on row n; 15-bit colours, binary alpha (`tools/waterline.py`, its selftest also runs in `build_map.py --selftest`). Set on the Onrac submarine (62 of 96: the conning tower and upper hull above), the Onrac fishing boat (84 of 96) and the Pravoka brig (134 of 144); the frigate vehicle is its own sprite.
 - patch `art_ground` (FX-R) — the patch overlay is painted as this legend char instead of `ground` (same terrain only), e.g. the canal's stone-banked `~` over Water `o`.
 - `layouts/world_dress.py` (FX-R) — `scatter()` dresses a town icon with seeded 1x1 copses, bushes and stones (offsets, gaps, `collide: alpha`; the door's sides stay solid, the gate stays reachable): Melmond, Onrac.
 - A peak drawn near a chunk border reaches into the next chunk, so editing mountains in a chunk beside another region's chunk can repaint it (FX-R: EARTH's hogback at x 48-63, y 80-95 touches A1's chunk at x 64). Check the changed chunk files against `world.py --owned-chunks <region>` after a compile.
@@ -354,7 +355,10 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   (pass LM4); cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache key, model, seed, pass and the cut
   and pixelize settings. Both are re-cut offline from the render cache by `python3 -I assets-src/gen/landmark_cut.py`
   (`SPEC` / `SPEC4`; `--check`: both committed sheets rebuild; `landmark_pix.py` holds the cutter, with LM4-INT's
-  `sea_y` (the painted sea round a town's walls) and `drop` (fractional rects cut away, Pravoka's pier)). The renders
+  `sea_y` (the painted sea round a town's walls) and `drop` (fractional rects cut away, Pravoka's pier), and WL's
+  `oval` / `oval_top` (the ground outside an ellipse round a walled town, below a row, is cut away: Melmond's and
+  Crescent's renders run their ground off the frame, which left the icons flat-cut; `tests/data/wlArtFixes.test.ts`
+  fails on a straight edge over a quarter of a town icon's height)). The renders
   are not tracked: copy `assets-src/gen/cache/<key>.png` from the main checkout into a worktree first.
   `kit.load_kit` puts their cells over the code-drawn placeholders in **every** kit; the placeholders remain only as
   the fallback while a sheet is missing. LM-INT added the 1x1 `tuft` (Gaia's fold; the `tuft` part stays the
@@ -366,6 +370,8 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `standing_stones` (the Circle's islet) and `hermit_hut`. A town icon covers its whole ICON box with
   `collide: alpha` and its door as a `walk_cells` cell; where the art's cell beside a door is near-empty sky, a
   `tree_clump` part stands in it (Elfheim's top corners, Melmond's top-right) so the door keeps one way in (OW-2).
+  WL dropped the two windmill decos beside Gaia's icon (it draws its own windmill); a `tree_clump` deco
+  `gaia_door_west` (149, 13) blocks the door's west side.
   The generic `town_icon` is no longer placed anywhere, and `buried_hull` is only FIRE's airship hull. Recolours
   kept: tower `slate` (the Western Keep), tent `dune` (the caravan camp), windmill `stone` (Melmond), cave_mouth
   `snow` (the Ice Cavern); LM4-INT dropped tower `bright` / `stone`, buried_hull `slate`, shrine `pale_stone`, the

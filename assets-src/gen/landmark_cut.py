@@ -60,15 +60,18 @@ APPROVED4 = "2026-11-19"
 R4, P4, Q4 = {"rim": 4}, {"fill": 0.95}, {"fill": 0.97, "apron": 0.12}      # LM4's review settings (run_sheet.py)
 # LM4 (the user's picks, 2026-11-19), the same row shape as SPEC
 SPEC4 = {
-    "town_melmond": ("town_melmond_ultra_a_1", "709c3c99c3b59268d8f2c9b4", (4, 3), False, R4, Q4, None),
+    "town_melmond": ("town_melmond_ultra_a_1", "709c3c99c3b59268d8f2c9b4", (4, 3), False,
+                     {"rim": 4, "oval": [0.51, 0.52, 0.43, 0.37], "oval_top": 0.4, "drop": [[0.0, 0.3, 0.085, 0.5]]},
+                     {**Q4, "hfill": 0.82}, None),
     "town_onrac": ("town_onrac_ultra_a_2", "d495d457c76fb08d332861f9", (5, 3), False, R4, {"fill": 0.97}, None),
     "town_pravoka": ("town_pravoka_ultra_a_3", "44ff0df3838561d243ffe09b", (3, 3), False,
-                     {"rim": 4, "sea_y": 0.45, "drop": [[0.0, 0.69, 0.49, 1.0]]}, Q4, None),
+                     {"rim": 4, "sea_y": 0.45, "drop": [[0.0, 0.735, 0.49, 1.0], [0.0, 0.69, 0.39, 0.735]]}, Q4, None),
     "town_elfheim": ("town_elfheim_ultra_a_3", "89d203e1f452094af4fde9dc", (3, 3), False, R4, Q4, None),
-    "town_crescent": ("town_crescent_ultra_b_4", "62c1d000e031f2dcdca68c18", (3, 3), False, R4, Q4, None),
+    "town_crescent": ("town_crescent_ultra_b_4", "62c1d000e031f2dcdca68c18", (3, 3), False,
+                      {"rim": 4, "oval": [0.5, 0.52, 0.47, 0.43], "oval_top": 0.45}, Q4, None),
     "town_gaia": ("town_gaia_ultra_a_3", "47fb9c70bf664d435f608910", (3, 2), False, R4, Q4, None),
     "lufenia": ("lufenia_ultra_a_3", "d3fecf9be5789401cb7e4668", (4, 2), False, R4, {"fill": 0.97, "apron": 0.1}, None),
-    "brig": ("brig_ultra_b_4", "58f156f5112d6d559d3c676c", (4, 3), False, R4, P4, None),
+    "brig": ("brig_ultra_b_4", "58f156f5112d6d559d3c676c", (4, 3), False, {"rim": 4, "base_y": 0.9}, P4, None),
     "submarine": ("submarine_ultra_b_6", "739cea1ec20fc8eb089366ce", (4, 2), False, R4, P4, None),
     "fishing_boat": ("fishing_boat_ultra_a_3", "db9e0440ec808448a0ea3778", (3, 2), True, {}, P4, None),
     "bell_tower": ("bell_tower_ultra_a_2", "7427f3aca030b3112ef6454a", (2, 3), False, R4, {}, None),
@@ -83,7 +86,16 @@ NOTES = {
     "windmill": "LM-INT: re-cut with its grass, path and bushes base, kept solid (soft_y alpha > soft_alpha, closed, "
                 "holes filled); no outline round the bottom apron",
     "town_pravoka": "LM4-INT: re-cut bigger (3x3, user ruling 2026-11-19; LM4 reviewed it at 2x2): the painted sea "
-                    "round the walls (sea_y) and the pier with its boat (drop) are cut away, the rock footing kept",
+                    "round the walls (sea_y) and the pier with its boat (drop) are cut away, the rock footing kept; "
+                    "WL: the drop keeps the rocks left of the gate (no flat-cut notch), a pier stub stays under it",
+    "town_melmond": "WL: the render's ground runs off its left and right edges and ends in a flat cliff slab, so the "
+                    "icon was flat-cut on three sides; the ground outside an oval round the walls (oval, below "
+                    "oval_top) and a grass tuft at the left edge (drop) are cut away: the whole ring on a thin lip, "
+                    "scaled to 0.82 of the box height (hfill) so the top row stays mostly sky (its middle cells stay "
+                    "walkable behind the walls, under the 25 % alpha_min)",
+    "town_crescent": "WL: the render's ground runs off its left and right edges (flat-cut sides); cut to an oval lip",
+    "brig": "WL: the render's painted foam under the keel is cut (base_y); the map draws the hull into the water "
+            "(deco waterline, tools/waterline.py)",
     "fishing_boat": "LM4: through remove_bg (it drops the render's white reflection on the water)",
 }
 

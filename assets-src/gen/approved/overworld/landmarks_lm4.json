@@ -238,7 +238,22 @@
       "cut": {
         "mode": "flood",
         "tol": 28,
-        "rim": 4
+        "rim": 4,
+        "oval": [
+          0.51,
+          0.52,
+          0.43,
+          0.37
+        ],
+        "oval_top": 0.4,
+        "drop": [
+          [
+            0.0,
+            0.3,
+            0.085,
+            0.5
+          ]
+        ]
       },
       "pixelize": {
         "fill": 0.97,
@@ -246,14 +261,16 @@
         "seed": 0,
         "sharpen": 1.0,
         "outline": "selective",
-        "apron": 0.12
+        "apron": 0.12,
+        "hfill": 0.82
       },
       "post": null,
       "fig_px": [
-        186,
-        120
+        175,
+        118
       ],
       "approved": "2026-11-19",
+      "note": "WL: the render's ground runs off its left and right edges and ends in a flat cliff slab, so the icon was flat-cut on three sides; the ground outside an oval round the walls (oval, below oval_top) and a grass tuft at the left edge (drop) are cut away: the whole ring on a thin lip, scaled to 0.82 of the box height (hfill) so the top row stays mostly sky (its middle cells stay walkable behind the walls, under the 25 % alpha_min)",
       "at": [
         0,
         0
@@ -310,9 +327,15 @@
         "drop": [
           [
             0.0,
-            0.69,
+            0.735,
             0.49,
             1.0
+          ],
+          [
+            0.0,
+            0.69,
+            0.39,
+            0.735
           ]
         ]
       },
@@ -330,7 +353,7 @@
         105
       ],
       "approved": "2026-11-19",
-      "note": "LM4-INT: re-cut bigger (3x3, user ruling 2026-11-19; LM4 reviewed it at 2x2): the painted sea round the walls (sea_y) and the pier with its boat (drop) are cut away, the rock footing kept",
+      "note": "LM4-INT: re-cut bigger (3x3, user ruling 2026-11-19; LM4 reviewed it at 2x2): the painted sea round the walls (sea_y) and the pier with its boat (drop) are cut away, the rock footing kept; WL: the drop keeps the rocks left of the gate (no flat-cut notch), a pier stub stays under it",
       "at": [
         0,
         9
@@ -383,7 +406,14 @@
       "cut": {
         "mode": "flood",
         "tol": 28,
-        "rim": 4
+        "rim": 4,
+        "oval": [
+          0.5,
+          0.52,
+          0.47,
+          0.43
+        ],
+        "oval_top": 0.45
       },
       "pixelize": {
         "fill": 0.97,
@@ -396,9 +426,10 @@
       "post": null,
       "fig_px": [
         140,
-        131
+        133
       ],
       "approved": "2026-11-19",
+      "note": "WL: the render's ground runs off its left and right edges (flat-cut sides); cut to an oval lip",
       "at": [
         3,
         0
@@ -485,7 +516,8 @@
       "cut": {
         "mode": "flood",
         "tol": 28,
-        "rim": 4
+        "rim": 4,
+        "base_y": 0.9
       },
       "pixelize": {
         "fill": 0.95,
@@ -497,9 +529,10 @@
       "post": null,
       "fig_px": [
         182,
-        129
+        134
       ],
       "approved": "2026-11-19",
+      "note": "WL: the render's painted foam under the keel is cut (base_y); the map draws the hull into the water (deco waterline, tools/waterline.py)",
       "at": [
         3,
         10

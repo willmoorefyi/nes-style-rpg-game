@@ -828,23 +828,11 @@ objects:
   - [0, 1]
   collide: alpha
 - type: deco
-  name: gaia_mill
+  name: gaia_door_west
   parts:
-  - [windmill_icon_0_0, windmill_icon_0_1]
-  - [windmill_icon_1_0, windmill_icon_1_1]
-  - [windmill_icon_2_0, windmill_icon_2_1]
-  x: 148
-  y: 11
-  collide: alpha
-- type: deco
-  name: gaia_mill_east
-  parts:
-  - [windmill_icon_0_0, windmill_icon_0_1]
-  - [windmill_icon_1_0, windmill_icon_1_1]
-  - [windmill_icon_2_0, windmill_icon_2_1]
-  x: 146
-  y: 8
-  collide: alpha
+  - [tree_clump]
+  x: 149
+  y: 13
 - type: deco
   name: mirage
   parts:
