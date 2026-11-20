@@ -7,6 +7,9 @@ export const STREAM_MIN_CHUNKS = 64;
 export const STREAM_TEXTURE_CAP = 60;
 /** A step into a view whose chunks are not loaded waits at most this many frames; then a placeholder shows. */
 export const MISS_HOLD_FRAMES = 6;
+/** Resident chunk textures while the Mode 7 view flies (docs/MODE7_PLAN.md 3.3): `full` and `low`. */
+export const FLIGHT_TEXTURE_CAP = 36;
+export const FLIGHT_TEXTURE_CAP_LOW = 16;
 
 /** Where chunk textures come from; `unload` frees one for good (the default goes through `Assets.unload`). */
 export interface ChunkSource {
@@ -52,11 +55,18 @@ export class ChunkStreamer {
   private readonly failed = new Set<string>();
   private disposed = false;
 
-  constructor(private readonly source: ChunkSource, private readonly cap: number,
+  constructor(private readonly source: ChunkSource, private cap: number,
     private readonly onEvict: (url: string) => void, private readonly onLoad: (url: string) => void) {}
 
   /** Resident or loading textures. */
   get count(): number { return this.resident.size; }
+
+  /** A new cap: evicts the least recently wanted textures until at most `n` are resident (3.3). */
+  setCap(n: number): void {
+    this.cap = n;
+    const none = new Set<string>();
+    while (this.resident.size > n) if (!this.evictOne(none)) break;   // each through onEvict and unload
+  }
 
   texture(url: string): Texture | null { return this.resident.get(url)?.tex ?? null; }
 
@@ -120,6 +130,19 @@ export function chunkRect(x0: number, y0: number, x1: number, y1: number, chunk:
     c0: Math.max(0, Math.floor(x0 / chunk)), r0: Math.max(0, Math.floor(y0 / chunk)),
     c1: Math.min(cols - 1, Math.floor((x1 - 1) / chunk)), r1: Math.min(rows - 1, Math.floor((y1 - 1) / chunk)),
   };
+}
+
+/**
+ * The Mode 7 near window (3.2): `n` x `n` chunks, moved in whole chunks so that cell (x, y) lies in its middle 16
+ * cells (so at least `(n - 1) x chunk / 2` cells on each side: 24 for 4x4, 16 for 3x3), clamped to the map.
+ */
+export function flightWindow(x: number, y: number, n: number, chunk: number, cols: number, rows: number): ChunkRect {
+  const margin = ((n - 1) * chunk) / 2;
+  const at = (v: number, count: number): number =>
+    Math.max(0, Math.min(Math.max(0, count - n), Math.floor((v - margin) / chunk)));
+  const c0 = at(x, cols);
+  const r0 = at(y, rows);
+  return { c0, r0, c1: Math.min(cols - 1, c0 + n - 1), r1: Math.min(rows - 1, r0 + n - 1) };
 }
 
 /** The tiles a view of `view` tiles shows on an axis of `size` tiles when it centres on tile `at`, plus 1 tile. */

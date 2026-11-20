@@ -110,6 +110,8 @@ export class WorldAtlas {
   get texture(): RenderTexture | null { return this.rt; }
   /** Px per cell of the loaded profile (0 until loaded). */
   cellPx = 0;
+  /** A loaded patch overlay (at the chunks' `art.tile` px per cell), shared with the near detail. */
+  patchTexture(id: string): Texture | null { return this.patchTex[id] ?? null; }
 
   /** Load the meta, the patch overlays and the image; compose; free the image. Rejects on a missing or stale atlas. */
   async load(): Promise<void> {

@@ -3,7 +3,7 @@ import type { BakedMapArt, MapData } from '../types/index.js';
 import type { Camera } from './Camera.js';
 import type { MapRenderer } from './MapRenderer.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
-import { assetChunkSource, chunkRect, streams, type ChunkSource } from './chunkStreaming.js';
+import { assetChunkSource, chunkRect, streams, type ChunkRect, type ChunkSource } from './chunkStreaming.js';
 import { StreamedChunks } from './StreamedChunks.js';
 
 export interface BakedTextures {
@@ -118,6 +118,16 @@ export class BakedMapRenderer implements MapRenderer {
   /** Resolves once every chunk in view is loaded (at once on a small map). */
   ready(): Promise<void> {
     return this.streamed?.ready() ?? Promise.resolve();
+  }
+
+  /** The Mode 7 flight's stream window and cap (docs/MODE7_PLAN.md 3.3); no-ops on a small map. */
+  setWindow(rect: ChunkRect | null, cap: number): void { this.streamed?.setWindow(rect, cap); }
+  onChunkLoaded(cb: (i: number) => void): () => void { return this.streamed?.onChunkLoaded(cb) ?? (() => {}); }
+  /** Chunk i's loaded textures (below, then above): a streamed map's, or a small map's own; null while missing. */
+  textureOf(i: number): Texture[] | null {
+    if (this.streamed) return this.streamed.textureOf(i);
+    const own = this.chunks.filter((c) => c.col + c.row * this.cols === i).map((c) => c.sprite.texture);
+    return own.length > 0 ? own : null;
   }
 
   /** Resident chunk textures (loaded or loading), both layers; 0 on a small map. */

@@ -403,10 +403,23 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   through the lazily imported `FlightRenderer` (far atlas strips, sky, ship, shadow, landing marker). The profile is
   `mode7Toggle.mode7Enabled`: `?mode7=0` / `?mode7=1`, then the GPU caps (`capsOf(game.app.renderer)`; a mock game has
   none, so older scene tests never load the renderer), then Config's "Airship view" (`Settings.airshipView`, default
-  `topdown` until M7-3). A missing atlas logs one `console.error` and the flight stays top-down. `window.__mode7`
-  reports the state, history, shadowCell, marker, GL string and the steady-flight p95s. Rules are unchanged: scene tests
+  `mode7` since M7-3, D-M8; `?mode7=low` forces the low profile). A missing atlas logs one `console.error` and the
+  flight stays top-down. `window.__mode7` reports the state, history, shadowCell, marker, GL string, the resident
+  textures (`textures`: atlas, near detail, chunks, recentres, late draws, split row) and the steady-flight p95s (the
+  upload frames left out, reported in `heavy`). Rules are unchanged: scene tests
   `tests/scenes/mode7/mode7Parity.test.ts`, `mode7Activation.test.ts` (harness `flightHarness.ts`, which `vi.mock`s
   `FlightRenderer.js`).
+- **Mode 7 near detail (M7-3, `docs/MODE7_PLAN.md` 3.2, 3.3).** `NearDetail` draws the flight window (4x4 chunks at
+  48 px per cell, 3072²; low 3x3 at 32 px, 1536²) into a render texture: the far atlas square as the underlay, the
+  streamed chunks, the set patches; a recentre (the ship kept in the window's middle 16 cells, `flightWindow` in
+  `chunkStreaming.ts`) or a patch flag change redraws it, a late chunk (`StreamedChunks.onChunkLoaded`) only its
+  square. `GroundStrips` draws the far mesh down to the split (`D_SPLIT` 25, low 16; moved down past any row the
+  window does not cover), 8 one-row seam meshes at alpha 1/9..8/9, and the near mesh; `FlightSky` adds the fog sprite
+  (haze, alpha 0.6 to 0 over 120 rows under the horizon). While the view shows, `FlightStream` sets the streamer's
+  window (`StreamedChunks.setWindow`: the window plus 1 chunk ahead, at most 25 / 16) and cap (`ChunkStreamer.setCap`,
+  36 / 16, trimmed least recently wanted first), and the step hold reads the flight window of the target cell
+  (D-M11); hiding the view restores the top-down window and the cap of 60. Tests: `tests/rendering/streamWindow.test.ts`,
+  `tests/scenes/mode7/nearDetail.test.ts`, `flightStats.test.ts`, and the streamed parity variant.
 - **LM5-INT.** A third sheet `landmarks_lm5.*` (SPEC5, pass LM5): `western_keep` 2x3 at (59, 122) (door (60, 124),
   the stair foot at the bottom right; anchor `elf_keep` (60, 125); its top two rows on the watchtower's rock `m`, the
   moat at x 61) and `citadel` 3x3 at (74, 25) (door (75, 27) bottom centre; anchor `ord_citadel` (75, 28); the broken

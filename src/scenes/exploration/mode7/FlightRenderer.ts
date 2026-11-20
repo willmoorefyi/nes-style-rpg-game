@@ -4,7 +4,8 @@
  * UI), and owns the sky, the ground strips over the far atlas (`WorldAtlas`) and the billboards. `load` rejects on a
  * missing or broken atlas; the view then falls back to top-down (7). `destroy` removes it all.
  *
- * M7-2 draws the far mesh only, over the whole ground; the near detail, its seam and the fog come in M7-3.
+ * Draw order: the sky, the far mesh, the 8 seam rows, the near mesh (from `NearDetail`, over the streamed chunks of
+ * the flight window), the fog, the billboards.
  */
 import { Container, type Renderer } from 'pixi.js';
 import type { MapData } from '../../../types/index.js';
@@ -12,6 +13,8 @@ import { FlightSky } from './FlightSky.js';
 import { GroundStrips } from './GroundStrips.js';
 import { WorldAtlas, type AtlasProfile } from './WorldAtlas.js';
 import { FlightBillboards, type BillboardFrame } from './FlightBillboards.js';
+import { NearDetail } from './NearDetail.js';
+import { nearProfile, type ChunkHost, type NearWindow } from './FlightStream.js';
 import type { ViewParams } from './mode7Math.js';
 
 export interface FlightRendererOptions {
@@ -26,6 +29,9 @@ export interface FlightRendererOptions {
 
 export interface FlightFrame extends BillboardFrame {
   view: ViewParams;
+  /** The near window (null: no streamed chunks, the far mesh draws all) and the map's chunks. */
+  near: NearWindow | null;
+  chunks: ChunkHost | null;
 }
 
 export class FlightRenderer {
@@ -34,6 +40,7 @@ export class FlightRenderer {
   private sky: FlightSky | null = null;
   private strips: GroundStrips | null = null;
   private billboards: FlightBillboards | null = null;
+  private near: NearDetail | null = null;
   private horizon = -1;
   private destroyed = false;
 
@@ -60,29 +67,41 @@ export class FlightRenderer {
       throw new Error('Mode 7: the far atlas did not compose');
     }
     this.sky = new FlightSky();
-    this.strips = new GroundStrips(texture, map.width, map.height);
+    this.near = map.art ? new NearDetail({ renderer: this.opts.renderer, map, atlas: this.atlas,
+      prof: nearProfile(this.opts.profile), hasFlag: this.opts.hasFlag }) : null;
+    this.strips = new GroundStrips(texture, map.width, map.height, this.near?.texture ?? null);
     this.billboards = billboards;
-    this.container.addChild(this.sky.view, this.strips.far, billboards.container);
+    this.container.addChild(this.sky.view, this.strips.view, this.sky.fog, billboards.container);
   }
 
   setVisible(visible: boolean): void {
     this.container.visible = visible;
   }
 
-  /** The resident textures this view adds (the report): the atlas size and its cell px. */
-  get textures(): { atlas: number; cellPx: number } | null {
+  /** The resident textures this view adds (the report): the atlas's and the near detail's sizes and cell px, and
+   *  the near detail's redraws. */
+  get textures(): Record<string, number> | null {
     const tex = this.atlas?.texture;
-    return tex ? { atlas: tex.width, cellPx: this.atlas?.cellPx ?? 0 } : null;
+    const n = this.near;
+    return tex ? { atlas: tex.width, cellPx: this.atlas?.cellPx ?? 0, near: n?.size ?? 0, nearCellPx: n?.cellPx ?? 0,
+      recentres: n?.recentres ?? 0, lateDraws: n?.lateDraws ?? 0, split: this.strips?.split ?? 0 } : null;
   }
+
+  /** The last draw drew into a render texture (a recentre or a late chunk): an upload frame, out of the p95s. */
+  get heavy(): boolean { return !!this.near?.heavy; }
 
   /** One flight frame: the atlas's patches, the strips' UVs, the sky down to the horizon, the billboards. */
   draw(frame: FlightFrame): void {
     if (!this.strips || !this.sky || !this.billboards) return;
     this.atlas?.update();
-    const table = this.strips.update(frame.view);
+    const near = this.near && frame.near && frame.chunks ? frame.near : null;
+    if (near && frame.chunks) this.near?.update(near, frame.chunks);
+    else if (this.near) this.near.heavy = false;
+    const table = this.strips.update(frame.view, near);
     if (table.firstRow !== this.horizon) {
       this.horizon = table.firstRow;
       this.sky.draw(table.firstRow);
+      this.sky.placeFog(table.firstRow);
     }
     this.billboards.draw(frame);
   }
@@ -92,11 +111,13 @@ export class FlightRenderer {
     this.strips?.destroy();
     this.sky?.destroy();
     this.billboards?.destroy();
+    this.near?.destroy();
     this.atlas?.destroy();
     this.container.destroy({ children: true });
     this.strips = null;
     this.sky = null;
     this.billboards = null;
+    this.near = null;
     this.atlas = null;
   }
 }

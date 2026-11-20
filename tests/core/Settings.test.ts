@@ -90,11 +90,11 @@ describe('Settings', () => {
     expect(error).toHaveBeenCalledTimes(1);
   });
 
-  // M7-2 (docs/MODE7_PLAN.md 7, 9): the airship view; M7-3 turns the default and this expected value to 'mode7'
-  it("airshipView defaults to 'topdown' until M7-3", () => {
-    expect(DEFAULT_AIRSHIP_VIEW).toBe('topdown');
+  // M7-2 (docs/MODE7_PLAN.md 7, 9): the airship view; M7-3 turned the default to 'mode7' (D-M8)
+  it("airshipView defaults to 'mode7' since M7-3", () => {
+    expect(DEFAULT_AIRSHIP_VIEW).toBe('mode7');
     vi.stubGlobal('localStorage', fakeStore());
-    expect(getSettings().airshipView).toBe('topdown');
+    expect(getSettings().airshipView).toBe('mode7');
   });
 
   it('airshipView: older settings without it take the default silently; round trip', () => {

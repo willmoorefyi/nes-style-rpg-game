@@ -122,11 +122,12 @@ export function cyForHorizon(p: ViewParams, row: number): number {
 
 /**
  * Fill one strip mesh's buffers for rows [from, to): 4 vertices per row (top-left, top-right, bottom-right,
- * bottom-left), positions in screen px, UVs = cells / (mapW, mapH). A row that misses the ground is collapsed to zero
- * height at its top edge (it draws nothing). `positions` and `uvs` hold (to - from) x 8 floats.
+ * bottom-left), positions in screen px, UVs = (cells - (ox, oy)) / (mapW, mapH): the whole map, or the near window's
+ * square from its origin. A row that misses the ground is collapsed to zero height at its top edge (it draws
+ * nothing). `positions` and `uvs` hold (to - from) x 8 floats.
  */
 export function fillStrips(p: ViewParams, table: RowTable, from: number, to: number, mapW: number, mapH: number,
-  positions: Float32Array, uvs: Float32Array, width = SCREEN_W): void {
+  positions: Float32Array, uvs: Float32Array, width = SCREEN_W, ox = 0, oy = 0): void {
   for (let r = from; r < to; r++) {
     const o = (r - from) * 8;
     const sTop = table.s[r];
@@ -138,15 +139,49 @@ export function fillStrips(p: ViewParams, table: RowTable, from: number, to: num
     positions[o + 4] = width; positions[o + 5] = yBot;
     positions[o + 6] = 0; positions[o + 7] = yBot;
     if (!hit) { uvs.fill(0, o, o + 8); continue; }
-    const top = p.py + p.back - table.d[r];
-    const bot = p.py + p.back - table.d[r + 1];
-    const lt = p.px - (p.cx * sTop) / p.f;
-    const rt = p.px + ((width - p.cx) * sTop) / p.f;
-    const lb = p.px - (p.cx * sBot) / p.f;
-    const rb = p.px + ((width - p.cx) * sBot) / p.f;
+    const top = p.py + p.back - table.d[r] - oy;
+    const bot = p.py + p.back - table.d[r + 1] - oy;
+    const lt = p.px - (p.cx * sTop) / p.f - ox;
+    const rt = p.px + ((width - p.cx) * sTop) / p.f - ox;
+    const lb = p.px - (p.cx * sBot) / p.f - ox;
+    const rb = p.px + ((width - p.cx) * sBot) / p.f - ox;
     uvs[o] = lt / mapW; uvs[o + 1] = top / mapH;
     uvs[o + 2] = rt / mapW; uvs[o + 3] = top / mapH;
     uvs[o + 4] = rb / mapW; uvs[o + 5] = bot / mapH;
     uvs[o + 6] = lb / mapW; uvs[o + 7] = bot / mapH;
   }
+}
+
+/** Collapse rows [from, to) of a strip buffer that starts at row `base` to zero height (they draw nothing). */
+export function collapseRows(positions: Float32Array, from: number, to: number, base = 0): void {
+  for (let r = Math.max(from, base); r < to; r++) {
+    const o = (r - base) * 8;
+    positions[o + 5] = positions[o + 1];
+    positions[o + 7] = positions[o + 1];
+  }
+}
+
+/** Whether row r hits the ground and its whole span lies inside the cell square [x0, x0 + cells) x [y0, y0 + cells). */
+export function rowFits(p: ViewParams, table: RowTable, r: number, x0: number, y0: number, cells: number,
+  width = SCREEN_W): boolean {
+  const sTop = table.s[r];
+  const sBot = table.s[r + 1];
+  if (Number.isNaN(sTop) || Number.isNaN(sBot)) return false;
+  const s = Math.max(sTop, sBot);   // the wider edge
+  const left = p.px - (p.cx * s) / p.f;
+  const right = p.px + ((width - p.cx) * s) / p.f;
+  const far = p.py + p.back - Math.max(table.d[r], table.d[r + 1]);
+  const near = p.py + p.back - Math.min(table.d[r], table.d[r + 1]);
+  return left >= x0 && right <= x0 + cells && far >= y0 && near <= y0 + cells;
+}
+
+/**
+ * The near mesh's first row (3.2): the first row nearer than `dist` cells ahead of C, moved down past any row whose
+ * span leaves the window (so the near texture is never sampled outside its square); `rows` when no row qualifies.
+ */
+export function nearSplit(p: ViewParams, table: RowTable, dist: number, x0: number, y0: number, cells: number,
+  rows = SCREEN_H, width = SCREEN_W): number {
+  const from = splitRow(p, dist, rows);
+  for (let r = rows - 1; r >= from; r--) if (!rowFits(p, table, r, x0, y0, cells, width)) return r + 1;
+  return from;
 }

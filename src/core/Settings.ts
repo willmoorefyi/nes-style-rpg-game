@@ -16,8 +16,8 @@ export interface GameSettings {
 export const SETTINGS_KEY = 'ff.settings';
 /** Speed 3 (pass F item 6): slower than the old timing, which is about speed 5. */
 export const DEFAULT_MESSAGE_SPEED: MessageSpeed = 3;
-/** Top-down until M7-3 brings the near detail; M7-3 turns the default to 'mode7' (D-M8). */
-export const DEFAULT_AIRSHIP_VIEW: AirshipView = 'topdown';
+/** Mode 7 by default since M7-3 brought the near detail (D-M8); Top-down stays a Config option and `?mode7=0`. */
+export const DEFAULT_AIRSHIP_VIEW: AirshipView = 'mode7';
 
 let cache: GameSettings | null = null;
 
