@@ -31,7 +31,7 @@ sys.path.insert(0, str(TOOLS))
 sys.path.insert(0, str(TOOLS / "layouts"))
 from worldgen import gates, gates_reach, prewalk  # noqa: E402
 from worldgen.geom import raster_line  # noqa: E402
-from world_api_v2 import CANOE_BARRIERS, DOCKS_ALLOWED, NORTH_REGIONS  # noqa: E402
+from world_api import CANOE_BARRIERS, DOCKS_ALLOWED, NORTH_REGIONS  # noqa: E402
 
 
 def _line(g, a, b, ch, keep=()):
@@ -43,11 +43,11 @@ def _line(g, a, b, ch, keep=()):
 
 
 def main() -> int:
-    import world_checks_v2 as WC2
-    import world_v2
-    import world_v2_source as SRC
+    import world_checks as WC2
+    import world
+    import world_source as SRC
     from a1 import world_a1_pins as T
-    g, meta, b, doc, ch = world_v2.build()
+    g, meta, b, doc, ch = world.build()
     E = meta["entrances"]
     _off, ent_map = SRC.doors()
     seeds = {"barriers": b.barrier_seeds, "links": b.links}

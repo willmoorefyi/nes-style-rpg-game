@@ -2,7 +2,7 @@
 foot and by canoe with their minimal cuts (`world.cuts`), north isolation, airship landings and walking detours.
 
 - **barriers** (all on): each barrier's seed is joined to none of the cells beyond it on foot, nor on foot plus
-  canoe (River and Lake passable) for the canoe barriers (world_api_v2.CANOE_BARRIERS: `spine`, `western_range`);
+  canoe (River and Lake passable) for the canoe barriers (world_api.CANOE_BARRIERS: `spine`, `western_range`);
   `crescent_ring` is closed on foot only, since R-volcano and R-ice cross it by design. The spine is checked with
   the bridge patch off; with it on its seeds join, and its minimal vertex cut is exactly one row of the patch's cells
   (the bridge is the spine's only cut). Each barrier's minimal cut (the fewest non-walkable land cells across the

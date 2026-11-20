@@ -70,7 +70,7 @@ def spec() -> RegionSpec:
 
 def content(g, meta: dict, ctx) -> dict:
     """EARTH's content on the generated ground (objects, inspect cells, zones, backdrops, the canal's dressing, its
-    map checks): `earth/world_earth_nw.py` (NW-R EARTH), for `world_v2_content.merge` (`ctx.doors`, `ctx.taken`)."""
+    map checks): `earth/world_earth_nw.py` (NW-R EARTH), for `world_content.merge` (`ctx.doors`, `ctx.taken`)."""
     here = str(Path(__file__).resolve().parents[1] / "earth")
     if here not in sys.path:
         sys.path.insert(0, here)

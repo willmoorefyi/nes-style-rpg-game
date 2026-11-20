@@ -1,233 +1,134 @@
-"""The world composer's global checks (docs/WORLD_PLAN.md 2.5, 2.6, 2.9; W1-C2), run by layouts/world.py:
+"""The world composer's global checks on the owner grid (docs/NATURAL_WORLD_PLAN.md 3.4, 3.7, 3.8; NW-4): pass W's
+`world_checks.py` (ids, docks, anchors, reachability, the region tiling) fed by the NW owner grid instead of the
+boxes, for the composer v2 (`world.py`), which prints them as one line, `world: OK (...)`.
 
-  1. the rects tile the world, chunk-aligned;          5. the basins hold (2.6 checks 1-4) and every dock is allowed;
-  2. no region writes outside its rects or a band;     6. every built region's anchors exist as entrances (2.2);
-  3. ids are unique and prefixed;                      7. every entrance is reachable on foot from a reach root,
-  4. the seams hold (2.5);                                with every patch on.
-
-Plus the Aldi walls' and the barriers' minimal cuts (2.9, exported for the mutations 6.3 GT-13 / GT-35). Each check
-returns error strings; [] means OK.
+  1. the raster: every region's `regions.<r>.raster` is chunk rects, each holding an owner cell of r; together they
+     cover every chunk, and a chunk's bookkeeping owner (`owners.chunk_owner`) is a region whose raster holds it;
+  2. ids: entrance, spot, dock, patch, NPC and zone ids are unique; a prefixed id (`<prefix>_...`, spots
+     `<prefix>_s_<name>`) stands on a cell its region owns (a spot, an entrance or an NPC) and an unprefixed one is
+     one of act 1's legacy ids (LEGACY) on an a1 cell;
+  3. docks: exactly the DOCKS_ALLOWED ids, each once (the gate checks place them, `gates.docks`);
+  4. anchors: every anchor of `assets/data/world-anchors.yaml` is an entrance within its tolerance;
+  5. reach: with every patch on, every entrance is reachable on foot or by canoe from an arrival the game offers:
+     Cornelia, a dock, or a cell the airship lands on (grass or tundra), so no door stands in a sealed pocket.
+Each check returns error strings; [] means OK.
 """
 from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import yaml
 
-from world_api import (BASIN_SEEDS, BOXES, CANAL_PATCH, CHUNK, DOCKS_ALLOWED, MOUNTAIN, PLACEHOLDER_WALLS, PREFIXES,
-                       SEAMS, UNSET, WALLS, WATER, WORLD_H, WORLD_W, Cell, RegionOut)
-from world_geom import DIRS, World, bbox, flood, inside, is_walkable, is_water, min_cut, region_at
+from world_api import CANAL_PATCH, CHUNK, DOCKS_ALLOWED, PREFIXES
+from worldgen import gates, owners
+from worldgen.geom import components
 
 ANCHORS = Path(__file__).resolve().parents[3] / "assets" / "data" / "world-anchors.yaml"
+LANDING = [".", "t"]
+# act 1's ids from before the prefixes (pass W's world_a1.LEGACY_IDS): entrances, zones, NPCs and the bridge patch
+LEGACY = frozenset({"cornelia", "cornelia_west", "cornelia_east", "cornelia_north", "castle", "north_shore", "temple",
+                    "east_pocket", "temple_approach", "chest_tomb", "bridge_worker_w", "bridge_worker_e",
+                    "north_bridge"})
 
 
-def check_bands(outs: dict[str, RegionOut], own, band: set[Cell], world: World) -> list[str]:
-    """Checks 1, 2 and 4."""
+def raster(region: np.ndarray, regions: tuple[str, ...], doc_regions: dict) -> list[str]:
     errs = []
-    cover = [[0] * WORLD_W for _ in range(WORLD_H)]
-    for r, rects in BOXES.items():
-        for rect in rects:
-            if rect.x0 % CHUNK or rect.y0 % CHUNK or (rect.x1 + 1) % CHUNK or (rect.y1 + 1) % CHUNK:
-                errs.append(f"{r} rect {rect} is not chunk-aligned")
-            for x, y in rect.cells():
-                if not inside(x, y):
-                    errs.append(f"{r} rect {rect} leaves the world")
-                    break
-                cover[y][x] += 1
-    bad = [(x, y) for y in range(WORLD_H) for x in range(WORLD_W) if cover[y][x] != 1]
-    if bad:
-        errs.append(f"rects do not tile the world: {len(bad)} cells, first {bad[0]} covered "
-                    f"{cover[bad[0][1]][bad[0][0]]}x")
-    for r, out in outs.items():
-        b = bbox(BOXES[r])
-        if len(out.ground) != b.h or any(len(row) != b.w for row in out.ground):
-            errs.append(f"{r}: ground is not {b.w}x{b.h} (the bounding box of its rects)")
-            continue
-        for j, row in enumerate(out.ground):
-            for i, ch in enumerate(row):
-                x, y = b.x0 + i, b.y0 + j
-                if ch == UNSET:
-                    continue
-                if own[y][x] != r:
-                    errs.append(f"cell ({x}, {y}) outside its rects written by {r}")
-                elif (x, y) in band:
-                    errs.append(f"band cell ({x}, {y}) written by {r}")
-    for name, s in SEAMS.items():
-        cells = set(s.rect.cells())
-        if not cells <= band:
-            errs.append(f"{name}: {len(cells - band)} cells outside the bands")
-        for r in s.joins:
-            side = {(x + dx, y + dy) for x, y in cells for dx, dy in DIRS} - cells
-            side = {(x, y) for x, y in side if inside(x, y) and own[y][x] == r}
-            want = (lambda c: c == MOUNTAIN) if s.fill == MOUNTAIN else is_walkable
-            if not any(want(world[y][x]) for x, y in side):
-                errs.append(f"{name}: no {'wall' if s.fill == MOUNTAIN else 'walkable'} cell of {r} next to it")
+    h, w = region.shape
+    cover = np.zeros((h // CHUNK, w // CHUNK), int)
+    for i, r in enumerate(regions):
+        rects = (doc_regions.get(r) or {}).get("raster") or []
+        if not rects:
+            errs.append(f"raster: region {r} has none")
+        for x0, y0, x1, y1 in rects:
+            if x0 % CHUNK or y0 % CHUNK or (x1 + 1) % CHUNK or (y1 + 1) % CHUNK:
+                errs.append(f"raster: {r} rect {[x0, y0, x1, y1]} is not chunk-aligned")
+                continue
+            for cy in range(y0 // CHUNK, (y1 + 1) // CHUNK):
+                for cx in range(x0 // CHUNK, (x1 + 1) // CHUNK):
+                    cover[cy, cx] += 1
+                    if not (region[cy * CHUNK:(cy + 1) * CHUNK, cx * CHUNK:(cx + 1) * CHUNK] == i).any():
+                        errs.append(f"raster: {r} lists chunk ({cx}, {cy}), which holds none of its cells")
+    if (cover == 0).any():
+        cy, cx = np.argwhere(cover == 0)[0]
+        errs.append(f"raster: {int((cover == 0).sum())} chunks in no raster, first ({cx}, {cy})")
+    for cy in range(h // CHUNK):
+        for cx in range(w // CHUNK):
+            o = regions[owners.chunk_owner(region, cx, cy)]
+            if [cx * CHUNK, cy * CHUNK] not in [r[:2] for r in _chunks_of(doc_regions.get(o) or {})]:
+                errs.append(f"raster: chunk ({cx}, {cy})'s owner {o} does not list it")
     return errs
 
 
-def patched(world: World, patches: list[dict], skip: set[str] = frozenset()) -> World:
-    """The world with every patch on (except the ids in `skip`)."""
-    out = [row[:] for row in world]
-    for p in patches:
-        if p["id"] not in skip:
-            for x, y in p["cells"]:
-                out[y][x] = p["ground"]
-    return out
+def _chunks_of(reg: dict) -> list[list[int]]:
+    return [[x, y0] for x0, y0, x1, _y1 in reg.get("raster") or [] for x in range(x0, x1 + 1, CHUNK)]
 
 
-def basins(world: World, patches: list[dict]) -> tuple[set[Cell], set[Cell], list[str]]:
-    """2.6 checks 1, 2 and 4; returns the two basins of the unpatched world."""
-    for name, (x, y) in BASIN_SEEDS.items():
-        if world[y][x] != WATER:
-            return set(), set(), [f"basins: seed {name} ({x}, {y}) is {world[y][x]!r}, not Water"]
-    errs = []
-    aldi, ocean = flood(world, [BASIN_SEEDS["aldi"]], is_water), flood(world, [BASIN_SEEDS["ocean"]], is_water)
-    if aldi & ocean:
-        x, y = min(aldi & ocean, key=lambda c: (c[1], c[0]))
-        errs.append(f"basins: LEAK aldi-ocean at ({x}, {y}), region {region_at(x, y)}")
-    stray = [(x, y) for y in range(WORLD_H) for x in range(WORLD_W)
-             if world[y][x] == WATER and (x, y) not in aldi and (x, y) not in ocean]
-    if stray:
-        errs.append(f"basins: {len(stray)} Water cells in neither basin, first {stray[0]}, region "
-                    f"{region_at(*stray[0])}")
-    canal = [p for p in patches if p["id"] == CANAL_PATCH]
-    if len(canal) != 1:
-        errs.append(f"basins: {len(canal)} `{CANAL_PATCH}` patches (want 1)")
-    elif not errs:
-        others = {p["id"] for p in patches} - {CANAL_PATCH}
-        wet = patched(world, patches, others)
-        if BASIN_SEEDS["ocean"] not in flood(wet, [BASIN_SEEDS["aldi"]], is_water):
-            errs.append("basins: the canal does not join aldi and ocean")
-        if any(p["id"] != CANAL_PATCH and p["ground"] == WATER for p in patches):
-            join = flood(patched(world, patches, {CANAL_PATCH}), [BASIN_SEEDS["aldi"]], is_water)
-            if BASIN_SEEDS["ocean"] in join:
-                errs.append("basins: a patch other than the canal joins aldi and ocean")
-    return aldi, ocean, errs
-
-
-def docks(world: World, patches: list[dict], placed: list[tuple[str, dict]]) -> list[str]:
-    """2.6 check 3 and DOCKS_ALLOWED: every (region, dock) is allowed in that region and lies in its declared basin,
-    with every patch on except the canal."""
-    errs = []
-    wet = patched(world, patches, {CANAL_PATCH})
-    member = {b: flood(wet, [s], is_water) for b, s in BASIN_SEEDS.items()}
-    for r, d in placed:
-        spec = DOCKS_ALLOWED.get(d.get("id"))
-        if spec is None or spec.region != r:
-            errs.append(f"DOCK {d.get('id')} at ({d.get('x')}, {d.get('y')}) not allowed in {r}")
-        elif d.get("basin") != spec.basin or (d["x"], d["y"]) not in member[spec.basin]:
-            errs.append(f"DOCK {d['id']} at ({d['x']}, {d['y']}) is not in basin {spec.basin}")
-    return errs
-
-
-def source_checks(src: dict) -> list[str]:
-    """The basin and dock checks on a written world source (build_hooks.region_checks with region None)."""
-    if not (src.get("world") or {}).get("frames"):
-        return []                                      # not the world map
-    world = [list(r) for r in src["ground"].rstrip("\n").split("\n")]
-    if len(world) != WORLD_H or any(len(r) != WORLD_W for r in world):
-        return [f"world source is not {WORLD_W}x{WORLD_H}"]
-    patches = src.get("patches") or []
-    errs = basins(world, patches)[2]
-    return errs + docks(world, patches, [(region_at(d["x"], d["y"]), d) for d in src.get("docks") or []])
-
-
-def ids(outs: dict[str, RegionOut]) -> list[str]:
-    """Check 3: entrance, zone, patch, dock, hazard and NPC ids are unique and carry the region prefix."""
+def ids(doc: dict, meta: dict, legacy: tuple[str, ...]) -> list[str]:
     errs, seen = [], {}
-    for r, out in outs.items():
-        legacy = set(out.checks.get("legacy_ids") or [])
-        named = [("entrance", e) for e in out.entrances] + [("NPC", n.get("id")) for n in out.npcs]
-        named += [("spot", s) for s in out.spots]                     # NW-1: `<prefix>_s_<name>`
-        errs += [f"{r}: spot id {s!r} is not {PREFIXES[r]}_s_<name>" for s in out.spots
-                 if not s.startswith(PREFIXES[r] + "_s_")]
-        for kind, items in (("zone", out.encounterZones), ("patch", out.patches), ("dock", out.docks),
-                            ("hazard", out.hazards)):
-            named += [(kind, i.get("id")) for i in items]
-        for kind, i in named:
-            if not isinstance(i, str):
-                errs.append(f"{r}: a {kind} has no id")
-                continue
-            if i not in legacy and not i.startswith(PREFIXES[r] + "_") and (kind, i) != ("patch", CANAL_PATCH):
-                errs.append(f"{r}: {kind} id {i!r} lacks the prefix {PREFIXES[r]}_")
-            if (kind, i) in seen:
-                errs.append(f"{kind} id {i!r} in {seen[(kind, i)]} and {r}")
-            seen[(kind, i)] = r
+    pre = {v: k for k, v in PREFIXES.items()}
+    named = [("entrance", e, tuple(c)) for e, c in doc["entrances"].items()]
+    named += [("spot", s, tuple(v["at"])) for s, v in doc["spots"].items()]
+    named += [("dock", d["id"], None) for d in doc["docks"]] + [("patch", p["id"], None) for p in doc["patches"]]
+    named += [("NPC", n.get("id"), (n["x"], n["y"]) if "x" in n else None) for n in doc.get("npcs") or []]
+    named += [("zone", z.get("id"), None) for z in doc.get("encounterZones") or []]
+    for kind, i, at in named:
+        if not isinstance(i, str):
+            errs.append(f"ids: a {kind} has no id")
+            continue
+        if (kind, i) in seen:
+            errs.append(f"ids: {kind} id {i!r} twice")
+        seen[(kind, i)] = True
+        p = i.split("_")[0]
+        if kind == "spot" and not (p in pre and i.startswith(p + "_s_")):
+            errs.append(f"ids: spot {i!r} is not <prefix>_s_<name>")
+        elif p not in pre:
+            if i not in LEGACY | set(legacy) and (kind, i) != ("patch", CANAL_PATCH):
+                errs.append(f"ids: {kind} id {i!r} lacks a region prefix")
+            elif at is not None and gates.owner(meta, *at) != "a1":
+                errs.append(f"ids: act 1's {kind} {i} at {at} stands on a cell owned by {gates.owner(meta, *at)}")
+        elif at is not None and gates.owner(meta, *at) != pre[p]:
+            errs.append(f"ids: {kind} {i} at {at} stands on a cell owned by {gates.owner(meta, *at)}, not {pre[p]}")
     return errs
 
 
-def anchors(outs: dict[str, RegionOut], entrances: dict[str, list[int]]) -> list[str]:
-    """Check 6: a built region's anchors (and every `built` anchor) are entrances within the tolerance (2.2)."""
-    doc = yaml.safe_load(ANCHORS.read_text(encoding="utf-8"))
-    tol, errs = doc["tolerance"], []
-    for a in doc["anchors"]:
-        out = outs[a["region"]]
-        need = a.get("built") or (not out.stub and a["entrance"] not in (out.checks.get("anchors_pending") or []))
-        at = entrances.get(a["entrance"])
+def docks(doc: dict) -> list[str]:
+    have = [d["id"] for d in doc["docks"]]
+    errs = [f"docks: {i} is not in DOCKS_ALLOWED" for i in have if i not in DOCKS_ALLOWED]
+    errs += [f"docks: {i} placed {have.count(i)} times" for i in sorted(set(have)) if have.count(i) != 1]
+    return errs + [f"docks: {i} is not placed" for i in DOCKS_ALLOWED if i not in have]
+
+
+def anchors(entrances: dict, path: Path = ANCHORS) -> list[str]:
+    a = yaml.safe_load(path.read_text(encoding="utf-8"))
+    tol, errs = a["tolerance"], []
+    for row in a["anchors"]:
+        at = entrances.get(row["entrance"])
         if at is None:
-            if need:
-                errs.append(f"anchor {a['entrance']} ({a['region']}) is not an entrance")
-        elif max(abs(at[0] - a["target"][0]), abs(at[1] - a["target"][1])) > tol:
-            errs.append(f"anchor {a['entrance']} at {tuple(at)} is more than {tol} from {tuple(a['target'])}")
+            errs.append(f"anchors: {row['entrance']} ({row['region']}) is not an entrance")
+        elif max(abs(at[0] - row["target"][0]), abs(at[1] - row["target"][1])) > tol:
+            errs.append(f"anchors: {row['entrance']} at {tuple(at)} is more than {tol} from {tuple(row['target'])}")
     return errs
 
 
-def reachable(world: World, patches: list[dict], outs: dict[str, RegionOut]) -> list[str]:
-    """Check 7: with every patch on, every entrance is reachable on foot from a reach root of some region (a region's
-    `checks.reach_roots`; by default every one of its entrances is a root)."""
-    walk = patched(world, patches)
-    ents = {k: tuple(v) for out in outs.values() for k, v in out.entrances.items()}
-    roots = [ents[k] for out in outs.values() for k in (out.checks.get("reach_roots") or list(out.entrances))
-             if k in ents]
-    seen = flood(walk, roots, is_walkable)
-    return [f"entrance {k} at {p} is not reachable on foot from any reach root (every patch on)"
-            for k, p in ents.items() if p not in seen]
+def reach(g: np.ndarray, meta: dict, root: str = "cornelia") -> list[str]:
+    h = gates.with_patches(g, meta)
+    lab, _ = components(gates.canoe(h))      # on foot, or by canoe once it is held (the waterfall's ledge)
+    good = {int(lab[meta["entrances"][root][1], meta["entrances"][root][0]])}
+    for d in meta["docks"]:
+        good |= {int(lab[d["y"] + dy, d["x"] + dx]) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))}
+    good |= {int(k) for k in np.unique(lab[np.isin(h, LANDING)])}
+    good.discard(0)
+    return [f"reach: entrance {e} at {tuple(c)} ({gates.owner(meta, *c)}) is reachable from no arrival (Cornelia, "
+            "a dock, a landing cell)" for e, c in meta["entrances"].items() if int(lab[c[1], c[0]]) not in good]
 
 
-def wall_cells(world: World, outs: dict[str, RegionOut]) -> tuple[dict[str, set[Cell]], list[str]]:
-    """Each Aldi wall's cells: its seams, the placeholder cells of its stub regions, the parts of its built ones."""
-    errs, out = [], {}
-    for name, w in WALLS.items():
-        cells = set().union(*(set(SEAMS[s].rect.cells()) for s in w.seams))
-        for r in w.regions:
-            if outs[r].stub:
-                cells |= {c for p in PLACEHOLDER_WALLS if p.wall == name and p.region == r for c in p.rect.cells()
-                          if world[c[1]][c[0]] != WATER}
-            elif not outs[r].walls.get(name):
-                errs.append(f"wall {name}: built region {r} returns no part of it")
-            else:
-                cells |= set(outs[r].walls[name])
-        out[name] = cells
-    return out, errs
-
-
-def cuts(world: World, aldi: set[Cell], ocean: set[Cell], outs: dict[str, RegionOut], walls: dict[str, set[Cell]]
-         ) -> tuple[dict[str, list[list[int]]], list[str]]:
-    """The minimal water cut of each wall (aldi to ocean through its cells), and the minimal walkable cut of each
-    barrier, whose seeds must be walkable and apart with the barrier in place (every patch on but the canal)."""
-    errs, res = [], {}
-    # a cut never runs through a site's door or arrival cell (INT-W2c: W_isthmus ran through the dwarf hall's door, so
-    # opening it also flooded the door and the mutation proved nothing about the wall)
-    doors = ({(t["x"], t["y"]) for out in outs.values() for t in out.transitions}
-             | {tuple(e) for out in outs.values() for e in out.entrances.values()})
-    for name, cells in walls.items():
-        cut = min_cut(world, aldi, ocean, cells - doors, is_water)
-        if not cut:
-            errs.append(f"wall {name}: no water cut through its {len(cells)} cells joins aldi and ocean")
-        res[name] = [list(c) for c in cut]
-    walk = patched(world, [p for out in outs.values() for p in out.patches], {CANAL_PATCH})
-    for r, out in outs.items():
-        for name, (cells, a, b) in sorted(out.barriers.items()):
-            if not (is_walkable(walk[a[1]][a[0]]) and is_walkable(walk[b[1]][b[0]])):
-                errs.append(f"barrier {name} ({r}): a seed is not walkable")
-                continue
-            open_ = [row[:] for row in walk]
-            for x, y in cells:
-                open_[y][x] = MOUNTAIN
-            if tuple(b) in flood(open_, [tuple(a)], is_walkable):
-                errs.append(f"barrier {name} ({r}): its seeds are joined on foot with the barrier in place")
-            cut = min_cut(open_, {tuple(a)}, {tuple(b)}, set(map(tuple, cells)), is_walkable)
-            if not cut:
-                errs.append(f"barrier {name} ({r}): no walkable cut joins its seeds")
-            res[name] = [list(c) for c in cut]
-    return res, errs
+def check(g: np.ndarray, meta: dict, doc: dict, legacy: tuple[str, ...]) -> tuple[list[str], str]:
+    """(errors, the summary for the `world: OK (...)` line)."""
+    errs = raster(meta["region"], meta["regions"], doc["regions"]) + ids(doc, meta, legacy) + docks(doc)
+    errs += anchors(doc["entrances"]) + reach(g, meta)
+    n = sum(len(_chunks_of(r)) for r in doc["regions"].values())
+    summary = (f"{len(doc['entrances'])} entrances, {len(doc['spots'])} spots, {len(doc['docks'])} docks, "
+               f"{len(doc['patches'])} patches; {len(meta['regions'])} regions, {n} raster chunks over "
+               f"{(g.shape[0] // CHUNK) * (g.shape[1] // CHUNK)}")
+    return errs, summary

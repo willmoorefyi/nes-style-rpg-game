@@ -3,8 +3,8 @@
 Cornelia's continent: an east-west mainland with a ragged north coast; the peninsula hanging south-west into the Aldi
 (today's outline as the template); the spine (barrier `spine`, the bridge its only cut); the mainland ridges;
 Pravoka's range (wall W_east) with spurs; the outer fjord east of it; the Aldi's open water and two islets;
-Cornelia's mild open fields. Every act-1 pin comes from `a1/world_a1_pins.py` (derived by `a1/world_a1_derive.py`
-from today's world), Cornelia-relative: its world cell is CORNELIA_NW + rel. The spec's own lines below are
+Cornelia's mild open fields. Every act-1 pin comes from `a1/world_a1_pins.py` (derived by NW-3 from pass W's
+world; the source since NW-5), Cornelia-relative: its world cell is CORNELIA_NW + rel. The spec's own lines below are
 Cornelia-relative too.
 
 The roads (2.4 rule 8, 3.10's stub fix) are today's network, routed through its points: every gate road starts on
@@ -16,7 +16,7 @@ from __future__ import annotations
 import numpy as np
 
 from a1 import world_a1_pins as P
-from world_api_v2 import CORNELIA_NW, WORLD_W
+from world_api import CORNELIA_NW, WORLD_W
 
 from worldgen import spec as S
 from worldgen.bundle import (Barrier, ClimateHint, Continent, Corridor, Dock, InlandSea, IsleField, RegionSpec, Ridge,
@@ -106,6 +106,6 @@ def spec() -> RegionSpec:
 
 def content(g, meta, _ctx=None) -> dict:
     """Act 1's content beyond its kept pins (NW-RINT: its zones, the map default, Pravoka's lighthouse):
-    `a1/world_a1_nw.py`, for `world_v2_content.merge`."""
+    `a1/world_a1_nw.py`, for `world_content.merge`."""
     from a1 import world_a1_nw
     return world_a1_nw.content(g, meta)

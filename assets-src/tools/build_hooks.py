@@ -10,10 +10,9 @@ W1-0b declared the four signatures; W1-C1 calls them from `build_map.py`; W1-C2 
   patched map round the patch, so no seam at its edge), into
   `<out_dir>/<map_id>/patch_<pid>.png`. The image covers the bounding box of the patch's cells, from its top-left
   cell, and is opaque exactly on the patch cells. It must run after `build_map.write`, which clears the folder;
-- `region_checks` runs a world region's own map checks (`map_checks_region.py`), or, with `region` None, the
-  world-level source checks (the basins and docks of 2.6; sealed edges, art coverage and the unreachable cells are
-  map_checks.run's, on the compiled map);
-- `owned_chunks` is the region's rect union in chunks (`world_geom.owned_chunks`);
+- `region_checks` runs a world region's own map checks (`map_checks_region.py`) on its raster; with `region` None
+  nothing (the world-level checks are the composer's, `layouts/world.py`; sealed edges, art coverage and the
+  unreachable cells are map_checks.run's, on the compiled map);
 - `bake_mode7` (M7-1, docs/MODE7_PLAN.md 3.1) re-bakes the world's Mode 7 far atlas (`mode7_atlas.py`) from the
   chunk files just written; it runs after `bake_patches`, in every full and `--region` compile of the world.
 """
@@ -157,22 +156,15 @@ def patch_errors(src: dict, out_dir: Path) -> list[str]:
 
 
 def region_checks(src: dict, grid: "Grid", region: str | None) -> list[str]:
-    """Run the map checks of one world region (`RegionOut.checks`, on that region's cells), or of the whole map when
-    `region` is None (the world-level source checks: the basins and the docks). Returns error strings; [] means OK.
-    A map without `regions` (any map but the world) has no region checks. `grid` is unused: the checks read the
-    source's legend chars."""
+    """Run the map checks of one world region (`regions.<r>.checks`, on that region's raster cells), or of every
+    none when `region` is None: the world-level checks (basins, docks, gates; docs/NATURAL_WORLD_PLAN.md 3.8) are the
+    composer's (`layouts/world.py`), run before it writes, and pass W's boxed source checks retired at NW-5. Returns
+    error strings; [] means OK. A map without `regions` (any map but the world) has no region checks. `grid` is unused:
+    the checks read the source's legend chars."""
+    if region is None:
+        return []
     import map_checks_region as MR  # noqa: PLC0415
-    if region is not None:
-        return MR.check(src, src["ground"], region)
-    import world_checks as WC  # noqa: PLC0415
-    return WC.source_checks(src)
-
-
-def owned_chunks(region: str) -> set[tuple[int, int]]:
-    """The (col, row) of every chunk of the region's rect union (`world_api.BOXES`); band cells belong to the chunk
-    that contains them."""
-    from world_geom import owned_chunks as owned  # noqa: PLC0415
-    return owned(region)
+    return MR.check(src, src["ground"], region)
 
 
 MODE7_MAPS = ("overworld",)                  # D-M7: Mode 7 flies only on the world map (not the selftest worlds)

@@ -10,8 +10,8 @@ from pathlib import Path
 import kit as K
 import map_graph as G
 
-sys.path.insert(0, str(Path(__file__).resolve().parent / "layouts"))
-import world_geom as WG  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from worldgen.gates import BLOCK  # noqa: E402
 
 
 def run(B) -> int:
@@ -34,7 +34,7 @@ def run(B) -> int:
             ok += 1
         else:
             raise AssertionError("a landing spot on snow must fail")
-    assert WG.is_walkable("t") and WG.is_walkable("n"), "world_geom.WALKABLE has tundra and snow"
+    assert "t" not in BLOCK and "n" not in BLOCK, "the composer's gates walk tundra and snow (worldgen.gates.BLOCK)"
     assert B.map_kit({"ground": "..."}, kit) is kit or "tundra" not in B.map_kit({"ground": "..."}, kit).materials, \
         "no tundra / snow fallback texture on a map without them (today's maps compile as before)"
     assert "tundra" in B.map_kit({"ground": ".t."}, kit).materials

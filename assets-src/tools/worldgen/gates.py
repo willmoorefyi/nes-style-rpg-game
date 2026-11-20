@@ -133,7 +133,7 @@ def canal(g, meta, aldi, ocean) -> dict:
 
 def docks(g, meta, allowed: dict | None = None) -> dict:
     """All on: every dock is an allowed id (once), in its basin's sea, on Water beside a walkable cell, and its land
-    is owned by the dock's region (`allowed`: world_api_v2.DOCKS_ALLOWED)."""
+    is owned by the dock's region (`allowed`: world_api.DOCKS_ALLOWED)."""
     h = with_patches(g, meta)
     w = walk(h)
     why, seen = [], set()

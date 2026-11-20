@@ -58,7 +58,7 @@ def spec() -> RegionSpec:
 
 
 def content(g, meta, _ctx=None) -> dict:
-    """WATER's content on the composed ground (`world_v2_content.merge`); stamps its own cells first."""
+    """WATER's content on the composed ground (`world_content.merge`); stamps its own cells first."""
     from water import world_water_nw as NW
     from water import world_water_nw_zones as Z
     p = NW.Places(g, meta)

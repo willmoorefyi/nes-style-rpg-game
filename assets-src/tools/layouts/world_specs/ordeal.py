@@ -20,7 +20,7 @@ from worldgen.bundle import ClimateHint, Continent, IsleField, RegionSpec, Ridge
 
 from .common import sites
 
-CX, CY = 146, 155                             # CORNELIA_NW (world_api_v2): world -> rel
+CX, CY = 146, 155                             # CORNELIA_NW (world_api): world -> rel
 # the arc's midline (world x, y) with its outer and inner half-widths, south-west horn to south-east horn
 MID = ((118, 73, 1.0, 1.0), (114, 65, 2.5, 4.0), (115, 56, 3.0, 7.0), (118, 47, 3.0, 5.0), (125, 39, 3.0, 4.0),
        (134, 34, 2.5, 3.0), (140, 32, 1.5, 1.5), (144, 32, 0.5, 0.5))
@@ -82,7 +82,7 @@ def spec() -> RegionSpec:
 
 
 def content(g, meta, _ctx=None) -> dict:
-    """ORDEAL's content on the composed ground (NW-R): `ordeal/world_ordeal_nw.py`, for `world_v2_content.merge`
+    """ORDEAL's content on the composed ground (NW-R): `ordeal/world_ordeal_nw.py`, for `world_content.merge`
     (its `battleBackgrounds.zones` are the zones' backdrops)."""
     from ordeal import world_ordeal_nw
     c = dict(world_ordeal_nw.content(g, meta))

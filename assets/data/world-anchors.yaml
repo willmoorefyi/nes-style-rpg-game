@@ -1,67 +1,69 @@
-# The macro-geography anchors of pass W (docs/WORLD_PLAN.md 2.2, read by the macro test 6.1 and proof (g)).
-# Owned by W1-0b; read only for every tranche (a change goes to the integrator; open question 1 lets the user correct
-# a reference offset or target, and only this file changes).
+# The macro-geography anchors of pass NW (docs/NATURAL_WORLD_PLAN.md 4.2, 2.2), re-fitted by NW-1 for the 256x256
+# world. It replaces assets/data/world-anchors.yaml at the cutover (NW-5); until then the verifier reads it with
+# `npm run quest -- --strict --maps <scratch compile> --anchors assets-src/maps-nw/world-anchors.yaml`.
 #
-# Each anchor is a named entrance (`entrance`) of the compiled `overworld`. Its owner places it within `tolerance`
-# cells per axis of `target` (world cells; act 1 at origin (64, 64)). `ref` is the classic reference offset from
-# Cornelia in classic tiles (east +x, south +y), rounded to multiples of 4 (2.1). A town's land-gate anchor is placed
-# by its site file (layouts/<region>/town_<town>_site.py), so its T tranche owns it; every other anchor is its O
-# tranche's. At these targets s* = 0.735 and every pair's ratio is in [0.86, 1.10].
+# Targets: CORNELIA_NW (146, 155) + s* x ref for every anchor outside act 1 (s* = 0.86, worldgen/spec.target);
+# act 1's four are its pins, today's cells + (54, 44) (spec.a1_pin). `ref` (classic tiles from Cornelia, east +x,
+# south +y) is unchanged from pass W. A region tranche may move a pin inside the +-2 window only.
+# At these targets the fitted s* = 0.847 (at NW-0's nudged pins 0.851); every pair is in
+# its bands. 20,000 random +-2 placements of the 20 non-act-1 anchors (act 1's pins fixed): 0 fail (0.0 %);
+# with act 1's four moved too: 11.125 % (cornelia-temple's bearing, as today's file at 8.2 %, and
+# pravoka-matoya's distance). The full 31-pair table is in docs/NATURAL_WORLD_PLAN.md, "NW-1 result".
 tolerance: 2
 fit:
-  scale: [0.60, 0.80]                   # s* = sum(d_w * d_r) / sum(d_r^2) over the pairs, distance-exempt pairs out
-  longPair: 20                          # a pair is long when s* x d_r >= 20 world cells
+  scale: [0.75, 0.95]                   # s* = sum(d_w * d_r) / sum(d_r^2) over the pairs, distance-exempt pairs out
+  longPair: 23                          # a pair is long when s* x d_r >= 23 world cells (20 x 0.86 / 0.735)
   ratio: {long: [0.70, 1.30], short: [0.55, 1.60]}       # r = d_w / (s* x d_r)
   bearing: {long: 40, short: 60}        # max error in compass degrees, min(|d|, 360 - |d|); every pair is checked
 anchors:
-  - {name: cornelia, entrance: cornelia, place: "Cornelia, south-gate arrival", region: a1, owner: act1, built: true,
-     ref: [0, 0], target: [92, 111], note: "act 1 at origin (64, 64)"}
-  - {name: temple, entrance: temple, place: "Temple of Fiends door", region: a1, owner: act1, built: true,
-     ref: [-20, -36], target: [79, 103], note: "distance exempt (act-1 compression); bearing checked"}
-  - {name: matoya, entrance: a1_matoya, place: "Matoya's cave", region: a1, owner: A1-O,
-     ref: [-40, -36], target: [74, 76], note: "in the act-1 Matoya rect"}
-  - {name: pravoka, entrance: a1_pravoka, place: "Pravoka's land gate", region: a1, owner: A1-T,
-     ref: [56, -12], target: [131, 101], note: "in the act-1 Pravoka rect"}
-  - {name: dwarf, entrance: ert_dwarf, place: "Dwarf hall (Mount Duergar)", region: earth, owner: ERT-O,
-     ref: [-56, -4], target: [54, 106], note: "on the isthmus, south of the canal"}
-  - {name: keep, entrance: elf_keep, place: "Western Keep", region: elf, owner: ELF-O,
-     ref: [-48, 24], target: [61, 126], note: "on Elfland's north arm"}
-  - {name: elfheim, entrance: elf_elfheim, place: "Elfheim's land gate", region: elf, owner: ELF-T,
-     ref: [-16, 48], target: [82, 150]}
-  - {name: marsh, entrance: elf_marsh, place: "Marsh Cave mouth", region: elf, owner: ELF-O,
-     ref: [-56, 76], target: [53, 162]}
-  - {name: melmond, entrance: ert_melmond, place: "Melmond's land gate", region: earth, owner: ERT-T,
-     ref: [-72, 4], target: [42, 112]}
-  - {name: earth_cave, entrance: ert_earth_cave, place: "Cavern of Earth mouth", region: earth, owner: ERT-O,
-     ref: [-88, 24], target: [30, 126]}
-  - {name: giant, entrance: ert_giant, place: "Giant's tunnel, east mouth", region: earth, owner: ERT-O,
-     ref: [-92, 4], target: [28, 112]}
-  - {name: sarda, entrance: ert_sarda, place: "Sarda's cave", region: earth, owner: ERT-O,
-     ref: [-104, 0], target: [19, 109]}
-  - {name: crescent, entrance: fir_crescent, place: "Crescent Lake's land gate", region: fire, owner: FIR-T,
-     ref: [68, 20], target: [148, 124]}
-  - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: FIR-O,
-     ref: [36, 56], target: [120, 151], note: "its mouth opens south, off the W_south cliffs"}
-  - {name: ice, entrance: fir_ice, place: "Ice Cavern mouth", region: fire, owner: FIR-O,
-     ref: [44, 44], target: [136, 148], note: "its mouth opens south; the arrival cell is south of the cliff rows 146-147"}
-  - {name: desert, entrance: fir_desert, place: "Buried hull, airship desert", region: fire, owner: FIR-O,
-     ref: [56, 60], target: [143, 160]}
-  - {name: citadel, entrance: ord_citadel, place: "Citadel of Trials gate", region: ordeal, owner: ORD-O,
-     ref: [-24, -116], target: [75, 28]}
-  - {name: bahamut, entrance: ord_bahamut, place: "Bahamut's cave", region: ordeal, owner: ORD-O,
-     ref: [20, -80], target: [106, 53]}
-  - {name: onrac, entrance: wat_onrac, place: "Onrac's land gate", region: water, owner: WAT-T,
-     ref: [-92, -100], target: [28, 39], note: "the Sea Shrine is entered from Onrac's pier"}
-  - {name: waterfall, entrance: wat_waterfall, place: "Waterfall cave", region: water, owner: WAT-O,
-     ref: [-88, -140], target: [30, 11]}
-  - {name: caravan, entrance: wat_caravan, place: "Caravan camp", region: water, owner: WAT-O,
-     ref: [-120, -116], target: [8, 28]}
-  - {name: gaia, entrance: wnd_gaia, place: "Gaia's land gate", region: wind, owner: WND-T,
-     ref: [72, -132], target: [150, 14]}
-  - {name: mirage, entrance: wnd_mirage, place: "Mirage Tower door", region: wind, owner: WND-O,
-     ref: [40, -104], target: [132, 36]}
-  - {name: lufenia, entrance: wnd_lufenia, place: "Lufenia's land gate", region: wind, owner: WND-O,
-     ref: [84, -92], target: [152, 46]}
+  - {name: cornelia, entrance: cornelia, place: "Cornelia, south-gate arrival", region: a1, owner: NW-3, built: true,
+     ref: [0, 0], target: [146, 155], note: "CORNELIA_NW (2.2); act 1's pins are today's cells relative to it, delta (+54, +44)"}
+  - {name: temple, entrance: temple, place: "Temple of Fiends door", region: a1, owner: NW-3, built: true,
+     ref: [-20, -36], target: [133, 147], note: "act-1 pin; distance exempt (act-1 compression); bearing checked"}
+  - {name: matoya, entrance: a1_matoya, place: "Matoya's cave", region: a1, owner: NW-3,
+     ref: [-40, -36], target: [128, 120], note: "act-1 pin, north-north-west of the Temple as today"}
+  - {name: pravoka, entrance: a1_pravoka, place: "Pravoka's land gate", region: a1, owner: NW-3,
+     ref: [56, -12], target: [185, 145], note: "act-1 pin; pravoka-matoya r 0.742 at the targets (>= 0.72: no exemption, 4.2)"}
+  - {name: dwarf, entrance: ert_dwarf, place: "Dwarf hall (Mount Duergar)", region: earth, owner: NW-R,
+     ref: [-56, -4], target: [98, 152]}
+  - {name: keep, entrance: elf_keep, place: "Western Keep", region: elf, owner: NW-R,
+     ref: [-48, 24], target: [105, 176]}
+  - {name: elfheim, entrance: elf_elfheim, place: "Elfheim's land gate", region: elf, owner: NW-R,
+     ref: [-16, 48], target: [132, 196]}
+  - {name: marsh, entrance: elf_marsh, place: "Marsh Cave mouth", region: elf, owner: NW-R,
+     ref: [-56, 76], target: [98, 220]}
+  - {name: melmond, entrance: ert_melmond, place: "Melmond's land gate", region: earth, owner: NW-R,
+     ref: [-72, 4], target: [84, 158], note: "NW-0 pins it at (82, 158), -2 x inside the window (2.2)"}
+  - {name: earth_cave, entrance: ert_earth_cave, place: "Cavern of Earth mouth", region: earth, owner: NW-R,
+     ref: [-88, 24], target: [70, 176]}
+  - {name: giant, entrance: ert_giant, place: "Giant's tunnel, east mouth", region: earth, owner: NW-R,
+     ref: [-92, 4], target: [67, 158]}
+  - {name: sarda, entrance: ert_sarda, place: "Sarda's cave", region: earth, owner: NW-R,
+     ref: [-104, 0], target: [57, 155]}
+  - {name: crescent, entrance: fir_crescent, place: "Crescent Lake's land gate", region: fire, owner: NW-R,
+     ref: [68, 20], target: [204, 172], note: "NW-0 pins it at (206, 172), +2 x inside the window (2.2)"}
+  - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: NW-R,
+     ref: [36, 56], target: [177, 203]}
+  - {name: ice, entrance: fir_ice, place: "Ice Cavern mouth", region: fire, owner: NW-R,
+     ref: [44, 44], target: [184, 193]}
+  - {name: desert, entrance: fir_desert, place: "Buried hull, airship desert", region: fire, owner: NW-R,
+     ref: [56, 60], target: [194, 207]}
+  - {name: citadel, entrance: ord_citadel, place: "Citadel of Trials gate", region: ordeal, owner: NW-R,
+     ref: [-24, -116], target: [125, 55]}
+  - {name: bahamut, entrance: ord_bahamut, place: "Bahamut's cave", region: ordeal, owner: NW-R,
+     ref: [20, -80], target: [163, 86]}
+  - {name: onrac, entrance: wat_onrac, place: "Onrac's land gate", region: water, owner: NW-R,
+     ref: [-92, -100], target: [67, 69]}
+  - {name: waterfall, entrance: wat_waterfall, place: "Waterfall cave", region: water, owner: NW-R,
+     ref: [-88, -140], target: [70, 35]}
+  - {name: caravan, entrance: wat_caravan, place: "Caravan camp", region: water, owner: NW-R,
+     ref: [-120, -116], target: [43, 55]}
+  - {name: gaia, entrance: wnd_gaia, place: "Gaia's land gate", region: wind, owner: NW-R,
+     ref: [72, -132], target: [208, 41]}
+  - {name: mirage, entrance: wnd_mirage, place: "Mirage Tower door", region: wind, owner: NW-R,
+     ref: [40, -104], target: [180, 66]}
+  - {name: lufenia, entrance: wnd_lufenia, place: "Lufenia's land gate", region: wind, owner: NW-R,
+     ref: [84, -92], target: [218, 76]}
 # the 31 pairs (anchor names); `distanceExempt` pairs skip the fit and the distance band, never the bearing band
 pairs:
   - [cornelia, pravoka]

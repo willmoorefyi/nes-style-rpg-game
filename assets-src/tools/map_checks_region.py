@@ -134,11 +134,6 @@ def check(src: dict, ground, region: str | None) -> list[str]:
     opts = {k: v for k, v in (regs[region].get("checks") or {}).items() if k in REGION_OPTIONS}
     if not opts:
         return []
-    if "raster" in regs[region]:                 # pass NW (3.7): the region's owner-grid raster, no composer cells
-        return run_options(src, view(src, ground, [tuple(r) for r in regs[region]["raster"]]), opts)
-    from world_api import BOXES, PLACEHOLDER_WALLS, SEAMS  # noqa: PLC0415
-    rects = [(b.x0, b.y0, b.x1, b.y1) for b in BOXES[region]]
-    composer = [s.rect for s in SEAMS.values()]
-    composer += [p.rect for p in PLACEHOLDER_WALLS if p.region == region and regs[region].get("stub")]
-    view_ = view(src, ground, rects, [(r.x0, r.y0, r.x1, r.y1) for r in composer])
-    return run_options(src, view_, opts)
+    if "raster" not in regs[region]:             # pass W's boxes retired at NW-5: a region names its raster
+        return [f"region {region}: no raster (regions.{region}.raster, docs/NATURAL_WORLD_PLAN.md 3.4)"]
+    return run_options(src, view(src, ground, [tuple(r) for r in regs[region]["raster"]]), opts)

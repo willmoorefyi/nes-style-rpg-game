@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from world_api_v2 import PREFIXES
+from world_api import PREFIXES
 
 from . import spec as S
 from .bundle import RegionSpec
@@ -63,7 +63,7 @@ def owners(sh: dict, g: np.ndarray, b: RegionSpec, regions: tuple[str, ...]) -> 
 
 
 def _site_region(entrance: str) -> str:
-    """A site's region from its entrance prefix (world_api_v2.PREFIXES); act 1's legacy names are a1's."""
+    """A site's region from its entrance prefix (world_api.PREFIXES); act 1's legacy names are a1's."""
     by_prefix = {v: k for k, v in PREFIXES.items()}
     return by_prefix.get(entrance.split("_")[0], "a1")
 

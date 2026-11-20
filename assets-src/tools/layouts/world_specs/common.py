@@ -1,4 +1,4 @@
-"""Helpers the region specs share: the site anchors of `assets-src/maps-nw/world-anchors.yaml` (4.2) and the
+"""Helpers the region specs share: the site anchors of `assets/data/world-anchors.yaml` (4.2) and the
 today -> NW mapping of the spots (5.2).
 
 A site's cell is its anchor's `target` (CORNELIA_NW + s* x ref, or an act-1 pin) plus the region's nudge inside the
@@ -13,7 +13,7 @@ import yaml
 
 from worldgen import spec as S
 
-ANCHORS = Path(__file__).resolve().parents[3] / "maps-nw" / "world-anchors.yaml"
+ANCHORS = Path(__file__).resolve().parents[4] / "assets" / "data" / "world-anchors.yaml"
 
 
 @lru_cache(maxsize=1)
