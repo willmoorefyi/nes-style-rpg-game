@@ -154,6 +154,8 @@ def run(B) -> int:
     road = {"id": "r", "ground": "..........\n.,,,,,,,..\n..........", "entrances": {"a": [0, 1]}}
     expect_error({**road, "road_check": {"materials": ["dirt"]}}, "dead ends")
     assert ok_src({**road, "road_check": {"materials": ["dirt"], "ends": [[7, 1]]}})
+    expect_error({**road, "road_check": {"ends": [[7, 1]], "no_stubs": True}}, "one cell off")   # NW 3.10
+    assert ok_src({**road, "entrances": {"a": [1, 1]}, "road_check": {"ends": [[7, 1]], "no_stubs": True}})
     expect_error({**road, "ground": "..........\n.,,,..,,..\n..........",
                   "road_check": {"ends": [[3, 1], [6, 1], [7, 1]]}}, "separate networks")
     expect_error({**road, "road_check": {"ends": [[7, 1]], "check_under": True},

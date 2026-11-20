@@ -1,29 +1,26 @@
-"""A1's continent spec (docs/NATURAL_WORLD_PLAN.md 2.3, 3.6; NW-0's pilot, preset B; NW-3 owns it from here).
+"""A1's continent spec (docs/NATURAL_WORLD_PLAN.md 2.3, 3.6; NW-0's pilot, preset B; NW-3).
 
 Cornelia's continent: an east-west mainland with a ragged north coast; the peninsula hanging south-west into the Aldi
-(today's outline as the template, `a1_today`); the spine (barrier `spine`, the bridge its only cut); the mainland
-ridges; Pravoka's range (wall W_east) with spurs; the outer fjord east of it; the Aldi's open water and two islets;
-Cornelia's mild open fields. Act 1's pins keep today's cells relative to Cornelia (`spec.a1_pin`).
+(today's outline as the template); the spine (barrier `spine`, the bridge its only cut); the mainland ridges;
+Pravoka's range (wall W_east) with spurs; the outer fjord east of it; the Aldi's open water and two islets;
+Cornelia's mild open fields. Every act-1 pin comes from `a1/world_a1_pins.py` (derived by `a1/world_a1_derive.py`
+from today's world), Cornelia-relative: its world cell is CORNELIA_NW + rel. The spec's own lines below are
+Cornelia-relative too.
+
+The roads (2.4 rule 8, 3.10's stub fix) are today's network, routed through its points: every gate road starts on
+its gate's warp cell, the ring joins the gates, and the east road crosses the footbridge onto the tomb road, so no
+road ends one cell off a gate (`a1/world_a1_checks.stubs`).
 """
 from __future__ import annotations
 
-from world_api_v2 import A1_DELTA, CORNELIA_TODAY, WORLD_W
+import numpy as np
 
+from a1 import world_a1_pins as P
+from world_api_v2 import CORNELIA_NW, WORLD_W
+
+from worldgen import spec as S
 from worldgen.bundle import (Barrier, ClimateHint, Continent, Corridor, Dock, InlandSea, IsleField, RegionSpec, Ridge,
                              Road, SeaLine, SpotDef, Template, WallLine)
-
-from . import a1_today as T
-
-
-def rel(p):
-    """Today's act-1 cell -> its Cornelia-relative point (world = CORNELIA_NW + rel = p + A1_DELTA)."""
-    return (p[0] - CORNELIA_TODAY[0], p[1] - CORNELIA_TODAY[1])
-
-
-def pin(p):
-    """Today's act-1 point -> its world point (spec.a1_pin, for fractional points too)."""
-    return (p[0] + A1_DELTA[0], p[1] + A1_DELTA[1])
-
 
 EXT_A1 = ((-47, -29), (-47, -36), (-41, -41), (-36, -47), (-28, -50), (-20, -47), (-12, -52), (-2, -50), (6, -54),
           (14, -50), (22, -53), (30, -47), (38, -49), (45, -45), (49, -41), (47, -34), (30, -31), (0, -31),
@@ -43,50 +40,64 @@ ALDI = ((-42, -26), (-30, -28), (-27, -22), (-27, -12), (-26, 0), (-20, 12), (0,
         (-18, 30), (-30, 25), (-38, 19), (-43, 10), (-43, 0), (-43, -14))
 # 2.4 rule 4b: the walks of S0-S3 (Cornelia -> the bridge, the temple; the north shore -> Pravoka, Matoya)
 CORRIDORS = (
-    Corridor("a1_bridge", ("cornelia", rel(T.BRIDGE_FOOT))),
-    Corridor("a1_temple", ("cornelia", rel((86, 106)), "temple")),
-    Corridor("a1_pravoka", ("north_shore", rel((101, 89)), rel((116, 88)), rel((124, 93)), rel((126, 97)),
-                            "a1_pravoka")),
-    Corridor("a1_matoya", ("north_shore", rel((88, 86)), rel((80, 80)), "a1_matoya")),
+    Corridor("a1_bridge", ("cornelia", P.BRIDGE_FOOT)),
+    Corridor("a1_temple", ("cornelia", (-6, -5), "temple")),
+    Corridor("a1_pravoka", ("north_shore", (9, -22), (24, -23), (32, -18), (34, -14), "a1_pravoka")),
+    Corridor("a1_matoya", ("north_shore", (-4, -25), (-12, -31), "a1_matoya")),
 )
 
 
+def at(p) -> tuple:
+    """A Cornelia-relative point -> its unrounded world point (fractional lines)."""
+    return (CORNELIA_NW[0] + p[0], CORNELIA_NW[1] + p[1])
+
+
+def grids(n: int = WORLD_W) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """(land, keep, keepch) world rasters from the pins' template grid."""
+    land, keep, keepch = np.zeros((n, n), bool), np.zeros((n, n), bool), np.full((n, n), "o")
+    ox, oy = S.world(P.TEMPLATE_AT)
+    for j, row in enumerate(P.TEMPLATE):
+        for i, c in enumerate(row):
+            x, y = ox + i, oy + j
+            land[y, x] = c not in " o"
+            if c not in " #":
+                keep[y, x], keepch[y, x] = True, c
+    return land, keep, keepch
+
+
 def template() -> Template:
-    ch = T.chars()
-    n = WORLD_W
-    x0, y0, x1, y1 = T.CHANNEL
+    land, keep, keepch = grids()
+    x0, y0, x1, y1 = P.CHANNEL
     return Template(
-        land=T.place(T.template_land(ch), False, A1_DELTA, n), keep=T.place(T.keep_mask(ch), False, A1_DELTA, n),
-        keepch=T.place(ch, "o", A1_DELTA, n), sound=tuple(pin(q) for q in T.SOUND_LINE),
-        channel=(*pin((x0, y0)), *pin((x1, y1))), channel_wall="W_east", warp=0.25,
-        road_keep=(pin(T.ROAD_KEEP[0]), T.ROAD_KEEP[1]),
-        icons=tuple(pin(q) for q in T.CITY_ICON + T.PRAVOKA_ICON + T.TEMPLE_ICON),
-        exempt=tuple(pin(q) for q in T.BRIDGE_PATCH + T.FOOTBRIDGE + T.JETTY),
-        bridge=tuple(pin(q) for q in T.BRIDGE_PATCH), seed_cell=pin(T.ALDI_SEED))
+        land=land, keep=keep, keepch=keepch, sound=tuple(at(q) for q in P.SOUND_LINE),
+        channel=(*S.world((x0, y0)), *S.world((x1, y1))), channel_wall="W_east", warp=0.25,
+        road_keep=((0, 0), 0.0),                          # no road of today is kept: all are routed
+        icons=tuple(S.world(q) for q in P.CITY_ICON + P.PRAVOKA_ICON + P.TEMPLE_ICON),
+        exempt=tuple(S.world(q) for q in P.BRIDGE_PATCH + P.FOOTBRIDGE + P.JETTY),
+        bridge=tuple(S.world(q) for q in P.BRIDGE_PATCH), seed_cell=S.world(P.ALDI_SEED))
 
 
 def spots() -> list[SpotDef]:
-    """Act 1's spots: today's cells, pinned relative to Cornelia (absolute world cells)."""
-    return [SpotDef(k, "", pin(tuple(v["at"])), v["kind"]) for k, v in T.spots().items() if k.startswith("a1_s_")]
+    """Act 1's spots (absolute world cells)."""
+    return [SpotDef(k, "", S.world(v["at"]), v["kind"]) for k, v in P.SPOTS.items()]
 
 
 def spec() -> RegionSpec:
-    ents = T.entrances()
     return RegionSpec(
         region="a1",
         continents=[Continent("a1_ext", "a1", EXT_A1, fjord=1.0)],
         ridges=list(RIDGES),
-        barriers=[Barrier("spine", tuple(rel(q) for q in T.SPINE), base=1.6, rn=0.8, warped=False)],
+        barriers=[Barrier("spine", tuple(P.SPINE), base=1.6, rn=0.8, warped=False)],
         walls=[WallLine("W_east", W_EAST, wobble=0.5)],
         sea_lines=[OUTER_FJORD],
         inland_seas=[InlandSea("aldi", ALDI)],
         isles=[IsleField((-36, 2), 3, 1, 102), IsleField((-6, 23), 3, 1, 103)],
         climate=[ClimateHint("mild", (2, -6), 26)],
-        sites={e: pin(tuple(ents[e])) for e in ents if e in T.ENTRANCES},
+        sites={e: S.world(c) for e, c in P.ENTRANCES.items()},
         towns=("cornelia", "a1_pravoka"),
-        docks=[Dock("a1_pravoka", rel(T.PRAVOKA_DOCK), "aldi", "a1_pravoka", cove=False)],
+        docks=[Dock("a1_pravoka", P.PRAVOKA_DOCK, "aldi", "a1_pravoka", cove=False)],
         corridors=list(CORRIDORS),
-        roads=[Road(f"a1_road_{i}", tuple(rel(q) for q in r)) for i, r in enumerate(T.ROADS)],
+        roads=[Road(f"a1_road_{i}", tuple(r)) for i, r in enumerate(P.ROADS)],
         spots=spots(),
         template=template(),
         barrier_seeds={"spine": ("cornelia", ("a1_pravoka",), True, True)},
