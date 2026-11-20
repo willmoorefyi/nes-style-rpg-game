@@ -45,7 +45,7 @@ def main() -> int:
     import world_checks_v2 as WC2
     import world_v2
     import world_v2_source as SRC
-    from world_specs import a1_today as T
+    from a1 import world_a1_pins as T
     g, meta, b, doc, ch = world_v2.build()
     E = meta["entrances"]
     _off, ent_map = SRC.doors()

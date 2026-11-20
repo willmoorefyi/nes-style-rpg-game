@@ -5,8 +5,8 @@ boxes, for the composer v2 (`world_v2.py`), which prints them as one line, `worl
   1. the raster: every region's `regions.<r>.raster` is chunk rects, each holding an owner cell of r; together they
      cover every chunk, and a chunk's bookkeeping owner (`owners.chunk_owner`) is a region whose raster holds it;
   2. ids: entrance, spot, dock, patch, NPC and zone ids are unique; a prefixed id (`<prefix>_...`, spots
-     `<prefix>_s_<name>`) stands on a cell its region owns (a spot or an entrance) and an unprefixed one is one of
-     act 1's legacy entrances;
+     `<prefix>_s_<name>`) stands on a cell its region owns (a spot, an entrance or an NPC) and an unprefixed one is
+     one of act 1's legacy ids (LEGACY) on an a1 cell;
   3. docks: exactly the DOCKS_ALLOWED ids, each once (the gate checks place them, `gates.docks`);
   4. anchors: every anchor of `assets-src/maps-nw/world-anchors.yaml` is an entrance within its tolerance;
   5. reach: with every patch on, every entrance is walkable from an arrival the game offers: Cornelia, a dock, or a
@@ -26,6 +26,10 @@ from worldgen.geom import components
 
 ANCHORS = Path(__file__).resolve().parents[2] / "maps-nw" / "world-anchors.yaml"
 LANDING = [".", "t"]
+# act 1's ids from before the prefixes (pass W's world_a1.LEGACY_IDS): entrances, zones, NPCs and the bridge patch
+LEGACY = frozenset({"cornelia", "cornelia_west", "cornelia_east", "cornelia_north", "castle", "north_shore", "temple",
+                    "east_pocket", "temple_approach", "chest_tomb", "bridge_worker_w", "bridge_worker_e",
+                    "north_bridge"})
 
 
 def raster(region: np.ndarray, regions: tuple[str, ...], doc_regions: dict) -> list[str]:
@@ -66,7 +70,7 @@ def ids(doc: dict, meta: dict, legacy: tuple[str, ...]) -> list[str]:
     named = [("entrance", e, tuple(c)) for e, c in doc["entrances"].items()]
     named += [("spot", s, tuple(v["at"])) for s, v in doc["spots"].items()]
     named += [("dock", d["id"], None) for d in doc["docks"]] + [("patch", p["id"], None) for p in doc["patches"]]
-    named += [("NPC", n.get("id"), None) for n in doc.get("npcs") or []]
+    named += [("NPC", n.get("id"), (n["x"], n["y"]) if "x" in n else None) for n in doc.get("npcs") or []]
     named += [("zone", z.get("id"), None) for z in doc.get("encounterZones") or []]
     for kind, i, at in named:
         if not isinstance(i, str):
@@ -79,8 +83,10 @@ def ids(doc: dict, meta: dict, legacy: tuple[str, ...]) -> list[str]:
         if kind == "spot" and not (p in pre and i.startswith(p + "_s_")):
             errs.append(f"ids: spot {i!r} is not <prefix>_s_<name>")
         elif p not in pre:
-            if not (kind == "entrance" and i in legacy) and (kind, i) != ("patch", CANAL_PATCH) and i != "north_bridge":
+            if i not in LEGACY | set(legacy) and (kind, i) != ("patch", CANAL_PATCH):
                 errs.append(f"ids: {kind} id {i!r} lacks a region prefix")
+            elif at is not None and gates.owner(meta, *at) != "a1":
+                errs.append(f"ids: act 1's {kind} {i} at {at} stands on a cell owned by {gates.owner(meta, *at)}")
         elif at is not None and gates.owner(meta, *at) != pre[p]:
             errs.append(f"ids: {kind} {i} at {at} stands on a cell owned by {gates.owner(meta, *at)}, not {pre[p]}")
     return errs

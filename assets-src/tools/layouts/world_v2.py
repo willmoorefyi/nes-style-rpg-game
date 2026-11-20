@@ -27,9 +27,9 @@ import world_checks_v2 as WC2  # noqa: E402
 import world_specs  # noqa: E402
 import world_v2_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
-from world_api_v2 import (A1_DELTA, CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET,  # noqa: E402
-                          NORTH_REGIONS, REGIONS)
-from world_specs import a1_today as T  # noqa: E402
+from a1 import world_a1_pins as P  # noqa: E402
+from world_api_v2 import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
+                          REGIONS)
 from worldgen import bundle, compose, gates, gates_reach, metrics, owners, prewalk, spots  # noqa: E402
 from worldgen import spec as S  # noqa: E402
 
@@ -42,7 +42,7 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     raster (`regions.<r>.raster`, 3.4) and the walls' and barriers' minimal cuts (`world.cuts`, 3.8)."""
     b = bundle.merge(world_specs.load())
     door_off, ent_map = SRC.doors()
-    g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(T.ENTRANCES))
+    g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
     trans = SRC.transitions(b.sites)
     objs, insp = SRC.act1_content(meta["keep"])
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
@@ -60,12 +60,12 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
     walk = gates.walk(g)
     pins_bad = list(sp_err)
     pins_bad += [f"entrance {e} at {tuple(c)} is not walkable" for e, c in meta["entrances"].items()
-                 if not walk[c[1], c[0]] and e not in T.ENTRANCES]
+                 if not walk[c[1], c[0]] and e not in P.ENTRANCES]
     doors = np.zeros(g.shape, bool)                    # no cut runs through a door or an arrival (INT-W2c)
     for x, y in blocked:
         doors[y, x] = True
     taken = set(blocked) | {(n["x"], n["y"]) for n in doc.get("npcs") or []}
-    werr, wsum = WC2.check(g, meta, doc, tuple(T.ENTRANCES))
+    werr, wsum = WC2.check(g, meta, doc, tuple(P.ENTRANCES))
     return {"world": {"ok": not werr, "why": werr, "summary": wsum},
             "basins": gates.basins(g, meta), "docks": gates.docks(g, meta, DOCKS_ALLOWED),
             "walls": gates.walls(g, meta, doors),
@@ -73,7 +73,8 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
                                              doors),
             "routes": gates.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
             "landings": gates_reach.landings(g, meta, b.north, sp, taken), "straits": gates.straits(g, meta),
-            "prewalk": prewalk.prewalk(g, meta, ent_map, sp), "act1": A1C.act1(g, meta), "walks": A1C.walks(g, meta),
+            "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
+            "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),
             "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad}}
 
 
@@ -96,13 +97,13 @@ def anchor_table(meta: dict) -> dict:
     for e, a in anchors().items():
         (tx, ty), (x, y) = S.target(tuple(a["ref"])), meta["entrances"][e]
         rows[a["name"]] = {"cell": [x, y], "s*_target": [tx, ty], "dx": x - tx, "dy": y - ty,
-                           "rule": "act-1 pin (today's cell relative to Cornelia)" if e in T.ENTRANCES else "anchor"}
+                           "rule": "act-1 pin (today's cell relative to Cornelia)" if e in P.ENTRANCES else "anchor"}
     return rows
 
 
 def _kept_rects() -> list:
-    dx, dy = A1_DELTA                        # act 1's keep rects (its template's forced cells), in world cells
-    return [(x0 + dx, y0 + dy, x1 + dx, y1 + dy) for x0, y0, x1, y1 in T.KEEP_RECTS.values()]
+    # act 1's keep rects (its template's forced cells), in world cells
+    return [(*S.world((x0, y0)), *S.world((x1, y1))) for x0, y0, x1, y1 in P.KEEP_RECTS.values()]
 
 
 def gate_lines(fig: dict) -> list[str]:
