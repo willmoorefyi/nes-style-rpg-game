@@ -107,10 +107,23 @@ def reach_roots(g: np.ndarray, ents: dict, cover: set) -> list:
     return roots
 
 
-def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict) -> dict:
+def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spots: dict, outs=()) -> dict:
+    """`outs`: the regions' content (world_api_v2.RegionOut, NW-R); its objects and inspect cells are in `objs` and
+    `insp` already, its NPCs, vehicles, ambient effects, zones and zone backdrops are appended here."""
     ents = dict(meta["entrances"])
     ents = {"cornelia": ents.pop("cornelia"), **ents}       # the first entrance is the reachability root
     npcs, ships = act1_people(g, meta["keep"])
+    npcs += [n for out in outs for n in out.npcs]
+    ships += [v for out in outs for v in out.vehicles]
+    extra = {"ambient": [a for out in outs for a in out.ambient],
+             "encounterZones": [z for out in outs for z in out.zones],
+             "battleBackgrounds": {"zones": {k: v for out in outs for k, v in
+                                             (out.battleBackgrounds.get("zones") or {}).items()}}}
+    return {**_document(g, meta, trans, objs, insp, spots, ents, npcs, ships),
+            **{k: v for k, v in extra.items() if v and v != {"zones": {}}}}
+
+
+def _document(g, meta, trans, objs, insp, spots, ents, npcs, ships) -> dict:
     return {
         "id": "overworld", "name": "World Map", "kits": ["overworld", "town", "temple"], "music": "overworld",
         "camp": True, "terrain": "organic", "sealed_edges": True,

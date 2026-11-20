@@ -21,6 +21,10 @@ from .noise import N, XX, YY, fbm
 COLD_Y = 62                                  # world row: cold from about here north (2.4 rule 5)
 H_M = 0.46                                   # mountain above this elevation
 TIE = "fstwn."                               # the tidy's tie-break among equally common neighbours (first wins)
+# NW-R WIND: the forest and desert thresholds, frozen at preset B's values on NW-4's world (np.quantile of mf over the
+# land at 0.72, of moist at 0.05; exact floats). Computed over all the land, they let one region's edit flip forest
+# and sand cells world-wide (NW-2's locality note), which pushed a region's `--region` past PAINT_LIMIT
+QF, QS = 0.8816931895841574, 0.14384668557967306
 
 
 def _gauss(c0, r: float) -> np.ndarray:
@@ -64,7 +68,7 @@ def biomes(land, elev, moist, cold, wet, river, lake, seed: int, h_m: float = H_
     coast1 = land & ~(np.roll(land, 1, 0) & np.roll(land, -1, 0) & np.roll(land, 1, 1) & np.roll(land, -1, 1))
     g[land] = "."
     mf = moist + 0.35 * fbm(seed + 92, (10, 5, 2.5))     # forests come in stands, not sheets
-    qf, qs = np.quantile(mf[land], 0.72), np.quantile(moist[land], 0.05)
+    qf, qs = QF, QS
     g[land & (mf > qf)] = "f"
     g[land & (moist < qs)] = "s"
     g[land & coast1 & (cold < 0.1) & (elev < 0.14) & (beachn > 0.18)] = "s"

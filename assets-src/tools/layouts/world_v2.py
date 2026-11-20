@@ -45,11 +45,14 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
     trans = SRC.transitions(b.sites)
     objs, insp = SRC.act1_content(meta["keep"])
+    outs = world_specs.contents(g, meta, b)             # NW-R: the regions' content on the generated ground
+    objs += [o for out in outs for o in out.objects]
+    insp += [i for out in outs for i in out.inspect]
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
     blocked |= {tuple(v) for v in meta["entrances"].values()}
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
-    doc = SRC.document(g, meta, trans, objs, insp, sp)
+    doc = SRC.document(g, meta, trans, objs, insp, sp, outs)
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}

@@ -23,3 +23,16 @@ def load() -> list:
     from . import a1, earth, elf, fire, ordeal, water, wind
     mods = {"a1": a1, "elf": elf, "earth": earth, "fire": fire, "ordeal": ordeal, "water": water, "wind": wind}
     return [mods[r].spec() for r in REGIONS]
+
+
+# NW-R: the regions whose content (icons, dressing, inspect cells, zones, backdrops) is placed on the generated ground
+CONTENT = {"wind": "wind.world_nw"}
+
+
+def contents(g, meta: dict, b) -> list:
+    """Each region's content on the generated ground, in world_api_v2.REGIONS order: its module's `content(g, meta,
+    b)`, a world_api_v2.RegionOut (it may write its stamps into `g`)."""
+    import importlib
+
+    from world_api_v2 import REGIONS
+    return [importlib.import_module(CONTENT[r]).content(g, meta, b) for r in REGIONS if r in CONTENT]
