@@ -840,7 +840,19 @@ Still open, each with a proposed default that the plan builds unless you say oth
   edge (x clamped) and over the south edge's field (y clamped; only the off-map band under the HUD differs: sea
   instead of black); each tilt 42 frames; Up held through a take-off moves on frame 43; frame p95 9.1 ms, update p95
   0.4 ms (120 Hz display); the tilt frames' p95 9.1 ms, max 9.3 ms; artefacts in `~/temp/ff-game/m7_4/`
-- [ ] M7-5 billboards and clouds (priority: medium, effort: 4 h)
+- [x] M7-5 billboards and clouds (priority: medium, effort: 4 h). Result: `propMath.ts` (pure: the billboard sources
+  read from the field's own sprites, the parked vehicles labelled `vehicle:*` but the airship and the NPCs; each stood
+  at `cellToScreen` of its ground point with the sprite's texture, anchor, flip and tint, scaled by `px per cell /
+  TILE_SIZE`, so it lands on the top-down sprite at a tilt's t = 0; culled beyond 40 cells of P or off screen, faded
+  over the last 4 cells and through the fog), `FlightProps.ts` (the sprite pool), the depth sort in `FlightBillboards`
+  (zIndex = px per cell at the ground point: nearer than P over the airship, farther behind it and its shadow),
+  `cloudMath.ts` (4 code-drawn 15-bit clouds lit from the top left, binary alpha, at scales 4 / 3 / 2 / 2 a fixed
+  height over the horizon, drifting east and sliding against the ship's sideways motion) drawn by `FlightSky.clouds`
+  behind the ground; `FlightView.ts` +0 lines (`deps.npcs`), `FlightRenderer.ts` +3 lines and 1 edited,
+  `ExplorationScene.ts` 1 line edited (+0), the `m7_parked` scenario. Tests: `propMath`, `cloudMath`,
+  `flightBillboards`, `mode7Props`. Browser (headed Chromium, ANGLE Metal, Apple M4 Pro): frame p95 9.9 ms, update p95
+  0.2 ms over 600 steady frames with the billboards in view (w_s18_start 10.0 / 0.2); artefacts in
+  `~/temp/ff-game/m7_5/`
 - [x] M7-6 fallbacks (priority: high, effort: 3 h). Result: `FlightContext.ts` (new, no PixiJS:
   `watchFlightContext` on the canvas, and `FlightFallback`, the view's `lost` flag and the log lines);
   `FlightRenderer` watches the canvas and on a restore reloads the atlas (`WorldAtlas.restore` now rejects on a

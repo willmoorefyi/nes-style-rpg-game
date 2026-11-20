@@ -3,10 +3,12 @@
  * blue down to the haze at the horizon. Every band is one 15-bit colour (5 bits per channel, as `snes_palette.py`
  * defines colours), so the gradient steps like a SNES HDMA sky. The fog (2.5) is one sprite over the ground: a 1x256
  * gradient texture stretched over the screen width, from the horizon row down `FOG_ROWS`, in the haze colour, alpha
- * `FOG_ALPHA` to 0; it moves with the horizon. The clouds come in M7-5.
+ * `FOG_ALPHA` to 0; it moves with the horizon. The clouds (M7-5, `cloudMath.ts`) are sprites in `clouds`, over the
+ * gradient and behind the ground, placed each frame by `drift`.
  */
-import { BufferImageSource, Graphics, Sprite, Texture } from 'pixi.js';
+import { BufferImageSource, Container, Graphics, Sprite, Texture } from 'pixi.js';
 import { SCREEN_W } from './mode7Math.js';
+import { CLOUDS, cloudPlace, cloudTexels } from './cloudMath.js';
 
 type C15 = readonly [number, number, number];
 
@@ -53,12 +55,32 @@ export function skyBands(horizon: number): { y: number; h: number; color: number
 export class FlightSky {
   readonly view = new Graphics();
   readonly fog: Sprite;
+  readonly clouds = new Container();
 
   constructor() {
     const source = new BufferImageSource({ resource: fogTexels(), width: 1, height: FOG_TEXELS,
       alphaMode: 'premultiplied-alpha', scaleMode: 'linear', addressMode: 'clamp-to-edge' });
     this.fog = new Sprite(new Texture({ source }));
     this.fog.label = 'mode7:fog';
+    this.clouds.label = 'mode7:clouds';
+    for (const c of CLOUDS) {
+      const src = new BufferImageSource({ resource: cloudTexels(c), width: c.w, height: c.h,
+        alphaMode: 'premultiplied-alpha', scaleMode: 'nearest' });
+      const s = new Sprite(new Texture({ source: src }));
+      s.anchor.set(0, 1);
+      s.scale.set(c.scale);
+      this.clouds.addChild(s);
+    }
+  }
+
+  /** Place the clouds: their drift at `tMs`, their slide with the ship at `px` cells, their height over `horizon`. */
+  drift(tMs: number, px: number, horizon: number): void {
+    CLOUDS.forEach((c, i) => {
+      const s = this.clouds.children[i];
+      const at = cloudPlace(c, tMs, px, horizon);
+      s.visible = at.visible;
+      if (at.visible) s.position.set(at.x, at.y);
+    });
   }
 
   /** Put the fog band under the horizon row. */
@@ -81,5 +103,6 @@ export class FlightSky {
   destroy(): void {
     this.view.destroy();
     this.fog.destroy({ texture: true, textureSource: true });
+    this.clouds.destroy({ children: true, texture: true, textureSource: true });
   }
 }

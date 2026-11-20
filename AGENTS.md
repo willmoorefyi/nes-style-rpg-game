@@ -432,6 +432,16 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `rowOffMap`), so the near detail draws by a clamped edge too. Tests: `tests/scenes/mode7/mode7Tilt.test.ts` (the
   t 0 match corner by corner against a real `Camera`), `mode7TiltScene.test.ts`, the parity tests (each tilt 42 held
   frames, the end state equal).
+- **Mode 7 billboards and clouds (M7-5, `docs/MODE7_PLAN.md` 5).** In flight the parked vehicles (the field's
+  `vehicle:*` sprites but the airship's) and the map's NPCs (`FlightViewDeps.npcs`) stand up as billboards:
+  `propMath.propSources` / `placeProps` (pure) put each field sprite at `cellToScreen` of its ground point, scaled by
+  that row's px per cell over `TILE_SIZE` (so at a tilt's t = 0 it is exactly the top-down sprite), cull it beyond
+  `PROP_RANGE` 40 cells of P (fading over the last 4) and haze it through the fog; `FlightProps` keeps the sprites and
+  `FlightBillboards` sorts them with the airship by depth (nearer than P in front of the hull). `FlightSky.clouds`: the
+  4 clouds of `cloudMath.ts` (15-bit, binary alpha, a fixed height over the horizon, drifting and sliding with the
+  ship's x), behind the ground. `window.__mode7.textures.props` counts the billboards drawn. Preview:
+  `?mute=1&scenario=m7_parked` (the ship at Pravoka's dock, the tomb's chest and the bridge workers). Tests:
+  `tests/scenes/mode7/propMath.test.ts`, `cloudMath.test.ts`, `flightBillboards.test.ts`, `mode7Props.test.ts`.
 - **Mode 7 fallbacks (M7-6, `docs/MODE7_PLAN.md` 7).** Context loss: `FlightRenderer` watches the canvas
   (`watchFlightContext`, `FlightContext.ts`); while the context is lost or the restore runs, `FlightView` hides the
   view and the top-down world shows; on `webglcontextrestored` the atlas reloads its freed source and recomposes
