@@ -32,13 +32,15 @@ describe('scenarioSpawns: overworld field scenarios', () => {
     expect(raw).toEqual(['r_ow_bridge', 'r_ow_east', 'r_ow_temple']);
   });
 
+  const OUTSIDE_A1 = new Set(['smoke_volcano']);
   it.each(maps)('every spawn is walkable and inside the act-1 frame (%s)', (_name, map) => {
     const [ox, oy] = a1OriginOf(map);
     const [w, h] = map.world?.frames.a1?.size ?? [map.width, map.height];
     for (const s of onOverworld) {
       const [x, y] = s.entrance ? map.entrances![s.entrance] : scenarioSpawn(s, map);
-      // pass W's w_* stage starts stand at their region's entrance (WORLD 6.5), outside the act-1 frame
-      if (!s.id.startsWith('w_')) {
+      // pass W's w_* stage starts stand at their region's entrance (WORLD 6.5), outside the act-1 frame, and so does
+      // the SMOKE check at the volcano door
+      if (!s.id.startsWith('w_') && !OUTSIDE_A1.has(s.id)) {
         expect(x >= ox && x < ox + w && y >= oy && y < oy + h, `${s.id} at (${x}, ${y}) inside the a1 frame`).toBe(true);
       }
       const state = { flags: new Set(s.flags ?? []), items: new Set<string>(), mode: 'walking' as const, vehicles: [] };
