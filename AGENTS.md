@@ -383,6 +383,19 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is the steam billows of the
   Field engine notes ("Ambient smoke"). The volcano's crater smoke is FIRE's `world_fire_data.SMOKE` (RegionOut
   `ambient`).
+- **Mode 7 far atlas (M7-1, `docs/MODE7_PLAN.md` 3.1).** Every full and `--region` world compile re-bakes
+  `assets/maps/ai/overworld/mode7.png` (3072x3072 RGB, 16 px per cell), `mode7_low.png` (1536x1536, 8 px per cell)
+  and `mode7.json` (`version`, `cellPx`, `size`, `lowCellPx`, `lowSize`, `inputs` = the sha256 over the 144 chunk
+  files in `art.below` order) through `build_hooks.bake_mode7`, called in `build_map.write()` right after
+  `bake_patches` (only for `MODE7_MAPS` = `overworld`, so the selftest worlds bake none). The baker,
+  `assets-src/tools/mode7_atlas.py`, box-averages the below chunks (3x3, 6x6; integers, round half up), adds no
+  border and refuses a world whose 4 edges are not all Water; the patches stay out (the runtime `WorldAtlas`,
+  `src/scenes/exploration/mode7/WorldAtlas.ts`, draws them over it while their flags are set, builds the mips with
+  WebGL2 only, and frees the source image after the compose). Gates: `mode7_atlas.py --check-determinism overworld`
+  (two bakes under PYTHONHASHSEED 0 / 1 into temp dirs) and `build_map.py overworld && git diff --exit-code assets
+  assets-src/maps`; `tests/data/mode7Atlas.test.ts` fails on a stale atlas. Never hand-merge `mode7*.png`:
+  recompile the world at the merge (risk R13). A by-hand bake: `mode7_atlas.py overworld [--maps DIR] [--out DIR]`
+  (it takes the world-compile lock when it writes into the map folder).
 - Still placeholder: the fairy and the mermaids are tinted NPC sheets.
 
 ### New Cutscene

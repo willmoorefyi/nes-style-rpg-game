@@ -13,13 +13,15 @@ W1-0b declared the four signatures; W1-C1 calls them from `build_map.py`; W1-C2 
 - `region_checks` runs a world region's own map checks (`map_checks_region.py`), or, with `region` None, the
   world-level source checks (the basins and docks of 2.6; sealed edges, art coverage and the unreachable cells are
   map_checks.run's, on the compiled map);
-- `owned_chunks` is the region's rect union in chunks (`world_geom.owned_chunks`).
+- `owned_chunks` is the region's rect union in chunks (`world_geom.owned_chunks`);
+- `bake_mode7` (M7-1, docs/MODE7_PLAN.md 3.1) re-bakes the world's Mode 7 far atlas (`mode7_atlas.py`) from the
+  chunk files just written; it runs after `bake_patches`, in every full and `--region` compile of the world.
 """
 from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(1, str(Path(__file__).resolve().parent / "layouts"))
@@ -170,3 +172,15 @@ def owned_chunks(region: str) -> set[tuple[int, int]]:
     that contains them."""
     from world_geom import owned_chunks as owned  # noqa: PLC0415
     return owned(region)
+
+
+MODE7_MAPS = ("overworld",)                  # D-M7: Mode 7 flies only on the world map (not the selftest worlds)
+
+
+def bake_mode7(map_id: str, src: dict, out_dir: Path, is_world: Callable[[dict], bool]) -> Path | None:
+    """Bake `<out_dir>/<map_id>/mode7.png`, `mode7_low.png` and `mode7.json` from that folder's chunks; None (no bake)
+    unless `is_world(src)` and the map is one Mode 7 flies on. `is_world` is build_map's, passed in."""
+    if not is_world(src) or map_id not in MODE7_MAPS:
+        return None
+    import mode7_atlas as M7  # noqa: PLC0415
+    return M7.bake(map_id, Path(out_dir), Path(out_dir) / map_id, src=src)
