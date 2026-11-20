@@ -396,6 +396,16 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   assets-src/maps`; `tests/data/mode7Atlas.test.ts` fails on a stale atlas. Never hand-merge `mode7*.png`:
   recompile the world at the merge (risk R13). A by-hand bake: `mode7_atlas.py overworld [--maps DIR] [--out DIR]`
   (it takes the world-compile lock when it writes into the map folder).
+- **Mode 7 flight view (M7-2, `docs/MODE7_PLAN.md` 4, 7, 8).** On `overworld` in the airship, `FlightView`
+  (`src/scenes/exploration/mode7/`, no PixiJS) follows `game.fieldMode` through the states of `mode7Tilt.ts` (`off`,
+  `loading` with its `takeoff` / `restore` reason, `tiltIn`, `flying`, `tiltOut`; M7-2 switches instantly) and draws
+  through the lazily imported `FlightRenderer` (far atlas strips, sky, ship, shadow, landing marker). The profile is
+  `mode7Toggle.mode7Enabled`: `?mode7=0` / `?mode7=1`, then the GPU caps (`capsOf(game.app.renderer)`; a mock game has
+  none, so older scene tests never load the renderer), then Config's "Airship view" (`Settings.airshipView`, default
+  `topdown` until M7-3). A missing atlas logs one `console.error` and the flight stays top-down. `window.__mode7`
+  reports the state, history, shadowCell, marker, GL string and the steady-flight p95s. Rules are unchanged: scene tests
+  `tests/scenes/mode7/mode7Parity.test.ts`, `mode7Activation.test.ts` (harness `flightHarness.ts`, which `vi.mock`s
+  `FlightRenderer.js`).
 - Still placeholder: the fairy and the mermaids are tinted NPC sheets.
 
 ### New Cutscene

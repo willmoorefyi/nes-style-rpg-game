@@ -1,18 +1,23 @@
 /**
  * Global player preferences (not part of the save data), stored in `localStorage` under `ff.settings`.
- * Read once and cached; `setMessageSpeed` writes through. Without `localStorage` (Node tests, a private context) the
+ * Read once and cached; `setMessageSpeed` and `setAirshipView` write through. Without `localStorage` (Node tests, a private context) the
  * defaults apply silently; a storage exception or an invalid stored value warns once and falls back to the default.
  */
 export type MessageSpeed = 1 | 2 | 3 | 4 | 5;
+/** How the airship flies on the world map: the tilted Mode 7 view or the top-down field (docs/MODE7_PLAN.md 7). */
+export type AirshipView = 'mode7' | 'topdown';
 
 export interface GameSettings {
   /** Battle text speed, 1 (slowest) to 5 (fastest). */
   messageSpeed: MessageSpeed;
+  airshipView: AirshipView;
 }
 
 export const SETTINGS_KEY = 'ff.settings';
 /** Speed 3 (pass F item 6): slower than the old timing, which is about speed 5. */
 export const DEFAULT_MESSAGE_SPEED: MessageSpeed = 3;
+/** Top-down until M7-3 brings the near detail; M7-3 turns the default to 'mode7' (D-M8). */
+export const DEFAULT_AIRSHIP_VIEW: AirshipView = 'topdown';
 
 let cache: GameSettings | null = null;
 
@@ -31,17 +36,24 @@ function store(): Storage | null {
   }
 }
 
+export function isAirshipView(v: unknown): v is AirshipView {
+  return v === 'mode7' || v === 'topdown';
+}
+
 function load(): GameSettings {
-  const settings: GameSettings = { messageSpeed: DEFAULT_MESSAGE_SPEED };
+  const settings: GameSettings = { messageSpeed: DEFAULT_MESSAGE_SPEED, airshipView: DEFAULT_AIRSHIP_VIEW };
   const s = store();
   if (!s) return settings;
   try {
     const raw = s.getItem(SETTINGS_KEY);
     if (raw === null) return settings;
     const parsed: unknown = JSON.parse(raw);
-    const speed = typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>).messageSpeed : undefined;
-    if (isMessageSpeed(speed)) settings.messageSpeed = speed;
-    else console.warn(`Settings: invalid ${SETTINGS_KEY} value ${raw}; using the defaults`);
+    const rec = typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {};
+    const view = rec.airshipView;
+    const viewOk = view === undefined || isAirshipView(view);  // older settings have no airshipView: the default
+    if (isMessageSpeed(rec.messageSpeed)) settings.messageSpeed = rec.messageSpeed;
+    if (isAirshipView(view)) settings.airshipView = view;
+    if (!isMessageSpeed(rec.messageSpeed) || !viewOk) console.warn(`Settings: invalid ${SETTINGS_KEY} value ${raw}; using the defaults`);
   } catch (err) {
     console.warn(`Settings: cannot read ${SETTINGS_KEY}; using the defaults`, err);
   }
@@ -60,7 +72,19 @@ export function setMessageSpeed(n: MessageSpeed): void {
     console.error(`Settings: message speed must be 1-5, got ${String(n)}`);
     return;
   }
-  const next: GameSettings = { ...getSettings(), messageSpeed: n };
+  write({ ...getSettings(), messageSpeed: n });
+}
+
+/** Change the airship view and write it through (a write failure is logged; the new value still applies). */
+export function setAirshipView(v: AirshipView): void {
+  if (!isAirshipView(v)) {
+    console.error(`Settings: airship view must be 'mode7' or 'topdown', got ${String(v)}`);
+    return;
+  }
+  write({ ...getSettings(), airshipView: v });
+}
+
+function write(next: GameSettings): void {
   cache = next;
   const s = store();
   if (!s) return;

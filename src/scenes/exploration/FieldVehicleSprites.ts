@@ -173,6 +173,7 @@ export class FieldVehicleSprites {
   }
 }
 
-async function defaultLoad(): Promise<[unknown, Texture]> {
+/** The vehicle sheet and its meta (shared with the Mode 7 flight view). */
+export async function defaultLoad(): Promise<[unknown, Texture]> {
   return Promise.all([fetchJson<unknown>(META), Assets.load<Texture>(SHEET)]);
 }

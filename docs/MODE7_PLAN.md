@@ -800,7 +800,13 @@ Still open, each with a proposed default that the plan builds unless you say oth
 - [x] Momus review of rev 3: OKAY; rev 3.1 fixed its last item (2026-11-19)
 - [x] M7-0 pilot; the user picked preset A (priority: high, effort: 6 h)
 - [ ] M7-1 atlas pipeline (priority: high, effort: 3 h)
-- [ ] M7-2 flight, default still top-down (priority: high, effort: 7 h)
+- [x] M7-2 flight, default still top-down (priority: high, effort: 7 h). Result: `FlightView`, `FlightRenderer`,
+  `FlightBillboards` (ship, shadow and the landing marker, which the user ruled on, so it came in early from M7-4),
+  `mode7Tilt` (the 5 states with M7-2's instant switch, `TILT_FRAMES` 0; M7-4 sets 42), `mode7Toggle`, the Settings
+  row `airshipView` (default `topdown`) and its Config row; `ExplorationScene.ts` +6 lines and 1 edited (545 to 551).
+  Tests: `mode7Toggle`, `mode7Tilt`, `mode7Activation`, `mode7Parity` (on / off / no renderer, the loading variant and
+  a streamed 192x192 variant with a late chunk). Browser, headed Chromium on ANGLE Metal (Apple M4 Pro), w_s18_start
+  `?mode7=1`: 600 steady flight frames, frame p95 10.0 ms, update p95 0.2 ms; artefacts in `~/temp/ff-game/m7_2/`
 - [ ] M7-3 near detail, default on; the user's live test (priority: high, effort: 6 h)
 - [ ] M7-4 tilt and landing (priority: high, effort: 4 h)
 - [ ] M7-5 billboards and clouds (priority: medium, effort: 4 h)
