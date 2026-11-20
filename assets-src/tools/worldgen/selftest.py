@@ -9,7 +9,8 @@
 5. a river across a corridor gets a ford (and past `max_fords`, a cut);
 6. locality (2.5): editing one continent changes the land field only within its box plus a 24-cell margin;
 7. determinism (G-NW5): the composer v2's source is byte-identical under PYTHONHASHSEED 0 and 1;
-8. preset B at seed 1987 reproduces NW-0's figures (B_classic_metrics.json: gates, shares, regions, jogs).
+8. preset B at seed 1987 meets NW-0's gates (G-NW1-3, the land band, the exemption cap, no ford cut) and every
+   check passes (NW-RINT: the exact NW-0 figures are a record in the plan; the region tranches move them).
 Gate checks on mutated worlds are `selftest_gates.py`.
 """
 from __future__ import annotations
@@ -33,17 +34,10 @@ from worldgen.geom import components, pline  # noqa: E402
 SQUARE = ((-60, -60), (20, -60), (20, 20), (-60, 20))
 RIDGE = Ridge(((-50, -20), (10, -24)), 1.0, 3.0, "a test range")
 ROUTE = ((-30, 0), (-10, 4), (8, 10))
-B_FIGURES = {"land": 28874, "coast_edges": 5204, "G2_index": 30.6, "G1_fail_runs_gt6": 0, "G1_longest_nonexempt": 6,
-             "G3_fail_runs_gt6": 0, "G3_longest": 6, "exempt": 427, "jogs": 33, "ford_cuts": 0,
-             # NW-3: act 1's routed road ring (grass B 42.4 -> 42.5); NW-4: the waterfall's ledge, a rock ring on
-             # R-waterfall (B mountain 15.1, tundra 6.0, snow 9.2, grass 42.5)
-             "shares": {"mountain": 15.2, "forest": 16.8, "sand": 4.9, "swamp": 0.5, "tundra": 5.9, "snow": 9.1,
-                        "river": 2.4, "lake": 2.4, "grass": 42.4},
-             # the coast index by region on NW-4's owner grid (a landmass shared by regions split along their
-             # fields; NW-0 / NW-2 gave each landmass to its majority region: a1 9.2, elf 8.6, earth 10.7, fire 19.4,
-             # ordeal 10.5, water 18.3, wind 5.7). Reported, not gated (0.1.1).
-             "regions": {"a1": 13.7, "elf": 8.1, "earth": 13.5, "fire": 11.1, "ordeal": 13.4, "water": 11.7,
-                         "wind": 10.1}}
+# NW-RINT: NW-0's preset-B figures (land 28,874, coast edges 5,204, index 30.6, jogs 33, ...) are a historical record
+# in docs/NATURAL_WORLD_PLAN.md 12 and 15; the region tranches tune them on purpose, so case 8 asserts NW-0's gates
+# on the world as it is now (G-NW1-3, the land band, the exemption cap, no ford cut, every check OK); case 7 is the
+# exact one (the source byte-identical under two hash seeds and equal to the committed one).
 
 
 def synthetic(**kw) -> RegionSpec:
@@ -141,16 +135,18 @@ def case_determinism() -> str:
 
 
 def case_b(fig: dict) -> str:
-    r, want = fig["gates"], B_FIGURES
-    got = {"land": r["land"], "coast_edges": r["coast_edges"], "G2_index": r["G2_index"],
-           "G1_fail_runs_gt6": r["G1_fail_runs_gt6"], "G1_longest_nonexempt": r["G1_longest_nonexempt"],
-           "G3_fail_runs_gt6": r["G3_fail_runs_gt6"], "G3_longest": r["G3_longest"], "exempt": fig["exempt_cells"],
-           "jogs": fig["jogs"], "ford_cuts": fig["ford_cuts"], "shares": fig["shares_pct_of_land"],
-           "regions": fig["coast_index_by_region"]}
-    bad = {k: (got[k], v) for k, v in want.items() if got[k] != v}
-    assert not bad and all(v["ok"] for v in fig["checks"].values()), bad
-    return f"preset B: NW-0's figures reproduced (land {r['land']}, index {r['G2_index']}, jogs {fig['jogs']}), " \
-           f"every check OK"
+    from world_api_v2 import EXEMPT_CAP, G2_MIN, LAND_TARGET
+    r, r32 = fig["gates"], fig["gates_rev32"]
+    lo, hi = LAND_TARGET
+    want = {"G1 (no non-exempt coast run over 6)": r32["G1_fail_runs_gt6"] == 0,
+            f"G2 (coast index >= {G2_MIN})": r32["G2_index"] >= G2_MIN,
+            "G3 (no chunk-line class run over 6)": r32["G3_fail_runs_gt6"] == 0 and r["G3_fail_runs_gt6"] == 0,
+            f"land in [{lo}, {hi}]": lo <= r32["land"] <= hi,
+            f"exempt <= {EXEMPT_CAP}": fig["exempt_cells"] <= EXEMPT_CAP, "no ford cut": fig["ford_cuts"] == 0}
+    bad = [k for k, v in want.items() if not v] + [k for k, v in fig["checks"].items() if not v["ok"]]
+    assert not bad, bad
+    return f"preset B: NW-0's gates hold on the merged world (land {r32['land']}, index {r32['G2_index']}, " \
+           f"longest coast run {r32['G1_longest_nonexempt']}, jogs {fig['jogs']}), every check OK"
 
 
 def main() -> int:
