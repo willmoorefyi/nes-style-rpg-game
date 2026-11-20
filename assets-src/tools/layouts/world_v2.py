@@ -24,6 +24,7 @@ sys.path.insert(1, str(HERE.parent))
 import numpy as np  # noqa: E402
 
 import world_checks_v2 as WC2  # noqa: E402
+import world_v2_content as RC  # noqa: E402
 import world_specs  # noqa: E402
 import world_v2_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
@@ -34,7 +35,7 @@ from worldgen import bundle, compose, gates, gates_reach, metrics, owners, prewa
 from worldgen import spec as S  # noqa: E402
 
 CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
-          "walks", "detours", "pins")
+          "walks", "detours", "pins", "coverage")
 
 
 def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
@@ -43,15 +44,19 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     b = bundle.merge(world_specs.load())
     door_off, ent_map = SRC.doors()
     g, meta = compose.compose(b, preset, seed, door_off, REGIONS, tuple(P.ENTRANCES))
+    rc = RC.merge(g, meta)                   # NW-R: each region's own content (it may stamp its own cells first)
     trans = SRC.transitions(b.sites)
     objs, insp = SRC.act1_content(meta["keep"])
+    objs, insp = objs + rc["objects"], insp + rc["inspect"]
     blocked = {(t["x"], t["y"]) for t in trans} | {(k["x"], k["y"]) for k in SRC.gates()}
     blocked |= {tuple(v) for v in meta["entrances"].values()}
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     sp, sp_err = spots.resolve(g, b.spots, b.sites, docks, blocked, SRC.covered(objs))
-    doc = SRC.document(g, meta, trans, objs, insp, sp)
-    doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)]} for i, r in enumerate(REGIONS)}
+    doc = SRC.document(g, meta, trans, objs, insp, sp, rc)
+    doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)],
+                          **({"checks": rc["checks"][r]} if r in rc["checks"] else {})} for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked)
+    ch["coverage"] = RC.coverage(g, meta, doc.get("encounterZones") or [], rc["zones_of"])
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
 
@@ -139,6 +144,8 @@ def _ok_note(k: str, v: dict) -> str:
         return " (walk, canoe; cuts " + ", ".join(f"{b} {len(c)}" for b, c in v["cuts"].items()) + ")"
     if k == "prewalk":
         return f" ({prewalk.STAGES[0]}-{prewalk.STAGES[-1]})"
+    if k == "coverage":
+        return f" ({', '.join(v['regions']) or 'no region'}; zones pending: {', '.join(v['pending']) or 'none'})"
     return ""
 
 
