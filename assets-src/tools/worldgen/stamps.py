@@ -7,7 +7,8 @@ routes, the canal, the docks and their coves, and the exemption list.
   CANAL_OPEN) and exempt.
 - A canoe-only site (`RegionSpec.ledges`, the waterfall; 4.1) is a ledge: its entrance and door cells sand, joined
   to its nearest pinned route cell by river, and every other cell within LEDGE_R rock, so the ledge touches only
-  rock and river (NW-4; today's world draws it so).
+  rock and river (NW-4; today's world draws it so); a grass cell on the route's bank within 8 steps when no
+  grass is that near (the airship's landing).
 - A dock's cell is Water with one grass cell toward its town; its cove opens the water away from the town (at most 8
   cells) until the basin's forced sea. Every dock cell is exempt.
 """
@@ -21,6 +22,7 @@ from .geom import disc
 
 CLEAR_R = 1.6                                # a site's grass clearing
 LEDGE_R = 2                                  # a ledge's rock ring (Chebyshev cells round its entrance)
+LANDING_STEPS = 8                            # ... and an airship landing within this many grid steps of it
 COVE_MAX = 8
 
 
@@ -64,6 +66,22 @@ def ledges(g: np.ndarray, b: RegionSpec, routes: dict, doors: dict) -> None:
             cx, cy = (cx + int(np.sign(rx - cx)), cy) if cx != rx else (cx, cy + int(np.sign(ry - cy)))
             g[cy, cx] = "r"
         g[y, x] = g[y + dy, x + dx] = "s"     # sand: walkable, and never an airship landing
+        _landing_by(g, x, y, on_route)
+
+
+def _landing_by(g: np.ndarray, x: int, y: int, on_route: set) -> None:
+    """A ledge needs an airship landing within LANDING_STEPS grid steps (the verifier's T6 rule): when no grass cell
+    is there, the nearest snow, sand or tundra cell on its route's bank outside the rock ring becomes grass (a bank
+    clearing; grass, not tundra, since the runtime reads tundra as landable only from NW-5, 2.6)."""
+    near = [(abs(xx - x) + abs(yy - y), yy, xx) for yy in range(y - LANDING_STEPS, y + LANDING_STEPS + 1)
+            for xx in range(x - LANDING_STEPS, x + LANDING_STEPS + 1)
+            if abs(xx - x) + abs(yy - y) <= LANDING_STEPS and max(abs(xx - x), abs(yy - y)) > LEDGE_R]
+    if any(g[yy, xx] == "." for _d, yy, xx in near):
+        return
+    bank = [c for c in sorted(near) if g[c[1], c[2]] in "nst"
+            and any((c[2] + ax, c[1] + ay) in on_route for ax, ay in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    if bank:
+        g[bank[0][1], bank[0][2]] = "."
 
 
 def canal_cells(b: RegionSpec) -> list[tuple[int, int]]:

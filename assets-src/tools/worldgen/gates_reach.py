@@ -12,7 +12,8 @@ foot and by canoe with their minimal cuts (`world.cuts`), north isolation, airsh
   cells, and no dock touches one.
 - **routes**: `gates.routes` plus the ledge rule (a canoe-only site is reached only by its route's river).
 - **landings** (all on): every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance,
-  transition, gate or NPC) within 8 walking steps (a ledge's by canoe), and every `landing` spot is such a cell.
+  transition, gate or NPC) within 8 grid steps (the verifier's T6 rule), and every `landing` spot is such a
+  cell.
 """
 from __future__ import annotations
 
@@ -170,14 +171,14 @@ def north(g, meta, north_regions: tuple[str, ...]) -> dict:
 def landings(g, meta, anchors: tuple[str, ...], spots: dict | None = None, taken: set | None = None) -> dict:
     """`taken`: the cells no airship may land on (entrances, transitions, gates, NPCs)."""
     h = with_patches(g, meta)
-    w = walk(h)
     taken = set(taken or ()) | {tuple(v) for v in meta["entrances"].values()}
     land = np.isin(h, LANDING)
     res, why = {}, []
-    boat = canoe(h)                          # a ledge (canoe-only site) counts its steps by canoe
-    for e in anchors:
-        d = bfs_dist(boat if e in (meta.get("ledges") or []) else w, [tuple(meta["entrances"][e])])
-        near = [c for c in mask_cells(land & (d >= 0) & (d <= LANDING_STEPS)) if c not in taken]
+    yy, xx = np.mgrid[0:g.shape[0], 0:g.shape[1]]
+    for e in anchors:                        # the verifier's T6 rule (questTravel.landingNear): grid steps
+        ex, ey = meta["entrances"][e]
+        d = np.abs(xx - ex) + np.abs(yy - ey)
+        near = [c for c in mask_cells(land & (d <= LANDING_STEPS)) if c not in taken]
         res[e] = bool(near)
         if not near:
             why.append(f"anchor {e} {cells(meta, [meta['entrances'][e]])}: no landing cell within "
