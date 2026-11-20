@@ -36,7 +36,7 @@ ground: |
   oo..ssssssssssss...ffffff..mmmmrrmmmmmmmmmmmmmmmmmmmoommooooooooooommmmmmmmmmmmmmm......mm....mmooooooooooooooooooooooooooooooooooooommmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmfff.....mmmoooooooooooo
   oo.ssssssssssssss...ff.....mmmmrrmmmmmmmmmmmmmmmmmmmoooooooooooooommmmmmmmmmmmmmmm.....mmm....mmoooooooooooooooooooooooooooooooooooooommmmmssssssssssmmmmmmmmmmmmmmmmmmm.fff.....mmmoooooooooooo
   oo.ssssmmmmssssss...........mmmrrmmmmmmmmmmmmmmmmmmmoooooooooooooommmmmmmmmmmmmmmm....mmm.....mmoooooooooooooooooooooooooooooooooooooommmsssssssssssssmmmmmmmmmmmmmmmmmm.fff.....mmmoooooooooooo
-  ooossssmmmmssssss...........mmmrrmmmmmmmmmmmmmmmmmmmoooooooooooooomm.....mmmm.........mm......mmoooooooooooooooooooooooooooooooooooooomssssssssssssssssmmmmmmmmmmmmmmmmm..f........mmmmmmooooooo
+  ooossssmmmmssssss...........mmmrrmmmmmmmmmmmmmmmmmmmoooooooooooooomm.....m...m........mm......mmoooooooooooooooooooooooooooooooooooooomssssssssssssssssmmmmmmmmmmmmmmmmm..f........mmmmmmooooooo
   oooosssssss...sss...........mmmrrmmmmmmmmmmmmmmmmmmmoooooooooooooomm..................mm......mmooooooooooooooooooooooooooooooooooooosssssmmssssssssssssmmmmmmmmmmmmmmmm............mmmmmmoooooo
   oooossss,s....sss..............rrmmmmmmmmmmmmmmmmmmmmooooooooooooomm.................mmm......mmooooooooooooooooooooooooooooooooooooosssssmmsssss≈≈≈≈sssmmmmmmmmmmmmmmmm....ffffff...mmmmmmooooo
   oooossss,,,,...ss....mm........rrrmmmmmmmmmmmmmmmmmmmooooooooooooomm.................mm.......mmoooooooooooooooooooooooooooooooooooossssssmmsssss≈≈≈≈sssmmmmmmmmmmmmmmmmm...ffffff....mmmmmooooo
@@ -132,7 +132,7 @@ ground: |
   oooooooooooooo...........mmmmsssssssssoooooooooooo............oooooooooommm...ffff...r..oooo=ooooooo......rr..ssoooooooo....ff.ooooooooommmmmmooooo........≈≈≈≈≈≈≈≈≈≈≈≈..fffffffff........oooooo
   oooooooooooooo...........mmmssssssssssssoooooooooo............oooooooooommm..fff.....ooooooo=oooooooooooooo...soooooooo......moooooooooommmmmmooooo........≈≈≈≈≈≈≈≈≈≈≈≈....ffffffff.......oooooo
   ooooooooooooo...f.f......mmmmmmmmmssssssooooooooooos.....mm..ooooooooooomm.ffffff...ooooooooooooooooooooooo....oooooooo.....mmooooooooooommmmmooooo........≈≈≈≈≈≈≈≈≈≈≈......fffffff.......oooooo
-  oooooooooooo...ffff......mmmmmmmmmssssssooooooooooos.....mm..oooooooooommmfffffffff.ooooooooooooooooooooooo...ooooooooo.....mmooooooooooommmmmooooo........≈≈≈≈≈≈≈≈≈≈≈......fffffff.......oooooo
+  oooooooooooo...ffff......mmmmmmmmmssssssooooooooooos.....mmmmoooooooooommmfffffffff.ooooooooooooooooooooooo...ooooooooo.....mmooooooooooommmmmooooo........≈≈≈≈≈≈≈≈≈≈≈......fffffff.......oooooo
   oooooooooooo....fff.....mmmmmmmmmmssssssooooooooooos.....mmmmooooooooo..mffffffffff.ooooooooooooooooooooooooooooooooooo.....moooooooooooommmmmooooo........≈≈≈≈mm≈≈≈≈≈.......fffff........oooooo
   ooooooooooo....fffff.....mmmmmmmssssmmmsooooooooooos.........ooooooooo...fffffffffff.oooooooooooooooooooooooooooooooooo.....moooooooooooommmmmooooo.......≈≈≈≈≈mm≈≈≈≈≈.......fffff.........ooooo
   oooooooooo.....fffff....mmmmmmsmssssmmmmoooooooooooo........,.oooooooo....fffffffffff.oooooooooooooooooooooooooooooooooo....ooooooooooooommmmmooooo........≈≈≈≈≈≈≈≈≈≈≈........fff..........ooooo
@@ -365,13 +365,14 @@ objects:
 - type: deco
   name: western_keep
   x: 59
-  y: 123
-  style: slate
+  y: 122
   parts:
-  - [castle_icon_0_0, castle_icon_0_1]
-  - [castle_icon_1_0, castle_icon_1_1]
+  - [western_keep_icon_0_0, western_keep_icon_0_1]
+  - [western_keep_icon_1_0, western_keep_icon_1_1]
+  - [western_keep_icon_2_0, western_keep_icon_2_1]
   walk_cells:
-  - [1, 1]
+  - [1, 2]
+  collide: alpha
 - type: deco
   x: 57
   y: 121
@@ -671,13 +672,14 @@ objects:
 - type: deco
   name: citadel
   parts:
-  - [castle_icon_0_0, castle_icon_0_1]
-  - [castle_icon_1_0, castle_icon_1_1]
+  - [citadel_icon_0_0, citadel_icon_0_1, citadel_icon_0_2]
+  - [citadel_icon_1_0, citadel_icon_1_1, citadel_icon_1_2]
+  - [citadel_icon_2_0, citadel_icon_2_1, citadel_icon_2_2]
   x: 74
-  y: 26
-  style: stone
+  y: 25
   walk_cells:
-  - [1, 1]
+  - [1, 2]
+  collide: alpha
 - type: deco
   parts:
   - [tpillar_broken_top]
@@ -688,7 +690,7 @@ objects:
   parts:
   - [tpillar_broken_top]
   - [tpillar_broken_bottom]
-  x: 76
+  x: 77
   y: 26
 - type: deco
   name: cave_mouth
@@ -3006,7 +3008,8 @@ encounterZones:
   - [82, 25, 85, 25]
   - [89, 25, 93, 25]
   - [68, 26, 72, 26]
-  - [77, 26, 85, 26]
+  - [74, 26, 76, 26]
+  - [78, 26, 85, 26]
   - [88, 26, 93, 26]
   - [68, 27, 85, 27]
   - [88, 27, 93, 27]

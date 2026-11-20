@@ -1,6 +1,6 @@
-"""Re-cut the approved Bedrock landmark icons (passes LM / LM2, and LM4) from the render cache into the kit sheets.
+"""Re-cut the approved Bedrock landmark icons (passes LM / LM2, LM4 and LM5) from the render cache into the kit sheets.
 
-    python3 -I assets-src/gen/landmark_cut.py            # write approved/overworld/landmarks_lm{,4}.{png,json}
+    python3 -I assets-src/gen/landmark_cut.py            # write approved/overworld/landmarks_lm{,4,5}.{png,json}
     python3 -I assets-src/gen/landmark_cut.py --check    # rebuild in memory, exit 1 if a committed sheet differs
     python3 -I assets-src/gen/landmark_cut.py --native DIR   # also write each icon at native size into DIR
 
@@ -9,7 +9,8 @@ assets-src/gen/cache/<key>.png; a missing key is an error. Model, seed and pass 
 The cells are named <name>_icon_<r>_<c> (48 px), the names kit.LANDMARKS gives them; kit.load_kit puts them over
 the code-drawn placeholders in every kit. The cut is deterministic (seeded k-means, no hash order).
 Two sheets: `landmarks_lm` (SPEC, the LM / LM2 picks, LM-INT) and `landmarks_lm4` (SPEC4, the LM4 picks, LM4-INT:
-the town icons, the unique boats and the landmarks). LM4's Melmond and Onrac icons replace LM's 2x1 ones (the LM
+the town icons, the unique boats and the landmarks), and `landmarks_lm5` (SPEC5, LM5-INT: the Western Keep and the
+Citadel of Trials). LM4's Melmond and Onrac icons replace LM's 2x1 ones (the LM
 renders stay in the cache: `town_melmond_ultra_a_2` a915ca48f390b339f9406ba1 and `town_onrac_ultra_a_2`
 02b2da0c62a0affb86d1ef6c, both cut {"rim": 4}, {"fill": 0.9}).
 """
@@ -81,7 +82,24 @@ SPEC4 = {
                         None),
     "hermit_hut": ("hermit_hut_ultra_a_3", "a6c7cb7e75cc2b60f63cf20e", (2, 2), False, R4, {"apron": 0.15}, None),
 }
+OUT5 = HERE / "approved" / "overworld" / "landmarks_lm5"
+APPROVED5 = "2026-11-19"
+# LM5 (the user's picks, 2026-11-19): the Western Keep re-cut on a solid rock plinth (LM5-INT), the Citadel of Trials
+# as LM5 reviewed it
+SPEC5 = {
+    "western_keep": ("western_keep_ultra_a_3", "225fa61b7ed0c64c9476ea2b", (2, 3), False,
+                     {"rim": 4, "oval": [0.52, 0.42, 0.44, 0.16], "oval_top": 0.45, "solid_y": 0.45},
+                     {"apron": 0.3}, None),
+    "citadel": ("citadel_ultra_a_2", "2228347213a6e8586d02598e", (3, 3), False, R4, {"fill": 0.97, "apron": 0.1},
+                None),
+}
 NOTES = {
+    "western_keep": "LM5-INT: re-cut (user ruling 2026-11-19: LM5's cut left ragged stair rocks floating on the grass): "
+                    "the cliff the keep stands on is kept down to a wide, flat oval below the stair foot (oval from "
+                    "oval_top), closed and with its holes filled (solid_y), so the keep sits on one solid rock plinth; "
+                    "no outline round the bottom 30 % (apron), so the plinth melts into the ground; the oval also "
+                    "cuts the painted sea below the cliff",
+    "citadel": "LM5: approved as LM5 reviewed it (rim 4; fill 0.97, apron 0.1)",
     "volcano": "LM-INT: the grey smoke over the crater is cut (smoke_y); the engine draws it (ambient smoke)",
     "windmill": "LM-INT: re-cut with its grass, path and bushes base, kept solid (soft_y alpha > soft_alpha, closed, "
                 "holes filled); no outline round the bottom apron",
@@ -171,7 +189,10 @@ NOTE4 = ("LM4-INT: the user's picks of pass LM4 (Stability Ultra renders, the fi
          "offline from the render cache: the town icons of Melmond, Onrac, Pravoka, Elfheim, Crescent and Gaia, "
          "Lufenia's icon, the brig, submarine and fishing boat, and the bell tower, lighthouse, Mirage Tower, "
          "standing stones and hermit's hut")
-SHEETS = {"landmarks_lm": (OUT, SPEC, APPROVED, None), "landmarks_lm4": (OUT4, SPEC4, APPROVED4, NOTE4)}
+NOTE5 = ("LM5-INT: the user's picks of pass LM5 (Stability Ultra renders), re-cut offline from the render cache: the "
+         "Western Keep (on a solid rock plinth) and the Citadel of Trials; before, both were the shared castle icon")
+SHEETS = {"landmarks_lm": (OUT, SPEC, APPROVED, None), "landmarks_lm4": (OUT4, SPEC4, APPROVED4, NOTE4),
+          "landmarks_lm5": (OUT5, SPEC5, APPROVED5, NOTE5)}
 
 
 def _png_bytes(im: Image.Image) -> bytes:

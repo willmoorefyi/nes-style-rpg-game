@@ -1,0 +1,146 @@
+{
+  "kit": "overworld",
+  "sheet": "landmarks_lm5",
+  "backend": "bedrock",
+  "tool": "assets-src/gen/landmark_cut.py",
+  "approved": "2026-11-19",
+  "tile": 48,
+  "cells": [
+    [
+      "western_keep_icon_0_0",
+      "western_keep_icon_0_1",
+      "citadel_icon_0_0",
+      "citadel_icon_0_1",
+      "citadel_icon_0_2",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "western_keep_icon_1_0",
+      "western_keep_icon_1_1",
+      "citadel_icon_1_0",
+      "citadel_icon_1_1",
+      "citadel_icon_1_2",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "western_keep_icon_2_0",
+      "western_keep_icon_2_1",
+      "citadel_icon_2_0",
+      "citadel_icon_2_1",
+      "citadel_icon_2_2",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "landmarks": {
+    "western_keep": {
+      "tag": "western_keep_ultra_a_3",
+      "cache_key": "225fa61b7ed0c64c9476ea2b",
+      "cells": [
+        2,
+        3
+      ],
+      "model": "ultra",
+      "seed": 3,
+      "pass": "LM5",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4,
+        "oval": [
+          0.52,
+          0.42,
+          0.44,
+          0.16
+        ],
+        "oval_top": 0.45,
+        "solid_y": 0.45
+      },
+      "pixelize": {
+        "fill": 0.92,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.3
+      },
+      "post": null,
+      "fig_px": [
+        88,
+        110
+      ],
+      "approved": "2026-11-19",
+      "note": "LM5-INT: re-cut (user ruling 2026-11-19: LM5's cut left ragged stair rocks floating on the grass): the cliff the keep stands on is kept down to a wide, flat oval below the stair foot (oval from oval_top), closed and with its holes filled (solid_y), so the keep sits on one solid rock plinth; no outline round the bottom 30 % (apron), so the plinth melts into the ground; the oval also cuts the painted sea below the cliff",
+      "at": [
+        0,
+        0
+      ]
+    },
+    "citadel": {
+      "tag": "citadel_ultra_a_2",
+      "cache_key": "2228347213a6e8586d02598e",
+      "cells": [
+        3,
+        3
+      ],
+      "model": "ultra",
+      "seed": 2,
+      "pass": "LM5",
+      "cut": {
+        "mode": "flood",
+        "tol": 28,
+        "rim": 4
+      },
+      "pixelize": {
+        "fill": 0.97,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.1
+      },
+      "post": null,
+      "fig_px": [
+        140,
+        136
+      ],
+      "approved": "2026-11-19",
+      "note": "LM5: approved as LM5 reviewed it (rim 4; fill 0.97, apron 0.1)",
+      "at": [
+        0,
+        2
+      ]
+    }
+  },
+  "note": "LM5-INT: the user's picks of pass LM5 (Stability Ultra renders), re-cut offline from the render cache: the Western Keep (on a solid rock plinth) and the Citadel of Trials; before, both were the shared castle icon"
+}

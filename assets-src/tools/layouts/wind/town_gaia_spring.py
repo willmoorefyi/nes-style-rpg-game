@@ -82,7 +82,7 @@ def npcs() -> list[dict]:
                       "Its fairy lived in the water. A year ago a trader's caravan came through, all bright glass, "
                       "and she followed the shine.", "The caravan went west, to the desert. If you ever see a bottle "
                       "with a light inside it, bring it here."])},
-        {"id": "gaia_fairy", "sprite": "white_mage", "x": 12, "y": 9, "showIf": FREED, "tint": "#a8f0ff",
+        {"id": "gaia_fairy", "sprite": "fairy", "x": 12, "y": 9, "showIf": FREED,     # LM5-INT: her own sheet
          "dialog": ["Mm? Oh, it's you. I'm still getting the glass out of my wings.",
                     "Remember: one drink of the Oxyale, and the sea lets you breathe as long as you keep moving. "
                     "Onrac's divers will know where the sunken shrine lies."]},

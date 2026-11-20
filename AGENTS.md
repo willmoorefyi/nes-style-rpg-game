@@ -350,11 +350,12 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `--json FILE`. The search stops at `MAX_STATES` = 1,000,000 (`questSearch.ts`). A full `--mutate` run takes about half
   an hour and a few GB: run it in the background, and only when world or quest data changed. Its test,
   `tests/progression/questMutateWorld.test.ts`, is the heavy tier (`npm run test:world`, "Test tiers" under Testing).
-- **Landmark art (LM-INT, LM4-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from two sheets
-  (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2) and `landmarks_lm4.*`
-  (pass LM4); cells `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache key, model, seed, pass and the cut
-  and pixelize settings. Both are re-cut offline from the render cache by `python3 -I assets-src/gen/landmark_cut.py`
-  (`SPEC` / `SPEC4`; `--check`: both committed sheets rebuild; `landmark_pix.py` holds the cutter, with LM4-INT's
+- **Landmark art (LM-INT, LM4-INT, LM5-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from three
+  sheets (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2),
+  `landmarks_lm4.*` (pass LM4) and `landmarks_lm5.*` (pass LM5: the Western Keep and the Citadel of Trials); cells
+  `<name>_icon_<r>_<c>`, 48 px; per landmark the render's cache key, model, seed, pass and the cut and pixelize
+  settings. All are re-cut offline from the render cache by `python3 -I assets-src/gen/landmark_cut.py`
+  (`SPEC` / `SPEC4` / `SPEC5`; `--check`: every committed sheet rebuilds; `landmark_pix.py` holds the cutter, with LM4-INT's
   `sea_y` (the painted sea round a town's walls) and `drop` (fractional rects cut away, Pravoka's pier), and WL's
   `oval` / `oval_top` (the ground outside an ellipse round a walled town, below a row, is cut away: Melmond's and
   Crescent's renders run their ground off the frame, which left the icons flat-cut; `tests/data/wlArtFixes.test.ts`
@@ -373,7 +374,7 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   WL dropped the two windmill decos beside Gaia's icon (it draws its own windmill); a `tree_clump` deco
   `gaia_door_west` (149, 13) blocks the door's west side.
   The generic `town_icon` is no longer placed anywhere, and `buried_hull` is only FIRE's airship hull. Recolours
-  kept: tower `slate` (the Western Keep), tent `dune` (the caravan camp), windmill `stone` (Melmond), cave_mouth
+  kept: tower `slate` (the watchtower beside the Western Keep), tent `dune` (the caravan camp), windmill `stone` (Melmond), cave_mouth
   `snow` (the Ice Cavern); LM4-INT dropped tower `bright` / `stone`, buried_hull `slate`, shrine `pale_stone`, the
   hermit's tent `dune` and Elfheim's `elf` roofs (each item has its own art now). The approved icons leave their top
   rows mostly sky, so tall landmarks use `collide: alpha` (the overworld's `art_coverage` check fails on a blocked
@@ -406,7 +407,23 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   reports the state, history, shadowCell, marker, GL string and the steady-flight p95s. Rules are unchanged: scene tests
   `tests/scenes/mode7/mode7Parity.test.ts`, `mode7Activation.test.ts` (harness `flightHarness.ts`, which `vi.mock`s
   `FlightRenderer.js`).
-- Still placeholder: the fairy and the mermaids are tinted NPC sheets.
+- **LM5-INT.** A third sheet `landmarks_lm5.*` (SPEC5, pass LM5): `western_keep` 2x3 at (59, 122) (door (60, 124),
+  the stair foot at the bottom right; anchor `elf_keep` (60, 125); its top two rows on the watchtower's rock `m`, the
+  moat at x 61) and `citadel` 3x3 at (74, 25) (door (75, 27) bottom centre; anchor `ord_citadel` (75, 28); the broken
+  pillars at (73, 26) and (77, 26); its top row on the crag, rows 26-27 grass), both `collide: alpha`; the shared
+  `castle_icon` is no longer placed on the world map. The keep is re-cut on a solid rock plinth: `landmark_pix`'s
+  `solid_y` (below that row the figure is closed and its holes filled, then cut to the `oval` again), with a wide flat
+  oval under the stair foot and `apron` 0.3. The NPC field sheets `approved/fairy/field.*` and
+  `approved/mermaid/field.*` are LM5 Bedrock control-structure renders re-cut offline by
+  `python3 -I assets-src/gen/npc_field_cut.py` (`--check`; LM5's sheetcut, then the post steps: the fairy pixelized
+  at 2/3 scale, about 62 of a hero's 90 px, the down row's step_right = its step_left mirrored; the mermaid's back row
+  remapped onto the front rows' teal ramp by nearest value); both walk with the default puppet boxes (no
+  `gen/anim/<id>.yaml`: that directory is the hero classes', and the kneel tools read every file in it). The gen
+  selftests check a `backend: bedrock` (or vehicle) approved json against the BR ledger
+  instead of re-planning a Gemini request. Field previews: `?mute=1&scenario=w_lm5_keep | w_lm5_citadel | w_lm5_fairy
+  | w_lm5_mermaids`.
+- No placeholder NPCs left: the fairy (`sprite: fairy`, Gaia's spring) and the sea-shrine mermaids (`sprite:
+  mermaid`, all four on `sea-shrine-b1`, the elder included) have their own sheets, untinted.
 
 ### New Cutscene
 

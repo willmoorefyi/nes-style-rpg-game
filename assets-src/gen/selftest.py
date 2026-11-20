@@ -254,6 +254,11 @@ def test_style_lock() -> None:
             check(SRo.revived_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: revived from "
                                                    f"{meta['revived_from']}, cache/{meta['cache_key']} present")
             continue
+        if meta.get("backend") == "bedrock" or meta.get("vehicle"):   # LM-INT .. LM5-INT: Stability renders re-cut offline
+            from gen import selftest_roster as SRo
+            check(SRo.bedrock_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: Bedrock keys "
+                                                   f"{SRo.bedrock_keys(meta)} BR-ledgered and cached")
+            continue
         char = GEN.load_character(meta["character"])
         req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
         check(req.key == meta["cache_key"] and req.cached,

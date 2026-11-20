@@ -42,8 +42,7 @@ npcs:
   chestFlag: CHEST_WAT_D_B1_EAST
   dialog: [You found a Diamond Helm!]
 - id: wat_d_elder
-  sprite: princess
-  tint: '#5fb8b0'
+  sprite: mermaid
   x: 16
   y: 11
   dialog:
@@ -52,8 +51,7 @@ npcs:
   - text: ['Elder Maraleth: You climbed past the brothers and their garden. Then you have come for the king.', 'He is not cruel. He is sure. When the storm came he chose to sink us all rather than lose
         one of us, and the sea folk have lived in his choice ever since.', 'He wears the sky folk''s tablet on his breast. It was given to this shrine to keep, not to him.']
 - id: wat_d_tide_hint
-  sprite: villager_f
-  tint: '#5fb8b0'
+  sprite: mermaid
   x: 10
   y: 17
   dialog:
@@ -62,8 +60,7 @@ npcs:
   - text: ['Coralie: The halls under the nave are flooded two ways. The long way round is wet; the library way is dry, but the dead read there.', Either stair at the bottom takes you to the throne. He waits
         north of where you come up.]
 - id: wat_d_storm_hint
-  sprite: villager_f
-  tint: '#5fb8b0'
+  sprite: mermaid
   x: 25
   y: 12
   dialog:
@@ -72,8 +69,7 @@ npcs:
   - text: ['Nerissa: When the king strikes, he strikes with the whole tide behind him. Do not trade blows with him for long.', He was a king of calm water. Lightning was the one thing his sea never learned
         to swallow.]
 - id: wat_d_singer
-  sprite: villager_f
-  tint: '#5fb8b0'
+  sprite: mermaid
   x: 21
   y: 5
   dialog:

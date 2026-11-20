@@ -100,11 +100,10 @@ npcs:
         trader''s caravan came through, all bright glass, and she followed the shine.', 'The caravan went west, to the desert. If you ever see
         a bottle with a light inside it, bring it here.']
 - id: gaia_fairy
-  sprite: white_mage
+  sprite: fairy
   x: 12
   y: 9
   showIf: FAIRY_FREED
-  tint: '#a8f0ff'
   dialog: ['Mm? Oh, it''s you. I''m still getting the glass out of my wings.', 'Remember: one drink of the Oxyale, and the sea lets you breathe
       as long as you keep moving. Onrac''s divers will know where the sunken shrine lies.']
 - id: gaia_spring_novice

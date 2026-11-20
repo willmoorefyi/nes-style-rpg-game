@@ -2605,3 +2605,48 @@
   items: {}
   gold: 100
   enemies: []
+# LM5-INT: the new art in the field (?mute=1&scenario=w_lm5_*; `w_` ids are world scenarios): the Western Keep's door,
+# the Citadel's gate, the freed fairy at Gaia's spring (FAIRY_FREED) and the sea-shrine mermaids
+- id: w_lm5_keep
+  name: LM5 - the Western Keep's door (overworld)
+  mode: field
+  map: overworld
+  entrance: elf_keep
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 10, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_lm5_citadel
+  name: LM5 - the Citadel of Trials' gate (overworld)
+  mode: field
+  map: overworld
+  entrance: ord_citadel
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 24, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_lm5_fairy
+  name: LM5 - the freed fairy at Gaia's spring
+  mode: field
+  map: gaia-spring
+  spawn: [15, 8]
+  flags: [FAIRY_FREED]
+  party:
+    - { class: warrior, name: WAR, level: 24, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_lm5_mermaids
+  name: LM5 - the mermaids of the sea shrine's grotto (sea-shrine-b1)
+  mode: field
+  map: sea-shrine-b1
+  spawn: [17, 12]
+  party:
+    - { class: warrior, name: WAR, level: 28, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
