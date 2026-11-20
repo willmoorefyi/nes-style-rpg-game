@@ -407,8 +407,9 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   `approved/mermaid/field.*` are LM5 Bedrock control-structure renders re-cut offline by
   `python3 -I assets-src/gen/npc_field_cut.py` (`--check`; LM5's sheetcut, then the post steps: the fairy pixelized
   at 2/3 scale, about 62 of a hero's 90 px, the down row's step_right = its step_left mirrored; the mermaid's back row
-  remapped onto the front rows' teal ramp by nearest value); `gen/anim/mermaid.yaml` skips the puppet walk boxes (a
-  tail has no feet). The gen selftests check a `backend: bedrock` (or vehicle) approved json against the BR ledger
+  remapped onto the front rows' teal ramp by nearest value); both walk with the default puppet boxes (no
+  `gen/anim/<id>.yaml`: that directory is the hero classes', and the kneel tools read every file in it). The gen
+  selftests check a `backend: bedrock` (or vehicle) approved json against the BR ledger
   instead of re-planning a Gemini request. Field previews: `?mute=1&scenario=w_lm5_keep | w_lm5_citadel | w_lm5_fairy
   | w_lm5_mermaids`.
 - No placeholder NPCs left: the fairy (`sprite: fairy`, Gaia's spring) and the sea-shrine mermaids (`sprite:

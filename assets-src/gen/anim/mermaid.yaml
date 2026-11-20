@@ -1,6 +1,0 @@
-# LM5-INT: the mermaid's field walk (puppet.walk_row). A tail has no feet: the default foot boxes would lift and
-# shift halves of the fin, so every direction just alternates its three drawn frames (stand, step L, step R).
-field:
-  down: {skip: true}
-  up: {skip: true}
-  side: {skip: true}
