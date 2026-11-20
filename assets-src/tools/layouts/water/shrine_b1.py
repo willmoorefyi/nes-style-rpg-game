@@ -18,8 +18,9 @@ from shrine_common import NOTE, Floor, chest, talk  # noqa: E402
 W, H = 34, 26
 
 
-def mermaid(nid: str, x: int, y: int, before: list[str], after: list[str], sprite: str = "mermaid") -> dict:
-    return {"id": f"wat_d_{nid}", "sprite": sprite, "x": x, "y": y, "dialog": talk(before, after)}   # LM5-INT: own sheet
+def mermaid(nid: str, x: int, y: int, before: list[str], after: list[str]) -> dict:
+    """One of the sea folk: the approved mermaid field sheet (LM5-INT; before, villager_f / princess tinted #5fb8b0)."""
+    return {"id": f"wat_d_{nid}", "sprite": "mermaid", "x": x, "y": y, "dialog": talk(before, after)}
 
 
 def build() -> Floor:
@@ -51,7 +52,7 @@ def build() -> Floor:
             "and the sea folk have lived in his choice ever since.",
             "He wears the sky folk's tablet on his breast. It was given to this shrine to keep, not to him."], [
             "Elder Maraleth: The water is lower in the lagoon this morning. I can see the old steps.",
-            "Take the tablet to someone who can read it. We never could; we only kept it."], sprite="princess"),
+            "Take the tablet to someone who can read it. We never could; we only kept it."]),
         mermaid("tide_hint", 10, 17, [
             "Coralie: The halls under the nave are flooded two ways. The long way round is wet; the library way is "
             "dry, but the dead read there.",

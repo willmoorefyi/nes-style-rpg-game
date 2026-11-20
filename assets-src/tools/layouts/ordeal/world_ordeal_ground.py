@@ -144,7 +144,8 @@ def ground(mine: np.ndarray) -> tuple[np.ndarray, dict[str, set[Cell]]]:
     g[my0:my1 + 1, mx0:mx1 + 1] = np.where(plateau[my0:my1 + 1, mx0:mx1 + 1], ".", g[my0:my1 + 1, mx0:mx1 + 1])
     x, y = CITADEL
     g[y, x - 1:x + 4], g[y + 1:y + 3, x - 1:x + 4] = "m", "."   # the icon's top row stands against the crag, its
-    # body, gate and the two broken pillars (x - 1, x + 3) on the meadow's grass
+    # body and gate on the meadow's grass; the two broken pillars (x - 1, x + 3) stand with their tops on the crag
+    g[y + 1, x - 1], g[y + 1, x + 3] = "m", "m"
     # the isles: a crag on each, wood on the larger ones, Bahamut's landing patch before the cave
     for i, (k, m) in enumerate(isles.items()):
         nn = n2 if i % 2 else n3

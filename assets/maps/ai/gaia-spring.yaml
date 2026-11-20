@@ -28,17 +28,16 @@ npcs:
   tint: '#d8e8c8'
   dialog:
   - condition: FAIRY_FREED
-    text: [Forty years I sat by a dry stone. Now I'll sit by a wet one and complain about the splashing., 'She gave you her breath of the spring, didn''t she? Drink it under the sea and you''ll breathe.']
+    text: [A whole year I sat by a dry stone. Now I'll sit by a wet one and complain about the splashing., 'She gave you her breath of the spring, didn''t she? Drink it under the sea and you''ll breathe.']
   - condition: item:fairy_bottle
     text: [That bottle... the light in it is pressing against the glass towards the basin. It knows home., 'Unstop it over the spring, quickly, before it breaks its own heart.']
   - text: [I am the warden of the spring. It ran from that stone for longer than Gaia has stood., 'Its fairy lived in the water. A year ago a trader''s caravan came through, all bright glass, and she followed
         the shine.', 'The caravan went west, to the desert. If you ever see a bottle with a light inside it, bring it here.']
 - id: gaia_fairy
-  sprite: white_mage
+  sprite: fairy
   x: 12
   y: 9
   showIf: FAIRY_FREED
-  tint: '#a8f0ff'
   dialog: ['Mm? Oh, it''s you. I''m still getting the glass out of my wings.', 'Remember: one drink of the Oxyale, and the sea lets you breathe as long as you keep moving. Onrac''s divers will know where
       the sunken shrine lies.']
 - id: gaia_spring_novice
@@ -62,8 +61,8 @@ inspect:
   y: 4
   text:
   - condition: FAIRY_FREED
-    text: [Water wells up over the stone's cupped hands and runs singing into the basin.]
-  - text: ['The spring-stone is a carved figure with cupped hands, worn smooth where the water once spilled over them.', 'The stone is bone dry, and cold to the touch.']
+    text: [Water wells up at the armoured stone figure's feet and runs singing into the basin.]
+  - text: ['The spring-stone is a figure in stone armour, its feet worn smooth where the water once welled up.', 'The stone is bone dry, and cold to the touch.']
 - x: 7
   y: 4
   text:

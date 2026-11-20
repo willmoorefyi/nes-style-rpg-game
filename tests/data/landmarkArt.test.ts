@@ -15,6 +15,7 @@ interface Sheet { tile: number; cells: (string | null)[][]; landmarks: Record<st
 const read = (n: string) => JSON.parse(readFileSync(`assets-src/gen/approved/overworld/${n}.json`, 'utf-8')) as Sheet;
 const sheet = read('landmarks_lm');
 const sheet4 = read('landmarks_lm4');
+const sheet5 = read('landmarks_lm5');
 const ledger = readFileSync('assets-src/gen/cache/bedrock_ledger.jsonl', 'utf-8').trim().split('\n')
   .map((l) => JSON.parse(l) as { event: string; key?: string; pass?: string });
 const PICKS: Record<string, string> = {
@@ -64,7 +65,7 @@ describe('the approved landmark sheet', () => {
   });
 
   it('names every cell <name>_icon_<r>_<c> at its landmark\'s place, 48 px, no name in both sheets', () => {
-    for (const sh of [sheet, sheet4]) {
+    for (const sh of [sheet, sheet4, sheet5]) {
       expect(sh.tile).toBe(48);
       for (const [name, e] of Object.entries(sh.landmarks)) {
         const [w, h] = e.cells;
@@ -74,7 +75,7 @@ describe('the approved landmark sheet', () => {
         }
       }
     }
-    const named = [...sheet.cells.flat(), ...sheet4.cells.flat()].filter(Boolean);
+    const named = [...sheet.cells.flat(), ...sheet4.cells.flat(), ...sheet5.cells.flat()].filter(Boolean);
     expect(new Set(named).size).toBe(named.length);
   });
 });
@@ -120,6 +121,70 @@ describe('LM4-INT: the LM4 art at its sites', () => {
     expect([at(onrac, 'bell_tower')].map((o) => [o.x, o.y])).toEqual([[27, 17]]);
     for (const m of ['pravoka', 'onrac']) expect(uses(objs(m), 'buried_hull'), m).toEqual([]);
     expect(uses(world, 'buried_hull').map((o) => o.name)).toEqual(['buried_hull']);
+  });
+
+  it('LM5-INT: the keep and the citadel have their own icons, doors and anchors unchanged', () => {
+    expect(Object.fromEntries(Object.entries(sheet5.landmarks).map(([n, e]) => [n, [e.tag, ...e.cells]]))).toEqual({
+      western_keep: ['western_keep_ultra_a_3', 2, 3], citadel: ['citadel_ultra_a_2', 3, 3] });
+    for (const [name, e] of Object.entries(sheet5.landmarks)) {
+      const row = ledger.find((r) => r.event === 'request' && r.key === e.cache_key);
+      expect(row?.pass, `${name}: ${e.cache_key} an LM5 render`).toBe('LM5');
+      expect([e.pass, e.approved]).toEqual(['LM5', '2026-11-19']);
+    }
+    const one = (name: string) => {
+      const found = world.filter((o) => o.name === name);
+      expect(found, name).toHaveLength(1);
+      expect(found[0].style, `${name}: no recolour`).toBeUndefined();
+      return found[0];
+    };
+    const keep = one('western_keep'), citadel = one('citadel');
+    expect([keep.x, keep.y, keep.parts, door(keep)]).toEqual([59, 122, [
+      ['western_keep_icon_0_0', 'western_keep_icon_0_1'], ['western_keep_icon_1_0', 'western_keep_icon_1_1'],
+      ['western_keep_icon_2_0', 'western_keep_icon_2_1']], [[60, 124]]]);
+    expect([citadel.x, citadel.y, citadel.parts.length, citadel.parts[0].length, door(citadel)])
+      .toEqual([74, 25, 3, 3, [[75, 27]]]);
+    const pillars = world.filter((o) => (o.parts ?? []).flat().includes('tpillar_broken_top') && o.y === 26)
+      .map((o) => o.x).sort((a, b) => a - b);
+    expect(pillars, 'the citadel gate\'s broken pillars').toEqual([73, 77]);
+    expect(world.filter((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('castle_icon_'))), 'no shared castle icon')
+      .toEqual([]);
+    const compiled = parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')) as {
+      entrances: Record<string, [number, number]>; transitions: { x: number; y: number; targetMap: string }[] };
+    expect([compiled.entrances.elf_keep, compiled.entrances.ord_citadel]).toEqual([[60, 125], [75, 28]]);
+    const into = (m: string) => compiled.transitions.filter((t) => t.targetMap === m).map((t) => [t.x, t.y]);
+    expect([into('western-keep-1f'), into('citadel-1f')]).toEqual([[[60, 124]], [[75, 27]]]);
+  });
+});
+
+describe('LM5-INT: the fairy and the mermaids have their own field sheets', () => {
+  type Npc = { id: string; sprite: string; tint?: string };
+  const npcs = (m: string) => (parse(readFileSync(`assets-src/maps/${m}.yaml`, 'utf-8')) as { npcs: Npc[] }).npcs;
+  const meta = (id: string) => JSON.parse(readFileSync(`assets-src/gen/approved/${id}/field.json`, 'utf-8')) as {
+    backend: string; pass: string; approved: string; grid: number[]; bottom_row: number; figure_px: number[];
+    sources: { cache_key: string; pass: string }[] };
+
+  it('the approved sheets: LM5 renders re-cut offline, 48x96 cells with the feet on row 93', () => {
+    for (const id of ['fairy', 'mermaid']) {
+      const m = meta(id);
+      expect([m.backend, m.pass, m.approved, m.grid, m.bottom_row], id).toEqual(['bedrock', 'LM5', '2026-11-19', [48, 96], 93]);
+      for (const s of m.sources) {
+        expect(ledger.find((r) => r.event === 'request' && r.key === s.cache_key)?.pass, `${id} ${s.cache_key}`).toBe('LM5');
+      }
+    }
+    // the fairy at about 2/3 of a hero's 90 px; the mermaid at full size
+    for (const h of meta('fairy').figure_px) {
+      expect(h).toBeGreaterThanOrEqual(56);
+      expect(h).toBeLessThanOrEqual(66);
+    }
+    for (const h of meta('mermaid').figure_px) expect(h).toBeGreaterThanOrEqual(80);
+  });
+
+  it('the spring fairy and every sea-shrine mermaid use them, untinted', () => {
+    const fairy = npcs('gaia-spring').find((n) => n.id === 'gaia_fairy')!;
+    expect([fairy.sprite, fairy.tint]).toEqual(['fairy', undefined]);
+    const folk = npcs('sea-shrine-b1').filter((n) => n.id.startsWith('wat_d_'));
+    expect(folk.map((n) => n.id)).toEqual(['wat_d_elder', 'wat_d_tide_hint', 'wat_d_storm_hint', 'wat_d_singer']);
+    for (const n of folk) expect([n.sprite, n.tint], n.id).toEqual(['mermaid', undefined]);
   });
 });
 
