@@ -202,6 +202,7 @@ export class BattleScene implements Scene {
 
   update(dt: number): void {
     dt = this.devClock?.frameDt(dt) ?? dt;  // dev ?battleStep= / ?enemyAnim= / &slow=: before anything else
+    dt *= this.config.boosts?.speed ?? 1;   // the Battle speed boost: messages, waits and animations alike
     enemyAnimPreview.tick(this.display, this.battle.allEnemies.map(e => e.displayName), this.layers.hud, dt, this.devClock?.stepping);
     kneelPreview.tick(this.display, this.battle, this.layers.hud, dt);   // dev ?kneel= / &poseLabel=1 (docs/KNEEL_PLAN.md 8)
     this.messageText.update(dt);

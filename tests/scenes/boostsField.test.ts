@@ -1,0 +1,129 @@
+/**
+ * Pass CHT: the field boosts. Encounters Off rolls no random battle (scripted ones still start), x2 halves the steps
+ * between battles; Walk speed x2 halves the frames per tile, on foot and in a vehicle.
+ */
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { Texture } from 'pixi.js';
+import { ExplorationScene } from '../../src/scenes/ExplorationScene.js';
+import { EncounterSystem } from '../../src/systems/EncounterSystem.js';
+import { BattleTrigger } from '../../src/systems/BattleTrigger.js';
+import { PlayerController } from '../../src/entities/PlayerController.js';
+import { ShipMode } from '../../src/entities/ShipMode.js';
+import { CollisionMap } from '../../src/rendering/CollisionMap.js';
+import { InputManager } from '../../src/core/InputManager.js';
+import { EventBus } from '../../src/core/EventBus.js';
+import { TerrainType, type MapData } from '../../src/types/index.js';
+import type { Game } from '../../src/core/Game.js';
+import { createMockGame, createMapData } from '../helpers/testUtils.js';
+
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+async function fieldAt(map: MapData, x: number, y: number) {
+  vi.stubGlobal('localStorage', {
+    getItem: (k: string) => (k === 'ff1_controlsSeen' ? 'true' : null), setItem: () => {}, removeItem: () => {},
+  });
+  const game = { ...createMockGame(map), events: new EventBus() };
+  game.currentMapId = map.id;
+  game.playerPosition = { x, y };
+  const scene = new ExplorationScene(game as unknown as Game);
+  await scene.enter();
+  return { game, scene };
+}
+
+/** A field where every step is due a battle (rate 1). */
+const battleField = () => createMapData({ id: 'field', width: 10, height: 10, encounterRate: { min: 1, max: 1 },
+  encounters: [{ enemies: ['goblin'], weight: 1 }] });
+
+/** 100 steps on open cells (the scene syncs its rate first, as it does every field frame). */
+function walk100(game: { events: EventBus }, scene: ExplorationScene): void {
+  scene.update(1);
+  for (let i = 0; i < 100; i++) game.events.emit('playerMove', { x: 2 + (i % 5), y: 4 });
+}
+
+describe('the Encounters boost', () => {
+  it('Off: 100 steps on a field due a battle every step start no random battle', async () => {
+    const { game, scene } = await fieldAt(battleField(), 4, 4);
+    const battle = vi.spyOn(BattleTrigger.prototype, 'triggerBattle').mockResolvedValue(undefined);
+    game.boosts.encounters = 0;
+    walk100(game, scene);
+    expect(battle).not.toHaveBeenCalled();
+  });
+
+  it('x1 on the same field: the first step starts one (the control)', async () => {
+    const { game, scene } = await fieldAt(battleField(), 4, 4);
+    const battle = vi.spyOn(BattleTrigger.prototype, 'triggerBattle').mockResolvedValue(undefined);
+    scene.update(1);
+    game.events.emit('playerMove', { x: 3, y: 4 });
+    expect(battle).toHaveBeenCalledTimes(1);
+  });
+
+  it('Off still starts a scripted (story / boss) battle', async () => {
+    const map = createMapData({ id: 'temple', width: 10, height: 10,
+      npcs: [{ id: 'garland', x: 3, y: 3, sprite: 'garland_npc', dialog: ['I, Garland, will knock you all down!'] }],
+      scriptedEncounters: [{ x: 2, y: 3, enemyIds: ['garland'], flag: 'GARLAND_DEFEATED', isBoss: true, npc: 'garland',
+        message: 'Garland attacks!' }] });
+    const { game, scene } = await fieldAt(map, 3, 2);
+    game.boosts.encounters = 0;
+    const battle = vi.spyOn(BattleTrigger.prototype, 'triggerBattle').mockResolvedValue(undefined);
+    game.input.isJustPressed.mockImplementation((a: string) => a === 'confirm');
+    for (let i = 0; i < 20 && battle.mock.calls.length === 0; i++) scene.update(1);
+    expect(battle).toHaveBeenCalledTimes(1);
+    expect(battle.mock.calls[0][1]).toMatchObject({ isBoss: true, canRun: false });
+  });
+
+  it('x2 halves the steps to the next battle; x0.5 doubles them (EncounterSystem rate x mode x boost)', () => {
+    const steps = (mult: number): number => {
+      const sys = new EncounterSystem(new EventBus(), () => 0);
+      sys.setRateMultiplier(mult);
+      sys.setRate({ min: 30, max: 30 });
+      return sys.stepsRemaining;
+    };
+    expect(steps(1)).toBe(30);
+    expect(steps(2)).toBe(15);
+    expect(steps(0.5)).toBe(60);
+  });
+});
+
+describe('the Walk speed boost', () => {
+  function framesPerTile(boost: number, ship = false): number {
+    const input = new InputManager();
+    vi.spyOn(input, 'isPressed').mockImplementation((a) => a === 'right');
+    const terrain = ship ? TerrainType.Water : TerrainType.Grass;
+    const map = createMapData({ id: 't', width: 8, height: 8, collision: Array(64).fill(terrain) });
+    const player = new PlayerController({ startX: 1, startY: 1, texture: Texture.WHITE, collisionMap: new CollisionMap(map),
+      input, events: new EventBus(), moveSpeed: 200, ...(ship ? { movementMode: new ShipMode() } : {}) });
+    player.speedBoost = boost;
+    player.update(1);                 // starts the step
+    let frames = 0;
+    while (player.gridX === 1 && frames < 100) { player.update(1); frames++; }
+    return frames;
+  }
+
+  it('x2 takes half the frames per tile on foot', () => {
+    const base = framesPerTile(1);
+    expect(base).toBe(12);
+    expect(framesPerTile(2)).toBe(6);
+  });
+
+  it('x2 takes half the frames per tile by ship', () => {
+    const base = framesPerTile(1, true);
+    expect(base).toBeGreaterThan(1);
+    expect(Math.abs(framesPerTile(2, true) - base / 2)).toBeLessThanOrEqual(1);
+  });
+
+  it('the field scene applies the boost to its player every frame', async () => {
+    const { game, scene } = await fieldAt(createMapData({ id: 'town', width: 10, height: 10 }), 4, 4);
+    game.boosts.walkSpeed = 2;
+    game.input.isPressed.mockImplementation((a: string) => a === 'right');
+    let frames = 0;
+    while (game.playerPosition.x === 4 && frames < 100) { scene.update(1); frames++; }
+    game.input.isPressed.mockReturnValue(false);
+    const fast = frames;
+    const slow = await fieldAt(createMapData({ id: 'town', width: 10, height: 10 }), 4, 4);
+    slow.game.input.isPressed.mockImplementation((a: string) => a === 'right');
+    frames = 0;
+    while (slow.game.playerPosition.x === 4 && frames < 100) { slow.scene.update(1); frames++; }
+    expect(fast).toBeLessThan(frames);
+    expect(Math.abs(fast - frames / 2)).toBeLessThanOrEqual(1);
+  });
+});

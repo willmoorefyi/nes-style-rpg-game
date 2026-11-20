@@ -383,8 +383,9 @@ export class ExplorationScene implements Scene {
     if (!this.player) return;
 
     this.refreshNpcPresence(); // a flag set anywhere (an NPC's gift, a step, a battle) shows or hides its NPCs (P3-03)
-    // Sync encounter rate multiplier from movement mode
-    this.encounterSystem.setRateMultiplier(this.player.encounterRateMultiplier);
+    // the movement mode's encounter rate times the Encounters boost (0 = Off); the Walk speed boost (src/core/Boosts.ts)
+    this.encounterSystem.setRateMultiplier(this.player.encounterRateMultiplier * this.game.boosts.encounters);
+    this.player.speedBoost = this.game.boosts.walkSpeed;
     this.encounterSystem.setMode(fieldModeOf(this.player.currentMode)); // zone `modes` (W1-B)
     // Check vehicle boarding on confirm key (when not moving)
     if (this.vehicles.tryBoard(this.player)) return;

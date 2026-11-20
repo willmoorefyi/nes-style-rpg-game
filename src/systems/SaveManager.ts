@@ -3,6 +3,7 @@ import { FIELD_MODES } from '../types/index.js';
 import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
+import { parseBoosts, type Boosts } from '../core/Boosts.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
@@ -10,14 +11,16 @@ const MAX_SLOTS = 3;
  * Version 2 (pass W, W1-A) adds the party's field `mode` and the parked `vehicles`; a version-1 save loads on foot
  * with no vehicles, and its overworld position is an act-1 cell (GAP-17: `frame: 'a1'`, translated by the world's
  * `world.frames.a1.origin` on the next field enter). Old saves load through `Character.fromJSON`, which clamps
- * charges and recomputes the level (T4).
+ * charges and recomputes the level (T4). Version 3 (pass CHT) adds the playthrough's `boosts`; an older save loads
+ * with the default boosts (`parseBoosts`).
  */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
-/** The field part of a save (v2): the party's mode and the parked vehicles of every map. */
+/** The field part of a save (v2): the party's mode and the parked vehicles of every map; the boosts (v3). */
 export interface SaveField {
   mode: FieldMode;
   vehicles: VehicleState[];
+  boosts: Boosts;
 }
 
 /** What `SaveManager.load` returns (the shape `Game.restoreState` takes). */
@@ -30,6 +33,7 @@ export interface LoadedSave {
   playTime: number;
   fieldMode: FieldMode;
   vehicles: VehicleState[];
+  boosts: Boosts;
   /** `a1`: a version-1 save on `overworld`, whose position is an act-1 cell (GAP-17). */
   frame: 'a1' | null;
 }
@@ -103,6 +107,7 @@ export class SaveManager {
       slotId,
       mode: field.mode ?? 'walking',
       vehicles: (field.vehicles ?? []).map((v) => ({ ...v })),
+      boosts: parseBoosts(field.boosts),
     };
     if (location !== undefined) data.location = location;
     
@@ -124,7 +129,7 @@ export class SaveManager {
       
       const data: SaveData = JSON.parse(raw);
       const v1 = data.version === 1;
-      if (!v1 && data.version !== SAVE_VERSION) {
+      if (!v1 && data.version !== 2 && data.version !== SAVE_VERSION) {
         console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${data.version}`);
       }
       return {
@@ -136,6 +141,7 @@ export class SaveManager {
         playTime: data.playTime,
         fieldMode: v1 ? 'walking' : savedMode(data.mode),
         vehicles: v1 ? [] : savedVehicles(data.vehicles),
+        boosts: parseBoosts(data.boosts),   // v1 / v2: none saved, the defaults
         frame: v1 && data.currentMap === 'overworld' ? 'a1' : null,
       };
     } catch (e) {

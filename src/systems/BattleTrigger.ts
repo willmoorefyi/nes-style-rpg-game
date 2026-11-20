@@ -9,6 +9,7 @@ import { seenFlag } from '../scenes/bestiary/bestiaryModel.js';
 import { battleArt, monsterSpriteKey } from '../rendering/BattleArt.js';
 import { formChain } from '../battle/bossForms.js';
 import type { BattleConfig } from '../battle/BattleStateMachine.js';
+import { battleBoosts } from '../core/Boosts.js';
 
 /** Loads the monster atlas pages a formation needs (BattleArt; tests inject their own). Never rejects. */
 export interface MonsterArtPreload {
@@ -108,6 +109,7 @@ export class BattleTrigger {
       enemyAi,
       enemyStatus,
       music: bossConfig?.isBoss ? 'boss' : undefined,
+      boosts: battleBoosts(this.game.boosts),
       ...(forms.length > 0 ? { forms } : {}),
       ...(enemyHp ? { enemyHp } : {}),
     };

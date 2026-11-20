@@ -425,4 +425,6 @@ export interface SaveData extends SaveDataQuestFields {
   slotId: number;
   /** Display name of the map at save time (S5); older saves fall back to a label made from `currentMap`. */
   location?: string;
+  /** The playthrough's boosts (v3, src/core/Boosts.ts); older saves have none (the defaults). */
+  boosts?: import('../core/Boosts.js').Boosts;
 }

@@ -16,6 +16,7 @@ import { applyStartHp, setEnemyHp } from './enemyHp.js';
 import { losesTurn, type PresentHold, type TickSubject } from './StatusTick.js';
 import { runTurn } from './turnTick.js';
 import { xpShare } from './Rewards.js';
+import { scaleReward, type BattleBoosts } from '../core/Boosts.js';
 import { ItemEffects } from '../systems/ItemEffects.js';
 import { SpellExecutor } from './SpellExecutor.js';
 
@@ -51,6 +52,8 @@ export interface BattleConfig {
   /** The form records the enemies can change into (CHAOS_FORMS_PLAN 2.2; `formChain`). */
   forms?: EnemyData[];
   enemyHp?: Record<number, number>; // debug scenarios: start HP per enemy index, fractions of the pool (applyStartHp)
+  /** The player's boosts (src/core/Boosts.ts): reward multipliers and the sure escape; missing means none. */
+  boosts?: Pick<BattleBoosts, 'gold' | 'xp' | 'alwaysEscape'>;
 }
 
 export interface BattleResult {
@@ -128,6 +131,7 @@ export class BattleStateMachine {
   private rng: () => number;
   private inventory: Inventory | undefined;
   private canRun: boolean;
+  private boosts: Pick<BattleBoosts, 'gold' | 'xp' | 'alwaysEscape'>;
   private turnNumber = 0;
   private bossPatterns: Map<string, BossPattern>;
   private spellExecutor: SpellExecutor;
@@ -146,6 +150,7 @@ export class BattleStateMachine {
     this.inventory = config.inventory;
     this.rng = rng;
     this.canRun = config.canRun ?? true;
+    this.boosts = config.boosts ?? { gold: 1, xp: 1, alwaysEscape: false };
     this.bossPatterns = config.bossPatterns ?? new Map();
     this.spells = config.spells ?? [];
     this.targets = {
@@ -459,8 +464,9 @@ export class BattleStateMachine {
       }
       // FF1: the acting member's luck and level decide (enemies never run)
       const runner = this.getPartyMember(cmd.actorId);
-      const chance = runner ? calculateRunChance(runner.stats.luck, runner.level, this.livingEnemies.length) : 0;
-      if (this.rng() < chance) {
+      const chance = this.boosts.alwaysEscape ? 1   // Escape boost: only `canRun` (above) still blocks
+        : runner ? calculateRunChance(runner.stats.luck, runner.level, this.livingEnemies.length) : 0;
+      if (chance >= 1 || this.rng() < chance) {
         this.messages.push({ text: 'Escaped!' });
         this.finish('escaped');
       } else {
@@ -552,8 +558,8 @@ export class BattleStateMachine {
     this._state = outcome;
     this._actionQueue.length = 0;
     if (outcome === 'victory') {
-      const xp = this.enemies.reduce((sum, e) => sum + e.data.xpReward, 0);
-      const gold = this.enemies.reduce((sum, e) => sum + e.data.goldReward, 0);
+      const xp = scaleReward(this.enemies.reduce((sum, e) => sum + e.data.xpReward, 0), this.boosts.xp);
+      const gold = scaleReward(this.enemies.reduce((sum, e) => sum + e.data.goldReward, 0), this.boosts.gold);
       const share = xpShare(xp, this.livingParty.length);
       this.result = { victory: true, xpReward: xp, xpPerMember: share, goldReward: gold };
       this.messages = [{ text: `Victory! ${share} XP each, ${gold} Gold.` }];

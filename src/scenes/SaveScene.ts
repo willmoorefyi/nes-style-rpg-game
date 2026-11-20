@@ -116,7 +116,7 @@ export class SaveScene implements Scene {
       this.game.playerPosition,
       this.game.playTime,
       location,
-      { mode: this.game.fieldMode, vehicles: this.game.vehicles }, // save v2 (W1-A)
+      { mode: this.game.fieldMode, vehicles: this.game.vehicles, boosts: this.game.boosts }, // save v2 (W1-A), v3
     );
     if (!ok) console.error(`Save to slot ${slotId + 1} failed`);
     // the list behind the message shows the new save (S4)

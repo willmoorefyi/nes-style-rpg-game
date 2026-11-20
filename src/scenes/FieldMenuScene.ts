@@ -8,6 +8,7 @@ import { PartyPanel } from '../ui/PartyPanel.js';
 import { NES_FONT } from '../ui/NESFont.js';
 import type { ExplorationScene } from './ExplorationScene.js';
 import { wrapText } from '../ui/textUtils.js';
+import { boostSummary } from '../core/Boosts.js';
 import { SCREEN_MARGIN, FONT_SIZE, MENU_LINE_HEIGHT, WINDOW_PADDING, LINE_HEIGHT, CHAR_WIDTH } from '../core/LayoutConstants.js';
 
 /** MS-7 layout (fix plan T6 revision 12): left pane x 24 w 360, party pane x 408 w 1488, rows 168 px; the shared
@@ -26,6 +27,7 @@ const COMMANDS: ReadonlyArray<MenuItem & { help: string }> = [
   { label: 'Bestiary', value: 'bestiary', help: 'Look up the monsters: stats, weaknesses and moves.' },
   { label: 'Save', value: 'save', help: 'Record your journey.' },
   { label: 'Load', value: 'load', help: 'Resume a saved journey.' },
+  { label: 'Boosts', value: 'boosts', help: 'Gold, experience, encounter, speed and escape boosts.' },
   { label: 'Config', value: 'config', help: 'Set the battle message speed.' },
 ];
 
@@ -115,6 +117,7 @@ export class FieldMenuScene implements Scene {
   /** The party rows, gold and time as they are now. */
   private refresh(): void {
     this.partyPanel.refresh(this.game.party.all);
+    this.partyPanel.setBoostTag(boostSummary(this.game.boosts));   // back from Boosts: the indicator follows
     this.goldText.text = `${this.game.party.gold} G`;
     this.timeText.text = formatPlayTime(this.game.playTime);
     this.shownIndex = -1;
@@ -146,6 +149,9 @@ export class FieldMenuScene implements Scene {
         break;
       case 'bestiary':
         this.game.scenes.push('bestiary');
+        break;
+      case 'boosts':
+        this.game.scenes.push('boosts');
         break;
       case 'config':
         this.game.scenes.push('config');

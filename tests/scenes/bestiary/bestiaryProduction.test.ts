@@ -12,6 +12,7 @@ import { PartyManager } from '../../../src/entities/PartyManager.js';
 import type { Game } from '../../../src/core/Game.js';
 import { createMockGame } from '../../helpers/testUtils.js';
 import { loadRealRegistries, tapInput, visibleLabels } from '../../helpers/realData.js';
+import { defaultBoosts } from '../../../src/core/Boosts.js';
 
 beforeAll(loadRealRegistries);
 
@@ -43,7 +44,7 @@ describe('bestiary in production', () => {
   it('the field menu still has the Bestiary row', () => {
     vi.stubEnv('DEV', false);
     const explorationScene = { canSave: vi.fn().mockReturnValue(true), getMapName: vi.fn().mockReturnValue('Cornelia') };
-    const game = { party: new PartyManager(), playTime: 0, input: tapInput(),
+    const game = { party: new PartyManager(), playTime: 0, input: tapInput(), boosts: defaultBoosts(),
       scenes: { get: vi.fn().mockReturnValue(explorationScene), push: vi.fn(), pop: vi.fn() } };
     const scene = new FieldMenuScene(game as unknown as Game);
     scene.enter();
