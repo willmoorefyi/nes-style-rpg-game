@@ -1,9 +1,8 @@
 """The world contract of pass NW (docs/NATURAL_WORLD_PLAN.md 3.2, 3.3, 0.1.1, 2.2; NW-1, NW-5).
 
 Declared beside pass W's contract by NW-1 as `world_api_v2.py`; NW-5 deleted pass W's 192x192 boxed contract and
-renamed this one. There are no region boxes and no act-1 frame (`BOXES`, `SEAMS`, `EDGE`, `PLACEHOLDER_WALLS`,
-`A1_ORIGIN`, `A1_SIZE`, `FROZEN_CORE`, `FROZEN_EXCEPTIONS` and `PRAVOKA_ICON_CELLS` are gone): act 1's cells are world
-cells, pinned relative to Cornelia (3.6). Regions own content, not ground: a `RegionOut` has no `ground` rows. The NW
+renamed this one. There are no region boxes, seams or edge bands and no act-1 frame or frozen core (Appendix A's grep
+1 and 2 find none of their names): act 1's cells are world cells, pinned relative to Cornelia (3.6). Regions own content, not ground: a `RegionOut` has no `ground` rows. The NW
 integrator owns this file; a region that needs a constant changed asks the integrator (3.5).
 """
 from __future__ import annotations

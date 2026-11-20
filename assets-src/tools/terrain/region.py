@@ -3,7 +3,7 @@ the regions of a map source, the build digests that make `--region` safe, and th
 
 - **Regions.** A source lists them as `regions: {name: [[x0, y0, x1, y1], ...]}` (inclusive cells, chunk-aligned;
   one or more rects each, GAP-19), `{name: {rects: [...]}}` or, for the composed world, `{name: {raster: [...]}}` (pass
-  NW; pass W's `world_api.BOXES` fallback retired at NW-5). A map without regions compiles as before.
+  NW; pass W's box fallback retired at NW-5). A map without regions compiles as before.
 - **Build digests.** A compiled map with regions records `build: {compiler, boxes}`: a digest of the compiler (its
   code and the kit art it painted with) and one per region of what its pixels depend on (the region's ground
   cells, the objects anchored in it, and the map-wide painting keys). `--region r` repaints only r's chunks, so it
@@ -54,7 +54,7 @@ def regions_of(src: dict, wid: int | None = None, hgt: int | None = None) -> dic
     for name, v in (spec or {}).items():
         if isinstance(v, dict) and ("rects" in v or "raster" in v):
             v = v.get("rects", v.get("raster"))
-        if not isinstance(v, list):                 # pass W's boxes (world_api.BOXES) retired at NW-5
+        if not isinstance(v, list):                 # pass W's box fallback retired at NW-5
             raise RegionError(f"region {name}: no rects (a region names its `rects` or `raster`)")
         regions[str(name)] = [tuple(int(c) for c in r) for r in v]
     for name, rects in regions.items():

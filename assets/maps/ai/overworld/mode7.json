@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "cellPx": 16,
+  "cellPx": 12,
   "size": 3072,
-  "lowCellPx": 8,
+  "lowCellPx": 6,
   "lowSize": 1536,
-  "inputs": "7b8b5461788b1528606dc7f9430811241174088f38ac186d2bb890b3b27441dd"
+  "inputs": "29755c170aa96b05c28bd77d2007ccbbbc5ea91f24b01efa668246ad463f99d2"
 }

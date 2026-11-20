@@ -19,7 +19,7 @@ from .geom import bilinear, components, edt_signed, pline, sdist
 from .noise import N, XX, YY, fbm, ridged
 
 TEMPLATE = "a1_tpl"                          # the act-1 template's field name (its owner is region a1)
-EDGE = 5                                     # cells of open ocean forced round the world's edge
+OCEAN_RING = 5                                     # cells of open ocean forced round the world's edge
 
 
 def _knob(name: str, p: S.Preset, b: RegionSpec, cont: dict, a1: np.ndarray):
@@ -136,8 +136,8 @@ def shape(b: RegionSpec, p: S.Preset, seed: int) -> dict:
     land &= ~chan
     for k in wall_masks:
         wall_masks[k] &= ~chan & ~fjord
-    land[:EDGE, :] = land[-EDGE:, :] = False
-    land[:, :EDGE] = land[:, -EDGE:] = False
+    land[:OCEAN_RING, :] = land[-OCEAN_RING:, :] = False
+    land[:, :OCEAN_RING] = land[:, -OCEAN_RING:] = False
     land = np.where(keep, keepch != "o", land)           # act 1's kept cells: today's land / water exactly
     return dict(land=land, field=f2, cont=cont, keep=keep, keepch=keepch, walls=walls & ~chan & ~fjord,
                 wall_masks=wall_masks, hard=hard, cores=cores, inner=inner, wall_cores=wall_cores, barriers=barriers,

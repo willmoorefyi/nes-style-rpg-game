@@ -3993,6 +3993,7 @@ encounterZones:
   - groups:
     - {id: allosaurus, min: 1, max: 1}
     weight: 1
+  encounterRate: {min: 14, max: 31}
 - id: fir_rivers
   name: Crescent Waters
   modes: [canoe]

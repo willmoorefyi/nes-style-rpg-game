@@ -41,7 +41,7 @@ def _patch_terrain(p: dict) -> int:
 
 def passthrough(src: dict, out: dict) -> None:
     """Copy the quest fields of a map source into its compiled map: `docks`, `patches`, `hazards`, `exit`, `world`
-    (GAP-17: `world.frames.a1`, plus the composer's `basins` and `cuts`) and `spots` (NW-1: the named places of
+    (the composer's `basins` and `cuts`) and `spots` (NW-1: the named places of
     quest.yaml, the scenarios and the cutscenes). `out` is the compiled map document, changed in place."""
     for k in ("docks", "hazards", "exit", "world", "spots"):
         if src.get(k) is not None:
