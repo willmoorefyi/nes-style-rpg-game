@@ -7,6 +7,7 @@ import { NES_FONT } from '../ui/NESFont.js';
 import { FONT_SIZE, GAME_WIDTH, SCREEN_MARGIN, WINDOW_PADDING, MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
 import { getSettings, setAirshipView, setMessageSpeed, isMessageSpeed, type AirshipView, type MessageSpeed } from '../core/Settings.js';
 import { RESULT_FRAMES, holdFrames } from './battle/battleTiming.js';
+import { setSlowSession } from './exploration/mode7/mode7Toggle.js';
 
 /** Battle-like lines the sample window cycles through, each held as long as a battle result line at the chosen speed. */
 export const SAMPLE_LINES = ['FGHTR attacks Goblin!', 'Goblin takes 12 damage.', 'B.MAG casts FIRE!', 'Goblin is defeated.'];
@@ -91,6 +92,7 @@ export class ConfigScene implements Scene {
     const step = (input.isJustPressed('right') ? 1 : 0) - (input.isJustPressed('left') ? 1 : 0);
     if (step !== 0 && this.row === 1) {
       setAirshipView(getSettings().airshipView === 'mode7' ? 'topdown' : 'mode7');
+      if (getSettings().airshipView === 'mode7') setSlowSession(false);   // re-choosing Mode 7 retries it (M7-6)
       this.redraw();
       return;
     }

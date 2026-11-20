@@ -132,10 +132,13 @@ export class WorldAtlas {
   /** Recompose when a patch flag changed (call once per frame; cheap when nothing changed). */
   update(): void {
     if (!this.rt || this.composing) return;
-    if (patchSignature(this.placements, this.opts.hasFlag) !== this.signature) void this.recompose();
+    if (patchSignature(this.placements, this.opts.hasFlag) !== this.signature) {
+      this.recompose().catch((err: unknown) => console.error('Mode 7: the atlas recompose failed', err));
+    }
   }
 
-  /** After a context restore the render texture's contents are lost: reload the image and draw it again. */
+  /** After a context restore the render texture's contents are lost: reload the image and draw it again (joining a
+   *  recompose under way). Rejects when that fails (M7-6: the view then flies top-down). */
   restore(): Promise<void> {
     return this.recompose();
   }
@@ -146,9 +149,9 @@ export class WorldAtlas {
     this.rt = null;
   }
 
+  /** One compose at a time; it rejects on a failure (each caller handles it). */
   private recompose(): Promise<void> {
-    this.composing ??= this.compose().catch((err: unknown) => console.error('Mode 7: the atlas recompose failed', err))
-      .finally(() => { this.composing = null; });
+    this.composing ??= this.compose().finally(() => { this.composing = null; });
     return this.composing;
   }
 
