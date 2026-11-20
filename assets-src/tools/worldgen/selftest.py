@@ -37,8 +37,11 @@ B_FIGURES = {"land": 28874, "coast_edges": 5204, "G2_index": 30.6, "G1_fail_runs
              "G3_fail_runs_gt6": 0, "G3_longest": 6, "exempt": 427, "jogs": 33, "ford_cuts": 0,
              "shares": {"mountain": 15.1, "forest": 16.8, "sand": 4.9, "swamp": 0.5, "tundra": 6.0, "snow": 9.2,
                         "river": 2.4, "lake": 2.4, "grass": 42.4},
-             "regions": {"a1": 9.2, "elf": 8.6, "earth": 10.7, "fire": 19.4, "ordeal": 10.5, "water": 18.3,
-                         "wind": 5.7}}
+             # the coast index by region on NW-4's owner grid (a landmass shared by regions split along their
+             # fields; NW-0 / NW-2 gave each landmass to its majority region: a1 9.2, elf 8.6, earth 10.7, fire 19.4,
+             # ordeal 10.5, water 18.3, wind 5.7). Reported, not gated (0.1.1).
+             "regions": {"a1": 13.7, "elf": 8.1, "earth": 13.5, "fire": 11.1, "ordeal": 13.4, "water": 11.7,
+                         "wind": 10.1}}
 
 
 def synthetic(**kw) -> RegionSpec:

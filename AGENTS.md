@@ -375,6 +375,20 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   legacy tile sheet (rows 11-13, `tiles_cold.py`); the runtime meets them at NW-5. A map over 192x192 cells is
   painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality), which keeps the 256² compile
   under G-NW8's 26 GB.
+- **The NW gates and `--region` (NW-4, `docs/NATURAL_WORLD_PLAN.md` 3.4, 3.8, 13).** `world_v2.py` prints one line
+  per check, G-NW4's among them: `world: OK (...)` (`layouts/world_checks_v2.py`: rasters, ids on their owners' cells,
+  docks, anchors, every entrance reachable from an arrival), `basins: OK (aldi .., ocean ..; canal joins; the canal
+  pass ..)`, `barriers: OK (walk, canoe; cuts ..)`, `prewalk: OK (S0-S14)`, `north: OK`; a failure lists its rule,
+  region and cells. `worldgen/gates.py` (basins + canal pass, docks, walls with their minimal water cuts, routes,
+  straits), `gates_reach.py` (barriers by foot and canoe, the spine's cut = a row of the bridge patch, north,
+  landings, detours), `cuts.py` (0-1 min cut, vertex cut), `prewalk.py` (starts from the ancestors' maps' real exits,
+  the nearest blocking cell). The source carries `regions.<r>.raster` (from `owners.py`'s owner grid: a shared
+  landmass split along its continent fields, sea to the nearest land) and `world.cuts`. A source with rasters
+  compiles in **chunk-digest mode** (`terrain/region_chunks.py`): `build.chunks` per chunk; `--region r` repaints r's
+  raster plus every chunk whose digest differs from the base's, refusing over 70 painted chunks (ring included).
+  The shared compiled base is `~/temp/ff-game/worldplan/base/latest/` (source hash in `base.txt`, read-only): clone it
+  (`cp -cR`) to `/tmp/<agent>/nw-out/` and run `build_map.py overworld --src-dir assets-src/maps-nw --out
+  /tmp/<agent>/nw-out --region <r>` there; never full-compile (the integrator refreshes the base).
 - **Landmark art (LM-INT, LM4-INT, LM5-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from three
   sheets (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2),
   `landmarks_lm4.*` (pass LM4) and `landmarks_lm5.*` (pass LM5: the Western Keep and the Citadel of Trials); cells

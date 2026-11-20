@@ -8,6 +8,13 @@ the regions of a map source, the build digests that make `--region` safe, and th
   code and the kit art it painted with) and one per region of what its pixels depend on (the region's ground
   cells, the objects anchored in it, and the map-wide painting keys). `--region r` repaints only r's chunks, so it
   refuses a base whose compiler or any other region's digest differs (`--region: stale base, run a full compile`).
+- **Chunk digests (pass NW 3.4, NW-4).** A source whose regions are owner-grid rasters (`regions: {r: {raster:
+  [...]}}`, the NW world; its regions share chunks) records `build: {compiler, chunks: {"col,row": digest}}`
+  instead: each digest covers what that chunk's pixels read (its cells plus a CHUNK + RING_PAD ring, the objects
+  that reach it, the painting keys). `--region r` repaints r's raster plus **every chunk whose digest differs from
+  the base's** (a neighbour's coast edit is repainted, not refused); `check_base` checks only the size, the compiler
+  and that the base has chunk digests. Over PAINT_LIMIT painted chunks (with their ring) it refuses: run a full
+  compile.
 - **The world-compile lock.** One world compile at a time across all worktrees: an exclusive `fcntl.flock` on
   LOCK_PATH, taken by the top-level CLI for any compile of a map with regions (and `overworld`). A waiter prints
   `waiting for the world-compile lock` and polls; after 30 min (`FFG_WORLD_LOCK_TIMEOUT` s) it prints
@@ -26,19 +33,16 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from .frame import CHUNK
+from .region_chunks import (OBJ_REACH, PAINT_KEYS, RING_PAD, RegionError, changed_chunks, chunk_digests,  # noqa: F401
+                            chunked, painted)
 
 TOOLS = Path(__file__).resolve().parent.parent
 LOCK_PATH = Path("/tmp/ff-game-world-compile.lock")
 LOCK_TIMEOUT = 30 * 60
 WORLD_IDS = ("overworld",)                     # compiled under the lock even before they have regions
-PAINT_KEYS = ("id", "kit", "kits", "materials", "terrain", "carpet_trim")   # map-wide keys that change pixels
 CODE = ["build_map.py", "kit.py", "terrain"]   # the compiler's code (terrain/*.py)
 
 Rect = tuple[int, int, int, int]
-
-
-class RegionError(ValueError):
-    pass
 
 
 def regions_of(src: dict, wid: int | None = None, hgt: int | None = None) -> dict[str, list[Rect]] | None:
@@ -50,8 +54,8 @@ def regions_of(src: dict, wid: int | None = None, hgt: int | None = None) -> dic
     regions = {}
     for name in (spec or _boxes()):
         v = (spec or {}).get(name)
-        if isinstance(v, dict) and "rects" in v:
-            v = v["rects"]
+        if isinstance(v, dict) and ("rects" in v or "raster" in v):
+            v = v.get("rects", v.get("raster"))
         if not isinstance(v, list):                 # the composer's {stub, checks}: the rects are world_api.BOXES
             boxes = boxes or _boxes()
             if name not in boxes:
@@ -113,8 +117,11 @@ def compiler_digest(kit) -> str:
     return h.hexdigest()[:16]
 
 
-def digests(src: dict, kit, wid: int, hgt: int) -> dict:
-    """`build: {compiler, boxes: {region: digest}}` for a map with regions (recorded in the compiled map)."""
+def digests(src: dict, kit, wid: int, hgt: int, footprint=None) -> dict:
+    """`build: {compiler, boxes: {region: digest}}` for a map with regions (recorded in the compiled map); in
+    chunk-digest mode (`chunked`) `build: {compiler, chunks: {"col,row": digest}}` (`footprint`: build_map's)."""
+    if chunked(src):
+        return {"compiler": compiler_digest(kit), "chunks": chunk_digests(src, wid, hgt, footprint)}
     regions = regions_of(src, wid, hgt) or {}
     rows = src["ground"].rstrip("\n").split("\n")
     paint = json.dumps({k: src.get(k) for k in PAINT_KEYS}, sort_keys=True)
@@ -134,9 +141,10 @@ def digests(src: dict, kit, wid: int, hgt: int) -> dict:
     return {"compiler": compiler_digest(kit), "boxes": boxes}
 
 
-def check_base(base: dict | None, new: dict, region: str, wid: int, hgt: int) -> None:
+def check_base(base: dict | None, new: dict, region: str, wid: int, hgt: int) -> set[tuple[int, int]]:
     """Raise unless the compiled base can take a `--region` compile of `region` (every other region and the
-    compiler unchanged since the base was compiled)."""
+    compiler unchanged since the base was compiled). In chunk-digest mode only the size and the compiler must match;
+    returns the (col, row) chunks whose digests differ from the base's (empty in box mode)."""
     why = None
     if base is None:
         why = "no compiled map"
@@ -146,12 +154,18 @@ def check_base(base: dict | None, new: dict, region: str, wid: int, hgt: int) ->
         why = "the base has no build digests"
     elif base["build"].get("compiler") != new["compiler"]:
         why = "the compiler or the kit art changed"
+    elif "chunks" in new:
+        changed = changed_chunks(base["build"], new)
+        if changed is not None:
+            return changed
+        why = "the base has no chunk digests"
     else:
         other = [r for r in new["boxes"] if r != region and base["build"].get("boxes", {}).get(r) != new["boxes"][r]]
         if other:
             why = f"region {', '.join(other)} changed"
     if why:
         raise RegionError(f"--region: stale base, run a full compile ({why})")
+    return set()
 
 
 @contextmanager
