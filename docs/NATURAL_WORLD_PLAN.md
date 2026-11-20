@@ -1725,7 +1725,7 @@ act 1's frame are gone.
 | Gate | Result |
 |---|---|
 | `npm run build` | OK |
-| `npm run test:fast` / `test:full` | see the integrator's run below |
+| `npm run test:fast` / `test:full` | fast: 399 files, 9,613 tests OK; world tier (8 GB heap, forks): `questGraph` 30 and `questMutateWorld` 4 tests OK, 7,821 s; together the full 401 files |
 | `npm run quest -- --strict` | `quest-verify: OK`: (a) OK, (b) 423 withheld runs, (c) 1,291,102 states, (d) every band OK, (e) 8 towns, (f) Crescent 13,340 / 60,240, Gaia 87,241 / 259,240, (g) s* 0.851, (h) 12 rows + 2 basin rows; 193 s, max RSS 4.4 GB |
 | `MAX_STATES` | 3,000,000, with a compact state key (flag and item bitsets; the old key ran out of the 4 GB heap on `--stage S30` at 249 s); `npm run quest` with an 8 GB heap; `--stage S30 --strict`: OK, 1,956,096 states, 284 s, max RSS 4.35 GB |
 | `--from-reset` | `npm run quest -- --strict --only c --from-reset`: OK, 192 reset states (the 32 stage entries, each in its `--stage` scope, and 160 mid-stage samples), 5,559,533 states searched, 882 s, max RSS 7.1 GB. **Deviation:** 5 samples per stage (`--reset-samples N`, default 5), not 5.3's 50: a late sample searches 0.3-0.5 M states (41-68 s), so 50 per stage measured about 12 h |
