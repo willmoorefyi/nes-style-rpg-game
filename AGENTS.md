@@ -215,7 +215,7 @@ Two vitest projects (`vitest.workspace.ts`) built from one list, `tests/tiers.ts
 | Tier | Command | What | Time (2 workers, at TST) |
 |------|---------|------|------|
 | fast | `npm run test:fast` | every test file not listed in `HEAVY_TESTS` | 2 min (128 s) (368 files) |
-| world | `npm run test:world` | the files in `HEAVY_TESTS`: only `tests/progression/questMutateWorld.test.ts` | 28 min (1673 s: the plain run 1637 s, the --strict run 36 s) |
+| world | `npm run test:world` | the files in `HEAVY_TESTS`: `tests/progression/questMutateWorld.test.ts` and, since NW-5 (the 256x256 world's 1.29 M-state graph, 170 s at collect), `questGraph.test.ts`; forks with an 8 GB heap | 28 min (1673 s: the plain run 1637 s, the --strict run 36 s) |
 | full | `npm run test:full` = `npm test` = `vitest run` | both | 30 min (1772 s; before TST 58 min, 3507 s) |
 
 - **Who runs what.** An agent runs `npm run build`, `npm run test:fast` and the tests of what it touched (`npx vitest run <paths>`) before a handoff, and `npm run quest -- --strict --mutate` only when it changes world or quest data. The integrator runs `npm run test:full` once per merge batch. Pass `-- --maxWorkers=2 --minWorkers=1` when other heavy processes share the machine.

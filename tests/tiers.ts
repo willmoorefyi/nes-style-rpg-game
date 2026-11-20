@@ -11,7 +11,12 @@ export const HEAVY_TESTS: ReadonlyArray<{ file: string; why: string }> = [
   {
     file: 'tests/progression/questMutateWorld.test.ts',
     why: 'the real-world no-skip mutation suite (`npm run quest -- --mutate`), plain and --strict: every gate-table '
-      + 'and generic element re-runs the proofs on the 192x192 world (about half an hour on one worker)',
+      + 'and generic element re-runs the proofs on the world (about half an hour on one worker at pass W\'s 192x192)',
+  },
+  {
+    file: 'tests/progression/questGraph.test.ts',
+    why: 'the real world\'s proofs (a)-(c) at collect time: 35 s on pass W\'s 192x192 world (311,272 states), 170 s on '
+      + 'the 256x256 NW world (1,291,102 states; NW-5), over the fast budget',
   },
 ];
 
