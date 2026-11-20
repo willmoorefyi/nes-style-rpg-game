@@ -1735,7 +1735,10 @@ act 1's frame are gone.
 | Appendix A | grep 1, 2: none; 3: the pure math / rendering tests' synthetic 192-cell maps and texture sizes (`streamWindow`, `bakedStreaming`, `worldAtlas`, `nearDetail`, `mode7Math`, `mode7Tilt`, `mode7Fallback`, `mode7Parity`, `propMath`), unrelated 192 px sprite and texture literals, two `src` comments; 4: none on the world map (the hits are interior entries, temple-of-fiends, pravoka, sky-castle-1f); 5: no world-cell literal but the contract constants (`CORNELIA_NW`, the delta (54, 44), the Aldi seed (146, 165)), pass W's frozen cell `[93, 97]` mapped by `pin` (a1Pins), and synthetic data (v1/v3 saves in `saveWorldReset`, the schema fixtures of `spotVehicles`, `questSpots`' scratch spot); the rest are interior, pixel and size literals; 6: `world_api.py` and the composer's comment only |
 | browser | the opening walk (21 steps to the bridge foot, the gate refuses), a ship voyage on the Aldi, a canoe trip at Onrac, an airship landing on tundra (65, 40) and a refusal on snow (65, 37), a Mode 7 flight over the north (3072 atlas at 12 px), a v3 save reset to Cornelia with the ship at the `a1_pravoka` dock; screenshots in `~/temp/ff-game/nw_5/` |
 
-**Left for NW-INT:** the `--mutate` result; the browser's reset check found the world map undrawn while the reset
+**`--mutate`:** `npm run quest -- --strict --mutate`: `mutations: OK (64 gate rows; 105 elements, each removal
+reported)`, every proof OK, `quest-verify: OK`; 8,059 s (2 h 14 min), max RSS 7.9 GB.
+
+**Left for NW-INT:** the browser's reset check found the world map undrawn while the reset
 notice was open (the field skipped its camera and map render under any dialog): `ExplorationScene` now renders under a
 dialog too (scene tests pass; to be seen again in the browser); the world's land, 26,847 cells,
 3.3 % above its band's floor; `D_SPLIT` tuning if the 12 px far atlas shows a blur line (6.1).
