@@ -115,7 +115,7 @@ export class ExplorationScene implements Scene {
     });
     this.bindGameState();
     this.container.addChild(this.worldContainer);
-    this.flight = new FlightView({ game, world: this.worldContainer, parent: this.container, at: 1, player: () => this.player, tilemap: () => this.tilemap, camera: this.camera, vehicles: this.vehicles });
+    this.flight = new FlightView({ game, world: this.worldContainer, parent: this.container, at: 1, player: () => this.player, tilemap: () => this.tilemap, camera: this.camera, vehicles: this.vehicles, npcs: () => this.npcs });
     this.container.addChild(this.uiContainer);
     this.fieldHUD = new FieldHUD(game.party);
     this.container.addChild(this.fieldHUD.container);

@@ -25,6 +25,7 @@ import { FLIGHT_VIEW, SHIP_FOOT_Y, TILT_HOLDOFF_FRAMES, TILT_MS, TiltMachine, ti
 import { capsOf, mode7Enabled, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
 import { FlightStream, chunkHost, nearProfile } from './FlightStream.js';
 import { FlightStats } from './flightStats.js';
+import { propSources, type PropNpc } from './propMath.js';
 
 /** The only map Mode 7 draws (D-M7). */
 export const WORLD_MAP = 'overworld';
@@ -38,9 +39,8 @@ export interface FlightViewDeps {
   tilemap: () => MapRenderer | null;
   camera: Camera;
   vehicles: FieldVehicles;
+  npcs?: () => readonly PropNpc[];   // the field's NPCs: the world map's stand up as billboards (M7-5)
 }
-
-export { p95 } from './flightStats.js';
 
 export class FlightView {
   private readonly machine = new TiltMachine();
@@ -228,7 +228,7 @@ export class FlightView {
     // down over the tilt's last 400 ms
     const footY = tilt ? tilt.ship.y - AIRSHIP_LIFT * nativeScale(TILE_SIZE) : SHIP_FOOT_Y;
     const sinceBoard = m.state === 'tiltOut' ? m.t * TILT_MS : Number.isFinite(this.boardAt) ? now - this.boardAt : TAKEOFF_MS;
-    return { view, near: chunks ? near : null, chunks, marker, shadow,
+    return { view, near: chunks ? near : null, chunks, marker, shadow, props: propSources(this.deps.world, this.deps.npcs?.()),
       ship: { x: tilt?.ship.x ?? view.cx, footY, facing: this.facing, tMs: now, sinceBoard } };
   }
 

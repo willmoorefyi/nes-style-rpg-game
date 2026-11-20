@@ -6,6 +6,7 @@
  *
  * Draw order: the sky, the far mesh, the 8 seam rows, the near mesh (from `NearDetail`, over the streamed chunks of
  * the flight window), the fog, the billboards.
+ * M7-5: the sky's clouds draw over the sky; the parked vehicles and the NPCs are billboards, depth-sorted with the ship.
  */
 import { Container, type Renderer } from 'pixi.js';
 import type { MapData } from '../../../types/index.js';
@@ -72,7 +73,7 @@ export class FlightRenderer {
       prof: nearProfile(this.opts.profile), hasFlag: this.opts.hasFlag }) : null;
     this.strips = new GroundStrips(texture, map.width, map.height, this.near?.texture ?? null);
     this.billboards = billboards;
-    this.container.addChild(this.sky.view, this.strips.view, this.sky.fog, billboards.container);
+    this.container.addChild(this.sky.view, this.sky.clouds, this.strips.view, this.sky.fog, billboards.container);
   }
 
   setVisible(visible: boolean): void {
@@ -85,7 +86,8 @@ export class FlightRenderer {
     const tex = this.atlas?.texture;
     const n = this.near;
     return tex ? { atlas: tex.width, cellPx: this.atlas?.cellPx ?? 0, near: n?.size ?? 0, nearCellPx: n?.cellPx ?? 0,
-      recentres: n?.recentres ?? 0, lateDraws: n?.lateDraws ?? 0, split: this.strips?.split ?? 0 } : null;
+      recentres: n?.recentres ?? 0, lateDraws: n?.lateDraws ?? 0, split: this.strips?.split ?? 0,
+      props: this.billboards?.props.drawn ?? 0 } : null;
   }
 
   /** The last draw drew into a render texture (a recentre or a late chunk): an upload frame, out of the p95s. */
@@ -109,6 +111,7 @@ export class FlightRenderer {
       this.fogY = fogY;
       this.sky.placeFog(fogY);
     }
+    this.sky.drift(frame.ship.tMs, frame.view.px, horizonY(frame.view));
     this.billboards.draw(frame);
   }
 

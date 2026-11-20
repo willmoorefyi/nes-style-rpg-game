@@ -2650,3 +2650,25 @@
   items: {}
   gold: 100
   enemies: []
+# M7 (docs/MODE7_PLAN.md 8, 9): the Mode 7 flight scenarios.
+# M7-5 (sections 5, 9): the airship in flight at Pravoka's gate (entrance a1_pravoka, 131, 101), the ship parked at the
+# dock beside it (132, 102) and the tomb's chest (117, 107) 14 cells west: the upright billboards, their depth order
+# against the airship (the ship in front here; fly south and it falls behind, then out of range at 40 cells; fly north
+# and it passes under), with the flags of w_s18_start, so every world-map NPC but the tomb's chest has left.
+- id: m7_parked
+  name: M7 - airship flight with the parked ship and the tomb's chest in view
+  mode: field
+  map: overworld
+  entrance: a1_pravoka
+  fieldMode: airship
+  vehicles:
+    - { type: ship, map: overworld, x: 132, y: 102 }
+  flags: *w_s18_flags
+  party:
+    - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
