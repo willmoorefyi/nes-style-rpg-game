@@ -11,7 +11,7 @@ from .frame import CPX, CTX, chunk_rng, lattice, tile_at
 
 T = K.T
 # organic partition; ties: earlier wins (new materials go at the end)
-WILD = ["grass", "sand", "forest", "mountain", "river", "ocean", "lake", "swamp"]
+WILD = ["grass", "sand", "forest", "mountain", "river", "ocean", "lake", "swamp", "tundra", "snow"]   # NW: +2
 ROADS = ("dirt", "cobble")                         # painted over the partition with a small ragged edge
 WATERS = ("river", "ocean", "lake")
 TEX = {"river": "water", "lake": "water"}          # texture of each material

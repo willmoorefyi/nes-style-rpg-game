@@ -360,6 +360,21 @@ Plans: `docs/WORLD_PLAN.md` (rev 3; every tranche's result is in its Results anc
   start); `set_vehicle` takes `at:` (a spot vehicle in `Game.vehicles` gets its cell when its map loads; a save refuses
   one without a cell). A new world place needs a spot in its region's `SPOTS`. The NW contract is
   `layouts/world_api_v2.py` and `tools/worldgen/` (`spec.py`, `noise.py`); nothing of today's world reads them.
+- **The NW generator (NW-2, `docs/NATURAL_WORLD_PLAN.md` 3, 12).** `python3 -I assets-src/tools/layouts/world_v2.py`
+  (the composer v2; `--metrics`, `--json FILE`, `--check`, `--out FILE`, `--owned-chunks <r>`) merges the seven
+  region specs `layouts/world_specs/<region>.py` (act 1's template is read from today's source by
+  `world_specs/a1_today.py` until NW-3's pins), runs `tools/worldgen/compose.py` (shape, relief, hydro, climate,
+  stamps, roads, finish (seal, jogs), owners) at preset B, seed 1987, checks 3.8 (`gates.py`, `prewalk.py`,
+  `a1/world_a1_checks.py`; one line each) and the metrics (`metrics.py`: G-NW1-3, land, exemptions, jogs, kept
+  rects), and writes `assets-src/maps-nw/overworld.yaml` (256x256, never compiled into `assets/maps/ai/` before
+  NW-5: `build_map.py overworld --src-dir assets-src/maps-nw --out /tmp/<agent>/out`, under the lock, one at a time).
+  Selftests: `python3 -I assets-src/tools/worldgen/selftest.py` (synthetic specs, locality, determinism, B's NW-0
+  figures) and `selftest_gates.py` (each check fails on its mutated fixture, the sealed-Elfheim prewalk case);
+  `tests/nw/worldSource.test.ts` reads the source. Tundra `t` / snow `n` (D-NW9) are in the compiler (TerrainType
+  12 / 13, walkable; a `landing` spot on tundra, never snow; fallback textures only on maps that use them) and the
+  legacy tile sheet (rows 11-13, `tiles_cold.py`); the runtime meets them at NW-5. A map over 192x192 cells is
+  painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality), which keeps the 256² compile
+  under G-NW8's 26 GB.
 - **Landmark art (LM-INT, LM4-INT, LM5-INT).** Every `kit.py` LANDMARKS entry has approved Bedrock art, from three
   sheets (`kit.LANDMARK_SHEETS`): `gen/approved/overworld/landmarks_lm.{png,json}` (passes LM / LM2),
   `landmarks_lm4.*` (pass LM4) and `landmarks_lm5.*` (pass LM5: the Western Keep and the Citadel of Trials); cells

@@ -62,29 +62,35 @@ LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "
           # a natural lake or tarn (no stone rim, unlike the town canal `~`); a river source for river_check
           "≈": "lake",
           # pass W: a swamp (walkable, TerrainType.Swamp; soft, drawn like grass in its own texture)
-          "w": "swamp"}
+          "w": "swamp",
+          # pass NW (D-NW9): tundra (the airship lands on it) and snow (it does not); both walk like grass
+          "t": "tundra", "n": "snow"}
 # painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
 FULL = ["floor", "floor_stone", "carpet", "rubble", "in_wall_top", "in_wall_face"]
 COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
 # painted in this order; each erodes (ragged edge inside its own cells) against the ones before it
 # (new materials go at the end: a layer's noise seed depends on its index). Ties between materials are broken by
 # this order too (the earlier wins), so no pixel depends on set iteration order (PYTHONHASHSEED).
-SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean", "lake", "swamp"]
+SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean", "lake", "swamp", "tundra", "snow"]
 SOFT_WATER = {"river", "ocean", "lake"}            # foam on their edge
-ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16, "lake": 12, "swamp": 12}  # blur (px)
+ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16, "lake": 12, "swamp": 12,  # blur (px)
+           "tundra": 12, "snow": 10}
 WATERISH = {"water", "bridge", "culvert"}
 # TerrainType values (src/types/index.ts)
 GRASS, WALL, WATER, ROAD, BRIDGE, SWAMP, LAKE = 0, 1, 2, 8, 9, 6, 11
+TUNDRA, SNOW = 12, 13                              # pass NW (D-NW9, docs/NATURAL_WORLD_PLAN.md 2.6)
 TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
            "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
            "counter": COUNTER, "void": WALL, "rubble": ROAD, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER,
-           "lake": LAKE, "swamp": SWAMP}
+           "lake": LAKE, "swamp": SWAMP, "tundra": TUNDRA, "snow": SNOW}
 # on foot: walls, water, counters, mountains (3), rivers (7) and lakes (11, pass W; the canoe's)
 BLOCKED = MC.BLOCKED
 # materials a kit may not have yet: (base material, hue shift, saturation factor, value factor) of a recoloured copy
-FALLBACK_MATERIALS = {"swamp": ("grass", 25, 0.55, 0.7)}
+FALLBACK_MATERIALS = {"swamp": ("grass", 25, 0.55, 0.7),
+                      "tundra": ("grass", 20, 0.45, 0.95), "snow": ("sand", 0, 0.08, 1.25)}     # NW 2.6
 OBJ_REACH = 3            # cells: an object's art reaches at most this far outside its footprint (raster windows)
 RING_PAD = 4             # cells beyond a raster window's 1-chunk ring (what a ring chunk's placements read)
+BAND_ABOVE, BAND_ROWS = 192 * 192, 64    # NW-2 (G-NW8): a map over 192x192 cells paints in bands of 64 rows
 MAX_INSET = 5            # ragged edge: up to this many px inside the overlay cell
 RIM = 5                  # stone rim width inside water cells
 # rows of the approved castle_face texture (castle/masonry): two courses of plain ashlar that repeat vertically, and
@@ -360,8 +366,11 @@ def door_effect(src: dict) -> dict:
 def map_kit(src: dict, kit: K.Kit) -> K.Kit:
     """The kit with the map's material remaps applied: `materials: {name: alias}` (another material) or
     `{from: alias, shade: f, hue: deg, sat: f}` (a recoloured copy: hue shift and saturation factor in HSV, then the
-    RGB shade factor), plus the fallback textures of materials a kit may not have yet (swamp)."""
-    extra = {m: f for m, f in FALLBACK_MATERIALS.items() if m not in kit.materials}
+    RGB shade factor), plus the fallback textures of materials a kit may not have yet (swamp; NW 2.6's tundra and
+    snow, only on a map whose ground has them)."""
+    used = set(src.get("ground") or "")                # NW: tundra / snow only where the ground has them
+    extra = {m: f for m, f in FALLBACK_MATERIALS.items()
+             if m not in kit.materials and (m not in ("tundra", "snow") or {"tundra": "t", "snow": "n"}[m] in used)}
     if not src.get("materials") and not extra:
         return kit
     import copy
@@ -427,12 +436,15 @@ def compile_map(src: dict, kit: K.Kit, check_interiors: bool = True, raster: lis
     transitions = [dict(t) for t in (src.get("transitions") or [])]
     _objects(src, objects, kit, grid, coll, entrances, transitions, check_interiors)
 
-    # pixels, window by window (the whole map is one window)
+    # pixels, window by window (the whole map is one window; a map over BAND_ABOVE cells, the 256x256 NW world, is
+    # painted in bands of BAND_ROWS rows, each with its ring: byte-equal by chunk locality, GAP-14; NW-2, G-NW8)
     below = np.zeros((H, W, 3), np.uint8)
     above = np.zeros((H, W, 4), np.uint8)
     art_share = np.ones((hgt, wid), np.float32) if raster else np.zeros((hgt, wid), np.float32)
     known = np.zeros((hgt, wid), bool) if raster else None
-    for (x0, y0, x1, y1), (wx0, wy0, wx1, wy1) in raster_windows(raster, wid, hgt):
+    bands = None if raster or wid * hgt <= BAND_ABOVE else [(0, y, wid - 1, min(y + BAND_ROWS, hgt) - 1)
+                                                            for y in range(0, hgt, BAND_ROWS)]
+    for (x0, y0, x1, y1), (wx0, wy0, wx1, wy1) in raster_windows(raster or bands, wid, hgt):
         b, a, share = _raster(src, kit, grid, owner, objects, seed, (wx0, wy0, wx1, wy1))
         iy, ix = slice(y0 - wy0, y1 - wy0 + 1), slice(x0 - wx0, x1 - wx0 + 1)
         py, px = slice((y0 - wy0) * T, (y1 - wy0 + 1) * T), slice((x0 - wx0) * T, (x1 - wx0 + 1) * T)

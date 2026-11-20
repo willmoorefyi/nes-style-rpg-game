@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from map_graph import WATER, static_npc_cells, walkable
 
-GRASS = 0                                   # TerrainType.Grass: the only terrain the airship lands on
+GRASS, TUNDRA = 0, 12                       # TerrainType.Grass / Tundra: the airship lands on them (D-NW9), not snow
 KINDS = ("land", "dock", "landing")
 
 
@@ -48,7 +48,7 @@ def spot_errors(src: dict, c) -> list[str]:
             errors.append(f"spot {name} (land) at ({x}, {y}) is not walkable (terrain {t})")
         elif kind == "dock" and t != WATER:
             errors.append(f"spot {name} (dock) at ({x}, {y}) is not Water (terrain {t})")
-        elif kind == "landing" and (t != GRASS or (x, y) in blocked):
+        elif kind == "landing" and (t not in (GRASS, TUNDRA) or (x, y) in blocked):
             errors.append(f"spot {name} (landing) at ({x}, {y}) is not a landing cell (terrain {t}"
                           f"{'; a transition, gate or static NPC' if (x, y) in blocked else ''})")
     return errors

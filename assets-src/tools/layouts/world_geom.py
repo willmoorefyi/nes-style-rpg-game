@@ -10,7 +10,7 @@ from collections.abc import Callable, Iterable
 from world_api import BOXES, CHUNK, EDGE, UNSET, WATER, WORLD_H, WORLD_W, Cell, Rect, RegionOut
 
 # legend chars a walker may stand on (build_map.TERRAIN values outside map_graph.BLOCKED)
-WALKABLE = frozenset(".,:fs=%w_+-")
+WALKABLE = frozenset(".,:fs=%w_+-tn")         # pass NW adds tundra `t` and snow `n` (2.6)
 DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
 World = list[list[str]]
 

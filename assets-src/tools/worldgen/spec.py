@@ -78,6 +78,7 @@ class WallLine:
     """An Aldi wall (world_api_v2.WALLS id): forced land along the polyline, made mountain by its ridge."""
     id: str
     points: tuple[Point, ...]
+    wobble: float = 1.0                      # x the line wobble (W_east, Pravoka's range, takes half: NW-0)
 
 
 @dataclass(frozen=True)
@@ -119,6 +120,7 @@ class IsleField:
     radius: float
     count: int
     seed: int
+    owner: str = ""                          # a region the field's land always belongs to (Cardia: ordeal)
 
 
 @dataclass

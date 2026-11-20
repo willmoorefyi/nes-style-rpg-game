@@ -163,14 +163,15 @@ def foothill_share(below: np.ndarray, mat: np.ndarray, kit: K.Kit) -> float:
     return round(hits / total, 3) if total else 1.0
 
 
-FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "cobble")
+FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "cobble", "tundra", "snow")
 
 
 def fidelity(below: np.ndarray, mat: np.ndarray, kit: K.Kit, skip: set | None = None) -> dict[str, float]:
     """Per wild cell: the share of its centre CORE px that read as its own material (classify: its texture, shaded,
     or its stamped art); the minimum and the number of cells under 50 %. Roads are left out: they are drawn as a
     track along their centre line (a diagonal cuts across its cells), and road and grass are both walkable."""
-    cls = classify(below, kit, FID_MATS)
+    mats = tuple(m for m in FID_MATS if m in kit.materials)    # NW: tundra / snow only in a kit that has them
+    cls = classify(below, kit, mats)
     worst, bad = 1.0, 0
     hgt, wid = mat.shape
     for y in range(hgt):
@@ -179,7 +180,7 @@ def fidelity(below: np.ndarray, mat: np.ndarray, kit: K.Kit, skip: set | None = 
             if m not in WILD or (skip and (x, y) in skip):
                 continue
             sl = (slice(y * T + MARGIN, y * T + MARGIN + CORE), slice(x * T + MARGIN, x * T + MARGIN + CORE))
-            share = float((cls[sl] == FID_MATS.index(TEX.get(m, m))).mean())
+            share = float((cls[sl] == mats.index(TEX.get(m, m))).mean())
             worst = min(worst, share)
             bad += share < 0.5
     return {"min_core_share": round(worst, 3), "cells_below_half": bad}
