@@ -11,7 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import {
-  ACT1, inAct1, key, nw, pin, reach, size, steps, today, withBridge, walkable, grid, type XY,
+  ACT1, act1Cell, inAct1, key, nw, pin, reach, size, steps, today, withBridge, walkable, grid, type XY,
 } from './nwA1.js';
 
 const g = grid(nw);
@@ -60,11 +60,12 @@ describe('act 1 pins (NW-3, 3.6.2)', () => {
     const was = (list: { x: number; y: number }[] | undefined) => new Set((list ?? []).filter((o) => inAct1([o.x, o.y])).map((o) => key(pin([o.x, o.y]))));
     for (const [name, now, then] of [['objects', nw.objects, today.objects], ['inspect', nw.inspect, today.inspect],
       ['npcs', nw.npcs, today.npcs], ['vehicles', nw.vehicles, today.vehicles]] as const) {
-      const mine = (now ?? []).filter((o) => inAct1([o.x - 54, o.y - 44]));
+      const mine = (now ?? []).filter((o) => act1Cell([o.x, o.y]));
       expect(mine.length, name).toBeGreaterThan(0);
       for (const o of mine) expect(was(then).has(key([o.x, o.y])), `${name} at (${o.x}, ${o.y})`).toBe(true);
     }
-    expect((nw.npcs ?? []).map((n) => n.id).sort()).toEqual(['bridge_worker_e', 'bridge_worker_w', 'chest_tomb']);
+    expect((nw.npcs ?? []).filter((n) => act1Cell([n.x, n.y])).map((n) => n.id).sort())
+      .toEqual(['bridge_worker_e', 'bridge_worker_w', 'chest_tomb']);
   });
 
   it('every pin cell has its material', () => {
@@ -78,7 +79,7 @@ describe('act 1 pins (NW-3, 3.6.2)', () => {
     const dock = nw.docks.find((d) => d.id === 'a1_pravoka')!;
     expect(at([dock.x, dock.y])).toBe('o');
     const boulders = (nw.objects ?? []).filter((o) => JSON.stringify(o).includes('"boulder"') && o.name !== 'cairn'
-      && inAct1([o.x - 54, o.y - 44]));     // act 1's (NW-R: the other regions' dressing has boulders too)
+      && act1Cell([o.x, o.y]));             // act 1's (NW-R: the other regions' dressing has boulders too)
     expect(boulders).toHaveLength(3);
     for (const b of boulders) expect(at([b.x, b.y]), `boulder (${b.x}, ${b.y})`).toBe('.');
     // the city's moat ponds and its stream under the town are today's cells
