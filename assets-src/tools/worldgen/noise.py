@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import numpy as np
 
-N = 256                                      # world_api_v2.WORLD_W (the grids below are N x N)
+N = 256                                      # world_api.WORLD_W (the grids below are N x N)
 YY, XX = np.mgrid[0:N, 0:N].astype(float)
 STD = 0.3          # every fbm field is normalised to this standard deviation (so an amplitude is in cells)
 

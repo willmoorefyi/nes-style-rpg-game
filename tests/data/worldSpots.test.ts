@@ -2,7 +2,8 @@
  * NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2, D-NW10): quest.yaml, the debug scenarios and the cutscenes name their world-map
  * places, never raw cells. Every `at` / `spot` names a spot of its map, of the kind its user needs (a stage entry or a
  * spawn on land, a ship at a dock spot, an airship at a landing spot); every `nonLoadBearing` `ref` names an element
- * of its kind; and the compiled world carries the source's spots and basin seeds unchanged.
+ * of its kind; and the compiled world carries the source's spots and basin seeds unchanged. NW-5: the world is pass
+ * NW's; act 1's records keep pass W's cells (`tests/fixtures/passW/overworld.yaml`) moved by the act-1 delta (54, 44).
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -14,6 +15,8 @@ const read = (p: string): unknown => parse(readFileSync(p, 'utf-8'));
 const world = validateMapData(read('assets/maps/ai/overworld.yaml'));
 const source = read('assets-src/maps/overworld.yaml') as { spots: Record<string, MapSpot>; world: { basins: unknown } };
 const spots = world.spots ?? {};
+const passW = read('tests/fixtures/passW/overworld.yaml') as { keyItemGates: Array<{ id: string; x: number; y: number }> };
+const DELTA = [54, 44];                       // act 1's pins: pass W's cell + (54, 44) (docs/NATURAL_WORLD_PLAN.md 2.2)
 type Place = { map: string; at?: string; x?: number; y?: number; type?: string };
 const quest = read('assets/data/quest.yaml') as {
   stages: Array<{ id: string; entry?: Place & { vehicles?: Place[] };
@@ -50,7 +53,8 @@ describe('world spots (NW-1)', () => {
     expect(Object.keys(spots).length).toBeGreaterThanOrEqual(40);
     expect(spots).toEqual(source.spots);
     expect(world.world?.basins).toEqual(source.world.basins);
-    expect(world.world?.basins).toEqual({ aldi: [92, 121], ocean: [2, 2] });
+    const [cx, cy] = world.entrances!.cornelia;      // the Aldi's seed: the cell below Cornelia's jetty, 10 south of the gate
+    expect(world.world?.basins).toEqual({ aldi: [cx, cy + 10], ocean: [2, 2] });
     for (const name of Object.keys(spots)) expect(name).toMatch(/^(a1|elf|ert|fir|ord|wat|wnd)_s_[a-z0-9_]+$/);
   });
 
@@ -84,14 +88,16 @@ describe('world spots (NW-1)', () => {
       const hit = n.kind === 'dock' ? world.docks?.find((d) => d.id === n.ref) : world.keyItemGates?.find((g) => g.id === n.ref);
       expect(hit, `${n.stage} ${n.kind} ${n.ref}`).toBeDefined();
     }
-    expect(world.keyItemGates?.map((g) => [g.id, g.x, g.y])).toEqual([['a1_bridge_gate_w', 93, 96], ['a1_bridge_gate_e', 94, 96]]);
+    expect(world.keyItemGates?.map((g) => [g.id, g.x, g.y]))
+      .toEqual(passW.keyItemGates.map((g) => [g.id, g.x + DELTA[0], g.y + DELTA[1]]));
   });
 
-  it('the spots stand at the cells the data used before the rewrite (today\'s world, unchanged)', () => {
+  it('the spots stand on their records: Cornelia on its entrance, the ships on their docks', () => {
     const at = (n: string): [number, number] => spots[n].at;
     expect(at('a1_s_cornelia')).toEqual(world.entrances!.cornelia);
-    expect(at('a1_s_pravoka_ship')).toEqual([132, 102]);
-    expect(at('fir_s_airship')).toEqual([149, 162]);
+    const dock = world.docks!.find((d) => d.id === 'a1_pravoka')!;
+    expect(at('a1_s_pravoka_ship')).toEqual([dock.x, dock.y]);
+    expect(spots.fir_s_airship.kind).toBe('landing');
     for (const d of world.docks ?? []) {
       const ship = Object.entries(spots).find(([, s]) => s.kind === 'dock' && s.at[0] === d.x && s.at[1] === d.y);
       expect(ship, `a ship spot on dock ${d.id}`).toBeDefined();

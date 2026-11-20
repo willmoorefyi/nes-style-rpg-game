@@ -61,7 +61,7 @@ def spec() -> RegionSpec:
 
 
 def content(g, meta, ctx) -> dict:
-    """ELF's content on the composed ground (`layouts/elf/world_nw.py`, NW-R ELF) for `world_v2_content.merge`: its
+    """ELF's content on the composed ground (`layouts/elf/world_nw.py`, NW-R ELF) for `world_content.merge`: its
     `zones` are the encounter zones, its `region` record (`checks`, `land`) joins `regions.elf`."""
     from elf import world_nw
     c = dict(world_nw.content(g, meta, ctx.doors))

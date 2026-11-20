@@ -372,6 +372,8 @@ export enum TerrainType {
   Road = 8,
   Bridge = 9,
   Lake = 11, // 10 stays the compiler's counter value
+  Tundra = 12, // NW (D-NW9): walkable, the airship lands
+  Snow = 13, // walkable, no landing
 }
 
 export type VehicleType = 'canoe' | 'ship' | 'airship';

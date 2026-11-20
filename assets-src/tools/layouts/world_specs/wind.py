@@ -14,7 +14,7 @@ Every point is written in world cells where the feature should stand (`W`). The 
 hints are placed there as given; a continent polygon is drawn against the generator's continent warp (`_unwarp`:
 the shape stage samples a polygon's distance at the warped cell, so a vertex is moved by the warp at its place and
 the coast lands where it is drawn, give or take the fjord and coast noise). The ring and the mesa cliffs are forced
-high ground (`Barrier` records outside world_api_v2.BARRIERS: they gate no stage, so they carry no seeds and no cut;
+high ground (`Barrier` records outside world_api.BARRIERS: they gate no stage, so they carry no seeds and no cut;
 `wind/world_nw.py` checks that the three parts stay apart). The places, stamps and zones on the generated ground are
 `wind/world_nw.py` (`content`).
 """
@@ -117,7 +117,7 @@ def spec() -> RegionSpec:
 
 
 def content(g, meta, ctx) -> dict:
-    """WIND's content on the generated ground (`wind/world_nw.py`, a RegionOut), for `world_v2_content.merge`."""
+    """WIND's content on the generated ground (`wind/world_nw.py`, a RegionOut), for `world_content.merge`."""
     from wind import world_nw
     out = world_nw.content(g, meta, ctx.bundle)
     return {"objects": out.objects, "inspect": out.inspect, "npcs": out.npcs, "vehicles": out.vehicles,

@@ -2,7 +2,7 @@
 Onrac's icon and its scattered dressing, the falls over the waterfall cave, the caravan's tent on its outcrop with
 the crate and the oasis post, the cairn at the meadow's canoe launch, the two inspect cells, and the
 basalt sea-stacks across the mouth of Onrac's bay. Called by `world_specs/water.py`'s `content` on the composed
-ground (`world_v2_content.merge`); the zones are `world_water_nw_zones.py`.
+ground (`world_content.merge`); the zones are `world_water_nw_zones.py`.
 
 Every place hangs off its entrance's cell on the NW world (the anchors' targets, `world_specs/common.sites`), at the
 offsets today's world (`world_water_sites.py`, `world_water_land.py`) uses, so the content follows the spec:

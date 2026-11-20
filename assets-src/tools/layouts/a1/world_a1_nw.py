@@ -1,7 +1,7 @@
 """Act 1's content on the NW world beyond its kept pins (docs/NATURAL_WORLD_PLAN.md 3.6.4, 3.8 `coverage`; NW-RINT).
 
 NW-3 left two things of act 1 for later; the integrator adds them here, through the composer's one content hook
-(`world_specs/a1.content` -> `world_v2_content.merge`):
+(`world_specs/a1.content` -> `world_content.merge`):
 
 - **The zones (3.6.4).** Today's ids and tables, unchanged (`overworld_zones.py`, `a1/world_a1_zones.py`), their
   cells from today's rules on the NW ground and the owner grid:
@@ -62,9 +62,10 @@ def _dist(ok: np.ndarray, start, shut: set) -> dict:
 
 
 def walk_grid(g: np.ndarray) -> np.ndarray:
-    """On foot with the patches off, the city's and the temple's icons and the tomb blocked (as `overworld_grid`)."""
+    """On foot with the patches off, the city's and the temple's icons, the tomb and the boulders blocked (as pass W's
+    `overworld_grid.walk_grid`; NW-5 added the boulders, so no zone holds a boulder's cell)."""
     ok = gates.walk(g)
-    for c in P.CITY_ICON + P.TEMPLE_ICON:
+    for c in P.CITY_ICON + P.TEMPLE_ICON + P.BOULDERS:
         x, y = _w(c)
         ok[y, x] = False
     tx, ty = _w(P.TOMB)

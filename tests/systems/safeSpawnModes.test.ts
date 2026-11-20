@@ -57,7 +57,7 @@ describe('safeSpawn: the saved mode (GAP-11)', () => {
 describe('restoredSpawn: mode and position together', () => {
   const map = dock();
   const game = (mode: FieldMode, x: number, y: number, vehicles: VehicleState[] = []) =>
-    ({ playerPosition: { x, y }, fieldMode: mode, vehicles, pendingFrame: null as 'a1' | null });
+    ({ playerPosition: { x, y }, fieldMode: mode, vehicles });
 
   it('keeps the ship at sea in ship mode', () => {
     const g = game('ship', 12, 4);

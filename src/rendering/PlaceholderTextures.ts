@@ -20,7 +20,9 @@ const TILE_COLORS: Record<number, number> = {
   8: 0xc2b280, // Road - tan
   9: 0x8b4513, // Bridge - wood brown
   10: 0xdeb887, // Counter - burlywood
-  11: 0x2f6fb8, // Lake - deep blue (no row in the legacy terrain sheet)
+  11: 0x2f6fb8, // Lake - deep blue
+  12: 0x8a9a7a, // Tundra - grey moss (NW, D-NW9)
+  13: 0xe8ecf0, // Snow - white
 };
 const DEFAULT_TILE_COLOR = 0x555555;
 
@@ -28,7 +30,7 @@ const DEFAULT_TILE_COLOR = 0x555555;
 /** Terrain sheet at the on-screen tile size: legacy 16 px tiles at 3x, or at 6x for the 96 px AI-preview tiles. */
 const TERRAIN_SHEET_PATH = TILE_SIZE === 96 ? 'assets/sprites/terrain-6x.png' : 'assets/sprites/terrain.png';
 const TERRAIN_VARIANTS = 4;
-const TERRAIN_ROWS = 11;
+const TERRAIN_ROWS = 14; // rows 0-13: TerrainType order, the counter at 10, lake / tundra / snow (tiles_cold.py)
 
 // NPC colors by sprite type
 const NPC_COLORS: Record<string, number> = {

@@ -1,6 +1,6 @@
 """Region FIRE's content on the NW world (pass NW, NW-R FIRE; docs/NATURAL_WORLD_PLAN.md 3.3, 3.8 `coverage`, 7).
 
-The composer v2 (`world_v2.py`) calls `content(g, meta, b, trans)` after the generator: FIRE's geography is its spec
+The composer v2 (`world.py`) calls `content(g, meta, b, trans)` after the generator: FIRE's geography is its spec
 (`world_specs/fire.py`), its doors the composer's (today's door offsets, `world_specs/today_doors.py`); this module
 places what stands on that ground, as today's world has it (`world_fire_data.py`, FIR-O / FIR-T), ported to the new
 cells:
@@ -19,7 +19,7 @@ cells:
 
 Stamps (3.3's `rock` and `icon` kinds, on FIRE-owned cells only, after the generator): the neck's rock (`neck`), the
 ledge above the cave mouth and the hollow's pines, the volcano's top row on the cone, the hull's dune, the town's
-footprint, the promontory. The composer's `coverage` line (`world_v2_content.coverage`, NW-RINT) proves 3.8's rule
+footprint, the promontory. The composer's `coverage` line (`world_content.coverage`, NW-RINT) proves 3.8's rule
 for FIRE: every walkable or canoe cell it owns in one zone of its kind, every sea cell in exactly one ship zone.
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ from __future__ import annotations
 import numpy as np
 
 import kit as K
-from world_api_v2 import REGIONS
+from world_api import REGIONS
 from worldgen import spec as S
 from worldgen.gates import BLOCK
 from worldgen.geom import disc

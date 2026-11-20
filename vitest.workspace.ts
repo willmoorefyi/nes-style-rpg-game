@@ -19,6 +19,9 @@ export default defineWorkspace([
     test: {
       name: 'world',
       include: [...HEAVY_FILES],
+      // NW-5: the 256x256 world's state graphs need more than the default 4 GB heap: child processes (forks) take the
+      // 8 GB of the scripts' NODE_OPTIONS (package.json `test`, `test:full`, `test:world`), as `npm run quest` does
+      pool: 'forks',
     },
   },
 ]);

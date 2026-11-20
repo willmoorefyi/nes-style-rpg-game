@@ -101,6 +101,23 @@ export function sortedKey(s: ReadonlySet<string>): string {
   return [...s].sort().join(',');
 }
 
+/** Process-wide ids of the names a state key holds (NW-5: the compact key; only equality of keys matters). */
+const NAME_IDS = new Map<string, number>();
+
+/** A set of names as a bitset string (16 bits per char): a short, order-free key for the exact search. */
+export function bitKey(s: ReadonlySet<string>, ns: string): string {
+  const words: number[] = [];
+  for (const name of s) {
+    const k = `${ns}${name}`;
+    let id = NAME_IDS.get(k);
+    if (id === undefined) NAME_IDS.set(k, id = NAME_IDS.size);
+    const w = id >> 4;
+    while (words.length <= w) words.push(0);
+    words[w] |= 1 << (id & 15);
+  }
+  return String.fromCharCode(...words);
+}
+
 /** Apply effects exactly: flags and items added, takes removed, a vehicle replaces its type's old position. */
 export function applyExact(state: QuestState, eff: QuestEffects, at: QuestPlace): QuestState {
   const flags = new Set(state.flags);

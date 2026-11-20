@@ -45,7 +45,7 @@ describe('pass W file-size ceilings', () => {
     expect(FILES).toContain('src/progression/questTypes.ts');
     expect(FILES).toContain('src/systems/fieldRules.ts');
     expect(FILES).toContain('assets-src/tools/worldgen/spec.py');
-    expect(FILES).toContain(`${LAYOUTS}/world_api_v2.py`);
+    expect(FILES).toContain(`${LAYOUTS}/world_api.py`);
   });
 
   it.each(FILES)('%s is under 250 lines', (path) => {

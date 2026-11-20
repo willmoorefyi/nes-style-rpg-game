@@ -12,7 +12,7 @@ import { FlightSky } from './FlightSky.js';
 import { GroundStrips } from './GroundStrips.js';
 import { depthAt, type ViewParams } from './mode7Math.js';
 import { pickPreset, presetView, type PilotPreset } from './pilotPresets.js';
-import { ATLAS_CELL_PX, atlasTexture, composeStandIn, fillTexture, glInfo, meanRgb, readMip, readScreenRow, rowDiff,
+import { atlasCellPx, atlasTexture, composeStandIn, fillTexture, glInfo, meanRgb, readMip, readScreenRow, rowDiff,
   samplerState, type StandInAtlas } from './pilotGl.js';
 
 const SAMPLES = 600;
@@ -66,12 +66,13 @@ export class Mode7PilotScene implements Scene {
       presetName: preset.name, scenario: scenario?.id, map: mapId, cell: at });
 
     // the mip check: a known colour, regenerated, then the world over it, regenerated again
-    const rt = atlasTexture(map.width * ATLAS_CELL_PX, aniso);
+    const cellPx = await atlasCellPx(map);
+    const rt = atlasTexture(map.width * cellPx, aniso);
     fillTexture(gl, rt, RED);
     rt.source.updateMipmaps();
     const levels = rt.source.mipLevelCount;
     const before = meanRgb(readMip(gl, rt.source, levels - 1).px);
-    this.atlas = await composeStandIn(gl, rt, map.art);
+    this.atlas = await composeStandIn(gl, rt, map.art, cellPx);
     const after = meanRgb(readMip(gl, rt.source, levels - 1).px);
     const level6 = meanRgb(readMip(gl, rt.source, 6).px);
     const near = after.every((v, i) => Math.abs(v - level6[i]) <= 12);

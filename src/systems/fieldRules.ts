@@ -41,7 +41,7 @@ function inBounds(map: MapData, x: number, y: number): boolean {
 export function baseTerrain(map: MapData, x: number, y: number): TerrainType {
   if (!inBounds(map, x, y)) return TerrainType.Wall;
   const v = map.collision[y * map.width + x];
-  return (v >= 0 && v <= 9) || v === TerrainType.Lake ? (v as TerrainType) : TerrainType.Wall;
+  return (v >= 0 && v <= 9) || (v >= TerrainType.Lake && v <= TerrainType.Snow) ? (v as TerrainType) : TerrainType.Wall;
 }
 
 /**
@@ -70,6 +70,7 @@ export function terrainAllows(mode: FieldMode, t: TerrainType): boolean {
   switch (t) {
     case TerrainType.Grass: case TerrainType.Forest: case TerrainType.Desert:
     case TerrainType.Swamp: case TerrainType.Road: case TerrainType.Bridge:
+    case TerrainType.Tundra: case TerrainType.Snow:
       return true;
     default:
       return false;

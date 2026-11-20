@@ -90,23 +90,14 @@ export interface RestoredField {
   playerPosition: { x: number; y: number };
   fieldMode: FieldMode;
   vehicles: ParkedVehicle[];
-  pendingFrame: 'a1' | null;
-}
-
-/** An act-1 overworld cell in the map's frame: moved by `overworld`'s `world.frames.a1.origin` (GAP-17), else kept. */
-export function shiftA1(map: Pick<MapData, 'id' | 'world'>, pos: { x: number; y: number }): { x: number; y: number } {
-  const o = map.id === 'overworld' ? map.world?.frames?.a1?.origin : undefined;
-  return o ? { x: pos.x + o[0], y: pos.y + o[1] } : pos;
 }
 
 /**
- * Where the party stands on entering `map` after a load, a retry or a scenario: a version-1 overworld position is
- * first translated into the world frame (GAP-17's save half; once), then `safeSpawn` checks it in the saved mode
- * with the parked vehicles (GAP-11). A position moved elsewhere is on foot.
+ * Where the party stands on entering `map` after a load, a retry or a scenario: `safeSpawn` checks the position in
+ * the saved mode with the parked vehicles (GAP-11). A position moved elsewhere is on foot. (A pre-NW save on the
+ * world map is reset to Cornelia before it gets here: `worldReset.ts`, docs/NATURAL_WORLD_PLAN.md 5.3.)
  */
 export function restoredSpawn(map: MapData, game: RestoredField): { x: number; y: number } {
-  if (game.pendingFrame === 'a1') game.playerPosition = shiftA1(map, game.playerPosition);
-  game.pendingFrame = null;
   const pos = safeSpawn(map, game.playerPosition, game.fieldMode, resolveParked(game.vehicles ?? [], map).filter(hasCell));
   const moved = pos.x !== game.playerPosition.x || pos.y !== game.playerPosition.y;
   if (moved || !validInMode(map, new CollisionMap(map), pos, game.fieldMode)) game.fieldMode = 'walking';

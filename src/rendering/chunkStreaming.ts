@@ -157,7 +157,8 @@ const TERRAIN_COLOURS: Record<number, number> = {
   [TerrainType.Grass]: 0x3f8f3a, [TerrainType.Wall]: 0x4a4a4a, [TerrainType.Water]: 0x1d4f9c,
   [TerrainType.Mountain]: 0x7a6447, [TerrainType.Forest]: 0x23602a, [TerrainType.Desert]: 0xcdb47c,
   [TerrainType.Swamp]: 0x4f5f33, [TerrainType.River]: 0x3a6fc4, [TerrainType.Road]: 0xb9a57a,
-  [TerrainType.Bridge]: 0x86603a, [TerrainType.Lake]: 0x2a5fae,
+  [TerrainType.Bridge]: 0x86603a, [TerrainType.Lake]: 0x2a5fae, [TerrainType.Tundra]: 0x8a9a7a,
+  [TerrainType.Snow]: 0xe8ecf0,
 };
 
 /** The colour of a chunk's most common terrain (its flat placeholder). */

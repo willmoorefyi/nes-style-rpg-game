@@ -183,7 +183,7 @@ export class ExplorationScene implements Scene {
       const map = this.currentMapData;
       const hasEntrance = entrance !== null && map.entrances?.[entrance] !== undefined;
       if (entrance !== null && !hasEntrance) console.warn(`map ${map.id} has no entrance '${entrance}'; using the saved position`);
-      const pos = hasEntrance ? entrancePosition(map, entrance) : restoredSpawn(map, this.game); // mode, a1 (W1-A)
+      const pos = hasEntrance ? entrancePosition(map, entrance) : restoredSpawn(map, this.game); // the saved mode (W1-A)
       this.player?.setPosition(pos.x, pos.y);
       applyPendingFacing(this.game, this.player); // Retry / Return to Field: facing as when the battle began
       this.redraw();
@@ -197,6 +197,9 @@ export class ExplorationScene implements Scene {
       this.battleTrigger.triggerBattle(retry.enemyIds, retry.bossConfig, retry.background, retry.enemyAi)
         .catch((e) => console.error('Retry battle failed to start:', e));
     }
+    const notice = this.game.pendingNotice;           // NW-5: a pre-NW save's world reset, said once (5.3)
+    this.game.pendingNotice = null;
+    if (notice && this.currentMapData) this.dialogManager.start([notice]);
   }
 
   /** Every arrival in the field (new game, load, retry) fades in from black. */
@@ -370,6 +373,8 @@ export class ExplorationScene implements Scene {
     if (this.dialogManager.isActive) {
       this.fieldHUD.container.visible = false;
       this.dialogManager.update(dt, this.game.input);
+      this.camera.update();     // NW-5: the field still draws under a dialog (the reset notice on arrival: the
+      this.tilemap?.render();   // world map streamed in only once it closed)
       return;
     }
     if (this.fieldBusy) return;

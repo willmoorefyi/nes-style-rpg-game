@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from world_api_v2 import REGIONS, RegionOut
+from world_api import REGIONS, RegionOut
 from worldgen import spec as S
 from worldgen.gates import BLOCK
 from worldgen.geom import components, flood, sdist

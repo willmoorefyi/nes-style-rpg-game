@@ -1,8 +1,10 @@
 /**
  * The north bridge (docs/WORLD_PLAN.md 4.1, 6.3 GT-1 / GT-2, D-W13; A1-O). The King's scene `act1_complete` sets
  * INTRO_COMPLETE and BRIDGE_BUILT; the compiled world's patch `north_bridge` (flag BRIDGE_BUILT) turns the two gap
- * rows into Bridge and also covers the bridge gate cells (93, 96), (94, 96), so forcing it on opens the span and
- * drops the gates together (GT-2). Its overlay is opaque on every cell (its art covers the debris).
+ * rows into Bridge and also covers the two bridge gate cells, so forcing it on opens the span and drops the gates
+ * together (GT-2). Its overlay is opaque on every cell (its art covers the debris). NW-5: the cells come from the
+ * records (the gates `a1_bridge_gate_w` / `_e`, the two Water rows north of them, the `north_shore` entrance), not
+ * pass W's act-1 cells.
  */
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
@@ -15,8 +17,11 @@ import { validateMapData } from '../../../src/core/schemaValidation.js';
 const map = validateMapData(parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8'))) as MapData;
 const state = (flags: string[]): FieldState => ({ flags: new Set(flags), items: new Set(), mode: 'walking', vehicles: [] });
 const AFTER = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'INTRO_COMPLETE'];
-const GAP = [[93, 94], [94, 94], [93, 95], [94, 95]];
-const GATES = [[93, 96], [94, 96]];
+const GATES = (map.keyItemGates ?? []).filter((g) => g.id === 'a1_bridge_gate_w' || g.id === 'a1_bridge_gate_e')
+  .map((g) => [g.x, g.y]);
+/** The two Water rows north of the gates (the broken span). */
+const GAP = [2, 1].flatMap((d) => GATES.map(([x, y]) => [x, y - d]));
+const [GX, GY] = GATES[0];
 type Step = { type: string; flag?: string };
 const cutscenes = parse(readFileSync('assets/data/cutscenes.yaml', 'utf-8')) as Array<{ id: string; steps: Step[] }>;
 const flagsOf = (id: string) => cutscenes.find((c) => c.id === id)!.steps.filter((s) => s.type === 'set_flag').map((s) => s.flag);
@@ -34,16 +39,17 @@ describe('the north bridge patch (WORLD_PLAN 4.1, GT-2)', () => {
   });
 
   it('closed until BRIDGE_BUILT: the gap is water, the gate refuses the step; then the span walks', () => {
+    expect(GATES).toHaveLength(2);
     for (const [x, y] of GAP) expect(canEnter(map, { x, y }, 'walking', state(AFTER)), `(${x}, ${y})`).toBe(false);
-    expect(fieldStep(map, { x: 93, y: 97 }, { x: 93, y: 96 }, state(AFTER)).ok).toBe(false);
+    expect(fieldStep(map, { x: GX, y: GY + 1 }, { x: GX, y: GY }, state(AFTER)).ok).toBe(false);
     const built = state([...AFTER, 'BRIDGE_BUILT']);
-    let at = { x: 93, y: 97 };
-    for (const y of [96, 95, 94, 93, 92]) {
-      const to = { x: 93, y };
-      expect(fieldStep(map, at, to, built).ok, `(93, ${y})`).toBe(true);
+    let at = { x: GX, y: GY + 1 };
+    for (const y of [GY, GY - 1, GY - 2, GY - 3, GY - 4]) {
+      const to = { x: GX, y };
+      expect(fieldStep(map, at, to, built).ok, `(${GX}, ${y})`).toBe(true);
       at = to;
     }
-    expect(map.entrances?.north_shore).toEqual([93, 92]);
+    expect(map.entrances?.north_shore).toEqual([GX, GY - 4]);
   });
 
   it('its overlay exists and is opaque on every patch cell', () => {

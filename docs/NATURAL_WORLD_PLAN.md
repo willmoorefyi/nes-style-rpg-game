@@ -1174,10 +1174,9 @@ uses an entrance name.
 - [x] NW-4 gates, checks, the chunk-digest `check_base` and the compiled base (2026-11-20; result in 14)
 - [x] NW-R ELF / EARTH / FIRE / ORDEAL / WATER / WIND, merged by NW-RINT with act 1's zones and the lighthouse
   (2026-11-20; result in 15)
-- [ ] The verifier's state cap: on the merged NW world the full graph is 1,348,366 states and `--stage S30`'s
-  2,096,640, over `MAX_STATES` (1,000,000); raise it or shrink the state key (NW-5; priority: high, effort: 1h)
-- [ ] M7-5, M7-6, M7-INT merged before NW-5 (priority: medium, effort: external)
-- [ ] NW-5 cutover and balance, the save reset and `--from-reset` (priority: high, effort: 19h)
+- [x] The verifier's state cap: `MAX_STATES` 3,000,000 with a compact state key (NW-5; result in 16) (2026-11-20)
+- [x] M7-5, M7-6, M7-INT merged before NW-5 (2026-11-20)
+- [x] NW-5 cutover and balance, the save reset and `--from-reset` (2026-11-20; result in 16)
 - [ ] NW-INT and the user's play session (priority: high, effort: 5h)
 ```
 
@@ -1660,3 +1659,86 @@ still import `overworld_zones.py` and `a1/world_a1_zones.py` (v1's world_api), w
 retires their cell logic; the land figure near its band's floor; the compile's determinism check
 (`build_map.py --check-determinism overworld --src-dir assets-src/maps-nw`, two full compiles), not re-run here; the
 NW-R tranches' results are in their modules' design notes (ORDEAL's in its own section above).
+
+## 16. NW-5 result (cutover and balance)
+
+Branch `nw-5` from `mainline` bf8afef9. The game plays the 256x256 NW world; pass W's world source, `world_api` v1 and
+act 1's frame are gone.
+
+- **(1) The source swap.** `assets-src/maps-nw/overworld.yaml` -> `assets-src/maps/overworld.yaml`,
+  `world-anchors.yaml` -> `assets/data/`. `world_v2.py` -> `world.py` (the only composer; `overworld.py` a shim),
+  `world_api_v2.py` -> `world_api.py`, `world_checks_v2.py` -> `world_checks.py`, `world_v2_source` / `_content` ->
+  `world_source` / `world_content`. Deleted: pass W's `world_api.py`, composer, `world_checks.py`, the seven
+  `world_<r>.py` region modules, `world_coast.py`, `world_geom.py`, the region grounds (`a1/world_a1_ground`,
+  `earth/world_earth_ground`, `fire/world_fire_ground` / `_data`, `ordeal/world_ordeal_ground`,
+  `water/world_water_land`, `elf/world_land`, `wind/world_ground`) and act 1's retired files (`overworld_consts`,
+  `overworld_grid`, `overworld_noise`, `a1/world_a1_sites`, `a1/world_a1_derive`; 3.6.1). Kept as data (their cell
+  logic cut): `overworld_zones.py` and `a1/world_a1_zones.py` (act 1's tables, `row_rects`), `earth/world_earth_sites`,
+  `ordeal/world_ordeal_data`, `water/world_water_sites`, `water/world_water_zones` (tables, texts). `today_doors.py`
+  read pass W's source: its doors are frozen in `world_specs/today_doors_data.py`. `a1/world_a1_pins.py` is the source
+  now. `build_hooks`, `map_checks_region` and `terrain/region.py` lost their `BOXES` fallbacks. Two content fixes the
+  moved tests found: Bahamut's cave door had two ways out (its east side is rock now, OW-2), and act 1's zones held a
+  boulder's cell (`a1/world_a1_nw.walk_grid` blocks the boulders). `world.py`: every line OK, land 26,847 (in
+  [26,000, 31,800], 3.3 % above the floor: left as is, as the brief asked), G-NW2 34.1.
+- **(2) The compile.** `build_map.py overworld`: 254 s, peak footprint 11.2 GB (max RSS about 9.5 GB); 256 chunks, the
+  patches, `mode7.png` 3072² at 12 px per cell and `mode7_low.png` 1536² at 6. `build_map.py --check-determinism
+  overworld`: deterministic (429 s); `mode7_atlas.py --check-determinism overworld`: deterministic; `world.py`
+  re-run: `git diff --exit-code assets-src/maps` clean.
+- **(3) Snow and tundra, runtime (2.6).** `TerrainType.Tundra = 12`, `Snow = 13`; `baseTerrain` reads both (14 is
+  Wall); walking yes, ship and canoe no; the airship lands on grass or tundra, never snow (`canLand`, the Mode 7
+  marker); `TERRAIN_COLOURS`, the legacy placeholders and sheet rows; backdrop terrain names need no code. `pilotGl`
+  reads `cellPx` from `mode7.json` (16 when there is none). Tests: `fieldRulesCold`, `mode7Cold`, `pilotCellPx`.
+- **(4) The frame.** `shiftA1`, `Game.pendingFrame`, `DebugScenarioLoader`'s `frame: a1`, `questGeo.A1_ORIGIN` /
+  `worldOffsetOf` and the `world.frames` schema check removed; `tests/helpers/worldFrame.ts` -> `worldSpots.ts`;
+  `debugFrame` and `saveOriginShift` retired.
+- **(5) Saves.** `SAVE_VERSION` 4; `src/systems/worldReset.ts` (`resetSave`, `resetVehicles`, `RESET_SPOTS`:
+  `a1_s_pravoka_ship` (the `a1_pravoka` dock), `a1_s_airship`), `LoadedSave.reset`, `LoadScene` sets
+  `pendingEntrance = 'cornelia'`, the one-time notice; Q4a (inside a map with the ship or airship: Cornelia).
+  `tests/systems/saveWorldReset.test.ts` (the 8 cases), `worldReset.test.ts`, `tests/progression/resetStates.test.ts`.
+  `--from-reset` (`questReset.ts`): see the gates.
+- **(6) Tests.** `tests/nw/` moved into `tests/quest/a1/`, `tests/quest/<r>/`, `tests/data/`, `tests/progression/`;
+  pass W's box-copy tests (`<r>_o_world`, `fir_o_world`, `northWest`), `frozenCore` and its fixtures, `fxdWorldArt`,
+  `fxrWorldArt`, `pravokaChannel` retired; the act-1, site, spot and geography tests read records, spots and offsets.
+  Pass W's world source and anchors are frozen in `tests/fixtures/passW/` (the act-1 pins and the regions' kept ids
+  and rosters are compared with them).
+- **(7) Balance (4.4).** Measured from both worlds' witnesses (the curve model's walk of proof (a)): the NW world's
+  world-map fights were 1,357 against pass W's 1,275, and their xp up most in S10, S14 (+109 %: the voyage round the
+  north sea), S21 (+133 %) and S23-S26, which put S16 (L25.2, band [21, 24]) and S21 (L29.9, [25, 28]) over. A
+  fight-count fit brought the counts back but not the levels (S21 L29.3), because the NW walks cross richer zones; so
+  the step means were fitted to each stage's walk **xp**: one factor per zone (`layouts/world_balance.py`, an iterative
+  proportional fit over the stages, clamped to [0.67, 2.25], a factor within 10 % of 1 left at 1, the fields
+  untouched; `fir_desert` 1.4 set by hand for S15's seeded wipes). Result: every stage's level within 0.2 of pass W's
+  (S14 18.0 / 18.1, S16 evil_eye 24.5 / 24.6, S21 28.8 / 28.8, S28 hollow_seraph 33.9 / 33.8, lich_2 35.3 / 35.2),
+  every band OK. The fight counts per stage (walk plus exploration) are within 10 % of pass W's except S7 +1.5, S10
+  -3.0, S12 -3.0, S14 -34.6 (-39 %), S21 -4.1, S22 -1.6, S23 / S25 / S26 about +1.5 each, S29 -1.7 and S31 +8.6: the
+  exception is the rule's own (4.4 keeps the levels; the count moved because the walks moved). `--stage` runs: the
+  per-stage over-band failures of S16, S17, S21 and S24-S29 (15) fail pass W's world by the same margins (NW-RINT
+  measured both): they come from `--stage`'s entry at the band's low plus the stage's own grind, not from the world,
+  and are not re-measured or gated here; the full `--strict` run, the gate, is OK.
+  `tests/balance/questCurve.test.ts`: S31 (optional) wipes 0.40 per run, all in the Warmech's engine halls (the NW
+  witness sails the Aldi first and drains the party's charges): its optional bound is 0.45; `fieldCampaign`,
+  `fieldPacing`, `zones` pass unchanged.
+- **(8) AGENTS.md** "The world (pass W)" is "The world (pass NW)".
+
+**Gates.**
+
+| Gate | Result |
+|---|---|
+| `npm run build` | OK |
+| `npm run test:fast` / `test:full` | fast: 399 files, 9,613 tests OK; world tier (8 GB heap, forks): `questGraph` 30 and `questMutateWorld` 4 tests OK, 7,821 s; together the full 401 files |
+| `npm run quest -- --strict` | `quest-verify: OK`: (a) OK, (b) 423 withheld runs, (c) 1,291,102 states, (d) every band OK, (e) 8 towns, (f) Crescent 13,340 / 60,240, Gaia 87,241 / 259,240, (g) s* 0.851, (h) 12 rows + 2 basin rows; 193 s, max RSS 4.4 GB |
+| `MAX_STATES` | 3,000,000, with a compact state key (flag and item bitsets; the old key ran out of the 4 GB heap on `--stage S30` at 249 s); `npm run quest` with an 8 GB heap; `--stage S30 --strict`: OK, 1,956,096 states, 284 s, max RSS 4.35 GB |
+| `--from-reset` | `npm run quest -- --strict --only c --from-reset`: OK, 192 reset states (the 32 stage entries, each in its `--stage` scope, and 160 mid-stage samples), 5,559,533 states searched, 882 s, max RSS 7.1 GB. **Deviation:** 5 samples per stage (`--reset-samples N`, default 5), not 5.3's 50: a late sample searches 0.3-0.5 M states (41-68 s), so 50 per stage measured about 12 h |
+| the 8 save cases | OK (`saveWorldReset.test.ts`) |
+| determinism | `build_map.py --check-determinism overworld` and `mode7_atlas.py --check-determinism overworld` OK |
+| `world.py` | every line OK |
+| Appendix A | grep 1, 2: none; 3: the pure math / rendering tests' synthetic 192-cell maps and texture sizes (`streamWindow`, `bakedStreaming`, `worldAtlas`, `nearDetail`, `mode7Math`, `mode7Tilt`, `mode7Fallback`, `mode7Parity`, `propMath`), unrelated 192 px sprite and texture literals, two `src` comments; 4: none on the world map (the hits are interior entries, temple-of-fiends, pravoka, sky-castle-1f); 5: no world-cell literal but the contract constants (`CORNELIA_NW`, the delta (54, 44), the Aldi seed (146, 165)), pass W's frozen cell `[93, 97]` mapped by `pin` (a1Pins), and synthetic data (v1/v3 saves in `saveWorldReset`, the schema fixtures of `spotVehicles`, `questSpots`' scratch spot); the rest are interior, pixel and size literals; 6: `world_api.py` and the composer's comment only |
+| browser | the opening walk (21 steps to the bridge foot, the gate refuses), a ship voyage on the Aldi, a canoe trip at Onrac, an airship landing on tundra (65, 40) and a refusal on snow (65, 37), a Mode 7 flight over the north (3072 atlas at 12 px), a v3 save reset to Cornelia with the ship at the `a1_pravoka` dock; screenshots in `~/temp/ff-game/nw_5/` |
+
+**`--mutate`:** `npm run quest -- --strict --mutate`: `mutations: OK (64 gate rows; 105 elements, each removal
+reported)`, every proof OK, `quest-verify: OK`; 8,059 s (2 h 14 min), max RSS 7.9 GB.
+
+**Left for NW-INT:** the browser's reset check found the world map undrawn while the reset
+notice was open (the field skipped its camera and map render under any dialog): `ExplorationScene` now renders under a
+dialog too (scene tests pass; to be seen again in the browser); the world's land, 26,847 cells,
+3.3 % above its band's floor; `D_SPLIT` tuning if the 12 px far atlas shows a blur line (6.1).

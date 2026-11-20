@@ -1,7 +1,7 @@
 """A region's spec bundle and the records `spec.py` lacks (docs/NATURAL_WORLD_PLAN.md 3.2, 3.3; NW-2).
 
-Each `layouts/world_specs/<region>.py` builds one `RegionSpec`; the composer v2 (`layouts/world_v2.py`) merges the
-seven in `world_api_v2.REGIONS` order (`merge`) and hands the result to `compose.compose`. Points follow `spec.py`'s
+Each `layouts/world_specs/<region>.py` builds one `RegionSpec`; the composer v2 (`layouts/world.py`) merges the
+seven in `world_api.REGIONS` order (`merge`) and hands the result to `compose.compose`. Points follow `spec.py`'s
 rule: **Cornelia-relative** new-world offsets (east +x, south +y), turned into world coordinates by `spec.poly` in the
 generator. Only the act-1 template (`Template`) holds world rasters, and `sites` hold world cells.
 
@@ -56,7 +56,7 @@ class Lake:
 
 @dataclass(frozen=True)
 class Barrier:
-    """A named barrier ridge (world_api_v2.BARRIERS): forced high ground within `base` + `rn` x ridged noise of the
+    """A named barrier ridge (world_api.BARRIERS): forced high ground within `base` + `rn` x ridged noise of the
     line. `warped`: the line takes the shared line wobble (the spine does not)."""
     name: str
     points: tuple[Point, ...]
@@ -67,7 +67,7 @@ class Barrier:
 
 @dataclass(frozen=True)
 class Dock:
-    """A dock (world_api_v2.DOCKS_ALLOWED id) at a Cornelia-relative cell, its basin, the entrance it serves; `cove`:
+    """A dock (world_api.DOCKS_ALLOWED id) at a Cornelia-relative cell, its basin, the entrance it serves; `cove`:
     open the water from the dock away from that entrance (8 cells at most) until the basin's forced sea."""
     id: str
     at: Point
@@ -100,7 +100,7 @@ class Template:
     icons: tuple[Cell, ...] = ()             # icon cells (exempt, 0.1.1)
     exempt: tuple[Cell, ...] = ()            # the bridge, the footbridge, the jetty (exempt)
     bridge: tuple[Cell, ...] = ()            # the north bridge patch cells (the first 4 are the gap rows)
-    seed_cell: Cell = (0, 0)                 # the Aldi seed (world_api_v2.BASIN_SEEDS["aldi"])
+    seed_cell: Cell = (0, 0)                 # the Aldi seed (world_api.BASIN_SEEDS["aldi"])
 
 
 @dataclass
@@ -143,7 +143,7 @@ def empty_template(n: int = 256) -> Template:
 
 
 def merge(specs: list[RegionSpec]) -> RegionSpec:
-    """One bundle of every region's records, in the order given (world_api_v2.REGIONS)."""
+    """One bundle of every region's records, in the order given (world_api.REGIONS)."""
     out = RegionSpec(region="world")
     for s in specs:
         for f in ("continents", "ridges", "barriers", "walls", "passes", "cones", "sea_lines", "sea_discs",

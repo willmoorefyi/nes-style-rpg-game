@@ -2,8 +2,8 @@
 the regions of a map source, the build digests that make `--region` safe, and the world-compile lock.
 
 - **Regions.** A source lists them as `regions: {name: [[x0, y0, x1, y1], ...]}` (inclusive cells, chunk-aligned;
-  one or more rects each, GAP-19) or `{name: {rects: [...]}}`; for the composed world (`regions: {name: {stub,
-  checks}}`, or only `world:`) the rects are `layouts/world_api.BOXES`. A map without regions compiles as before.
+  one or more rects each, GAP-19), `{name: {rects: [...]}}` or, for the composed world, `{name: {raster: [...]}}` (pass
+  NW; pass W's box fallback retired at NW-5). A map without regions compiles as before.
 - **Build digests.** A compiled map with regions records `build: {compiler, boxes}`: a digest of the compiler (its
   code and the kit art it painted with) and one per region of what its pixels depend on (the region's ground
   cells, the objects anchored in it, and the map-wide painting keys). `--region r` repaints only r's chunks, so it
@@ -50,17 +50,12 @@ def regions_of(src: dict, wid: int | None = None, hgt: int | None = None) -> dic
     spec = src.get("regions")
     if not spec and not src.get("world"):
         return None
-    boxes = None
     regions = {}
-    for name in (spec or _boxes()):
-        v = (spec or {}).get(name)
+    for name, v in (spec or {}).items():
         if isinstance(v, dict) and ("rects" in v or "raster" in v):
             v = v.get("rects", v.get("raster"))
-        if not isinstance(v, list):                 # the composer's {stub, checks}: the rects are world_api.BOXES
-            boxes = boxes or _boxes()
-            if name not in boxes:
-                raise RegionError(f"region {name}: no rects (not in world_api.BOXES)")
-            v = boxes[name]
+        if not isinstance(v, list):                 # pass W's box fallback retired at NW-5
+            raise RegionError(f"region {name}: no rects (a region names its `rects` or `raster`)")
         regions[str(name)] = [tuple(int(c) for c in r) for r in v]
     for name, rects in regions.items():
         for r in rects:
@@ -69,12 +64,6 @@ def regions_of(src: dict, wid: int | None = None, hgt: int | None = None) -> dic
             if wid is not None and not (r[2] < wid and r[3] < hgt):
                 raise RegionError(f"region {name}: rect {list(r)} is outside the {wid}x{hgt} map")
     return regions
-
-
-def _boxes() -> dict[str, list[Rect]]:
-    sys.path.insert(0, str(TOOLS / "layouts"))
-    import world_api  # noqa: PLC0415
-    return {k: [(r.x0, r.y0, r.x1, r.y1) for r in rects] for k, rects in world_api.BOXES.items()}
 
 
 def region_of_cell(regions: dict[str, list[Rect]], x: int, y: int) -> str | None:

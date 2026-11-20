@@ -6,9 +6,24 @@
  * chunk row at a time, freeing each row's chunks after its draw. The patches are left out, as in the bake.
  */
 import { Assets, Container, Graphics, RenderTexture, Sprite, type Texture, type TextureSource, type WebGLRenderer } from 'pixi.js';
-import type { BakedMapArt } from '../../../types/index.js';
+import type { BakedMapArt, MapData } from '../../../types/index.js';
+import { atlasUrls, type AtlasMeta } from './WorldAtlas.js';
 
+/** The pilot's fallback cell size when the map has no `mode7.json` (pass W's 16 px; NW-5 reads `cellPx`). */
 export const ATLAS_CELL_PX = 16;
+
+/** The baked atlas's px per cell (`mode7.json` `cellPx`: 16 at 192 cells, 12 at 256), else ATLAS_CELL_PX. */
+export async function atlasCellPx(map: Pick<MapData, 'art'>,
+  load: (url: string) => Promise<AtlasMeta> = (url) => Assets.load<AtlasMeta>(url)): Promise<number> {
+  const urls = atlasUrls(map);
+  if (!urls) return ATLAS_CELL_PX;
+  try {
+    return (await load(urls.meta)).cellPx || ATLAS_CELL_PX;
+  } catch (e) {
+    console.error(`pilot: ${urls.meta} unreadable, using ${ATLAS_CELL_PX} px per cell`, e);
+    return ATLAS_CELL_PX;
+  }
+}
 
 export interface StandInAtlas {
   texture: RenderTexture;
@@ -36,11 +51,12 @@ export function fillTexture(renderer: WebGLRenderer, rt: RenderTexture, color: n
   g.destroy();
 }
 
-/** Draw every below chunk of `art` into `rt` at 16 px per cell, then regenerate its mips. */
-export async function composeStandIn(renderer: WebGLRenderer, rt: RenderTexture, art: BakedMapArt): Promise<StandInAtlas> {
+/** Draw every below chunk of `art` into `rt` at `cellPx` per cell, then regenerate its mips. */
+export async function composeStandIn(renderer: WebGLRenderer, rt: RenderTexture, art: BakedMapArt,
+  cellPx: number = ATLAS_CELL_PX): Promise<StandInAtlas> {
   const t0 = performance.now();
   const chunkPx = art.tile * art.chunk;
-  const destPx = ATLAS_CELL_PX * art.chunk;
+  const destPx = cellPx * art.chunk;
   const rows = new Map<number, { url: string; c: number }[]>();
   for (const url of art.below) {
     const m = /below_(\d+)_(\d+)\.png$/.exec(url ?? '');

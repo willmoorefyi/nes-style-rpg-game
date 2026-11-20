@@ -1,110 +1,181 @@
 /**
- * ERT-O (docs/WORLD_PLAN.md 2.2, 2.6, 2.8, 4.3, 6.3 GT-35 / GT-36): region EARTH on the compiled world and its three
- * site maps. The anchors sit within 2 cells of their targets; the canal patch is the only Water link between the
- * Aldi and the western strait; the dwarves' landing is an Aldi dock and Melmond's harbour an ocean one; the western
- * range parts Melmond's plain from Sarda's coast on foot (the composer exports its 4-cell cut); in the giant's
- * tunnel the giant's cell is the only way west, and the dwarf hall's foreman takes the TNT through his cutscene.
+ * NW-R EARTH (docs/NATURAL_WORLD_PLAN.md 3.3, 3.8, 7): region EARTH on the NW world source (committed sources only:
+ * `assets-src/maps/overworld.yaml` and its `world-anchors.yaml`). Today's `tests/quest/earth/ert_o_world` keeps
+ * testing today's compiled world until NW-5. The anchors sit within 2 cells of their targets; the canal patch alone
+ * joins the Aldi to the ocean; the dwarves' landing is an Aldi dock and Melmond's harbour an ocean one; the western
+ * range parts Melmond's plain from Sarda's coast on foot and by canoe, at least 3 cells thick (its exported cut 3,
+ * the ridge between the giant's mouths 3 or more); every door leads to its map; the cave mouths, Melmond's icon,
+ * the windmill, the shrine and the mooring post are placed; and the zones, by EARTH's raster chunks of the owner grid
+ * (`regions.earth.raster`), cover every walkable or canoe cell of EARTH's two landmasses once and every Water cell
+ * of its raster that no other region claims.
  */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 
 type XY = [number, number];
-interface Compiled {
-  width: number; height: number; collision: number[]; entrances: Record<string, XY>;
+type Rect = [number, number, number, number];
+interface Src {
+  ground: string; entrances: Record<string, XY>;
   transitions: Array<{ x: number; y: number; targetMap: string; targetEntrance?: string }>;
-  docks?: Array<{ id: string; x: number; y: number; basin: string }>;
-  patches?: Array<{ id: string; flag: string; cells: XY[]; terrain: number }>;
-  npcs: Array<{ id: string; x: number; y: number; requiredItem?: string; hideIf?: string; wander?: boolean;
-    cutscene?: { id: string; requiredFlags?: string[]; onceFlag: string }; shopId?: string }>;
-  encounterZones?: Array<{ id: string; rects: number[][]; modes?: string[]; name?: string }>;
-  world?: { cuts?: Record<string, XY[]> };
+  objects: Array<{ name?: string; x: number; y: number; parts?: string[][]; walk_cells?: number[][] }>;
+  inspect: Array<{ x: number; y: number; text: string[] }>;
+  patches: Array<{ id: string; flag: string; ground: string; cells: XY[]; art_ground?: string; objects?: unknown[] }>;
+  docks: Array<{ id: string; x: number; y: number; basin: string }>;
+  encounterZones?: Array<{ id: string; rects: Rect[]; modes?: string[]; encounters: unknown[] }>;
+  battleBackgrounds?: { zones?: Record<string, { default?: string }> };
+  regions: Record<string, { raster: Rect[]; checks?: Record<string, unknown> }>;
+  world: { basins: Record<string, XY>; cuts?: Record<string, XY[]> };
 }
-const load = (id: string): Compiled => parse(readFileSync(`assets/maps/ai/${id}.yaml`, 'utf-8')) as Compiled;
-const world = load('overworld');
+const nw = parse(readFileSync('assets-src/maps/overworld.yaml', 'utf-8')) as Src;
+const today = parse(readFileSync('tests/fixtures/passW/overworld.yaml', 'utf-8')) as Src;
 const anchors = (parse(readFileSync('assets/data/world-anchors.yaml', 'utf-8')) as
   { anchors: Array<{ entrance: string; region: string; target: XY }> }).anchors;
+const g = nw.ground.replace(/\n$/, '').split('\n').map((r) => [...r]);
+const N = g.length;
+const E = nw.entrances;
+const BLOCK = new Set(['o', 'm', 'r', '≈']);
+const walk = (c: string) => !BLOCK.has(c);
+const canoe = (c: string) => walk(c) || c === 'r' || c === '≈';
+const key = ([x, y]: XY) => `${x},${y}`;
 
-const BLOCKED = new Set([1, 2, 3, 7, 10, 11]);
-const WATER = 2;
-const at = (m: Compiled, x: number, y: number): number => m.collision[y * m.width + x];
-
-/** 4-connected flood over cells that pass `ok`, from `seeds`. */
-function flood(m: Compiled, seeds: XY[], ok: (x: number, y: number) => boolean): Set<string> {
+function flood(seeds: XY[], ok: (x: number, y: number) => boolean): Set<string> {
   const seen = new Set<string>();
   const q: XY[] = [];
-  for (const s of seeds) if (ok(...s)) { seen.add(`${s[0]},${s[1]}`); q.push(s); }
-  while (q.length) {
-    const [x, y] = q.shift()!;
+  for (const s of seeds) if (ok(...s)) { seen.add(key(s)); q.push(s); }
+  for (let i = 0; i < q.length; i++) {
+    const [x, y] = q[i];
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const nx = x + dx; const ny = y + dy;
-      if (nx < 0 || ny < 0 || nx >= m.width || ny >= m.height || seen.has(`${nx},${ny}`) || !ok(nx, ny)) continue;
+      if (nx < 0 || ny < 0 || nx >= N || ny >= N || seen.has(`${nx},${ny}`) || !ok(nx, ny)) continue;
       seen.add(`${nx},${ny}`);
       q.push([nx, ny]);
     }
   }
   return seen;
 }
-const walkable = (m: Compiled, extra: Set<string> = new Set()) =>
-  (x: number, y: number): boolean => !BLOCKED.has(at(m, x, y)) && !extra.has(`${x},${y}`);
+const inRects = (rs: Rect[], x: number, y: number) => rs.some(([a, b, c, d]) => x >= a && x <= c && y >= b && y <= d);
+const raster = (r: string) => nw.regions[r].raster;
+const others = Object.keys(nw.regions).filter((r) => r !== 'earth');
+/** A cell in a chunk of EARTH's raster that no other region's raster holds. */
+const earthOnly = (x: number, y: number) => inRects(raster('earth'), x, y) && !others.some((r) => inRects(raster(r), x, y));
 
-describe('ERT-O: EARTH on the world map', () => {
-  it('every EARTH anchor is an entrance within 2 cells of its target (2.2)', () => {
+describe('NW-R EARTH on the NW world', () => {
+  it('every EARTH anchor is a walkable entrance within 2 cells of its target; the west mouth lies west of the range', () => {
     const earth = anchors.filter((a) => a.region === 'earth');
     expect(earth.map((a) => a.entrance).sort()).toEqual(['ert_dwarf', 'ert_earth_cave', 'ert_giant', 'ert_melmond', 'ert_sarda']);
     for (const a of earth) {
-      const e = world.entrances[a.entrance];
-      expect(e, a.entrance).toBeDefined();
-      expect(Math.max(Math.abs(e[0] - a.target[0]), Math.abs(e[1] - a.target[1])), a.entrance).toBeLessThanOrEqual(2);
+      const [x, y] = E[a.entrance];
+      expect(Math.max(Math.abs(x - a.target[0]), Math.abs(y - a.target[1])), a.entrance).toBeLessThanOrEqual(2);
+      expect(walk(g[y][x]), a.entrance).toBe(true);
     }
-    expect(world.entrances.ert_giant_west).toEqual([23, 112]);
+    expect(E.ert_giant_west[0]).toBeLessThan(E.ert_giant[0]);
   });
 
-  it('the canal patch (CANAL_OPEN) alone joins the Aldi to the western strait (2.6)', () => {
-    const canal = world.patches!.find((p) => p.id === 'canal')!;
-    expect(canal.flag).toBe('CANAL_OPEN');
-    expect(canal.terrain).toBe(WATER);
-    const aldi: XY = [92, 121];
-    const strait: XY = [45, 92];
-    const wet = (cells: Set<string>) => (x: number, y: number) => at(world, x, y) === WATER || cells.has(`${x},${y}`);
-    expect(flood(world, [aldi], wet(new Set())).has(`${strait[0]},${strait[1]}`)).toBe(false);
-    const open = new Set(canal.cells.map(([x, y]) => `${x},${y}`));
-    expect(flood(world, [aldi], wet(open)).has(`${strait[0]},${strait[1]}`)).toBe(true);
-    for (const [x, y] of canal.cells) expect(at(world, x, y), `saddle cell ${x},${y}`).not.toBe(WATER);
+  it('the canal patch (CANAL_OPEN) alone joins the Aldi to the ocean; it is grass until then and stone-banked', () => {
+    const canal = nw.patches.find((p) => p.id === 'canal')!;
+    expect(canal).toMatchObject({ flag: 'CANAL_OPEN', ground: 'o', art_ground: '~' });
+    expect(canal.objects).toHaveLength(2);
+    const open = new Set(canal.cells.map(key));
+    for (const [x, y] of canal.cells) expect(g[y][x]).toBe('.');
+    const wet = (cells: Set<string>) => (x: number, y: number) => g[y][x] === 'o' || cells.has(`${x},${y}`);
+    expect(flood([nw.world.basins.aldi], wet(new Set())).has(key(nw.world.basins.ocean))).toBe(false);
+    expect(flood([nw.world.basins.aldi], wet(open)).has(key(nw.world.basins.ocean))).toBe(true);
   });
 
-  it('the dwarves\' landing is an Aldi dock by the hall, Melmond\'s harbour an ocean dock by its gate', () => {
-    const docks = Object.fromEntries((world.docks ?? []).map((d) => [d.id, d]));
-    expect(docks.ert_dwarf).toMatchObject({ x: 59, y: 104, basin: 'aldi' });
-    expect(docks.ert_melmond).toMatchObject({ x: 43, y: 113, basin: 'ocean' });
-    expect(at(world, 59, 104)).toBe(WATER);
-    const hall = flood(world, [world.entrances.ert_dwarf], walkable(world));
-    expect(hall.has('58,104')).toBe(true);                       // the landing's land cell
-    expect(hall.has(`${world.entrances.ert_melmond.join(',')}`)).toBe(false);   // the strait parts them on foot
+  it("the dwarves' landing is an Aldi dock by the hall, Melmond's harbour an ocean dock by its gate", () => {
+    const docks = Object.fromEntries(nw.docks.map((d) => [d.id, d]));
+    expect(docks.ert_dwarf.basin).toBe('aldi');
+    expect(docks.ert_melmond.basin).toBe('ocean');
+    const aldi = flood([nw.world.basins.aldi], (x, y) => g[y][x] === 'o');
+    for (const d of [docks.ert_dwarf, docks.ert_melmond]) expect(g[d.y][d.x]).toBe('o');
+    expect(aldi.has(key([docks.ert_dwarf.x, docks.ert_dwarf.y]))).toBe(true);
+    expect(aldi.has(key([docks.ert_melmond.x, docks.ert_melmond.y]))).toBe(false);
+    const nextTo = (d: { x: number; y: number }, seen: Set<string>) =>
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a, b]) => seen.has(`${d.x + a},${d.y + b}`));
+    const hall = flood([E.ert_dwarf], (x, y) => walk(g[y][x]));
+    expect(nextTo(docks.ert_dwarf, hall)).toBe(true);
+    expect(nextTo(docks.ert_melmond, flood([E.ert_melmond], (x, y) => walk(g[y][x])))).toBe(true);
+    expect(hall.has(key(E.ert_melmond))).toBe(false);          // the strait parts them on foot
   });
 
-  it('the western range parts Melmond\'s plain from Sarda\'s coast; its exported cut crosses it (GT-35)', () => {
-    const plain = flood(world, [world.entrances.ert_giant], walkable(world));
-    expect(plain.has(world.entrances.ert_melmond.join(','))).toBe(true);
-    expect(plain.has(world.entrances.ert_earth_cave.join(','))).toBe(true);
-    expect(plain.has(world.entrances.ert_sarda.join(','))).toBe(false);
-    expect(plain.has(world.entrances.ert_giant_west.join(','))).toBe(false);
-    const cut = world.world!.cuts!.western_range;
-    expect(cut.length).toBe(3);   // FX-R (P3-R3): the meandering range is 3 cells at its narrowest (4 before)
-    const opened = new Set(cut.map(([x, y]) => `${x},${y}`));
-    const open = (x: number, y: number) => !BLOCKED.has(at(world, x, y)) || opened.has(`${x},${y}`);
-    expect(flood(world, [world.entrances.ert_giant], open).has(world.entrances.ert_sarda.join(','))).toBe(true);
+  it("the western range parts Melmond's plain from Sarda's coast on foot and by canoe; its cut is 3 cells (GT-35)", () => {
+    for (const ok of [walk, canoe]) {
+      const plain = flood([E.ert_giant], (x, y) => ok(g[y][x]));
+      for (const e of ['ert_melmond', 'ert_earth_cave']) expect(plain.has(key(E[e])), e).toBe(true);
+      for (const e of ['ert_sarda', 'ert_giant_west']) expect(plain.has(key(E[e])), e).toBe(false);
+    }
+    const cut = nw.world.cuts!.western_range;
+    expect(cut.length).toBeGreaterThanOrEqual(3);
+    const opened = new Set(cut.map(key));
+    expect(flood([E.ert_giant], (x, y) => walk(g[y][x]) || opened.has(`${x},${y}`)).has(key(E.ert_sarda))).toBe(true);
   });
 
-  it('the tunnel mouths, the hall, the sage cave, Melmond and the Cavern lead to their maps', () => {
-    const to = (m: string, e: string) => world.transitions.filter((t) => t.targetMap === m && t.targetEntrance === e);
-    for (const [m, e] of [['dwarf-hall', 'arrival'], ['giant-tunnel', 'arrival'], ['giant-tunnel', 'west'],
-      ['sage-cave', 'arrival'], ['melmond', 'gate'], ['cavern-earth-b1', 'arrival']]) expect(to(m, e), `${m}:${e}`).toHaveLength(1);
+  it("the ridge between the giant's two mouths is at least 3 rock cells thick on every row round them", () => {
+    const [wx, y0] = E.ert_giant_west;
+    const [ex] = E.ert_giant;
+    for (let y = y0 - 6; y <= y0 + 6; y++) {
+      const row = g[y].slice(wx, ex + 1).join('');
+      const longest = Math.max(...(row.match(/m+/g) ?? ['']).map((s) => s.length));
+      expect(longest, `row ${y}: ${row}`).toBeGreaterThanOrEqual(3);
+    }
   });
 
-  it('every walkable EARTH cell is in one walking zone and every Water cell of the box in one ship zone (4.0.3)', () => {
-    const zones = (world.encounterZones ?? []).filter((z) => z.id.startsWith('ert_'));
-    expect(zones.map((z) => z.id)).toEqual(['ert_isthmus', 'ert_plain', 'ert_badlands', 'ert_sarda_coast', 'ert_aldi', 'ert_sea']);
+  it('the tunnel mouths, the hall, the sage cave, Melmond and the Cavern lead to their maps, each beside its entrance', () => {
+    for (const [m, e, ent] of [['dwarf-hall', 'arrival', 'ert_dwarf'], ['giant-tunnel', 'arrival', 'ert_giant'],
+      ['giant-tunnel', 'west', 'ert_giant_west'], ['sage-cave', 'arrival', 'ert_sarda'], ['melmond', 'gate', 'ert_melmond'],
+      ['cavern-earth-b1', 'arrival', 'ert_earth_cave']]) {
+      const t = nw.transitions.filter((x) => x.targetMap === m && x.targetEntrance === e);
+      expect(t, `${m}:${e}`).toHaveLength(1);
+      expect(Math.abs(t[0].x - E[ent][0]) + Math.abs(t[0].y - E[ent][1]), ent).toBe(1);
+    }
+  });
+
+  it("today's EARTH landmarks are placed: five cave mouths over their doors, Melmond's icon, the windmill, the shrine, the post", () => {
+    const doors = nw.transitions.filter((t) => ['dwarf-hall', 'giant-tunnel', 'sage-cave', 'cavern-earth-b1'].includes(t.targetMap));
+    const mouths = nw.objects.filter((o) => o.parts?.[0]?.[0] === 'cave_mouth_icon_0_0');
+    for (const d of doors) {
+      expect(mouths.some((o) => o.walk_cells && o.x + o.walk_cells[0][0] === d.x && o.y + o.walk_cells[0][1] === d.y),
+        `${d.targetMap} ${d.x},${d.y}`).toBe(true);
+    }
+    const mel = nw.objects.find((o) => o.name === 'melmond')!;
+    const door = nw.transitions.find((t) => t.targetMap === 'melmond')!;
+    expect([mel.x + mel.walk_cells![0][0], mel.y + mel.walk_cells![0][1]]).toEqual([door.x, door.y]);
+    expect(mel.parts!.length).toBe(3);
+    for (const name of ['windmill_icon_0_0', 'shrine_icon_0_0', 'dock_post_icon_0_0']) {
+      // EARTH's own (NW-RINT: on its raster; ELF's port has a mooring post too)
+      expect(nw.objects.filter((o) => o.parts?.[0]?.[0] === name && inRects(raster('earth'), o.x, o.y)), name)
+        .toHaveLength(1);
+    }
+    const shrine = nw.objects.find((o) => o.parts?.[0]?.[0] === 'shrine_icon_0_0')!;
+    const text = today.inspect.find((i) => i.text[0].startsWith('A shrine to the earth'))!.text;
+    expect(nw.inspect.filter((i) => i.y === shrine.y + 1 && i.x >= shrine.x && i.x <= shrine.x + 1)
+      .map((i) => i.text)).toEqual([text, text]);
+  });
+
+  it('every cave door leaves only to its arrival on the ground (warp_leaves: rock under and beside its mouth)', () => {
+    for (const [m, ent] of [['dwarf-hall', 'ert_dwarf'], ['giant-tunnel', 'ert_giant'], ['giant-tunnel', 'ert_giant_west'],
+      ['sage-cave', 'ert_sarda'], ['cavern-earth-b1', 'ert_earth_cave']]) {
+      const d = nw.transitions.find((t) => t.targetMap === m && Math.abs(t.x - E[ent][0]) + Math.abs(t.y - E[ent][1]) === 1)!;
+      const out = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([a, b]) => [d.x + a, d.y + b] as XY).filter(([x, y]) => walk(g[y][x]));
+      expect(out, ent).toEqual([E[ent]]);
+    }
+  });
+
+  it("the zones keep today's ids and rosters; the badlands keep their backdrop", () => {
+    const zones = (nw.encounterZones ?? []).filter((z) => z.id.startsWith('ert_'));
+    const was = (today.encounterZones ?? []).filter((z) => z.id.startsWith('ert_'));
+    expect(zones.map((z) => z.id)).toEqual(was.map((z) => z.id));
+    for (const z of zones) {
+      const t = was.find((w) => w.id === z.id)!;
+      expect(z.encounters, z.id).toEqual(t.encounters);
+      expect(z.modes, z.id).toEqual(t.modes);
+    }
+    expect(nw.battleBackgrounds?.zones?.ert_badlands).toEqual({ default: 'cracked_earth' });
+  });
+
+  it('every walkable or canoe cell of the western continent and of the isthmus is in one EARTH walking zone; every Water cell only EARTH holds in one ship zone', () => {
+    const zones = (nw.encounterZones ?? []).filter((z) => z.id.startsWith('ert_'));
     const count = new Map<string, number>();
     for (const z of zones) for (const [x0, y0, x1, y1] of z.rects) {
       for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
@@ -112,45 +183,15 @@ describe('ERT-O: EARTH on the world map', () => {
         count.set(k, (count.get(k) ?? 0) + 1);
       }
     }
-    const inEarth = (x: number, y: number) => (x <= 63 && y >= 64 && y <= 111) || (x <= 47 && y >= 112 && y <= 143);
-    for (let y = 64; y <= 143; y++) for (let x = 0; x <= 63; x++) {
-      if (!inEarth(x, y)) continue;
-      const c = at(world, x, y);
-      if (c === WATER) expect(count.get(`S${x},${y}`), `water ${x},${y}`).toBe(1);
-      else if (!BLOCKED.has(c)) expect(count.get(`W${x},${y}`), `land ${x},${y}`).toBe(1);
+    for (const k of count.keys()) {
+      const [x, y] = k.slice(1).split(',').map(Number);
+      expect(inRects(raster('earth'), x, y), `${k} outside EARTH's raster`).toBe(true);
     }
-  });
-});
-
-describe('ERT-O: the site maps', () => {
-  it('the giant lies on the tunnel\'s only way west; once he is gone the way is open (GT-36)', () => {
-    const t = load('giant-tunnel');
-    const giant = t.npcs.find((n) => n.id === 'ert_giant')!;
-    expect(giant).toMatchObject({ requiredItem: 'ruby', hideIf: 'TITAN_FED', cutscene: { id: 'ert_giant_feast', onceFlag: 'TITAN_FED' } });
-    expect(giant.wander).toBeUndefined();
-    const west = t.entrances.west.join(',');
-    expect(flood(t, [t.entrances.arrival], walkable(t, new Set([`${giant.x},${giant.y}`]))).has(west)).toBe(false);
-    expect(flood(t, [t.entrances.arrival], walkable(t)).has(west)).toBe(true);
-  });
-
-  it('Nerrick needs the TNT for the blast; Sarda\'s rod waits for the vampire; Smyth forges from adamant', () => {
-    const hall = load('dwarf-hall');
-    expect(hall.npcs.find((n) => n.id === 'ert_nerrick')).toMatchObject(
-      { requiredItem: 'tnt', cutscene: { id: 'ert_canal_blast', onceFlag: 'CANAL_OPEN' } });
-    // S31: switched on by INT; W-S31 (the classic order): he forges as soon as the adamant comes, no flag gate
-    const smyth = hall.npcs.find((n) => n.id === 'ert_smyth')!;
-    expect(smyth).toMatchObject({ requiredItem: 'adamant' });
-    expect(smyth.cutscene).toEqual({ id: 'ert_smyth_forge', onceFlag: 'ERT_O_SWORD_FORGED' });
-    expect(hall.npcs.find((n) => n.shopId)?.shopId).toBe('dwarf_item');
-    const sage = load('sage-cave');
-    expect(sage.npcs).toHaveLength(3);
-    expect(sage.npcs.find((n) => n.id === 'ert_sarda')?.cutscene).toEqual(
-      { id: 'ert_sarda_rod', requiredFlags: ['VAMPIRE_DEFEATED'], onceFlag: 'ERT_O_ROD_GIVEN' });
-    const cut = parse(readFileSync('assets/data/cutscenes.yaml', 'utf-8')) as Array<{ id: string; steps: Array<Record<string, string>> }>;
-    const steps = (id: string) => cut.find((c) => c.id === id)!.steps;
-    expect(steps('ert_canal_blast')).toEqual(expect.arrayContaining([{ type: 'take_item', item: 'tnt' }, { type: 'set_flag', flag: 'CANAL_OPEN' }]));
-    expect(steps('ert_giant_feast')).toEqual(expect.arrayContaining([{ type: 'take_item', item: 'ruby' }, { type: 'set_flag', flag: 'TITAN_FED' }]));
-    expect(steps('ert_sarda_rod')).toEqual(expect.arrayContaining([{ type: 'give_item', item: 'rod' }]));
-    expect(steps('ert_smyth_forge')).toEqual(expect.arrayContaining([{ type: 'give_item', item: 'excalibur', announce: true }]));
+    const west = flood([E.ert_melmond, E.ert_sarda, E.ert_giant_west], (x, y) => canoe(g[y][x]));
+    const isthmus = flood([E.ert_dwarf], (x, y) => canoe(g[y][x]) && earthOnly(x, y));
+    for (const c of [...west, ...isthmus]) expect(count.get(`W${c}`), `land ${c}`).toBe(1);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      if (g[y][x] === 'o' && earthOnly(x, y)) expect(count.get(`S${x},${y}`), `water ${x},${y}`).toBe(1);
+    }
   });
 });

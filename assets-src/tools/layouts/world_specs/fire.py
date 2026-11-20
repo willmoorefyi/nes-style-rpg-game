@@ -67,6 +67,6 @@ def spec() -> RegionSpec:
 
 def content(g, meta, ctx) -> dict:
     """NW-R FIRE: the region's content on the composed ground (`fire/world_fire_nw.py`), for
-    `world_v2_content.merge` (`ctx.bundle`, `ctx.trans`)."""
+    `world_content.merge` (`ctx.bundle`, `ctx.trans`)."""
     from fire import world_fire_nw
     return world_fire_nw.content(g, meta, ctx.bundle, ctx.trans)

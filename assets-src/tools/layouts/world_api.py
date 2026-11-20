@@ -1,132 +1,47 @@
-"""The world contract of pass W (docs/WORLD_PLAN.md 2.4-2.9): the 192x192 world map, its region boxes, edge bands,
-seams, the frozen act-1 core, the basins, the allowed docks, the Aldi walls and the module dataclasses.
+"""The world contract of pass NW (docs/NATURAL_WORLD_PLAN.md 3.2, 3.3, 0.1.1, 2.2; NW-1, NW-5).
 
-W1-0b declares the constants and dataclasses below (they are read only for every other tranche; a needed change goes
-to the integrator). W1-C2 implements the composer logic in `world.py`. All coordinates are world cells unless a name
-says `local` (act-1 cells, world = local + A1_ORIGIN). Every Rect is inclusive.
+Declared beside pass W's contract by NW-1 as `world_api_v2.py`; NW-5 deleted pass W's 192x192 boxed contract and
+renamed this one. There are no region boxes, seams or edge bands and no act-1 frame or frozen core (Appendix A's grep
+1 and 2 find none of their names): act 1's cells are world cells, pinned relative to Cornelia (3.6). Regions own content, not ground: a `RegionOut` has no `ground` rows. The NW
+integrator owns this file; a region that needs a constant changed asks the integrator (3.5).
 """
 from __future__ import annotations
 
-from collections.abc import Iterator
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:                            # the generator's records (worldgen/spec.py imports this module)
+    from worldgen.spec import Pin, Route, Stamp
 
 Cell = tuple[int, int]
 
-WORLD_W = WORLD_H = 192
+WORLD_W = WORLD_H = 256                      # D-NW1 (user ruling 2026-11-20): 16 x 16 = 256 chunks
 CHUNK = 16                                   # cells per chunk side (the compiler's 2x chunks)
-EDGE = 2                                     # band half-width: 2 cells on each side of a box edge
-A1_ORIGIN: Cell = (64, 64)                   # the act-1 72x72 block moves from (0, 0) to here (D-W1)
-A1_SIZE: Cell = (72, 72)
-UNSET = " "                                  # a RegionOut.ground cell the region leaves to the composer
 WATER, MOUNTAIN, GRASS = "o", "m", "."       # build_map.py LEGEND chars the composer writes
+TUNDRA, SNOW = "t", "n"                      # D-NW9 (2.6): the airship lands on tundra, never on snow
 
+# 2.2: Cornelia's south-gate arrival in the new world (fixed by NW-0) and the act-1 delta from today's world. An act-1
+# pin sits at CORNELIA_NW + (p_today - CORNELIA_TODAY); every other anchor's target is CORNELIA_NW + S_STAR x ref.
+CORNELIA_NW: Cell = (146, 155)
+CORNELIA_TODAY: Cell = (92, 111)
+A1_DELTA: Cell = (CORNELIA_NW[0] - CORNELIA_TODAY[0], CORNELIA_NW[1] - CORNELIA_TODAY[1])     # (+54, +44)
+S_STAR = 0.86                                # cells per classic tile (D-NW1; today 0.735)
 
-@dataclass(frozen=True)
-class Rect:
-    x0: int
-    y0: int
-    x1: int
-    y1: int
-
-    @property
-    def w(self) -> int:
-        return self.x1 - self.x0 + 1
-
-    @property
-    def h(self) -> int:
-        return self.y1 - self.y0 + 1
-
-    def contains(self, x: int, y: int) -> bool:
-        return self.x0 <= x <= self.x1 and self.y0 <= y <= self.y1
-
-    def cells(self) -> Iterator[Cell]:
-        """Row-major, so every walk over a rect is deterministic."""
-        for y in range(self.y0, self.y1 + 1):
-            for x in range(self.x0, self.x1 + 1):
-                yield x, y
-
-    def shift(self, dx: int, dy: int) -> Rect:
-        return Rect(self.x0 + dx, self.y0 + dy, self.x1 + dx, self.y1 + dy)
-
-    def chunks(self) -> set[tuple[int, int]]:
-        """(col, row) of every chunk the rect touches."""
-        return {(c, r) for r in range(self.y0 // CHUNK, self.y1 // CHUNK + 1)
-                for c in range(self.x0 // CHUNK, self.x1 // CHUNK + 1)}
-
-
-@dataclass(frozen=True)
-class Region:
-    id: str
-    prefix: str                              # entrance, zone, flag and patch ids start with `<prefix>_`
-    rects: tuple[Rect, ...]
-    owner: str                               # the O tranche that writes `layouts/world_<id>.py`
-
-
-# 2.4: the boxes, 1 or 2 chunk-aligned rects each; together they tile the world (144 chunks, each in one region)
-BOXES: dict[str, list[Rect]] = {
-    "a1": [Rect(64, 64, 143, 143)],
-    "elf": [Rect(48, 112, 63, 143), Rect(0, 144, 111, 191)],
-    "earth": [Rect(0, 64, 63, 111), Rect(0, 112, 47, 143)],
-    "fire": [Rect(144, 64, 191, 143), Rect(112, 144, 191, 191)],
-    "ordeal": [Rect(64, 0, 127, 63)],
-    "water": [Rect(0, 0, 63, 63)],
-    "wind": [Rect(128, 0, 191, 63)],
-}
+REGIONS = ("a1", "elf", "earth", "fire", "ordeal", "water", "wind")     # tie-break order (owner grid, 3.4)
 PREFIXES = {"a1": "a1", "elf": "elf", "earth": "ert", "fire": "fir", "ordeal": "ord", "water": "wat", "wind": "wnd"}
-OWNERS = {"a1": "A1-O", "elf": "ELF-O", "earth": "ERT-O", "fire": "FIR-O", "ordeal": "ORD-O", "water": "WAT-O",
-          "wind": "WND-O"}
-REGION_DEFS: dict[str, Region] = {r: Region(r, PREFIXES[r], tuple(BOXES[r]), OWNERS[r]) for r in BOXES}
+NORTH_REGIONS = ("water", "ordeal", "wind")  # 3.8 `north`: their walk+canoe components hold only their own cells
 
-# 2.5: the act-1 frozen core (local x 0-71, y 0-71) and the cells inside it that may change
-FROZEN_CORE = Rect(A1_ORIGIN[0], A1_ORIGIN[1], A1_ORIGIN[0] + A1_SIZE[0] - 1, A1_ORIGIN[1] + A1_SIZE[1] - 1)
+# 0.1.1 G-NW2 (D-NW11, preset B measured 30.6 in NW-0): the whole-world coast index gate
+G2_MIN = 30.0
+G1_MAX_RUN = 6                               # G-NW1 / G-NW3: a straight run longer than this fails (unless exempt)
+EXEMPT_KINDS = ("quay", "dock", "canal", "bridge", "icon")    # 0.1.1: the stamp kinds whose cells (+ ring) are exempt
+STAMP_KINDS = EXEMPT_KINDS + ("pond", "rock")                 # 3.3: every kind a region's stamp may have
+EXEMPT_CAP = 600                             # 0.1.1: the exemption list may hold at most this many cells
+LAND_TARGET = (26_000, 31_800)               # D-NW12: preset B's 28,874 land cells +- 10 %
+SPOT_KINDS = ("land", "dock", "landing")     # 5.2: a spot's kind (walkable, Water, a landing cell)
 
-
-@dataclass(frozen=True)
-class FrozenException:
-    local: Rect                              # act-1 local cells
-    allowed: str                             # "any", or "o>m" (ocean may become mountain, nothing else changes)
-    owners: tuple[str, ...]
-    about: str
-
-    @property
-    def world(self) -> Rect:
-        return self.local.shift(*A1_ORIGIN)
-
-
-# LM4-INT (user ruling 2026-11-19): Pravoka's world icon may grow and break the frozen act-1 core. It grew from 2x1
-# (130-131, 100) to the approved 3x3 icon over PRAVOKA_ICON_CELLS; those cells changed (their objects, collision and
-# art; the ground under them is unchanged: the headland rock at 130-131, 98-99 and the channel water at 132, 98-100).
-# Every one of them already lies in X_pravoka (local x 58-71, y 26-44), so no rect grew; tests/quest/a1/frozenCore
-# pins the icon to exactly these cells.
-PRAVOKA_ICON_CELLS = Rect(130, 98, 132, 100)
-FROZEN_EXCEPTIONS: dict[str, FrozenException] = {
-    "X_pravoka": FrozenException(Rect(58, 26, 71, 44), "any", ("A1-T", "A1-O"),
-                                 "Pravoka, its dock and its shore (A1-T: town icon and dock; A1-O: ground)"),
-    "X_matoya": FrozenException(Rect(6, 8, 14, 16), "any", ("A1-O",), "Matoya's grove and cave"),
-    "X_west": FrozenException(Rect(0, 14, 7, 20), "o>m", ("A1-O", "composer"),
-                              "part of the Aldi's north-west wall; local x 0-1 is seam_w"),
-    "X_east": FrozenException(Rect(64, 12, 71, 18), "o>m", ("A1-O",), "the north end of Pravoka's range"),
-}
-
-
-@dataclass(frozen=True)
-class Seam:
-    rect: Rect                               # band cells the composer fills
-    fill: str                                # MOUNTAIN or GRASS
-    joins: tuple[str, str]                   # the two regions it joins
-    about: str
-
-
-# 2.5: a mountain seam must touch a wall cell of each joined region; a grass seam a walkable cell of each
-SEAMS: dict[str, Seam] = {
-    "seam_w": Seam(Rect(62, 78, 65, 84), MOUNTAIN, ("earth", "a1"), "the Aldi's north-west wall"),
-    "seam_n": Seam(Rect(48, 110, 61, 113), GRASS, ("earth", "elf"), "the dwarf hall can be walked to from Elfland"),
-    "seam_s": Seam(Rect(110, 146, 113, 165), MOUNTAIN, ("elf", "fire"), "the Aldi's south wall"),
-    "seam_se": Seam(Rect(138, 142, 141, 145), MOUNTAIN, ("a1", "fire"), "the Aldi's east wall"),
-}
-
-# 2.6: the two basins and their seeds (aldi: the act-1 ship spawn's cell below Cornelia's jetty, local (28, 57))
-BASIN_SEEDS: dict[str, Cell] = {"aldi": (92, 121), "ocean": (2, 2)}
+# 3.8 `basins`: the two seas and their seeds (aldi: the cell below Cornelia's jetty, today (92, 121) + A1_DELTA)
+BASIN_SEEDS: dict[str, Cell] = {"aldi": (146, 165), "ocean": (2, 2)}
 CANAL_PATCH = "canal"                        # EARTH's patch (flag CANAL_OPEN), the only link between the basins
 
 
@@ -134,73 +49,52 @@ CANAL_PATCH = "canal"                        # EARTH's patch (flag CANAL_OPEN), 
 class DockSpec:
     basin: str
     region: str
-    owner: str
     place: str
 
 
-# 2.6: any other dock fails the verifier with `DOCK ... not allowed`
+# 4.1: the same ids as pass W; each dock cell is a pin on a natural cove. Any other dock fails `docks` (3.8).
 DOCKS_ALLOWED: dict[str, DockSpec] = {
-    "a1_pravoka": DockSpec("aldi", "a1", "A1-T", "Pravoka's quay, in the channel between the mainland and the range "
-                                                  "(world x 129-135)"),
-    "elf_port": DockSpec("aldi", "elf", "ELF-O", "Elfheim's harbour on Elfland's north coast"),
-    "ert_dwarf": DockSpec("aldi", "earth", "ERT-O", "the dwarves' landing on the isthmus's east coast"),
-    "ert_melmond": DockSpec("ocean", "earth", "ERT-O", "Melmond's harbour on the western strait"),
-    "fir_crescent": DockSpec("ocean", "fire", "FIR-O", "Crescent Lake's harbour on the outer channel (x 142-147)"),
+    "a1_pravoka": DockSpec("aldi", "a1", "Pravoka's quay, in the channel between the mainland and its range"),
+    "elf_port": DockSpec("aldi", "elf", "Elfheim's harbour on Elfland's north coast"),
+    "ert_dwarf": DockSpec("aldi", "earth", "the dwarves' landing on the isthmus's Aldi side"),
+    "ert_melmond": DockSpec("ocean", "earth", "Melmond's harbour on the western strait"),
+    "fir_crescent": DockSpec("ocean", "fire", "Crescent Lake's harbour on the outer fjord"),
 }
 
 
 @dataclass(frozen=True)
-class Wall:
-    regions: tuple[str, ...]                 # the regions whose modules return a part of it (RegionOut.walls)
-    seams: tuple[str, ...]                   # the composer-owned seams that are part of it
+class WallLine:
+    region: str                              # the region whose spec draws the line (`world_specs/<region>.py`)
     about: str
 
 
-# 2.6: the five walls that close the Aldi (the act-1 peninsula and mainland close the north). The composer exports
-# each as a named cell set (its seams plus the regions' parts) for the mutations (6.3 GT-13).
-WALLS: dict[str, Wall] = {
-    "W_west": Wall(("a1", "earth"), ("seam_w",), "X_west, seam_w and EARTH's isthmus stub (y 76-87, mountain)"),
-    "W_isthmus": Wall(("earth",), (), "the isthmus from the canal strip south to seam_n"),
-    "W_arm": Wall(("elf",), ("seam_n",), "ELF's north arm and Elfland's north coast"),
-    "W_south": Wall(("fire",), ("seam_s",), "seam_s and the north-west cliffs of the south-east continent"),
-    "W_east": Wall(("a1", "fire"), ("seam_se",), "seam_se, Pravoka's range (x 138-141, y 76-141), the A1 cells "
-                                                  "x 136-137, y 76-82 that join X_east to it, and X_east"),
+# 4.1: the five wall lines that close the Aldi, by id. Each is forced land in the shape stage and a ridge in relief;
+# the `walls` check (3.8) wants it unbroken land >= 3 cells wide with no water across, and exports it as world.cuts.
+WALLS: dict[str, WallLine] = {
+    "W_west": WallLine("earth", "the mainland's west headland to the isthmus's north end"),
+    "W_isthmus": WallLine("earth", "the hogback along the isthmus (the canal saddle is its one pass)"),
+    "W_arm": WallLine("elf", "Elfland's north coast to the Western Keep's cape"),
+    "W_south": WallLine("fire", "Elfland's east fells to the volcanic arc, a mountain neck"),
+    "W_east": WallLine("a1", "Pravoka's range, from the mainland to the south-east's rock neck"),
 }
-
-
-@dataclass(frozen=True)
-class PlaceholderWall:
-    wall: str                                # a WALLS key
-    region: str                              # the region whose cells it fills
-    rect: Rect
-    fill: str                                # MOUNTAIN (GRASS next to the grass seam, so seam_n has walkable sides)
-
-
-# 5.1: until a region's module is built (RegionOut.stub), the composer fills these cells along the wall's planned
-# path, Water cells only (so on the act-1 core only o -> m, as X_west and X_east allow). None is in a band.
-PLACEHOLDER_WALLS: list[PlaceholderWall] = [
-    PlaceholderWall("W_west", "a1", FROZEN_EXCEPTIONS["X_west"].world, MOUNTAIN),
-    PlaceholderWall("W_west", "earth", Rect(48, 76, 61, 87), MOUNTAIN),
-    PlaceholderWall("W_isthmus", "earth", Rect(48, 88, 61, 108), MOUNTAIN),
-    PlaceholderWall("W_isthmus", "earth", Rect(48, 109, 61, 109), GRASS),
-    PlaceholderWall("W_arm", "elf", Rect(50, 114, 61, 114), GRASS),
-    PlaceholderWall("W_arm", "elf", Rect(50, 115, 61, 147), MOUNTAIN),
-    PlaceholderWall("W_arm", "elf", Rect(62, 146, 109, 147), MOUNTAIN),
-    PlaceholderWall("W_south", "fire", Rect(114, 146, 137, 147), MOUNTAIN),
-    PlaceholderWall("W_east", "fire", Rect(138, 146, 141, 147), MOUNTAIN),
-    PlaceholderWall("W_east", "a1", FROZEN_EXCEPTIONS["X_east"].world, MOUNTAIN),
-    PlaceholderWall("W_east", "a1", Rect(136, 76, 137, 82), MOUNTAIN),
-    PlaceholderWall("W_east", "a1", Rect(138, 76, 141, 141), MOUNTAIN),
-]
+# 3.8 `barriers`: the named ridge or ring barriers (seeds and the minimal cut are derived by the composer)
+BARRIERS = ("spine", "western_range", "crescent_ring")
+CANOE_BARRIERS = ("spine", "western_range")  # also closed on foot plus canoe; crescent_ring is closed on foot only
 
 
 @dataclass
 class RegionOut:
-    """What a region module returns (QUEST 3.5, with the pass W deltas of 2.9). Coordinates are world cells inside
-    the region's rects and outside its bands. `ground` holds the rows of the bounding box of the region's rects (legend
-    chars); cells outside the rects and band cells are UNSET. The list fields carry map-source entries as in a map
-    YAML (their keys are the map keys, hence the camelCase names)."""
-    ground: list[str]
+    """What a region module returns in pass NW (3.3). No `ground`: the generator paints the whole world from the
+    region's `spec`; the region places its content on it. The list fields carry map-source entries as in a map YAML
+    (their keys are the map keys, hence the camelCase names). Coordinates are world cells."""
+    spec: list = field(default_factory=list)                            # worldgen.spec Continent / Ridge / ... records
+    pins: list[Pin] = field(default_factory=list)
+    stamps: list[Stamp] = field(default_factory=list)
+    routes: list[Route] = field(default_factory=list)
+    corridors: dict[str, list[Cell]] = field(default_factory=dict)      # 2.4 rule 4b: polylines, 3 cells wide
+    roads: dict[str, list[Cell]] = field(default_factory=dict)          # 2.4 rule 8: ordered road ends
+    # 5.2: {`<prefix>_s_<name>`: {"at": [x, y], "kind": SPOT_KINDS, "reason": str}}; each is also a pin
+    spots: dict[str, dict] = field(default_factory=dict)
     objects: list[dict] = field(default_factory=list)
     npcs: list[dict] = field(default_factory=list)
     inspect: list[dict] = field(default_factory=list)
@@ -210,18 +104,14 @@ class RegionOut:
     patches: list[dict] = field(default_factory=list)
     docks: list[dict] = field(default_factory=list)                     # ids from DOCKS_ALLOWED
     hazards: list[dict] = field(default_factory=list)
-    encounterZones: list[dict] = field(default_factory=list)            # noqa: N815
+    # 3.3: named zone areas (a polygon, a biome of the region's land, or the cells near a spec feature); the owner
+    # grid turns them into `row_rects` after the ground is built
+    zones: list[dict] = field(default_factory=list)
     vehicles: list[dict] = field(default_factory=list)
-    ambient: list[dict] = field(default_factory=list)                   # looping field effects (LM-INT: smoke)
+    ambient: list[dict] = field(default_factory=list)
     battleBackgrounds: dict = field(default_factory=dict)               # noqa: N815 ({"zones": {...}})
     notes: list[str] = field(default_factory=list)
     checks: dict = field(default_factory=dict)       # the region's map-check options (road_check, river_check, ...)
-    # 2.9 (new): {name: (cells, side_a_seed, side_b_seed)}, a named land barrier with one walkable seed on each side;
-    # the composer checks the seeds are walkable and not joined on foot, and exports the barrier's minimal cut
-    barriers: dict[str, tuple[set[Cell], Cell, Cell]] = field(default_factory=dict)
-    # this region's parts of the Aldi walls (WALLS keys); a built region must return its parts (5.1)
-    walls: dict[str, set[Cell]] = field(default_factory=dict)
-    stub: bool = False                       # a stub module: the composer applies the region's PLACEHOLDER_WALLS
-    # NW-1 (docs/NATURAL_WORLD_PLAN.md 5.2): named world places for quest.yaml, the scenarios and the cutscenes,
-    # {`<prefix>_s_<name>`: {"at": [x, y], "kind": "land" | "dock" | "landing"}}
-    spots: dict[str, dict] = field(default_factory=dict)
+    # 3.3: a barrier is a ridge or ring id (BARRIERS) plus one walkable seed on each side
+    barriers: dict[str, tuple[Cell, Cell]] = field(default_factory=dict)
+    walls: tuple[str, ...] = ()                      # the WALLS ids this region's spec draws

@@ -121,8 +121,8 @@ def case_locality() -> str:
 
 def case_determinism() -> str:
     out = {}
-    script = TOOLS / "layouts" / "world_v2.py"
-    target = TOOLS.parent / "maps-nw" / "overworld.yaml"
+    script = TOOLS / "layouts" / "world.py"
+    target = TOOLS.parent / "maps" / "overworld.yaml"
     for seed in ("0", "1"):
         env = {**os.environ, "PYTHONHASHSEED": seed}
         subprocess.run([sys.executable, "-I", str(script), "--check", "--out", f"/tmp/nw2_det_{seed}.yaml"],
@@ -135,7 +135,7 @@ def case_determinism() -> str:
 
 
 def case_b(fig: dict) -> str:
-    from world_api_v2 import EXEMPT_CAP, G2_MIN, LAND_TARGET
+    from world_api import EXEMPT_CAP, G2_MIN, LAND_TARGET
     r, r32 = fig["gates"], fig["gates_rev32"]
     lo, hi = LAND_TARGET
     want = {"G1 (no non-exempt coast run over 6)": r32["G1_fail_runs_gt6"] == 0,
@@ -150,13 +150,13 @@ def case_b(fig: dict) -> str:
 
 
 def main() -> int:
-    import world_v2
+    import world
     fails = 0
     g, m = compose.compose(synthetic(ridges=[RIDGE], routes={"R-test": ROUTE},
                                      corridors=[Corridor("c", ((-55, -40), (15, -40)))]))
-    g0, meta, _b, _doc, ch = world_v2.build()
+    g0, meta, _b, _doc, ch = world.build()
     cases = [case_square, lambda: case_ridge(g, m), lambda: case_rivers(g), lambda: case_route(g, m), case_fords,
-             case_locality, case_determinism, lambda: case_b(world_v2.figures(g0, meta, ch))]
+             case_locality, case_determinism, lambda: case_b(world.figures(g0, meta, ch))]
     for c in cases:
         try:
             print("OK", c())

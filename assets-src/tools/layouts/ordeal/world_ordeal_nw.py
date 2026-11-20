@@ -86,6 +86,8 @@ def _cave(gr: _Ground, meta: dict) -> list[dict]:
     for x in (cx - 1, cx + 2):
         if gr.g[cy, x] != "o":
             gr.put(x, cy, "m")
+    if gr.g[dy, dx + 1] != "o":                 # NW-5: the door's east side is rock too, so its only way out is south
+        gr.put(dx + 1, dy, "m")                 # (the arrival; OW-2, warp_leaves)
     for x, y in ((cx, cy), (cx + 1, cy), (cx, cy + 1), (dx, dy), (dx, dy + 1)):
         gr.put(x, y, ".")
     return [D._deco("cave_mouth", cx, cy, walk_cells=[[1, 1]])]
@@ -97,7 +99,7 @@ def _hermit(gr: _Ground, meta: dict) -> tuple[list[dict], list[dict]]:
     for j in range(2):
         for i in range(2):
             gr.put(hx + i, hy + j, ".")
-    text = D.INSPECT[0]["text"]
+    text = D.HERMIT_TEXT
     return ([D._deco("hermit_hut", hx, hy, collide="alpha")], [{"x": hx + 1, "y": hy + 1, "text": list(text)}])
 
 

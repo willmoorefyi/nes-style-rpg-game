@@ -1,5 +1,5 @@
 """Elfland's content on the NW world (docs/NATURAL_WORLD_PLAN.md 3.3, 3.5, 7; NW-R ELF), placed on the generated
-ground by the composer v2 (`world_v2_source.region_content` calls `content`).
+ground by the composer v2 (`world_source.region_content` calls `content`).
 
 Today's ELF content (`elf/world_sites.py`, ELF-O; `town_elfheim_site.py`, ELF-T), ported to the new geography: every
 piece is placed relative to its site's entrance (world-anchors.yaml's targets, `world_specs/elf.py`) and its door

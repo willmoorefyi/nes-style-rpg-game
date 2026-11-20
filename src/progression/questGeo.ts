@@ -4,22 +4,13 @@
  * is in its band, each pair's distance ratio and bearing error are in theirs, and the listed hops have no long
  * detour. An anchor whose entrance does not exist yet uses its target and is `assumed` (a failure with --strict).
  */
-import type { FieldMode, MapData } from '../types/index.js';
+import type { FieldMode } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestPlace, QuestState } from './questTypes.js';
 import { fail, result, type QuestContext } from './questProofs.js';
 import { route } from './questRoute.js';
 import { lateOf, type GeoData } from './questLateData.js';
 
 type XY = [number, number];
-
-/** The act-1 block's origin (WORLD 2.9 `A1_ORIGIN`): the legacy 72x72 world map has act-1 coordinates. */
-export const A1_ORIGIN: XY = [64, 64];
-
-/** World coordinates = map coordinates + this offset. */
-export function worldOffsetOf(map: MapData | undefined): XY {
-  if (!map || map.world?.frames?.a1) return [0, 0];
-  return map.width === 72 && map.height === 72 ? A1_ORIGIN : [0, 0];
-}
 
 /** Compass bearing in degrees: north 0, east 90 (y grows south). */
 export function bearing(dx: number, dy: number): number {
@@ -129,17 +120,16 @@ const MODES: Record<string, FieldMode[]> = {
 /** Path lengths on the world map in a hop's modes, the ship parked at the dock nearest the start. */
 export function worldPathLength(ctx: QuestContext): (from: XY, to: XY, mode: string) => number | null {
   const map = ctx.world.maps.get(ctx.world.worldMap);
-  const [ox, oy] = worldOffsetOf(map);
   return (from, to, mode) => {
     if (!map) return null;
-    const a: QuestPlace = { map: map.id, x: from[0] - ox, y: from[1] - oy, mode: 'walking' };
+    const a: QuestPlace = { map: map.id, x: from[0], y: from[1], mode: 'walking' };
     const st = openState(ctx, a);
     const modes = new Set<FieldMode>(MODES[mode] ?? ['walking']);
     if (modes.has('ship')) {
       const near = [...(map.docks ?? [])].sort((d, e) => Math.hypot(d.x - a.x, d.y - a.y) - Math.hypot(e.x - a.x, e.y - a.y))[0];
       if (near) st.vehicles = [{ type: 'ship', map: map.id, x: near.x, y: near.y }];
     }
-    const path = route(ctx, a, (p) => p.map === map.id && p.x === to[0] - ox && p.y === to[1] - oy && p.mode === 'walking',
+    const path = route(ctx, a, (p) => p.map === map.id && p.x === to[0] && p.y === to[1] && p.mode === 'walking',
       st, { modes, exitSpell: false });
     return path ? path.length : null;
   };
@@ -148,11 +138,10 @@ export function worldPathLength(ctx: QuestContext): (from: XY, to: XY, mode: str
 /** The anchors' placed world cells (entrances of the world map). */
 export function anchorCells(ctx: QuestContext, geo: GeoData): Map<string, XY> {
   const map = ctx.world.maps.get(ctx.world.worldMap);
-  const [ox, oy] = worldOffsetOf(map);
   const out = new Map<string, XY>();
   for (const a of geo.anchors) {
     const e = map?.entrances?.[a.entrance];
-    if (e) out.set(a.name, [e[0] + ox, e[1] + oy]);
+    if (e) out.set(a.name, [e[0], e[1]]);
   }
   return out;
 }

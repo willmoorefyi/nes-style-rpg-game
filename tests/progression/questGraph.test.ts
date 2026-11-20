@@ -184,7 +184,9 @@ describe('questGraph: each proof fails on its RED fixture', () => {
 describe('questGraph: the CLI', () => {
   it('parses its arguments', () => {
     expect(parseArgs(['--strict', '--mutate', '--stage', 'S11', '--json', '/tmp/q.json', '--only', 'ab']))
-      .toEqual({ strict: true, mutate: true, stage: 'S11', json: '/tmp/q.json', only: new Set(['a', 'b']), worstCanoe: false });
+      .toEqual({ strict: true, mutate: true, stage: 'S11', json: '/tmp/q.json', only: new Set(['a', 'b']), worstCanoe: false, fromReset: false });
+    expect(parseArgs(['--strict', '--from-reset']).fromReset).toBe(true);
+    expect(() => parseArgs(['--from-reset', '--stage', 'S2'])).toThrow(/no --stage/);
     expect(() => parseArgs(['--only', 'z'])).toThrow(/unknown proof z/);
     expect(() => parseArgs(['--stage', 'X1'])).toThrow(/S<n>/);
     expect(() => parseArgs(['--bogus'])).toThrow(/unknown argument/);
@@ -206,7 +208,9 @@ describe('questGraph: the CLI', () => {
 describe('questGraph: the import rule', () => {
   // QUEST 4.5: field semantics come only from fieldRules.ts (plus the data types, validators and ExperienceTable)
   const ALLOWED = [/^\.\/quest\w+\.js$/, /^\.\.\/systems\/fieldRules\.js$/, /^\.\.\/types\/index\.js$/,
-    /^\.\.\/entities\/ExperienceTable\.js$/, /^\.\.\/core\/schemaValidation(Quest)?\.js$/, /^node:/, /^yaml$/];
+    /^\.\.\/entities\/ExperienceTable\.js$/, /^\.\.\/core\/schemaValidation(Quest)?\.js$/, /^node:/, /^yaml$/,
+    // NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): `--from-reset` (questReset.ts) runs the game's own pure resetVehicles
+    /^\.\.\/systems\/worldReset\.js$/];
 
   it('src/progression imports nothing else', () => {
     const dir = 'src/progression';

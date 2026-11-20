@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "layouts"))
-from world_api_v2 import A1_DELTA, CORNELIA_NW, S_STAR, WORLD_H, WORLD_W, Cell  # noqa: E402
+from world_api import A1_DELTA, CORNELIA_NW, S_STAR, WORLD_H, WORLD_W, Cell  # noqa: E402
 
 Point = tuple[float, float]
 
@@ -70,12 +70,12 @@ class Ridge:
     points: tuple[Point, ...]
     height: float
     width: float
-    name: str = ""                           # a named barrier ridge (world_api_v2.BARRIERS) or ""
+    name: str = ""                           # a named barrier ridge (world_api.BARRIERS) or ""
 
 
 @dataclass(frozen=True)
 class WallLine:
-    """An Aldi wall (world_api_v2.WALLS id): forced land along the polyline, made mountain by its ridge."""
+    """An Aldi wall (world_api.WALLS id): forced land along the polyline, made mountain by its ridge."""
     id: str
     points: tuple[Point, ...]
     wobble: float = 1.0                      # x the line wobble (W_east, Pravoka's range, takes half: NW-0)
@@ -134,7 +134,7 @@ class Pin:
 
 @dataclass
 class Stamp:
-    """A small ground override inside a region's pins (3.3): a world_api_v2.STAMP_KINDS kind, cells -> legend char."""
+    """A small ground override inside a region's pins (3.3): a world_api.STAMP_KINDS kind, cells -> legend char."""
     kind: str
     cells: dict[Cell, str]
     about: str = ""

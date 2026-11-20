@@ -1,9 +1,9 @@
-"""The world's metrics (docs/NATURAL_WORLD_PLAN.md 0.1.1 and 2.5; printed by `world_v2.py --metrics`).
+"""The world's metrics (docs/NATURAL_WORLD_PLAN.md 0.1.1 and 2.5; printed by `world.py --metrics`).
 
 Measured on the source's `ground` with every patch off. Sea is `o` only; every other char is land.
 - G-NW1: a straight coast run (coast edges on one grid line, consecutive, sea on the same side) longer than 6 fails,
   unless every edge of it touches an exempt cell.
-- G-NW2: the coast index, coast edges / sqrt(land cells), at least world_api_v2.G2_MIN.
+- G-NW2: the coast index, coast edges / sqrt(land cells), at least world_api.G2_MIN.
 - G-NW3: a run of boundary edges between two **land classes** on a chunk line (between cells 16k-1 and 16k) longer
   than 6 fails, unless every edge touches an exempt cell. Sea and inland water take part in no edge; beach sand (a
   sand cell 4-adjacent to sea, lake or river) is grass-class, as are roads and bridges (rev 3.2).

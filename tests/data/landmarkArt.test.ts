@@ -96,18 +96,23 @@ describe('LM4-INT: the LM4 art at its sites', () => {
   };
   const door = (o: Obj) => (o.walk_cells ?? []).map(([i, j]) => [o.x + i, o.y + j]);
 
-  it('the world icons: placed with their doors on the unchanged door cells', () => {
-    expect([at(world, 'town_melmond')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[38, 111, [41, 112]]]);
-    expect([at(world, 'town_onrac')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[26, 36, [28, 38]]]);
-    expect([at(world, 'town_pravoka')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[130, 98, [131, 100]]]);
-    expect([at(world, 'town_elfheim')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[81, 151, [82, 151]]]);
-    expect([at(world, 'town_crescent')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[149, 123, [149, 124]]]);
-    expect([at(world, 'town_gaia')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[150, 12, [150, 13]]]);
-    expect([at(world, 'lufenia')].map((o) => [o.x, o.y, ...door(o)])).toEqual([[150, 44, [152, 45]]]);
-    expect([at(world, 'mirage_tower')].map((o) => [o.x, o.y])).toEqual([[131, 34]]);
-    expect([at(world, 'lighthouse')].map((o) => [o.x, o.y])).toEqual([[138, 98]]);
-    expect([at(world, 'standing_stones')].map((o) => [o.x, o.y])).toEqual([[159, 123]]);
-    expect([at(world, 'hermit_hut')].map((o) => [o.x, o.y])).toEqual([[118, 38]]);
+  // NW-5: the world is pass NW's 256x256 map; each icon keeps pass W's door cell inside it (`walk_cells`, the frozen
+  // pass W source) and its door is the cell of the world's transition into its town (the doors moved with the sites)
+  const compiled = parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')) as {
+    entrances: Record<string, [number, number]>; transitions: { x: number; y: number; targetMap: string }[] };
+  const into = (m: string) => compiled.transitions.filter((t) => t.targetMap === m).map((t) => [t.x, t.y]);
+  const passW = (parse(readFileSync('tests/fixtures/passW/overworld.yaml', 'utf-8')) as { objects: Obj[] }).objects;
+  const passWOne = (lm: string) => uses(passW, lm)[0];
+
+  it('the world icons: placed with their doors on the town transitions, each door where pass W had it in the icon', () => {
+    const towns: [string, string][] = [['town_melmond', 'melmond'], ['town_onrac', 'onrac'], ['town_pravoka', 'pravoka'],
+      ['town_elfheim', 'elfheim'], ['town_crescent', 'crescent'], ['town_gaia', 'gaia'], ['lufenia', 'lufenia']];
+    for (const [lm, map] of towns) {
+      const o = at(world, lm);
+      expect(door(o), lm).toEqual(into(map));
+      expect(o.walk_cells, `${lm}: the door's cell in the icon`).toEqual(passWOne(lm).walk_cells);
+    }
+    for (const lm of ['mirage_tower', 'lighthouse', 'standing_stones', 'hermit_hut']) at(world, lm);
     expect(uses(world, 'dome'), 'Lufenia\'s domes are gone').toEqual([]);
     expect(uses(world, 'town_icon'), 'no generic walled-town icon is left').toEqual([]);
   });
@@ -123,7 +128,7 @@ describe('LM4-INT: the LM4 art at its sites', () => {
     expect(uses(world, 'buried_hull').map((o) => o.name)).toEqual(['buried_hull']);
   });
 
-  it('LM5-INT: the keep and the citadel have their own icons, doors and anchors unchanged', () => {
+  it('LM5-INT: the keep and the citadel have their own icons, doors and anchors', () => {
     expect(Object.fromEntries(Object.entries(sheet5.landmarks).map(([n, e]) => [n, [e.tag, ...e.cells]]))).toEqual({
       western_keep: ['western_keep_ultra_a_3', 2, 3], citadel: ['citadel_ultra_a_2', 3, 3] });
     for (const [name, e] of Object.entries(sheet5.landmarks)) {
@@ -138,21 +143,19 @@ describe('LM4-INT: the LM4 art at its sites', () => {
       return found[0];
     };
     const keep = one('western_keep'), citadel = one('citadel');
-    expect([keep.x, keep.y, keep.parts, door(keep)]).toEqual([59, 122, [
+    expect([keep.parts, keep.walk_cells]).toEqual([[
       ['western_keep_icon_0_0', 'western_keep_icon_0_1'], ['western_keep_icon_1_0', 'western_keep_icon_1_1'],
-      ['western_keep_icon_2_0', 'western_keep_icon_2_1']], [[60, 124]]]);
-    expect([citadel.x, citadel.y, citadel.parts.length, citadel.parts[0].length, door(citadel)])
-      .toEqual([74, 25, 3, 3, [[75, 27]]]);
-    const pillars = world.filter((o) => (o.parts ?? []).flat().includes('tpillar_broken_top') && o.y === 26)
-      .map((o) => o.x).sort((a, b) => a - b);
-    expect(pillars, 'the citadel gate\'s broken pillars').toEqual([73, 77]);
+      ['western_keep_icon_2_0', 'western_keep_icon_2_1']], [[1, 2]]]);
+    expect([citadel.parts.length, citadel.parts[0].length, citadel.walk_cells]).toEqual([3, 3, [[1, 2]]]);
+    const pillars = world.filter((o) => (o.parts ?? []).flat().includes('tpillar_broken_top') && o.y === citadel.y + 1)
+      .map((o) => o.x - citadel.x).sort((a, b) => a - b);
+    expect(pillars, 'the citadel gate\'s broken pillars, either side of its icon').toEqual([-1, 3]);
     expect(world.filter((o) => (o.parts ?? []).flat().some((p) => p?.startsWith('castle_icon_'))), 'no shared castle icon')
       .toEqual([]);
-    const compiled = parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')) as {
-      entrances: Record<string, [number, number]>; transitions: { x: number; y: number; targetMap: string }[] };
-    expect([compiled.entrances.elf_keep, compiled.entrances.ord_citadel]).toEqual([[60, 125], [75, 28]]);
-    const into = (m: string) => compiled.transitions.filter((t) => t.targetMap === m).map((t) => [t.x, t.y]);
-    expect([into('western-keep-1f'), into('citadel-1f')]).toEqual([[[60, 124]], [[75, 27]]]);
+    // the anchors are the cells below the doors, the doors the transitions into the keep and the citadel
+    expect([compiled.entrances.elf_keep, compiled.entrances.ord_citadel])
+      .toEqual([[door(keep)[0][0], door(keep)[0][1] + 1], [door(citadel)[0][0], door(citadel)[0][1] + 1]]);
+    expect([into('western-keep-1f'), into('citadel-1f')]).toEqual([door(keep), door(citadel)]);
   });
 });
 

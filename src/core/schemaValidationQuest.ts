@@ -52,19 +52,11 @@ function mode(path: string, value: unknown): void {
   }
 }
 
-/** `MapData.world`: `frames` (optional since NW-1), the composer's `basins` (name -> cell) and `cuts` (name -> cells). */
+/** `MapData.world`: the composer's `basins` (name -> cell) and `cuts` (name -> cells); pass W's act-1 `frames` are
+ *  gone (NW-5, docs/NATURAL_WORLD_PLAN.md 3.6.5) and no longer checked. */
 function validateWorld(w: unknown): void {
   want('MapData.world', w, 'object');
   const world = w as Obj;
-  if (world.frames !== undefined) {
-    want('MapData.world.frames', world.frames, 'object');
-    const a1 = (world.frames as Obj).a1;
-    if (a1 !== undefined) {
-      want('MapData.world.frames.a1', a1, 'object');
-      cell('MapData.world.frames.a1.origin', (a1 as Obj).origin);
-      cell('MapData.world.frames.a1.size', (a1 as Obj).size);
-    }
-  }
   if (world.basins !== undefined) {
     want('MapData.world.basins', world.basins, 'object');
     for (const [k, c] of Object.entries(world.basins as Obj)) cell(`MapData.world.basins.${k}`, c);

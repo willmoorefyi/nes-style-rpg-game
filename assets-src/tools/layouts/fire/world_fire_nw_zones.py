@@ -1,7 +1,7 @@
 """Region FIRE's encounter zones on the NW world (pass NW, NW-R FIRE; docs/NATURAL_WORLD_PLAN.md 3.3, 3.8
 `coverage`): every FIRE-owned walkable, canoe and sea cell to its zone (today's ids and rosters, `fire_tables.py`).
 Used by `world_fire_nw.content`; the coverage rule itself (with FIRE's ship-zone rule) is the composer's single
-check, `world_v2_content.coverage` (NW-RINT).
+check, `world_content.coverage` (NW-RINT).
 
 - Crescent's shore (`fir_lakeshore`): the land walkable from its gate (and FIRE land nearer Crescent than the south);
 - the south lands: the frost hollow (`fir_tundra`) within FROST_R of the Ice Cavern, the ash (`fir_ashlands`)
@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from world_api_v2 import REGIONS
+from world_api import REGIONS
 from worldgen.gates import BLOCK, with_patches
 from worldgen.geom import flood
 

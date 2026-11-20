@@ -27,21 +27,22 @@ function pngHeader(file: string): { width: number; height: number; depth: number
 
 describe('M7-1: the Mode 7 world atlas', () => {
   it('mode7.json inputs is the sha256 of the current chunk files, in art.below order (a stale atlas fails)', () => {
-    expect(world.art.below.length).toBe(144);
+    expect(world.art.below.length).toBe((world.width / 16) * (world.height / 16));   // one per 16-cell chunk
     const h = createHash('sha256');
     for (const p of world.art.below) h.update(readFileSync(join(root, p)));
     expect(meta.inputs).toBe(h.digest('hex'));
   });
 
-  it('mode7.json gives 16 px per cell at 3072 and 8 px per cell at 1536', () => {
-    expect(meta).toEqual({ version: 1, cellPx: 16, size: 3072, lowCellPx: 8, lowSize: 1536, inputs: meta.inputs });
+  it('mode7.json gives 12 px per cell on the 256-cell world and 6 px on the low atlas (NW-5, NATURAL_WORLD 6.1)', () => {
+    expect(meta).toEqual({ version: 1, cellPx: 12, size: world.width * 12, lowCellPx: 6, lowSize: world.width * 6,
+      inputs: meta.inputs });
     expect(meta.size).toBe(world.width * meta.cellPx);
     expect(meta.lowSize).toBe(world.width * meta.lowCellPx);
   });
 
-  it('mode7.png is 3072x3072 and mode7_low.png 1536x1536, 8-bit RGB, with no border (PNG headers)', () => {
-    expect(pngHeader('mode7.png')).toEqual({ width: 3072, height: 3072, depth: 8, colour: 2 });
-    expect(pngHeader('mode7_low.png')).toEqual({ width: 1536, height: 1536, depth: 8, colour: 2 });
+  it('mode7.png is size x size and mode7_low.png lowSize x lowSize, 8-bit RGB, with no border (PNG headers)', () => {
+    expect(pngHeader('mode7.png')).toEqual({ width: meta.size, height: meta.size, depth: 8, colour: 2 });
+    expect(pngHeader('mode7_low.png')).toEqual({ width: meta.lowSize, height: meta.lowSize, depth: 8, colour: 2 });
   });
 
   it('every cell of the world\'s 4 edges is Water (the atlas clamps to sea off the map)', () => {

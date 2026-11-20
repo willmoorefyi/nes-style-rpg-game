@@ -104,19 +104,20 @@ describe('A1 zones (WORLD_PLAN 4.0.3, 4.1)', () => {
     for (const e of ['cornelia', 'temple']) expect(inZone('a1_mainland', ...ow.entrances![e]), e).toBe(false);
   });
 
-  it('every Water cell of the A1 box is in exactly one ship zone; aldi holds the basin seed and the quay', () => {
-    const bad: string[] = [];
-    for (let y = 64; y <= 143; y++) {
-      for (let x = 64; x <= 143; x++) {
-        if (ow.collision[y * ow.width + x] !== TerrainType.Water) continue;
-        const n = Number(inZone('a1_aldi', x, y)) + Number(inZone('a1_north_sea', x, y));
-        if (n !== 1) bad.push(`(${x}, ${y}) in ${n}`);
-      }
-    }
+  it('A1\'s two ship zones share no cell and hold only Water; aldi holds the basin seed and the quay (NW-5: by records)', () => {
+    const cells = (id: string) => zone(id).rects.flatMap(([x0, y0, x1, y1]) =>
+      Array.from({ length: (x1 - x0 + 1) * (y1 - y0 + 1) }, (_, i): [number, number] => [x0 + (i % (x1 - x0 + 1)), y0 + Math.floor(i / (x1 - x0 + 1))]));
+    const aldi = cells('a1_aldi'), north = cells('a1_north_sea');
+    expect(aldi.length).toBeGreaterThan(0);
+    expect(north.length).toBeGreaterThan(0);
+    // Water, or Water under an on-water icon (Pravoka's harbour corner compiles to Wall)
+    const sea = (t: number) => t === TerrainType.Water || t === TerrainType.Wall;
+    const bad = [...aldi, ...north].filter(([x, y]) => !sea(ow.collision[y * ow.width + x])
+      || (inZone('a1_aldi', x, y) && inZone('a1_north_sea', x, y))).map(([x, y]) => `(${x}, ${y})`);
     expect(bad).toEqual([]);
-    expect(inZone('a1_aldi', 92, 121)).toBe(true);
+    const seed = ow.world!.basins!.aldi;
+    expect(inZone('a1_aldi', seed[0], seed[1])).toBe(true);
     const dock = (ow.docks ?? []).find((d) => d.id === 'a1_pravoka')!;
     expect(inZone('a1_aldi', dock.x, dock.y)).toBe(true);
-    expect(inZone('a1_north_sea', 100, 66)).toBe(true);
   });
 });

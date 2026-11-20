@@ -14,7 +14,7 @@ import { ancestorsOf, globMatch, stageOrder, type QuestWorld } from './questData
 import { effectsOf } from './questEvents.js';
 import type { QuestCatalog } from './questCatalog.js';
 import {
-  applyExact, changes, closeMarkers, fieldStateOf, relevantEffects, sortedKey, stageMark, vehicleKey,
+  applyExact, bitKey, changes, closeMarkers, fieldStateOf, relevantEffects, stageMark, vehicleKey,
   type WithheldGrants,
 } from './questStates.js';
 import { PlaceIndex, type PlaceComponent } from './questPlaces.js';
@@ -34,9 +34,9 @@ export function createModel(world: QuestWorld, cat: QuestCatalog): QuestModel {
   return { world, cat, places: new PlaceIndex(world, cat), order: new Map(cat.events.map((e, i) => [e.id, i])) };
 }
 
-/** The exact search's default cap: 1,000,000 states (INT-W2c; it was 200,000, and `--stage S15`, with the airship
- *  stages before Gurgu, needs about 400,000 at about 1.2 GB). */
-export const MAX_STATES = 1_000_000;
+/** The exact search's default cap: 3,000,000 states (NW-5; INT-W2c's 1,000,000 was too small for the 256x256 NW
+ *  world: its full graph is 1,348,366 states and `--stage S30`'s 2,096,640). */
+export const MAX_STATES = 3_000_000;
 
 export interface SearchOptions {
   start?: QuestState;
@@ -48,6 +48,8 @@ export interface SearchOptions {
   maxStates?: number;
   /** From a state holding this flag, only exits are followed, no events (`--stage`: the stage's marker; INT-W2c). */
   stopAt?: string;
+  /** State keys already proven (a node with one is kept but not expanded: `--from-reset`, questReset.ts). */
+  known?: ReadonlySet<string>;
 }
 
 /** The new game's state: the start place and flags, with the markers and auto events closed. */
@@ -147,9 +149,13 @@ export interface StateGraph {
   limited: boolean;
 }
 
+/** A state's key: its flags and items as bitsets (NW-5: the 256x256 world's graphs passed 2,000,000 states, and the
+ *  sorted name lists ran the search out of memory), the parked vehicles and the place component. */
 function stateKey(s: QuestState, comp: PlaceComponent): string {
   const v = s.vehicles.map(vehicleKey).sort().join(';');
-  return `${sortedKey(s.flags)}|${sortedKey(s.items)}|${v}|${comp.key}`;
+  const f = bitKey(s.flags, 'f');
+  const i = bitKey(s.items, 'i');
+  return `${f.length},${i.length}|${f}${i}|${v}|${comp.key}`;     // the lengths keep the two bitsets apart
 }
 
 /** Breadth-first over exact states from `opts.start` (default: the new game). */
@@ -175,7 +181,8 @@ export function exploreStates(model: QuestModel, opts: SearchOptions = {}): Stat
   };
   add(opts.start ?? newGameState(model), -1);
   for (let i = 0; i < graph.nodes.length; i++) {
-    const { state, comp } = graph.nodes[i];
+    const { state, comp, key } = graph.nodes[i];
+    if (opts.known?.has(key)) continue;
     // past the target only the party's moves are followed (the way home still counts for STRANDED), not events
     const stopped = !!opts.stopAt && state.flags.has(opts.stopAt);
     const link = (next: QuestState, via: string): void => {

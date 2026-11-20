@@ -6,14 +6,13 @@
 import { TerrainType } from '../types/index.js';
 import type { MapData, MapNPC, QuestData } from '../types/index.js';
 import type { QuestWorld } from './questData.js';
-import { worldOffsetOf } from './questGeo.js';
 
 export type ElementKind = 'gate' | 'transition' | 'npc' | 'encounter' | 'spawn' | 'patch' | 'dock' | 'cut' | 'quest';
 
 export interface MutElement {
   map: string;
   kind: ElementKind;
-  /** World cells on the world map, map cells elsewhere. */
+  /** The element's map cell (the world map's cells are world cells: NW-5 removed the act-1 frame). */
   at: [number, number];
   /** What is changed, e.g. `npc giant requiredItem ruby`. */
   label: string;
@@ -42,19 +41,6 @@ export function editQuest(w: QuestWorld, fn: (q: QuestData) => void): QuestWorld
   const quest = structuredClone(w.quest);
   fn(quest);
   return { ...w, quest, stages: new Map(quest.stages.map((s) => [s.id, s])) };
-}
-
-/** A map cell in world cells when the map is the world map. */
-export function worldAt(w: QuestWorld, map: string, x: number, y: number): [number, number] {
-  if (map !== w.worldMap) return [x, y];
-  const [ox, oy] = worldOffsetOf(w.maps.get(map));
-  return [x + ox, y + oy];
-}
-
-/** Map cells of world cells on the world map. */
-export function mapCell(w: QuestWorld, x: number, y: number): [number, number] {
-  const [ox, oy] = worldOffsetOf(w.maps.get(w.worldMap));
-  return [x - ox, y - oy];
 }
 
 export function flagsOf(o: Flagged): string[] {
@@ -98,10 +84,10 @@ export function dropItemAt(map: MapData, kind: ElementKind, x: number, y: number
   if (kind === 'gate') for (const g of map.keyItemGates ?? []) if (g.x === x && g.y === y && g.requiredItem === item) delete g.requiredItem;
 }
 
-/** Cells (world cells on the world map) set to a terrain; gates on them go too (the cell is open ground). */
+/** World-map cells set to a terrain; gates on them go too (the cell is open ground). */
 export function setCells(w: QuestWorld, cells: Array<[number, number]>, terrain: TerrainType): QuestWorld {
   return editMap(w, w.worldMap, (m) => {
-    const local = new Set(cells.map(([x, y]) => mapCell(w, x, y)).map(([x, y]) => y * m.width + x));
+    const local = new Set(cells.map(([x, y]) => y * m.width + x));
     for (const c of local) if (c >= 0 && c < m.collision.length) m.collision[c] = terrain;
     m.keyItemGates = (m.keyItemGates ?? []).filter((g) => !local.has(g.y * m.width + g.x));
   });
