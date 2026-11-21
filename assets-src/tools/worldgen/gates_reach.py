@@ -12,8 +12,8 @@ foot and by canoe with their minimal cuts (`world.cuts`), north isolation, airsh
   cells, and no dock touches one.
 - **routes**: `gates.routes` plus the ledge rule (a canoe-only site is reached only by its route's river).
 - **landings** (all on): every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance,
-  transition, gate or NPC) within 8 grid steps (the verifier's T6 rule), and every `landing` spot is such a
-  cell.
+  transition, gate or NPC) within the hike cap U steps in its mode (NW2 D-NW2-12; the verifier's T6 rule), and
+  every `landing` spot is such a cell.
 """
 from __future__ import annotations
 
@@ -24,7 +24,6 @@ from . import gates
 from .gates import LANDING, WALL_GROW, canoe, cells, grow, joined, mask_cells, owner, walk, with_patches
 from .geom import bfs_dist, components, ring1
 
-LANDING_STEPS = 8
 # WORLD 6.1's walking detour hops (2.5; melmond-sarda through the tunnel 3.0)
 DETOURS = (("cornelia", "a1_pravoka"), ("cornelia", "a1_matoya"), ("elf_elfheim", "elf_keep"),
            ("elf_elfheim", "elf_marsh"), ("ert_melmond", "ert_earth_cave"), ("ert_melmond", "ert_giant"),
@@ -38,11 +37,16 @@ def _one(shape, c) -> np.ndarray:
     return m
 
 
+def seed_cells(meta: dict, spots: dict | None = None) -> dict:
+    """The barrier seeds' names -> cells: every entrance, and NW2's `spot:<name>` for every resolved spot."""
+    return {**meta["entrances"], **{f"spot:{k}": tuple(v["at"]) for k, v in (spots or {}).items()}}
+
+
 def barriers(g, meta, seeds: dict, canoe_barriers: tuple[str, ...] = ("spine", "western_range"),
-             doors: np.ndarray | None = None) -> dict:
+             doors: np.ndarray | None = None, spots: dict | None = None) -> dict:
     """`seeds`: {"barriers": {name: (seed, [beyond...], _canoe, cut by the bridge patch)}, "links": {name: (a, b)}},
-    by entrance (bundle.RegionSpec.barrier_seeds / links)."""
-    S = meta["entrances"]
+    by entrance or `spot:<name>` (bundle.RegionSpec.barrier_seeds / links; `seed_cells`)."""
+    S = seed_cells(meta, spots)
     on, off = with_patches(g, meta), with_patches(g, meta, bridge=False)
     closed = np.zeros(g.shape, bool) if doors is None else doors.copy()
     r, why, cuts = {}, [], {}
@@ -168,26 +172,33 @@ def north(g, meta, north_regions: tuple[str, ...]) -> dict:
             "north_components": int(len(np.unique(lab[isn & (lab > 0)]))), "why": why}
 
 
-def landings(g, meta, anchors: tuple[str, ...], spots: dict | None = None, taken: set | None = None) -> dict:
-    """`taken`: the cells no airship may land on (entrances, transitions, gates, NPCs)."""
+def landings(g, meta, anchors: tuple[str, ...], hike: dict, spots: dict | None = None,
+             taken: set | None = None) -> dict:
+    """Every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance, transition, gate or
+    NPC: `taken`) within the hike cap U steps of its entrance, BFS in its mode (NW2 D-NW2-12: `hike["sites"]`, the
+    waterfall by foot+canoe, any other anchor on foot; the verifier's T6 `questTravel.landingNear`), and every
+    `landing` spot is such a cell. `hike`: `world_specs.common.hike()`."""
     h = with_patches(g, meta)
     taken = set(taken or ()) | {tuple(v) for v in meta["entrances"].values()}
     land = np.isin(h, LANDING)
-    res, why = {}, []
-    yy, xx = np.mgrid[0:g.shape[0], 0:g.shape[1]]
-    for e in anchors:                        # the verifier's T6 rule (questTravel.landingNear): grid steps
-        ex, ey = meta["entrances"][e]
-        d = np.abs(xx - ex) + np.abs(yy - ey)
-        near = [c for c in mask_cells(land & (d <= LANDING_STEPS)) if c not in taken]
-        res[e] = bool(near)
-        if not near:
-            why.append(f"anchor {e} {cells(meta, [meta['entrances'][e]])}: no landing cell within "
-                       f"{LANDING_STEPS} steps")
+    for x, y in taken:
+        land[y, x] = False
+    res, why, cap = {}, [], hike["cap"]
+    for e in anchors:
+        mode = hike["sites"].get(e, "walking")
+        d = bfs_dist(canoe(h) if mode == "canoe" else walk(h), [tuple(meta["entrances"][e])])
+        near = d[land & (d >= 0)]
+        res[e] = int(near.min()) if near.size else None
+        if res[e] is None or res[e] > cap:
+            why.append(f"anchor {e} {cells(meta, [meta['entrances'][e]])}: no landing cell within {cap} steps "
+                       f"{'on foot' if mode == 'walking' else 'on foot+canoe'} (nearest: {res[e]})")
     for k, s in (spots or {}).items():
         x, y = s["at"]
         if s.get("kind") == "landing" and (h[y, x] not in LANDING or (x, y) in taken):
             why.append(f"spot {k} {cells(meta, [(x, y)])} is a landing on {str(h[y, x])!r} (grass or tundra, free)")
-    return {"ok": not why, **res, "why": why}
+    far = max((v for v in res.values() if v is not None), default=0)
+    return {"ok": not why, **res, "note": f"{len(res)} anchors within {cap} steps in their modes; farthest {far}",
+            "why": why}
 
 
 def detours(g, meta) -> dict:

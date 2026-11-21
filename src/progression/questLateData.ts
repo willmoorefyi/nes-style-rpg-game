@@ -39,6 +39,16 @@ export interface GeoDetour {
   factor: number;
 }
 
+/** NW2 (docs/NW2_EDITS_PLAN.md D-NW2-12): the hike bounds, one source with the composer's `landings` / `hikes`. */
+export interface HikeBounds {
+  /** K: no landing within this many steps of a hike site (foot+canoe). */
+  floor: number;
+  /** U: every airship-only anchor has a landing within this many steps in its mode (T6's `landingNear`). */
+  cap: number;
+  /** The anchors' modes (an anchor not listed walks). */
+  sites: Readonly<Record<string, 'walking' | 'canoe'>>;
+}
+
 export interface GeoData {
   tolerance: number;
   scale: [number, number];
@@ -49,6 +59,8 @@ export interface GeoData {
   pairs: Array<[string, string]>;
   distanceExempt: Array<[string, string]>;
   detours: GeoDetour[];
+  /** The `hike:` block (absent in pass W's file: then T6's landing check fails, naming it). */
+  hike: HikeBounds | null;
 }
 
 export interface KitClass {
@@ -102,7 +114,20 @@ function geoOf(raw: unknown): GeoData | null {
     pairs: (g.pairs as Array<[string, string]>) ?? [],
     distanceExempt: (g.distanceExempt as Array<[string, string]>) ?? [],
     detours: (g.detours as GeoDetour[]) ?? [],
+    hike: hikeOf(g.hike),
   };
+}
+
+/** A malformed `hike:` block throws (like a missing band); an absent one is null. */
+function hikeOf(raw: unknown): HikeBounds | null {
+  if (raw === undefined || raw === null) return null;
+  const h = raw as Record<string, unknown>;
+  const sites = (h.sites ?? {}) as Record<string, unknown>;
+  if (typeof h.floor !== 'number' || typeof h.cap !== 'number' || typeof sites !== 'object'
+    || Object.values(sites).some((m) => m !== 'walking' && m !== 'canoe')) {
+    throw new Error(`world-anchors: malformed hike block ${JSON.stringify(raw)}`);
+  }
+  return { floor: h.floor, cap: h.cap, sites: sites as HikeBounds['sites'] };
 }
 
 export function buildLateData(input: LateInput): LateData {

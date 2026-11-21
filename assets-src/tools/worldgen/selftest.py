@@ -8,6 +8,7 @@
 4. a pinned canoe route connects its ends;
 5. a river across a corridor gets a ford (and past `max_fords`, a cut);
 6. locality (2.5): editing one continent changes the land field only within its box plus a 24-cell margin;
+6b. NW2's `cold` climate hint is local (it raises the cold field inside 1.5 radii only);
 7. determinism (G-NW5): the composer v2's source is byte-identical under PYTHONHASHSEED 0 and 1;
 8. preset B at seed 1987 meets NW-0's gates (G-NW1-3, the land band, the exemption cap, no ford cut) and every
    check passes (NW-RINT: the exact NW-0 figures are a record in the plan; the region tranches move them).
@@ -119,6 +120,21 @@ def case_locality() -> str:
     return f"locality: a Gaia edit changes {int(changed.sum())} land cells, none outside its box + {m}"
 
 
+def case_cold() -> str:
+    """NW2 (docs/NW2_EDITS_PLAN.md 3): a `cold` hint raises the cold field inside its disc, nothing past 1.5 radii."""
+    from worldgen import climate
+    from worldgen.bundle import ClimateHint
+    land, zero = np.ones((256, 256), bool), np.zeros((256, 256))
+    base = climate.climate(synthetic(), land, zero, zero, S.SEED)[1]
+    cold = climate.climate(synthetic(climate=[ClimateHint("cold", (0, 40), 12)]), land, zero, zero, S.SEED)[1]
+    cx, cy = S.world((0, 40))
+    yy, xx = np.mgrid[0:256, 0:256]
+    far = np.hypot(xx - cx, yy - cy) > 1.5 * 12 + 1      # the cut: gauss > exp(-6.75 / s*^2)
+    up = cold - base
+    assert up[cy, cx] > 0.5 and not np.abs(up[far]).any() and (up >= 0).all(), (up[cy, cx], np.abs(up[far]).max())
+    return f"cold hint: cold +{up[cy, cx]:.2f} at its centre, {int((up > 0).sum())} cells raised, none past 1.5 radii"
+
+
 def case_determinism() -> str:
     out = {}
     script = TOOLS / "layouts" / "world.py"
@@ -156,7 +172,7 @@ def main() -> int:
                                      corridors=[Corridor("c", ((-55, -40), (15, -40)))]))
     g0, meta, _b, _doc, ch = world.build()
     cases = [case_square, lambda: case_ridge(g, m), lambda: case_rivers(g), lambda: case_route(g, m), case_fords,
-             case_locality, case_determinism, lambda: case_b(world.figures(g0, meta, ch))]
+             case_locality, case_cold, case_determinism, lambda: case_b(world.figures(g0, meta, ch))]
     for c in cases:
         try:
             print("OK", c())

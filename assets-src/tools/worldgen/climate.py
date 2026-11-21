@@ -2,9 +2,9 @@
 biome table and the tidy.
 
 Moisture is a westerly sweep per row that refills over the sea and drains slowly over land and fast over high ground
-(rain shadow), smoothed across rows, plus a coast term, fbm and the hand climate hints (arid, wet, mild, warm;
+(rain shadow), smoothed across rows, plus a coast term, fbm and the hand climate hints (arid, wet, mild, warm, cold;
 ragged, never discs). Temperature is latitude (cold from about row COLD_Y north) minus elevation, with a noisy cut-off
-and the `warm` hints (NW-R). The biome
+and the `warm` / `cold` hints (NW-R, NW2). The biome
 table on (moisture, temperature, elevation) writes the legend chars: ocean `o`, grass `.`, forest `f` (stands), sand
 `s` (deserts and low hot beaches), swamp `w` (wet lowland), tundra `t`, snow `n`, mountain `m`, river `r`, lake `≈`.
 The tidy merges patches under `min_blob` into their neighbours and fills one-cell ocean inlets. NW-0's pilot math;
@@ -65,6 +65,10 @@ def climate(b: RegionSpec, land: np.ndarray, elev: np.ndarray, field: np.ndarray
         if h.kind == "warm":                 # so its peaks stay snowy; cut at 1.5 radii: nothing far moves)
             gw = _gauss(h.centre, h.radius)
             cold = np.clip(cold - 0.9 * gw * np.clip(hn, 0.8, 2) * (gw > np.exp(-6.75 / S.S_STAR ** 2)), 0, 1)
+    for h in b.climate:                      # NW2 (docs/NW2_EDITS_PLAN.md 3): a cold pocket, the warm hint's mirror
+        if h.kind == "cold":                 # (same ragged disc and 1.5-radius cut; none is declared before NW2-T)
+            gc = _gauss(h.centre, h.radius)
+            cold = np.clip(cold + 0.9 * gc * np.clip(hn, 0.8, 2) * (gc > np.exp(-6.75 / S.S_STAR ** 2)), 0, 1)
     cold = np.clip(cold + 0.6 * np.clip(elev - 0.45, 0, 1) * (cold > 0.05), 0, 1)
     return moist, cold, wet
 

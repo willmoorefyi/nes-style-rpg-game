@@ -5,7 +5,7 @@
  * ship's water and its docks. Plus the dock rule of 2.6: every world-map dock is an allowed one, in its basin.
  * A row whose targets or vehicle places are not built yet is pending (a failure with --strict).
  */
-import { canLand } from '../systems/fieldRules.js';
+import { canEnter, canLand, type FieldState } from '../systems/fieldRules.js';
 import type { MapData, VehicleState } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestPlace, QuestState } from './questTypes.js';
 import { globMatch } from './questData.js';
@@ -96,8 +96,13 @@ export function travelRow(ctx: QuestContext, rows: readonly TravelRow[], row: Tr
     if (h === 'missing') out.missing.push(t);
     else if (h === 'no' && !placed) out.missing.push(`${t} (vehicle unplaced)`);
     else if (h === 'no') out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} cannot reach ${t}`));
-    else if (row.landing && AIRSHIP_ONLY.includes(t) && !landingNear(ctx, map, t)) {
-      out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} ${t} has no landing cell within 8 steps`));
+    else if (row.landing && AIRSHIP_ONLY.includes(t)) {
+      const hike = lateOf(ctx).geo?.hike;
+      if (!hike) out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} no hike bounds (world-anchors.yaml hike:)`));
+      else if (!landingNear(map, t, hike.sites[t] ?? 'walking', hike.cap, st)) {
+        out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} ${t} has no landing cell within ${hike.cap} steps ${
+          hike.sites[t] === 'canoe' ? 'on foot+canoe' : 'on foot'}`));
+      }
     }
   }
   for (const t of row.notReach) if (hit(t) === 'yes') out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} reaches ${t}`));
@@ -141,28 +146,33 @@ function basinRow(ctx: QuestContext, map: MapData, row: TravelRow, vehicles: Veh
   for (const b of row.basins?.lacks ?? []) if (inComp(b)) out.failures.push(fail('h', 'TRAVEL', `TRAVEL ${row.id} the ship's water holds ${b}`));
 }
 
-/** A grass landing cell (`canLand`) within 8 walking steps of an anchor's entrance. */
-function landingNear(ctx: QuestContext, map: MapData, anchor: string): boolean {
+/** A landing cell (`canLand`) within `cap` steps of an anchor's entrance, by BFS in its mode (NW2 D-NW2-12: on foot,
+ *  or on foot and by canoe on River / Lake), with the row's flags and items (patches, gates). */
+export function landingNear(map: MapData, anchor: string, mode: 'walking' | 'canoe', cap: number,
+  st: { flags: ReadonlySet<string>; items: ReadonlySet<string> }): boolean {
   const e = map.entrances?.[anchor];
   if (!e) return false;
-  const fly = { flags: new Set<string>(), items: new Set<string>(), vehicles: [], mode: 'airship' as const };
+  const walk: FieldState = { flags: new Set(st.flags), items: new Set(st.items), vehicles: [], mode: 'walking' };
+  const fly: FieldState = { ...walk, mode: 'airship' };
+  const boat: FieldState = { ...walk, mode: 'canoe' };
+  const open = (c: { x: number; y: number }): boolean => canEnter(map, c, 'walking', walk)
+    || (mode === 'canoe' && canEnter(map, c, 'canoe', boat));
   const seen = new Set<number>([e[1] * map.width + e[0]]);
   let frontier = [{ x: e[0], y: e[1] }];
-  for (let d = 0; d <= 8; d++) {
+  for (let d = 0; d <= cap && frontier.length; d++) {
     const next: Array<{ x: number; y: number }> = [];
     for (const c of frontier) {
       if (canLand(map, c, fly)) return true;
       for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
         const n = { x: c.x + dx, y: c.y + dy };
         const k = n.y * map.width + n.x;
-        if (n.x < 0 || n.y < 0 || n.x >= map.width || n.y >= map.height || seen.has(k)) continue;
+        if (n.x < 0 || n.y < 0 || n.x >= map.width || n.y >= map.height || seen.has(k) || !open(n)) continue;
         seen.add(k);
         next.push(n);
       }
     }
     frontier = next;
   }
-  void ctx;
   return false;
 }
 

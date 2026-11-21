@@ -16,7 +16,8 @@ export interface TravelRow {
   drop?: { items?: string[]; vehicles?: string[] };
   reach: string[];
   notReach: string[];
-  /** Every airship-only anchor reached needs a landing cell within 8 steps (T6). */
+  /** Every airship-only anchor reached needs a landing cell within the hike cap U steps in its mode (T6; NW2
+   *  D-NW2-12: `world-anchors.yaml` `hike:`). */
   landing?: boolean;
   /** A basin row: the docks the ship (parked at `vehicles`) can reach, exactly. */
   docks?: string[];
