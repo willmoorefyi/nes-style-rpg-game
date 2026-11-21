@@ -385,7 +385,7 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   `--anchors FILE`, `--worst-canoe` (rows T0-T4 again with the canoe). The search stops at `MAX_STATES` = 3,000,000
   (`questSearch.ts`; the state key is compact: flag and item bitsets): the full NW graph is 1,348,366 states, `--stage
   S30`'s 2,096,640; `npm run quest` runs with an 8 GB heap.
-- **Saves (NW-5, plan 5.3, D-NW8).** `SAVE_VERSION` 4. A v1-v3 save is reset by the pure `resetSave` of
+- **Saves (NW-5, plan 5.3, D-NW8; NW2-S).** `SAVE_VERSION` 5 (`NW2_SAVE_VERSION`; v1-v5 read). A v1-v3 save is reset by the pure `resetSave` of
   `src/systems/worldReset.ts` (`LoadedSave.reset`): on the world map, or owning the ship (`BIKKE_DEFEATED`) or the
   airship (`AIRSHIP_RAISED`) wherever it is (Q4a), it loads at Cornelia's world entrance on foot (`LoadScene` sets
   `game.pendingEntrance = 'cornelia'`); its world-map vehicles become `resetVehicles(flags)` (the ship at the
@@ -393,6 +393,16 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   shows "The world has changed. You stand before Cornelia." once. A save that owns neither and is inside another map
   keeps its place. Tests: `tests/systems/saveWorldReset.test.ts` (the 8 cases), `worldReset.test.ts`,
   `tests/progression/resetStates.test.ts`.
+- **NW2 saves (NW2-S, `docs/NW2_EDITS_PLAN.md` 12, D-NW2-11: targeted, not a reset).** A v4 save loads as saved,
+  marked `revalidate`; `LoadScene` (async; `busy` while it loads) reads the world map and, for a save inside a map,
+  its way out (`wayOutSearch`: a BFS over open transitions to a world-map entrance, chains up to 8 maps) and runs the
+  pure `revalidateNw2` (`src/systems/worldRevalidate.ts`, host `src/scenes/save/loadRevalidate.ts`): a ship off open
+  water moves to an open dock in the party's component (foot, plus canoe with the canoe item), else the nearest; a
+  party inside a map whose way out reaches no ship shore, airship or Cornelia gets its ship at that component's dock;
+  an airship on rock or water moves to the nearest landing in the component, else `a1_s_airship`; canoe mode off
+  River / Lake walks; a cell that admits neither mode, or a stranded component, takes the D-NW8 reset. `--from-reset`
+  adds three relocated v4 saves (`questResetNw2.ts`: S10 in `dwarf-hall`, S16 in `ice-cavern-b1`, S6 at the keep).
+  Tests: `tests/systems/worldRevalidate.test.ts`, `tests/scenes/loadRevalidate.test.ts`, `resetStates.test.ts`.
 - **Tests of the world.** Act 1: `tests/quest/a1/` (`a1Pins`, `a1Sites`, `a1Walks`, `nwA1.ts`), the regions
   `tests/quest/<r>/<r>_o_world.test.ts` (FIRE's `fireWorld.test.ts`) on the committed source and its owner grid,
   `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`. Pass W's world

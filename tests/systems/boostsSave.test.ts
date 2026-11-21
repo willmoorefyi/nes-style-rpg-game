@@ -34,11 +34,11 @@ beforeEach(() => { for (const k of Object.keys(store)) delete store[k]; vi.resto
 
 describe('save v3: the boosts', () => {
   it('saves version 3 with the boosts and loads them back', () => {
-    expect(SAVE_VERSION).toBe(4);   // NW-5: v4 (the NW world); the boosts came in v3
+    expect(SAVE_VERSION).toBe(5);   // NW2: v5 (the NW2 world); the boosts came in v3
     SaveManager.save(0, new PartyManager(), new Inventory(), new GameFlags(), 'cornelia', { x: 1, y: 1 }, 0, 'Cornelia',
       { mode: 'walking', vehicles: [], boosts: BOOSTED });
     const raw = JSON.parse(store.ff1_save_0);
-    expect(raw.version).toBe(4);
+    expect(raw.version).toBe(5);
     expect(raw.boosts).toEqual(BOOSTED);
     expect(SaveManager.load(0)!.boosts).toEqual(BOOSTED);
   });

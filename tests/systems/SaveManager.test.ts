@@ -114,7 +114,7 @@ describe('SaveManager', () => {
     SaveManager.save(2, party, new Inventory(), new GameFlags(), 'cornelia-castle-2f', { x: 1, y: 1 }, 60);
 
     expect(JSON.parse(localStorageMock.getItem('ff1_save_0')!).location).toBe('Throne Room');
-    expect(JSON.parse(localStorageMock.getItem('ff1_save_0')!).version).toBe(4);
+    expect(JSON.parse(localStorageMock.getItem('ff1_save_0')!).version).toBe(5);
     const slots = SaveManager.getSaveSlots();
     expect(slots[0]!.location).toBe('Throne Room');
     expect(slots[2]!.location).toBe('Cornelia Castle 2F');
