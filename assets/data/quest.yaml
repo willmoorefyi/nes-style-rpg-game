@@ -288,7 +288,7 @@ stages:
     # cutscene's give_item is tracked like any key item; the trade is switched on in earth/dwarf.py.
     # W-S31 (user ruling 2026-11-18, the classic order): no wind-crystal gate. The adamant is the sky castle's 3F
     # vault chest, which is not one of S28's grants, so S31 follows S27 (the castle open), not the seraph. Entry: S28's,
-    # 1F's south berth with the airship on the oasis meadow and the ship at the dwarves' quay (S10's); the walk takes
+    # 1F's south berth with the airship on the sands' north meadow and the ship at the dwarves' quay (S10's); the walk takes
     # the chest and flies to Smyth. In a --stage S31 run the chest (an S28 map's event) stays in scope because it
     # gives S31's own requirement (outOfScopeEvents)
     entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, at: wnd_s_sky_airship},
@@ -698,7 +698,8 @@ stages:
     zones: [sky-castle-4f:wnd_d2_engine]
     grind: 1.0
     # set down by the Mirage console's beam on 1F's south berth (mirage_ascent warps to sky-castle-1f `arrival`), the
-    # airship on the oasis meadow beside the Mirage Tower (the berth's beam drops back to the tower's top); up the hub
+    # airship on the sands' north meadow, the Mirage Tower's hike landing (NW2-N; the berth's beam drops back to the
+    # tower's top); up the hub
     # stair, over 2F's south bridge to the east island, its belts to D and to the stair island, the archive's vault,
     # then the engine halls and the spire
     entry: {map: sky-castle-1f, x: 19, y: 34, mode: walking, vehicles: [{type: airship, map: overworld, at: wnd_s_sky_airship}]}

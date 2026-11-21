@@ -4,7 +4,8 @@
  * testing today's compiled world until NW-5). The three anchors within 2 cells of `assets/data/world-anchors.yaml`'s
  * targets with their doors one step north; each door a doorway (OW-2); the three parts (Gaia's arm with the Pinewold,
  * the Mirage sands, Lufenia's mesa) never joined on foot and joined to no other region's entrance; the sands closed by
- * their mountain ring; an airship meadow within 8 steps of each door; no dock; pass W's zone ids, names and modes,
+ * their mountain ring; an airship meadow within 8 steps of Gaia's door, the Mirage's and Lufenia's hikes (NW2-N:
+ * no grass within K, the landing within U); no dock; pass W's zone ids, names and modes,
  * the zones closed on foot and by canoe (3.8 `coverage`: no walkable or canoe cell beside WIND's land left out); the
  * backdrops, snow and taiga included (D-NW9, NW2); the cairn and the dial.
  */
@@ -113,12 +114,10 @@ describe('NW-R WIND: region WIND on the NW world source', () => {
     for (const [x, y] of part) for (const [dx, dy] of NB) expect(g[y + dy][x + dx], `${x},${y}`).not.toBe('o');
   });
 
-  it('every door has an airship landing (grass, no warp) within 8 steps; the landing spots are grass (D-NW9)', () => {
+  it("Gaia's door has an airship landing (grass, no warp) within 8 steps; the landing spots are grass (D-NW9)", () => {
     const warps = new Set([...src.transitions.map((t) => key(t.x, t.y)), ...Object.values(E).map(([x, y]) => key(x, y))]);
-    for (const [, e] of PARTS) {
-      const near = [...flood(E[e], (x, y) => walk(x, y) && !blocked.has(key(x, y)))].filter(([, d]) => d <= 8);
-      expect(near.some(([k]) => g[at(k)[1]][at(k)[0]] === '.' && !warps.has(k)), e).toBe(true);
-    }
+    const near = [...flood(E.wnd_gaia, (x, y) => walk(x, y) && !blocked.has(key(x, y)))].filter(([, d]) => d <= 8);
+    expect(near.some(([k]) => g[at(k)[1]][at(k)[0]] === '.' && !warps.has(k))).toBe(true);
     for (const s of ['wnd_s_gaia_airship', 'wnd_s_sky_airship', 'wnd_s_mirage_airship', 'wnd_s_lufenia_airship']) {
       const { at: [x, y], kind } = src.spots[s];
       expect([kind, g[y][x]], s).toEqual(['landing', '.']);
@@ -126,6 +125,20 @@ describe('NW-R WIND: region WIND on the NW world source', () => {
     expect(src.spots.wnd_s_gaia.at).toEqual(E.wnd_gaia);
     const [sx, sy] = src.spots.wnd_s_ship.at;
     expect([src.spots.wnd_s_ship.kind, g[sy][sx]]).toEqual(['dock', 'o']);
+  });
+
+  it('NW2-N hikes (docs/NW2_EDITS_PLAN.md 7): no grass within K of the Mirage and Lufenia on foot+canoe, the landing spots within U on foot', () => {
+    const h = (parse(readFileSync('assets/data/world-anchors.yaml', 'utf-8')) as { hike: { floor: number; cap: number } }).hike;
+    const want: [string, string, XY][] = [['wnd_mirage', 'wnd_s_mirage_airship', [191, 43]],
+      ['wnd_mirage', 'wnd_s_sky_airship', [191, 43]], ['wnd_lufenia', 'wnd_s_lufenia_airship', [243, 70]]];
+    for (const [e, spot, cell] of want) {
+      const grass = [...flood(E[e], (x, y) => walk(x, y) || wet(x, y))].filter(([k]) => g[at(k)[1]][at(k)[0]] === '.');
+      expect(Math.min(...grass.map(([, d]) => d)), e).toBeGreaterThanOrEqual(h.floor);
+      expect(src.spots[spot].at, spot).toEqual(cell);
+      const d = flood(E[e], walk).get(key(...cell));
+      expect(d, spot).toBeDefined();
+      expect(d!, spot).toBeLessThanOrEqual(h.cap);
+    }
   });
 
   it("WIND has no dock (airship only, WORLD 2.8): no dock id of WIND's, none beside its land", () => {

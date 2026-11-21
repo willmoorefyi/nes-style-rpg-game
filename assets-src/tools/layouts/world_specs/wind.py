@@ -7,7 +7,8 @@ Distinct: the Mirage sands, a dune basin closed on every side by a mountain ring
   Sundering, a sea sound between the ring and the tail; the Pinewold, the forested upper tail; Lufenia's mesa at the
   tail's end, a wet moor cut off from the Pinewold by a line of cliffs.
 Topology: three walkable parts never joined on foot (Gaia's arm with the Pinewold and the ring's outer slopes, the
-  sands, Lufenia's mesa), each with an airship meadow by its door; no dock (WORLD 2.8), so the ship sails the north
+  sands, Lufenia's mesa), Gaia with an airship meadow by its door, the Mirage and Lufenia with a hike (NW2-N,
+  `Hike`: no landing within K 25 steps, the meadow the hike pass stamps within U 50); no dock (WORLD 2.8), so the ship sails the north
   seas but lands nowhere.
 
 Every point is written in world cells where the feature should stand (`W`). The ridges, barriers, sea lines and
@@ -23,8 +24,8 @@ from __future__ import annotations
 from functools import lru_cache
 
 from worldgen import spec as S
-from worldgen.bundle import (Barrier, ClimateHint, Continent, IsleField, Lake, RegionSpec, Ridge, SeaDisc, SeaLine,
-                             SpotDef)
+from worldgen.bundle import (Barrier, ClimateHint, Continent, Hike, IsleField, Lake, RegionSpec, Ridge, SeaDisc,
+                             SeaLine, SpotDef)
 from worldgen.noise import fbm
 
 from .common import sites
@@ -83,6 +84,7 @@ ARM = _unwarp(_band(ARM_LINE, (5.0, 5.0, 4.8, 4.6, 4.2, 3.8, 3.8, 3.8, 3.0, 2.8,
 # the spur keeps that neck rock (no walk from the Citadel's land onto WIND's)
 SPUR = W((177, 35), (176, 43), (176, 51))
 CLIFFS = W((205, 61), (214, 60), (224, 62), (232, 60), (240, 61))           # Lufenia's mesa cliffs
+MIRAGE_LANDING, LUFENIA_LANDING = (9, -25), (25, -6)    # NW2-N: the hike landings (spot offsets from the arrivals)
 SUNDERING = W((210, 55), (211, 62), (211, 68), (209, 76), (206, 86))         # the sound between the ring and the tail
 
 
@@ -110,11 +112,14 @@ def spec() -> RegionSpec:
         towns=("wnd_gaia", "wnd_lufenia"),
         spots=[SpotDef("wnd_s_gaia", "wnd_gaia", (0, 0), "land"),
                SpotDef("wnd_s_gaia_airship", "wnd_gaia", (2, 2), "landing"),
-               SpotDef("wnd_s_sky_airship", "wnd_mirage", (3, 1), "landing"),
-               SpotDef("wnd_s_mirage_airship", "wnd_mirage", (4, 1), "landing"),
-               SpotDef("wnd_s_lufenia_airship", "wnd_lufenia", (3, 2), "landing"),
+               # NW2-N (docs/NW2_EDITS_PLAN.md 7): the hike meadows, the Mirage's on the sands' north shore (191, 43),
+               # Lufenia's on the mesa's east tip (243, 70); offsets from the (nudged) arrivals (182, 68), (218, 76)
+               SpotDef("wnd_s_sky_airship", "wnd_mirage", MIRAGE_LANDING, "landing"),
+               SpotDef("wnd_s_mirage_airship", "wnd_mirage", MIRAGE_LANDING, "landing"),
+               SpotDef("wnd_s_lufenia_airship", "wnd_lufenia", LUFENIA_LANDING, "landing"),
                SpotDef("wnd_s_ship", "wnd_lufenia", (20, 16), "dock")],
         north=("wnd_gaia", "wnd_mirage", "wnd_lufenia"),
+        hikes=[Hike("wnd_mirage", "wnd_s_mirage_airship"), Hike("wnd_lufenia", "wnd_s_lufenia_airship")],
     )
 
 
