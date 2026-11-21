@@ -57,7 +57,7 @@ class DockSpec:
 DOCKS_ALLOWED: dict[str, DockSpec] = {
     "a1_pravoka": DockSpec("aldi", "a1", "Pravoka's quay, in the channel between the mainland and its range"),
     "elf_port": DockSpec("aldi", "elf", "Elfheim's harbour on Elfland's north coast"),
-    "ert_dwarf": DockSpec("aldi", "earth", "the dwarves' landing on the isthmus's Aldi side"),
+    "ert_dwarf": DockSpec("aldi", "earth", "the dwarves' landing in the Aldi's north-west corner, below Mount Duergar"),
     "ert_melmond": DockSpec("ocean", "earth", "Melmond's harbour on the western strait"),
     "fir_crescent": DockSpec("ocean", "fire", "Crescent Lake's harbour on the outer fjord"),
     "fir_ice": DockSpec("ocean", "fire", "the Frost Shore's cove on the peninsula tip's west coast, below R-ice's mouth"),
@@ -80,10 +80,10 @@ WALLS: dict[str, WallLine] = {
     "W_east": WallLine("a1", "Pravoka's range, from the mainland to the south-east's rock neck"),
 }
 # 3.8 `barriers`: the named ridge or ring barriers (seeds and the minimal cut are derived by the composer)
-BARRIERS = ("spine", "western_range", "crescent_ring", "ice_neck", "ice_ring")
-# also closed on foot plus canoe; crescent_ring and ice_ring (NW2: the Rime Hollow's wall, R-ice crosses it) are
-# closed on foot only
-CANOE_BARRIERS = ("spine", "western_range", "ice_neck")
+BARRIERS = ("spine", "western_range", "crescent_ring", "duergar_range", "ice_neck", "ice_ring")
+# also closed on foot plus canoe; crescent_ring and ice_ring (NW2-F: the Rime Hollow's wall, R-ice crosses it) are
+# closed on foot only. NW2-E: duergar_range (Matoya | the dwarves); NW2-F: ice_neck (Crescent's shore | the tip)
+CANOE_BARRIERS = ("spine", "western_range", "duergar_range", "ice_neck")
 
 # NW2 (docs/NW2_EDITS_PLAN.md 2, 8): the gorge and fight-count bounds of the canoe gates and the hikes. The hike's
 # floor and cap (K 25, U 50) and its per-site modes are not here: their one source is `world-anchors.yaml`'s `hike:`

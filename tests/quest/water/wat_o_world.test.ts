@@ -6,7 +6,8 @@
  * one landmass, which it shares with ORDEAL and WIND, 3.8 `north`) within REACH cells of a WATER anchor, where the
  * owner grid gives every cell to WATER (the composer's `coverage` check proves the zones on the owner grid itself).
  *
- * The three anchors at their targets with a grass landing within 8 steps; no dock (airship-only); the cave behind
+ * The three anchors at their targets; their hikes (NW2-W: no grass within the floor K, the landing meadow within
+ * the cap U in the site's mode, Onrac and the caravan sharing one); no dock (airship-only); the cave behind
  * the falls reached by canoe only (the ledge holds no grass and joins nothing on foot but its door); R-waterfall to
  * the sea; the doors, icons, inspect cells and sea-stacks; the four zones with today's ids, every walkable or canoe
  * cell of the continent in one, every Water cell in at most one ship zone; the snow and taiga backdrops.
@@ -88,25 +89,20 @@ describe('NW-R WATER: the anchors, the landings and no dock', () => {
   });
 
   for (const a of anchors) {
-    it(`${a.entrance} is within ${anchorFile.tolerance} of its target ${a.target.join(', ')}, on WATER's land, with grass within 8 steps`, () => {
+    it(`${a.entrance} is within ${anchorFile.tolerance} of its target ${a.target.join(', ')}, on WATER's land`, () => {
       const [x, y] = E(a.entrance);
       expect(Math.max(Math.abs(x - a.target[0]), Math.abs(y - a.target[1]))).toBeLessThanOrEqual(anchorFile.tolerance);
       expect(walkable(at([x, y]))).toBe(true);
       expect(inRaster([x, y]) && continent.has(key([x, y]))).toBe(true);
-      let near = false;
-      for (let dy = -8; dy <= 8; dy++) for (let dx = -8; dx <= 8; dx++) {
-        if (Math.abs(dx) + Math.abs(dy) <= 8 && at([x + dx, y + dy]) === '.' && !doors.has(key([x + dx, y + dy]))) near = true;
-      }
-      expect(near).toBe(true);
     });
   }
 
-  it("the airship's landing spots are grass (the airship lands on grass only, D-NW2-4)", () => {
+  it("the airship's landing spots are grass on WATER's land (the airship lands on grass only, D-NW2-4)", () => {
     expect(src.spots.wat_s_onrac.at).toEqual(E('wat_onrac'));
-    for (const s of ['wat_s_onrac_airship', 'wat_s_caravan_airship']) {
+    for (const s of ['wat_s_onrac_airship', 'wat_s_caravan_airship', 'wat_s_waterfall_airship']) {
       expect(src.spots[s].kind).toBe('landing');
       expect(at(src.spots[s].at), s).toBe('.');
-      expect(continent.has(key(src.spots[s].at))).toBe(true);
+      expect(inRaster(src.spots[s].at) && north.has(key(src.spots[s].at)), s).toBe(true);
     }
   });
 
@@ -119,6 +115,49 @@ describe('NW-R WATER: the anchors, the landings and no dock', () => {
     expect([...new Set(on)].every((p) => ['ord', 'wat', 'wnd'].includes(p)) && on.includes('wat')).toBe(true);
     const mine = Object.entries(src.entrances).filter(([, c]) => continent.has(key(c))).map(([e]) => e).sort();
     expect(mine).toEqual(['wat_caravan', 'wat_onrac', 'wat_waterfall']);
+  });
+});
+
+/** Step distances from `from` over cells `ok` accepts (4-steps; doors do not stop it, as the composer's BFS). */
+function dist(from: XY, ok: (c: string) => boolean): Map<string, number> {
+  const d = new Map([[key(from), 0]]);
+  const q: XY[] = [from];
+  for (let i = 0; i < q.length; i++) for (const [dx, dy] of DIRS) {
+    const n: XY = [q[i][0] + dx, q[i][1] + dy];
+    if (d.has(key(n)) || !ok(at(n))) continue;
+    d.set(key(n), d.get(key(q[i]))! + 1);
+    q.push(n);
+  }
+  return d;
+}
+
+describe('NW2-W WATER: the hikes (docs/NW2_EDITS_PLAN.md 7; K, U from world-anchors.yaml)', () => {
+  const hike = (parse(readFileSync('assets/data/world-anchors.yaml', 'utf-8')) as {
+    hike: { floor: number; cap: number; sites: Record<string, string> };
+  }).hike;
+  const landing = (c: XY): boolean => at(c) === '.' && !doors.has(key(c));
+  const cases: [string, string][] = [['wat_onrac', 'wat_s_onrac_airship'], ['wat_caravan', 'wat_s_caravan_airship'],
+    ['wat_waterfall', 'wat_s_waterfall_airship']];
+
+  for (const [site, spot] of cases) {
+    it(`${site}: no grass within ${hike.floor} steps on foot+canoe; its landing ${spot} within ${hike.cap} in its mode`, () => {
+      const fc = dist(E(site), (c) => walkable(c) || canoe(c));
+      const near = [...fc].filter(([k, d]) => d < hike.floor && landing(k.split(',').map(Number) as XY));
+      expect(near).toEqual([]);
+      const mode = hike.sites[site];
+      expect(mode).toBe(site === 'wat_waterfall' ? 'canoe' : 'walking');
+      const inMode = mode === 'canoe' ? fc : dist(E(site), walkable);
+      const d = inMode.get(key(src.spots[spot].at));
+      expect(d, spot).toBeDefined();
+      expect(d!).toBeGreaterThanOrEqual(hike.floor);
+      expect(d!).toBeLessThanOrEqual(hike.cap);
+    });
+  }
+
+  it('Onrac and the caravan share the south-coast meadow (Q14); the waterfall lands on the east downs, by canoe only', () => {
+    const [a, b] = [src.spots.wat_s_onrac_airship.at, src.spots.wat_s_caravan_airship.at];
+    expect(Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])).toBeLessThanOrEqual(2);
+    expect(dist(E('wat_waterfall'), walkable).has(key(src.spots.wat_s_waterfall_airship.at))).toBe(false);
   });
 });
 

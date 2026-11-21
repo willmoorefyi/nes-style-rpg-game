@@ -81,7 +81,7 @@ describe('world spots (NW-1)', () => {
     const refs = quest.stages.flatMap((s) => s.nonLoadBearing.filter((n) => n.map === 'overworld')
       .map((n) => ({ ...n, stage: s.id })));
     expect(refs.map((n) => `${n.stage} ${n.kind} ${n.ref}`)).toEqual([
-      'S0 gate a1_bridge_gate_w', 'S0 gate a1_bridge_gate_e', 'S2 dock a1_pravoka', 'S4 dock elf_port', 'S10 dock ert_dwarf',
+      'S0 gate a1_bridge_gate_w', 'S0 gate a1_bridge_gate_e', 'S2 dock a1_pravoka',   // NW2-E: no S4 / S10 dock
     ]);
     for (const n of refs) {
       expect(n.at, `${n.stage}: no cell`).toBeUndefined();

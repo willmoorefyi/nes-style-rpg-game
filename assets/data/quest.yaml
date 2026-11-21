@@ -164,9 +164,9 @@ stages:
     walk: ["overworld:board:ship", "overworld:dock:elf_port", "overworld:warp:elfheim"]
     entry: {map: overworld, at: a1_s_pravoka, mode: walking, vehicles: [{type: ship, map: overworld, at: a1_s_pravoka_ship}]}
     basins: {}
-    nonLoadBearing:
-      # GT-5 (WORLD 6.3, P1), added by INT-W2a: with ERT-O's landing merged, the elf_port dock (ELF-O) is redundant
-      - {map: overworld, kind: dock, ref: elf_port, reason: "Elfland is also reachable on foot from ert_dwarf, the dwarves' landing, over seam_n"}
+    # NW2-E (docs/NW2_EDITS_PLAN.md 5): the dwarves moved north of the canal, so Elfland is reached only by elf_port
+    # and the dock is load-bearing again (GT-5 caught); INT-W2a's entry is gone
+    nonLoadBearing: []
     status: built
   - id: S8
     title: "The prince wakes"
@@ -248,8 +248,9 @@ stages:
     entry: {map: overworld, at: ert_s_dwarf, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_dwarf_ship}]}
     walk: [overworld:warp:dwarf-hall, dwarf-hall:npc:ert_nerrick]
     basins: {}
-    nonLoadBearing:
-      - {map: overworld, kind: dock, ref: ert_dwarf, reason: "the dwarf hall is also reachable on foot from Elfland over seam_n"}
+    # NW2-E: the hall is north of the canal, walled off from Matoya (duergar_range) and from Elfland (duergar_south),
+    # so the ert_dwarf dock is load-bearing (GT-14 caught)
+    nonLoadBearing: []
     status: built
   - id: S12
     title: "The giant's tunnel and Sarda"
@@ -341,8 +342,8 @@ stages:
     # where S10 ends, on foot at the dwarf hall's mouth with the ship at the landing cove (the `ert_dwarf` dock): the
     # cavern lies beyond the canal, so withholding CANAL_OPEN strands it (GT-12, GT-13 read S11's SKIP)
     entry: {map: overworld, at: ert_s_dwarf, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_dwarf_ship}]}
-    # sail west through the canal to Melmond's harbour, walk to the badlands, down the split gallery and round the lake
-    # to the crypt; the vampire's cutscene gives the ruby
+    # sail south through the canal (NW2-E: the hall lies north of it) to Melmond's harbour, walk to the badlands, down
+    # the split gallery and round the lake to the crypt; the vampire's cutscene gives the ruby
     walk: [overworld:warp:cavern-earth-b1, cavern-earth-b3:battle:VAMPIRE_DEFEATED]
     basins: {}
     nonLoadBearing:

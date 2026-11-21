@@ -22,9 +22,12 @@ from worldgen import spec as S
 from worldgen.bundle import (Barrier, ClimateHint, Continent, Corridor, Dock, InlandSea, IsleField, RegionSpec, Ridge,
                              Road, SeaLine, SpotDef, Template, WallLine)
 
-EXT_A1 = ((-47, -29), (-47, -36), (-41, -41), (-36, -47), (-28, -50), (-20, -47), (-12, -52), (-2, -50), (6, -54),
+EXT_A1 = ((-25, -34), (-26, -40), (-28, -47), (-28, -50), (-20, -47), (-12, -52), (-2, -50), (6, -54),
           (14, -50), (22, -53), (30, -47), (38, -49), (45, -45), (49, -41), (47, -34), (30, -31), (0, -31),
-          (-30, -31), (-42, -27))
+          (-26, -31))
+# NW2-E (docs/NW2_EDITS_PLAN.md 5): the mainland east of the Duergar range, a fjord-free field beside EARTH's lobe so
+# the owner line follows the range's crest (EXT_A1's fjord warp folds there, so it is trimmed east of the crest)
+DUERGAR_EAST = ((-32, -47), (-22, -47), (-22, -32), (-29, -30), (-32, -32))
 W_EAST = ((48, -42), (51, -36), (48.5, -30), (51, -24), (48.5, -18), (51.5, -12), (49, -6), (51.5, 0), (49, 6),
           (51.5, 12), (49, 18), (50.5, 24), (45, 30), (34, 35), (24, 36))
 RIDGES = (
@@ -85,7 +88,7 @@ def spots() -> list[SpotDef]:
 def spec() -> RegionSpec:
     return RegionSpec(
         region="a1",
-        continents=[Continent("a1_ext", "a1", EXT_A1, fjord=1.0)],
+        continents=[Continent("a1_ext", "a1", EXT_A1, fjord=1.0), Continent("a1_duergar_east", "a1", DUERGAR_EAST)],
         ridges=list(RIDGES),
         barriers=[Barrier("spine", tuple(P.SPINE), base=1.6, rn=0.8, warped=False)],
         walls=[WallLine("W_east", W_EAST, wobble=0.5)],

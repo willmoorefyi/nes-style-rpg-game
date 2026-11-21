@@ -12,8 +12,9 @@ EARTH content (`world_earth.py`, `earth/world_earth_sites.py`) ported onto the g
   its site on the nearest cells that fit;
 - the canal patch dressing: the stone-banked water (`art_ground: "~"`) and a culvert arch over each mouth (FX-D, R);
 - the zones, same ids and rosters as today (`world_earth_sites.TABLES`, `NAMES`): `ert_isthmus` (the dwarves'
-  land, flooded from the hall), `ert_sarda_coast` (west of the range, from Sarda's cave), `ert_badlands` (east of
-  the range from BADLANDS_DY rows south of Melmond's gate) and `ert_plain`, on foot and by canoe; `ert_aldi` (EARTH's
+  land, flooded from the hall, and since NW2-E the old south isthmus, flooded from the canal's south bank),
+  `ert_sarda_coast` (west of the range, from Sarda's cave), `ert_badlands` (east of the range from BADLANDS_DY rows
+  south of Melmond's gate) and `ert_plain`, on foot and by canoe; `ert_aldi` (EARTH's
   Aldi water and the canal cells) and `ert_sea`, by ship. Every walkable or canoe cell EARTH owns is in exactly one
   walking zone, every Water cell in one ship zone (3.3's coverage rule); a cell no flood reaches (an islet) takes
   the zone of the nearest cell that one reaches;
@@ -23,11 +24,13 @@ EARTH content (`world_earth.py`, `earth/world_earth_sites.py`) ported onto the g
   regions' cells too (ELF's keep door, owner-line slivers), so they would fail on cells EARTH does not own.
 
 Design note (NW-R EARTH; WORLD 4.0.4's concept kept). A dwarf-held hogback walls the Aldi on the west; its canal
-saddle is a grass pass above the dwarves' downs, and the landing is a cove under the hall's forested ridge on the
-Aldi side. Across a strait lies a broad farm continent whose single range runs from the north sea cliff to the south
-sea cliff with no pass and no river across: at least 3 rock cells thick everywhere (the giant's mouths sit 9 cells
-apart, the ridge between them 3-4 cells), so Sarda's wet pine coast is reached only through the tunnel map. Melmond
-sits on the east shore in the range's rain shadow; south of it the plain dries into sand badlands round the
+saddle is a grass pass above the old south isthmus. NW2-E (docs/NW2_EDITS_PLAN.md 5): Mount Duergar stands north of
+the canal, in the mainland's west lobe at the hogback's north peak; the Duergar range (`duergar_range`) walls the lobe
+off from Matoya's mainland, so the hall is reached only by ship, at the landing in the Aldi's north-west corner.
+Across a strait lies a broad farm continent whose single range runs from the north sea cliff to the south sea cliff
+with no pass and no river across: at least 3 rock cells thick everywhere (the giant's mouths sit 9 cells apart, the
+ridge between them 3-4 cells), so Sarda's wet pine coast is reached only through the tunnel map. Melmond sits on the
+east shore in the range's rain shadow; south of it the plain dries into sand badlands round the
 Cavern's mouth. Topology unchanged: overworld -> dwarf-hall; the east mouth -> giant-tunnel -> the west mouth ->
 Sarda's coast -> sage-cave; Melmond and the Cavern's B1 by their doors.
 """
@@ -160,12 +163,22 @@ def _nearest(label: np.ndarray, todo: np.ndarray) -> np.ndarray:
     return label
 
 
+def canal_bank(g: np.ndarray, meta: dict, ok: np.ndarray) -> tuple[int, int]:
+    """NW2-E: the canal's south bank, the first `ok` cell below the patch's middle column (the second `ert_isthmus`
+    seed: the old south isthmus, walkable from Elfland, keeps the dwarves' roster with the hall north of the canal)."""
+    xs = sorted({x for x, _y in meta["canal"]})
+    x, y = xs[len(xs) // 2], max(y for _x, y in meta["canal"]) + 1
+    while not ok[y, x]:
+        y += 1
+    return (x, y)
+
+
 def zones(g: np.ndarray, meta: dict, ents: dict) -> list[dict]:
     mine = meta["region"] == meta["regions"].index(REGION)
     canoe = (~np.isin(g, BLOCK) | np.isin(g, ["r", "≈"])) & mine
     names = ["ert_isthmus", "ert_plain", "ert_badlands", "ert_sarda_coast"]
     lab = np.zeros(g.shape, int)
-    lab[flood(canoe, [tuple(ents["ert_dwarf"])])] = 1
+    lab[flood(canoe, [tuple(ents["ert_dwarf"]), canal_bank(g, meta, canoe)])] = 1
     lab[flood(canoe & (lab == 0), [tuple(ents["ert_sarda"])])] = 4
     plain = flood(canoe & (lab == 0), [tuple(ents["ert_melmond"])])
     south = np.arange(g.shape[0])[:, None] >= ents["ert_melmond"][1] + BADLANDS_DY

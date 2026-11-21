@@ -11,23 +11,33 @@ NW-0's (moving it shifts the world-wide forest quantile and so repaints far chun
 range is thickened where its cut is thinner than 3 by `earth/world_earth_nw.thicken` (rock on the flanks of its
 thinnest cells, inside its mask). The content (icons, zones, backdrops, the canal's dressing) is
 `earth/world_earth_nw.py`, with the design note.
+
+NW2-E (docs/NW2_EDITS_PLAN.md 5): Mount Duergar moved north of the canal. The isthmus polygon grows north over the
+mainland's west lobe (`ISTHMUS`'s first nine points; act 1's `EXT_A1` is trimmed east of it and its fjord-free
+`a1_duergar_east` field holds the far side, so the owner line runs on the crest), the hall sits at the hogback's north
+peak (anchor ref (-54, -40)), the new barrier `duergar_range` walls the lobe off from Matoya (foot and canoe; seeds
+Matoya -> the hall), the dock `ert_dwarf` is a cove in the Aldi's north-west corner, and `duergar_south` keeps the
+hall apart from the Western Keep with the canal shut. The old south isthmus stays land, empty, its cove closed.
 """
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-from worldgen.bundle import (Barrier, ClimateHint, Continent, Corridor, Dock, IsleField, Pass, RegionSpec, Ridge,
-                             SeaLine, SpotDef, WallLine)
+from worldgen.bundle import (Apart, Barrier, ClimateHint, Continent, Corridor, Dock, IsleField, Pass, RegionSpec,
+                             Relation, Ridge, SeaLine, SpotDef, WallLine)
 
 from .common import sites
 
-ISTHMUS = ((-53, -31), (-45, -31), (-43, -22), (-45, -17), (-46, -12), (-44, -6), (-43, 2), (-44, 10), (-42, 17),
-           (-48, 21), (-53, 14), (-55, 6), (-54, -4), (-53, -10), (-54, -16), (-56, -24))
+ISTHMUS = ((-53, -31), (-49, -36), (-44, -42), (-40, -47), (-35, -49), (-38, -41), (-37, -37), (-36, -34), (-38, -32),
+           (-45, -31), (-43, -22), (-45, -17), (-46, -12), (-44, -6), (-43, 2), (-44, 10), (-42, 17), (-48, 21),
+           (-53, 14), (-55, 6), (-54, -4), (-53, -10), (-54, -16), (-56, -24))
 MELMOND = ((-60, -13), (-66, -18), (-76, -16), (-86, -20), (-96, -16), (-104, -10), (-110, -2), (-108, 8), (-102, 14),
            (-98, 24), (-90, 30), (-80, 34), (-72, 30), (-66, 24), (-62, 16), (-61, 8), (-61, 0), (-61, -6))
 WESTERN_RANGE = ((-86, -22), (-81, -12), (-84, -4), (-82, 3), (-79, 10), (-83, 18), (-80, 27), (-84, 37))
-DWARF_DOCK, MELMOND_DOCK = (-42, -3), (-60, 3)
+DWARF_DOCK, MELMOND_DOCK = (-40, -34), (-60, 3)
+# NW2-E: the north coast (world (109, 95)) to the Aldi's north-west corner (world (112, 122)), on the crest line
+DUERGAR_RANGE = ((-37, -60), (-36, -51), (-36, -44), (-35, -38), (-34, -33))
 
 
 def spec() -> RegionSpec:
@@ -36,7 +46,7 @@ def spec() -> RegionSpec:
         continents=[Continent("isthmus", "earth", ISTHMUS, fjord=0.0),
                     Continent("melmond", "earth", MELMOND, fjord=0.5)],
         ridges=[Ridge(((-100, -8), (-94, 6)), 0.6, 2.4, "Sarda's hills")],
-        barriers=[Barrier("western_range", WESTERN_RANGE)],
+        barriers=[Barrier("western_range", WESTERN_RANGE), Barrier("duergar_range", DUERGAR_RANGE)],
         walls=[WallLine("W_west", ((-44, -31), (-47, -28), (-50, -24))),
                WallLine("W_isthmus", ((-50, -24), (-49.5, -16), (-49, -6), (-48.5, 4), (-48, 12)))],
         passes=[Pass((-49.5, -14), 4.0, "the canal saddle")],
@@ -56,7 +66,10 @@ def spec() -> RegionSpec:
                    Corridor("ert_sarda", ("ert_giant_west", "ert_sarda"))],
         dock_links=("ert_dwarf", "ert_melmond"),
         canal=((-15, -14, -13), (-53, -46)),
-        barrier_seeds={"western_range": ("ert_melmond", ("ert_sarda",), True, False)},
+        barrier_seeds={"western_range": ("ert_melmond", ("ert_sarda",), True, False),
+                       "duergar_range": ("a1_matoya", ("ert_dwarf",), True, False)},
+        relations=[Relation("ert_dwarf", "canal", "north_of", 10), Relation("ert_dwarf", "canal", "bearing", 45, 0)],
+        apart=[Apart("duergar_south", "ert_dwarf", "elf_keep")],
         links={"giant_west_to_sarda_foot": ("ert_giant_west", "ert_sarda")},
         spots=[SpotDef("ert_s_dwarf", "ert_dwarf", (0, 0), "land"),
                SpotDef("ert_s_melmond", "ert_melmond", (0, 0), "land"),

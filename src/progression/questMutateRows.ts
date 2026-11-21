@@ -60,7 +60,7 @@ export const GATE_ROWS: GateRow[] = [
     expect: [{ proof: 'c', prefix: 'SOFTLOCK ' }, goal], anyOf: true },
   { row: 'GT-5', stages: ['S4'], element: 'the dock elf_port', mutation: 'remove', nlb: 'entry', expect: [],
     find: (c) => docks(c, ['elf_port']) },
-  { row: 'GT-5b', stages: ['S4', 'S10'], element: 'both Aldi docks of Elfland\'s coast, elf_port and ert_dwarf',
+  { row: 'GT-5b', stages: ['S4', 'S10'], element: 'the Aldi docks elf_port and ert_dwarf',
     mutation: 'remove both', find: (c) => docks(c, ['elf_port', 'ert_dwarf']), expect: [goal] },
   { row: 'GT-6', stages: ['S6'], element: 'Astos\'s requiredFlags: [MARSH_GUARD_DEFEATED]', mutation: 'remove', nlb: 'entry',
     expect: [], find: (c) => grantNeeds(['ASTOS_DEFEATED'])(c, 'MARSH_GUARD_DEFEATED') },
@@ -76,6 +76,11 @@ export const GATE_ROWS: GateRow[] = [
     expect: [...skip('S11'), ...early('melmond')] },
   { row: 'GT-14', stages: ['S10'], element: 'the dock ert_dwarf', mutation: 'remove', nlb: 'entry', expect: [],
     find: (c) => docks(c, ['ert_dwarf']) },
+  // NW2-E (docs/NW2_EDITS_PLAN.md 10): the range walls the dwarves' lobe off from Matoya; opened, the hall's keeper is
+  // walked to from the mainland after S1, before the dwarf town's opensAfter [S2]
+  { row: 'GT-42', stages: ['S10'], element: 'the Duergar range between a1_matoya and ert_dwarf (EARTH)',
+    mutation: 'open its minimal walkable cut', find: (c) => cutOpen(c, 'duergar_range', TerrainType.Grass),
+    expect: early('dwarf') },
   item('GT-15', 'S12', 'the giant', 'ruby', 'S12'),
   { row: 'GT-16', stages: ['S12'], element: 'Sarda\'s requiredFlags: [VAMPIRE_DEFEATED]', mutation: 'remove', nlb: 'entry',
     expect: [], find: (c) => grantNeeds(['rod'])(c, 'VAMPIRE_DEFEATED') },

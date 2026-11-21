@@ -8,9 +8,9 @@ Every place hangs off its entrance's cell on the NW world (the anchors' targets,
 offsets today's world (`world_water_sites.py`, `world_water_land.py`) uses, so the content follows the spec:
 
 - Onrac (`wat_onrac`, its 2.2 target): the approved 5x3 `town_onrac` icon over the 5x3 box above the gate, its door
-  the bottom-middle cell, the airship's landing 2 cells west of the gate (spot `wat_s_onrac_airship`);
+  the bottom-middle cell (NW2-W: the airship's landing is the hike's south-coast meadow, `HIKES` below);
 - the waterfall (`wat_waterfall`): NW-4's canoe-only ledge (`stamps.ledges`: door and arrival sand in a rock ring,
-  a river cell to R-waterfall, a grass bank landing within 8 steps) is kept; the 2x3 falls icon stands on it, its
+  a river cell to R-waterfall; its grass bank is now in the hike's ring) is kept; the 2x3 falls icon stands on it, its
   bottom-left cell the cave door, its top row stamped to rock;
 - the caravan (`wat_caravan`): the 2x2 tent above the arrival, its top row on a rock outcrop, the crate west of the
   door (so the door has one way out) and the oasis signpost (today's dirt track is left out: on the NW world
@@ -37,8 +37,12 @@ from world_dress import door_sides, ring_of, scatter  # noqa: E402
 
 Cell = tuple[int, int]
 REGION = "water"
-LANDING_OFF = (-2, 0)            # the airship's landing beside Onrac's gate (spot wat_s_onrac_airship, S24's entry)
-CARAVAN_LANDING_OFF = (3, -1)    # ... and in the oasis meadow by the camp (spot wat_s_caravan_airship)
+CLEAR_OFF = (-2, 0)              # kept clear of Onrac's dressing (NW's landing beside the gate, before the hikes)
+# NW2-W (docs/NW2_EDITS_PLAN.md 7; K 25, U 50): the hikes' landings, rel their sites (spot, site, offset). Onrac and
+# the caravan share the south-coast meadow (Q14), the waterfall's lies on the east downs (foot+canoe); re-measured on
+# NW2-T's ground: d 34 / 35 / 35 steps, floor 30 (the `hikes` line is the authority)
+HIKES = (("wat_s_onrac_airship", "wat_onrac", (-14, 16)), ("wat_s_caravan_airship", "wat_caravan", (7, 28)),
+         ("wat_s_waterfall_airship", "wat_waterfall", (15, 20)))
 OUTCROP = [(x, y) for y in (-3, -2) for x in range(-1, 3)]   # rock under the tent's top row, rel the arrival
 CRATE_OFF = (-1, -1)             # west of the tent's door
 POST_OFF = (5, 0)                # the oasis signpost, rel the arrival
@@ -61,7 +65,7 @@ class Places:
         gx, gy = self.gate
         self.icon = [(x, y) for y in range(gy - 3, gy) for x in range(gx - 2, gx + 3)]
         self.door = (gx, gy - 1)
-        self.landing = _add(self.gate, LANDING_OFF)
+        self.clear = _add(self.gate, CLEAR_OFF)
         lx, ly = self.ledge
         self.falls = (lx, ly - 3)            # the falls icon's top-left; its bottom-left cell is the cave door
         self.cave_door = (lx, ly - 1)
@@ -106,7 +110,7 @@ class Places:
     def objects(self) -> list[dict]:
         x0, y0 = self.icon[0]
         gx, gy = self.gate
-        taken = set(self.icon) | {self.gate, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), self.landing}
+        taken = set(self.icon) | {self.gate, (gx - 1, gy), (gx + 1, gy), (gx, gy + 1), self.clear}
         walk = lambda c: self.mine[c[1], c[0]] and self.ch(c) == "."       # noqa: E731
         return [
             {"type": "deco", "name": "onrac", "x": x0, "y": y0, "parts": landmark_parts("town_onrac"),
