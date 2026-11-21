@@ -3627,6 +3627,7 @@ encounterZones:
     - {id: winter_wolf, min: 2, max: 3}
     - {id: ice_gigas, min: 1, max: 1}
     weight: 2
+  encounterRate: {min: 20, max: 44}
 - id: fir_desert
   name: Hull Desert
   modes: [walking]
@@ -4434,7 +4435,7 @@ encounterZones:
     - {id: weretiger, min: 1, max: 2}
     - {id: nightmare, min: 1, max: 1}
     weight: 2
-  encounterRate: {min: 7, max: 15}
+  encounterRate: {min: 14, max: 31}
 - id: ord_isles
   name: Cardia Isles
   modes: [walking, canoe]
@@ -5877,6 +5878,7 @@ encounterZones:
     - {id: deepeyes, min: 1, max: 1}
     - {id: sahagin_prince, min: 1, max: 2}
     weight: 2
+  encounterRate: {min: 23, max: 50}
 - id: wnd_highlands
   name: Gaia Highlands
   rects:
@@ -6107,7 +6109,7 @@ encounterZones:
     - {id: stone_golem, min: 1, max: 1}
     - {id: sand_worm, min: 1, max: 1}
     weight: 1
-  encounterRate: {min: 13, max: 28}
+  encounterRate: {min: 21, max: 46}
 - id: wnd_lufen_moor
   name: Lufenian Mesa
   rects:
