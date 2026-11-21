@@ -7,17 +7,21 @@ export type BattleBackdropConfig = MapData['battleBackgrounds'];
 /** TerrainType name at a cell (e.g. `'FOREST'`, any case), or undefined off the map / without a collision map. */
 export type TerrainAt = (x: number, y: number) => string | undefined;
 
-/** A grass cell with at least this many forest 4-neighbours counts as forest (organic outlines draw forest over it). */
+/** A grass cell with at least this many forest 4-neighbours counts as forest (organic outlines draw forest over it);
+ * NW2: the same for taiga, ties between the two going to forest. */
 export const FOREST_EDGE_NEIGHBOURS = 2;
 
 const NEIGHBOURS: ReadonlyArray<readonly [number, number]> = [[0, -1], [1, 0], [0, 1], [-1, 0]];
 
-/** Lowercase terrain at `pos`, with grass on a forest edge read as forest; undefined when unknown. */
+/** Lowercase terrain at `pos`, with grass on a forest (or taiga) edge read as forest (taiga); undefined when unknown. */
 export function backdropTerrain(pos: TilePos, terrainAt: TerrainAt): string | undefined {
   const terrain = terrainAt(pos.x, pos.y)?.toLowerCase();
   if (terrain !== 'grass') return terrain;
-  const forests = NEIGHBOURS.filter(([dx, dy]) => terrainAt(pos.x + dx, pos.y + dy)?.toLowerCase() === 'forest').length;
-  return forests >= FOREST_EDGE_NEIGHBOURS ? 'forest' : terrain;
+  const count = (name: string) => NEIGHBOURS.filter(([dx, dy]) => terrainAt(pos.x + dx, pos.y + dy)?.toLowerCase() === name).length;
+  const forests = count('forest');
+  const taigas = count('taiga');
+  if (forests >= FOREST_EDGE_NEIGHBOURS && forests >= taigas) return 'forest';
+  return taigas >= FOREST_EDGE_NEIGHBOURS ? 'taiga' : terrain;
 }
 
 /**

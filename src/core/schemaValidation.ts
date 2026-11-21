@@ -166,6 +166,8 @@ function validateBackdropTable(path: string, value: unknown): Record<string, unk
   if (value.terrain !== undefined) {
     assertObject(`${path}.terrain`, value.terrain);
     for (const [k, v] of Object.entries(value.terrain)) assertString(`${path}.terrain.${k}`, v);
+    // NW2 (D-NW2-4): TerrainType 12 is Taiga now; a `tundra` key would never match a cell (a silent defect)
+    if ('tundra' in value.terrain) throw new ValidationError(`${path}.terrain.tundra: no such terrain (use taiga)`);
   }
   return value;
 }

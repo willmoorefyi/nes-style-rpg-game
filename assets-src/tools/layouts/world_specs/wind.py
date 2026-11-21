@@ -103,7 +103,9 @@ def spec() -> RegionSpec:
         lakes=[Lake(W((215, 37))[0], 2.2, "Gaia's crater tarn")],
         isles=[IsleField(W((238, 18))[0], 6, 3, 108)],
         climate=[ClimateHint("arid", W(RING_C)[0], 22), ClimateHint("arid", W((185, 64))[0], 14),
-                 ClimateHint("wet", W((221, 80))[0], 10)],
+                 ClimateHint("wet", W((221, 80))[0], 10),
+                 # NW2-T (D-NW2-8): taiga over the east lobe and round Lufenia (Gaia keeps its meadow)
+                 ClimateHint("cold", W((228, 52))[0], 10), ClimateHint("cold", W((220, 80))[0], 8)],
         sites=sites("wind", nudges=NUDGES),
         towns=("wnd_gaia", "wnd_lufenia"),
         spots=[SpotDef("wnd_s_gaia", "wnd_gaia", (0, 0), "land"),

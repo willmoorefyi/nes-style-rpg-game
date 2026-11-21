@@ -4,9 +4,10 @@ biome table and the tidy.
 Moisture is a westerly sweep per row that refills over the sea and drains slowly over land and fast over high ground
 (rain shadow), smoothed across rows, plus a coast term, fbm and the hand climate hints (arid, wet, mild, warm, cold;
 ragged, never discs). Temperature is latitude (cold from about row COLD_Y north) minus elevation, with a noisy cut-off
-and the `warm` / `cold` hints (NW-R, NW2). The biome
-table on (moisture, temperature, elevation) writes the legend chars: ocean `o`, grass `.`, forest `f` (stands), sand
-`s` (deserts and low hot beaches), swamp `w` (wet lowland), tundra `t`, snow `n`, mountain `m`, river `r`, lake `≈`.
+and the `warm` / `cold` hints (NW-R, NW2). The biome table on (moisture, temperature, elevation) writes the legend
+chars: ocean `o`, grass `.`, forest `f` (stands), sand `s` (deserts and low hot beaches), swamp `w` (wet lowland),
+taiga `t` (NW2: the snowy conifer belt where cold > T_TAIGA; tundra before), snow `n`, mountain `m`, river `r`, lake
+`≈`.
 The tidy merges patches under `min_blob` into their neighbours and fills one-cell ocean inlets. NW-0's pilot math;
 the tidy's tie-break is fixed (TIE), where the pilot iterated a set (2.5: no set iteration).
 """
@@ -21,6 +22,7 @@ from .noise import N, XX, YY, fbm
 
 COLD_Y = 62                                  # world row: cold from about here north (2.4 rule 5)
 H_M = 0.46                                   # mountain above this elevation
+T_TAIGA = 0.25                               # NW2-T (docs/NW2_EDITS_PLAN.md 3, D-NW2-8): taiga where cold > T_TAIGA
 TIE = "fstwn."                               # the tidy's tie-break among equally common neighbours (first wins)
 # The forest and desert thresholds: NW-0 / NW-2 took them per compose as quantiles over all the land (forest above
 # the 0.72 quantile of `mf`, sand below the 0.05 quantile of `moist`), so any region's land edit moved every
@@ -85,7 +87,8 @@ def biomes(land, elev, moist, cold, wet, river, lake, seed: int, h_m: float = H_
     g[land & (moist < qs)] = "s"
     g[land & coast1 & (cold < 0.1) & (elev < 0.14) & (beachn > 0.18)] = "s"
     g[land & (wet + 0.5 * fbm(seed + 93, (6, 3)) > 0.45) & (elev < 0.32) & (moist > 0.5)] = "w"
-    g[land & (cold > 0.5)] = "t"
+    g[land & (cold > T_TAIGA)] = "t"             # taiga overrides forest, sand and grass after the frozen
+                                                 # Q_FOREST / Q_SAND (the forest share reported falls there)
     g[land & (cold > 0.93) & (moist > 0.4)] = "n"
     g[land & (elev > h_m)] = "m"
     g[river & land] = "r"

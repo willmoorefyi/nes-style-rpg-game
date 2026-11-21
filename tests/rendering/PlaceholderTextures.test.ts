@@ -21,9 +21,9 @@ describe('PlaceholderTextures', () => {
   });
 
   describe('getTileTexture', () => {
-    it('returns a texture for every TerrainType, tundra and snow included (NW-5, 2.6)', () => {
+    it('returns a texture for every TerrainType, taiga and snow included (NW-5, 2.6; NW2)', () => {
       const ids = Object.values(TerrainType).filter((v): v is number => typeof v === 'number');
-      expect(ids).toContain(TerrainType.Tundra);
+      expect(ids).toContain(TerrainType.Taiga);
       expect(ids).toContain(TerrainType.Snow);
       for (const t of ids) expect(placeholders.getTileTexture(t + 1)).toBeDefined();
     });

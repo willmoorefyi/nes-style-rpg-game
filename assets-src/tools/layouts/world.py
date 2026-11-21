@@ -32,7 +32,7 @@ import world_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
 from world_api import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
-                          REGIONS)
+                          REGIONS, TAIGA_MIN)
 from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, metrics, owners,  # noqa: E402
                       prewalk, spots)
 from world_specs.common import hike  # noqa: E402
@@ -40,7 +40,8 @@ from worldgen import spec as S  # noqa: E402
 
 CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
           "walks", "detours", "pins", "coverage", "canoe_gates", "gorges", "relations", "duergar_south", "hikes",
-          "dock_towns")                 # the last six: NW2 (docs/NW2_EDITS_PLAN.md 8), over declared records only
+          "dock_towns", "taiga_share")  # dock_towns and the five before it: NW2 (docs/NW2_EDITS_PLAN.md 8), over
+                                         # declared records only; taiga_share: NW2-T (D-NW2-8)
 
 
 def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
@@ -93,7 +94,8 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "gorges": gates_canoe.gorges(g, meta, b.gorges, sp, doc), "relations": gates_canoe.relations(meta, b.relations),
             "duergar_south": gates_canoe.duergar_south(g, meta, b.apart),
             "hikes": gates_hike.hikes(g, meta, b.hikes, hike(), sp, doc, taken),
-            "dock_towns": prewalk.dock_towns(g, meta, ent_map)}
+            "dock_towns": prewalk.dock_towns(g, meta, ent_map),
+            "taiga_share": metrics.taiga_share(g, meta["region"], REGIONS, NORTH_REGIONS, TAIGA_MIN)}
 
 
 def figures(g, meta, ch) -> dict:

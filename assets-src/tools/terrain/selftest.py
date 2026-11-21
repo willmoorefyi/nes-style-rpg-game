@@ -113,21 +113,21 @@ def selftest() -> int:
 
 
 def _cold_case(B, kit: K.Kit) -> int:
-    """NW 2.6: tundra and snow are organic soft materials (recoloured grass and sand): the straight snow / tundra
-    and tundra / grass boundaries read as no straight run, every cell centre shows its own material, and the
+    """NW 2.6, NW2: taiga and snow are organic soft materials (recoloured forest and sand): the straight snow / taiga
+    and taiga / grass boundaries read as no straight run, every cell centre shows its own material, and the
     collision is TerrainType 13 / 12 (both walkable)."""
     src = {"id": "cold", "terrain": "organic", "kits": ["overworld", "town"], "entrances": {"a": [0, 8]},
            "ground": "\n".join(["n" * 12] * 3 + ["t" * 12] * 3 + ["." * 12] * 3)}
     c = B.compile_map(src, kit, check_interiors=False)
-    assert (int(c.collision[0, 0]), int(c.collision[4, 0]), int(c.collision[8, 0])) == (B.SNOW, B.TUNDRA, B.GRASS)
+    assert (int(c.collision[0, 0]), int(c.collision[4, 0]), int(c.collision[8, 0])) == (B.SNOW, B.TAIGA, B.GRASS)
     mk = B.map_kit(src, kit)
-    mats = ("grass", "tundra", "snow")
+    mats = ("grass", "taiga", "snow")
     cls = classify(c.below, mk, mats)
-    for a, b, line in (("snow", "tundra", 3), ("tundra", "grass", 6)):
+    for a, b, line in (("snow", "taiga", 3), ("taiga", "grass", 6)):
         st = boundary_stats(cls == mats.index(a), cls == mats.index(b), (slice((line - 2) * T, (line + 2) * T),
                                                                          slice(T, 11 * T)))
         assert st["edges"] > 0 and st["longest_run"] < RUN_MAX and st["on_cell_line"] <= 0.15, f"{a} / {b}: {st}"
-    assert fidelity(c.below, c.mat, mk)["cells_below_half"] == 0, "a tundra or snow cell centre shows another material"
+    assert fidelity(c.below, c.mat, mk)["cells_below_half"] == 0, "a taiga or snow cell centre shows another material"
     return 3
 
 

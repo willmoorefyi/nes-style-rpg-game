@@ -14,7 +14,8 @@ GROUPS = {"coast": (("ocean", "water"), ("grass", "sand", "forest", "mountain", 
           "mountain_grass": (("mountain",), ("grass",))}
 
 
-PART_OF = {"forest": ("tree_clump",), "mountain": ("peak", "boulder")}
+PART_OF = {"forest": ("tree_clump",), "mountain": ("peak", "boulder"),
+           "taiga": ("tree_clump@taiga",)}          # NW2: the recoloured clump (build_map.map_kit)
 
 
 def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray:
@@ -27,7 +28,7 @@ def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray
     for i, m in enumerate(mats):
         t = _tile(kit.material(m), H, W).astype(np.float32)
         d = np.min([np.abs(b - t * f).sum(axis=2) for f in (1.0, 0.85, 0.8, 0.72, 0.6, 0.55)], axis=0)
-        parts = [kit.parts[p] for p in PART_OF.get(m, ()) if p in kit.parts and p in kit.approved]
+        parts = [kit.parts[p] for p in PART_OF.get(m, ()) if p in kit.parts and p.split("@")[0] in kit.approved]
         if parts:                                  # stamped art (clumps, peaks, rocks) counts as its material
             pal = np.unique(np.concatenate([np.asarray(p.convert("RGBA"))[..., :3][np.asarray(p)[..., 3] > 127]
                                             for p in parts]), axis=0).astype(np.int32)
@@ -163,14 +164,14 @@ def foothill_share(below: np.ndarray, mat: np.ndarray, kit: K.Kit) -> float:
     return round(hits / total, 3) if total else 1.0
 
 
-FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "cobble", "tundra", "snow")
+FID_MATS = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt", "cobble", "taiga", "snow")
 
 
 def fidelity(below: np.ndarray, mat: np.ndarray, kit: K.Kit, skip: set | None = None) -> dict[str, float]:
     """Per wild cell: the share of its centre CORE px that read as its own material (classify: its texture, shaded,
     or its stamped art); the minimum and the number of cells under 50 %. Roads are left out: they are drawn as a
     track along their centre line (a diagonal cuts across its cells), and road and grass are both walkable."""
-    mats = tuple(m for m in FID_MATS if m in kit.materials)    # NW: tundra / snow only in a kit that has them
+    mats = tuple(m for m in FID_MATS if m in kit.materials)    # NW: taiga / snow only in a kit that has them
     cls = classify(below, kit, mats)
     worst, bad = 1.0, 0
     hgt, wid = mat.shape

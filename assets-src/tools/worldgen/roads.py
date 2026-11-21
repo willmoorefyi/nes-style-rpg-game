@@ -1,7 +1,7 @@
 """Stage `roads` (docs/NATURAL_WORLD_PLAN.md 3.1, 2.4 rule 8): roads are routed, not drawn.
 
 A pinned road (a region spec's `roads`: ordered ends) is laid after the biomes by A* on the generated ground: grass 1,
-road 0.6, tundra 1.2, snow 1.5, sand or forest 2, swamp 4, a bridge or ford 1; mountain, water and river cells are
+road 0.6, snow 1.5, sand, forest or taiga 2 (NW2: forest's cost), swamp 4, a bridge or ford 1; mountain, water and river cells are
 refused (except the road's own end). Ties are broken by (cost, y, x) in the heap. The laid cells become dirt `,`
 where they were open ground. NW-0's pilot router, unchanged.
 """
@@ -13,7 +13,7 @@ import numpy as np
 
 from .noise import N
 
-COST = {".": 1, ",": 0.6, ":": 0.6, "s": 2, "f": 2, "t": 1.2, "n": 1.5, "w": 4, "=": 1}
+COST = {".": 1, ",": 0.6, ":": 0.6, "s": 2, "f": 2, "t": 2, "n": 1.5, "w": 4, "=": 1}
 PAVED = ".sftnw"                             # the chars a laid road turns into dirt `,`
 
 

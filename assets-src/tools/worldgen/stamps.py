@@ -71,8 +71,8 @@ def ledges(g: np.ndarray, b: RegionSpec, routes: dict, doors: dict) -> None:
 
 def _landing_by(g: np.ndarray, x: int, y: int, on_route: set) -> None:
     """A ledge needs an airship landing within LANDING_STEPS grid steps (the verifier's T6 rule): when no grass cell
-    is there, the nearest snow, sand or tundra cell on its route's bank outside the rock ring becomes grass (a bank
-    clearing; grass, not tundra, since the runtime reads tundra as landable only from NW-5, 2.6)."""
+    is there, the nearest snow, sand or taiga cell on its route's bank outside the rock ring becomes grass (a bank
+    clearing; the airship lands on grass only, NW2 D-NW2-4)."""
     near = [(abs(xx - x) + abs(yy - y), yy, xx) for yy in range(y - LANDING_STEPS, y + LANDING_STEPS + 1)
             for xx in range(x - LANDING_STEPS, x + LANDING_STEPS + 1)
             if abs(xx - x) + abs(yy - y) <= LANDING_STEPS and max(abs(xx - x), abs(yy - y)) > LEDGE_R]

@@ -2,13 +2,13 @@
 
 Design note (NW-R WATER; WAT-O's note of 4.0.4 carried to the generated world):
   Concept: a big cold continent in the north-west, hung from a central north-south ridge (Onrac's spine). Its north
-    is a snowfield over tundra; the waterfall pours off the spine's east flank onto a rock ledge, and R-waterfall (the
-    pinned canoe route) runs south down a valley of tundra to Onrac's meadow and out into Onrac's bay. West of the
+    is a snowfield over taiga; the waterfall pours off the spine's east flank onto a rock ledge, and R-waterfall (the
+    pinned canoe route) runs south down a valley of taiga to Onrac's meadow and out into Onrac's bay. West of the
     spine, in its lee, the caravan camps in an oasis meadow at the edge of a dune field; the south is cold forest
     and lakes; the Sunken isles (the second archipelago, for the look) lie south of it.
   Distinct: the falls on a rock ledge reached only by canoe; a ring of basalt sea-stacks across the mouth of Onrac's
     bay (with them WATER's coast index is 12.2, NW-0's lumpy 11.7; 3.10's target 12); the camp nudged (+2, +2) into
-    the dunes, its clearing the oasis meadow; the snow and tundra north (D-NW9) with their own backdrops.
+    the dunes, its clearing the oasis meadow; the snow and taiga north (D-NW9) with their own backdrops.
   Not tuned here (NW-R WATER's finding): a coast knob (`finger` 22, `fjord` 11: index 12.5) or a stronger arid hint
     at the camp (a 144-cell desert) changes 29 / 22 chunks outside WATER, since the westerly moisture sweep runs the
     whole row and the forest and sand thresholds are quantiles over all the land (12, Locality); that is over
@@ -31,7 +31,7 @@ ONRAC = ((-110, -128), (-98, -136), (-84, -138), (-70, -132), (-62, -122), (-62,
          (-71, -90), (-73, -82), (-80, -73), (-92, -70), (-104, -74), (-114, -80), (-122, -92), (-124, -106),
          (-120, -120))
 # the region's map checks on its raster (map_checks_region): every door leaves by one cell. Today's `river_check` and
-# `min_blob` are not carried: the generated rivers rise in snow and tundra (the generator's hydrology; `routes`
+# `min_blob` are not carried: the generated rivers rise in snow and taiga (the generator's hydrology; `routes`
 # guards R-waterfall), the ledge is 2 sand cells by design (NW-4), and a raster's shared chunks hold other regions' cells
 CHECKS = {"warp_leaves": True}
 
@@ -46,7 +46,9 @@ def spec() -> RegionSpec:
         sea_discs=[SeaDisc((-66, -83), 4.5)],
         routes={"R-waterfall": ((-76, -118), (-75, -110), (-74, -100), (-72, -92), (-69, -86))},
         isles=[IsleField((-98, -46), 16, 9, 105)],
-        climate=[ClimateHint("arid", (-103, -100), 16)],
+        climate=[ClimateHint("arid", (-103, -100), 16),
+                 ClimateHint("cold", (-74, -93), 10),     # NW2-T (D-NW2-8): taiga over the meadows east of the spine
+                 ClimateHint("warm", (-102, -98), 6)],    # ... and the caravan's dunes kept out of it
         sites=sites("water", {"wat_caravan": (2, 2)}),   # the camp at the dunes' edge (inside the +-2 window)
         towns=("wat_onrac",),
         spots=[SpotDef("wat_s_onrac", "wat_onrac", (0, 0), "land"),

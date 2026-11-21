@@ -2,7 +2,7 @@
 
 A region names its spots (`bundle.SpotDef`) relative to an entrance or a dock (or as an absolute world cell, act 1's
 pins). The composer resolves each to the nearest cell of its kind within SEARCH_R cells of its target (ties by
-(distance, y, x)): `land` walkable, `dock` Water, `landing` a canLand cell (grass or tundra, never snow; not a
+(distance, y, x)): `land` walkable, `dock` Water, `landing` a canLand cell (grass only, never taiga or snow; not a
 transition, gate or entrance cell); none under an object. The resolved cell is then a pin of that material, so it
 holds on every later compose; one with no such cell is reported (`errors`) and the `pins` check fails.
 """

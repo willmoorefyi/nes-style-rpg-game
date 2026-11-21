@@ -6,7 +6,7 @@
  * the Mirage sands, Lufenia's mesa) never joined on foot and joined to no other region's entrance; the sands closed by
  * their mountain ring; an airship meadow within 8 steps of each door; no dock; pass W's zone ids, names and modes,
  * the zones closed on foot and by canoe (3.8 `coverage`: no walkable or canoe cell beside WIND's land left out); the
- * backdrops, snow and tundra included (D-NW9); the cairn and the dial.
+ * backdrops, snow and taiga included (D-NW9, NW2); the cairn and the dial.
  */
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
@@ -154,13 +154,13 @@ describe('NW-R WIND: region WIND on the NW world source', () => {
     for (const k of cells(zone('wnd_sea'))) expect(g[at(k)[1]][at(k)[0]]).toBe('o');
   });
 
-  it('every WIND zone has a staged backdrop; the walking zones map snow and tundra (D-NW9)', () => {
+  it('every WIND zone has a staged backdrop; the walking zones map snow and taiga (D-NW9, NW2)', () => {
     const bg = src.battleBackgrounds.zones;
     for (const z of ['wnd_highlands', 'wnd_mirage_sands', 'wnd_lufen_moor', 'wnd_tarns', 'wnd_sea']) {
       const ids = [bg[z].default, ...Object.values(bg[z].terrain ?? {})];
       for (const id of ids) expect(existsSync(`assets/backgrounds/${id}.webp`), `${z} ${id}`).toBe(true);
     }
-    for (const [z] of PARTS) expect(Object.keys(bg[z].terrain!)).toEqual(expect.arrayContaining(['snow', 'tundra']));
+    for (const [z] of PARTS) expect(Object.keys(bg[z].terrain!)).toEqual(expect.arrayContaining(['snow', 'taiga']));
     expect(bg.wnd_mirage_sands.default).toBe('desert');
   });
 

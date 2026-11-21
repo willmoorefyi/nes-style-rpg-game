@@ -12,7 +12,7 @@ export class WalkingMode implements MovementMode {
   }
 
   getSpeedMultiplier(terrain: TerrainType): number {
-    if (terrain === TerrainType.Forest) return 0.7;
+    if (terrain === TerrainType.Forest || terrain === TerrainType.Taiga) return 0.7; // NW2 D-NW2-7: taiga as forest
     if (terrain === TerrainType.Road) return 1.3;
     return 1.0;
   }

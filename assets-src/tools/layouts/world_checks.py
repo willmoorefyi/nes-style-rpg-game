@@ -10,7 +10,7 @@ boxes, for the composer v2 (`world.py`), which prints them as one line, `world: 
   3. docks: exactly the DOCKS_ALLOWED ids, each once (the gate checks place them, `gates.docks`);
   4. anchors: every anchor of `assets/data/world-anchors.yaml` is an entrance within its tolerance;
   5. reach: with every patch on, every entrance is reachable on foot or by canoe from an arrival the game offers:
-     Cornelia, a dock, or a cell the airship lands on (grass or tundra), so no door stands in a sealed pocket.
+     Cornelia, a dock, or a cell the airship lands on (grass only), so no door stands in a sealed pocket.
 Each check returns error strings; [] means OK.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ from worldgen import gates, owners
 from worldgen.geom import components
 
 ANCHORS = Path(__file__).resolve().parents[3] / "assets" / "data" / "world-anchors.yaml"
-LANDING = [".", "t"]
+LANDING = gates.LANDING                # grass only (NW2, D-NW2-4)
 # act 1's ids from before the prefixes (pass W's world_a1.LEGACY_IDS): entrances, zones, NPCs and the bridge patch
 LEGACY = frozenset({"cornelia", "cornelia_west", "cornelia_east", "cornelia_north", "castle", "north_shore", "temple",
                     "east_pocket", "temple_approach", "chest_tomb", "bridge_worker_w", "bridge_worker_e",

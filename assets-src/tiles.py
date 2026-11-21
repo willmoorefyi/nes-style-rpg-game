@@ -15,7 +15,7 @@ VARIANTS = 4
 TERRAIN_ORDER = [
     "grass", "wall", "water", "mountain", "forest", "desert",
     "swamp", "river", "road", "bridge", "counter",
-    "lake", "tundra", "snow",                  # 11-13: pass NW gives them rows (tiles_cold.py)
+    "lake", "taiga", "snow",                   # 11-13: pass NW gives them rows (tiles_cold.py; NW2: tundra -> taiga)
 ]
 
 
@@ -300,7 +300,7 @@ GENERATORS = {
     "grass": grass, "wall": wall, "water": water, "mountain": mountain,
     "forest": forest, "desert": desert, "swamp": swamp, "river": river,
     "road": road, "bridge": bridge, "counter": counter,
-    "lake": lambda v, rng: water(v, rng), "tundra": tiles_cold.tundra, "snow": tiles_cold.snow,
+    "lake": lambda v, rng: water(v, rng), "taiga": tiles_cold.taiga, "snow": tiles_cold.snow,
 }
 
 

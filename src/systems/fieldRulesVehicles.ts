@@ -30,9 +30,9 @@ export function vehicleTerrainAllows(mode: VehicleMode, t: TerrainType): boolean
   }
 }
 
-/** The terrain the airship may land on: grass or tundra, never snow (D-NW9). */
+/** The terrain the airship may land on: grass only, never taiga or snow (D-NW9, NW2 D-NW2-4). */
 export function airshipTerrainLands(t: TerrainType): boolean {
-  return t === TerrainType.Grass || t === TerrainType.Tundra;
+  return t === TerrainType.Grass;
 }
 
 /** What the vehicle rules read about a map, given by fieldRules.ts. */

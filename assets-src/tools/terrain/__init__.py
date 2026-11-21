@@ -57,4 +57,6 @@ def paint_soft(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> Non
     foothills(below, get("mountain"), grass, ocean, core, bayer, mtex, seed)
     paint_roads(below, mat, kit, seed)
     _forest(below, get("forest"), (grass | sand) & ~road_cells & ~core, kit)
+    if "taiga" in lab:                            # NW2: taiga edges, its recoloured clumps (build_map.map_kit)
+        _forest(below, get("taiga"), (grass | sand) & ~road_cells & ~core & ~get("forest"), kit, "tree_clump@taiga")
     shallows(below, [get(m) for m in WATERS], {m: get(m) for m in WATERS}, bayer, seed)

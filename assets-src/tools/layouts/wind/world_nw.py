@@ -11,7 +11,7 @@ as pass W's `world_wind.py` / `wind/world_sites.py` placed it on today's world, 
 - the encounter zones, with pass W's ids, names and rosters: one walking zone per part, each the flood from its
   door's arrival, the walkable islets with the nearest part, each canoe water (river, lake) with the part it
   touches, the canoe-only water left over in `wnd_tarns`, every Water cell WIND owns in `wnd_sea`, and their battle
-  backdrops (snow and tundra included, D-NW9). Every walkable or canoe cell WIND owns lands in a zone (3.8
+  backdrops (snow and taiga included, D-NW9, NW2). Every walkable or canoe cell WIND owns lands in a zone (3.8
   `coverage`).
 
 A small walkable pocket of WIND's outside the three parts that touches another region's land on foot is sealed to
@@ -38,11 +38,11 @@ PARTS = (("wnd_highlands", "wnd_gaia"), ("wnd_mirage_sands", "wnd_mirage"), ("wn
 MEADOWS = {"wnd_gaia": ((1, 2), 4.0), "wnd_mirage": ((4, 1), 2.4), "wnd_lufenia": ((3, 2), 2.6)}  # offset, radius
 SEAL_MAX = 80                                # the largest pocket `seal` turns to rock
 PAN = ((196, 53), 2.4)                       # the salt pan in the sands (world cell, radius of a ragged disc)
-SNOW, TUNDRA = "ice_cave", "grassland"       # the staged backdrops of snow and tundra (D-NW9; no new art)
+SNOW, TAIGA = "ice_cave", "dark_forest"      # the staged backdrops of snow and taiga (D-NW9, NW2 Q8; no new art)
 BACKDROPS = {
-    "wnd_highlands": {"default": "grassland", "terrain": {"forest": "forest", "tundra": TUNDRA, "snow": SNOW}},
-    "wnd_mirage_sands": {"default": "desert", "terrain": {"forest": "forest", "tundra": TUNDRA, "snow": SNOW}},
-    "wnd_lufen_moor": {"default": "grassland", "terrain": {"swamp": "marsh", "forest": "forest", "tundra": TUNDRA,
+    "wnd_highlands": {"default": "grassland", "terrain": {"forest": "forest", "taiga": TAIGA, "snow": SNOW}},
+    "wnd_mirage_sands": {"default": "desert", "terrain": {"forest": "forest", "taiga": TAIGA, "snow": SNOW}},
+    "wnd_lufen_moor": {"default": "grassland", "terrain": {"swamp": "marsh", "forest": "forest", "taiga": TAIGA,
                                                            "snow": SNOW}},
     "wnd_tarns": {"default": "river"},
     "wnd_sea": {"default": "ocean"},
@@ -102,7 +102,7 @@ def stamp(g, mine, ent) -> None:
                          "is open")
     g[floor] = "s"                            # the sands (the basin's own pools and streams dry out) ...
     g[_ragged(*PAN, 1297) & floor] = "≈"      # ... but for the salt pan
-    for e, ((ox, oy), r) in MEADOWS.items():  # the airship meadows: snow, tundra, sand, moor -> grass
+    for e, ((ox, oy), r) in MEADOWS.items():  # the airship meadows: snow, taiga, sand, moor -> grass
         x, y = ent[e]
         g[_ragged((x + ox, y + oy), r, 1301 + len(e)) & mine & np.isin(g, ["t", "n", "s", "w"])] = "."
     for cells, ch in OB.ground(ent):

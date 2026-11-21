@@ -7,7 +7,9 @@ Measured on the source's `ground` with every patch off. Sea is `o` only; every o
 - G-NW3: a run of boundary edges between two **land classes** on a chunk line (between cells 16k-1 and 16k) longer
   than 6 fails, unless every edge touches an exempt cell. Sea and inland water take part in no edge; beach sand (a
   sand cell 4-adjacent to sea, lake or river) is grass-class, as are roads and bridges (rev 3.2).
-Also: the biome shares, the per-region coast index (reported, not gated) and the exemption count.
+Also: the biome shares, the per-region coast index (reported, not gated) and the exemption count, and NW2's
+`taiga_share` (D-NW2-8, gated by world.py from NW2-T on): taiga over the walkable land of the given regions, on the
+owner grid, leaving out mountain, water (ocean, river, lake, canal) and snow.
 """
 from __future__ import annotations
 
@@ -18,7 +20,7 @@ from .noise import N
 WATER_CLASS, GRASS_CLASS = 1, 8
 CLASS = {"o": 0, "≈": WATER_CLASS, "r": WATER_CLASS, "m": 2, "f": 3, "s": 4, "w": 5, "n": 6, "t": 7,
          ".": GRASS_CLASS, ",": GRASS_CLASS, ":": GRASS_CLASS, "=": GRASS_CLASS}
-SHARES = (("mountain", "m"), ("forest", "f"), ("sand", "s"), ("swamp", "w"), ("tundra", "t"), ("snow", "n"),
+SHARES = (("mountain", "m"), ("forest", "f"), ("sand", "s"), ("swamp", "w"), ("taiga", "t"), ("snow", "n"),
           ("river", "r"), ("lake", "≈"), ("grass", "."))
 
 
@@ -110,6 +112,22 @@ def shares(g: np.ndarray) -> dict:
     return {k: round(100 * float((g == c).sum()) / n, 1) for k, c in SHARES}
 
 
+NOT_COUNTED = list("o≈rmn~")                  # taiga_share: mountain, water and snow are not counted
+
+
+def taiga_share(g: np.ndarray, region: np.ndarray, regions, north, floor: float) -> dict:
+    """D-NW2-8: taiga cells over the north regions' walkable non-snow land (the owner grid `region`)."""
+    own = np.isin(region, [regions.index(r) for r in north])
+    land = own & ~np.isin(g, NOT_COUNTED)
+    t, n = int((land & (g == "t")).sum()), int(land.sum())
+    s = t / max(n, 1)
+    return {"ok": s >= floor, "taiga": t, "land": n, "share": round(s, 4),
+            "note": f"{100 * s:.1f} % >= {100 * floor:.0f} %: {t} taiga of {n} walkable non-snow cells of "
+                    f"{', '.join(north)}",
+            "why": [] if s >= floor else [f"taiga {100 * s:.1f} % of {', '.join(north)}'s walkable non-snow land, "
+                                         f"under {100 * floor:.0f} % (D-NW2-8)"]}
+
+
 def region_index(g: np.ndarray, region: np.ndarray, regions) -> dict:
     """The coast index per region (its land's coast edges / sqrt(its land); reported, not gated)."""
     sea = g == "o"
@@ -133,4 +151,4 @@ def kept_rect_edges(rects: list[tuple[int, int, int, int]], chunk: int = 16) -> 
     return out
 
 
-__all__ = ["N", "coast_runs", "chunk_runs", "classes", "gates", "shares", "region_index", "kept_rect_edges"]
+__all__ = ["N", "coast_runs", "chunk_runs", "classes", "gates", "shares", "taiga_share", "region_index", "kept_rect_edges"]

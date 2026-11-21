@@ -12,7 +12,7 @@ horseshoe whose bay opens east, with its cave mouth in a notch of rock; the herm
 his driftwood hut; four more named islets and the look-only ones between them. A small group lies south of the
 arc's west horn. No dock, no land joined to Onrac or Gaia: the airship lands on the meadow and on every islet.
 Zones: `ord_heath` on the arc, `ord_isles` on every islet (both on foot and by canoe on the arc's streams),
-`ord_sea` on ORDEAL's water. Backdrops: the heath grassland (forest in the stands, grassland on tundra, the ice
+`ord_sea` on ORDEAL's water. Backdrops: the heath grassland (forest in the stands, dark_forest on taiga, the ice
 floor on snow), the isles the shoreline, the sound the ship's deck.
 """
 from __future__ import annotations
@@ -31,9 +31,10 @@ REGION = "ordeal"
 BLOCK = ("o", "m", "r", "≈")                  # on foot
 CANOE = ("r", "≈")
 MODES = {"ord_heath": ["walking", "canoe"], "ord_isles": ["walking", "canoe"], "ord_sea": ["ship"]}
-COLD = {"tundra": "grassland", "snow": "ice_cave"}     # D-NW9: the cold terrains' backdrops (staged ids)
+COLD = {"taiga": "dark_forest", "snow": "ice_cave"}   # D-NW9, NW2 Q8: the cold terrains' backdrops (staged)
 BOULDERS = ((3, 11), (-5, 6), (-6, 3))        # the heath's boulders: offsets from the Citadel's door
 HUT = (-1, -2)                                # the hermit's 2x2 hut: its offset from his islet's landing
+MEADOW_R = 2.5                                # NW2-T: the Citadel's landing meadow, grass round ord_meadow
 
 
 def _door(meta: dict, e: str) -> tuple[int, int]:
@@ -56,7 +57,8 @@ class _Ground:
 
 def _citadel(gr: _Ground, meta: dict) -> list[dict]:
     """The 3x3 icon over the door (bottom centre), its top row and the pillars' tops on the crag; the gate's court
-    and the path down to the meadow grass."""
+    and the path down to the meadow grass. NW2-T (docs/NW2_EDITS_PLAN.md 3): the meadow round `ord_meadow` (the
+    airship's landing, `ord_s_citadel_airship`) is stamped grass within MEADOW_R, so the taiga belt never takes it."""
     dx, dy = _door(meta, "ord_citadel")
     x0, y0 = dx - 1, dy - 2
     for x in range(x0 - 1, x0 + 4):
@@ -70,6 +72,11 @@ def _citadel(gr: _Ground, meta: dict) -> list[dict]:
     for y in range(dy + 1, my + 2):
         for x in range(mx - 1, mx + 2):
             gr.put(x, y, ".")
+    r = int(MEADOW_R)
+    for y in range(my - r, my + r + 1):
+        for x in range(mx - r, mx + r + 1):
+            if (x - mx) ** 2 + (y - my) ** 2 <= MEADOW_R ** 2 and gr.own[y, x] and gr.g[y, x] in "tnswf":
+                gr.put(x, y, ".")
     pillar = [["tpillar_broken_top"], ["tpillar_broken_bottom"]]
     return [D._deco("citadel", x0, y0, walk_cells=[[1, 2]], collide="alpha"),
             {"type": "deco", "parts": pillar, "x": x0 - 1, "y": y0 + 1},

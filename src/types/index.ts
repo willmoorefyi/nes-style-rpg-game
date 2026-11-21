@@ -372,7 +372,7 @@ export enum TerrainType {
   Road = 8,
   Bridge = 9,
   Lake = 11, // 10 stays the compiler's counter value
-  Tundra = 12, // NW (D-NW9): walkable, the airship lands
+  Taiga = 12, // NW2 (D-NW2-4; tundra before): walkable at forest's speed, no landing
   Snow = 13, // walkable, no landing
 }
 

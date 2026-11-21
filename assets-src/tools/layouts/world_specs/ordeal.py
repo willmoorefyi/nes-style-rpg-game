@@ -72,7 +72,8 @@ def spec() -> RegionSpec:
                IsleField((-40, -64), 7, 3, 109)],
         isle_sites={**{e: (HERMIT_R if e == "ord_isle_hermit" else ISLE_R, ISLE_K) for e in ISLETS},
                     "ord_bahamut": (BAHAMUT_R, BAHAMUT_K)},
-        climate=[ClimateHint("warm", rel((120, 58)), 20), ClimateHint("warm", rel((158, 80)), 20)],
+        climate=[ClimateHint("warm", rel((120, 58)), 20), ClimateHint("warm", rel((158, 80)), 20),
+                 ClimateHint("warm", rel((125, 56)), 9)],   # NW2-T: the heath round the gate stays out of the taiga
         sites=sites("ordeal", extra=EXTRA),
         spots=[SpotDef("ord_s_citadel", "ord_meadow", (0, -1), "land"),
                SpotDef("ord_s_citadel_airship", "ord_meadow", (0, 0), "landing"),
