@@ -56,7 +56,8 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     # NW-R: each region's own content, in REGIONS order (it may stamp its own cells first; world_content)
     rc = RC.merge(g, meta, RC.Ctx(door_off, b, trans, frozenset(blocked | set(docks.values()))))
-    filled = hikes.apply(g, meta, b, b.hikes, hike()["floor"], seed)   # NW2 7: the hike rings and meadows
+    sdefs = {d.name: d for d in b.spots}              # NW2 (7): the hike pass, after the content, before the spots
+    hk = hikes.apply(g, meta, b, hike(), {r.site: spots.target(sdefs[r.landing], b.sites, docks) for r in b.hikes})
     objs, insp = SRC.act1_content(meta["keep"])
     objs, insp = objs + rc["objects"], insp + rc["inspect"]
     people = {(n["x"], n["y"]) for n in rc["npcs"]}
@@ -66,8 +67,8 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)], **rc["regions"].get(r, {})}
                       for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err + rc["errors"], blocked)
-    if filled:
-        ch["hikes"]["note"] += "; filled " + ", ".join(f"{k} {n}" for k, n in filled.items())
+    if hk and ch["hikes"]["ok"]:
+        ch["hikes"]["note"] += "; converted " + ", ".join(f"{s} {v['converted']}" for s, v in hk.items())
     ch["coverage"] = RC.coverage(g, meta, doc.get("encounterZones") or [], rc["zones_of"], rc["fallback"])
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch

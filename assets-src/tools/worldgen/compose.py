@@ -98,8 +98,8 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
     region = owners.owners(sh, g, b, regions)
     meta = dict(entrances={e: [int(x), int(y)] for e, (x, y) in b.sites.items()}, docks=docks, routes=routes,
                 corridors=corr, fords=fl, ford_cuts=cut, canal=canal, bridge=list(t.bridge), exempt=exempt,
-                region=region, regions=regions, roads_ok=roads_ok, elev=elev, walls=sh["walls"],
+                region=region, regions=regions, roads_ok=roads_ok, elev=elev, cold=cold, walls=sh["walls"],
                 barriers=sh["barriers"], keep=sh["keep"], wall_masks=sh["wall_masks"], inner=sh["inner"],
                 sealed=sealed, jogs=jogs, tarns=tarns, hard=sh["hard"], seeds={"aldi": t.seed_cell, "ocean": (2, 2)},
-                frozen=frozen, ledges=list(b.ledges), cold=cold, gen_s=time.time() - t0)  # cold: NW2's hike fill
+                frozen=frozen, ledges=list(b.ledges), gen_s=time.time() - t0)
     return g, meta

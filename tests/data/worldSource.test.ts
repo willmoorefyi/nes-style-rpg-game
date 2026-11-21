@@ -101,7 +101,7 @@ describe('the NW world source (NW-2)', () => {
       else if (s.kind === 'dock') expect(c, name).toBe('o');
       else expect(['.', 't'], name).toContain(c);
     }
-    expect(Object.keys(src.spots)).toHaveLength(41);
+    expect(Object.keys(src.spots)).toHaveLength(42);        // NW2-W: + wat_s_waterfall_airship
     for (const d of src.docks) expect(g[d.y][d.x], d.id).toBe('o');
     expect(src.docks.map((d) => d.id).sort()).toEqual(['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent']);
     for (const [name, [x, y]] of Object.entries(src.entrances)) expect(BLOCK.has(g[y][x]), name).toBe(false);
