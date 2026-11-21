@@ -210,7 +210,10 @@ describe('questGraph: the import rule', () => {
   const ALLOWED = [/^\.\/quest\w+\.js$/, /^\.\.\/systems\/fieldRules\.js$/, /^\.\.\/types\/index\.js$/,
     /^\.\.\/entities\/ExperienceTable\.js$/, /^\.\.\/core\/schemaValidation(Quest)?\.js$/, /^node:/, /^yaml$/,
     // NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): `--from-reset` (questReset.ts) runs the game's own pure resetVehicles
-    /^\.\.\/systems\/worldReset\.js$/];
+    /^\.\.\/systems\/worldReset\.js$/,
+    // NW2-S (docs/NW2_EDITS_PLAN.md 12): `--from-reset`'s relocated v4 saves (questResetNw2.ts) run the game's own
+    // pure revalidateNw2 (it imports only the types, fieldRules*, and worldReset)
+    /^\.\.\/systems\/worldRevalidate\.js$/];
 
   it('src/progression imports nothing else', () => {
     const dir = 'src/progression';
