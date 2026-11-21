@@ -223,7 +223,7 @@ generated 256x256 world (`docs/NATURAL_WORLD_PLAN.md`, tranches NW-0 to NW-INT, 
   its pins (`a1/world_a1_pins.py`, Cornelia-relative). `world.py` is the only composer and prints every check.
 - **Measured** (pass W in brackets): coast index 34.1 (19.7), straight coast runs of 8+ edges 0 (40, longest 50),
   land 26,847 cells (21,089), mountains 15.5 % of land (28 %); snow 8.5 % and tundra 4.8 % in the far north (new
-  terrains: walkable, the airship lands on tundra only).
+  terrains: walkable, the airship lands on tundra only; pass NW2 replaced tundra with taiga, below).
 - **Game:** spots name every world place (`spots:`, `at: <spot>`); save v4, an older save on the world map or owning a
   ship or airship resets to Cornelia with a one-time notice; the Mode 7 atlas is 3072² at 12 px per cell; per-zone
   step means keep each stage's level within 0.2 of pass W's; the verifier's state cap is 3,000,000.
@@ -231,6 +231,26 @@ generated 256x256 world (`docs/NATURAL_WORLD_PLAN.md`, tranches NW-0 to NW-INT, 
   both determinism checks; the full test suite. NW-INT's browser checkpoints (the opening walk and the bridge, the
   ship round the Aldi, the canal, the canoe to Gurgu, an airship landing on tundra and a refusal on snow, a Mode 7
   flight over the north, a v3 save reset) all pass with no console error; screenshots in `~/temp/ff-game/nw_int/`.
+
+### Pass NW2: edits to the natural world ✅
+Five requested edits to the NW world (`docs/NW2_EDITS_PLAN.md`, tranches NW2-0, T, E, F, W, N, S, BAL and INT; the
+results at the end of the plan). Every stage's `requires`, `grants`, `after` and `boss` are unchanged.
+- **Taiga** replaces tundra (TerrainType 12): walkable at forest's speed, no ship or canoe, no airship landing (the
+  airship lands on grass only). It covers 34.5 % of the north's walkable non-snow land (gate >= 30 %).
+- **Canoe gorges:** Gurgu is reached only through the Cinder Gorge from Crescent Lake (54 forced canoe steps), and the
+  Ice Cavern moved to the tip of Crescent's peninsula, in the walled Rime Hollow, reached from its own new ocean dock
+  `fir_ice` and the Rime Gorge (47).
+- **Mount Duergar** moved north of the canal into the mainland's west lobe, with its Aldi dock, behind the new
+  `duergar_range` (walled off from Matoya on foot and canoe).
+- **Dock audit:** every town that needs a dock has one in a basin the ship reaches at its band stage (`dock_towns`).
+- **Hikes:** Onrac, the caravan, the waterfall, the Mirage and Lufenia have no landing within 25 steps and one within
+  50 (d 26-32 / 31-35).
+- **Balance:** four zone factors re-fit under caps, S16 / S17 grind lowered; every stage within 0.11 of NW's level.
+- **Saves:** version 5; a v4 save is revalidated on load (a ship off open water moves to a dock in the party's reach,
+  an airship on rock moves to a landing, a stranded party resets to Cornelia).
+- **Gates (NW2-INT):** the full compile reproduces the committed world byte for byte; both determinism checks; every
+  `world.py` line OK; `npm run quest -- --strict` and `--from-reset` OK; `--mutate` (see the plan's INT result);
+  `npm run build`; `test:fast` 403 files, 9,680 tests. Browser checkpoints in `~/temp/ff-game/nw2/int/`.
 
 ---
 

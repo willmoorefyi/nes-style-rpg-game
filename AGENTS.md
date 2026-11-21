@@ -10,7 +10,7 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm run test:fast    # Every test but the heavy tier: 368 files, about 2 min (128 s) with 2 workers (the agent's handoff check)
+npm run test:fast    # Every test but the heavy tier: 403 files, 9680 tests, about 3 min (172 s at NW2-INT; 128 s at TST) with 2 workers (the agent's handoff check)
 npm run test:full    # Everything, both tiers: 369 files, 9197 tests, about 30 min (1772 s; before TST 58 min, 3507 s) with 2 workers (the integrator's check)
 npm run test:world   # The heavy tier alone (tests/tiers.ts): the real-world mutation suite, about 28 min (1673 s: the plain run 1637 s, the --strict run 36 s)
 npm test             # = test:full (unchanged meaning: all tests)
@@ -299,8 +299,10 @@ Re-running every layout script must leave `git diff --exit-code assets-src/maps`
 
 ### The world (pass NW)
 
-Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in its sections 11-16) on
-`docs/WORLD_PLAN.md` (pass W: the progression S0-S31, the gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
+Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in its sections 11-16) and its edits
+`docs/NW2_EDITS_PLAN.md` (pass NW2, rev 3: the gorges, Mount Duergar, the dock audit, the northern hikes, taiga, save
+v5; the tranche results and the INT result at its end), on `docs/WORLD_PLAN.md` (pass W: the progression S0-S31, the
+gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
 
 - **Size.** The world map `overworld` is 256x256 cells (`layouts/world_api.py`: `WORLD_W`, `WORLD_H`, `CHUNK` 16, so
   256 chunks), one whole-world generator, no region boxes and no act-1 frame (NW-5 removed `A1_ORIGIN`,
@@ -321,19 +323,23 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   land's (`worldgen/owners.py`); the source carries `regions.<r>.raster` (the chunks holding r's cells) and
   `world.py --owned-chunks <r>` lists them. Pass W's door offsets of the regions outside act 1 are frozen in
   `world_specs/today_doors_data.py`. Two seas: the inland `aldi` (docks `a1_pravoka`, `elf_port`, `ert_dwarf`) and the
-  `ocean` (`ert_melmond`, `fir_crescent`), joined by the `canal` patch (CANAL_OPEN, a saddle across the isthmus).
+  `ocean` (`ert_melmond`, `fir_crescent`, `fir_ice`), joined by the `canal` patch (CANAL_OPEN, a saddle across the
+  isthmus).
 - **The composer.** `python3 -I assets-src/tools/layouts/world.py` (`--metrics`, `--json FILE`, `--check`, `--out
   FILE`, `--owned-chunks <r>`) merges the specs, runs `tools/worldgen/compose.py` (shape, relief, hydro, climate,
   stamps, roads, finish (seal, jogs), owners) at preset B, seed 1987, places the content, resolves the spots, applies
   the step-mean scaling (`world_balance.py`, below) and writes `assets-src/maps/overworld.yaml`. It prints one line per
   check of plan 3.8 and exits 1 on a failure: `world`, `basins` (aldi .., ocean ..; canal joins), `docks`, `walls`
-  (W_west, W_isthmus, W_arm, W_south, W_east with their minimal water cuts), `barriers` (`spine`, `western_range` by
-  foot and canoe, `crescent_ring` by foot), `routes` (the pinned canoe rivers), `north` (the north continents are
-  their own walk+canoe components), `landings`, `straits`, `prewalk` (S0-S14: every required entrance on foot from the
-  stage's starts), `act1`, `walks`, `detours`, `pins`, `coverage` (every walkable / canoe cell in a zone of its owner
-  region; act 1's fields are the map default), then G-NW1 (no straight coast run over 6), G-NW2 (coast index >= 30),
-  G-NW3 (no land-class run over 6 on a chunk line), land (in [26,000, 31,800]; 26,847 at NW-5, near the floor), the
-  exemptions (cap 600) and the jogs. A failure names its rule, region and cells. Selftests: `python3 -I
+  (W_west, W_isthmus, W_arm, W_south, W_east with their minimal water cuts), `barriers` (`spine`, `western_range`,
+  `duergar_range` and `ice_neck` by foot and canoe, `crescent_ring` and `ice_ring` by foot; minimal cuts >= 3),
+  `routes` (the pinned canoe rivers; no unpinned river crosses a foot-only ring), `north` (the north continents are
+  their own walk+canoe components), `landings` (grass only; every airship-only anchor has one within U 50 steps in its
+  mode), `straits`, `prewalk` (S0-S14: every required entrance on foot from the stage's starts), `act1`, `walks`,
+  `detours`, `pins`, `coverage` (every walkable / canoe cell in a zone of its owner region; act 1's fields are the map
+  default), NW2's `canoe_gates`, `gorges`, `relations`, `duergar_south`, `hikes`, `dock_towns` and `taiga_share`
+  (below), then G-NW1 (no straight coast run over 6), G-NW2 (coast index >= 30), G-NW3 (no land-class run over 6 on a
+  chunk line), land (in [26,000, 31,800]; 26,948 at NW2-INT, near the floor), the exemptions (cap 600; 440) and the
+  jogs. A failure names its rule, region and cells. Selftests: `python3 -I
   assets-src/tools/worldgen/selftest.py` (synthetic specs, locality, determinism, NW-0's gates on the world) and
   `selftest_gates.py` (each check fails on its mutated fixture). Snow `n` and taiga `t` (TerrainType 13 / 12; D-NW9, D-NW2-4):
   walkable (taiga at forest's speed), no ship or canoe, the airship lands on grass only (`fieldRulesVehicles.ts`).
@@ -341,9 +347,37 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   `taiga_share` gates it at >= 30 % of WATER / ORDEAL / WIND walkable non-snow land (`TAIGA_MIN`). Art: the 2x
   `FALLBACK_MATERIALS["taiga"]` (forest recoloured, snow on the lit crowns, `build_map._speckle`) with recoloured
   `tree_clump@taiga` edges; 1x `tiles_cold.taiga`; battle backdrop `dark_forest`; a `tundra` backdrop key is refused.
-- **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time; NW-5:
-  250 s, peak footprint 14.5 GB) writes the 256 chunks, the patch overlays and the Mode 7 atlas (`mode7.png` 3072x3072
-  at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).
+  Taiga's share at NW2-INT: 34.5 % (1,903 of 5,514 cells).
+- **NW2 geography (`docs/NW2_EDITS_PLAN.md` 4-7; the checks run only over the records the specs declare: `Gorge`,
+  `Hike`, `Relation`, the barrier seeds).**
+  - **Gorges (D-NW2-2, -3).** Gurgu `fir_volcano` (177, 203) is reached only by canoe from Crescent's dock: Crescent
+    Lake, then the **Cinder Gorge** (R-volcano, 51 route cells, walled by the Cinder Wall ridge; 54 forced canoe steps,
+    39 pass cells, E_canoe 2.16). The Ice Cavern `fir_ice` moved to the tip of Crescent's peninsula (214, 108), inside
+    the foot-only `ice_ring` (the Rime Hollow, snow floor); the ship sails up the western channel to the new ocean dock
+    `fir_ice` (205, 119) on the Frost Shore (zone `fir_tundra`), then the canoe climbs the **Rime Gorge** (R-ice, 47
+    cells; 47 forced canoe steps, 32 pass cells, E 1.88) to the Rime Tarn. `ice_neck` closes the peninsula south of the
+    tip on foot and canoe. `gorges` needs >= 26 forced canoe steps (M), >= 12 pass cells (N) and E_canoe >= 1.0 (the
+    canoe's 0.5 rate counted, so `fir_rivers` is capped at 0.75); `canoe_gates`: neither site on foot from any start,
+    both by foot+canoe, `fir_ice` not without its dock.
+  - **Mount Duergar (R3).** The dwarves `ert_dwarf` moved north of the canal into the mainland's west lobe
+    (100, 121); its Aldi dock `ert_dwarf` moved too (106, 121). `duergar_range` (x about 108-114, y 96-117, the north
+    coast to the Aldi) walls the lobe off from Matoya on foot and canoe; `duergar_south` proves the lobe and the keep
+    apart with the canal patch off. The old south isthmus is empty EARTH land; its cove is closed. S4's and S10's dock
+    `nonLoadBearing` entries are gone (both docks are load-bearing); GT-42 proves the range (proof (e)).
+  - **Dock audit (R4).** `dock_towns`: each town that needs a dock (no airship by its `bandStage`, its gate not on foot
+    from Cornelia) has one in a basin the ship reaches then, its gate within 12 steps: elfheim `elf_port` 9, dwarf
+    `ert_dwarf` 7, melmond `ert_melmond` 3, crescent `fir_crescent` 1.
+  - **Hikes (R5, D-NW2-1/9/12).** Five northern sites have no landing within K 25 steps (foot+canoe) and one within
+    U 50 in their mode (`world-anchors.yaml` `hike:`, read by both sides): Onrac and the caravan share the south-coast
+    meadow (`wat_s_onrac_airship` (53, 85), `wat_s_caravan_airship` (52, 85); d 27 / 34 and 26 / 35), the waterfall the
+    east downs (`wat_s_waterfall_airship` (85, 55), canoe mode, 26 / 35), the Mirage a north oasis in the sands
+    (`wnd_s_mirage_airship` = `wnd_s_sky_airship` (191, 43), 32 / 34), Lufenia the east coast (`wnd_s_lufenia_airship`
+    (243, 70), 27 / 31). `worldgen/hikes.py` fills the grass inside the floor (taiga, sand, swamp or forest by climate)
+    and stamps the landing meadow; `hikes` checks d and E_hike >= 1.0. Gaia, the Citadel and Bahamut keep their
+    landings (the Citadel's meadow is stamped).
+- **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time;
+  NW2-INT: 236 s, peak footprint 14.6 GB; `--check-determinism` 401 s) writes the 256 chunks, the patch overlays and
+  the Mode 7 atlas (`mode7.png` 3072x3072 at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).
   A map over 192x192 cells is painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality). Gates:
   `build_map.py --check-determinism overworld`, `mode7_atlas.py --check-determinism overworld`, and re-running
   `world.py` leaves `git diff --exit-code assets-src/maps` clean. A source with rasters compiles in **chunk-digest
@@ -362,15 +396,21 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
 - **The step-mean scaling (NW-5, plan 4.4 lever 1).** `layouts/world_balance.py`: one factor per world zone on the
   map's rate (10-22 steps), fitted from the curve model's witnesses of pass W's world and the NW world so each
   stage's walk earns pass W's xp again (factors 0.67-2.25; the method and the table in the file and in plan 16). No
-  enemy, table, item, formula or `grind` changed. Re-fit after a change that moves the witness's walks a lot.
+  enemy, table, item or formula changed. NW2-BAL re-fit it on the NW2 world (`wat_sea` 2.25, `ord_heath` 1.4,
+  `fir_tundra` 2.0, `wnd_mirage_sands` 2.1) under the `CAP` dict that `apply` asserts (`fir_rivers` 0.75 for E_canoe;
+  `wat_isles` 2.0, `wat_streams` 2.0, `wnd_lufen_moor` 1.9, `wnd_mirage_sands` 2.1 for E_hike), and lowered two
+  `grind`s (S16 2.0 -> 1.5, S17 4.0 -> 3.0; D-NW2-10: 0.5 steps, never below 1.0); every stage is within 0.11 of
+  NW's level. Re-fit after a change that moves the witness's walks a lot.
 - **The verifier** (`src/progression/`, CLI `scripts/quest-verify.ts`): a state search over flags, key items,
   vehicles and places, firing the field rules the game runs (`src/systems/fieldRules.ts`). Proofs (a) order, (b) no
   skip, (c) no soft-lock, (d) bands (the curve model's whole-party level at each boss in its `band`, up to the top
   level + 1; kits affordable; (d3) every `takeGold` price at most 80 % of the stage's starting gold), (e) early shops,
   (f) price walls (Crescent, Gaia), (g) geography (the anchors of `assets/data/world-anchors.yaml` within the fitted
   scale [0.75, 0.95], distance, bearing and detour bands), (h) the travel matrix (rows T0-T10, T6b, the two basin
-  rows; the seeds from the map's `world.basins`). `--mutate` adds the no-skip mutation suite (GT-1 to GT-37 + GT-5b,
-  `questMutateRows.ts`, and the generic elements); an uncaught element needs a `nonLoadBearing` entry.
+  rows; the seeds from the map's `world.basins`; T6's landing is a BFS in the anchor's hike mode, bounded by U).
+  `--mutate` adds the no-skip mutation suite (GT-1 to GT-37 + GT-5b and NW2's GT-40 to GT-43, `questMutateRows.ts`,
+  and the generic elements); an uncaught element needs a `nonLoadBearing` entry (GT-43, `ice_neck` opened, is one by
+  design).
   `--from-reset` (NW-5, `questReset.ts`) runs proof (c) again from every stage's save-reset state (the party at
   `cornelia` on foot, the vehicles of `worldReset.resetVehicles`) and from 50 seeded mid-stage samples per stage.
 - **The curve model** (`questCurve.ts`, `questExplore.ts`): no battles. It walks the witness of (a); each route cell in
@@ -383,9 +423,11 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   `tests/progression/questMutateWorld.test.ts`, is the heavy tier), `--from-reset`, `--stage S11` (from the stage's
   `entry`, with its ancestors' grants), `--only abc`, `--json FILE`, `--maps DIR` (a scratch compile's maps first),
   `--anchors FILE`, `--worst-canoe` (rows T0-T4 again with the canoe). The search stops at `MAX_STATES` = 3,000,000
-  (`questSearch.ts`; the state key is compact: flag and item bitsets): the full NW graph is 1,348,366 states, `--stage
-  S30`'s 2,096,640; `npm run quest` runs with an 8 GB heap.
-- **Saves (NW-5, plan 5.3, D-NW8; NW2-S).** `SAVE_VERSION` 5 (`NW2_SAVE_VERSION`; v1-v5 read). A v1-v3 save is reset by the pure `resetSave` of
+  (`questSearch.ts`; the state key is compact: flag and item bitsets): the full NW2 graph is 835,121 states (NW's was
+  1,348,366; `--stage S30`'s 2,096,640 at NW); `npm run quest -- --strict` takes about 2 min (115 s, 3.0 GB at
+  NW2-INT) and runs with an 8 GB heap.
+- **Saves (NW-5, plan 5.3, D-NW8; NW2-S).** `SAVE_VERSION` 5 (`NW2_SAVE_VERSION`; `NW_SAVE_VERSION` 4 is the first
+  NW world; v1-v5 read, a v5 save loads as saved). A v1-v3 save is reset by the pure `resetSave` of
   `src/systems/worldReset.ts` (`LoadedSave.reset`): on the world map, or owning the ship (`BIKKE_DEFEATED`) or the
   airship (`AIRSHIP_RAISED`) wherever it is (Q4a), it loads at Cornelia's world entrance on foot (`LoadScene` sets
   `game.pendingEntrance = 'cornelia'`); its world-map vehicles become `resetVehicles(flags)` (the ship at the
@@ -405,7 +447,9 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   Tests: `tests/systems/worldRevalidate.test.ts`, `tests/scenes/loadRevalidate.test.ts`, `resetStates.test.ts`.
 - **Tests of the world.** Act 1: `tests/quest/a1/` (`a1Pins`, `a1Sites`, `a1Walks`, `nwA1.ts`), the regions
   `tests/quest/<r>/<r>_o_world.test.ts` (FIRE's `fireWorld.test.ts`) on the committed source and its owner grid,
-  `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`. Pass W's world
+  `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`; NW2's
+  `tests/data/canoeGorges.test.ts` (the gorge figures with the canoe's rate) and the hike d / E checks in
+  `tests/quest/water/wat_o_world.test.ts` and `tests/quest/wind/wnd_o_world.test.ts`. Pass W's world
   source and anchors are frozen in `tests/fixtures/passW/` (never edit them): the act-1 pins and the regions' kept ids
   and rosters are compared with them.
 - **Landmark art** below gives pass W's cells for the icons; on the NW world each icon is placed by its door offset.
