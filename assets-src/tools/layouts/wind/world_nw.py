@@ -4,8 +4,8 @@ The spec (`world_specs/wind.py`) shapes the land; `content` places WIND's conten
 as pass W's `world_wind.py` / `wind/world_sites.py` placed it on today's world, each piece relative to its door:
 
 - the stamps (small ground overrides, on WIND's own cells only): the Mirage sands (the ring's floor is sand, but for
-  the salt pan, the stone spine and the oasis meadow), the airship meadows by the three doors (Gaia's grass bowl),
-  the rocky knoll behind Gaia's door and the ground under each icon;
+  the salt pan and the stone spine), Gaia's airship meadow (its grass bowl; the Mirage's and Lufenia's landings are
+  the hike pass's meadows, NW2-N, `worldgen/hikes.py`), the rocky knoll behind Gaia's door and the ground under each icon;
 - the objects (`wind/world_nw_objects.py`): the three approved icons, the tree clump and the fallen block by their
   doors, the cairn in the neck between Gaia's arm and the Pinewold and the bronze dial in the sands;
 - the encounter zones, with pass W's ids, names and rosters: one walking zone per part, each the flood from its
@@ -35,7 +35,7 @@ from world_specs import wind as SPEC
 R = REGIONS.index("wind")
 WET = ["r", "≈"]
 PARTS = (("wnd_highlands", "wnd_gaia"), ("wnd_mirage_sands", "wnd_mirage"), ("wnd_lufen_moor", "wnd_lufenia"))
-MEADOWS = {"wnd_gaia": ((1, 2), 4.0), "wnd_mirage": ((4, 1), 2.4), "wnd_lufenia": ((3, 2), 2.6)}  # offset, radius
+MEADOWS = {"wnd_gaia": ((1, 2), 4.0)}         # offset, radius; NW2-N: the Mirage's and Lufenia's are the hike pass's
 SEAL_MAX = 80                                # the largest pocket `seal` turns to rock
 PAN = ((196, 53), 2.4)                       # the salt pan in the sands (world cell, radius of a ragged disc)
 SNOW, TAIGA = "ice_cave", "dark_forest"      # the staged backdrops of snow and taiga (D-NW9, NW2 Q8; no new art)

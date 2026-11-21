@@ -26,7 +26,7 @@ STEP_FACTOR = {
     "ord_heath": 0.67, "ord_isles": 2.25, "ord_sea": 2.25,
     "temple_approach": 0.81,
     "wat_dunes": 0.67, "wat_isles": 2.0, "wat_streams": 2.0,    # NW2-W: the hike caps (NW2 7, E_hike >= 1.0)
-    "wnd_highlands": 2.25, "wnd_lufen_moor": 2.25, "wnd_mirage_sands": 1.26,
+    "wnd_highlands": 2.25, "wnd_lufen_moor": 1.9, "wnd_mirage_sands": 1.26,  # NW2-N: lufen_moor capped at d / 16
 }
 
 
