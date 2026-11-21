@@ -725,3 +725,18 @@ No question is open.
   the northern belt is expected and owned by NW2-T (which also re-checks the Citadel's, Bahamut's and Gaia's landings);
   the frozen forest / sand thresholds stay as they are.
 - **Q14 (Onrac and the caravan sharing one meadow): default accepted (shared).**
+
+### Momus OKAY (round 3, 2026-11-21): fixture and test notes for NW2-E and NW2-F
+
+Momus returned OKAY with conditions; these are folded in as tranche instructions (no design change):
+1. `tests/progression/miniWorld.ts` `MINI_ROWS` B2 lists docks exactly: add `fir_ice` (NW2-F).
+2. `tests/progression/travelMatrix.test.ts`: the B1 message at :49 gains `fir_ice`; the T3 RED case at :60
+   (`dropGate(37, 5)` expects `TRAVEL T3 reaches fir_ice`) no longer holds once the ice sits behind its canoe cell
+   (45, 4): drop it or add a T3 RED case for (45, 4) (NW2-F).
+3. `questMutate.test.ts` :93-110 rely on GT-5 / GT-14 being uncaught: drop their two `nonLoadBearing` reason checks and
+   move the RED test to another entry row (GT-6 or GT-16) (NW2-E).
+4. The mini ice pocket: the `hull` NPC at (46, 6) lands on new rock; move it beside `fir_desert`'s new cell, e.g.
+   (42, 6) (NW2-F).
+5. §3: `--region`'s limit is `PAINT_LIMIT` 160 (`terrain/region_chunks.py:16`), not 70; the repaint is still by full
+   compiles.
+6. §12: a save with no way out still runs vehicle rules 1 and 3 (wording only; no map lacks a way out).
