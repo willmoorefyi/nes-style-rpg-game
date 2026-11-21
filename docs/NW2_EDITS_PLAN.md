@@ -1,4 +1,4 @@
-# NW2: edits to the natural world (plan, rev 2)
+# NW2: edits to the natural world (plan, rev 3)
 
 Base: `mainline` 37cce624 (pass NW closed; `docs/NATURAL_WORLD_PLAN.md`, "NW" below, sections cited as NW x.y).
 Requests: the user, 2026-11-20 (R1-R5); rulings of 2026-11-21 (tundra is replaced by **taiga**, with forest's
@@ -11,6 +11,9 @@ Rev 2 (2026-11-21):
   the contract and GT rows move into the tranches that build them, per-site landing modes, the mutation rows and
   fixtures, and save v5's host and rules;
 - momus's suggestions 7-18 folded in.
+Rev 3 (2026-11-21): Q13 is ruled (taiga is common across the north, with a measured target); momus round 2 is fixed
+(the canoe-aware stranded rule, multi-floor exits, proof (g) in the full gate, the mini fixture's geography, the
+waterfall's bound, the hike figures).
 See "Changelog" at the end.
 
 Renders for this plan (from the committed source `assets-src/maps/overworld.yaml`, scratch script outside the repo):
@@ -97,7 +100,7 @@ world = (146, 155) + rel), the unit the region specs use. A **ref** is classic t
 | D-NW2-5 | **The dwarves move; the canal stays** (Q1, default accepted). Anchor `dwarf` ref (-56, -4) -> (-54, -40); `ice` ref (44, 44) -> (79, -55) | 9 |
 | D-NW2-6 | **Frozen:** every stage's `requires`, `grants`, `after` and `boss`. Allowed: `walk` events, `entry` spot cells, `nonLoadBearing`, and `grind` (Q6) | |
 | D-NW2-7 | **Taiga has forest's modifiers** (user): walking speed 0.7, and forest's encounter-rate modifier, which is none today (no terrain modifies the rate) | user |
-| D-NW2-8 | **No global widening of the cold band.** `T_TAIGA` stays 0.5, the tundra band's threshold, so the cold belt keeps its shape: the 1,301 old tundra cells become taiga and only their art changes. Taiga spreads only through local `cold` hints at the hike sites (cut at 1.5 radii) and the hike pass. This reconciles locality (risk N4) with the frozen thresholds; widening globally is Q13 | integrator, momus 9 |
+| D-NW2-8 | **Taiga is common across the north** (Q13, coordinator ruling 2026-11-21). The target: taiga covers **>= 30 %** of the northern continents' walkable land, the WATER, ORDEAL and WIND land cells that are not mountain, water (ocean, river, lake) or snow. The baseline, approximated by rows 0-95: 1,301 of about 5,322 cells, **24.4 %**. Momus's probe: `T_TAIGA` 0.35 adds only about 302 cells, about 30.1 % on that approximation, so it is borderline. **NW2-T chooses the threshold, plus local `cold` hints, that meets the target with margin; the measure is the owner grid's, not the row approximation.** It reports the share. The later hike pass only adds to it | Q13 ruled; momus R2-1 |
 | D-NW2-9 | **Hikes only at the five sites** (Q4). Gaia, the Citadel and Bahamut keep today's landings (d <= U) | user |
 | D-NW2-10 | **The grind lever** (Q6): after the zone factors are capped and re-fitted, a stage still over may lower its `grind` in 0.5 steps, never below 1.0 | user |
 | D-NW2-11 | **Targeted save fix** (Q11), with the rules of 12 | user |
@@ -139,10 +142,23 @@ Glossary:
 | Step means | `layouts/world_balance.py` per zone | per zone | per zone (11) |
 
 **Generation** (`worldgen/climate.py`):
-- The `cold > 0.5` band writes `t` meaning taiga; `T_TAIGA` stays 0.5 (D-NW2-8).
-- The new hint kind `cold` raises `cold` in a ragged disc, cut at 1.5 radii like `warm`.
-- `Q_FOREST` / `Q_SAND` stay frozen. A note in `climate.py`: taiga overrides forest after the thresholds, so the
-  forest share reported falls where taiga wins; the thresholds never move.
+- The cold band writes `t` meaning taiga where `cold > T_TAIGA`. The new constant `T_TAIGA` replaces the literal
+  0.5 and is **set by NW2-T** to meet D-NW2-8's >= 30 % (0.35 alone is borderline).
+- The new hint kind `cold` raises `cold` in a ragged disc, cut at 1.5 radii like `warm`, round the hike sites and
+  wherever the share needs it.
+- The figure `taiga_share` (in `worldgen/metrics.py`, with a `world.py` line) is taiga over the WATER, ORDEAL and
+  WIND walkable non-snow land on the owner grid. The gate is >= 0.30 from NW2-T on.
+- `Q_FOREST` / `Q_SAND` **stay frozen**. A note in `climate.py`: taiga overrides forest and grass after the
+  thresholds, so the forest share reported falls where taiga wins; the thresholds never move.
+- **The repaint.** Moving `T_TAIGA` repaints the whole cold belt, about 40 north chunks plus their rings, past
+  `--region`'s 70-chunk limit when combined. That is expected, not a locality breach. NW2-T's preview is a scratch
+  full compile under the lock, and the integrator's full compile at NW2-T's merge commits it.
+- **Every landing stays valid:**
+  - the Citadel's meadow at (125, 59) is **stamped** grass (ORDEAL content);
+  - Gaia (212, 43), Bahamut (163, 87) and the waterfall keep a landing within U in their mode;
+  - `landings` and `hikes` run on every compose.
+- **The §7 distances are re-measured after NW2-T.** NW2-W and NW2-N start from NW2-T's ground and re-derive d, the
+  landings and the factor bounds before they place their meadows.
 
 **Art** (no Gemini):
 - 2x: `build_map.FALLBACK_MATERIALS["taiga"]` is a recolour of `forest` (hue -25, saturation 0.55, value 0.70) plus
@@ -183,9 +199,10 @@ Glossary:
 | `tiles.py`, `tiles_cold.py`, `assets/sprites/terrain.png` | row 12 |
 | AGENTS.md "The world (pass NW)" | "Snow `n` and taiga `t` (TerrainType 13 / 12; D-NW9, D-NW2-4): walkable (taiga at forest's speed), no ship or canoe, the airship lands on grass only" |
 
-**ORDEAL's and the others' landings.** With D-NW2-8 only the old tundra changes. If `landings` (8) fails for the
-Citadel (125, 59), Bahamut (163, 87) or Gaia (212, 43), the **NW2-T agent** owns the fix. It may edit ORDEAL's and
-WIND's content modules for this alone: a grass meadow stamp within U of the anchor.
+**ORDEAL's and the others' landings.** The widened band may turn the ground under the Citadel (125, 59), Bahamut
+(163, 87), Gaia (212, 43) or the waterfall's current landing to taiga. The **NW2-T agent** owns the fix and may edit
+ORDEAL's, WIND's and WATER's content modules for it alone: a grass meadow stamp within U of the anchor. The
+Citadel's is stamped in any case. The five hike sites' final meadows are NW2-W's and NW2-N's.
 
 ## 4. R1 + R2: FIRE (the Ice Cavern moved; both sites canoe-gated through gorges)
 
@@ -300,20 +317,28 @@ The check `dock_towns` (8) passes on today's world, so it lands in NW2-0.
 - Removed: WIND's `MEADOWS` for Mirage and Lufenia, and WATER's oasis and Onrac meadows (`CARAVAN_LANDING_OFF`, the
   S24 bank). Gaia's meadow stays.
 
-**Landings** (re-derived for K 25 / U 50 by BFS on today's ground; d is to the landing cell itself, before the pass
-adds taiga. The floor is the minimum over all five sites, so no landing serves one site too close to another):
+**Landings** (indicative: derived for K 25 / U 50 by BFS on **today's** ground, and **re-measured on NW2-T's ground**
+before NW2-W and NW2-N place them, D-NW2-8). d is measured to the landing cell itself. The floor is the minimum over
+all five sites, so no landing serves one site too close to another. "Grass that qualifies" counts today's grass
+cells meeting the floor and the cap. Where it is 0 or 1, the landing **is** the meadow stamp:
 
-| Site | Ring | Landing spot -> cell | d floor (foot+canoe, min over the five) | d cap (mode) | Manhattan | Hike zone, factor bound d / 16 |
-|---|---|---|---|---|---|---|
-| Onrac `wat_onrac` | taiga belt (`cold` hint rel (-79, -86), 16) | `wat_s_onrac_airship` -> the south coast meadow **(53, 85)** | 30 | 34 on foot | 30 | `wat_isles` <= 1.9 |
-| Caravan `wat_caravan` | the dunes plus taiga to the north | `wat_s_caravan_airship` -> the same meadow, **(52, 85)** | 35 | 35 on foot | 35 | `wat_dunes` (0.67) |
-| Waterfall `wat_waterfall` | snow and taiga on the spine's flank | **new** `wat_s_waterfall_airship` -> the east downs **(84, 55)** | 31 (Onrac's) | 34 foot+canoe (none on foot) | 34 | `wat_isles`, `wat_streams` <= 2.1 |
-| Mirage `wnd_mirage` | the sands; the oasis becomes sand | `wnd_s_mirage_airship`, `wnd_s_sky_airship` -> a north oasis inside the ring, **(191, 43)** | 34 | 34 on foot | 34 | `wnd_mirage_sands` <= 2.1 |
-| Lufenia `wnd_lufenia` | taiga and forest moor (`cold` hint rel (72, -79), 14) | `wnd_s_lufenia_airship` -> the east coast, **(243, 70)** (one of 12 cells that qualify; the tightest site) | 31 | 31 on foot | 31 | `wnd_lufen_moor` <= 1.9 |
-| Gaia, Citadel, Bahamut | unchanged (Q4) | unchanged | | <= U | | |
+| Site | Ring | Landing spot -> cell | d floor (foot+canoe, min over the five) | d cap (mode): walk + canoe steps | Manhattan | Grass that qualifies today | Factor bound (D-NW2-3, canoe at 0.5) |
+|---|---|---|---|---|---|---|---|
+| Onrac `wat_onrac` | taiga belt (`cold` hint rel (-79, -86), 16) | `wat_s_onrac_airship` -> the south coast meadow **(53, 85)** | 30 | 34 on foot | 30 | several (forest round them; the meadow is stamped) | `wat_isles` 34 / 16 = 2.1 |
+| Caravan `wat_caravan` | the dunes plus taiga to the north | `wat_s_caravan_airship` -> the same meadow, **(52, 85)** | **31** (Onrac's) | 35 on foot | 35 | as Onrac (shared) | `wat_dunes` 2.1 (it stays at 0.67) |
+| Waterfall `wat_waterfall` | snow and taiga on the spine's flank | **new** `wat_s_waterfall_airship` -> the east downs **(84, 55)** | 31 (Onrac's) | 34 foot+canoe: 31 walk + 3 canoe (none on foot) | 34 | several (east downs grass) | `wat_isles`, `wat_streams` (31 + 3 x 0.5) / 16 = **2.0** |
+| Mirage `wnd_mirage` | the sands; the oasis becomes sand | `wnd_s_mirage_airship`, `wnd_s_sky_airship` -> a north oasis inside the ring, **(191, 43)** | 34 | 34 on foot | 34 | **0** (sand only): the stamp | `wnd_mirage_sands` 34 / 16 = 2.1 |
+| Lufenia `wnd_lufenia` | taiga and forest moor (`cold` hint rel (72, -79), 14) | `wnd_s_lufenia_airship` -> the east coast, **(243, 70)** | 31 | 31 on foot | 31 | **1** (momus): the stamp | `wnd_lufen_moor` 31 / 16 = 1.9 |
+| Gaia, Citadel, Bahamut | unchanged (Q4) | unchanged (the Citadel's meadow stamped, 3) | | <= U | | | |
 
-- E_hike at those d, with every bound met: at least 1.0 one way (for example Onrac 34 / (16 x 1.9) = 1.12).
-- The hike zones' factor caps in `world_balance.CAP` are the bounds above, rounded down to 0.05.
+- **Zone caps** (`world_balance.CAP`): a zone crossed by several hikes takes the smallest bound, rounded down to 0.05:
+  `wat_isles` **2.0** (the waterfall's), `wat_streams` 2.0, `wnd_mirage_sands` 2.1, `wnd_lufen_moor` 1.9.
+- **E_hike at the rounded rates:**
+  - the waterfall at 2.0 (rate 20-44, mean 32): (31 + 1.5) / 32 = 1.02; at 2.1 it would be 0.97 (momus);
+  - Onrac at 2.0: 34 / 32 = 1.06;
+  - Mirage at 2.1 (mean 33.5): 1.01;
+  - Lufenia at 1.9 (rate 19-42, mean 30.5): 1.02.
+- The bounds are re-derived from each tranche's final d, and `hikes` enforces E_hike >= 1.0, never the table.
 - **Airship-only gates.** `north` is unchanged. T6 / T6b (10): the four are reachable on foot from a landing within
   U; the waterfall only with the canoe.
 - **Files.**
@@ -391,10 +416,46 @@ the barrier seeds). With none declared it prints `OK (none declared)`, so the co
     - GT-43: `ice_neck` opened, `nlb` "the tip becomes walkable from Crescent's shore, so the fir_ice dock is
       redundant; S16 still needs the canoe" (F).
   - GT-5 and GT-14: no edit (5). GT-5b: wording only (E).
-  - Each new row's element is added to `tests/fixtures/quest/mini.yaml` (an `ice_ring` cut, an `ice_neck` cut, a
-    `duergar_range` cut, the `fir_ice` dock) in the same tranche, so `questMutate.test.ts` finds no MISSING row.
-    `byRow('GT-21')` expects its new element count (2 -> 2 or 3, as the fixture's R-ice cut gives).
   - GT-38 and GT-39 stay unused.
+- **The mini fixture** (`tests/fixtures/quest/mini.yaml`, 48x32, its stand-ins as today: a river crossing is a
+  Bridge cell gated by the `canoe` item). It gains the geography that makes each new row **caught**, not "pending:
+  town dwarf not built":
+  - **The dwarves' pocket (NW2-E).**
+    - Carve the land cells x 22-24, rows 1-6, plus (22-24, 7), out of the rock east of M (the mainland, x 12-20),
+      with rock column x 21 between them.
+    - Cut `duergar_range: [[21, 3]]` in `world.cuts`.
+    - Move dock `ert_dwarf` from (22, 13) to (23, 8), aldi, below the pocket.
+    - A new room `dwarf-hall` (the 10th) with Nerrick, moved from the overworld (20, 18), and a `keeper` (shopId
+      `dwarf_item`). Its entrance is `ert_dwarf` (23, 2), with the transition at (23, 1).
+    - A town `{id: dwarf, owner: ERT-O, maps: [dwarf-hall], opensAfter: [S2], bandStage: S10, kit: k_low, status:
+      built}`; S10's `maps: [dwarf-hall]`.
+    - The S4 and S10 dock `nonLoadBearing` entries go, as in `quest.yaml`.
+  - **The Ice Cavern's pocket (NW2-F).**
+    - In the FL lands (x 38-46, rows 1-6), rock column x 43, rows 1-6, splits off the hollow: `fir_ice` stays at
+      (44, 2) in a hollow of x 44-46, rows 1-3.
+    - Row 4 is (44, 4) rock, the R-ice stand-in (45, 4) a Bridge cell gated by `canoe`, and (46, 4) rock.
+    - The shore is x 44-45, rows 5-6, with rock at x 46. The dock `fir_ice` is at (45, 7), ocean, with (45, 7)
+      carved to Water.
+    - Cuts: `ice_ring: [[44, 4]]` (shore to hollow) and `ice_neck: [[43, 5]]` (FL to shore).
+    - `fir_desert` moves to (41, 6). The flight stand-in (the AIRSHIP_RAISED transition) moves from (46, 1) to
+      (42, 1), and its return target from (45, 2) to (41, 2), so neither lands in the hollow.
+    - `crescent_ring`'s ring (x 37) now guards only the volcano and the desert.
+  - **`questMutate.test.ts`.**
+    - `ids` count 38 -> 42.
+    - `byRow('GT-21')`: 2 elements, the cuts (37, 5) and (45, 4).
+    - `CAUGHT` changes:
+
+      | Row | Expectation |
+      |---|---|
+      | `'GT-37'` | `['SKIP S15 ']` (was `['SKIP S15 ', 'SKIP S16 ']`) |
+      | `'GT-40'` | `['SKIP S16 ']`: the opened ring walks the shore into the hollow, so S16 holds without S14's canoe |
+      | `'GT-41'` | `['ORDER goal ']`: no dock, no hollow, no levistone |
+      | `'GT-42'` | `['EARLY dwarf ']`: the opened range walks M into the pocket after S1, so the keeper is talkable before S2 |
+      | `'GT-14'` | `['ORDER goal ']` (now caught) |
+      | `'GT-5'` | `['ORDER goal ']` (Elfland only by `elf_port`) |
+
+    - GT-43 gets its own `it`: `nonLoadBearing` equals the row's `nlb` text, `caught` false.
+  - The fixture's comment block names the two pockets. `miniWorld.ts` is unchanged.
 - **Proofs (e) and (f)** are re-run at NW2-INT.
 
 ## 11. Balance (`layouts/world_balance.py`, the curve model)
@@ -402,7 +463,7 @@ the barrier seeds). With none declared it prints `OK (none declared)`, so the co
 - **Rule:** every band OK (d), each stage within +0.5 of NW's level, and (d2) / (d3) OK.
 - **Levers, in order** (D-NW2-10):
   1. Re-fit `STEP_FACTOR` (NW-5's iterative fit, scratch outside the worktree), clamp [0.67, 2.25], with the new
-     **`CAP` dict** asserted by `apply`: `fir_rivers` <= 0.75 (E_canoe); `wat_isles` 1.9, `wat_streams` 2.1,
+     **`CAP` dict** asserted by `apply`: `fir_rivers` <= 0.75 (E_canoe); `wat_isles` 2.0, `wat_streams` 2.0,
      `wnd_mirage_sands` 2.1, `wnd_lufen_moor` 1.9 (E_hike at the measured d, 7). The caps are re-derived from each
      tranche's final d.
   2. A stage still over lowers its `grind` by 0.5 steps, never below 1.0.
@@ -448,8 +509,11 @@ re-measured.
 - A v1-v3 save takes the D-NW8 reset as today.
 
 **Host.** `SaveManager.load` stays synchronous and `resetSave` stays pure.
-- For a v4 save, `LoadScene` (async) loads the `overworld` map and, if the save is inside a map, that map, before it
-  switches scene.
+- For a v4 save, `LoadScene` (async) loads the `overworld` map before it switches scene. If the save is inside a
+  map, it also loads that map's **way out**: a BFS over the interior maps' transitions until one targets an
+  overworld entrance. For example `ice-cavern-b2` -> `ice-cavern-b1` -> overworld `fir_ice`, and `dwarf-hall` ->
+  `ert_dwarf`. Each map on the chain is loaded once, and the chain is capped at 8 maps; a save with no way out keeps
+  today's behaviour.
 - It builds the collision with the save's flags' patches applied, through the same patch code the field uses
   (`fieldRules` / the patch overlay).
 - It then calls a new pure function, `revalidateNw2(save, world)` (`src/systems/worldRevalidate.ts`, under 250
@@ -457,22 +521,33 @@ re-measured.
 - The result sets `pendingEntrance` / `pendingNotice` as the reset does today, or rewrites the save's vehicle or party
   cells.
 
-**Rules** (keyed on each parked vehicle and on the party's cell, never on the party's map alone):
+**Rules** (keyed on each parked vehicle and on the party's cell, never on the party's map alone).
+
+**The party's component** is the set of cells reachable from the party's cell, or for a save inside a map from its
+way-out entrance, with the save's flags' patches applied:
+- **on foot and canoe whenever the save holds the canoe** (`canoe` in its items). The Ice Cavern lies inside the
+  foot-only `ice_ring`, Gurgu behind `crescent_ring`, and the waterfall's foot component has no grass, so judging a
+  canoe-holding save on foot alone would reset valid saves;
+- on foot otherwise.
+
 1. **Ship.** It is valid on Water inside a basin its flags open (aldi; ocean with CANAL_OPEN). Its **shore** is any
    walkable 4-neighbour of its cell; a ship with no shore is at anchor (like `wnd_s_ship`) and still valid. An invalid
    ship (its cell became land, as at the old dwarf cove (104, 152)) moves to the allowed dock in the party's
-   foot-component, if there is one, else to the nearest allowed dock of an open basin. A party in elfheim, the keep
-   or the marsh therefore gets its ship at `elf_port`.
-2. **The party inside a map:** its component is that of the map's overworld exit entrances. If that component holds
-   no ship shore, no airship and not Cornelia, the ship moves to the component's dock: `dwarf-hall` -> `ert_dwarf`,
-   `ice-cavern-*` -> `fir_ice`.
+   component, if there is one, else to the nearest allowed dock of an open basin. A party in elfheim, the keep or the
+   marsh therefore gets its ship at `elf_port`.
+2. **The party inside a map:** its component is its way-out entrance's. If that component holds no ship shore, no
+   airship and not Cornelia, the ship moves to the component's dock: `dwarf-hall` -> `ert_dwarf`, `ice-cavern-*` ->
+   `fir_ice` (whose component, with the canoe, holds the dock's shore via R-ice).
 3. **Airship.** It is valid on a walkable cell (it may stand on taiga or snow; boarding needs no landing). If its cell
-   became rock or water, it moves to the nearest `canLand` cell in the party's foot-component, else to the
-   `RESET_SPOTS` airship spot.
+   became rock or water, it moves to the nearest `canLand` cell in the party's component, else to the `RESET_SPOTS`
+   airship spot.
 4. **Party cell and mode.** In canoe mode on a cell that is no longer River or Lake (an old R-ice cell): walking mode
-   if the cell is walkable. On foot on a non-walkable cell (the old frost hollow, now rock): rule 5.
-5. **Stranded** (as D-NW8): the party's foot-component, after rules 1-4, holds none of Cornelia's entrance, its
-   ship's shore or its airship. Then reset to Cornelia, the vehicles to `RESET_SPOTS`, with the one-time notice.
+   if the cell is walkable. On a cell that admits neither mode (the old frost hollow, now rock): rule 5.
+5. **Stranded** (as D-NW8): the party's component (foot+canoe with the canoe), after rules 1-4, holds none of
+   Cornelia's entrance, its ship's shore or its airship. Then reset to Cornelia, the vehicles to `RESET_SPOTS`, with
+   the one-time notice.
+   - Examples: a canoe-holding save on foot inside the Rime Hollow, with the ship at `fir_ice`, is **kept** (the
+     component reaches the shore by R-ice); the same party without the canoe could not have entered.
 
 `--from-reset` (`questReset.ts`) adds the relocated states: S10 inside `dwarf-hall` with the ship at `ert_dwarf`,
 S16 inside `ice-cavern-b1` with the ship at `fir_ice`, and S6 at the keep with the ship moved to `elf_port`. Proof
@@ -500,7 +575,7 @@ the new Onrac meadow.
 | `tests/quest/water/*`, `tests/quest/wind/*`, `tests/quest/ordeal/ord_o_world.test.ts` | spots moved; the `taiga` key; hike d |
 | `tests/data/worldSource`, `worldSpots` (:84 list), `worldGates`, `overworldZoneCoverage` | docks, spots, barriers, cuts; the `nonLoadBearing` list without S4 and S10 |
 | `tests/progression/travelMatrix`, `macroGeography`, `worldAnchors`, `questSpots`, `questMutate` (GT-21 count, GT-40-43), `miniWorld.ts` + `tests/fixtures/quest/mini.yaml` | B2 docks; targets; landing modes; new rows' elements; the fixture's tundra cell becomes taiga |
-| `tests/systems/saveWorldReset.test.ts`, `worldReset.test.ts`, new `worldRevalidate.test.ts`, `tests/progression/resetStates.test.ts` | v5: rules 1-5 (the ship at the old dwarf cove with the party in elfheim; inside `ice-cavern-b2` with the ship at Crescent; an airship on new rock; canoe mode on an old R-ice cell; stranded in the lobe); a valid v4 kept; v1-v3 as before |
+| `tests/systems/saveWorldReset.test.ts`, `worldReset.test.ts`, new `worldRevalidate.test.ts`, `tests/progression/resetStates.test.ts` | v5: rules 1-5 (the ship at the old dwarf cove with the party in elfheim; inside `ice-cavern-b2` with the ship at Crescent, resolved b2 -> b1 -> `fir_ice`, then the ship moved to `fir_ice`; a canoe-holding party in the Rime Hollow kept, not reset; a party at Gurgu's mouth with the canoe kept; an airship on new rock; canoe mode on an old R-ice cell; stranded in the lobe without a vehicle); a valid v4 kept; v1-v3 as before |
 | new `tests/data/northHikes.test.ts`, `canoeGorges.test.ts`, `dockTowns.test.ts` | 7, 4 (E with the canoe rate), 6 |
 | `tests/data/questCeilings.test.ts` | finds `gates_canoe.py`, `gates_hike.py`, `hikes.py`, `gorges.py`, `worldRevalidate.ts` (each < 250 lines) |
 
@@ -517,14 +592,14 @@ Rules:
   declared records (8), so no tranche merges a failing line.
 
 **Verifier gates** (the `--stage` (d) failures of 1 are not gated):
-- full: `npm run quest -- --strict --only abceh`;
+- full: `npm run quest -- --strict --only abcegh` (proof (g) included: the anchors move in E and F);
 - per stage: `npm run quest -- --strict --stage S<n> --only abc`;
 - (d), (f) and `--mutate` belong to NW2-BAL and NW2-INT.
 
 | Tranche | Owner | Content | Gates | Depends | Effort |
 |---|---|---|---|---|---|
 | **NW2-0 Checks** | integrator | constants (N, M, the E targets) in `world_api`; `hike:` in `world-anchors.yaml` read by both sides; `Hike`, `Gorge`, `Relation`, the `cold` hint and `spot:` barrier seeds in `bundle`/`spec`; `gates_canoe.py`, `gates_hike.py`, `dock_towns` with selftests (they run over declared records only); `landings` and `landingNear` in the anchor's mode with U; the `ship+canoe+walking` detour mode | `world.py` OK (`OK (none declared)` lines); `selftest_gates.py` (+6); full verifier gate on today's world; test:fast | — | 6 h |
-| **NW2-T Taiga** | integrator or a runtime agent | 3 in full; the ORDEAL / Gaia landing fix if needed; the recompile (`tundra:` keys gone) | `world.py` OK; image review of 4 north crops (the luminance gap); full verifier gate; test:fast | NW2-0 | 8 h |
+| **NW2-T Taiga** | integrator or a runtime agent | 3 in full; **`T_TAIGA` and the `cold` hints chosen to meet D-NW2-8's >= 30 %**, with the share reported; the Citadel's meadow stamped; the Gaia / Bahamut / waterfall landing fixes if needed; a scratch full compile for the preview; the recompile at merge (`tundra:` keys gone) | `world.py` OK (`taiga_share` >= 0.30, `landings`); image review of 4 north crops (the luminance gap); full verifier gate; test:fast | NW2-0 | 9 h |
 | **NW2-E Duergar** | EARTH agent (A1 spec edit approved) | 5; the `ert_dwarf` contract text, `duergar_range`; `duergar_south`; S4 / S10 `nonLoadBearing` removed; GT-5b wording, GT-42 with its fixture; `worldSpots:84` | `world.py` OK (`barriers`, `duergar_south`, `relations`, `prewalk`, `dock_towns`, `act1`, `walks`); stage gate S4, S6, S10, S11; full gate; test:fast | NW2-T | 7 h |
 | **NW2-F Fire** | FIRE agent | 4; `fir_ice` dock (Python and TS), `ice_neck`, `ice_ring`, `crescent-ice` strait, B2 docks; S16 `walk`; GT-21, GT-37, GT-40, GT-41, GT-43 with fixtures, `canoeCut` `dock:`; the 31-pair table | `world.py` OK (`canoe_gates`, `gorges`, `relations`, `routes`, `straits`); stage gate S14-S17; full gate; test:fast | NW2-T | 10 h |
 | **NW2-W Water hikes** | WATER agent | 7 for Onrac, caravan, waterfall | `hikes` (3 sites), `landings`; stage gate S20-S24; full gate; test:fast | NW2-T | 5 h |
@@ -535,7 +610,7 @@ Rules:
 
 - **Merge order:** 0, T, then E, F, W, N in any order (each re-runs `world.py` after rebasing, then the integrator's
   full compile), then S, BAL and INT.
-- **Totals:** about 57 h. Critical path 0 -> T -> F -> BAL -> INT is about 36 h of wall clock, plus the mutate run.
+- **Totals:** about 58 h. Critical path 0 -> T -> F -> BAL -> INT is about 36 h of wall clock, plus the mutate run.
   About 8 full compiles.
 
 ## 15. Risks
@@ -545,11 +620,12 @@ Rules:
 | N1 | S16 (24.5 of 25), S21 (28.8 of 29) and the grind-1.0 stages go over band | `CAP` and refit, the grind lever, the grind-1.0 fallback (11) |
 | N2 | A generated river gives a shorter canoe way through a ring, the neck or the fells | `gorges` over all rivers; `ice_neck` and `duergar_range` canoe-closed; the `routes` ring rule; GT-21, GT-40, GT-41 |
 | N3 | The hike rings look like clean rings (up to about 890 grass cells converted at K 25) | the `cold` hints and sand do most; jitter; the converted count reported; an image review per site |
-| N4 | Locality: hints or the Duergar ridge repaint far chunks | D-NW2-8 (no global band change); hints cut at 1.5 radii; frozen thresholds; the range is west of Matoya; full compiles are the integrator's anyway |
+| N4 | Locality: the taiga band repaints the whole cold belt; hints or the Duergar ridge repaint far chunks | the cold belt's repaint is accepted and done by full compiles (NW2-T's scratch preview, the integrator's at merge), never `--region`; hints are cut at 1.5 radii; `Q_FOREST` / `Q_SAND` stay frozen, so nothing south of the belt moves; the range is west of Matoya |
 | N5 | Act 1 drifts (Matoya walk, OW-15) | the range at x >= 106; act-1 checks on every compose |
 | N6 | A v4 save strands a party | v5 rules 1-5 and `--from-reset` from the relocated states |
 | N7 | The tip is too tight for the hollow, a 28-cell gorge and a shore | the polygon's northern lobe; the east strip may turn to Fells rock |
-| N8 | Lufenia's landing is tight: 12 qualifying cells, d 31 | the hike pass and the `cold` hint add room; the cap is 50 |
+| N8 | Lufenia has 1 qualifying grass cell today and Mirage 0 (momus): both landings exist only as meadow stamps, at d 31 and 34 | the stamp is the landing by design; `landings` and `hikes` check it on every compose; the cap is 50, so either may move further out if the stamp's cell turns out bad |
+| N13 | NW2-T's taiga moves the hike distances that §7 derived on today's ground | NW2-W and NW2-N re-measure on NW2-T's ground before placing (3); the `hikes` check is the authority |
 | N9 | Taiga reads as forest | the luminance gate; the speckle; Bedrock as the fallback only if the review fails |
 | N10 | The `--mutate` run grows | 4 new rows of about 30-90 s each; one run, at INT |
 | N11 | A coast tidy erases a dock cove | docks are pins with `cove=True`; `docks` and `dock_towns` on every compose |
@@ -574,12 +650,14 @@ All of rev 1's questions are closed:
 | Q11 | Saves | **answered: targeted** (D-NW2-11) |
 | Q12 | The zone id `fir_tundra` | default accepted: kept |
 
-New, from rev 2:
+Rev 2's new questions, both closed (the integrator's rulings, end of this file):
 
-| # | Question | Default |
+| # | Question | Status |
 |---|---|---|
-| Q13 | Widen the taiga band over the whole north (`T_TAIGA` 0.35), which repaints the cold belt and may move the Citadel's, Bahamut's and Gaia's ground? Or only locally at the hike sites? | **local only** (D-NW2-8) |
-| Q14 | Onrac and the caravan share one south-coast meadow, about (52-53, 85), two spots side by side. Is that acceptable, or should each get its own? | shared |
+| Q13 | Widen the taiga band over the whole north? | **ruled: yes, widen.** Taiga is common across the north, with D-NW2-8's >= 30 % target; NW2-T owns the threshold, the repaint and the landings |
+| Q14 | Onrac and the caravan share one south-coast meadow? | default accepted: shared |
+
+No question is open.
 
 ## 17. TODOs
 
@@ -588,9 +666,10 @@ New, from rev 2:
 - [x] Measure the baseline (forced canoe, hikes, docks, crops) at 37cce624 (2026-11-21)
 - [x] Fold in the rulings of 2026-11-21 (taiga; forest's modifiers) (2026-11-21)
 - [x] Rev 2: the user's answers Q3, Q4, Q6, Q11; momus's 6 blocking items and suggestions 7-18 (2026-11-21)
-- [ ] User answers Q13, Q14 (priority: low, effort: 0.1h)
+- [x] Q13 and Q14 ruled by the integrator (2026-11-21)
+- [x] Rev 3: Q13 folded in (the >= 30 % taiga target); momus round 2 fixed (2026-11-21)
 - [ ] NW2-0 checks over declared records, landing modes, hike bounds in the anchors file (priority: high, effort: 6h)
-- [ ] NW2-T taiga: runtime, Python, art, recompile (priority: high, effort: 8h)
+- [ ] NW2-T taiga: runtime, Python, art, T_TAIGA and hints for >= 30 %, landings, recompile (priority: high, effort: 9h)
 - [ ] NW2-E Duergar, the range, duergar_south, the dock, GT-42 (priority: high, effort: 7h)
 - [ ] NW2-F the ice tip, the two gorges, fir_ice, GT-21/37/40/41/43 (priority: high, effort: 10h)
 - [ ] NW2-W Onrac, caravan, waterfall hikes (priority: medium, effort: 5h)
@@ -602,6 +681,24 @@ New, from rev 2:
 
 ## Changelog
 
+- **rev 3 (2026-11-21).**
+  - R2-1, Q13: D-NW2-8 now reads "taiga is common across the north". The target is taiga >= 30 % of WATER, ORDEAL
+    and WIND walkable non-snow land (baseline about 24.4 %; 0.35 alone is borderline). NW2-T picks `T_TAIGA` and the
+    hints, reports `taiga_share`, stamps the Citadel's meadow and keeps Gaia's, Bahamut's and the waterfall's
+    landings. §7 is re-measured after NW2-T. `Q_FOREST` / `Q_SAND` stay frozen, and the cold belt's repaint goes
+    through full compiles. §3, N4, N13 and the NW2-T row are updated.
+  - R2-2: the save component is foot+canoe whenever the save holds the canoe. The way out of a multi-floor map is
+    resolved through its transitions (b2 -> b1 -> overworld, capped at 8 maps). The test cases are extended.
+  - R2-3: the full gate is `--only abcegh`.
+  - R2-4: the mini fixture gains a dwarves' pocket (`duergar_range` cut (21, 3), dock (23, 8), the `dwarf-hall`
+    room, the `dwarf` town) and an ice pocket (`ice_neck` (43, 5), `ice_ring` (44, 4), the `fir_ice` dock (45, 7));
+    the flight stand-in moves. The `CAUGHT` entries: GT-37, GT-40, GT-41, GT-42, GT-14, GT-5; GT-43 as `nlb`; the
+    row count 42; GT-21 at 2.
+  - R2-5: the waterfall's bound is 2.0 with the canoe's rate counted, so `wat_isles` and `wat_streams` cap at 2.0;
+    E_hike is worked at the rounded rates.
+  - R2-6: the caravan's floor is 31 (Onrac's). Lufenia has 1 qualifying grass cell and Mirage 0: both rely on the
+    meadow stamp. N8 is corrected.
+  - The integrator's Q13 and Q14 rulings are folded into §16; no question is open. NW2-T goes to 9 h.
 - **rev 2 (2026-11-21).**
   - Decisions: Q3 (K 25 / U 50), Q4, Q6 and Q11 answered; the other defaults accepted. D-NW2-8 (no global taiga
     widening), D-NW2-12 (one source for the hike bounds).
