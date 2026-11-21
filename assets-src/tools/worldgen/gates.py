@@ -14,7 +14,7 @@ from .geom import components, flood
 
 BLOCK = ["o", "m", "r", "≈"]                 # on foot
 WET = ["o", "r", "≈"]                        # no wall cell may be any of these (3.8 `walls`)
-LANDING = [".", "t"]                         # the airship lands on grass and tundra, never on snow (D-NW9)
+LANDING = ["."]                              # the airship lands on grass only (D-NW2-4), never taiga or snow
 STRAIT_W = 3                                 # a ship lane is at least 3 Water cells wide (3x3 erosion)
 WALL_W = 3                                   # a wall's minimal water cut is at least this many cells (its width)
 WALL_GROW = 12                               # ... searched in its mask grown by at most this many steps

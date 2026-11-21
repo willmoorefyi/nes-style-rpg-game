@@ -18,7 +18,7 @@ Cell = tuple[int, int]
 WORLD_W = WORLD_H = 256                      # D-NW1 (user ruling 2026-11-20): 16 x 16 = 256 chunks
 CHUNK = 16                                   # cells per chunk side (the compiler's 2x chunks)
 WATER, MOUNTAIN, GRASS = "o", "m", "."       # build_map.py LEGEND chars the composer writes
-TUNDRA, SNOW = "t", "n"                      # D-NW9 (2.6): the airship lands on tundra, never on snow
+TAIGA, SNOW = "t", "n"                       # D-NW9, D-NW2-4: walkable; the airship lands on neither
 
 # 2.2: Cornelia's south-gate arrival in the new world (fixed by NW-0) and the act-1 delta from today's world. An act-1
 # pin sits at CORNELIA_NW + (p_today - CORNELIA_TODAY); every other anchor's target is CORNELIA_NW + S_STAR x ref.
@@ -30,6 +30,7 @@ S_STAR = 0.86                                # cells per classic tile (D-NW1; to
 REGIONS = ("a1", "elf", "earth", "fire", "ordeal", "water", "wind")     # tie-break order (owner grid, 3.4)
 PREFIXES = {"a1": "a1", "elf": "elf", "earth": "ert", "fire": "fir", "ordeal": "ord", "water": "wat", "wind": "wnd"}
 NORTH_REGIONS = ("water", "ordeal", "wind")  # 3.8 `north`: their walk+canoe components hold only their own cells
+TAIGA_MIN = 0.30                             # NW2 D-NW2-8: taiga_share's floor over the NORTH_REGIONS' walkable land
 
 # 0.1.1 G-NW2 (D-NW11, preset B measured 30.6 in NW-0): the whole-world coast index gate
 G2_MIN = 30.0

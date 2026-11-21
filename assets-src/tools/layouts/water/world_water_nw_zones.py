@@ -6,12 +6,12 @@ from the composed ground and WATER's owner cells instead of today's box. The fir
   behind the falls (its arrival and the cave door);
 - `wat_dunes`: the caravan's dune field (the sand patches within DUNE_R of the camp, with a one-cell fringe), the
   oasis meadow within OASIS_R of the camp's arrival and the tent's door;
-- `wat_isles`: every other walkable cell WATER owns (grass, forest, tundra, snow, sand; the look-only islands too);
+- `wat_isles`: every other walkable cell WATER owns (grass, forest, taiga, snow, sand; the look-only islands too);
 - `wat_sea` (ship): every Water cell WATER owns.
 
 So every walkable or canoe cell of WATER is in one of its zones (3.8 `coverage`). Backdrops: today's, plus D-NW9's
-cold ground on `wat_isles`: snow fights on `ice_cave` (the frozen floor), tundra fights on `shoreline` (the rock
-field under snowy peaks); both are staged ids already (no new art).
+cold ground on `wat_isles`: snow fights on `ice_cave` (the frozen floor), taiga fights on `dark_forest` (the conifer
+belt, NW2 Q8); both are staged ids already (no new art).
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from worldgen.geom import components
 
 DUNE_R = 8                      # the dune field: sand patches that come this close to the caravan's arrival
 OASIS_R = 3                     # ... and the meadow round the camp
-COLD = {"tundra": "shoreline", "snow": "ice_cave"}
+COLD = {"taiga": "dark_forest", "snow": "ice_cave"}
 
 
 def _disc(shape, c, r: float) -> np.ndarray:

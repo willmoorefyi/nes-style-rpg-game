@@ -11,7 +11,7 @@ foot and by canoe with their minimal cuts (`world.cuts`), north isolation, airsh
 - **north** (all on): every walk+canoe component holding a cell owned by WATER, ORDEAL or WIND holds only such
   cells, and no dock touches one.
 - **routes**: `gates.routes` plus the ledge rule (a canoe-only site is reached only by its route's river).
-- **landings** (all on): every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance,
+- **landings** (all on): every airship-only anchor has a landing cell (grass only, never taiga or snow; no entrance,
   transition, gate or NPC) within the hike cap U steps in its mode (NW2 D-NW2-12; the verifier's T6 rule), and
   every `landing` spot is such a cell.
 """
@@ -174,7 +174,7 @@ def north(g, meta, north_regions: tuple[str, ...]) -> dict:
 
 def landings(g, meta, anchors: tuple[str, ...], hike: dict, spots: dict | None = None,
              taken: set | None = None) -> dict:
-    """Every airship-only anchor has a landing cell (grass or tundra, never snow; no entrance, transition, gate or
+    """Every airship-only anchor has a landing cell (grass only, never taiga or snow; no entrance, transition, gate or
     NPC: `taken`) within the hike cap U steps of its entrance, BFS in its mode (NW2 D-NW2-12: `hike["sites"]`, the
     waterfall by foot+canoe, any other anchor on foot; the verifier's T6 `questTravel.landingNear`), and every
     `landing` spot is such a cell. `hike`: `world_specs.common.hike()`."""
@@ -195,7 +195,7 @@ def landings(g, meta, anchors: tuple[str, ...], hike: dict, spots: dict | None =
     for k, s in (spots or {}).items():
         x, y = s["at"]
         if s.get("kind") == "landing" and (h[y, x] not in LANDING or (x, y) in taken):
-            why.append(f"spot {k} {cells(meta, [(x, y)])} is a landing on {str(h[y, x])!r} (grass or tundra, free)")
+            why.append(f"spot {k} {cells(meta, [(x, y)])} is a landing on {str(h[y, x])!r} (grass only, free)")
     far = max((v for v in res.values() if v is not None), default=0)
     return {"ok": not why, **res, "note": f"{len(res)} anchors within {cap} steps in their modes; farthest {far}",
             "why": why}

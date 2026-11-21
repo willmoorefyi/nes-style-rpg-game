@@ -32,8 +32,8 @@ const npc = (map: MapData, id: string): MapNPC => {
   return found;
 };
 
-// NW-5 (D-NW9): tundra and snow, where the TerrainType has them, are walked like grass
-const COLD = ['Tundra', 'Snow'].map((n) => (TerrainType as unknown as Record<string, number | undefined>)[n])
+// NW-5 (D-NW9), NW2: taiga and snow, where the TerrainType has them, are walkable
+const COLD = ['Taiga', 'Snow'].map((n) => (TerrainType as unknown as Record<string, number | undefined>)[n])
   .filter((v): v is TerrainType => v !== undefined);
 
 describe('fieldRules: terrain per mode (today\'s WalkingMode, ShipMode, CanoeMode, AirshipMode)', () => {

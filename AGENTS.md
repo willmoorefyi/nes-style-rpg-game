@@ -335,8 +335,12 @@ Plans: `docs/NATURAL_WORLD_PLAN.md` (pass NW, rev 3.2; every tranche's result in
   G-NW3 (no land-class run over 6 on a chunk line), land (in [26,000, 31,800]; 26,847 at NW-5, near the floor), the
   exemptions (cap 600) and the jogs. A failure names its rule, region and cells. Selftests: `python3 -I
   assets-src/tools/worldgen/selftest.py` (synthetic specs, locality, determinism, NW-0's gates on the world) and
-  `selftest_gates.py` (each check fails on its mutated fixture). Snow `n` and tundra `t` (TerrainType 13 / 12, D-NW9):
-  walkable like grass, no ship or canoe, the airship lands on tundra and never on snow (`fieldRulesVehicles.ts`).
+  `selftest_gates.py` (each check fails on its mutated fixture). Snow `n` and taiga `t` (TerrainType 13 / 12; D-NW9, D-NW2-4):
+  walkable (taiga at forest's speed), no ship or canoe, the airship lands on grass only (`fieldRulesVehicles.ts`).
+  NW2-T: taiga where `cold > T_TAIGA` (0.25, `worldgen/climate.py`) plus `cold` hints (WATER, WIND); `world.py`'s
+  `taiga_share` gates it at >= 30 % of WATER / ORDEAL / WIND walkable non-snow land (`TAIGA_MIN`). Art: the 2x
+  `FALLBACK_MATERIALS["taiga"]` (forest recoloured, snow on the lit crowns, `build_map._speckle`) with recoloured
+  `tree_clump@taiga` edges; 1x `tiles_cold.taiga`; battle backdrop `dark_forest`; a `tundra` backdrop key is refused.
 - **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time; NW-5:
   250 s, peak footprint 14.5 GB) writes the 256 chunks, the patch overlays and the Mode 7 atlas (`mode7.png` 3072x3072
   at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).

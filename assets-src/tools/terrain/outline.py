@@ -143,28 +143,31 @@ def _line_edges(mask: np.ndarray, y0: int, x0: int) -> tuple[int, int]:
     return int(eh.sum() + ev.sum()), int(eh[ly].sum() + ev[:, lx].sum())
 
 
-def _clumps(kit: K.Kit) -> list[tuple[np.ndarray, int, int]]:
-    """tree_clump at 0.8 / 1.0 scale, as drawn and mirrored: (RGBA, centre y, centre x)."""
+def _clumps(kit: K.Kit, part: str = "tree_clump") -> list[tuple[np.ndarray, int, int]]:
+    """tree_clump (or `part`, NW2's taiga recolour) at 0.8 / 1.0 scale, as drawn and mirrored: (RGBA, centre y,
+    centre x)."""
     out = []
     for s in (1.0, 0.8):
         for mirror in (False, True):
-            img = _resized(kit.part("tree_clump"), s, mirror)
+            img = _resized(kit.part(part), s, mirror)
             ys, xs = np.nonzero(img[..., 3] > 127)
             out.append((img, int((ys.min() + ys.max()) // 2), int((xs.min() + xs.max()) // 2)))
     return out
 
 
-def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit: K.Kit) -> None:
+def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit: K.Kit,
+            part: str = "tree_clump") -> None:
     """Forest edges: tree_clump stamps about every 40 px along the outline (sticking out at most 14 px, only onto
     open grass or sand outside other cells' centres), a 1 px canopy rim and a 3 px shadow cast to the south-east.
     The clumps are placed chunk by chunk (GAP-14): each chunk draws from its own rng, keeps its anchors CLUMP_STEP / 2
-    px inside its border (so two chunks' clumps keep the spacing) and tests a bulge against its own clumps only."""
+    px inside its border (so two chunks' clumps keep the spacing) and tests a bulge against its own clumps only.
+    NW2: taiga's edges are drawn the same way with `part` = its recoloured clump (its own rng purpose)."""
     if not forest.any():
         return
     H, W = forest.shape
     canopy = forest.copy()
-    if "tree_clump" in kit.parts and "tree_clump" in kit.approved:
-        clumps = _clumps(kit)
+    if part in kit.parts and "tree_clump" in kit.approved:
+        clumps = _clumps(kit, part)
         out_d = _dist(forest, CLUMP_OUT + 1)
         inner = _inner_depth(forest, 13)
         cand_px = forest & (inner >= 3) & (inner <= 12)
@@ -178,7 +181,7 @@ def _forest(below: np.ndarray, forest: np.ndarray, open_ground: np.ndarray, kit:
             cand = np.argwhere(cand_px[ay0:ay1, ax0:ax1]) + (ay0, ax0)
             if not len(cand):
                 continue
-            rng = chunk_rng("clumps", col, row)
+            rng = chunk_rng("clumps" if part == "tree_clump" else f"clumps:{part}", col, row)
             by0, by1, bx0, bx1 = max(0, ay0 - pad), min(H, ay1 + pad), max(0, ax0 - pad), min(W, ax1 + pad)
             own = forest[by0:by1, bx0:bx1].copy()             # the forest plus this chunk's clumps
 

@@ -63,31 +63,36 @@ LEGEND = {".": "grass", ":": "cobble", ",": "dirt", "~": "water", "#": "wall", "
           "≈": "lake",
           # pass W: a swamp (walkable, TerrainType.Swamp; soft, drawn like grass in its own texture)
           "w": "swamp",
-          # pass NW (D-NW9): tundra (the airship lands on it) and snow (it does not); both walk like grass
-          "t": "tundra", "n": "snow"}
+          # pass NW (D-NW9), NW2 (D-NW2-4): taiga (snowy conifers, walked at forest's speed) and snow; both
+          # walkable, the airship lands on neither
+          "t": "taiga", "n": "snow"}
 # painted full-cell from a seamless texture (no ragged edge); interior walls and carpets get a dark edge
 FULL = ["floor", "floor_stone", "carpet", "rubble", "in_wall_top", "in_wall_face"]
 COUNTER = 10                                       # collision value of counters (CollisionMap treats it as a wall)
 # painted in this order; each erodes (ragged edge inside its own cells) against the ones before it
 # (new materials go at the end: a layer's noise seed depends on its index). Ties between materials are broken by
 # this order too (the earlier wins), so no pixel depends on set iteration order (PYTHONHASHSEED).
-SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean", "lake", "swamp", "tundra", "snow"]
+SOFT = ["grass", "sand", "dirt", "cobble", "forest", "mountain", "river", "ocean", "lake", "swamp", "taiga", "snow"]
 SOFT_WATER = {"river", "ocean", "lake"}            # foam on their edge
 ROUNDED = {"sand": 10, "forest": 12, "mountain": 12, "river": 8, "ocean": 16, "lake": 12, "swamp": 12,  # blur (px)
-           "tundra": 12, "snow": 10}
+           "taiga": 12, "snow": 10}
 WATERISH = {"water", "bridge", "culvert"}
 # TerrainType values (src/types/index.ts)
 GRASS, WALL, WATER, ROAD, BRIDGE, SWAMP, LAKE = 0, 1, 2, 8, 9, 6, 11
-TUNDRA, SNOW = 12, 13                              # pass NW (D-NW9, docs/NATURAL_WORLD_PLAN.md 2.6)
+TAIGA, SNOW = 12, 13                               # pass NW (D-NW9), NW2 (D-NW2-4: tundra renamed taiga)
 TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall": WALL, "bridge": BRIDGE, "culvert": WALL,
            "floor": ROAD, "floor_stone": ROAD, "carpet": ROAD, "in_wall_top": WALL, "in_wall_face": WALL,
            "counter": COUNTER, "void": WALL, "rubble": ROAD, "forest": 4, "mountain": 3, "sand": 5, "river": 7, "ocean": WATER,
-           "lake": LAKE, "swamp": SWAMP, "tundra": TUNDRA, "snow": SNOW}
+           "lake": LAKE, "swamp": SWAMP, "taiga": TAIGA, "snow": SNOW}
 # on foot: walls, water, counters, mountains (3), rivers (7) and lakes (11, pass W; the canoe's)
 BLOCKED = MC.BLOCKED
-# materials a kit may not have yet: (base material, hue shift, saturation factor, value factor) of a recoloured copy
+# materials a kit may not have yet: (base material, hue shift, saturation factor, value factor[, snow speckle share])
+# of a recoloured copy. NW2 (docs/NW2_EDITS_PLAN.md 3): taiga is the forest darkened toward blue-green, with snow
+# on the crowns' lit upper-left (`_speckle`); its tree_clump edges take the same recolour (`TAIGA_CLUMP`)
 FALLBACK_MATERIALS = {"swamp": ("grass", 25, 0.55, 0.7),
-                      "tundra": ("grass", 20, 0.45, 0.95), "snow": ("sand", 0, 0.08, 1.25)}     # NW 2.6
+                      "taiga": ("forest", 25, 0.55, 0.55, 1.0), "snow": ("sand", 0, 0.08, 1.25)}
+COLD_MATS = {"taiga": "t", "snow": "n"}             # fallbacks only on a map whose ground has them
+TAIGA_CLUMP = "tree_clump@taiga"
 OBJ_REACH = R.OBJ_REACH  # cells: an object's art reaches at most this far outside its footprint (raster windows)
 RING_PAD = R.RING_PAD    # cells beyond a raster window's 1-chunk ring (what a ring chunk's placements read)
 BAND_ABOVE, BAND_ROWS = 192 * 192, 64    # NW-2 (G-NW8): a map over 192x192 cells paints in bands of 64 rows
@@ -366,18 +371,23 @@ def door_effect(src: dict) -> dict:
 def map_kit(src: dict, kit: K.Kit) -> K.Kit:
     """The kit with the map's material remaps applied: `materials: {name: alias}` (another material) or
     `{from: alias, shade: f, hue: deg, sat: f}` (a recoloured copy: hue shift and saturation factor in HSV, then the
-    RGB shade factor), plus the fallback textures of materials a kit may not have yet (swamp; NW 2.6's tundra and
-    snow, only on a map whose ground has them)."""
-    used = set(src.get("ground") or "")                # NW: tundra / snow only where the ground has them
+    RGB shade factor), plus the fallback textures of materials a kit may not have yet (swamp; taiga and snow only
+    on a map whose ground has them; taiga also its recoloured tree_clump)."""
+    used = set(src.get("ground") or "")
     extra = {m: f for m, f in FALLBACK_MATERIALS.items()
-             if m not in kit.materials and (m not in ("tundra", "snow") or {"tundra": "t", "snow": "n"}[m] in used)}
+             if m not in kit.materials and (m not in COLD_MATS or COLD_MATS[m] in used)}
     if not src.get("materials") and not extra:
         return kit
     import copy
     kit = copy.copy(kit)
-    kit.materials = dict(kit.materials)
-    for name, (base, hue, sat, val) in extra.items():
-        kit.materials[name] = _recolor_rgb(kit.material(base), hue, sat, val)
+    kit.materials, kit.parts = dict(kit.materials), dict(kit.parts)
+    for name, (base, hue, sat, val, *speck) in extra.items():
+        kit.materials[name] = _speckle(_recolor_rgb(kit.material(base), hue, sat, val), *speck)
+        if name == "taiga" and "tree_clump" in kit.parts:
+            clump = _recolor(kit.part("tree_clump"), hue, sat, val)
+            rgba = np.asarray(clump).copy()
+            rgba[..., :3] = _speckle(rgba[..., :3], *speck, alpha=rgba[..., 3] > 127)
+            kit.parts[TAIGA_CLUMP] = Image.fromarray(rgba)          # (H, W, 4) uint8: RGBA
     for name, alias in (src.get("materials") or {}).items():
         if isinstance(alias, dict):                    # {from: castle_face, shade: 0.4, hue: 20, sat: 0.6}
             unknown = set(alias) - {"from", "shade", "hue", "sat"}
@@ -390,6 +400,25 @@ def map_kit(src: dict, kit: K.Kit) -> K.Kit:
         else:
             kit.materials[name] = kit.material(alias)
     return kit
+
+
+def _speckle(rgb: np.ndarray, share: float = 0.0, alpha: np.ndarray | None = None) -> np.ndarray:
+    """NW2: snow on the crowns' lit upper-left: a px brighter than its lower-right neighbour (the lit side, light
+    from the top-left) and in the brightest third of the texture takes a snow tone, on a fixed 4x4 pattern of
+    `share` of the px (deterministic, no rng); the snow is a 15-bit tone. `alpha`: only these px (a part)."""
+    if not share:
+        return rgb
+    a = rgb.astype(np.float32)
+    luma = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+    on = np.ones(luma.shape, bool) if alpha is None else alpha
+    lit = luma - np.roll(luma, (-2, -2), (0, 1)) > 6
+    top = luma >= np.quantile(luma[on], 0.66)
+    yy, xx = np.mgrid[0:luma.shape[0], 0:luma.shape[1]]
+    keep = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]])[yy % 4, xx % 4] + 0.5) / 16 < share
+    snow = on & lit & top & keep
+    out = rgb.copy()
+    out[snow] = np.where(luma[snow, None] > np.quantile(luma[on], 0.85), (232, 240, 248), (184, 200, 216))
+    return out
 
 
 def _recolor_rgb(tex: np.ndarray, hue: float, sat: float, val: float) -> np.ndarray:

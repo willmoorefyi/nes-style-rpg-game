@@ -108,7 +108,7 @@ describe('the NW world source (NW-2)', () => {
     expect(src.world.basins).toEqual({ aldi: [146, 165], ocean: [2, 2] });
   });
 
-  it('snow and tundra lie in the far north (2.4 rule 5)', () => {
+  it('snow and taiga lie in the far north (2.4 rule 5)', () => {
     const rows = (ch: string): number[] => g.flatMap((r, y) => (r.includes(ch) ? [y] : []));
     expect(Math.max(...rows('n'))).toBeLessThan(110);
     expect(Math.max(...rows('t'))).toBeLessThan(120);

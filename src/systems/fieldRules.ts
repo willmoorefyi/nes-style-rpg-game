@@ -70,7 +70,7 @@ export function terrainAllows(mode: FieldMode, t: TerrainType): boolean {
   switch (t) {
     case TerrainType.Grass: case TerrainType.Forest: case TerrainType.Desert:
     case TerrainType.Swamp: case TerrainType.Road: case TerrainType.Bridge:
-    case TerrainType.Tundra: case TerrainType.Snow:
+    case TerrainType.Taiga: case TerrainType.Snow:
       return true;
     default:
       return false;

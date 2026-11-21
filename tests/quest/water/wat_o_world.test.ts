@@ -9,7 +9,7 @@
  * The three anchors at their targets with a grass landing within 8 steps; no dock (airship-only); the cave behind
  * the falls reached by canoe only (the ledge holds no grass and joins nothing on foot but its door); R-waterfall to
  * the sea; the doors, icons, inspect cells and sea-stacks; the four zones with today's ids, every walkable or canoe
- * cell of the continent in one, every Water cell in at most one ship zone; the snow and tundra backdrops.
+ * cell of the continent in one, every Water cell in at most one ship zone; the snow and taiga backdrops.
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
@@ -101,7 +101,7 @@ describe('NW-R WATER: the anchors, the landings and no dock', () => {
     });
   }
 
-  it("the airship's landing spots are grass (the runtime lands on grass until NW-5's tundra row)", () => {
+  it("the airship's landing spots are grass (the airship lands on grass only, D-NW2-4)", () => {
     expect(src.spots.wat_s_onrac.at).toEqual(E('wat_onrac'));
     for (const s of ['wat_s_onrac_airship', 'wat_s_caravan_airship']) {
       expect(src.spots[s].kind).toBe('landing');
@@ -244,12 +244,12 @@ describe('NW-R WATER: the encounter zones on the owner grid (3.3, 3.8 coverage)'
     }
   });
 
-  it('the backdrops: today\'s per zone, and snow and tundra on the coast zone (D-NW9), all staged ids', () => {
+  it('the backdrops: today\'s per zone, and snow and taiga on the coast zone (D-NW9, NW2), all staged ids', () => {
     const b = src.battleBackgrounds.zones;
     expect(b.wat_streams.default).toBe('waterfall');
     expect(b.wat_dunes.default).toBe('desert');
     expect(b.wat_sea.default).toBe('ocean');
-    expect(b.wat_isles.terrain).toMatchObject({ forest: 'forest', snow: 'ice_cave', tundra: 'shoreline' });
+    expect(b.wat_isles.terrain).toMatchObject({ forest: 'forest', snow: 'ice_cave', taiga: 'dark_forest' });
     const ids = Object.values(b).flatMap((t) => [t.default, ...Object.values(t.terrain ?? {})]).filter((v): v is string => !!v);
     for (const id of ids) expect(existsSync(`assets/backgrounds/${id}.webp`), id).toBe(true);
   });

@@ -6,7 +6,7 @@
  * landing within 8 steps of the Citadel and of every islet, the meadow below the gate; the crescent's cold north rim;
  * the icons (the Citadel between its pillars on the crag, Bahamut's cave mouth, the hermit's hut and slate); the
  * zones with today's ids and rosters covering every walkable and canoe cell of ORDEAL's land (3.8 `coverage`) and
- * ORDEAL's water; the backdrops, snow and tundra included (D-NW9).
+ * ORDEAL's water; the backdrops, snow and taiga included (D-NW9, NW2).
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
@@ -191,10 +191,10 @@ describe('ORDEAL on the NW world (NW-R)', () => {
     for (const e of ['ord_citadel', ...ISLES]) expect(zoneOf.has(key(...E[e])), e).toBe(true);
   });
 
-  it('backdrops: the heath grassland (forest, tundra, snow), the isles the shoreline, the sound the deck; staged ids', () => {
+  it('backdrops: the heath grassland (forest, taiga, snow), the isles the shoreline, the sound the deck; staged ids', () => {
     const bg = nw.battleBackgrounds!.zones;
-    expect(bg.ord_heath).toEqual({ default: 'grassland', terrain: { forest: 'forest', tundra: 'grassland', snow: 'ice_cave' } });
-    expect(bg.ord_isles).toEqual({ default: 'shoreline', terrain: { forest: 'forest', tundra: 'grassland', snow: 'ice_cave' } });
+    expect(bg.ord_heath).toEqual({ default: 'grassland', terrain: { forest: 'forest', taiga: 'dark_forest', snow: 'ice_cave' } });
+    expect(bg.ord_isles).toEqual({ default: 'shoreline', terrain: { forest: 'forest', taiga: 'dark_forest', snow: 'ice_cave' } });
     expect(bg.ord_sea).toEqual({ default: 'ocean' });
     for (const z of ['ord_heath', 'ord_isles', 'ord_sea']) {
       for (const id of [bg[z].default, ...Object.values(bg[z].terrain ?? {})]) {
