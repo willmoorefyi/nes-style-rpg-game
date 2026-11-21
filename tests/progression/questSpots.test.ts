@@ -94,7 +94,7 @@ describe('quest places by name (NW-1)', () => {
         n++;
       });
     }
-    expect(n).toBeGreaterThanOrEqual(27 + 33 + 5);             // NW-1's rewrite: 27 entries, 33 vehicles, 5 refs
+    expect(n).toBeGreaterThanOrEqual(27 + 33 + 3);             // NW-1's 27 entries, 33 vehicles; 3 refs (NW2-E: 5 - 2)
   });
 });
 

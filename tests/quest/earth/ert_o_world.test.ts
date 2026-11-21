@@ -195,3 +195,69 @@ describe('NW-R EARTH on the NW world', () => {
     }
   });
 });
+
+describe('NW2-E: Mount Duergar north of the canal (docs/NW2_EDITS_PLAN.md 5)', () => {
+  const canal = nw.patches.find((p) => p.id === 'canal')!;
+  const shut = new Set(canal.cells.map(key));               // the patch off: its saddle is walkable grass
+  const zone = (id: string) => nw.encounterZones!.find((z) => z.id === id)!;
+  const steps = (from: XY, to: Set<string>, ok: (x: number, y: number) => boolean): number => {
+    const seen = new Map<string, number>([[key(from), 0]]);
+    const q: XY[] = [from];
+    for (let i = 0; i < q.length; i++) {
+      const [x, y] = q[i];
+      if (to.has(key([x, y]))) return seen.get(key([x, y]))!;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const n: XY = [x + dx, y + dy];
+        if (seen.has(key(n)) || !ok(...n)) continue;
+        seen.set(key(n), seen.get(key([x, y]))! + 1);
+        q.push(n);
+      }
+    }
+    return Infinity;
+  };
+
+  it('the hall lies north of the canal: at least 10 rows above it, within 45 degrees of north of its centre', () => {
+    const ys = canal.cells.map(([, y]) => y);
+    const cx = canal.cells.reduce((s, [x]) => s + x, 0) / canal.cells.length;
+    const cy = ys.reduce((s, y) => s + y, 0) / ys.length;
+    const [x, y] = E.ert_dwarf;
+    expect(y).toBeLessThanOrEqual(Math.min(...ys) - 10);
+    expect(Math.abs(Math.atan2(x - cx, cy - y) * 180 / Math.PI)).toBeLessThanOrEqual(45);
+  });
+
+  it('the Duergar range parts Matoya from the hall on foot and by canoe; its exported cut (GT-42) is 3 cells and opens it', () => {
+    for (const ok of [walk, canoe]) {
+      expect(flood([E.a1_matoya], (x, y) => ok(g[y][x])).has(key(E.ert_dwarf))).toBe(false);
+    }
+    const cut = nw.world.cuts!.duergar_range;
+    expect(cut.length).toBeGreaterThanOrEqual(3);
+    const opened = new Set(cut.map(key));
+    expect(flood([E.a1_matoya], (x, y) => walk(g[y][x]) || opened.has(`${x},${y}`)).has(key(E.ert_dwarf))).toBe(true);
+  });
+
+  it('with the canal shut the hall stays apart from the Western Keep, on foot and by canoe (duergar_south)', () => {
+    for (const ok of [walk, canoe]) {
+      expect(flood([E.elf_keep], (x, y) => ok(g[y][x]) || shut.has(`${x},${y}`)).has(key(E.ert_dwarf))).toBe(false);
+    }
+  });
+
+  it("the moved dock is an Aldi cove within 8 steps of the hall's arrival, and the old cove south of the canal is land", () => {
+    const d = nw.docks.find((x) => x.id === 'ert_dwarf')!;
+    expect(d.y).toBeLessThan(Math.min(...canal.cells.map(([, y]) => y)));
+    const shore = new Set([[1, 0], [-1, 0], [0, 1], [0, -1]].map(([a, b]) => key([d.x + a, d.y + b])));
+    expect(steps(E.ert_dwarf, shore, (x, y) => walk(g[y][x]))).toBeLessThanOrEqual(8);
+    expect(g[152][104]).not.toBe('o');                        // pass NW's cove at (104, 152)
+  });
+
+  it("ert_isthmus holds the hall's pocket (on foot and canoe) and the old south isthmus below the canal", () => {
+    const rects = zone('ert_isthmus').rects;
+    const pocket = flood([E.ert_dwarf], (x, y) => canoe(g[y][x]));
+    for (const c of pocket) expect(inRects(rects, ...(c.split(',').map(Number) as XY)), c).toBe(true);
+    const xs = canal.cells.map(([x]) => x).sort((a, b) => a - b);
+    let y = Math.max(...canal.cells.map(([, cy]) => cy)) + 1;
+    const x = xs[Math.floor(xs.length / 2)];
+    while (!walk(g[y][x])) y++;
+    expect(inRects(rects, x, y), `the canal's south bank ${x},${y}`).toBe(true);
+    expect(inRects(zone('ert_plain').rects, x, y)).toBe(false);
+  });
+});

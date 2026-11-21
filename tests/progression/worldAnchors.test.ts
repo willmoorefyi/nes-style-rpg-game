@@ -20,11 +20,15 @@ const cellsOf = (geo: GeoData, move: (name: string, t: XY) => XY = (_n, t) => t)
 
 describe('NW anchors (4.2)', () => {
   it('keeps pass W\'s anchors, refs, pairs, exemptions and detours; moves the scale bands', () => {
-    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref])).toEqual(today.anchors.map((a) => [a.name, a.entrance, a.ref]));
+    // NW2-E (docs/NW2_EDITS_PLAN.md 9, D-NW2-5): the dwarves' ref moved north of the canal, dwarf-melmond tightened
+    const nw2: Record<string, XY> = { dwarf: [-54, -40] };
+    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref]))
+      .toEqual(today.anchors.map((a) => [a.name, a.entrance, nw2[a.name] ?? a.ref]));
     expect(nw.pairs).toEqual(today.pairs);
     expect(nw.pairs).toHaveLength(31);
     expect(nw.distanceExempt).toEqual([['cornelia', 'temple']]);
-    expect(nw.detours).toEqual(today.detours);
+    expect(nw.detours).toEqual(today.detours.map((d) => (d.pair.join('-') === 'dwarf-melmond'
+      ? { ...d, factor: 2.5, via: 'south through the canal (NW2: the dwarves lie north of it)' } : d)));
     expect([nw.tolerance, nw.scale, nw.longPair]).toEqual([2, [0.75, 0.95], 23]);
     expect([nw.ratio, nw.bearing]).toEqual([today.ratio, today.bearing]);
   });

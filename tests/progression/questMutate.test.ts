@@ -1,6 +1,6 @@
 /**
  * The no-skip mutation suite (docs/WORLD_PLAN.md 6.3, docs/QUEST_PLAN.md 5.4): every gate-table row GT-1 to GT-37
- * (with GT-5b) on the mini world, by name, with its expected proof and message prefix; the non-load-bearing rows
+ * (with GT-5b, and NW2's GT-42) on the mini world, by name, with its expected proof and message prefix; the non-load-bearing rows
  * with their reasons; and a RED run (an uncaught element without a `nonLoadBearing` entry fails). The real world
  * (`npm run quest -- --mutate`) is questMutateWorld.test.ts, in the heavy tier (tests/tiers.ts).
  */
@@ -24,6 +24,9 @@ const messages = (id: string): string[] => byRow(id).flatMap((m) => m.failures.m
 /** The plan's catch per row: each element of the row must be caught with a failure starting with every prefix. */
 const CAUGHT: Record<string, string[]> = {
   'GT-2': ['SKIP S2 ', 'EARLY pravoka '], 'GT-3': ['SKIP S4 '], 'GT-5b': ['ORDER goal '],
+  // NW2-E (docs/NW2_EDITS_PLAN.md 10): the dwarves' pocket makes both Aldi docks load-bearing (Elfland only by
+  // elf_port, the hall only by ert_dwarf), and the opened Duergar range walks M into the pocket after S1
+  'GT-5': ['ORDER goal '], 'GT-14': ['ORDER goal '], 'GT-42': ['EARLY dwarf '],
   'GT-7': ['SKIP S6 '], 'GT-8': ['SKIP S7 '], 'GT-9': ['SKIP S8 '], 'GT-10': ['SKIP S9 '], 'GT-11': ['SKIP S10 '],
   'GT-12': ['SKIP S11 ', 'EARLY melmond ', 'EARLY crescent '], 'GT-13': ['SKIP S11 ', 'EARLY melmond '],
   'GT-15': ['SKIP S12 '], 'GT-17': ['SKIP S13 '], 'GT-19': ['SKIP S14 '], 'GT-20': ['EARLY crescent talkable before S13'],
@@ -39,7 +42,7 @@ describe('questMutate: the mini world is clean', () => {
 
   it('every gate-table row is present, and every element has a result', () => {
     const ids = [...new Set(GATE_ROWS.map((r) => r.row))];
-    expect(ids).toHaveLength(38);
+    expect(ids).toHaveLength(39);
     expect(ids).toContain('GT-5b');
     for (const id of ids) expect(byRow(id).length, id).toBeGreaterThan(0);
   });
@@ -90,20 +93,19 @@ describe('questMutate: each row is caught by its named proof (WORLD 6.3)', () =>
   });
 });
 
-describe('questMutate: non-load-bearing rows (GT-1, GT-5, GT-6, GT-14, GT-16, the lute of GT-33)', () => {
+describe('questMutate: non-load-bearing rows (GT-1, GT-6, GT-16, the lute of GT-33)', () => {
   it('each is caught or carries its stage\'s nonLoadBearing reason', () => {
-    for (const id of ['GT-1', 'GT-5', 'GT-6', 'GT-14', 'GT-16']) {
+    for (const id of ['GT-1', 'GT-6', 'GT-16']) {
       for (const m of byRow(id)) expect(m.caught || m.nonLoadBearing !== undefined, `${id} ${m.element}`).toBe(true);
     }
     expect(byRow('GT-1').map((m) => m.nonLoadBearing)).toEqual(expect.arrayContaining([expect.stringMatching(/holds the crossing/)]));
-    expect(byRow('GT-5')[0].nonLoadBearing).toMatch(/on foot from ert_dwarf/);
-    expect(byRow('GT-14')[0].nonLoadBearing).toMatch(/on foot from Elfland/);
+    expect(byRow('GT-16')[0].nonLoadBearing).toMatch(/behind the giant/);
   });
 
   it('RED: without its nonLoadBearing entry an uncaught gate fails the run', () => {
-    const w = editQuest(ctx.world, (q) => { q.stages.find((s) => s.id === 'S4')!.nonLoadBearing = []; });
+    const w = editQuest(ctx.world, (q) => { q.stages.find((s) => s.id === 'S12')!.nonLoadBearing = []; });
     const red = attachLate(createQuestContext(w), buildLateData(MINI_LATE));
-    const r = runGateRows(red, new Set(['GT-5']));
+    const r = runGateRows(red, new Set(['GT-16']));
     expect(r[0]).toMatchObject({ caught: false });
     expect(r[0].nonLoadBearing).toBeUndefined();
     expect(mutationLine(r)).toBe('mutations: FAIL  (1 of 1 elements not caught)');
