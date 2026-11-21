@@ -5,7 +5,7 @@
  * map keeps its place; a v4 save is untouched; flags, party, items and gold are always kept.
  */
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
-import { SaveManager, SAVE_VERSION } from '../../src/systems/SaveManager.js';
+import { ACCEPTED_VERSIONS, SaveManager, SAVE_VERSION } from '../../src/systems/SaveManager.js';
 import { RESET_ENTRANCE, RESET_LOCATION, resetSave } from '../../src/systems/worldReset.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
 import { Inventory } from '../../src/entities/Inventory.js';
@@ -75,7 +75,10 @@ beforeAll(loadRealRegistries);
 beforeEach(() => { for (const k of Object.keys(store)) delete store[k]; });
 
 describe('saveWorldReset: the 8 cases (5.3)', () => {
-  it('saves are version 4', () => expect(SAVE_VERSION).toBe(4));
+  it('saves are version 5 (NW2); v1-v5 are read', () => {
+    expect(SAVE_VERSION).toBe(5);
+    expect(ACCEPTED_VERSIONS).toEqual([1, 2, 3, 4, 5]);
+  });
 
   it('1. a v3 save on foot on the world map, no vehicle: Cornelia', () => {
     const l = load({ version: 3, map: 'overworld', at: [92, 111], flags: ['GARLAND_DEFEATED'] });
@@ -124,13 +127,23 @@ describe('saveWorldReset: the 8 cases (5.3)', () => {
     expect(l.fieldMode).toBe('walking');
   });
 
-  it('7. a v4 save is untouched', () => {
+  it('7. a v4 save is not reset: it loads as saved, marked for the NW2 check (worldRevalidate.test.ts)', () => {
     const v = [ship('overworld', 150, 170), { type: 'airship' as const, map: 'overworld', x: 60, y: 40 }];
     const l = load({ version: 4, map: 'overworld', at: [60, 41], flags: ['BIKKE_DEFEATED', 'AIRSHIP_RAISED'],
       mode: 'walking', vehicles: v });
     expect(l.reset).toBe(false);
+    expect(l.revalidate).toBe(true);
     expect(l.playerPosition).toEqual({ x: 60, y: 41 });
     expect(l.vehicles).toEqual(v);
+  });
+
+  it('a v5 save is untouched and not checked again; v1-v3 are never marked for the NW2 check', () => {
+    const v = [ship('overworld', 150, 170)];
+    const l = load({ version: 5, map: 'overworld', at: [60, 41], flags: ['BIKKE_DEFEATED'], vehicles: v });
+    expect(l.reset).toBe(false);
+    expect(l.revalidate).toBe(false);
+    expect(l.vehicles).toEqual(v);
+    for (const version of [1, 2, 3]) expect(load({ version, map: 'overworld', at: [1, 1], flags: [] }).revalidate).toBe(false);
   });
 
   it('resetSave is pure: the input is not changed; a moved save says Cornelia; the entrance is cornelia', () => {

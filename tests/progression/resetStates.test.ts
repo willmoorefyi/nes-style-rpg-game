@@ -9,6 +9,7 @@ import { loadQuestWorld, stageOrder } from '../../src/progression/questData.js';
 import { buildCatalog } from '../../src/progression/questCatalog.js';
 import { assumedState, createModel } from '../../src/progression/questSearch.js';
 import { reachedEntrances, relocate, requiredEntrances, resetPlace } from '../../src/progression/questReset.js';
+import { NW2_CASES, nw2States } from '../../src/progression/questResetNw2.js';
 
 const world = loadQuestWorld();
 const model = createModel(world, buildCatalog(world));
@@ -41,5 +42,17 @@ describe('resetStates: every stage\'s reset state reaches its required entrances
       if (need.length && !got.size) lost.push(id);
     }
     expect(lost).toEqual([]);
+  });
+
+  it('NW2 (12): the v4 saves the fix relocates: S10 in dwarf-hall, S16 in ice-cavern-b1, S6 at the keep, each ship at its dock', () => {
+    const got = nw2States(model);
+    expect(got.map((g) => g.stage)).toEqual(NW2_CASES.map((c) => c.stage));
+    for (const [i, g] of got.entries()) {
+      const c = NW2_CASES[i];
+      expect(g.problem, g.label).toBeNull();
+      expect(g.state.place.map, g.label).toBe(c.map === 'overworld' ? world.worldMap : c.map);
+      const d = world.maps.get(world.worldMap)!.docks!.find((x) => x.id === c.dock)!;
+      expect(g.state.vehicles.filter((v) => v.type === 'ship'), g.label).toEqual([{ type: 'ship', map: world.worldMap, x: d.x, y: d.y }]);
+    }
   });
 });

@@ -4,7 +4,11 @@ import type { Game } from '../core/Game.js';
 import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import { ConfirmBox } from '../ui/ConfirmBox.js';
-import { SaveManager, type SlotSummary } from '../systems/SaveManager.js';
+import { SaveManager, type LoadedSave, type SlotSummary } from '../systems/SaveManager.js';
+import { resolveMapPath } from '../systems/MapLoader.js';
+import { isPreviewAi } from '../core/artPreview.js';
+import type { MapData } from '../types/index.js';
+import { revalidateLoaded, type MapSource } from './save/loadRevalidate.js';
 import { RESET_ENTRANCE, RESET_NOTICE } from '../systems/worldReset.js';
 import { SLOT_RECTS, detailWindow, slotLabel, titleWindow } from './save/slotView.js';
 import { MENU_LINE_HEIGHT } from '../core/LayoutConstants.js';
@@ -19,8 +23,11 @@ export class LoadScene implements Scene {
   private slots: (SlotSummary | null)[] = [];
   private confirmBox?: ConfirmBox;
   private fromTitle = false;
+  /** A v4 save's NW2 check is loading maps (input waits). */
+  private checking = false;
 
-  constructor(private readonly game: Game) {
+  /** `maps` reads a map for the NW2 save check (default: the game's data loader, compiled maps as the field). */
+  constructor(private readonly game: Game, private readonly maps: MapSource = (id) => defaultMaps(game, id)) {
     this.container.addChild(titleWindow(LOAD_TITLE), this.listWindow, this.detail.window);
     this.buildMenu();
   }
@@ -63,6 +70,7 @@ export class LoadScene implements Scene {
   }
 
   update(_dt: number): void {
+    if (this.checking) return;
     if (this.confirmBox) {
       this.confirmBox.update(this.game.input);
       return;
@@ -99,12 +107,33 @@ export class LoadScene implements Scene {
     this.confirmBox = undefined;
   }
 
+  /** Whether a v4 save's NW2 check is still loading maps (tests, the browser check). */
+  get busy(): boolean { return this.checking; }
+
   private load(slotId: number): void {
     const data = SaveManager.load(slotId);
     if (!data) {
       console.error(`Load: slot ${slotId + 1} could not be read`);
       return;
     }
+    if (!data.revalidate) {
+      this.start(data);
+      return;
+    }
+    // NW2 (docs/NW2_EDITS_PLAN.md 12): a v4 save is checked on the NW2 world first (the maps load async)
+    this.checking = true;
+    revalidateLoaded(data, this.maps)
+      .catch((e: unknown) => {
+        console.error('Load: the NW2 save check failed; loading the save as it was', e);
+        return data;
+      })
+      .then((checked) => {
+        this.checking = false;
+        this.start(checked);
+      });
+  }
+
+  private start(data: LoadedSave): void {
     this.game.restoreState(data);
     // NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): a pre-NW save moved to Cornelia arrives at its south gate, facing
     // south, and the field says so once
@@ -115,4 +144,9 @@ export class LoadScene implements Scene {
     this.game.pendingBattle = null;
     this.game.scenes.switchTo('exploration');
   }
+}
+
+/** A map as the field reads it: the compiled file for the ids in the manifest (the preview rule), else the legacy one. */
+async function defaultMaps(game: Game, id: string): Promise<MapData> {
+  return game.data.loadMap(await resolveMapPath(game.data, id, isPreviewAi()));
 }

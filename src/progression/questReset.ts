@@ -5,6 +5,7 @@
  * builds it, relocated so) and up to `samples` relocated states of the main search per stage (a party that saved half
  * way through a stage; a seeded pick) are searched with proof (c): every state reached reaches the goal and has a way
  * back to the world map. The main graph's states are already proven, so a reset search stops where it meets one.
+ * NW2 (docs/NW2_EDITS_PLAN.md 12) adds the states its targeted v4 save fix relocates (questResetNw2.ts).
  */
 import { resetVehicles, RESET_ENTRANCE } from '../systems/worldReset.js';
 import type { VehicleState } from '../types/index.js';
@@ -16,6 +17,7 @@ import { assumedState, exploreStates, settle, type QuestModel, type StateNode } 
 import { Saturator } from './questSaturate.js';
 import { stageMark } from './questStates.js';
 import { spotCell } from './questSpots.js';
+import { nw2States } from './questResetNw2.js';
 
 /** Cornelia's world-map arrival, on foot. */
 export function resetPlace(model: QuestModel): QuestPlace {
@@ -175,9 +177,14 @@ export function proofFromReset(ctx: QuestContext, samples = RESET_SAMPLES, log: 
     const id = label.split(' ')[0];
     run(label, state, { target: stageMark(id), known: none, stopAt: stageMark(id), disabled: outOfScopeEvents(ctx, id) });
   }
+  const nw2 = nw2States(ctx);
+  for (const { label, stage, state, problem } of nw2) {
+    if (problem) failures.push(fail('c', 'NW2SAVE', `NW2SAVE ${label}: ${problem}`));
+    run(label, state, { target: stageMark(stage), known: none, stopAt: stageMark(stage), disabled: outOfScopeEvents(ctx, stage) });
+  }
   for (const { label, state } of midStageStates(ctx, samples)) run(label, state, { target: goal, known });
   const n = stageOrder(ctx.world.quest).length;
-  const res = result('c', 'from reset', failures,
-    `(${starts} reset states: ${n} stage entries, ${starts - n} mid-stage samples; ${states} states searched)`);
+  const res = result('c', 'from reset', failures, `(${starts} reset states: ${n} stage entries, ${nw2.length} NW2 v4 saves, `
+    + `${starts - n - nw2.length} mid-stage samples; ${states} states searched)`);
   return { result: res, starts, states };
 }

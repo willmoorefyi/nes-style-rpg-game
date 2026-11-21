@@ -4,7 +4,7 @@ import { PartyManager } from '../entities/PartyManager.js';
 import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
 import { parseBoosts, type Boosts } from '../core/Boosts.js';
-import { NW_SAVE_VERSION, resetSave } from './worldReset.js';
+import { isPreNw2, NW_SAVE_VERSION, NW2_SAVE_VERSION, resetSave } from './worldReset.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
@@ -15,8 +15,13 @@ const MAX_SLOTS = 3;
  * Version 4 (pass NW) is the 256x256 world: a version 1-3 save goes through `resetSave` (worldReset.ts,
  * docs/NATURAL_WORLD_PLAN.md 5.3), so a party on the world map, or one owning a ship or the airship, starts again
  * before Cornelia with its vehicles at their milestone spots.
+ * Version 5 (pass NW2) is the NW2 world: a version-4 save loads as it was saved and is marked `revalidate`, so
+ * `LoadScene` checks its vehicles and place on the new world (`revalidateNw2`, worldRevalidate.ts,
+ * docs/NW2_EDITS_PLAN.md 12).
  */
-export const SAVE_VERSION = NW_SAVE_VERSION;
+export const SAVE_VERSION = NW2_SAVE_VERSION;
+/** The versions `load` reads. */
+export const ACCEPTED_VERSIONS: readonly number[] = [1, 2, 3, NW_SAVE_VERSION, NW2_SAVE_VERSION];
 
 /** The field part of a save (v2): the party's mode and the parked vehicles of every map; the boosts (v3). */
 export interface SaveField {
@@ -40,6 +45,8 @@ export interface LoadedSave {
   boosts: Boosts;
   /** A pre-NW save moved to Cornelia (worldReset.ts): the loader sets `pendingEntrance = 'cornelia'`. */
   reset: boolean;
+  /** A v4 save (the first NW world): the loader revalidates it on the NW2 world before the field opens. */
+  revalidate: boolean;
 }
 
 const VEHICLE_TYPES = ['canoe', 'ship', 'airship'];
@@ -139,7 +146,7 @@ export class SaveManager {
       
       const stored: SaveData = JSON.parse(raw);
       const v1 = stored.version === 1;
-      if (![1, 2, 3, SAVE_VERSION].includes(stored.version)) {
+      if (!ACCEPTED_VERSIONS.includes(stored.version)) {
         console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${stored.version}`);
       }
       const { data, vehicles, moved } = resetSave({ ...stored, vehicles: v1 ? [] : savedVehicles(stored.vehicles) });
@@ -154,6 +161,7 @@ export class SaveManager {
         vehicles,
         boosts: parseBoosts(data.boosts),   // v1 / v2: none saved, the defaults
         reset: moved,
+        revalidate: isPreNw2(stored),
       };
     } catch (e) {
       console.error(`Failed to load save slot ${slotId}:`, e);

@@ -16,6 +16,8 @@ import type { ParkedVehicle, SaveData, VehicleType } from '../types/index.js';
 
 /** Saves before this version predate the NW world. */
 export const NW_SAVE_VERSION = 4;
+/** The NW2 world (docs/NW2_EDITS_PLAN.md 12): a v4 save is revalidated on load (worldRevalidate.ts), not reset. */
+export const NW2_SAVE_VERSION = 5;
 /** The world map and the entrance a moved save arrives at (Cornelia's south gate). */
 export const RESET_MAP = 'overworld';
 export const RESET_ENTRANCE = 'cornelia';
@@ -41,6 +43,11 @@ export function resetVehicles(flags: Flags): ParkedVehicle[] {
 /** A save of an older version than the NW world (none: a fresh v4 save). */
 export function isPreNw(data: Pick<SaveData, 'version'>): boolean {
   return !(typeof data.version === 'number' && data.version >= NW_SAVE_VERSION);
+}
+
+/** A save of the first NW world (v4): `LoadScene` revalidates it on the NW2 world (`revalidateNw2`). */
+export function isPreNw2(data: Pick<SaveData, 'version'>): boolean {
+  return data.version === NW_SAVE_VERSION;
 }
 
 /** True when a pre-NW save must be moved to Cornelia (on the world map, or owning a ship or the airship). */
