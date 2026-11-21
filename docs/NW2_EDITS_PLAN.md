@@ -914,7 +914,7 @@ assets` clean; `tests/data/mode7Atlas.test.ts` 4 tests OK. Nothing to commit fro
 |---|---|
 | `npm run quest -- --strict` | `quest-verify: OK`: (a)-(h) OK; (b) 423 withheld runs; (c) 835,121 states; (d) every band OK; (f) Crescent 13,207 / 60,240, Gaia 94,194 / 259,240; (g) s* 0.851, 31 pairs; (h) 12 rows + 2 basin rows; 115 s, max RSS 3.0 GB |
 | `npm run quest -- --strict --from-reset` | OK: 195 reset states (32 stage entries, the 3 NW2 v4 saves, 160 mid-stage samples), 5,134,488 states searched; 647 s, max RSS 5.7 GB |
-| `npm run quest -- --strict --mutate` | MUTATE_RESULT |
+| `npm run quest -- --strict --mutate` | `quest-verify: OK`, `mutations: OK (68 gate rows; 109 elements, each removal reported)` (NW: 64 rows, 105 elements; NW2 added GT-40 to GT-43); (a)-(h) OK as above; 4,320 s (72 min, run beside `--from-reset` and `test:fast`), max RSS 6.6 GB |
 
 **Browser checkpoints** (headed Chromium, a dev server on 127.0.0.1:5293, every URL `?mute=1`; field scenarios
 appended to `debug-scenarios.yaml` by a request route, so the repo file is unchanged; one fresh page per scenario):

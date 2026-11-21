@@ -249,7 +249,7 @@ results at the end of the plan). Every stage's `requires`, `grants`, `after` and
 - **Saves:** version 5; a v4 save is revalidated on load (a ship off open water moves to a dock in the party's reach,
   an airship on rock moves to a landing, a stranded party resets to Cornelia).
 - **Gates (NW2-INT):** the full compile reproduces the committed world byte for byte; both determinism checks; every
-  `world.py` line OK; `npm run quest -- --strict` and `--from-reset` OK; `--mutate` (see the plan's INT result);
+  `world.py` line OK; `npm run quest -- --strict` and `--from-reset` OK; `--mutate` OK (68 gate rows, 109 elements, 72 min);
   `npm run build`; `test:fast` 403 files, 9,680 tests. Browser checkpoints in `~/temp/ff-game/nw2/int/`.
 
 ---
