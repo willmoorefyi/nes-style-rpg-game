@@ -244,5 +244,19 @@
       "used": 36,
       "closed": "2026-11-19, 36 of 80 (LM5 done: Western Keep and citadel icons, fairy and mermaid field sheets rendered; awaiting the user's review; no remove_bg, no reserve)"
     }
-  ]
+  ],
+  "bedrock": {
+    "pass": "AR",
+    "cap": 340,
+    "per_purpose_caps": {
+      "ar_tiles": 70,
+      "ar_npc": 100,
+      "ar_props": 70,
+      "ar_towns": 80,
+      "reserve": 20
+    },
+    "gemini_before": 553,
+    "reserve_max_usd": 0.08,
+    "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl."
+  }
 }
