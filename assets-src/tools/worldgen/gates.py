@@ -22,7 +22,7 @@ CANAL_LEN = (5, 8)                           # 4.1: the canal saddle is 5-8 cell
 # WORLD 2.6's ship lanes: (name, dock a, dock b, canal open)
 STRAITS = (("pravoka-elf_port", "a1_pravoka", "elf_port", False), ("pravoka-dwarf", "a1_pravoka", "ert_dwarf", False),
            ("dwarf-melmond (canal)", "ert_dwarf", "ert_melmond", True),
-           ("melmond-crescent", "ert_melmond", "fir_crescent", True))
+           ("melmond-crescent", "ert_melmond", "fir_crescent", True), ("crescent-ice", "fir_crescent", "fir_ice", False))
 SHOW = 6                                     # cells listed per failure line
 
 

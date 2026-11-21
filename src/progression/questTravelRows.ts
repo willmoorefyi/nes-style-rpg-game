@@ -58,5 +58,6 @@ export const DEFAULT_TRAVEL_ROWS: TravelRow[] = [
   { id: 'B1', from: 'T2', reach: [], notReach: [], docks: ['a1_pravoka', 'elf_port', 'ert_dwarf'],
     basins: { holds: ['aldi'], lacks: ['ocean'] } },
   { id: 'B2', from: 'T3', reach: [], notReach: [],
-    docks: ['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent'], basins: { holds: ['aldi', 'ocean'], lacks: [] } },
+    docks: ['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent', 'fir_ice'],
+    basins: { holds: ['aldi', 'ocean'], lacks: [] } },
 ];

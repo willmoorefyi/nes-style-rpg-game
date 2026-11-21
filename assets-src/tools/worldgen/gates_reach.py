@@ -26,8 +26,8 @@ from .geom import bfs_dist, components, ring1
 
 # WORLD 6.1's walking detour hops (2.5; melmond-sarda through the tunnel 3.0)
 DETOURS = (("cornelia", "a1_pravoka"), ("cornelia", "a1_matoya"), ("elf_elfheim", "elf_keep"),
-           ("elf_elfheim", "elf_marsh"), ("ert_melmond", "ert_earth_cave"), ("ert_melmond", "ert_giant"),
-           ("fir_ice", "fir_desert"))
+           ("elf_elfheim", "elf_marsh"), ("ert_melmond", "ert_earth_cave"), ("ert_melmond", "ert_giant"))
+# NW2: fir_ice-fir_desert left (the ice tip is off the south lands on foot; proof (g) checks it by ship and canoe)
 DETOUR_MAX, TUNNEL_MAX = 2.5, 3.0
 
 
@@ -128,12 +128,18 @@ def _spine(g, meta, name, a, bs, on, off, cut, cuts, r) -> list[str]:
     return why
 
 
-def routes(g, meta) -> dict:
+def routes(g, meta, rings: tuple[str, ...] = ()) -> dict:
     """`gates.routes` plus 4.1's ledge rule: a canoe-only site (`meta["ledges"]`, the waterfall) is walkable only
     on its ledge, which touches only rock and its route's river: its walk component (every patch on) holds no cell
-    the airship lands on and borders a pinned route cell."""
+    the airship lands on and borders a pinned route cell. NW2: no unpinned river crosses a foot-only ring barrier
+    (`rings`: crescent_ring, ice_ring): no River or ford cell inside its mask but the pinned routes'."""
     res = gates.routes(g, meta)
     h = with_patches(g, meta)
+    pinned = {c for cs in meta["routes"].values() for c in cs}
+    for name in rings:
+        stray = [c for c in mask_cells(meta["barriers"][name] & np.isin(h, ["r", "="])) if c not in pinned]
+        if stray:
+            res["why"].append(f"ring {name}: an unpinned river crosses it at {cells(meta, stray)}")
     lab, _ = components(walk(h))
     wet = np.isin(h, ["r", "≈"])
     wlab, _ = components(wet)

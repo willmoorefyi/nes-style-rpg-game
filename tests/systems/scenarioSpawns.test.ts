@@ -26,9 +26,10 @@ describe('scenarioSpawns: overworld field scenarios', () => {
     }
   });
 
-  it('the three spot spawns are act 1\'s temple road, bridge and east, land spots of the world', () => {
+  it('the spot spawns are act 1\'s temple road, bridge and east, and (NW2) the Frost Shore, land spots of the world', () => {
     const spots = onOverworld.filter((s) => s.entrance === undefined).map((s) => [s.id, s.spot ?? '']).sort();
-    expect(spots).toEqual([['r_ow_bridge', 'a1_s_bridge'], ['r_ow_east', 'a1_s_east'], ['r_ow_temple', 'a1_s_temple_road']]);
+    expect(spots).toEqual([['r_ow_bridge', 'a1_s_bridge'], ['r_ow_east', 'a1_s_east'], ['r_ow_temple', 'a1_s_temple_road'],
+      ['w_s16_shore', 'fir_s_ice_shore']]);
     for (const [, name] of spots) expect(map.spots?.[name]?.kind, name).toBe('land');
   });
 

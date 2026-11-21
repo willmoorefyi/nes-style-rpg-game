@@ -101,15 +101,17 @@ describe('the NW world source (NW-2)', () => {
       else if (s.kind === 'dock') expect(c, name).toBe('o');
       else expect(['.', 't'], name).toContain(c);
     }
-    expect(Object.keys(src.spots)).toHaveLength(42);        // NW2-W: + wat_s_waterfall_airship
+    expect(Object.keys(src.spots)).toHaveLength(44);        // NW2-W: + wat_s_waterfall_airship; NW2-F: + fir_s_ice_ship, fir_s_ice_shore
     for (const d of src.docks) expect(g[d.y][d.x], d.id).toBe('o');
-    expect(src.docks.map((d) => d.id).sort()).toEqual(['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent']);
+    expect(src.docks.map((d) => d.id).sort()).toEqual(['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent',
+      'fir_ice']);
     for (const [name, [x, y]] of Object.entries(src.entrances)) expect(BLOCK.has(g[y][x]), name).toBe(false);
     expect(src.world.basins).toEqual({ aldi: [146, 165], ocean: [2, 2] });
   });
 
-  it('snow and taiga lie in the far north (2.4 rule 5)', () => {
-    const rows = (ch: string): number[] => g.flatMap((r, y) => (r.includes(ch) ? [y] : []));
+  it('snow and taiga lie in the far north (2.4 rule 5), but for FIRE\'s cold tip beyond ice_neck (NW2: x >= 196, y <= 136)', () => {
+    const tip = (x: number, y: number): boolean => x >= 196 && y <= 136;
+    const rows = (ch: string): number[] => g.flatMap((r, y) => (r.some((c, x) => c === ch && !tip(x, y)) ? [y] : []));
     expect(Math.max(...rows('n'))).toBeLessThan(110);
     expect(Math.max(...rows('t'))).toBeLessThan(120);
   });

@@ -15,16 +15,23 @@ const today = loadLateData(process.cwd(), { anchors: 'tests/fixtures/passW/world
 const A1 = new Set(['cornelia', 'temple', 'matoya', 'pravoka']);
 const CORNELIA_NW: XY = [146, 155];
 const S_STAR = 0.86;
+/** NW2-F (docs/NW2_EDITS_PLAN.md 9): the detour hops whose mode changed. */
+const NW2_MODES: Record<string, string> = { 'crescent|ice': 'ship+canoe+walking', 'ice|desert': 'ship+canoe+walking' };
 const cellsOf = (geo: GeoData, move: (name: string, t: XY) => XY = (_n, t) => t): Map<string, XY> =>
   new Map(geo.anchors.map((a) => [a.name, move(a.name, a.target)]));
 
 describe('NW anchors (4.2)', () => {
   it('keeps pass W\'s anchors, refs, pairs, exemptions and detours; moves the scale bands', () => {
-    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref])).toEqual(today.anchors.map((a) => [a.name, a.entrance, a.ref]));
+    // NW2 (docs/NW2_EDITS_PLAN.md 9, D-NW2-5): the dwarves' ref moved north of the canal, dwarf-melmond tightened
+    // (NW2-E); the Ice Cavern's moved to the peninsula's tip, crescent-ice and ice-desert by ship and canoe (NW2-F)
+    const nw2: Record<string, XY> = { dwarf: [-54, -40], ice: [79, -55] };
+    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref]))
+      .toEqual(today.anchors.map((a) => [a.name, a.entrance, nw2[a.name] ?? a.ref]));
     expect(nw.pairs).toEqual(today.pairs);
     expect(nw.pairs).toHaveLength(31);
     expect(nw.distanceExempt).toEqual([['cornelia', 'temple']]);
-    expect(nw.detours).toEqual(today.detours);
+    expect(nw.detours.map((d) => [d.pair, d.mode, d.factor])).toEqual(today.detours.map((d) => [d.pair,
+      NW2_MODES[d.pair.join('|')] ?? d.mode, d.pair.join('-') === 'dwarf-melmond' ? 2.5 : d.factor]));
     expect([nw.tolerance, nw.scale, nw.longPair]).toEqual([2, [0.75, 0.95], 23]);
     expect([nw.ratio, nw.bearing]).toEqual([today.ratio, today.bearing]);
   });

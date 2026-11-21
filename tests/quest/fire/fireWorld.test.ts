@@ -4,7 +4,10 @@
  * (`regions.fire.raster`). The anchors at their targets; the ring (no foot path from Crescent's shore to the south
  * lands, the canoe joins them, within the detour factors; its cut opens it); the south lands one land on foot; the
  * neck (NW-4's T2 finding: no river at Elfland's east edge carries an early canoe from the Aldi's shores into FIRE);
- * the dock; the zones over every FIRE cell; the icons, doors, smoke and vents; the hatch and the airship (S17).
+ * NW2 (docs/NW2_EDITS_PLAN.md 4): the Ice Cavern on the cold tip beyond ice_neck, reached from its own dock `fir_ice`
+ * and then only by canoe up R-ice into the Rime Hollow (ice_ring), the cuts of both opening them, the tip mostly
+ * taiga and snow; the docks; the zones over every FIRE cell; the icons, doors, smoke and vents; the hatch and the
+ * airship (S17).
  * Committed sources only: legend chars, no compiled collision (objects ignored).
  */
 import { describe, expect, it } from 'vitest';
@@ -35,7 +38,8 @@ const BLOCK = new Set(['o', 'm', 'r', '≈']);
 const CANOE = new Set(['r', '≈']);
 const foot = (c: string): boolean => !BLOCK.has(c);
 const paddle = (c: string): boolean => foot(c) || CANOE.has(c);
-const SOUTH = ['fir_volcano', 'fir_ice', 'fir_desert'];
+const SOUTH = ['fir_volcano', 'fir_desert'];
+const SHORE = nw.spots.fir_s_ice_shore.at;            // NW2: the Frost Shore by the fir_ice dock
 const dist = (d: number[][], [x, y]: XY): number => d[y][x];
 const euclid = (a: string, b: string): number => Math.hypot(E[a][0] - E[b][0], E[a][1] - E[b][1]);
 const raster = src.regions.fire.raster;
@@ -58,32 +62,69 @@ describe('FIRE on the NW world (NW-R FIRE; fir_o_world)', () => {
     }
   });
 
-  it("on foot Crescent's shore reaches none of the south lands; by canoe it reaches all three", () => {
+  it("on foot Crescent's shore reaches none of the south lands; by canoe it reaches both, never the tip (ice_neck)", () => {
     const walk = steps(g, E.fir_crescent, foot);
     const boat = steps(g, E.fir_crescent, paddle);
     for (const a of SOUTH) {
       expect(dist(walk, E[a]), a).toBe(Infinity);
       expect(dist(boat, E[a]), a).toBeLessThan(Infinity);
     }
+    expect(dist(boat, SHORE)).toBe(Infinity);
+    expect(dist(boat, E.fir_ice)).toBe(Infinity);
   });
 
-  it('the detour factors (WORLD 6.1): crescent-volcano and crescent-ice by canoe, ice-desert on foot, at most 2.5x', () => {
+  it('NW2: from the fir_ice dock the Rime Hollow is reached only by canoe up R-ice (ice_ring), and the tip only from that dock', () => {
+    expect(dist(steps(g, SHORE, foot), E.fir_ice)).toBe(Infinity);
+    expect(dist(steps(g, SHORE, paddle), E.fir_ice)).toBeLessThanOrEqual(70);   // the Rime Gorge winds (57 steps at NW2-F)
+    const boat = steps(g, SHORE, paddle);
+    for (const a of ['fir_crescent', ...SOUTH]) expect(dist(boat, E[a]), a).toBe(Infinity);
+  });
+
+  it("NW2: the Ice Cavern lies north of Crescent (>= 40 rows, within 30 degrees of north) and >= 60 cells from Gurgu", () => {
+    const [ix, iy] = E.fir_ice;
+    const [cx, cy] = E.fir_crescent;
+    expect(iy).toBeLessThanOrEqual(cy - 40);
+    expect(Math.abs(Math.atan2(ix - cx, cy - iy) * 180 / Math.PI)).toBeLessThanOrEqual(30);
+    expect(euclid('fir_ice', 'fir_volcano')).toBeGreaterThanOrEqual(60);
+  });
+
+  it('the detour factor (WORLD 6.1): crescent-volcano by canoe at most 2.5x (crescent-ice and ice-desert go by ship: proof (g))', () => {
     const boat = steps(g, E.fir_crescent, paddle);
-    for (const a of ['fir_volcano', 'fir_ice']) expect(dist(boat, E[a]), a).toBeLessThanOrEqual(2.5 * euclid('fir_crescent', a));
-    expect(dist(steps(g, E.fir_ice, foot), E.fir_desert)).toBeLessThanOrEqual(2.5 * euclid('fir_ice', 'fir_desert'));
+    expect(dist(boat, E.fir_volcano)).toBeLessThanOrEqual(2.5 * euclid('fir_crescent', 'fir_volcano'));
   });
 
-  it('the south lands are one land on foot (volcano, ice, desert)', () => {
-    const walk = steps(g, E.fir_ice, foot);
+  it('the south lands are one land on foot (volcano, desert)', () => {
+    const walk = steps(g, E.fir_volcano, foot);
     for (const a of SOUTH) expect(dist(walk, E[a]), a).toBeLessThan(Infinity);
   });
 
-  it("opening the composer's crescent_ring cut joins the shore and the south lands on foot (GT-37)", () => {
+  it("opening the composer's crescent_ring cut joins the shore and the south lands on foot, not the tip (GT-37)", () => {
     const cut = new Set(src.world.cuts.crescent_ring.map(key));
     expect(cut.size).toBeGreaterThan(0);
     const open = g.map((row, y) => row.map((c, x) => (cut.has(key([x, y])) ? '.' : c)));
     const walk = steps(open, E.fir_crescent, foot);
     for (const a of SOUTH) expect(dist(walk, E[a]), a).toBeLessThan(Infinity);
+    expect(dist(walk, E.fir_ice)).toBe(Infinity);
+  });
+
+  it('NW2: opening ice_ring walks the Frost Shore into the hollow (GT-40); opening ice_neck walks Crescent\'s shore to the Frost Shore, not the cave (GT-43)', () => {
+    const opened = (name: string): string[][] => {
+      const cut = new Set(src.world.cuts[name].map(key));
+      expect(cut.size, name).toBeGreaterThanOrEqual(3);
+      return g.map((row, y) => row.map((c, x) => (cut.has(key([x, y])) ? '.' : c)));
+    };
+    expect(dist(steps(opened('ice_ring'), SHORE, foot), E.fir_ice)).toBeLessThan(Infinity);
+    const neck = steps(opened('ice_neck'), E.fir_crescent, foot);
+    expect(dist(neck, SHORE)).toBeLessThan(Infinity);
+    expect(dist(neck, E.fir_ice)).toBe(Infinity);
+  });
+
+  it('NW2: the tip beyond ice_neck is taiga and snow (>= 50 % of its walkable cells; the hollow\'s floor snow)', () => {
+    const tip = cellsOf(steps(g, SHORE, paddle)).filter(([x, y]) => foot(g[y][x]));
+    const hollow = cellsOf(steps(g, E.fir_ice, foot));
+    const cold = [...tip, ...hollow].filter(([x, y]) => g[y][x] === 't' || g[y][x] === 'n');
+    expect(cold.length / (tip.length + hollow.length)).toBeGreaterThanOrEqual(0.5);
+    expect(hollow.filter(([x, y]) => g[y][x] === 'n').length).toBeGreaterThan(hollow.length / 2);
   });
 
   it("the neck (NW-4's T2 row): from the Aldi's shores an early canoe reaches no FIRE site, bridge built, canal shut", () => {
@@ -95,7 +136,18 @@ describe('FIRE on the NW world (NW-R FIRE; fir_o_world)', () => {
     }
     const reached = new Set<string>();
     for (const s of starts) for (const c of cellsOf(steps(h, s, paddle))) reached.add(key(c));
-    for (const a of ['fir_crescent', ...SOUTH]) expect(reached.has(key(E[a])), a).toBe(false);
+    for (const a of ['fir_crescent', ...SOUTH, 'fir_ice']) expect(reached.has(key(E[a])), a).toBe(false);
+  });
+
+  it('NW2: the fir_ice dock is ocean Water on the tip, its shore at most 6 steps from R-ice\'s mouth', () => {
+    const d = nw.docks.find((x) => x.id === 'fir_ice')!;
+    expect(d.basin).toBe('ocean');
+    expect(g[d.y][d.x]).toBe('o');
+    expect(nw.spots.fir_s_ice_ship.at).toEqual([d.x, d.y]);
+    expect(Math.abs(SHORE[0] - d.x) + Math.abs(SHORE[1] - d.y)).toBe(1);
+    const walk = steps(g, SHORE, foot);
+    const bank = cellsOf(walk).filter(([x, y]) => [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => g[y + dy][x + dx] === 'r'));
+    expect(Math.min(...bank.map((c) => dist(walk, c)))).toBeLessThanOrEqual(6);
   });
 
   it('the fir_crescent dock is ocean Water, with land beside it on the way to the gate', () => {
@@ -119,12 +171,12 @@ describe('FIRE on the NW world (NW-R FIRE; fir_o_world)', () => {
 
   it("FIRE's land walkable from its sites lies in its raster, each cell in one walking zone; its rivers and lakes in fir_rivers", () => {
     const bad: string[] = [];
-    const land = [E.fir_crescent, ...SOUTH.map((a) => E[a])].flatMap((s) => cellsOf(steps(g, s, foot)));
+    const land = [E.fir_crescent, E.fir_ice, SHORE, ...SOUTH.map((a) => E[a])].flatMap((s) => cellsOf(steps(g, s, foot)));
     for (const c of land) {
       const walking = holds(c).filter((z) => z.modes.includes('walking'));
       if (!inFire(c) || walking.length !== 1) bad.push(`walk ${key(c)}`);
     }
-    for (const c of cellsOf(steps(g, E.fir_crescent, paddle))) {
+    for (const c of [E.fir_crescent, SHORE].flatMap((s) => cellsOf(steps(g, s, paddle)))) {
       if (CANOE.has(g[c[1]][c[0]]) && !holds(c).some((z) => z.id === 'fir_rivers')) bad.push(`river ${key(c)}`);
     }
     expect(bad.slice(0, 10)).toEqual([]);
@@ -149,8 +201,10 @@ describe('FIRE on the NW world (NW-R FIRE; fir_o_world)', () => {
     }
     expect(bad.slice(0, 10)).toEqual([]);
     expect([...ship.values()].every((n) => n === 1)).toBe(true);
-    const d = nw.docks.find((x) => x.id === 'fir_crescent')!;
-    expect(holds([d.x, d.y]).map((z) => z.id)).toEqual(['fir_sea']);
+    for (const id of ['fir_crescent', 'fir_ice']) {
+      const d = nw.docks.find((x) => x.id === id)!;
+      expect(holds([d.x, d.y]).map((z) => z.id), id).toEqual(['fir_sea']);
+    }
   });
 
   it("the icons stand on their doors: Crescent's town, Gurgu's volcano (with its smoke), the Ice Cavern's mouth", () => {

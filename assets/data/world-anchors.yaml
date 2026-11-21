@@ -32,8 +32,8 @@ anchors:
      ref: [-40, -36], target: [128, 120], note: "act-1 pin, north-north-west of the Temple as today"}
   - {name: pravoka, entrance: a1_pravoka, place: "Pravoka's land gate", region: a1, owner: NW-3,
      ref: [56, -12], target: [185, 145], note: "act-1 pin; pravoka-matoya r 0.742 at the targets (>= 0.72: no exemption, 4.2)"}
-  - {name: dwarf, entrance: ert_dwarf, place: "Dwarf hall (Mount Duergar)", region: earth, owner: NW-R,
-     ref: [-56, -4], target: [98, 152]}
+  - {name: dwarf, entrance: ert_dwarf, place: "Dwarf hall (Mount Duergar)", region: earth, owner: NW2-E,
+     ref: [-54, -40], target: [100, 121], note: "NW2 ruling D-NW2-5 (docs/NW2_EDITS_PLAN.md 5): moved north of the canal into the mainland's west lobe; was ref [-56, -4], target [98, 152]"}
   - {name: keep, entrance: elf_keep, place: "Western Keep", region: elf, owner: NW-R,
      ref: [-48, 24], target: [105, 176]}
   - {name: elfheim, entrance: elf_elfheim, place: "Elfheim's land gate", region: elf, owner: NW-R,
@@ -53,7 +53,7 @@ anchors:
   - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: NW-R,
      ref: [36, 56], target: [177, 203]}
   - {name: ice, entrance: fir_ice, place: "Ice Cavern mouth", region: fire, owner: NW-R,
-     ref: [44, 44], target: [184, 193]}
+     ref: [79, -55], target: [214, 108], note: "NW2 ruling D-NW2-5: moved to the peninsula's north tip (the Rime Hollow); was ref [44, 44]"}
   - {name: desert, entrance: fir_desert, place: "Buried hull, airship desert", region: fire, owner: NW-R,
      ref: [56, 60], target: [194, 207]}
   - {name: citadel, entrance: ord_citadel, place: "Citadel of Trials gate", region: ordeal, owner: NW-R,
@@ -116,12 +116,12 @@ detours:
   - {pair: [pravoka, dwarf], mode: ship+walking, factor: 2.5}
   - {pair: [elfheim, keep], mode: walking, factor: 2.5}
   - {pair: [elfheim, marsh], mode: walking, factor: 2.5}
-  - {pair: [dwarf, melmond], mode: ship+walking, factor: 4.5, via: "through the canal (it lies north of the dwarves)"}
+  - {pair: [dwarf, melmond], mode: ship+walking, factor: 2.5, via: "south through the canal (NW2: the dwarves lie north of it)"}
   - {pair: [melmond, earth_cave], mode: walking, factor: 2.5}
   - {pair: [melmond, giant], mode: walking, factor: 2.5}
   - {pair: [melmond, sarda], mode: walking, factor: 3.0, via: "through the tunnel"}
   - {pair: [melmond, crescent], mode: ship+walking, factor: 2.5}
   - {pair: [crescent, volcano], mode: canoe+walking, factor: 2.5}
-  - {pair: [crescent, ice], mode: canoe+walking, factor: 2.5}
-  - {pair: [ice, desert], mode: walking, factor: 2.5}
+  - {pair: [crescent, ice], mode: ship+canoe+walking, factor: 2.5, via: "by sea to the fir_ice dock, then up R-ice (NW2)"}
+  - {pair: [ice, desert], mode: ship+canoe+walking, factor: 2.5, via: "down R-ice, by sea round the peninsula, up R-volcano (NW2)"}
   - {pair: [onrac, waterfall], mode: canoe+walking, factor: 2.5}

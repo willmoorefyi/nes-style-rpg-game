@@ -143,7 +143,7 @@ describe('NW-R ELF: Elfland on the NW world source', () => {
     expect([[w.x, w.y], [w.x, w.y + 1]].some(([x, y]) => DIRS.some(([dx, dy]) => g[y + dy][x + dx] === ','))).toBe(true);
   });
 
-  it('Elfheim-keep and Elfheim-marsh walk at most 2.5x their straight line; the arm walks to the dwarves', () => {
+  it('Elfheim-keep and Elfheim-marsh walk at most 2.5x their straight line; the dwarves are off the arm on foot', () => {
     const d = bfs([E.elf_elfheim], walk);
     for (const k of ['elf_keep', 'elf_marsh']) {
       const [x, y] = E[k];
@@ -151,7 +151,9 @@ describe('NW-R ELF: Elfland on the NW world source', () => {
       expect(path, k).toBeDefined();
       expect(path!, k).toBeLessThanOrEqual(2.5 * Math.hypot(x - E.elf_elfheim[0], y - E.elf_elfheim[1]));
     }
-    expect(bfs([E.elf_keep], walk).has(`${E.ert_dwarf[0]},${E.ert_dwarf[1]}`)).toBe(true);
+    // NW2-E (docs/NW2_EDITS_PLAN.md 5): the hall moved north of the canal, so even with the canal shut (its saddle
+    // walkable) the keep's arm does not walk to it (duergar_south)
+    expect(bfs([E.elf_keep], walk).has(`${E.ert_dwarf[0]},${E.ert_dwarf[1]}`)).toBe(false);
   });
 
   it('T2 by canoe: the Aldi docks reach no FIRE entrance and not the fir_crescent dock\'s shore (4.3)', () => {
