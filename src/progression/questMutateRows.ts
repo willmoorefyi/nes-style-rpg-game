@@ -1,5 +1,5 @@
 /**
- * The gate table of docs/WORLD_PLAN.md 6.3 (GT-1 to GT-37, with GT-5b) as named mutations: the element (found by
+ * The gate table of docs/WORLD_PLAN.md 6.3 (GT-1 to GT-37, with GT-5b; NW2's GT-40 to GT-43) as named mutations: the element (found by
  * questMutateFind.ts), the change, and the expected catch (proof and message prefix). A row whose `nlb` is set is
  * non-load-bearing: it needs an entry in its stage's `nonLoadBearing` (`entry`) or carries the plan's reason itself.
  */
@@ -92,7 +92,7 @@ export const GATE_ROWS: GateRow[] = [
   { row: 'GT-20', stages: ['S14'], element: 'the Crescent shop keepers', mutation: 'move crescent\'s opensAfter to [S13]',
     find: (c) => townOpensAfter(c, 'crescent', ['S13']), expect: [{ proof: 'e', prefix: 'EARLY crescent talkable before S13' }] },
   { row: 'GT-21', stages: ['S15', 'S16'], element: 'the river mouths of R-volcano and R-ice', mutation: 'make the cut walkable grass',
-    find: (c) => [...canoeCut(c, 'fir_crescent', 'fir_volcano'), ...canoeCut(c, 'fir_crescent', 'fir_ice')],
+    find: (c) => [...canoeCut(c, 'fir_crescent', 'fir_volcano'), ...canoeCut(c, 'dock:fir_ice', 'fir_ice')],
     expect: skip('S15', 'S16'), anyOf: true },
   item('GT-22', 'S17', 'the buried hull', 'levistone', 'S17'),
   { row: 'GT-23', stages: ['S17', 'S18'], element: 'the airship\'s set_vehicle cutscene\'s trigger', mutation: 'fire it with no levistone',
@@ -122,6 +122,14 @@ export const GATE_ROWS: GateRow[] = [
     find: (c) => cutOpen(c, 'western_range', TerrainType.Grass), expect: skip('S12') },
   { row: 'GT-36', stages: ['S12'], element: 'the giant NPC on the tunnel\'s chokepoint', mutation: 'remove the NPC',
     find: (c) => npcRemoved(c, 'ruby'), expect: skip('S12') },
-  { row: 'GT-37', stages: ['S15', 'S16'], element: 'Crescent\'s mountain ring (FIRE)', mutation: 'open its minimal walkable cut',
-    find: (c) => cutOpen(c, 'crescent_ring', TerrainType.Grass), expect: skip('S15', 'S16') },
+  { row: 'GT-37', stages: ['S15'], element: 'Crescent\'s mountain ring (FIRE)', mutation: 'open its minimal walkable cut',
+    find: (c) => cutOpen(c, 'crescent_ring', TerrainType.Grass), expect: skip('S15') },
+  // NW2 (docs/NW2_EDITS_PLAN.md 10): the Ice Cavern's tip; GT-38, GT-39 stay unused, GT-42 is the dwarves' (NW2-E)
+  { row: 'GT-40', stages: ['S16'], element: 'the Rime Hollow\'s wall ice_ring (FIRE)', mutation: 'open its minimal walkable cut',
+    find: (c) => cutOpen(c, 'ice_ring', TerrainType.Grass), expect: skip('S16') },
+  { row: 'GT-41', stages: ['S16'], element: 'the dock fir_ice', mutation: 'remove', find: (c) => docks(c, ['fir_ice']),
+    expect: [goal] },
+  { row: 'GT-43', stages: ['S16'], element: 'the ridge ice_neck (FIRE)', mutation: 'open its minimal walkable cut',
+    find: (c) => cutOpen(c, 'ice_neck', TerrainType.Grass), expect: [],
+    nlb: 'the tip becomes walkable from Crescent\'s shore, so the fir_ice dock is redundant; S16 still needs the canoe' },
 ];

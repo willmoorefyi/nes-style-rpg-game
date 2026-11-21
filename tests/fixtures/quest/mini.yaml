@@ -10,9 +10,11 @@
 # (10-11,3)), M the mainland (Pravoka, Matoya), D the dwarves' pocket x 22-24 rows 1-7 (NW2-E: the hall ert_dwarf
 # (23,2), walled off from M by rock column x 21, cut duergar_range (21,3), reached only from its dock (23,8)), the Aldi
 # sea (docks a1_pravoka, elf_port, ert_dwarf), S Elfland (only by elf_port), the isthmus x 31 (cuts W_west ..
-# W_east, the canal at y 11), the ocean (docks ert_melmond, fir_crescent), CS Crescent's shore and its ring x 37 (cut
-# crescent_ring, river (37,5)), FL the volcano, ice and desert lands, L Melmond's plain, the western range y 17 (cut
-# western_range, the giant's tunnel (42,17)), Sarda's coast, the lich's room, N the north (Citadel, Bahamut, Onrac,
+# W_east, the canal at y 11), the ocean (docks ert_melmond, fir_crescent, fir_ice), CS Crescent's shore and its ring
+# x 37 (cut crescent_ring, river (37,5)), FL the volcano and desert lands (the flight stand-in at (42,1)), NW2-F's ice
+# pocket east of FL's rock x 43 (cut ice_neck (43,5)): the Frost Shore x 44-45 rows 5-6 by the dock fir_ice (45,7),
+# the R-ice stand-in (45,4) (cut ice_ring (44,4)), the Rime Hollow x 44-46 rows 1-3 with the Ice Cavern (44,2),
+# L Melmond's plain, the western range y 17 (cut western_range, the giant's tunnel (42,17)), Sarda's coast, the lich's room, N the north (Citadel, Bahamut, Onrac,
 # the waterfall, the caravan, the fairy, the shrine, Lufenia, the Mirage, the sky castle, the time gate) and the
 # temple of the past.
 start: {map: overworld, x: 2, y: 2}
@@ -123,13 +125,13 @@ maps:
   - id: overworld
     grid:
       - "################################################"
-      - "#........###.........#...########....^.........#"
-      - "#........###.........#...########....^.........#"
-      - "#.........==.........#...########....^.........#"
-      - "#........###.........#...########....^.........#"
-      - "#........###.........#...########....=.........#"
-      - "#........###.........#...########....^.........#"
-      - "############.........#...#######~~~~~~~~~~~~~###"
+      - "#........###.........#...########....^.....^...#"
+      - "#........###.........#...########....^.....^...#"
+      - "#.........==.........#...########....^.....^...#"
+      - "#........###.........#...########....^.....^^=^#"
+      - "#........###.........#...########....=.....^..^#"
+      - "#........###.........#...########....^.....^..^#"
+      - "############.........#...#######~~~~~~~~~~~~~~##"
       - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
       - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
       - "##########~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~###"
@@ -154,7 +156,7 @@ maps:
       - "########...###...#...###########################"
       - "########...###...#...###########################"
       - "################################################"
-    entrances: {"cornelia": [2, 2], "a1_pravoka": [19, 1], "a1_matoya": [13, 1], "elf_elfheim": [11, 14], "fir_crescent": [34, 6], "fir_volcano": [40, 2], "fir_ice": [44, 2], "fir_desert": [45, 6], "ert_dwarf": [23, 2], "ert_melmond": [34, 14], "wat_onrac": [10, 22], "wat_waterfall": [23, 22], "past": [20, 25], "n_lufenia": [12, 25], "n_arrival": [2, 21]}
+    entrances: {"cornelia": [2, 2], "a1_pravoka": [19, 1], "a1_matoya": [13, 1], "elf_elfheim": [11, 14], "fir_crescent": [34, 6], "fir_volcano": [40, 2], "fir_ice": [44, 2], "fir_desert": [41, 6], "ert_dwarf": [23, 2], "ert_melmond": [34, 14], "wat_onrac": [10, 22], "wat_waterfall": [23, 22], "past": [20, 25], "n_lufenia": [12, 25], "n_arrival": [2, 21]}
     transitions:
       - {"x": 20, "y": 1, "targetMap": "pravoka", "targetEntrance": "gate"}
       - {"x": 12, "y": 1, "targetMap": "matoya-cave", "targetEntrance": "gate"}
@@ -162,8 +164,8 @@ maps:
       - {"x": 10, "y": 14, "targetMap": "elfheim", "targetEntrance": "gate"}
       - {"x": 33, "y": 1, "targetMap": "crescent", "targetEntrance": "gate"}
       - {"x": 33, "y": 14, "targetMap": "melmond", "targetEntrance": "gate"}
-      - {"x": 46, "y": 1, "targetMap": "overworld", "targetX": 2, "targetY": 21, "requiredFlag": "AIRSHIP_RAISED"}
-      - {"x": 1, "y": 21, "targetMap": "overworld", "targetX": 45, "targetY": 2}
+      - {"x": 42, "y": 1, "targetMap": "overworld", "targetX": 2, "targetY": 21, "requiredFlag": "AIRSHIP_RAISED"}
+      - {"x": 1, "y": 21, "targetMap": "overworld", "targetX": 41, "targetY": 2}
       - {"x": 10, "y": 21, "targetMap": "onrac", "targetEntrance": "gate"}
       - {"x": 12, "y": 26, "targetMap": "lufenia", "targetEntrance": "gate"}
       - {"x": 22, "y": 25, "targetMap": "past-temple-1", "targetEntrance": "gate"}
@@ -174,6 +176,7 @@ maps:
       - {"x": 24, "y": 17, "requiredItem": "mystic_key", "message": "Locked.", "permanent": false}
       - {"x": 31, "y": 11, "requiredFlag": "CANAL_OPEN", "message": "Rock.", "permanent": false}
       - {"x": 37, "y": 5, "requiredItem": "canoe", "message": "A river.", "permanent": false}
+      - {"x": 45, "y": 4, "requiredItem": "canoe", "message": "A river.", "permanent": false}
       - {"x": 34, "y": 17, "requiredItem": "rod", "flag": "EARTH_SEAL_BROKEN", "message": "Sealed.", "permanent": true}
       - {"x": 21, "y": 22, "requiredItem": "canoe", "message": "A river.", "permanent": false}
       - {"x": 9, "y": 27, "requiredItem": "oxyale", "message": "Water.", "permanent": false}
@@ -190,7 +193,7 @@ maps:
       - {"id": "chest_tnt", "x": 24, "y": 18, "sprite": "chest", "chestItem": "tnt", "chestFlag": "CHEST_ELF_T_TNT"}
       - {"id": "ashen", "x": 40, "y": 1, "sprite": "boss"}
       - {"id": "evil_eye", "x": 44, "y": 1, "sprite": "boss"}
-      - {"id": "hull", "x": 46, "y": 6, "dialog": ["..."], "requiredItem": "levistone", "giftItem": "hull_log", "giftFlag": "AIRSHIP_RAISED", "takeItem": true}
+      - {"id": "hull", "x": 42, "y": 6, "dialog": ["..."], "requiredItem": "levistone", "giftItem": "hull_log", "giftFlag": "AIRSHIP_RAISED", "takeItem": true}
       - {"id": "elder", "x": 36, "y": 1, "showIf": "EARTH_CRYSTAL_LIT", "dialog": ["A canoe."], "giftItem": "canoe", "giftFlag": "CANOE_GIVEN"}
       - {"id": "vampire", "x": 46, "y": 14, "sprite": "boss"}
       - {"id": "giant", "x": 42, "y": 17, "dialog": ["..."], "requiredItem": "ruby", "giftItem": "giant_meal", "giftFlag": "TITAN_FED", "takeItem": true, "hideIf": "TITAN_FED"}
@@ -221,12 +224,13 @@ maps:
       - {"id": "ert_dwarf", "x": 23, "y": 8, "basin": "aldi"}
       - {"id": "ert_melmond", "x": 36, "y": 13, "basin": "ocean"}
       - {"id": "fir_crescent", "x": 34, "y": 7, "basin": "ocean"}
+      - {"id": "fir_ice", "x": 45, "y": 7, "basin": "ocean"}
     vehicles:
       - {"type": "ship", "x": 16, "y": 8, "requiredFlag": "BIKKE_DEFEATED"}
     patches:
       - {"id": "north_bridge", "flag": "BRIDGE_BUILT", "cells": [[9, 3], [10, 3], [11, 3]], "terrain": 9}
       - {"id": "canal", "flag": "CANAL_OPEN", "cells": [[31, 11]], "terrain": 2}
-    world: {"frames": {}, "cuts": {"W_west": [[31, 8]], "W_isthmus": [[31, 9]], "W_arm": [[31, 10]], "W_south": [[31, 12]], "W_east": [[31, 13]], "western_range": [[40, 17]], "crescent_ring": [[37, 3]], "duergar_range": [[21, 3]]}}
+    world: {"frames": {}, "cuts": {"W_west": [[31, 8]], "W_isthmus": [[31, 9]], "W_arm": [[31, 10]], "W_south": [[31, 12]], "W_east": [[31, 13]], "western_range": [[40, 17]], "crescent_ring": [[37, 3]], "duergar_range": [[21, 3]], "ice_ring": [[44, 4]], "ice_neck": [[43, 5]]}}
   - id: pravoka
     grid:
       - "#####"

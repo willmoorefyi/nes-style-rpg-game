@@ -21,7 +21,7 @@ STEP_FACTOR = {
     "a1_aldi": 0.74, "a1_north_sea": 2.25,
     "elf_aldi": 1.15, "elf_fen": 1.85, "elf_fields": 1.45, "elf_keep_moor": 0.86,
     "ert_aldi": 2.09, "ert_isthmus": 1.36, "ert_plain": 2.25, "ert_sarda_coast": 0.67, "ert_sea": 2.25,
-    "fir_aldi": 1.46, "fir_ashlands": 2.25, "fir_desert": 1.4, "fir_lakeshore": 2.25, "fir_rivers": 2.25,
+    "fir_aldi": 1.46, "fir_ashlands": 2.25, "fir_desert": 1.4, "fir_lakeshore": 2.25, "fir_rivers": 0.75,
     "fir_sea": 2.25,
     "ord_heath": 0.67, "ord_isles": 2.25, "ord_sea": 2.25,
     "temple_approach": 0.81,

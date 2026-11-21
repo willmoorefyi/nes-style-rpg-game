@@ -46,7 +46,7 @@ describe('travelMatrix: each row fails on its RED fixture', () => {
   it('T2 and B1: the canal open without its flag', () => {
     const msgs = run(dropGate(31, 11));
     expect(msgs).toContain('TRAVEL T2 reaches ert_melmond');
-    expect(msgs).toContain('TRAVEL B1 ship docks a1_pravoka elf_port ert_dwarf ert_melmond fir_crescent (want a1_pravoka elf_port ert_dwarf)');
+    expect(msgs).toContain('TRAVEL B1 ship docks a1_pravoka elf_port ert_dwarf ert_melmond fir_crescent fir_ice (want a1_pravoka elf_port ert_dwarf)');
   });
 
   it('B1: an Aldi wall\'s water cut opened (W_isthmus)', () => {
@@ -55,7 +55,11 @@ describe('travelMatrix: each row fails on its RED fixture', () => {
   });
 
   it('T3: the river through Crescent\'s ring walkable (no canoe)', () => {
-    expect(run(dropGate(37, 5))).toEqual(expect.arrayContaining(['TRAVEL T3 reaches fir_volcano', 'TRAVEL T3 reaches fir_ice']));
+    expect(run(dropGate(37, 5))).toEqual(expect.arrayContaining(['TRAVEL T3 reaches fir_volcano']));
+  });
+
+  it('T3: R-ice\'s stand-in by the fir_ice dock walkable (no canoe; NW2)', () => {
+    expect(run(dropGate(45, 4))).toEqual(expect.arrayContaining(['TRAVEL T3 reaches fir_ice']));
   });
 
   it('T6b: the waterfall river walkable', () => {
@@ -96,7 +100,7 @@ describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => 
       'T10', 'B1', 'B2']);
     const t6 = DEFAULT_TRAVEL_ROWS.find((r) => r.id === 'T6')!;
     expect(t6).toMatchObject({ start: 'fir_desert', landing: true });
-    expect(DEFAULT_TRAVEL_ROWS.find((r) => r.id === 'B2')!.docks).toHaveLength(5);
+    expect(DEFAULT_TRAVEL_ROWS.find((r) => r.id === 'B2')!.docks).toHaveLength(6);   // NW2: + fir_ice
   });
 
   it('the repository: T0-T5 and both basin rows hold with the W2 regions built, the rest wait (failures with --strict)', () => {

@@ -3,7 +3,7 @@
  * its id (an NPC that needs the crown, the patch `canal`, the composer's cut `W_isthmus`), so the same rows run on
  * the fixtures and on the real world. Each returns the elements found; none found means the element is not built.
  */
-import { canEnter } from '../systems/fieldRules.js';
+import { canEnter, terrainAllows } from '../systems/fieldRules.js';
 import { TerrainType } from '../types/index.js';
 import type { KeyItemGate, MapData, MapWorld } from '../types/index.js';
 import type { QuestContext } from './questProofs.js';
@@ -130,18 +130,27 @@ export function cutOpen(ctx: QuestContext, name: string, terrain: TerrainType): 
     key: `cut:${name}`, apply: (w) => setCells(w, cells, terrain) }];
 }
 
-/** The fewest canoe cells (River, Lake, or a gate that needs the canoe) joining two anchors on foot (0-1 BFS). */
+/** The fewest canoe cells (River, Lake, or a gate that needs the canoe) joining two anchors on foot (0-1 BFS). An
+ *  anchor is an entrance or `dock:<id>` (NW2: the dock's walkable shore, its first walkable 4-neighbour). */
 export function canoeCut(ctx: QuestContext, from: string, to: string): MutElement[] {
   const { world } = ctx;
   const map = world.maps.get(world.worldMap);
-  const a = map?.entrances?.[from];
-  const b = map?.entrances?.[to];
+  const a = map && place(map, from);
+  const b = map && place(map, to);
   if (!map || !a || !b) return [];
-  const cells = minimalCut(ctx, map, { x: a[0], y: a[1] }, { x: b[0], y: b[1] });
+  const cells = minimalCut(ctx, map, a, b);
   if (!cells.length) return [];
   const wc = cells.map(([x, y]): [number, number] => [x, y]);
   return [{ map: map.id, kind: 'cut', at: wc[0], label: `canoe cut ${from}-${to} made grass (${wc.length} cells)`,
     key: `canoecut:${from}:${to}`, apply: (w) => setCells(w, wc, TerrainType.Grass) }];
+}
+
+function place(map: MapData, name: string): { x: number; y: number } | undefined {
+  const d = name.startsWith('dock:') ? map.docks?.find((k) => k.id === name.slice(5)) : undefined;
+  const e = map.entrances?.[name];
+  if (!d) return e ? { x: e[0], y: e[1] } : undefined;
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => ({ x: d.x + dx, y: d.y + dy }))
+    .find((c) => terrainAllows('walking', map.collision[c.y * map.width + c.x]));
 }
 
 function minimalCut(ctx: QuestContext, map: MapData, a: { x: number; y: number }, b: { x: number; y: number }): XY[] {

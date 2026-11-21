@@ -98,7 +98,7 @@ def docks(g: np.ndarray, exempt: np.ndarray, b: RegionSpec, hard: np.ndarray, ke
         x, y = S.world(d.at)
         if d.cove:
             g[y, x] = "o"
-            tx, ty = b.sites[d.town]
+            tx, ty = S.world(d.toward) if d.toward else b.sites[d.town]
             sx, sy = int(np.sign(tx - x)), int(np.sign(ty - y))
             nx, ny = (x + sx, y) if abs(tx - x) >= abs(ty - y) else (x, y + sy)
             g[ny, nx] = "."

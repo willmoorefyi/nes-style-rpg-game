@@ -740,3 +740,73 @@ Momus returned OKAY with conditions; these are folded in as tranche instructions
 5. §3: `--region`'s limit is `PAINT_LIMIT` 160 (`terrain/region_chunks.py:16`), not 70; the repaint is still by full
    compiles.
 6. §12: a save with no way out still runs vehicle rules 1 and 3 (wording only; no map lacks a way out).
+
+### NW2-F result (2026-11-21)
+
+Built on mainline e9376e04, merged with NW2-E and NW2-W (ec1ec36d) before the gates. Placements (world cells; rel =
+Cornelia-relative):
+- **Ice Cavern** `fir_ice` (214, 108), at its target (ref (79, -55)); the cave icon on the Rime Hollow's north wall
+  (ledge row 106, door (214, 107)). `ice_ring` is a circle of radius 6 round rel (69, -44) = (215, 111) (`warped:
+  False`); the hollow's floor is snow with taiga pines (FIRE's content, `_hollow`), the floe at (212, 110). The Rime
+  Tarn: rel (70, -42), radius 2.
+- **R-ice** (47 cells): rel (70, -42) -> (71, -37) -> (76, -34) -> (77, -29) -> (72, -26) -> (66, -27) -> (64, -30) ->
+  (62, -32) -> (60, -33), the mouth (206, 122) on the west coast; the gorge stamp walls cells 3 to -9.
+- **Dock `fir_ice`** (205, 119), ocean, facing east (`Dock.toward`); spots `fir_s_ice_ship` (205, 119), `fir_s_ice_shore`
+  (206, 119). The Frost Shore (x 206-214, y 113-121, taiga) runs from the dock to the mouth: 2 walking steps to the
+  first canoe cell.
+- **`ice_neck`**: rel (56, -21) .. (87, -24), coast to coast at y about 131-134 (south of the plan's 126-131, for the
+  gorge's room); foot and canoe closed; seeds `fir_crescent` -> `spot:fir_s_ice_shore`, `fir_ice`.
+- **Cold hint** rel (73, -40), radius 22: the tip's walkable cells 67 % taiga and snow (fireWorld gate 50 %).
+- **R-volcano** (51 cells): rel (64, 25) [in the lake] -> (62, 28) -> (58, 31) -> (54, 35) -> (49, 38) -> (45, 41) ->
+  (40, 43) -> (37, 45) -> (35, 46), its sink (181, 201) by Gurgu; the gorge stamp walls cells 3 to -6; the Cinder Wall
+  ridge rel (61, 28) .. (41, 42) (height 0.9, width 4) beside it. `crescent_ring`'s seeds drop `fir_ice`.
+- Corridors: `fir_south` (Gurgu, rel (37, 48), (46, 49), the hull), `fir_ice_shore` (the dock to the mouth); `fir_ash`
+  dropped. The old frost hollow is ash and dune.
+- `fir_rivers` step factor 2.25 -> **0.75** (rate 8-17), so E_canoe >= 1.0 (D-NW2-3).
+
+Gorge figures (`world.py`'s `gorges` line, least-canoe path over each stage's starts):
+
+| Gorge | Forced canoe steps (M >= 26) | Path steps | Pass cells (N >= 12) | E_canoe (>= 1.0) |
+|---|---|---|---|---|
+| Cinder Gorge, `fir_volcano` S15 | 54 (25 of them Crescent Lake) | 86 | 39 | 2.16 |
+| Rime Gorge, `fir_ice` S16 | 47 | 57 | 32 | 1.88 |
+
+Cuts: `ice_neck` 17, `ice_ring` 6, `crescent_ring` 4. Relations: `fir_ice` 64 rows north of Crescent, bearing 7.1,
+102.0 from Gurgu.
+
+The 31-pair table (proof (g) on the source's cells; 20,000 +-2 placements of the 20 non-act-1 anchors at their targets,
+act 1 fixed: **0 fail**; s* at the targets 0.848):
+
+| pair | d_ref | s* x d_ref | d_world | r | band | bearing err | max |
+|---|---|---|---|---|---|---|---|
+| cornelia-pravoka | 57.3 | 48.8 | 40.3 | 0.83 | [0.7, 1.3] | 2.3 | 40 |
+| cornelia-matoya | 53.8 | 45.8 | 39.4 | 0.86 | [0.7, 1.3] | 20.8 | 40 |
+| cornelia-temple | 41.2 | 35.1 | 15.3 | 0.44 | exempt | 29.3 | 40 |
+| pravoka-elfheim | 93.7 | 79.8 | 73.6 | 0.92 | [0.7, 1.3] | 4.1 | 40 |
+| elfheim-marsh | 48.8 | 41.6 | 41.6 | 1.00 | [0.7, 1.3] | 0.2 | 40 |
+| elfheim-keep | 40.0 | 34.1 | 33.6 | 0.99 | [0.7, 1.3] | 0.3 | 40 |
+| keep-dwarf | 64.3 | 54.7 | 55.2 | 1.01 | [0.7, 1.3] | 0.2 | 40 |
+| dwarf-melmond | 47.5 | 40.5 | 41.1 | 1.02 | [0.7, 1.3] | 3.7 | 40 |
+| melmond-earth_cave | 25.6 | 21.8 | 21.6 | 0.99 | [0.55, 1.6] | 5.0 | 60 |
+| melmond-giant | 20.0 | 17.0 | 14.0 | 0.82 | [0.55, 1.6] | 0.0 | 60 |
+| melmond-sarda | 32.2 | 27.5 | 25.2 | 0.92 | [0.7, 1.3] | 0.3 | 40 |
+| melmond-crescent | 140.9 | 120.0 | 124.8 | 1.04 | [0.7, 1.3] | 0.1 | 40 |
+| cornelia-crescent | 70.9 | 60.3 | 62.4 | 1.03 | [0.7, 1.3] | 0.6 | 40 |
+| crescent-volcano | 48.2 | 41.0 | 42.4 | 1.04 | [0.7, 1.3] | 1.5 | 40 |
+| crescent-ice | 75.8 | 64.5 | 64.5 | 1.00 | [0.7, 1.3] | 1.2 | 40 |
+| ice-desert | 117.3 | 99.8 | 101.0 | 1.01 | [0.7, 1.3] | 0.1 | 40 |
+| desert-citadel | 193.3 | 164.6 | 166.9 | 1.01 | [0.7, 1.3] | 0.0 | 40 |
+| citadel-bahamut | 56.9 | 48.4 | 49.0 | 1.01 | [0.7, 1.3] | 0.1 | 40 |
+| desert-onrac | 218.0 | 185.5 | 187.5 | 1.01 | [0.7, 1.3] | 0.1 | 40 |
+| onrac-waterfall | 40.2 | 34.2 | 34.1 | 1.00 | [0.7, 1.3] | 0.7 | 40 |
+| onrac-caravan | 32.2 | 27.5 | 25.1 | 0.91 | [0.7, 1.3] | 1.1 | 40 |
+| caravan-gaia | 192.7 | 164.0 | 165.8 | 1.01 | [0.7, 1.3] | 0.8 | 40 |
+| gaia-mirage | 42.5 | 36.2 | 38.9 | 1.07 | [0.7, 1.3] | 2.8 | 40 |
+| gaia-lufenia | 41.8 | 35.6 | 35.9 | 1.01 | [0.7, 1.3] | 3.8 | 40 |
+| lufenia-melmond | 183.2 | 155.9 | 158.8 | 1.02 | [0.7, 1.3] | 0.5 | 40 |
+| cornelia-onrac | 135.9 | 115.7 | 116.8 | 1.01 | [0.7, 1.3] | 0.0 | 40 |
+| cornelia-gaia | 150.4 | 128.0 | 130.7 | 1.02 | [0.7, 1.3] | 0.7 | 40 |
+| cornelia-marsh | 94.4 | 80.4 | 80.8 | 1.01 | [0.7, 1.3] | 0.1 | 40 |
+| cornelia-sarda | 104.0 | 88.5 | 89.0 | 1.01 | [0.7, 1.3] | 0.0 | 40 |
+| cornelia-citadel | 118.5 | 100.8 | 102.2 | 1.01 | [0.7, 1.3] | 0.2 | 40 |
+| pravoka-matoya | 99.0 | 84.2 | 62.2 | 0.74 | [0.7, 1.3] | 9.6 | 40 |

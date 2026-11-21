@@ -4,8 +4,10 @@ Used by `world_fire_nw.content`; the coverage rule itself (with FIRE's ship-zone
 check, `world_content.coverage` (NW-RINT).
 
 - Crescent's shore (`fir_lakeshore`): the land walkable from its gate (and FIRE land nearer Crescent than the south);
-- the south lands: the frost hollow (`fir_tundra`) within FROST_R of the Ice Cavern, the ash (`fir_ashlands`)
-  within ASH_R of Gurgu or nearer it than the hull, the hull desert (`fir_desert`) the rest;
+- the cold tip north of `ice_neck` (NW2: the Frost Shore, the Rime Fells' pockets and the Rime Hollow) the frost
+  zone (`fir_tundra`), unless it is walkable from Crescent's gate;
+- the south lands: the ash (`fir_ashlands`) within ASH_R of Gurgu or nearer it than the hull, the hull desert
+  (`fir_desert`) the rest;
 - rivers and lakes `fir_rivers`; sea by basin, `fir_aldi` (the Aldi flood, canal shut) or `fir_sea`.
 """
 from __future__ import annotations
@@ -14,13 +16,15 @@ import numpy as np
 
 from world_api import REGIONS
 from worldgen.gates import BLOCK, with_patches
+from worldgen import spec as S
 from worldgen.geom import flood
 
 from fire import fire_tables as T
 
 REGION = "fire"
-SOUTH = ("fir_volcano", "fir_ice", "fir_desert")
-FROST_R, ASH_R = 8, 12                   # the frost hollow round the Ice Cavern; the ash round Gurgu
+SOUTH = ("fir_volcano", "fir_desert")
+ASH_R = 12                               # the ash round Gurgu
+TIP_Y = -27                              # NW2: the tip north of ice_neck (Cornelia-relative row) is the Frost Hollow
 
 
 def row_rects(cells: set) -> list[list[int]]:
@@ -60,10 +64,10 @@ def zone_cells(g, meta) -> dict[str, set]:
 
 def _land_zone(x: int, y: int, e: dict, shore: bool, south: bool) -> str:
     d = {k: float(np.hypot(x - e[k][0], y - e[k][1])) for k in ("fir_crescent",) + SOUTH}
+    if not shore and not south and y <= S.world((0, TIP_Y))[1]:
+        return "fir_tundra"
     if shore or (not south and d["fir_crescent"] <= min(d[s] for s in SOUTH)):
         return "fir_lakeshore"
-    if d["fir_ice"] <= FROST_R and d["fir_ice"] <= d["fir_volcano"]:
-        return "fir_tundra"
     if d["fir_volcano"] <= ASH_R or d["fir_volcano"] <= d["fir_desert"]:
         return "fir_ashlands"
     return "fir_desert"
