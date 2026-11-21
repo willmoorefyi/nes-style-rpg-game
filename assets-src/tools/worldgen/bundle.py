@@ -86,6 +86,52 @@ class SpotDef:
     kind: str
 
 
+@dataclass(frozen=True)
+class Gorge:
+    """NW2 (docs/NW2_EDITS_PLAN.md 4, 8): a canoe gate. `site` (an entrance) is reached from stage `stage`'s starts
+    (prewalk's) only by canoe, through the gorge on route cells `i0..i1` of `route` (its banks forced Mountain by the
+    gorge stamp); `dock`: a dock whose withholding cuts the site off by foot+canoe too (`canoe_gates` (iii)). The
+    checks `canoe_gates` and `gorges` run over these records only."""
+    route: str
+    i0: int
+    i1: int
+    site: str
+    stage: str
+    dock: str = ""
+
+
+@dataclass(frozen=True)
+class Hike:
+    """NW2 (7): an airship-only site with no landing within the floor K (foot+canoe) and the spot `landing` within the
+    cap U in the site's mode (`world-anchors.yaml` `hike:`); `fill`: what the hike pass paints the near grass with
+    (`climate`: taiga / sand / swamp / forest by the local climate). The check `hikes` runs over these only."""
+    site: str
+    landing: str
+    fill: str = "climate"
+
+
+@dataclass(frozen=True)
+class Relation:
+    """NW2 (8, `relations`): a placement rule between two entrances (`b` may be `canal`, the canal patch: its centre,
+    and for `north_of` its smallest row). `kind`: `north_of` (a.y <= b.y - value), `bearing` (a's compass bearing
+    from b within `value` degrees of `deg`, 0 = north, 90 = east), `min_dist` (Euclidean distance >= value)."""
+    a: str
+    b: str
+    kind: str
+    value: float
+    deg: float = 0.0
+
+
+@dataclass(frozen=True)
+class Apart:
+    """NW2 (5, `duergar_south`): `a` and `b` joined neither on foot nor on foot+canoe, with the canal patch on or off
+    (`canal`) and the bridge on (the barrier seeds have no canal-shut option)."""
+    name: str
+    a: str
+    b: str
+    canal: bool = False
+
+
 @dataclass
 class Template:
     """Act 1's template (3.6, NW-0): today's outline and the cells copied from today's world, in world rasters."""
@@ -131,9 +177,14 @@ class RegionSpec:
     template: Template | None = None
     north: tuple[str, ...] = ()             # airship-only anchors (3.8 `landings`)
     ledges: tuple[str, ...] = ()            # canoe-only sites: a ledge on their pinned route (4.1, `stamps.ledges`)
-    # 3.8 `barriers`: barrier -> (seed entrance, [entrances beyond], closed by canoe too, cut by the bridge patch)
+    # 3.8 `barriers`: barrier -> (seed entrance, [entrances beyond], closed by canoe too, cut by the bridge patch);
+    # NW2: a seed may also be `spot:<name>`, a resolved spot's cell (`gates_reach.seed_cell`)
     barrier_seeds: dict[str, tuple[str, tuple[str, ...], bool, bool]] = field(default_factory=dict)
     links: dict[str, tuple[str, str]] = field(default_factory=dict)   # pairs that must join on foot (patches on)
+    gorges: list[Gorge] = field(default_factory=list)               # NW2 8: `canoe_gates`, `gorges`
+    hikes: list[Hike] = field(default_factory=list)                 # NW2 8: `hikes`
+    relations: list[Relation] = field(default_factory=list)         # NW2 8: `relations`
+    apart: list[Apart] = field(default_factory=list)                # NW2 8: `duergar_south`
 
 
 def empty_template(n: int = 256) -> Template:
@@ -147,7 +198,8 @@ def merge(specs: list[RegionSpec]) -> RegionSpec:
     out = RegionSpec(region="world")
     for s in specs:
         for f in ("continents", "ridges", "barriers", "walls", "passes", "cones", "sea_lines", "sea_discs",
-                  "inland_seas", "lakes", "isles", "climate", "docks", "corridors", "roads", "spots"):
+                  "inland_seas", "lakes", "isles", "climate", "docks", "corridors", "roads", "spots", "gorges", "hikes",
+                  "relations", "apart"):
             getattr(out, f).extend(getattr(s, f))
         for f in ("routes", "isle_sites", "sites", "barrier_seeds", "links"):
             getattr(out, f).update(getattr(s, f))
@@ -160,6 +212,6 @@ def merge(specs: list[RegionSpec]) -> RegionSpec:
     return out
 
 
-__all__ = ["Barrier", "Cone", "Dock", "InlandSea", "Lake", "RegionSpec", "SeaDisc", "SeaLine", "SpotDef", "Template",
-           "empty_template", "merge", "Cell", "ClimateHint", "Continent", "Corridor", "IsleField", "Pass", "Ridge",
+__all__ = ["Apart", "Barrier", "Cone", "Dock", "Gorge", "Hike", "InlandSea", "Lake", "RegionSpec", "Relation", "SeaDisc",
+           "SeaLine", "SpotDef", "Template", "empty_template", "merge", "Cell", "ClimateHint", "Continent", "Corridor", "IsleField", "Pass", "Ridge",
            "Road", "WallLine"]

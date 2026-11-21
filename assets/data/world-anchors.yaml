@@ -15,6 +15,14 @@ fit:
   longPair: 23                          # a pair is long when s* x d_r >= 23 world cells (20 x 0.86 / 0.735)
   ratio: {long: [0.70, 1.30], short: [0.55, 1.60]}       # r = d_w / (s* x d_r)
   bearing: {long: 40, short: 60}        # max error in compass degrees, min(|d|, 360 - |d|); every pair is checked
+# NW2 (docs/NW2_EDITS_PLAN.md D-NW2-1, D-NW2-12): the one source of the hike bounds, read by the composer
+# (world_specs/common.hike(): the `landings` and `hikes` checks) and the verifier (questLateData: T6's landingNear).
+# floor K: no landing within K steps of a hike site (foot+canoe); cap U: a landing within U steps of every
+# airship-only anchor, BFS in its mode (`sites`; an anchor not listed walks).
+hike:
+  floor: 25
+  cap: 50
+  sites: {wat_onrac: walking, wat_waterfall: canoe, wat_caravan: walking, wnd_mirage: walking, wnd_lufenia: walking}
 anchors:
   - {name: cornelia, entrance: cornelia, place: "Cornelia, south-gate arrival", region: a1, owner: NW-3, built: true,
      ref: [0, 0], target: [146, 155], note: "CORNELIA_NW (2.2); act 1's pins are today's cells relative to it, delta (+54, +44)"}

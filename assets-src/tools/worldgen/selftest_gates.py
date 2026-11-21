@@ -29,7 +29,7 @@ import numpy as np
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
 sys.path.insert(0, str(TOOLS / "layouts"))
-from worldgen import gates, gates_reach, prewalk  # noqa: E402
+from worldgen import bundle, gates, gates_canoe, gates_hike, gates_reach, prewalk  # noqa: E402
 from worldgen.geom import raster_line  # noqa: E402
 from world_api import CANOE_BARRIERS, DOCKS_ALLOWED, NORTH_REGIONS  # noqa: E402
 
@@ -47,6 +47,7 @@ def main() -> int:
     import world
     import world_source as SRC
     from a1 import world_a1_pins as T
+    from world_specs.common import hike
     g, meta, b, doc, ch = world.build()
     E = meta["entrances"]
     _off, ent_map = SRC.doors()
@@ -115,7 +116,7 @@ def main() -> int:
     case("a dock moved onto land fails docks", not r["ok"], f"{r['why'][:1]}")
     snow = np.argwhere(g == "n")[0]
     sp = {**doc["spots"], "wnd_s_test_airship": {"at": [int(snow[1]), int(snow[0])], "kind": "landing"}}
-    r = gates_reach.landings(g, meta, b.north, sp)
+    r = gates_reach.landings(g, meta, b.north, hike(), sp)
     case("a landing spot on snow fails landings", not r["ok"], f"{r['why'][:1]}")
     d2 = copy.deepcopy(doc)
     d2["entrances"]["elf_keep"] = list(E["fir_crescent"])
@@ -143,19 +144,65 @@ def main() -> int:
             h[y, x] = "o"
         aldi, _ocean = gates.seas(h, meta)
         opened.append((k, bool(_ocean[np.nonzero(aldi)].any()) if aldi.any() else False))
+    SE = gates_reach.seed_cells(meta, doc["spots"])
     for k, (a, bs, _c, patch) in b.barrier_seeds.items():
         h = gates.with_patches(g, meta, bridge=not patch)
         for x, y in cuts[k]:
             h[y, x] = "."
-        opened.append((k, any(gates.joined(gates.walk(h), E[a], E[x]) for x in bs)))
+        opened.append((k, any(gates.joined(gates.walk(h), SE[a], SE[x]) for x in bs)))
     case("every cut of world.cuts opens its leak (walls to Water join aldi and ocean; barriers to grass join their "
          "seeds)", all(v for _, v in opened), f"{[k for k, v in opened if not v] or len(opened)}")
+    nw2_cases(g, meta, b, doc, ent_map, case)
     fails = 0
     for name, ok, detail in cases:
         print("OK" if ok else "FAIL", f"{name} ({detail})")
         fails += not ok
     print(f"worldgen gate selftest: {len(cases) - fails} of {len(cases)} OK")
     return 1 if fails else 0
+
+
+def nw2_cases(g, meta, b, doc, ent_map, case) -> None:
+    """NW2-0 (docs/NW2_EDITS_PLAN.md 8): the six new checks, each failing on a record declared on today's world (the
+    specs declare none yet), with a declared record that passes where today's world allows one; a `spot:` seed."""
+    from world_specs.common import hike
+    sp, hk = doc["spots"], hike()
+    gurgu = bundle.Gorge("R-volcano", 0, 1, "fir_volcano", "S15")
+    r = gates_canoe.canoe_gates(g, meta, [gurgu], sp)
+    ok = r["ok"] and not r["fir_volcano"]["foot"] and r["fir_volcano"]["canoe"]
+    r2 = gates_canoe.canoe_gates(g, meta, [bundle.Gorge("x", 0, 1, "ert_melmond", "S11")], sp)
+    r3 = gates_canoe.canoe_gates(g, meta, [bundle.Gorge("x", 0, 1, "fir_volcano", "S15", "elf_port")], sp)
+    case("canoe_gates: Gurgu (S15) passes; a site on foot (Melmond, S11) fails, and so does Gurgu with a dock "
+         "withheld that does not cut it (elf_port)", ok and not r2["ok"] and r2["ert_melmond"]["foot"]
+         and not r3["ok"] and r3["fir_volcano"]["without_elf_port"], f"{r['note']}; {r2['why'][:1]}")
+    r = gates_canoe.gorges(g, meta, [gurgu], sp, doc)
+    v = r.get("fir_volcano", {})
+    case(f"gorges: today's Gurgu way ({v.get('canoe')} canoe steps, {v.get('pass')} pass cells, E {v.get('E')}) "
+         "fails M / N / E", not r["ok"] and 0 < v.get("canoe", 0) < 26, f"{r['why'][:1]}")
+    rels = [bundle.Relation("fir_ice", "fir_crescent", "north_of", 40),
+            bundle.Relation("ert_dwarf", "canal", "north_of", 10),
+            bundle.Relation("fir_crescent", "fir_volcano", "bearing", 50, 0)]
+    r = gates_canoe.relations(meta, rels)
+    ok = gates_canoe.relations(meta, [bundle.Relation("fir_volcano", "fir_crescent", "min_dist", 10)])["ok"]
+    case("relations: today's Ice Cavern south of Crescent and dwarves south of the canal fail; true ones pass",
+         not r["ok"] and len(r["why"]) == 2 and ok, f"{r['note']}")
+    r = gates_canoe.duergar_south(g, meta, [bundle.Apart("duergar_south", "ert_dwarf", "elf_keep")])
+    case("duergar_south: today's dwarves join the Western Keep with the canal off",
+         not r["ok"] and r["duergar_south"]["foot"], f"{r['why'][:1]}")
+    r = gates_hike.hikes(g, meta, [bundle.Hike("wat_onrac", "wat_s_onrac_airship")], hk, sp, doc)
+    v = r.get("wat_onrac", {})
+    case(f"hikes: today's Onrac (a landing {v.get('floor')} steps away) fails the floor K {hk['floor']}",
+         not r["ok"] and v.get("floor") is not None and v["floor"] < hk["floor"], f"{r['note']}")
+    m2 = copy.deepcopy(meta)
+    m2["docks"] = [d for d in m2["docks"] if d["id"] != "elf_port"]
+    r = prewalk.dock_towns(g, m2, ent_map)
+    rf = gates_reach.landings(g, meta, b.north, {**hk, "cap": 0})
+    case("dock_towns: Elfheim without elf_port fails; landings with the cap 0 fails",
+         not r["ok"] and any("elfheim" in w for w in r["why"]) and not rf["ok"], f"{r['why'][:1]}")
+    seeds = {"barriers": {"crescent_ring": ("spot:fir_s_crescent", ("fir_volcano",), False, False)}, "links": {}}
+    r = gates_reach.barriers(g, meta, seeds, (), None, sp)
+    case("a `spot:` barrier seed resolves (crescent_ring from fir_s_crescent holds on foot, with a cut)",
+         r["ok"] and not r["crescent_ring_foot"] and bool(r["cuts"]["crescent_ring"]),
+         f"cut {len(r['cuts']['crescent_ring'])}")
 
 
 if __name__ == "__main__":

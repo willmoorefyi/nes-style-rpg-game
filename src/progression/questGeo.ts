@@ -115,6 +115,8 @@ export function openState(ctx: QuestContext, place: QuestPlace): QuestState {
 
 const MODES: Record<string, FieldMode[]> = {
   walking: ['walking'], 'ship+walking': ['walking', 'ship'], 'canoe+walking': ['walking', 'canoe'],
+  // NW2 (docs/NW2_EDITS_PLAN.md 9): the voyage to the Ice Cavern's dock, then its gorge
+  'ship+canoe+walking': ['walking', 'ship', 'canoe'],
 };
 
 /** Path lengths on the world map in a hop's modes, the ship parked at the dock nearest the start. */

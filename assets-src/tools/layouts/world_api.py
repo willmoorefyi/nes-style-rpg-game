@@ -81,6 +81,15 @@ WALLS: dict[str, WallLine] = {
 BARRIERS = ("spine", "western_range", "crescent_ring")
 CANOE_BARRIERS = ("spine", "western_range")  # also closed on foot plus canoe; crescent_ring is closed on foot only
 
+# NW2 (docs/NW2_EDITS_PLAN.md 2, 8): the gorge and fight-count bounds of the canoe gates and the hikes. The hike's
+# floor and cap (K 25, U 50) and its per-site modes are not here: their one source is `world-anchors.yaml`'s `hike:`
+# block (D-NW2-12), read by `world_specs.common.hike()` and the verifier's `questLateData`.
+GORGE_M = 26                                 # D-NW2-2: a gorge's least-canoe path has >= M forced canoe steps ...
+GORGE_N = 12                                 # ... of which >= N are pass cells
+E_CANOE_MIN = 1.0                            # D-NW2-3: expected fights on a one-way gorge (canoe rate counted)
+E_HIKE_MIN = 1.0                             # ... and on a one-way hike, at the site's mode
+MODE_RATE = {"walking": 1.0, "canoe": 0.5}   # questCurve.ts MODE_RATE (CanoeMode's 0.5); pinned by a test
+
 
 @dataclass
 class RegionOut:

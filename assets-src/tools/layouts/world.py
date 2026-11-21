@@ -33,11 +33,14 @@ from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
 from world_api import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
                           REGIONS)
-from worldgen import bundle, compose, gates, gates_reach, metrics, owners, prewalk, spots  # noqa: E402
+from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, metrics, owners,  # noqa: E402
+                      prewalk, spots)
+from world_specs.common import hike  # noqa: E402
 from worldgen import spec as S  # noqa: E402
 
 CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
-          "walks", "detours", "pins", "coverage")
+          "walks", "detours", "pins", "coverage", "canoe_gates", "gorges", "relations", "duergar_south", "hikes",
+          "dock_towns")                 # the last six: NW2 (docs/NW2_EDITS_PLAN.md 8), over declared records only
 
 
 def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
@@ -80,12 +83,17 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "basins": gates.basins(g, meta), "docks": gates.docks(g, meta, DOCKS_ALLOWED),
             "walls": gates.walls(g, meta, doors),
             "barriers": gates_reach.barriers(g, meta, {"barriers": b.barrier_seeds, "links": b.links}, CANOE_BARRIERS,
-                                             doors),
+                                             doors, sp),
             "routes": gates_reach.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
-            "landings": gates_reach.landings(g, meta, b.north, sp, taken), "straits": gates.straits(g, meta),
+            "landings": gates_reach.landings(g, meta, b.north, hike(), sp, taken), "straits": gates.straits(g, meta),
             "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
             "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),
-            "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad}}
+            "detours": gates_reach.detours(g, meta), "pins": {"ok": not pins_bad, "bad": pins_bad},
+            "canoe_gates": gates_canoe.canoe_gates(g, meta, b.gorges, sp),
+            "gorges": gates_canoe.gorges(g, meta, b.gorges, sp, doc), "relations": gates_canoe.relations(meta, b.relations),
+            "duergar_south": gates_canoe.duergar_south(g, meta, b.apart),
+            "hikes": gates_hike.hikes(g, meta, b.hikes, hike(), sp, doc, taken),
+            "dock_towns": prewalk.dock_towns(g, meta, ent_map)}
 
 
 def figures(g, meta, ch) -> dict:
@@ -149,6 +157,8 @@ def _ok_note(k: str, v: dict) -> str:
         return " (walk, canoe; cuts " + ", ".join(f"{b} {len(c)}" for b, c in v["cuts"].items()) + ")"
     if k == "prewalk":
         return f" ({prewalk.STAGES[0]}-{prewalk.STAGES[-1]})"
+    if "note" in v:                          # NW2's checks and `landings`: their own figures
+        return f" ({v['note']})"
     if k == "coverage":
         return f" ({', '.join(v['regions']) or 'no region'}; zones pending: {', '.join(v['pending']) or 'none'})"
     return ""

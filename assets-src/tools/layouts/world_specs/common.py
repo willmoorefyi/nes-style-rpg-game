@@ -22,6 +22,20 @@ def anchors() -> dict:
     return {a["entrance"]: a for a in yaml.safe_load(ANCHORS.read_text())["anchors"]}
 
 
+HIKE_MODES = ("walking", "canoe")
+
+
+@lru_cache(maxsize=1)
+def hike() -> dict:
+    """The hike bounds of `world-anchors.yaml` (D-NW2-12): {"floor": K, "cap": U, "sites": {entrance: mode}}; the one
+    source the verifier reads too. A missing or malformed block is an error, never a code default."""
+    h = yaml.safe_load(ANCHORS.read_text()).get("hike")
+    if not isinstance(h, dict) or not all(isinstance(h.get(k), int) for k in ("floor", "cap")) \
+            or not isinstance(h.get("sites"), dict) or any(m not in HIKE_MODES for m in h["sites"].values()):
+        raise SystemExit(f"world-anchors.yaml: no valid hike block (floor, cap, sites in {HIKE_MODES}): {h!r}")
+    return {"floor": h["floor"], "cap": h["cap"], "sites": dict(h["sites"])}
+
+
 def site(entrance: str, nudge: tuple[int, int] = (0, 0)) -> tuple[int, int]:
     """An anchored site's world cell: its target plus a nudge (inside the anchors' tolerance)."""
     tx, ty = anchors()[entrance]["target"]
