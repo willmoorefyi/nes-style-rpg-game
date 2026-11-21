@@ -1177,7 +1177,9 @@ uses an entrance name.
 - [x] The verifier's state cap: `MAX_STATES` 3,000,000 with a compact state key (NW-5; result in 16) (2026-11-20)
 - [x] M7-5, M7-6, M7-INT merged before NW-5 (2026-11-20)
 - [x] NW-5 cutover and balance, the save reset and `--from-reset` (2026-11-20; result in 16)
-- [ ] NW-INT and the user's play session (priority: high, effort: 5h)
+- [x] NW-INT: browser checkpoints, the final overview and metrics, PROGRESS and STATUS item 3 (2026-11-20; result in
+  17)
+- [ ] The user's review of the final overview and a play session (G-NW9) (priority: high, effort: 1h)
 ```
 
 ## 11. NW-1 result (contract and spots)
@@ -1742,3 +1744,74 @@ reported)`, every proof OK, `quest-verify: OK`; 8,059 s (2 h 14 min), max RSS 7.
 notice was open (the field skipped its camera and map render under any dialog): `ExplorationScene` now renders under a
 dialog too (scene tests pass; to be seen again in the browser); the world's land, 26,847 cells,
 3.3 % above its band's floor; `D_SPLIT` tuning if the 12 px far atlas shows a blur line (6.1).
+
+## 17. NW-INT result (browser checkpoints, the final overview)
+
+Branch `nw-int` from `mainline` b43f5e45 (NW-5 merged, M7-3 included). Docs only: no code, data or map changed, so
+`--mutate` and `test:full` were not re-run (NW-5's results in 16 stand). `world.py --metrics` re-run: every check
+line OK and `git status` clean afterwards.
+
+**Browser checkpoints** (headed Chromium, dev server on 127.0.0.1, every URL with `mute=1`, encounters off through
+`game.boosts`; screenshots in `~/temp/ff-game/nw_int/`). No console error or warning in any checkpoint.
+
+| Checkpoint | Result | Screenshots |
+|---|---|---|
+| act 1's opening walk | `act1_overworld`: Cornelia (146, 155) to the bridge foot (147, 141) in 21 steps (as NW-5 measured); north into the gap: "The bridge has collapsed into the sea." | `01a`-`01d` |
+| the bridge built | the workers appear with INTRO_COMPLETE; the foreman with the lute plays `a1_bridge_finished`, BRIDGE_BUILT, the `north_bridge` patch lays the deck; walked north over it to (147, 134) | `01e`-`01h` |
+| the ship round the Aldi | `w_s4_start`: boarded at the `a1_pravoka` dock (186, 146), sailed to `elf_port` (134, 188) in 94 steps and on to `ert_dwarf` (104, 152) in 66, every key path exact | `02a`-`02g` |
+| the canal | `w_s10_start`: with the canal shut the ship stops at (101, 141), refused at the patch; with CANAL_OPEN the patch draws (stone banks), the ship passes its 8 cells and docks at `ert_melmond` (86, 158), 48 steps in all | `03a`-`03f` |
+| the canoe to Gurgu | `w_s15_start`: from Crescent's gate (206, 172) to the volcano (177, 203), unreachable on foot; 66 steps mixing walk and canoe (canoe from (209, 174)); one step north enters `gurgu-b1` | `04a`-`04e` |
+| airship at Onrac | `w_s20_start`: board at `wat_s_onrac_airship` (65, 69), take-off into Mode 7, fly north 29 cells; the marker shows over tundra (65, 40) and the airship lands there; on snow (65, 37) no marker and "The airship can't land here." | `05a`-`05f` |
+| Mode 7 over the north | flying (3072 atlas, 12 px, near 48 px, split row 530 of 1080, 36 chunks resident); see the blur check below | `06a`-`06k` |
+| a v3 save reset by hand | a v3 record written into `ff1_save_0` (pass W cell (31, 40), airship mode, the ship at (34, 35), 19 flags with BIKKE_DEFEATED and AIRSHIP_RAISED, 12,000 G); Continue, slot 1: loads at Cornelia (146, 155) on foot, the ship at the `a1_pravoka` dock (186, 146), the airship at `a1_s_airship` (147, 155), flags and gold kept. **NW-5's fix (49b736e7) verified: the world map draws under "The world has changed. You stand before Cornelia."** | `07a`-`07c` |
+
+**The blur line (R10, 6.1).** At 1920x1080 over the northern ranges (64, 45) the per-row sharpness (mean |dx| of
+luminance over mountain-only columns) steps from about 8 above the split to about 22 below it, spread over the
+8 seam rows (526-536), not on one row. At 1:1 (`06k_mode7_split_1to1.png`) and x2 (`06j`) it reads as the far ground
+growing softer with distance, with no line. Not clearly visible, so **`D_SPLIT` stays 25** (no before/after pair).
+
+**The final overview:** `~/temp/ff-game/nw_int/00_final_side_by_side.png` (the classic reference, pass W's
+`worldplan/now.png`, the compiled NW world); the labelled world alone at 6 px per cell is
+`00_final_world_overview.png` (the base chunks with their above layers, the patches off).
+
+**Final metrics** (`world.py --metrics`, the committed source; pass W in brackets, 1.2):
+
+| Metric | NW | Gate |
+|---|---|---|
+| coast index (G-NW2) | 34.1 (19.7; classic about 36) | >= 30 |
+| coast edges / land cells | 5,584 / 26,847 (land 21,089) | land in [26,000, 31,800] |
+| straight coast runs (G-NW1) | 0 over 6 outside the exemptions; longest 6 non-exempt, 7 with them; 0 of 8 or more (40, longest 50) | none over 6 |
+| chunk-line runs (G-NW3) | longest 6, none failing | none over 6 |
+| exempt cells | 427 | cap 600 |
+| jogs / tarns / ford cuts | 41 / 5 / 0 | |
+| coast index by region | a1 13.7, elf 10.5, earth 13.2, fire 11.1, ordeal 20.1, water 12.7, wind 12.7 | reported |
+
+Biome shares of land: grass 41.9, forest 17.4, mountain 15.5 (pass W 28), snow 8.5, sand 6.6, tundra 4.8, river 2.1,
+lake 1.9, swamp 0.5 %.
+
+Anchors (proof (g): OK, fitted s* 0.851, 31 pairs; `npm run quest -- --strict --only g`). Cell against its
+`CORNELIA_NW + 0.86 x ref` target; act 1's four are pins (distance exempt, 4.2):
+
+| Anchor | Cell | Target | Off | Anchor | Cell | Target | Off |
+|---|---|---|---|---|---|---|---|
+| cornelia | (146, 155) | (146, 155) | 0, 0 | crescent | (206, 172) | (204, 172) | +2, 0 |
+| temple (pin) | (133, 147) | (129, 124) | +4, +23 | volcano | (177, 203) | (177, 203) | 0, 0 |
+| matoya (pin) | (128, 120) | (112, 124) | +16, -4 | ice | (184, 193) | (184, 193) | 0, 0 |
+| pravoka (pin) | (185, 145) | (194, 145) | -9, 0 | desert | (194, 207) | (194, 207) | 0, 0 |
+| dwarf | (98, 152) | (98, 152) | 0, 0 | citadel | (125, 55) | (125, 55) | 0, 0 |
+| keep | (105, 176) | (105, 176) | 0, 0 | bahamut | (163, 86) | (163, 86) | 0, 0 |
+| elfheim | (132, 196) | (132, 196) | 0, 0 | onrac | (67, 69) | (67, 69) | 0, 0 |
+| marsh | (98, 220) | (98, 220) | 0, 0 | waterfall | (70, 35) | (70, 35) | 0, 0 |
+| melmond | (82, 158) | (84, 158) | -2, 0 | caravan | (45, 57) | (43, 55) | +2, +2 |
+| earth_cave | (70, 176) | (70, 176) | 0, 0 | gaia | (210, 41) | (208, 41) | +2, 0 |
+| giant | (68, 158) | (67, 158) | +1, 0 | mirage | (182, 68) | (180, 66) | +2, +2 |
+| sarda | (57, 155) | (57, 155) | 0, 0 | lufenia | (218, 76) | (218, 76) | 0, 0 |
+
+**Docs:** `docs/PROGRESS.md` has the pass NW entry; `docs/STATUS_2026-11-18.md` item 3 (organic coastlines) is closed
+with a pointer here.
+
+**Bugs found:** none. Notes for the review, not defects: the canal patch draws as a straight stone-banked cut across
+the isthmus (by design, the FX-R `art_ground`); the land is 3.3 % above its band's floor (16).
+
+**Left:** G-NW9, the user's review of the overview and a play session; Q3, Q7, Q8, Q9 keep their defaults until
+answered.

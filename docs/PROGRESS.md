@@ -215,6 +215,23 @@ Optional `background` image field in `BattleSceneConfig`. Loaded via PixiJS `Ass
 - **R** (second playtest): R0–R6 on `r-integration` — battle, engine, menus, map and data fixes, 1 paid image (26 of 100). 49 planned browser checks pass. See "R result" in `docs/FIX_PLAN_PENINSULA.md`.
 - **U** (third playtest, U1–U22): input hold-offs, Game Over Return to Field, Garland 340 HP / attack 9 against the 400 G kit, turn-list targets, equip-now, and map and opening fixes; no paid art. 23 browser checks pass, 6 partial (U19, M7, W14 open). See "U result".
 
+### Pass NW: the natural world ✅
+The boxy 192x192 pass-W world (rectangular region boxes, straight sea lanes, mountain slabs) is replaced by one
+generated 256x256 world (`docs/NATURAL_WORLD_PLAN.md`, tranches NW-0 to NW-INT, results in its sections 11-17).
+- **Generator** (`assets-src/tools/worldgen/`, preset B, seed 1987): shape, relief, hydrology, climate, stamps, roads
+  and finish over the whole map; regions own content, not ground (`world_specs/<region>.py`); act 1 regenerated round
+  its pins (`a1/world_a1_pins.py`, Cornelia-relative). `world.py` is the only composer and prints every check.
+- **Measured** (pass W in brackets): coast index 34.1 (19.7), straight coast runs of 8+ edges 0 (40, longest 50),
+  land 26,847 cells (21,089), mountains 15.5 % of land (28 %); snow 8.5 % and tundra 4.8 % in the far north (new
+  terrains: walkable, the airship lands on tundra only).
+- **Game:** spots name every world place (`spots:`, `at: <spot>`); save v4, an older save on the world map or owning a
+  ship or airship resets to Cornelia with a one-time notice; the Mode 7 atlas is 3072² at 12 px per cell; per-zone
+  step means keep each stage's level within 0.2 of pass W's; the verifier's state cap is 3,000,000.
+- **Gates:** `npm run quest -- --strict --mutate` OK (64 gate rows, 105 elements, 2 h 14 min); `--from-reset` OK;
+  both determinism checks; the full test suite. NW-INT's browser checkpoints (the opening walk and the bridge, the
+  ship round the Aldi, the canal, the canoe to Gurgu, an airship landing on tundra and a refusal on snow, a Mode 7
+  flight over the north, a v3 save reset) all pass with no console error; screenshots in `~/temp/ff-game/nw_int/`.
+
 ---
 
 ## Current Metrics
