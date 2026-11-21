@@ -61,7 +61,7 @@ def main() -> int:
     case("the composed world passes every check", not bad, f"{len(ch)} checks" if not bad else f"failing: {bad}")
     ends = {tuple(E["ert_melmond"]), tuple(E["ert_sarda"])}
     h = _line(g, E["ert_melmond"], E["ert_sarda"], "r", ends)
-    r = gates_reach.barriers(h, meta, seeds, CANOE_BARRIERS)
+    r = gates_reach.barriers(h, meta, seeds, CANOE_BARRIERS, spots=doc["spots"])
     case("GT-38: a river across western_range fails barriers", not r["ok"] and r["western_range_canoe"],
          f"western_range_canoe {r['western_range_canoe']}; {r['why'][:1]}")
     h = _line(g, E["wat_onrac"], E["ert_melmond"], "r", {tuple(E["wat_onrac"]), tuple(E["ert_melmond"])})
@@ -78,6 +78,13 @@ def main() -> int:
     r = gates.routes(_line(g, wf[-1], ice[0], "r"), meta)
     case("a river joining R-waterfall (water) to R-ice (fire) fails routes",
          not r["ok"] and any("one River / Lake system" in w for w in r["why"]), f"{r['why'][-1:]}")
+    h = g.copy()                             # NW2: a generated river through the Rime Hollow's wall
+    ring = [c for c in gates.mask_cells(meta["barriers"]["ice_ring"]) if c not in set(ice)]
+    for x, y in ring[:3]:
+        h[y, x] = "r"
+    r = gates_reach.routes(h, meta, ("crescent_ring", "ice_ring"))
+    case("an unpinned river in ice_ring fails routes (foot-only rings)",
+         not r["ok"] and any("ring ice_ring" in w for w in r["why"]), f"{r['why'][-1:]}")
     h = g.copy()                             # the waterfall's ledge given a grass path to the snowfield
     x, y = E["wat_waterfall"]
     h[y, x - 1] = h[y, x - 2] = h[y, x - 3] = "."
@@ -106,7 +113,7 @@ def main() -> int:
     bx = max(x for x, _ in meta["bridge"]) + 2
     for y in range(min(y for _, y in meta["bridge"]) - 3, max(y for _, y in meta["bridge"]) + 4):
         h[y, bx] = "."
-    r = gates_reach.barriers(h, meta, seeds, CANOE_BARRIERS)
+    r = gates_reach.barriers(h, meta, seeds, CANOE_BARRIERS, spots=doc["spots"])
     case("a causeway beside the north bridge fails barriers (spine)", not r["ok"] and r["spine_foot_bridge_off"],
          f"{r['why'][:1]}")
     m2 = copy.deepcopy(meta)
@@ -174,17 +181,27 @@ def nw2_cases(g, meta, b, doc, ent_map, case) -> None:
     case("canoe_gates: Gurgu (S15) passes; a site on foot (Melmond, S11) fails, and so does Gurgu with a dock "
          "withheld that does not cut it (elf_port)", ok and not r2["ok"] and r2["ert_melmond"]["foot"]
          and not r3["ok"] and r3["fir_volcano"]["without_elf_port"], f"{r['note']}; {r2['why'][:1]}")
-    r = gates_canoe.gorges(g, meta, [gurgu], sp, doc)
+    r0 = gates_canoe.gorges(g, meta, b.gorges, sp, doc)
+    h = g.copy()                             # NW2-F: the Cinder Gorge's rock banks opened to grass
+    for x, y in meta["routes"]["R-volcano"]:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if h[y + dy, x + dx] == "m":
+                h[y + dy, x + dx] = "."
+    r = gates_canoe.gorges(h, meta, [gurgu], sp, doc)
     v = r.get("fir_volcano", {})
-    case(f"gorges: today's Gurgu way ({v.get('canoe')} canoe steps, {v.get('pass')} pass cells, E {v.get('E')}) "
-         "fails M / N / E", not r["ok"] and 0 < v.get("canoe", 0) < 26, f"{r['why'][:1]}")
+    case(f"gorges: the built gorges pass ({r0['note']}); the Cinder Gorge with grass banks ({v.get('canoe')} canoe "
+         f"steps, {v.get('pass')} pass cells, E {v.get('E')}) fails M / N / E",
+         r0["ok"] and not r["ok"] and v.get("canoe", 0) < 26, f"{r['why'][:1]}")
+    m2 = copy.deepcopy(meta)                 # the Ice Cavern back south of Crescent, the dwarves south of the canal
+    m2["entrances"]["fir_ice"], m2["entrances"]["ert_dwarf"] = [184, 193], [98, 152]
     rels = [bundle.Relation("fir_ice", "fir_crescent", "north_of", 40),
             bundle.Relation("ert_dwarf", "canal", "north_of", 10),
             bundle.Relation("fir_crescent", "fir_volcano", "bearing", 50, 0)]
-    r = gates_canoe.relations(meta, rels)
+    r = gates_canoe.relations(m2, rels)
     ok = gates_canoe.relations(meta, [bundle.Relation("fir_volcano", "fir_crescent", "min_dist", 10)])["ok"]
-    case("relations: today's Ice Cavern south of Crescent and dwarves south of the canal fail; true ones pass",
-         not r["ok"] and len(r["why"]) == 2 and ok, f"{r['note']}")
+    built = gates_canoe.relations(meta, [x for x in b.relations if x.a == "fir_ice"])
+    case("relations: an Ice Cavern south of Crescent and dwarves south of the canal fail; true ones (the built "
+         "Ice Cavern's) pass", not r["ok"] and len(r["why"]) == 2 and ok and built["ok"], f"{r['note']}")
     r = gates_canoe.duergar_south(g, meta, [bundle.Apart("duergar_south", "ert_dwarf", "elf_keep")])
     case("duergar_south: today's dwarves join the Western Keep with the canal off",
          not r["ok"] and r["duergar_south"]["foot"], f"{r['why'][:1]}")

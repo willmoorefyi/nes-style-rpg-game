@@ -7,19 +7,20 @@ cells:
 
 - the sites' icons with their doors as `walk_cells`: Crescent Lake's approved `town_crescent` (3x3, the door in its
   left column), Gurgu's `volcano` (3x2, door bottom centre, with the crater's smoke), the Ice Cavern's snow
-  `cave_mouth` (2x2, its top row a rock ledge, the hollow's pines below), the `buried_hull` (3x2) on its dune with the
-  hatch below it (`fir_hull_hatch`, S17: the levistone raises the airship);
+  `cave_mouth` (2x2, its top row a rock ledge on the Rime Hollow's north wall; NW2: the hollow's floor snow with
+  taiga pines), the `buried_hull` (3x2) on its dune with the hatch below it (`fir_hull_hatch`, S17: the levistone
+  raises the airship);
 - the dressing: the Circle's `standing_stones` on a promontory that bends Crescent Lake into its crescent, the
   hollow's `ice_floe` and four boulders in the ash; the smouldering vents round the volcano (`fir_ash_vents`), never
   on a corridor or by the mouth;
 - the zones (same ids and rosters as today, `fire_tables.py`) over every FIRE-owned walkable, canoe and sea cell:
-  Crescent's shore (the land walkable from its gate), the south lands split between the ash (nearest Gurgu), the
-  frost hollow (within 8 cells of the Ice Cavern) and the hull desert, the rivers and lakes, the Aldi and the
-  outer seas by basin; and their battle backdrops.
+  Crescent's shore (the land walkable from its gate), the cold tip beyond ice_neck (the frost zone; NW2), the south
+  lands split between the ash (nearest Gurgu) and the hull desert, the rivers and lakes, the Aldi and the outer
+  seas by basin; and their battle backdrops.
 
 Stamps (3.3's `rock` and `icon` kinds, on FIRE-owned cells only, after the generator): the neck's rock (`neck`), the
 ledge above the cave mouth and the hollow's pines, the volcano's top row on the cone, the hull's dune, the town's
-footprint, the promontory. The composer's `coverage` line (`world_content.coverage`, NW-RINT) proves 3.8's rule
+footprint, the promontory, the Rime Hollow's floor. The composer's `coverage` line (`world_content.coverage`, NW-RINT) proves 3.8's rule
 for FIRE: every walkable or canoe cell it owns in one zone of its kind, every sea cell in exactly one ship zone.
 """
 from __future__ import annotations
@@ -30,7 +31,7 @@ import kit as K
 from world_api import REGIONS
 from worldgen import spec as S
 from worldgen.gates import BLOCK
-from worldgen.geom import disc
+from worldgen.geom import disc, flood
 
 from fire import fire_tables as T
 from fire.world_fire_nw_zones import REGION, row_rects, zone_cells
@@ -39,9 +40,9 @@ TARGETS = {"fir_crescent": "crescent", "fir_volcano": "gurgu-b1", "fir_ice": "ic
 LAKE = ((67, 22), 5.0)                   # Crescent Lake (world_specs/fire.py), Cornelia-relative centre and radius
 PROMONTORY = ((70.5, 22), 3.2)           # the ring's spur into the lake that makes it a crescent opening west
 NECK_BOX, NECK_R = (10, 29, 26, 52), 2   # the neck's box (Cornelia-relative x0, y0, x1, y1); its rock's reach
-HOLLOW = (0, 2, 3.4)                     # the hollow's pines: (dx, dy) from 3 cells west of the cave's entrance, radius
+HOLLOW_MAX = 90                          # NW2: the Rime Hollow's floor is at most this many cells
 VENT_BOXES = ((3, -8, 7, -6), (5, -4, 10, -2), (-6, -9, -2, -7))   # (dx0, dy0, dx1, dy1) from Gurgu's entrance
-FLOE_TRY = ((-4, 2), (-5, 1), (-4, 4), (2, 3), (-6, 3))             # the floe's top-left from the Ice Cavern's
+FLOE_TRY = ((-2, 2), (-4, 2), (-5, 1), (-4, 4), (2, 3), (-6, 3))     # the floe's top-left from the Ice Cavern's
 BOULDER_TRY = ((5, -3), (8, 1), (-5, 4), (4, 6), (9, -5), (-4, -3), (7, 5))   # from Gurgu's entrance
 
 
@@ -87,16 +88,28 @@ def _stamp_icons(g, meta, e, doors) -> dict:
     for x, y in _box(ix - 1, iy - 1, 3, 1):   # the ledge: the cave mouth cut into rock above the hollow
         g[y, x] = "m"
     g[iy, ix + 1] = "m"                  # ... and beside the door, so the door keeps one way in (warp_leaves)
-    hollow = disc(ix - 3 + HOLLOW[0], iy + HOLLOW[1], HOLLOW[2]) & np.isin(g, [".", "s"])
-    for y, x in np.argwhere(hollow):     # the frost hollow's pines below the ledge (today's hollow: grass and forest)
-        if (int(x), int(y)) not in (e["fir_ice"], doors["fir_ice"]) and (x * 7 + y * 13) % 6:
-            g[y, x] = "f"
+    _hollow(g, e["fir_ice"], doors["fir_ice"])
     hx, hy = e["fir_desert"]
     hull = (hx - 1, hy - 3)              # the hatch is the cell above the entrance, below the hull's middle
     for x, y in _box(*hull, 3, 2):
         g[y, x] = "s"
     g[hy - 1, hx] = "s"
     return {"town": town, "volcano": volcano, "cave": cave, "hull": hull}
+
+
+def _hollow(g, at: tuple[int, int], door: tuple[int, int]) -> int:
+    """NW2: the Rime Hollow's floor (the walkable cells inside ice_ring, from the cave's entrance) is snow, with
+    taiga pines in a sparse pattern; the entrance and the door stay as stamped. A floor over HOLLOW_MAX cells means
+    the ring leaked: nothing is painted (the `barriers` line reports the leak). Returns the cells painted."""
+    floor = flood(~np.isin(g, BLOCK), [at])
+    if floor.sum() > HOLLOW_MAX:
+        return 0
+    n = 0
+    for y, x in np.argwhere(floor):
+        if (int(x), int(y)) not in (at, door):
+            g[y, x] = "t" if (x * 7 + y * 13) % 5 == 0 else "n"
+            n += 1
+    return n
 
 
 def _promontory(g, meta) -> tuple[int, int]:

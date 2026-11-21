@@ -15,16 +15,21 @@ const today = loadLateData(process.cwd(), { anchors: 'tests/fixtures/passW/world
 const A1 = new Set(['cornelia', 'temple', 'matoya', 'pravoka']);
 const CORNELIA_NW: XY = [146, 155];
 const S_STAR = 0.86;
+/** NW2 rulings (docs/NW2_EDITS_PLAN.md 9, D-NW2-5): the anchors that moved, and the detour hops whose mode changed. */
+const NW2_REFS: Record<string, XY> = { ice: [79, -55] };
+const NW2_MODES: Record<string, string> = { 'crescent|ice': 'ship+canoe+walking', 'ice|desert': 'ship+canoe+walking' };
 const cellsOf = (geo: GeoData, move: (name: string, t: XY) => XY = (_n, t) => t): Map<string, XY> =>
   new Map(geo.anchors.map((a) => [a.name, move(a.name, a.target)]));
 
 describe('NW anchors (4.2)', () => {
-  it('keeps pass W\'s anchors, refs, pairs, exemptions and detours; moves the scale bands', () => {
-    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref])).toEqual(today.anchors.map((a) => [a.name, a.entrance, a.ref]));
+  it('keeps pass W\'s anchors, refs (but NW2\'s moves), pairs, exemptions and detours (but NW2\'s modes); moves the scale bands', () => {
+    expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref]))
+      .toEqual(today.anchors.map((a) => [a.name, a.entrance, NW2_REFS[a.name] ?? a.ref]));
     expect(nw.pairs).toEqual(today.pairs);
     expect(nw.pairs).toHaveLength(31);
     expect(nw.distanceExempt).toEqual([['cornelia', 'temple']]);
-    expect(nw.detours).toEqual(today.detours);
+    expect(nw.detours.map((d) => [d.pair, d.mode, d.factor]))
+      .toEqual(today.detours.map((d) => [d.pair, NW2_MODES[d.pair.join('|')] ?? d.mode, d.factor]));
     expect([nw.tolerance, nw.scale, nw.longPair]).toEqual([2, [0.75, 0.95], 23]);
     expect([nw.ratio, nw.bearing]).toEqual([today.ratio, today.bearing]);
   });

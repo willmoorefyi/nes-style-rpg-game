@@ -12,7 +12,7 @@ import time
 
 import numpy as np
 
-from . import climate, finish, hydro, owners, relief, roads, shape, stamps
+from . import climate, finish, gorges, hydro, owners, relief, roads, shape, stamps
 from . import spec as S
 from .bundle import RegionSpec
 from .geom import disc, raster_line, ring1
@@ -56,9 +56,11 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
     for cells in routes.values():
         for x, y in cells:
             rmask[y, x] = True
-    elev = relief.carve(elev, land, sh, rmask, relief.corridor_mask(corr), b.sites)
+    bank = gorges.banks(b, routes, (N, N))   # NW2: the gorges' rock banks (raised here, stamped after the routes)
+    high = gorges.banks(b, routes, (N, N), gorges.RAISE_R)
+    elev = relief.carve(elev, land, sh, rmask, relief.corridor_mask(corr), b.sites, high)
     moist, cold, wet = climate.climate(b, land, elev, sh["field"], seed)
-    banned = relief.walls_all(sh) | sh["keep"] | pinned
+    banned = relief.walls_all(sh) | sh["keep"] | pinned | gorges.banks(b, routes, (N, N), gorges.DRY_R)
     river, lake, _acc = hydro.rivers(land, elev, moist, seed, banned)
     g = climate.biomes(land, elev, moist, cold, wet, river, lake, seed)
     g[lake0] = "≈"
@@ -72,6 +74,7 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
     for x, y in t.icons:
         exempt[y, x] = True
     stamps.lakes_routes(g, b, routes)
+    gorges.stamp(g, bank, b)
     stamps.ledges(g, b, routes, doors)
     canal = stamps.canal_cells(b)
     for x, y in canal:
@@ -87,7 +90,7 @@ def compose(b: RegionSpec, preset: S.Preset = S.PRESET, seed: int = S.SEED, door
         exempt[y, x] = True
     roads_ok = roads.lay(g, [[tuple(int(v) for v in p) for p in resolve(r.ends, b.sites)] for r in b.roads])
     exempt = ring1(exempt)
-    frozen = sh["keep"] | exempt | rmask | sh["inner"]
+    frozen = sh["keep"] | exempt | rmask | sh["inner"] | high
     for x, y in b.sites.values():
         frozen |= disc(x, y, FROZEN_R)
     gap = list(t.bridge[:4])

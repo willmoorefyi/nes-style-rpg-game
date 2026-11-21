@@ -458,12 +458,13 @@ stages:
     maps: [ice-cavern-*]
     zones: [overworld:fir_tundra]
     grind: 2.0
-    # S16 needs the canoe (only a boat reaches the Frost Hollow, by R-ice), so the proofs start on foot at Crescent
-    # Lake's gate with the ship at the `fir_crescent` dock; then down R-ice, B1's stair, the shelf (Hesk's cutscene
-    # sets FIR_D2_SHELF), the stair behind it, and the eye's vault (its fight; `fir_evil_eye_falls` gives the stone)
+    # S16 needs the canoe (only a boat reaches the Rime Hollow, by R-ice), so the proofs start on foot at Crescent
+    # Lake's gate with the ship at the `fir_crescent` dock; NW2: aboard the ship round the peninsula's tip to the
+    # `fir_ice` dock (the Frost Shore beyond ice_neck), up R-ice's gorge to the hollow, then B1's stair, the shelf
+    # (Hesk's cutscene sets FIR_D2_SHELF), the stair behind it, and the eye's vault (`fir_evil_eye_falls` gives the stone)
     entry: {map: overworld, at: fir_s_crescent, mode: walking, vehicles: [{type: ship, map: overworld, at: fir_s_crescent_ship}]}
-    walk: [overworld:warp:ice-cavern-b1, ice-cavern-b1:warp:ice-cavern-b2, ice-cavern-b2:cutscene:fir_d2_hesk,
-      ice-cavern-b2:warp:ice-cavern-b3, ice-cavern-b3:battle:EVIL_EYE_DEFEATED]
+    walk: [overworld:board:ship, overworld:dock:fir_ice, overworld:warp:ice-cavern-b1, ice-cavern-b1:warp:ice-cavern-b2,
+      ice-cavern-b2:cutscene:fir_d2_hesk, ice-cavern-b2:warp:ice-cavern-b3, ice-cavern-b3:battle:EVIL_EYE_DEFEATED]
     basins: {}
     nonLoadBearing:
       # the shelf is the floor's own puzzle: Hesk opens it to anyone who talks to him, so forcing it open skips nothing

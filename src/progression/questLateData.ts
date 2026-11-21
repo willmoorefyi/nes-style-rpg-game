@@ -21,7 +21,7 @@ export const PRICE_PARTY: readonly string[] = ['warrior', 'thief', 'white_mage',
 
 /** WORLD 2.6: the docks the world may have, with their basins. */
 export const DOCKS_ALLOWED: Readonly<Record<string, string>> = {
-  a1_pravoka: 'aldi', elf_port: 'aldi', ert_dwarf: 'aldi', ert_melmond: 'ocean', fir_crescent: 'ocean',
+  a1_pravoka: 'aldi', elf_port: 'aldi', ert_dwarf: 'aldi', ert_melmond: 'ocean', fir_crescent: 'ocean', fir_ice: 'ocean',
 };
 
 export interface GeoAnchor {

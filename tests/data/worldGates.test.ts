@@ -65,9 +65,9 @@ describe('the NW world gates (NW-4)', () => {
     expect(seen.size).toBe((N / C) * (N / C));
   });
 
-  it('the cuts: 5 walls, the spine, western_range and crescent_ring', () => {
+  it('the cuts: 5 walls, the spine, western_range, crescent_ring and (NW2) ice_neck and ice_ring', () => {
     expect(Object.keys(src.world.cuts).sort()).toEqual(
-      ['W_arm', 'W_east', 'W_isthmus', 'W_south', 'W_west', 'crescent_ring', 'spine', 'western_range']);
+      ['W_arm', 'W_east', 'W_isthmus', 'W_south', 'W_west', 'crescent_ring', 'ice_neck', 'ice_ring', 'spine', 'western_range']);
     for (const cells of Object.values(src.world.cuts)) expect(cells.length).toBeGreaterThan(0);
   });
 

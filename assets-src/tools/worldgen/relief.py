@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from . import gorges
 from . import spec as S
 from .bundle import RegionSpec
 from .geom import disc, edt_signed, pline
@@ -46,8 +47,10 @@ def walls_all(sh: dict) -> np.ndarray:
     return sh["walls"] | np.logical_or.reduce(list(sh["barriers"].values()))
 
 
-def carve(elev: np.ndarray, land: np.ndarray, sh: dict, rmask: np.ndarray, cmask: np.ndarray, sites: dict):
-    """The pinned canoe valleys (2.4 rule 4), the corridors under mountain height (4b), the sites flattened (7)."""
+def carve(elev: np.ndarray, land: np.ndarray, sh: dict, rmask: np.ndarray, cmask: np.ndarray, sites: dict,
+          bank: np.ndarray | None = None):
+    """The pinned canoe valleys (2.4 rule 4), the corridors under mountain height (4b), the sites flattened (7);
+    NW2: then a gorge's banks (`gorges.banks`) raised again above the valley, so the gorge stays walled."""
     valley = edt_signed(rmask)
     nobar = ~walls_all(sh) | rmask
     elev = np.where(land & (valley > -ROUTE_REACH) & nobar,
@@ -55,7 +58,7 @@ def carve(elev: np.ndarray, land: np.ndarray, sh: dict, rmask: np.ndarray, cmask
     elev = np.where(cmask & land & ~walls_all(sh), np.minimum(elev, CORRIDOR_MAX), elev)
     for x, y in sites.values():
         elev = np.where(disc(x, y, SITE_R) & land, np.minimum(elev, SITE_MAX), elev)
-    return elev
+    return elev if bank is None else gorges.raise_banks(elev, land, bank)
 
 
 def corridor_mask(corr: dict) -> np.ndarray:

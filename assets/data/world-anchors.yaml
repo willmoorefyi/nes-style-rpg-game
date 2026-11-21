@@ -53,7 +53,7 @@ anchors:
   - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: NW-R,
      ref: [36, 56], target: [177, 203]}
   - {name: ice, entrance: fir_ice, place: "Ice Cavern mouth", region: fire, owner: NW-R,
-     ref: [44, 44], target: [184, 193]}
+     ref: [79, -55], target: [214, 108], note: "NW2 ruling D-NW2-5: moved to the peninsula's north tip (the Rime Hollow); was ref [44, 44]"}
   - {name: desert, entrance: fir_desert, place: "Buried hull, airship desert", region: fire, owner: NW-R,
      ref: [56, 60], target: [194, 207]}
   - {name: citadel, entrance: ord_citadel, place: "Citadel of Trials gate", region: ordeal, owner: NW-R,
@@ -122,6 +122,6 @@ detours:
   - {pair: [melmond, sarda], mode: walking, factor: 3.0, via: "through the tunnel"}
   - {pair: [melmond, crescent], mode: ship+walking, factor: 2.5}
   - {pair: [crescent, volcano], mode: canoe+walking, factor: 2.5}
-  - {pair: [crescent, ice], mode: canoe+walking, factor: 2.5}
-  - {pair: [ice, desert], mode: walking, factor: 2.5}
+  - {pair: [crescent, ice], mode: ship+canoe+walking, factor: 2.5, via: "by sea to the fir_ice dock, then up R-ice (NW2)"}
+  - {pair: [ice, desert], mode: ship+canoe+walking, factor: 2.5, via: "down R-ice, by sea round the peninsula, up R-volcano (NW2)"}
   - {pair: [onrac, waterfall], mode: canoe+walking, factor: 2.5}

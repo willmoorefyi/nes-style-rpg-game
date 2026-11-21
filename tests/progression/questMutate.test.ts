@@ -10,6 +10,7 @@ import { createQuestContext } from '../../src/progression/questProofs.js';
 import { runCoreProofs, mutationLine } from '../../src/progression/questReport.js';
 import { runGateRows } from '../../src/progression/questMutate.js';
 import { GATE_ROWS } from '../../src/progression/questMutateRows.js';
+import { canoeCut } from '../../src/progression/questMutateFind.js';
 import { proofEarlyShops } from '../../src/progression/questShops.js';
 import { proofTravel } from '../../src/progression/questTravel.js';
 import { editQuest } from '../../src/progression/questMutateOps.js';
@@ -29,7 +30,9 @@ const CAUGHT: Record<string, string[]> = {
   'GT-15': ['SKIP S12 '], 'GT-17': ['SKIP S13 '], 'GT-19': ['SKIP S14 '], 'GT-20': ['EARLY crescent talkable before S13'],
   'GT-22': ['SKIP S17 '], 'GT-23': ['SKIP S18 '], 'GT-24': ['SKIP S19 '], 'GT-26': ['SKIP S23 '], 'GT-27': ['SKIP S24 '],
   'GT-28': ['SKIP S25 '], 'GT-29': ['SKIP S26 '], 'GT-30': ['EARLY lufenia '], 'GT-31': ['SKIP S27 '], 'GT-32': ['SKIP S27 '],
-  'GT-34': ['MILESTONE S30 '], 'GT-35': ['SKIP S12 '], 'GT-36': ['SKIP S12 '], 'GT-37': ['SKIP S15 ', 'SKIP S16 '],
+  'GT-34': ['MILESTONE S30 '], 'GT-35': ['SKIP S12 '], 'GT-36': ['SKIP S12 '], 'GT-37': ['SKIP S15 '],
+  // NW2-F: the ice pocket (the opened ring walks the Frost Shore into the hollow; no dock, no hollow, no levistone)
+  'GT-40': ['SKIP S16 '], 'GT-41': ['ORDER goal '],
 };
 
 describe('questMutate: the mini world is clean', () => {
@@ -39,7 +42,7 @@ describe('questMutate: the mini world is clean', () => {
 
   it('every gate-table row is present, and every element has a result', () => {
     const ids = [...new Set(GATE_ROWS.map((r) => r.row))];
-    expect(ids).toHaveLength(38);
+    expect(ids).toHaveLength(41);
     expect(ids).toContain('GT-5b');
     for (const id of ids) expect(byRow(id).length, id).toBeGreaterThan(0);
   });
@@ -75,6 +78,8 @@ describe('questMutate: each row is caught by its named proof (WORLD 6.3)', () =>
 
   it('GT-21: each river mouth cut skips the canoe (SKIP S15 or S16); GT-25: the waterfall cut fails T6b', () => {
     expect(byRow('GT-21')).toHaveLength(2);
+    const cuts = [...canoeCut(ctx, 'fir_crescent', 'fir_volcano'), ...canoeCut(ctx, 'dock:fir_ice', 'fir_ice')];
+    expect(cuts.map((e) => e.at)).toEqual([[37, 5], [45, 4]]);
     for (const m of byRow('GT-21')) expect(m.caught).toBe(true);
     expect(byRow('GT-25')[0].caught).toBe(true);
     expect(messages('GT-25').some((m) => m.startsWith('SKIP S21 ') || m === 'TRAVEL T6b reaches wat_waterfall')).toBe(true);
@@ -90,7 +95,15 @@ describe('questMutate: each row is caught by its named proof (WORLD 6.3)', () =>
   });
 });
 
-describe('questMutate: non-load-bearing rows (GT-1, GT-5, GT-6, GT-14, GT-16, the lute of GT-33)', () => {
+describe('questMutate: non-load-bearing rows (GT-1, GT-5, GT-6, GT-14, GT-16, the lute of GT-33, GT-43)', () => {
+  it('GT-43: the row carries its own reason; on the mini world the opened neck (43,5) joins the shore to FL (ORDER S15)', () => {
+    const row = GATE_ROWS.find((r) => r.row === 'GT-43')!;
+    expect(row).toMatchObject({ expect: [], nlb: expect.stringMatching(/fir_ice dock is redundant/) });
+    expect(byRow('GT-43')).toHaveLength(1);
+    expect(byRow('GT-43')[0].caught).toBe(true);
+    expect(messages('GT-43').some((m) => m.startsWith('ORDER S15 '))).toBe(true);
+  });
+
   it('each is caught or carries its stage\'s nonLoadBearing reason', () => {
     for (const id of ['GT-1', 'GT-5', 'GT-6', 'GT-14', 'GT-16']) {
       for (const m of byRow(id)) expect(m.caught || m.nonLoadBearing !== undefined, `${id} ${m.element}`).toBe(true);

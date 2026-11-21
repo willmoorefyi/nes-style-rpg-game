@@ -31,8 +31,8 @@ import world_specs  # noqa: E402
 import world_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
-from world_api import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
-                          REGIONS, TAIGA_MIN)
+from world_api import (BARRIERS, CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET,  # noqa: E402
+                          NORTH_REGIONS, REGIONS, TAIGA_MIN)
 from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, metrics, owners,  # noqa: E402
                       prewalk, spots)
 from world_specs.common import hike  # noqa: E402
@@ -85,7 +85,8 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "walls": gates.walls(g, meta, doors),
             "barriers": gates_reach.barriers(g, meta, {"barriers": b.barrier_seeds, "links": b.links}, CANOE_BARRIERS,
                                              doors, sp),
-            "routes": gates_reach.routes(g, meta), "north": gates_reach.north(g, meta, NORTH_REGIONS),
+            "routes": gates_reach.routes(g, meta, tuple(n for n in BARRIERS if n not in CANOE_BARRIERS)),
+            "north": gates_reach.north(g, meta, NORTH_REGIONS),
             "landings": gates_reach.landings(g, meta, b.north, hike(), sp, taken), "straits": gates.straits(g, meta),
             "prewalk": prewalk.prewalk(g, meta, ent_map, sp),
             "act1": A1C.act1(g, meta, doc["transitions"], SRC.gates()), "walks": A1C.walks(g, meta),

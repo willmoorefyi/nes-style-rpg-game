@@ -68,12 +68,15 @@ class Barrier:
 @dataclass(frozen=True)
 class Dock:
     """A dock (world_api.DOCKS_ALLOWED id) at a Cornelia-relative cell, its basin, the entrance it serves; `cove`:
-    open the water from the dock away from that entrance (8 cells at most) until the basin's forced sea."""
+    open the water from the dock away from that entrance (8 cells at most) until the basin's forced sea. NW2:
+    `toward`, a Cornelia-relative point the dock faces instead of its entrance (the fir_ice dock faces R-ice's
+    mouth, not the cave beyond the gorge)."""
     id: str
     at: Point
     basin: str
     town: str
     cove: bool = True
+    toward: Point | None = None
 
 
 @dataclass(frozen=True)

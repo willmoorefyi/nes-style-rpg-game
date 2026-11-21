@@ -17,7 +17,8 @@ export const MINI_ROWS: TravelRow[] = [
   { id: 'T5', from: 'T3', items: ['canoe'], reach: ['fir_volcano', 'fir_ice', 'fir_desert'], notReach: ['wat_onrac'] },
   { id: 'T6b', start: 'n_arrival', flags: ['AIRSHIP_RAISED'], reach: ['wat_onrac'], notReach: ['wat_waterfall'] },
   { id: 'B1', from: 'T2', reach: [], notReach: [], docks: ['a1_pravoka', 'elf_port', 'ert_dwarf'] },
-  { id: 'B2', from: 'T3', reach: [], notReach: [], docks: ['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent'] },
+  { id: 'B2', from: 'T3', reach: [], notReach: [],
+    docks: ['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent', 'fir_ice'] },
 ];
 
 export const MINI_LATE: LateInput = {
