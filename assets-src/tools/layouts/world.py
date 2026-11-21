@@ -33,8 +33,8 @@ from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
 from world_api import (CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET, NORTH_REGIONS,  # noqa: E402
                           REGIONS, TAIGA_MIN)
-from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, metrics, owners,  # noqa: E402
-                      prewalk, spots)
+from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, hikes, metrics,  # noqa: E402
+                      owners, prewalk, spots)
 from world_specs.common import hike  # noqa: E402
 from worldgen import spec as S  # noqa: E402
 
@@ -56,6 +56,8 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     # NW-R: each region's own content, in REGIONS order (it may stamp its own cells first; world_content)
     rc = RC.merge(g, meta, RC.Ctx(door_off, b, trans, frozenset(blocked | set(docks.values()))))
+    sdefs = {d.name: d for d in b.spots}              # NW2 (7): the hike pass, after the content, before the spots
+    hk = hikes.apply(g, meta, b, hike(), {r.site: spots.target(sdefs[r.landing], b.sites, docks) for r in b.hikes})
     objs, insp = SRC.act1_content(meta["keep"])
     objs, insp = objs + rc["objects"], insp + rc["inspect"]
     people = {(n["x"], n["y"]) for n in rc["npcs"]}
@@ -65,6 +67,8 @@ def build(preset: S.Preset = S.PRESET, seed: int = S.SEED):
     doc["regions"] = {r: {"raster": [list(x) for x in owners.raster(meta["region"], i)], **rc["regions"].get(r, {})}
                       for i, r in enumerate(REGIONS)}
     ch = run_checks(g, meta, b, doc, ent_map, sp, sp_err + rc["errors"], blocked)
+    if hk and ch["hikes"]["ok"]:
+        ch["hikes"]["note"] += "; converted " + ", ".join(f"{s} {v['converted']}" for s, v in hk.items())
     ch["coverage"] = RC.coverage(g, meta, doc.get("encounterZones") or [], rc["zones_of"], rc["fallback"])
     doc["world"]["cuts"] = {**ch["walls"]["cuts"], **ch["barriers"]["cuts"]}
     return g, meta, b, doc, ch
