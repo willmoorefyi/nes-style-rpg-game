@@ -810,3 +810,86 @@ act 1 fixed: **0 fail**; s* at the targets 0.848):
 | cornelia-sarda | 104.0 | 88.5 | 89.0 | 1.01 | [0.7, 1.3] | 0.0 | 40 |
 | cornelia-citadel | 118.5 | 100.8 | 102.2 | 1.01 | [0.7, 1.3] | 0.2 | 40 |
 | pravoka-matoya | 99.0 | 84.2 | 62.2 | 0.74 | [0.7, 1.3] | 9.6 | 40 |
+
+### NW2-BAL result (2026-11-21)
+
+Built on mainline 0b25c430 (E, F, W, N merged and compiled). Measured with the curve model (proof (d)'s witness walk)
+on both worlds: NW at 37cce624 and NW2 at 0b25c430, per stage and per zone. Before: S21 L29.3 over [25, 28] and every
+stage from S17 on 0.4-0.6 above NW's level. The excess per stage, in walk xp: S17 +30.9 k (17.1 `fir_rivers` canoe
+fights on the Cinder Gorge's return, 26 k), S16 +14.1 k (the Rime Gorge, 12.7 k), S18 / S19 +8.9 k / +6.6 k
+(`ord_heath`: twice NW's heath fights), S14 +7.2 k (the voyage now crosses `wat_sea`, 9.8 k), S27-S29 and S31 +3-4 k
+each (the Mirage hike's `wnd_mirage_sands`).
+
+Levers (D-NW2-10, in the plan's order):
+1. **Re-fit** (`layouts/world_balance.py`; clamp [0.67, 2.25]; the new `CAP` dict, asserted by `apply`: `fir_rivers`
+   0.75, `wat_isles` 2.0, `wat_streams` 2.0, `wnd_lufen_moor` 1.9, `wnd_mirage_sands` 2.1):
+   - `wat_sea` 1.0 -> **2.25** (rate 23-50; S14's voyage);
+   - `ord_heath` 0.67 -> **1.4** (14-31; S18 / S19's fights back to NW's: 68.5 / 13.1 against 67.8 / 13.0);
+   - `fir_tundra` 1.0 -> **2.0** (20-44; S17's return over the Frost Shore);
+   - `wnd_mirage_sands` 1.26 -> **2.1**, its cap (21-46): the Mirage hike's E_hike 1.66 -> 1.01.
+   The capped zones are not levers: `fir_rivers` stays 0.75 and the other walking / sea zones of S16 and S17
+   (`fir_sea`, `fir_lakeshore`, `fir_ashlands`) are already at 2.25. With the factors alone S21 stays over (L29.1).
+2. **Grind**, 0.5 steps: **S16 2.0 -> 1.5**, **S17 4.0 -> 3.0** (quest.yaml). These are the two stages whose walks
+   hold the capped gorge fights; lowering S21's own grind does not help (2.0 -> 1.0 leaves it at L29.08: its walk has
+   4.2 fights). Neither S16 1.5 nor S17 3.0 alone brings S21 into its band (L29.02 / L29.00); S17 3.5 with S16 1.5
+   does (L28.96), and 3.0 leaves a margin (L28.90, 0.07 from NW).
+3. The fallback (S25, S27, S28 at grind 1.0) was not needed: each is within 0.08 of NW after 1 and 2.
+4. No enemy, item, formula or band changed.
+
+Levels (curve model, `npm run quest -- --strict`'s (d); the witness order of (a)):
+
+| Stage | Band | grind | NW level | NW2 before | NW2-BAL | vs NW | fights NW / before / NW2-BAL |
+|---|---|---|---|---|---|---|---|
+| S0 garland | [2, 3] | 2 | 2.71 | 2.71 | 2.71 | +0.00 | 18.7 / 18.7 / 18.7 |
+| S1 | [2, 3] | 1 | 2.95 | 2.95 | 2.95 | +0.00 | 0.6 / 0.6 / 0.6 |
+| S3 | [2, 6] | 2 | 3.86 | 3.86 | 3.86 | +0.00 | 0 / 0 / 0 |
+| S2 pirate | [3, 6] | 2.5 | 3.60 | 3.60 | 3.60 | +0.00 | 10 / 10 / 10 |
+| S4 | [5, 9] | 2 | 8.68 | 8.68 | 8.68 | +0.00 | 0 / 0 / 0 |
+| S5 piscodemon | [8, 11] | 2 | 8.60 | 8.60 | 8.60 | +0.00 | 90 / 90 / 90 |
+| S6 astos | [10, 13] | 4 | 10.56 | 10.56 | 10.56 | +0.00 | 68.7 / 68.7 / 68.7 |
+| S7 | [10, 13] | 1 | 10.88 | 10.88 | 10.88 | +0.00 | 15.6 / 15.6 / 15.6 |
+| S8 | [10, 13] | 1 | 10.98 | 10.98 | 10.98 | +0.00 | 11.5 / 11.5 / 11.5 |
+| S9 | [10, 13] | 1 | 10.98 | 10.98 | 10.98 | +0.00 | 0 / 0 / 0 |
+| S10 | [11, 14] | 6 | 11.52 | 11.41 | 11.41 | -0.11 | 24.8 / 51 / 51 |
+| S11 vampire | [13, 16] | 7 | 14.45 | 14.41 | 14.41 | -0.04 | 97.8 / 100.4 / 100.4 |
+| S12 | [15, 17] | 7 | 15.16 | 15.12 | 15.12 | -0.04 | 21.3 / 21.3 / 21.3 |
+| S13 lich | [16, 19] | 4 | 17.06 | 17.03 | 17.03 | -0.03 | 66.2 / 66.2 / 66.2 |
+| S14 | [17, 20] | 6 | 18.05 | 18.16 | 18.05 | +0.00 | 54.5 / 59.4 / 57.5 |
+| S15 ashen_queen | [21, 24] | 3 | 21.90 | 21.90 | 21.81 | -0.09 | 111.5 / 112.6 / 112.6 |
+| S16 evil_eye | [21, 24] | **2 -> 1.5** | 24.49 | 24.64 | 24.43 | -0.06 | 99.1 / 111.1 / 103.3 |
+| S17 | [22, 25] | **4 -> 3** | 24.93 | 25.39 | 25.01 | +0.08 | 14 / 39.3 / 28.4 |
+| S20 | [25, 28] | 7 | 25.06 | 25.49 | 25.12 | +0.06 | 0 / 0 / 0 |
+| S22 | [25, 28] | 2 | 25.06 | 25.49 | 25.12 | +0.06 | 4.2 / 3.4 / 3.4 |
+| S18 dragon_zombie | [24, 27] | 2 | 26.17 | 26.65 | 26.23 | +0.06 | 67.8 / 73 / 68.5 |
+| S19 | [24, 27] | 2 | 26.46 | 27.01 | 26.52 | +0.06 | 13 / 16.9 / 13.1 |
+| S23 | [26, 29] | 2 | 26.63 | 27.16 | 26.69 | +0.06 | 3.3 / 3.3 / 3.3 |
+| S24 drowned_sovereign | [27, 30] | 2 | 28.62 | 29.07 | 28.66 | +0.04 | 79.1 / 78.6 / 78.6 |
+| S25 | [28, 31] | 1 | 28.72 | 29.16 | 28.76 | +0.04 | 3.8 / 4.5 / 4.5 |
+| S26 | [28, 31] | 2 | 28.76 | 29.22 | 28.81 | +0.05 | 3.5 / 5.7 / 5.7 |
+| S21 | [25, 28] | 2 | 28.83 | 29.30 **over** | 28.90 | +0.07 | 3.7 / 4.2 / 4.2 |
+| S27 | [29, 32] | 1 | 30.31 | 30.80 | 30.39 | +0.08 | 62.1 / 63.1 / 62.5 |
+| S31 | none | 1 | 33.01 | 33.52 | 33.10 | +0.09 | 35.7 / 25.8 / 25.1 |
+| S28 hollow_seraph | [31, 34] | 1 | 33.89 | 34.42 | 33.97 | +0.08 | 97.4 / 88.1 / 87.5 |
+| S29 | [33, 35] | 1 | 33.99 | 34.56 | 34.09 | +0.10 | 7.5 / 8.7 / 8 |
+| S30 lich_2 | [34, 41] | 1 | 35.28 | 35.85 | 35.39 | +0.11 | 28.5 / 28.5 / 28.5 |
+
+Every band OK, every stage within 0.11 of NW's level (the largest: S30 +0.11, S10 -0.11). Seeded battles
+(`tests/balance/questCurve.test.ts`, 60 seeds): boss medians garland 2.7, pirate 3.6, piscodemon 8.6, astos 10.6,
+vampire 14.4, lich 17.0, ashen_queen 21.8, evil_eye 24.4 (the tightest, [21, 24]), dragon_zombie 26.2,
+drowned_sovereign 28.6, hollow_seraph 33.9, lich_2 35.3; Chaos's door 40.5; wipes per run at most 0.05 on a required
+stage (S28), 0.13 on S31 (its bound 0.45; NW's 0.40: the walk no longer sails the Aldi first). The test names carry
+the new figures.
+
+The compiled `assets/maps/ai/overworld.yaml` got the four zones' new `encounterRate` lines (exactly the source's
+blocks; the zone rates touch no chunk or Mode 7 input); NW2-INT's full compile rewrites it.
+
+Gates:
+
+| Gate | Result |
+|---|---|
+| `world.py` | every line OK; `gorges: OK` (E 2.16 / 1.88, unchanged), `hikes: OK` (Mirage E 1.01, the others unchanged) |
+| `npm run quest -- --strict` | `quest-verify: OK`: (a)-(h) OK, (c) 835,121 states, (d) every band OK, (f) Crescent 13,207 / 60,240, Gaia 94,194 / 259,240, (g) s* 0.851; 116 s, max RSS 3.7 GB |
+| `tests/balance/*` | 16 files, 104 tests OK |
+| `npm run test:fast` | 401 files, 9,654 tests OK |
+| `npm run build` | OK |
+| `npm run test:full` | 403 files, 9,688 tests OK (both tiers, `questMutateWorld` and `questGraph` included); 4,348 s (72 min, 2 workers), max RSS 6.9 GB |

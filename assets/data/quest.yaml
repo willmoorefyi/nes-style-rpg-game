@@ -387,7 +387,7 @@ stages:
     kit: w_s17
     maps: []
     zones: [overworld:fir_desert]
-    grind: 4.0
+    grind: 3.0    # NW2-BAL: 4.0 -> 3.0 (the Cinder Gorge's canoe fights, D-NW2-10)
     # the hatch of the buried hull (overworld (143, 159)) takes the stone and plays fir_airship_rises
     walk: ["overworld:cutscene:fir_hull_hatch"]
     entry: {map: overworld, at: fir_s_desert, mode: walking}
@@ -458,7 +458,7 @@ stages:
     kit: w_s16
     maps: [ice-cavern-*]
     zones: [overworld:fir_tundra]
-    grind: 2.0
+    grind: 1.5    # NW2-BAL: 2.0 -> 1.5 (the Rime Gorge's canoe fights, D-NW2-10)
     # S16 needs the canoe (only a boat reaches the Rime Hollow, by R-ice), so the proofs start on foot at Crescent
     # Lake's gate with the ship at the `fir_crescent` dock; NW2: aboard the ship round the peninsula's tip to the
     # `fir_ice` dock (the Frost Shore beyond ice_neck), up R-ice's gorge to the hollow, then B1's stair, the shelf
