@@ -668,15 +668,15 @@ No question is open.
 - [x] Rev 2: the user's answers Q3, Q4, Q6, Q11; momus's 6 blocking items and suggestions 7-18 (2026-11-21)
 - [x] Q13 and Q14 ruled by the integrator (2026-11-21)
 - [x] Rev 3: Q13 folded in (the >= 30 % taiga target); momus round 2 fixed (2026-11-21)
-- [ ] NW2-0 checks over declared records, landing modes, hike bounds in the anchors file (priority: high, effort: 6h)
-- [ ] NW2-T taiga: runtime, Python, art, T_TAIGA and hints for >= 30 %, landings, recompile (priority: high, effort: 9h)
-- [ ] NW2-E Duergar, the range, duergar_south, the dock, GT-42 (priority: high, effort: 7h)
-- [ ] NW2-F the ice tip, the two gorges, fir_ice, GT-21/37/40/41/43 (priority: high, effort: 10h)
-- [ ] NW2-W Onrac, caravan, waterfall hikes (priority: medium, effort: 5h)
-- [ ] NW2-N Mirage, Lufenia hikes (priority: medium, effort: 5h)
-- [ ] NW2-S save v5 and worldRevalidate (priority: medium, effort: 4h)
-- [ ] NW2-BAL refit, CAP, grind, the levels table (priority: high, effort: 6h)
-- [ ] NW2-INT compile, --strict, --mutate (background), browser, overview, docs (priority: high, effort: 6h)
+- [x] NW2-0 checks over declared records, landing modes, hike bounds in the anchors file (priority: high, effort: 6h)
+- [x] NW2-T taiga: runtime, Python, art, T_TAIGA and hints for >= 30 %, landings, recompile (priority: high, effort: 9h)
+- [x] NW2-E Duergar, the range, duergar_south, the dock, GT-42 (priority: high, effort: 7h)
+- [x] NW2-F the ice tip, the two gorges, fir_ice, GT-21/37/40/41/43 (priority: high, effort: 10h)
+- [x] NW2-W Onrac, caravan, waterfall hikes (priority: medium, effort: 5h)
+- [x] NW2-N Mirage, Lufenia hikes (priority: medium, effort: 5h)
+- [x] NW2-S save v5 and worldRevalidate (priority: medium, effort: 4h)
+- [x] NW2-BAL refit, CAP, grind, the levels table (priority: high, effort: 6h)
+- [x] NW2-INT compile, --strict, --mutate (background), browser, overview, docs (priority: high, effort: 6h)
 ```
 
 ## Changelog
@@ -893,3 +893,60 @@ Gates:
 | `npm run test:fast` | 401 files, 9,654 tests OK |
 | `npm run build` | OK |
 | `npm run test:full` | 403 files, 9,688 tests OK (both tiers, `questMutateWorld` and `questGraph` included); 4,348 s (72 min, 2 workers), max RSS 6.9 GB |
+
+### NW2-INT result (2026-11-21)
+
+Built on mainline 8d1f97ae (every tranche merged: NW2-0, T, E, F, W, N, S, BAL). Scratch in `/tmp/nw2-int/`,
+screenshots and overviews in `~/temp/ff-game/nw2/int/`.
+
+**Compile and determinism.** `world.py` prints every line OK (28 OK lines; `taiga_share` 34.5 %, `gorges` 54 / 39 /
+2.16 and 47 / 32 / 1.88, `hikes` unchanged from W / N / BAL, land 26,948, exemptions 440). The full compile
+(`build_map.py overworld`: 236 s, peak footprint 14.6 GB) reproduces the committed output **byte for byte**: the git
+diff after it is empty, so NW2-BAL's four hand-edited zone blocks in `assets/maps/ai/overworld.yaml` are exactly what
+the compile writes, and no chunk, patch or Mode 7 file changed. `build_map.py --check-determinism overworld`
+"deterministic" (401 s); `mode7_atlas.py --check-determinism overworld` deterministic (`mode7.png` 7a035810927f,
+`mode7_low.png` 78dba53a5b81, `mode7.json` 252c4c7ea919); `world.py` re-run, `git diff --exit-code assets-src/maps
+assets` clean; `tests/data/mode7Atlas.test.ts` 4 tests OK. Nothing to commit from the compile.
+
+**Verifier.**
+
+| Gate | Result |
+|---|---|
+| `npm run quest -- --strict` | `quest-verify: OK`: (a)-(h) OK; (b) 423 withheld runs; (c) 835,121 states; (d) every band OK; (f) Crescent 13,207 / 60,240, Gaia 94,194 / 259,240; (g) s* 0.851, 31 pairs; (h) 12 rows + 2 basin rows; 115 s, max RSS 3.0 GB |
+| `npm run quest -- --strict --from-reset` | OK: 195 reset states (32 stage entries, the 3 NW2 v4 saves, 160 mid-stage samples), 5,134,488 states searched; 647 s, max RSS 5.7 GB |
+| `npm run quest -- --strict --mutate` | `quest-verify: OK`, `mutations: OK (68 gate rows; 109 elements, each removal reported)` (NW: 64 rows, 105 elements; NW2 added GT-40 to GT-43); (a)-(h) OK as above; 4,320 s (72 min, run beside `--from-reset` and `test:fast`), max RSS 6.6 GB |
+
+**Browser checkpoints** (headed Chromium, a dev server on 127.0.0.1:5293, every URL `?mute=1`; field scenarios
+appended to `debug-scenarios.yaml` by a request route, so the repo file is unchanged; one fresh page per scenario):
+
+| # | Checkpoint | Files | Result |
+|---|---|---|---|
+| 1 | The Cinder Gorge, Crescent Lake to Gurgu, by canoe | `1a_cinder_gorge_lake_outlet` (209, 181), `1b_..._mid` (201, 189), `1c_..._lower` (192, 196), `1d_..._gurgu` (180, 202) | the river runs SW between mountain walls from the lake's outlet to the ash flats by the smoking volcano; no walkable bank along it |
+| 2 | The voyage to the Frost Shore dock and the Rime Gorge | `2a_voyage_ice_neck_coast` (ship, (201, 136)), `2b_voyage_fir_ice_dock` (204, 124), `2c_frost_shore` (206, 119), `2d_rime_gorge_mouth` (208, 123), `2e_..._bend` (222, 121), `2f_..._upper` (217, 118), `2g_rime_hollow_ice_cavern` (214, 109) | the ship sails up the western channel to the dock; the Frost Shore is a taiga strip; the gorge climbs east then north through the Rime Fells to the tarn; the hollow is a snow floor with the cave on its north wall and the floe |
+| 3 | The dwarves' dock north of the canal, the Duergar range | `3a_dwarf_dock_hall` (104, 121), `3b_duergar_range_from_matoya` (116, 112), `3c_duergar_range_north` (116, 102), `3d_canal_south_of_dwarves` (ship, (100, 138)) | the hall's cave and the moored ship 6 cells apart; the range is a continuous mountain wall seen from Matoya's side; the canal lies well south |
+| 4 | The hikes | `4a_hike_onrac_caravan_landing` (53, 85), `4b_hike_waterfall_landing` (85, 55), `4c_hike_mirage_landing` (191, 43), `4d_hike_lufenia_landing` (243, 70) | each landing is where 7 / the hike results say: the shared south-coast meadow in forest, the waterfall's east downs, the oasis meadow in the Mirage sands, Lufenia's east-coast meadow in forest |
+| 5 | The airship refusing taiga | `5a_flight_over_taiga_no_marker` (65, 40), `5b_..._after_confirm`, `5c_flight_over_meadow_marker` (53, 86), `5d_..._after_confirm` | over taiga in Mode 7 the landing marker is hidden (`__mode7.marker` false) and confirm shows "The airship can't land here." (still `airship`); over the Onrac meadow the marker shows and confirm lands (`walking`, the airship parked at (53, 86)) |
+| 6 | A v4 save relocated by `revalidateNw2` | `6a_load_menu_v4_save`, `6a2_load_confirm`, `6b_loaded_in_dwarf_hall`, `6c_world_after_load_ship_at_ert_dwarf` | a version-4 save inside `dwarf-hall` (S10 flags) with its ship at the old dwarf cove (104, 152): the load logs "the ship is off open water: ship (104,152) -> (106,121)", the party stays in the hall, and walking out shows the ship at the moved `ert_dwarf` dock |
+
+Overviews (annotated crops of the compiled world: sites red, docks magenta, landings cyan, a line every 8 cells):
+`o1_fire_gorges.png`, `o2_dwarves_duergar.png`, `o3_water_hikes.png`, `o4_wind_hikes.png`.
+
+No console error in any checkpoint; one warning ("chunk 7_12 not loaded after 6 frames; showing a placeholder", the
+streamer's normal late-chunk path at the hollow). Things that look off, reported, not changed:
+- Taiga reads very dark at 2x: near-black crowns with bright snow speckle (`2b`, `2c`, `5a`); it is clearly not
+  forest (the plan's luminance gate), but it is the darkest ground on the map. An art review may want it lighter.
+- The "voyage round the tip" is in practice a straight sail north up the channel west of the peninsula (`o1`), not
+  round its tip; the dock and gorge are as planned.
+- §13's `tests/data/northHikes.test.ts` and `dockTowns.test.ts` were not added: the hike d / E checks live in
+  `tests/quest/water/wat_o_world.test.ts` and `tests/quest/wind/wnd_o_world.test.ts`, and `dock_towns` is a
+  compose-time check (with its `selftest_gates.py` fixture) with no TS test.
+- A harness note, not a game path: chaining about twenty debug scenarios on one page (the last two flying in Mode 7)
+  once raised an uncaught "Cannot read properties of null (reading '0')" (no stack captured); with a fresh page per
+  scenario it did not occur. Not investigated further.
+
+**Tests.** `npm run build` OK; `npm run test:fast -- --maxWorkers=2 --minWorkers=1`: 403 files, 9,680 tests OK
+(172 s). `npm run test:full` is the integrator's, after this merge.
+
+**Docs.** AGENTS.md's world section (the NW2 plan, the `fir_ice` dock, the barriers and new checks, an "NW2
+geography" bullet for the gorges, Duergar, the dock audit and the hikes, the taiga share, the NW2 re-fit and grinds,
+GT-40-43, the state count, save v5) and its quick reference; `docs/PROGRESS.md` (pass NW2); this section; the TODOs.
