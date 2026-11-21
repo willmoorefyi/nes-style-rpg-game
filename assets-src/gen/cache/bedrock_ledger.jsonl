@@ -618,3 +618,429 @@
 {"event": "result", "key": "ce780b620690778443074287", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
 {"event": "request", "ts": "2026-11-19T22:01:31", "tool": "lm5gen.py", "model": "structure", "purpose": "lm5_gen", "seed": 2, "key": "29148efc7c6f4be2535f594a", "pass": "LM5"}
 {"event": "result", "key": "29148efc7c6f4be2535f594a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:54:47", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "050841f64e0b6c4b66def1a8", "pass": "AR"}
+{"event": "result", "key": "050841f64e0b6c4b66def1a8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:55:24", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "8a731352ab1de4ea5a94be2a", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T12:55:31", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "1300556c4b37823cad80cf3a", "pass": "AR"}
+{"event": "result", "key": "8a731352ab1de4ea5a94be2a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:55:36", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "ff1ae9b19d2bdd9f1c586389", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T12:55:40", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 11, "key": "ed3a1f639c9e9a6416bbcbf3", "pass": "AR"}
+{"event": "result", "key": "ed3a1f639c9e9a6416bbcbf3", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "result", "key": "ff1ae9b19d2bdd9f1c586389", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "1300556c4b37823cad80cf3a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:56:02", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "46e38ffec5b8574939ba3cf8", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T12:56:11", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "8d61b82e6d07294deff3f1f0", "pass": "AR"}
+{"event": "result", "key": "8d61b82e6d07294deff3f1f0", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "46e38ffec5b8574939ba3cf8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:56:35", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "68ceacc844eded51c93b4858", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T12:56:47", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "a9797047fa588a2533505b72", "pass": "AR"}
+{"event": "result", "key": "a9797047fa588a2533505b72", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:56:58", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "4ea6214822494e8d6e81088f", "pass": "AR"}
+{"event": "result", "key": "4ea6214822494e8d6e81088f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:09", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "d7eafeffd4bb6085333cf1f8", "pass": "AR"}
+{"event": "result", "key": "68ceacc844eded51c93b4858", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:57:18", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "10753e6a8a266bfa6f8cf264", "pass": "AR"}
+{"event": "result", "key": "d7eafeffd4bb6085333cf1f8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:19", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "6e7f8e5ea8ff7dfad0919147", "pass": "AR"}
+{"event": "result", "key": "6e7f8e5ea8ff7dfad0919147", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:31", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "e988c951e234896ed561573b", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T12:57:32", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "e02559a8150b76f07b3b61d4", "pass": "AR"}
+{"event": "result", "key": "e02559a8150b76f07b3b61d4", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:38", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "3d65dd00a8381f4adb005b94", "pass": "AR"}
+{"event": "result", "key": "3d65dd00a8381f4adb005b94", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:42", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "86d973a147788ae1a303e145", "pass": "AR"}
+{"event": "result", "key": "e988c951e234896ed561573b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:42", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "fd57b9311fd9817bc7420d7c", "pass": "AR"}
+{"event": "result", "key": "86d973a147788ae1a303e145", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:50", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "1480fa11266e2a1d5546626e", "pass": "AR"}
+{"event": "result", "key": "fd57b9311fd9817bc7420d7c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:53", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "22626eadcade4aa342ca4f91", "pass": "AR"}
+{"event": "result", "key": "1480fa11266e2a1d5546626e", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:57:54", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "b7b8a34a3ff0002e5344b5e3", "pass": "AR"}
+{"event": "result", "key": "b7b8a34a3ff0002e5344b5e3", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:00", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "15f7c66af65839a7b00d5293", "pass": "AR"}
+{"event": "result", "key": "10753e6a8a266bfa6f8cf264", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:58:01", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "b39dd787045a8253c0249848", "pass": "AR"}
+{"event": "result", "key": "22626eadcade4aa342ca4f91", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:03", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "864ef7001356b7c4ef3babd2", "pass": "AR"}
+{"event": "result", "key": "15f7c66af65839a7b00d5293", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:06", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "8fcb288df0a7fd837f409795", "pass": "AR"}
+{"event": "result", "key": "8fcb288df0a7fd837f409795", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:11", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "767f7fbb0641b4f8ff205192", "pass": "AR"}
+{"event": "result", "key": "864ef7001356b7c4ef3babd2", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:14", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "ed9c33b340d186a35fa566e5", "pass": "AR"}
+{"event": "result", "key": "767f7fbb0641b4f8ff205192", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:17", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "ff36bde7d07c903d152c3ac4", "pass": "AR"}
+{"event": "result", "key": "ff36bde7d07c903d152c3ac4", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:22", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "9dc79db94acaff1de2f6330c", "pass": "AR"}
+{"event": "result", "key": "ed9c33b340d186a35fa566e5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:24", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "d7f1cb4fdabc0788a70babe2", "pass": "AR"}
+{"event": "result", "key": "b39dd787045a8253c0249848", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:58:27", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "43431230e775b1dedb65db49", "pass": "AR"}
+{"event": "result", "key": "9dc79db94acaff1de2f6330c", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:27", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "420a7786905680ccc6efe4e8", "pass": "AR"}
+{"event": "result", "key": "420a7786905680ccc6efe4e8", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:32", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "caacb6ac4c6638263e48de1c", "pass": "AR"}
+{"event": "result", "key": "d7f1cb4fdabc0788a70babe2", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:35", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "4b2635a7c2e9f50c11773779", "pass": "AR"}
+{"event": "result", "key": "caacb6ac4c6638263e48de1c", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:37", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "c87e5812c6fb2207c44d59c1", "pass": "AR"}
+{"event": "result", "key": "c87e5812c6fb2207c44d59c1", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:42", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "36d40e4b53270981eb8018f1", "pass": "AR"}
+{"event": "result", "key": "4b2635a7c2e9f50c11773779", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:46", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "76b54f1e675922604d1dc877", "pass": "AR"}
+{"event": "result", "key": "36d40e4b53270981eb8018f1", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:47", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "26eda99749ea2fbcfe9f8857", "pass": "AR"}
+{"event": "result", "key": "26eda99749ea2fbcfe9f8857", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:52", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "b8e222e71364a1fd503cea0b", "pass": "AR"}
+{"event": "result", "key": "76b54f1e675922604d1dc877", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:56", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "77035343fd8f73f1d4ee7fb6", "pass": "AR"}
+{"event": "result", "key": "b8e222e71364a1fd503cea0b", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:58:57", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "d0265f38b938f041138df0bf", "pass": "AR"}
+{"event": "result", "key": "43431230e775b1dedb65db49", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:59:02", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "4c1dc5e957f1c63dd4a9a98f", "pass": "AR"}
+{"event": "result", "key": "d0265f38b938f041138df0bf", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:02", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "cdb80ce32cffa5e5cd184eff", "pass": "AR"}
+{"event": "result", "key": "77035343fd8f73f1d4ee7fb6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:06", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "09431249dfa53dd7b599b990", "pass": "AR"}
+{"event": "result", "key": "cdb80ce32cffa5e5cd184eff", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:09", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "9eab7b60c624b82a210f6566", "pass": "AR"}
+{"event": "result", "key": "9eab7b60c624b82a210f6566", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:14", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "cd3441f29c4c6d3794b285f2", "pass": "AR"}
+{"event": "result", "key": "09431249dfa53dd7b599b990", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:17", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "7ddd3af3d85c64a7b6d26cf8", "pass": "AR"}
+{"event": "result", "key": "cd3441f29c4c6d3794b285f2", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:19", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "418ad15124aab42863e93db3", "pass": "AR"}
+{"event": "result", "key": "418ad15124aab42863e93db3", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:24", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "be50223a9cbe746325e85dcf", "pass": "AR"}
+{"event": "result", "key": "7ddd3af3d85c64a7b6d26cf8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:27", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "891ac99d2f5558b9ce38be46", "pass": "AR"}
+{"event": "result", "key": "be50223a9cbe746325e85dcf", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:29", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "55c34e8f98d5e00214d2871b", "pass": "AR"}
+{"event": "result", "key": "55c34e8f98d5e00214d2871b", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:34", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "909390925195354b9cff6a77", "pass": "AR"}
+{"event": "result", "key": "4c1dc5e957f1c63dd4a9a98f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T12:59:36", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "e4f72761c3c2ad2c4c3c7099", "pass": "AR"}
+{"event": "result", "key": "891ac99d2f5558b9ce38be46", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:38", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "feb5e27da15dbc964dde8244", "pass": "AR"}
+{"event": "result", "key": "909390925195354b9cff6a77", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:39", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "a38ebd0823cc4f1482ed57b8", "pass": "AR"}
+{"event": "result", "key": "a38ebd0823cc4f1482ed57b8", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:46", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "876e36f1fb00c393bd235e0d", "pass": "AR"}
+{"event": "result", "key": "feb5e27da15dbc964dde8244", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:50", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "9c65b1238c9e896ec4ce7094", "pass": "AR"}
+{"event": "result", "key": "876e36f1fb00c393bd235e0d", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:53", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "411279feb72ae8ae5206f748", "pass": "AR"}
+{"event": "result", "key": "411279feb72ae8ae5206f748", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T12:59:58", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "528101b01d1a8853e75e63f6", "pass": "AR"}
+{"event": "result", "key": "9c65b1238c9e896ec4ce7094", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:01", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "d883d8fb2d4415bd1ee82355", "pass": "AR"}
+{"event": "result", "key": "528101b01d1a8853e75e63f6", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:03", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "a2505493c0607fb2405cebb9", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:00:05", "tool": "argen.py", "model": "structure", "purpose": "ar_towns", "seed": 25, "key": "f4ea5e017586e30d2fcf8046", "pass": "AR"}
+{"event": "result", "key": "a2505493c0607fb2405cebb9", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:10", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "17dd20e1d4dc7da46b9a2beb", "pass": "AR"}
+{"event": "result", "key": "d883d8fb2d4415bd1ee82355", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:11", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "e98506f368261b9d6769025f", "pass": "AR"}
+{"event": "result", "key": "17dd20e1d4dc7da46b9a2beb", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:16", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "b32a201a140d65e5580d9f7e", "pass": "AR"}
+{"event": "result", "key": "f4ea5e017586e30d2fcf8046", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:00:17", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 15, "key": "d46e1de3bb0094293cf43129", "pass": "AR"}
+{"event": "result", "key": "e4f72761c3c2ad2c4c3c7099", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:00:18", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "2743c2a79a1c71ba70e3a14f", "pass": "AR"}
+{"event": "result", "key": "b32a201a140d65e5580d9f7e", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:21", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "e873b38e6da733a9ec36cfb2", "pass": "AR"}
+{"event": "result", "key": "e98506f368261b9d6769025f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:23", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "b341dc07a71e654739fcd46a", "pass": "AR"}
+{"event": "result", "key": "e873b38e6da733a9ec36cfb2", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:26", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "a4c38b2266bcdb4620631686", "pass": "AR"}
+{"event": "result", "key": "d46e1de3bb0094293cf43129", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "a4c38b2266bcdb4620631686", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:31", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "a417b0d1ebe7010fb7b0b02f", "pass": "AR"}
+{"event": "result", "key": "2743c2a79a1c71ba70e3a14f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:00:34", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "851bb2f371b5dfe10764fae2", "pass": "AR"}
+{"event": "result", "key": "b341dc07a71e654739fcd46a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:35", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "5773c5bbfb900f5c9fa3b9fb", "pass": "AR"}
+{"event": "result", "key": "a417b0d1ebe7010fb7b0b02f", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:36", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "7e98901167ae0c1fe5c4192c", "pass": "AR"}
+{"event": "result", "key": "851bb2f371b5dfe10764fae2", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:00:45", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "30ae4a9d7bb4c096751bdf01", "pass": "AR"}
+{"event": "result", "key": "5773c5bbfb900f5c9fa3b9fb", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:45", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "719f5929b4ade006c8bd3343", "pass": "AR"}
+{"event": "result", "key": "7e98901167ae0c1fe5c4192c", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:46", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "bae9fe00016ed90a08dc7bd2", "pass": "AR"}
+{"event": "result", "key": "bae9fe00016ed90a08dc7bd2", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:52", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "74dce84e68e2b7185df9fb1e", "pass": "AR"}
+{"event": "result", "key": "30ae4a9d7bb4c096751bdf01", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:00:56", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "0ed82404b731ef63aa357f2e", "pass": "AR"}
+{"event": "result", "key": "74dce84e68e2b7185df9fb1e", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:58", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "69cabac4abcff8dabd0de9c0", "pass": "AR"}
+{"event": "result", "key": "719f5929b4ade006c8bd3343", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:00:58", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "caed11b6d747bab814732d45", "pass": "AR"}
+{"event": "result", "key": "69cabac4abcff8dabd0de9c0", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:04", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "82314d361d4d6ee8c34571de", "pass": "AR"}
+{"event": "result", "key": "0ed82404b731ef63aa357f2e", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:01:06", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "29dc17e130a89fac826a5b43", "pass": "AR"}
+{"event": "result", "key": "caed11b6d747bab814732d45", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:09", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "8e6d00cec0e6b278e8a812f7", "pass": "AR"}
+{"event": "result", "key": "82314d361d4d6ee8c34571de", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:10", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "d1ea793badecc98c82df814c", "pass": "AR"}
+{"event": "result", "key": "d1ea793badecc98c82df814c", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "result", "key": "8e6d00cec0e6b278e8a812f7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:21", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "8ccf729752df4c01b2117f5c", "pass": "AR"}
+{"event": "result", "key": "8ccf729752df4c01b2117f5c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:32", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "96af8232203b9b629b8c2c63", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:01:35", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 25, "key": "aa4567aa135c4f87aa006c4c", "pass": "AR"}
+{"event": "result", "key": "aa4567aa135c4f87aa006c4c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "result", "key": "96af8232203b9b629b8c2c63", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:44", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "b97e3ea2ee5f1e5616e0aa6b", "pass": "AR"}
+{"event": "result", "key": "29dc17e130a89fac826a5b43", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "b97e3ea2ee5f1e5616e0aa6b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:01:54", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "74946855990ce6e3e2cfaa78", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:01:57", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 26, "key": "273291777c6b0f5ff8e95f53", "pass": "AR"}
+{"event": "result", "key": "273291777c6b0f5ff8e95f53", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "result", "key": "74946855990ce6e3e2cfaa78", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:05", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 1, "key": "8d1858cb280ed25386a41943", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:02:15", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "4192a5a59bb3c1119f9ba710", "pass": "AR"}
+{"event": "result", "key": "8d1858cb280ed25386a41943", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:24", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "8aef8873da1f0a63eff089fb", "pass": "AR"}
+{"event": "result", "key": "4192a5a59bb3c1119f9ba710", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:25", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "964ca93455b295b141b5dbb9", "pass": "AR"}
+{"event": "result", "key": "964ca93455b295b141b5dbb9", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:32", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "8d79430e6b1aa7c852cf3377", "pass": "AR"}
+{"event": "result", "key": "8aef8873da1f0a63eff089fb", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:02:38", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "1ba63858acda727a1005bd5d", "pass": "AR"}
+{"event": "result", "key": "8d79430e6b1aa7c852cf3377", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:43", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "a7f0a0736edcb6a8b92b0943", "pass": "AR"}
+{"event": "result", "key": "1ba63858acda727a1005bd5d", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "a7f0a0736edcb6a8b92b0943", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:50", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "08f41dab0775eeb6108e7f40", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:02:50", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "489df28c9e2d779b90626eaa", "pass": "AR"}
+{"event": "result", "key": "489df28c9e2d779b90626eaa", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:55", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "7bcaa14e3d766dada7034d4d", "pass": "AR"}
+{"event": "result", "key": "7bcaa14e3d766dada7034d4d", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:02:59", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "44f5bf6ff46e3d93ec9d902b", "pass": "AR"}
+{"event": "result", "key": "08f41dab0775eeb6108e7f40", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:03:02", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "4c344c04d1ed9450b2a0d579", "pass": "AR"}
+{"event": "result", "key": "44f5bf6ff46e3d93ec9d902b", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:03", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "2e8b37bbb6e5707146a80508", "pass": "AR"}
+{"event": "result", "key": "2e8b37bbb6e5707146a80508", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:10", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "2fb6e0a030ef81935d6ce6f1", "pass": "AR"}
+{"event": "result", "key": "4c344c04d1ed9450b2a0d579", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:03:14", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "fce7e199b7f31c34e8e087ff", "pass": "AR"}
+{"event": "result", "key": "2fb6e0a030ef81935d6ce6f1", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:17", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "523444fb9c5990188c0dd521", "pass": "AR"}
+{"event": "result", "key": "523444fb9c5990188c0dd521", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:22", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "ead80bf40da774964ad93667", "pass": "AR"}
+{"event": "result", "key": "fce7e199b7f31c34e8e087ff", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:03:23", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "7e6b4d5c4a91a1a81fd5d95a", "pass": "AR"}
+{"event": "result", "key": "ead80bf40da774964ad93667", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:28", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "c9ce282a7a8aebbc0e97b611", "pass": "AR"}
+{"event": "result", "key": "7e6b4d5c4a91a1a81fd5d95a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:03:33", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "ba60797eb87733d2865ad531", "pass": "AR"}
+{"event": "result", "key": "c9ce282a7a8aebbc0e97b611", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:34", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "d77f7334f00433cd2ba84bf6", "pass": "AR"}
+{"event": "result", "key": "d77f7334f00433cd2ba84bf6", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:41", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 1, "key": "55a772f369ffdad118bf4cd4", "pass": "AR"}
+{"event": "result", "key": "ba60797eb87733d2865ad531", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:03:43", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "717fa357607fefb2ba79a998", "pass": "AR"}
+{"event": "result", "key": "55a772f369ffdad118bf4cd4", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:47", "tool": "ar_tiles_gen.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "1079bf9e773717fbb5bcc2c0", "pass": "AR"}
+{"event": "result", "key": "1079bf9e773717fbb5bcc2c0", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "result", "key": "717fa357607fefb2ba79a998", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:03:55", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "0e622ba74f560cea86368e0b", "pass": "AR"}
+{"event": "result", "key": "0e622ba74f560cea86368e0b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:08", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "c3dc513e17a1ad5a67a7696a", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:04:13", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 3, "key": "2ad249697fe4336851bb2bba", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:04:15", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 11, "key": "7b7136602f15d9614e137304", "pass": "AR"}
+{"event": "result", "key": "c3dc513e17a1ad5a67a7696a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:19", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "6de2b4b8ac73f81d051d1c63", "pass": "AR"}
+{"event": "result", "key": "7b7136602f15d9614e137304", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "2ad249697fe4336851bb2bba", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:04:26", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 21, "key": "82bce45522034f727a9c3feb", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:04:26", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "1e3944160debcff5efd1e35f", "pass": "AR"}
+{"event": "result", "key": "6de2b4b8ac73f81d051d1c63", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:30", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "14237c1b59c9149369d267f0", "pass": "AR"}
+{"event": "result", "key": "82bce45522034f727a9c3feb", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:04:33", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 31, "key": "fdf31be2363a5a82b24198cc", "pass": "AR"}
+{"event": "result", "key": "1e3944160debcff5efd1e35f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:04:38", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "e4c758ec67328ad98e089363", "pass": "AR"}
+{"event": "result", "key": "14237c1b59c9149369d267f0", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:41", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "ccbc137f3ffb3769db36f61a", "pass": "AR"}
+{"event": "result", "key": "fdf31be2363a5a82b24198cc", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:44", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 41, "key": "aaa733a7b25009a328824f8c", "pass": "AR"}
+{"event": "result", "key": "e4c758ec67328ad98e089363", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:04:48", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "2eb5fda368390114b4cffb80", "pass": "AR"}
+{"event": "result", "key": "ccbc137f3ffb3769db36f61a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:53", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "2e53150bbfe87182a66c2902", "pass": "AR"}
+{"event": "result", "key": "aaa733a7b25009a328824f8c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:04:56", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 12, "key": "ead74e70f8efc9b92dbd4c66", "pass": "AR"}
+{"event": "result", "key": "2eb5fda368390114b4cffb80", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:04:58", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "44a1c0c84104959bbbcdd9ea", "pass": "AR"}
+{"event": "result", "key": "2e53150bbfe87182a66c2902", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:05:05", "tool": "argen.py", "model": "ultra", "purpose": "ar_props", "seed": 2, "key": "d319cc64e87a060853961761", "pass": "AR"}
+{"event": "result", "key": "ead74e70f8efc9b92dbd4c66", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:05:06", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 22, "key": "15bea4736f6e84df2a8ab799", "pass": "AR"}
+{"event": "result", "key": "44a1c0c84104959bbbcdd9ea", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:07", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "d3056cadd65400cd40f1a595", "pass": "AR"}
+{"event": "result", "key": "15bea4736f6e84df2a8ab799", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:13", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 32, "key": "42a474c49cb2bd30613debc3", "pass": "AR"}
+{"event": "result", "key": "d319cc64e87a060853961761", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "d3056cadd65400cd40f1a595", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:17", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "2c2fd3241ece013431ad92e5", "pass": "AR"}
+{"event": "result", "key": "42a474c49cb2bd30613debc3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:05:23", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 42, "key": "db8fde8bf8a3f7a5bbdab1ad", "pass": "AR"}
+{"event": "result", "key": "2c2fd3241ece013431ad92e5", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:26", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "e4a7c5adca1404e2f7659c0c", "pass": "AR"}
+{"event": "result", "key": "db8fde8bf8a3f7a5bbdab1ad", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:05:34", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 13, "key": "c9d40d90d8697ff488a29e0e", "pass": "AR"}
+{"event": "result", "key": "e4a7c5adca1404e2f7659c0c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:36", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "d759f1a2240a785b319ff04a", "pass": "AR"}
+{"event": "result", "key": "c9d40d90d8697ff488a29e0e", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:05:46", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 23, "key": "90c2e7c3239765262748966f", "pass": "AR"}
+{"event": "result", "key": "d759f1a2240a785b319ff04a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:47", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "48a87a00a3151d10ee9e8cd0", "pass": "AR"}
+{"event": "result", "key": "90c2e7c3239765262748966f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:54", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 33, "key": "a772d824cfbfcab933554783", "pass": "AR"}
+{"event": "result", "key": "48a87a00a3151d10ee9e8cd0", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:05:58", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "7dbf116b5bb94e5cb0295d9e", "pass": "AR"}
+{"event": "result", "key": "a772d824cfbfcab933554783", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:06:07", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 43, "key": "03f2b4cf72682cd59bb7889a", "pass": "AR"}
+{"event": "result", "key": "7dbf116b5bb94e5cb0295d9e", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:09", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "3d51136de02d01ea25f68871", "pass": "AR"}
+{"event": "result", "key": "03f2b4cf72682cd59bb7889a", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:06:18", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 14, "key": "d4f2ddcbf7a4834382e2be16", "pass": "AR"}
+{"event": "result", "key": "3d51136de02d01ea25f68871", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:20", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "1023cccbd396c0fbef339aa2", "pass": "AR"}
+{"event": "result", "key": "d4f2ddcbf7a4834382e2be16", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:06:30", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 24, "key": "52200aee6153a257b85a3dd5", "pass": "AR"}
+{"event": "result", "key": "1023cccbd396c0fbef339aa2", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:32", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "f1f8db07e1ba17227c5ed12e", "pass": "AR"}
+{"event": "result", "key": "52200aee6153a257b85a3dd5", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:37", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 34, "key": "88e21abd54a51749aeb6147d", "pass": "AR"}
+{"event": "result", "key": "f1f8db07e1ba17227c5ed12e", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:44", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "a27f6581f9ae49d94395dd51", "pass": "AR"}
+{"event": "result", "key": "88e21abd54a51749aeb6147d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:06:49", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 44, "key": "1dfac1c274994669efab59a7", "pass": "AR"}
+{"event": "result", "key": "a27f6581f9ae49d94395dd51", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:06:58", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "fb657f2dbf4c83f67d4fcb3a", "pass": "AR"}
+{"event": "result", "key": "1dfac1c274994669efab59a7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:07:02", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 35, "key": "57d3b59040722656ea0f0e31", "pass": "AR"}
+{"event": "result", "key": "fb657f2dbf4c83f67d4fcb3a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:07:11", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "eaa73b7562f60329b1e25c82", "pass": "AR"}
+{"event": "result", "key": "57d3b59040722656ea0f0e31", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:07:15", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 45, "key": "8a19fdb5208b4174626c9fd9", "pass": "AR"}
+{"event": "result", "key": "eaa73b7562f60329b1e25c82", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "8a19fdb5208b4174626c9fd9", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:07:27", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 16, "key": "c13ad8392d0c3f54135734d6", "pass": "AR"}
+{"event": "result", "key": "c13ad8392d0c3f54135734d6", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:07:39", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 26, "key": "afa167b6666cfb6335c96fb8", "pass": "AR"}
+{"event": "result", "key": "afa167b6666cfb6335c96fb8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:07:51", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 36, "key": "488956422acaa44362bceb4d", "pass": "AR"}
+{"event": "result", "key": "488956422acaa44362bceb4d", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:08:03", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 46, "key": "c821f9c8fda048a11e782ac7", "pass": "AR"}
+{"event": "result", "key": "c821f9c8fda048a11e782ac7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:08:14", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 17, "key": "7c2e89fe04a93fbf989a500c", "pass": "AR"}
+{"event": "result", "key": "7c2e89fe04a93fbf989a500c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:08:26", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 27, "key": "87d3209029c6378587fc0aaf", "pass": "AR"}
+{"event": "result", "key": "87d3209029c6378587fc0aaf", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:08:34", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 37, "key": "00b694d65b48f5307191d8ad", "pass": "AR"}
+{"event": "result", "key": "00b694d65b48f5307191d8ad", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:08:45", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 47, "key": "9e1acb27791b2c61b7d2c724", "pass": "AR"}
+{"event": "result", "key": "9e1acb27791b2c61b7d2c724", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:08:56", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 18, "key": "8ea773b01bbfd86a9ba36d80", "pass": "AR"}
+{"event": "result", "key": "8ea773b01bbfd86a9ba36d80", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:09:07", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 19, "key": "7fd9a34a98cc73f9d4a095e1", "pass": "AR"}
+{"event": "result", "key": "7fd9a34a98cc73f9d4a095e1", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:09:19", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 28, "key": "dec92ebee967a9ac4bf73822", "pass": "AR"}
+{"event": "result", "key": "dec92ebee967a9ac4bf73822", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:09:27", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 48, "key": "23bbf4b1138c30300d18d63e", "pass": "AR"}
+{"event": "result", "key": "23bbf4b1138c30300d18d63e", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:09:37", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 20, "key": "aaa9f1f45e015b6e15f907b4", "pass": "AR"}
+{"event": "result", "key": "aaa9f1f45e015b6e15f907b4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:09:50", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 29, "key": "1a9f0c8442182539e5fabb30", "pass": "AR"}
+{"event": "result", "key": "1a9f0c8442182539e5fabb30", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:10:02", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 30, "key": "150c6d2834d38223a4b79b77", "pass": "AR"}
+{"event": "result", "key": "150c6d2834d38223a4b79b77", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:10:10", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 49, "key": "b8e5c1ea89447b8ed57eca08", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:10:13", "tool": "arst.py", "model": "style_transfer", "purpose": "ar_npc", "seed": 1, "key": "f22b020aae6ad4f63815b719", "pass": "AR"}
+{"event": "result", "key": "b8e5c1ea89447b8ed57eca08", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "result", "key": "f22b020aae6ad4f63815b719", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:11:13", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 3, "key": "1e665f8c30aa6188ae7efb2b", "pass": "AR"}
+{"event": "result", "key": "1e665f8c30aa6188ae7efb2b", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:11:26", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 4, "key": "8cfc56a2fb9c527806dc703d", "pass": "AR"}
+{"event": "result", "key": "8cfc56a2fb9c527806dc703d", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:11:38", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 3, "key": "7cc6dfe78dd000fcb4bd078c", "pass": "AR"}
+{"event": "result", "key": "7cc6dfe78dd000fcb4bd078c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:11:47", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 4, "key": "41728e4119fd3e62199446b0", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:11:57", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 51, "key": "8f26fe7a86ee2f6f6aba4492", "pass": "AR"}
+{"event": "result", "key": "41728e4119fd3e62199446b0", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:11:58", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "feff114e1e39424579adab34", "pass": "AR"}
+{"event": "result", "key": "feff114e1e39424579adab34", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:12:09", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "93dd2ef5709b0a773246ada9", "pass": "AR"}
+{"event": "result", "key": "8f26fe7a86ee2f6f6aba4492", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:12:11", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 52, "key": "efb603c875775a9dcec23357", "pass": "AR"}
+{"event": "result", "key": "efb603c875775a9dcec23357", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:12:19", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 53, "key": "bce0fa0a0adb066797f02942", "pass": "AR"}
+{"event": "result", "key": "93dd2ef5709b0a773246ada9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:12:20", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "c630664690c9fb6175496faf", "pass": "AR"}
+{"event": "result", "key": "bce0fa0a0adb066797f02942", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:12:29", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 54, "key": "c38b89c90368608fff704bcf", "pass": "AR"}
+{"event": "result", "key": "c630664690c9fb6175496faf", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:12:30", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "005b069e56419c510b4ff3c8", "pass": "AR"}
+{"event": "result", "key": "c38b89c90368608fff704bcf", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:12:39", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 55, "key": "15994cab6612f245f65a8c4b", "pass": "AR"}
+{"event": "result", "key": "005b069e56419c510b4ff3c8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:12:41", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "42c8498b1ff417709f9279ea", "pass": "AR"}
+{"event": "result", "key": "15994cab6612f245f65a8c4b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:12:50", "tool": "argen.py", "model": "ultra", "purpose": "ar_towns", "seed": 56, "key": "2598c5682be3e3a38bc10cec", "pass": "AR"}
+{"event": "result", "key": "2598c5682be3e3a38bc10cec", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T13:13:00", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 60, "key": "6ec4d5d8f350daf0e7163051", "pass": "AR"}
+{"event": "result", "key": "42c8498b1ff417709f9279ea", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:05", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "bba75bbfff1d43ebd7cc954f", "pass": "AR"}
+{"event": "result", "key": "6ec4d5d8f350daf0e7163051", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:08", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 61, "key": "1a8425ba2e882d9bec1da57e", "pass": "AR"}
+{"event": "result", "key": "1a8425ba2e882d9bec1da57e", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:14", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 62, "key": "d57f913959ce729bb9bdb5c9", "pass": "AR"}
+{"event": "result", "key": "d57f913959ce729bb9bdb5c9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:22", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 63, "key": "2ae53aa0b7681fd45918e013", "pass": "AR"}
+{"event": "result", "key": "bba75bbfff1d43ebd7cc954f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:28", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "ddc31fb309f0bbff5ad3ab58", "pass": "AR"}
+{"event": "result", "key": "2ae53aa0b7681fd45918e013", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:29", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 64, "key": "e19d2a12f5b8caabe2dbb717", "pass": "AR"}
+{"event": "result", "key": "e19d2a12f5b8caabe2dbb717", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:36", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 65, "key": "9b1ae1b742322c36856535f4", "pass": "AR"}
+{"event": "result", "key": "9b1ae1b742322c36856535f4", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:43", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 66, "key": "be36fb4eac6ac51d1cbfb7ea", "pass": "AR"}
+{"event": "result", "key": "be36fb4eac6ac51d1cbfb7ea", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:13:50", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 67, "key": "860b7cf705c92c4b8b211362", "pass": "AR"}
+{"event": "result", "key": "860b7cf705c92c4b8b211362", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "result", "key": "ddc31fb309f0bbff5ad3ab58", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:14:06", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "828577f1a42a5028a53ff691", "pass": "AR"}
+{"event": "result", "key": "828577f1a42a5028a53ff691", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:14:24", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "991eb3bbf57b710a7036f1e2", "pass": "AR"}
+{"event": "result", "key": "991eb3bbf57b710a7036f1e2", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:14:34", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "8cded0eed064f10378d207a8", "pass": "AR"}
+{"event": "result", "key": "8cded0eed064f10378d207a8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:14:53", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "9e425e394d1ebd53d4f396e6", "pass": "AR"}
+{"event": "result", "key": "9e425e394d1ebd53d4f396e6", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:15:10", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "e4fc1f905ced0c85fc9e4ba5", "pass": "AR"}
+{"event": "result", "key": "e4fc1f905ced0c85fc9e4ba5", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:15:26", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "b17a82a4b94a637b57ca16de", "pass": "AR"}
+{"event": "result", "key": "b17a82a4b94a637b57ca16de", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:15:46", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "02ffc3da3fb3e8220e08aed4", "pass": "AR"}
+{"event": "result", "key": "02ffc3da3fb3e8220e08aed4", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:17:29", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "7f9e15876d7b1d78fdebf5b0", "pass": "AR"}
+{"event": "request", "ts": "2026-11-21T13:17:42", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 57, "key": "02238cec6e489aa29c20ac00", "pass": "AR"}
+{"event": "result", "key": "7f9e15876d7b1d78fdebf5b0", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:17:47", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "5495bcf0e9c6bde34f0d68bd", "pass": "AR"}
+{"event": "result", "key": "02238cec6e489aa29c20ac00", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:17:55", "tool": "argen.py", "model": "sd35", "purpose": "ar_towns", "seed": 58, "key": "a1a42d031c0532730733a57a", "pass": "AR"}
+{"event": "result", "key": "5495bcf0e9c6bde34f0d68bd", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:18:01", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 1, "key": "8fcf6115c55edcd81c2eb755", "pass": "AR"}
+{"event": "result", "key": "a1a42d031c0532730733a57a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "result", "key": "8fcf6115c55edcd81c2eb755", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:18:11", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 2, "key": "12bc7728c31f0cf3714b1f45", "pass": "AR"}
+{"event": "result", "key": "12bc7728c31f0cf3714b1f45", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T13:22:21", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 3, "key": "35d883af5646fcb941283d90", "pass": "AR"}
+{"event": "result", "key": "35d883af5646fcb941283d90", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
