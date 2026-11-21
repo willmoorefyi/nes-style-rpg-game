@@ -188,10 +188,14 @@ def nw2_cases(g, meta, b, doc, ent_map, case) -> None:
     r = gates_canoe.duergar_south(g, meta, [bundle.Apart("duergar_south", "ert_dwarf", "elf_keep")])
     case("duergar_south: today's dwarves join the Western Keep with the canal off",
          not r["ok"] and r["duergar_south"]["foot"], f"{r['why'][:1]}")
-    r = gates_hike.hikes(g, meta, [bundle.Hike("wat_onrac", "wat_s_onrac_airship")], hk, sp, doc)
+    ok = gates_hike.hikes(g, meta, b.hikes, hk, sp, doc)["ok"]      # NW2-W: the declared hikes pass on the world
+    g2, (ox, oy) = g.copy(), meta["entrances"]["wat_onrac"]
+    g2[oy, ox - 2] = "."                     # ... and a grass cell planted 2 steps from Onrac's gate fails the floor
+    r = gates_hike.hikes(g2, meta, [bundle.Hike("wat_onrac", "wat_s_onrac_airship")], hk, sp, doc)
     v = r.get("wat_onrac", {})
-    case(f"hikes: today's Onrac (a landing {v.get('floor')} steps away) fails the floor K {hk['floor']}",
-         not r["ok"] and v.get("floor") is not None and v["floor"] < hk["floor"], f"{r['note']}")
+    case(f"hikes: the declared hikes pass; a landing planted {v.get('floor')} steps from Onrac fails the floor K "
+         f"{hk['floor']}", ok and not r["ok"] and v.get("floor") is not None and v["floor"] < hk["floor"],
+         f"{r['note']}")
     m2 = copy.deepcopy(meta)
     m2["docks"] = [d for d in m2["docks"] if d["id"] != "elf_port"]
     r = prewalk.dock_towns(g, m2, ent_map)

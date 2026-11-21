@@ -13,9 +13,10 @@ Design note (NW-R WATER; WAT-O's note of 4.0.4 carried to the generated world):
     at the camp (a 144-cell desert) changes 29 / 22 chunks outside WATER, since the westerly moisture sweep runs the
     whole row and the forest and sand thresholds are quantiles over all the land (12, Locality); that is over
     `--region`'s 160 painted chunks, so it waits for per-continent thresholds (the integrator's generator).
-  Topology: airship-only (no dock, 2.8; `north`: its land joins only ORDEAL's and WIND's). Landings on grass: two
-    cells west of Onrac's gate (S24's entry), in the oasis meadow by the camp, and the grass bank NW-4 put within 8
-    steps of the ledge. The ledge (NW-4, `stamps.ledges`: kept) touches only rock and R-waterfall, so the cave is the
+  Topology: airship-only (no dock, 2.8; `north`: its land joins only ORDEAL's and WIND's). Landings on grass:
+    NW2-W's hikes (docs/NW2_EDITS_PLAN.md 7; `worldgen/hikes.py`): no grass within K 25 steps of the three sites,
+    Onrac and the caravan share the south-coast meadow (S24's entry), the waterfall's meadow is on the east downs
+    (foot+canoe). The ledge (NW-4, `stamps.ledges`: kept) touches only rock and R-waterfall, so the cave is the
     canoe's (T6b, GT-25).
 
 The content (icons, dressing, inspect cells, sea-stacks, zones, backdrops, the region's map checks) is placed on the
@@ -23,7 +24,7 @@ composed ground by `content`, from `water/world_water_nw.py` and `water/world_wa
 """
 from __future__ import annotations
 
-from worldgen.bundle import ClimateHint, Continent, IsleField, RegionSpec, Ridge, SeaDisc, SpotDef
+from worldgen.bundle import ClimateHint, Continent, Hike, IsleField, RegionSpec, Ridge, SeaDisc, SpotDef
 
 from .common import sites
 
@@ -52,8 +53,8 @@ def spec() -> RegionSpec:
         sites=sites("water", {"wat_caravan": (2, 2)}),   # the camp at the dunes' edge (inside the +-2 window)
         towns=("wat_onrac",),
         spots=[SpotDef("wat_s_onrac", "wat_onrac", (0, 0), "land"),
-               SpotDef("wat_s_onrac_airship", "wat_onrac", NW.LANDING_OFF, "landing"),
-               SpotDef("wat_s_caravan_airship", "wat_caravan", NW.CARAVAN_LANDING_OFF, "landing")],
+               *(SpotDef(name, site, off, "landing") for name, site, off in NW.HIKES)],
+        hikes=[Hike(site, name) for name, site, _off in NW.HIKES],     # NW2-W (7): the three hikes
         north=("wat_onrac", "wat_waterfall", "wat_caravan"),
         ledges=("wat_waterfall",),           # NW-4: the cave mouth is a ledge on R-waterfall, reached by canoe only
     )
