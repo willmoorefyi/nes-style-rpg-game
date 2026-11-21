@@ -892,4 +892,4 @@ Gates:
 | `tests/balance/*` | 16 files, 104 tests OK |
 | `npm run test:fast` | 401 files, 9,654 tests OK |
 | `npm run build` | OK |
-| `npm run test:full` | see below |
+| `npm run test:full` | 403 files, 9,688 tests OK (both tiers, `questMutateWorld` and `questGraph` included); 4,348 s (72 min, 2 workers), max RSS 6.9 GB |
