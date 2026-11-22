@@ -134,29 +134,45 @@
       "x": 96,
       "y": 1120
     },
-    "robot_sentry": {
+    "bahamut": {
       "x": 192,
       "y": 1120
     },
-    "robot_ancient": {
+    "dragon_sage": {
       "x": 288,
       "y": 1120
     },
-    "sage_star": {
+    "dragon_matron": {
       "x": 0,
       "y": 1280
     },
-    "sage_earth": {
+    "dragon_hatchling": {
       "x": 96,
       "y": 1280
     },
-    "sage_flame": {
+    "robot_sentry": {
       "x": 192,
       "y": 1280
     },
-    "dr_unne": {
+    "robot_ancient": {
       "x": 288,
       "y": 1280
+    },
+    "sage_star": {
+      "x": 0,
+      "y": 1440
+    },
+    "sage_earth": {
+      "x": 96,
+      "y": 1440
+    },
+    "sage_flame": {
+      "x": 192,
+      "y": 1440
+    },
+    "dr_unne": {
+      "x": 288,
+      "y": 1440
     }
   }
 }

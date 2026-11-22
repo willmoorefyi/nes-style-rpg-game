@@ -3,8 +3,12 @@
 
 A `cells` SPEC entry:
   renders  {alias: [render tag, cache key, rows in the render]}
-  cut      {alias: {"tol": flood tolerance (default 14), "holes": colour distance}}: `holes` cuts away enclosed
-           background-coloured areas of at least HOLE_MIN render px (between the legs, under a tail)
+  cut      {alias: {"tol": flood tolerance (default 14), "holes": colour distance, "edge": n}}: `holes` cuts away
+           enclosed background-coloured areas of at least HOLE_MIN render px (between the legs, under a tail);
+           `edge` (pass CD) paints the render's outer n px with the median colour of the ring just inside them
+           first, so a dark frame or floor strip along the border does not stop the background flood
+  scale    optional (pass CD: the dragon hatchling): each render cell is pixelized at scale x 48x96 and centred
+           in the cell, feet on row 93 (LM5's fairy rule); default 1.0
   cells    3 rows (down, up, side drawn facing right) of 3 cells [alias, cell index in the render, mirror]; a
            mirrored cell is flipped left-right after it is placed (so a step drawn facing the wrong way faces right)
   shifts   {row: [[src hue, tol, dst hue, sat x, val x, (min sat)]]}: pre-quantize hue shifts of that row's cells
@@ -54,9 +58,21 @@ def hue_shift(col, solid, src, tol, dst, smul=1.0, vmul=1.0, smin=0.12):
     return out.reshape(h, w, 3).astype(np.float32), solid
 
 
-def render_frames(C, raw, rows, tol=14, holes=None, scale=1.0):
+def edge_fill(raw: Image.Image, n: int) -> Image.Image:
+    """The outer n px of the render painted with the median colour of the 1 px ring just inside them."""
+    a = np.asarray(raw.convert("RGB")).copy()
+    h, w, _ = a.shape
+    ring = np.concatenate([a[n, n:w - n], a[h - 1 - n, n:w - n], a[n:h - n, n], a[n:h - n, w - 1 - n]])
+    col = np.median(ring, axis=0).astype(np.uint8)
+    a[:n], a[h - n:], a[:, :n], a[:, w - n:] = col, col, col, col
+    return Image.fromarray(a)
+
+
+def render_frames(C, raw, rows, tol=14, holes=None, scale=1.0, edge=0):
     """The cutter's cells of one render with a flood tolerance and the optional hole cut (AR-N's review.frames)."""
-    if holes is None and tol == 14:
+    if edge:
+        raw = edge_fill(raw, edge)
+    if holes is None and tol == 14 and not edge:
         return C.frames(raw, rows, scale)
     rgb, cells, ch, cw = C.cell_masks(raw, rows, tol)
     size = (round(GW * scale), round(GH * scale))
@@ -211,7 +227,8 @@ def build(C, spec: dict) -> tuple[Image.Image, Image.Image, list[dict]]:
         if alias not in cache:
             _tag, key, rows = spec["renders"][alias]
             cut = spec.get("cut", {}).get(alias, {})
-            cache[alias] = render_frames(C, C._cached(key), rows, cut.get("tol", 14), cut.get("holes"))
+            cache[alias] = render_frames(C, C._cached(key), rows, cut.get("tol", 14), cut.get("holes"),
+                                         spec.get("scale", 1.0), cut.get("edge", 0))
         return cache[alias]
 
     picked, flips = [], []
