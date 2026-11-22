@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from marsh_b1 import NOTE  # noqa: E402
-from marsh_common import DONE, Floor, chest  # noqa: E402
+from marsh_common import DONE, Floor, chest, talk  # noqa: E402
 
 W, H = 38, 36
 BIER = (7, 4)                          # the crown on its bier: talking to it wakes the keepers
@@ -61,6 +61,14 @@ def build() -> Floor:
         chest("b3_fallen", "hi_potion", "a Hi-Potion", 36, 7),
         {"id": "elf_d_bier", "sprite": "chest", "x": BIER[0], "y": BIER[1], "hideIf": DONE,
          "dialog": ["On the bier lies a slim crown of elven silver, green with marsh-rot."]},
+        # P1-1-09 (FX-S): the last word before the keepers, on the gallery both ways to the bier hall share
+        {"id": "elf_d_last_escort", "sprite": "knight", "tint": "#8fa38a", "x": 7, "y": 13, "dialog": talk(
+            ["A knight of the king's escort leans on the wall, his blade notched to the hilt.",
+             "\"Three keepers wait by the bier, and they strike together. Our swords alone were not enough.\"",
+             "\"Let your mages cast from the first breath, fire and the white healing both, and keep potions to "
+             "hand. Do not count on steel.\""],
+            ["The knight has slid down the wall to rest. \"The keepers are gone? Then the king will have his "
+             "crown. Go on, I will follow when I can.\""])},
     ]
     return f
 
