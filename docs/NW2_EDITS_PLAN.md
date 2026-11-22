@@ -1047,7 +1047,7 @@ Gates:
 | `mode7_atlas.py --check-determinism overworld` | deterministic (`mode7.png` 73c00610551a, `mode7_low.png` 2a81d768a1a8, `mode7.json` 55c0f78c68d1) |
 | `npm run quest -- --strict` | `quest-verify: OK`: (a)-(h) OK, (b) 423 withheld runs, (c) 847,265 states, (d) every band OK, (f) Crescent 13,238 / 60,240, Gaia 96,340 / 259,240, (g) s* 0.852 (31 pairs); 116 s, max RSS 3.8 GB |
 | `npm run quest -- --strict --from-reset` | `quest-verify: OK`: 195 reset states (32 stage entries, the 3 NW2 v4 saves, 160 mid-stage samples), 5,205,220 states searched; 653 s, max RSS 6.7 GB |
-| `npm run quest -- --strict --mutate` | started in the background beside `--from-reset` and `test:fast` (about 80 min); its result is in the QW2 report |
+| `npm run quest -- --strict --mutate` | `quest-verify: OK`, `mutations: OK (68 gate rows; 109 elements, each removal reported)`; 4,614 s (77 min, beside `--from-reset` and `test:fast`), max RSS 7.0 GB |
 | `tests/balance/*` | 16 files, 104 tests OK |
 | touched tests (EARTH, anchors, `worldSource`, `worldGates`, `mode7Atlas`, balance) | 26 files, 169 tests OK |
 | `npm run build` | OK |
