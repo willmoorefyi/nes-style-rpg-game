@@ -22,13 +22,18 @@ the Water sea), `ord_heath` 0.67 -> 1.4 (S18 / S19 walk twice NW's heath), `fir_
 Rime Gorges' `fir_rivers` canoe fights (capped at 0.75, so not a lever) in S16 and S17: those stages' `grind` went
 down by the plan's lever 2 (quest.yaml: S16 2.0 -> 1.5, S17 4.0 -> 3.0). Result: every stage within 0.11 of NW's
 level, every band OK (the table in NW2_EDITS_PLAN's NW2-BAL result).
+
+QW2 (docs/NW2_EDITS_PLAN.md, QW2 result; user ruling 2026-11-22): Sarda's cave moved to the south cape, 42 steps from
+the giant's west mouth (was 5), so S12 walks the Sarda coast there and S13 back. `ert_sarda_coast` 0.67 -> 2.25 (rate
+23-50; the fit had left it at the floor) and S12's `grind` 7.0 -> 5.0 (quest.yaml): every stage within 0.07 of its
+level before the move, every band OK, Gaia's price wall OK.
 """
 from __future__ import annotations
 
 STEP_FACTOR = {
     "a1_aldi": 0.74, "a1_north_sea": 2.25,
     "elf_aldi": 1.15, "elf_fen": 1.85, "elf_fields": 1.45, "elf_keep_moor": 0.86,
-    "ert_aldi": 2.09, "ert_isthmus": 1.36, "ert_plain": 2.25, "ert_sarda_coast": 0.67, "ert_sea": 2.25,
+    "ert_aldi": 2.09, "ert_isthmus": 1.36, "ert_plain": 2.25, "ert_sarda_coast": 2.25, "ert_sea": 2.25,
     "fir_aldi": 1.46, "fir_ashlands": 2.25, "fir_desert": 1.4, "fir_lakeshore": 2.25, "fir_rivers": 0.75,
     "fir_sea": 2.25, "fir_tundra": 2.0,
     "ord_heath": 1.4, "ord_isles": 2.25, "ord_sea": 2.25,

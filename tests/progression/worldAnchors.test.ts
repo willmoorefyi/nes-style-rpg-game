@@ -23,8 +23,9 @@ const cellsOf = (geo: GeoData, move: (name: string, t: XY) => XY = (_n, t) => t)
 describe('NW anchors (4.2)', () => {
   it('keeps pass W\'s anchors, refs, pairs, exemptions and detours; moves the scale bands', () => {
     // NW2 (docs/NW2_EDITS_PLAN.md 9, D-NW2-5): the dwarves' ref moved north of the canal, dwarf-melmond tightened
-    // (NW2-E); the Ice Cavern's moved to the peninsula's tip, crescent-ice and ice-desert by ship and canoe (NW2-F)
-    const nw2: Record<string, XY> = { dwarf: [-54, -40], ice: [79, -55] };
+    // (NW2-E); the Ice Cavern's moved to the peninsula's tip, crescent-ice and ice-desert by ship and canoe (NW2-F);
+    // QW (user ruling 2026-11-22): Sarda's cave moved to the far south tip of the land west of the range
+    const nw2: Record<string, XY> = { dwarf: [-54, -40], ice: [79, -55], sarda: [-109, 44] };
     expect(nw.anchors.map((a) => [a.name, a.entrance, a.ref]))
       .toEqual(today.anchors.map((a) => [a.name, a.entrance, nw2[a.name] ?? a.ref]));
     expect(nw.pairs).toEqual(today.pairs);

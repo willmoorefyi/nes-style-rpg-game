@@ -965,3 +965,98 @@ GT-40-43, the state count, save v5) and its quick reference; `docs/PROGRESS.md` 
   16.13 and S13 17.00 -> 18.26. The evil eye reaches L25.02 [21,24] and S21 L29.31 [25,28], and Gaia's price wall
   fails. Lowering S12's grind 7.0 -> 3.0 still leaves S21 at 29.06. Per the brief, the move waits for a rebalance
   ruling.
+
+### QW2 result (2026-11-22, Sarda's cave on the south cape, rebalanced)
+
+The user's ruling of 2026-11-22: Sarda's cave goes to the far end of the peninsula the giant's west mouth opens onto,
+away from the tunnel's exit. QW's held patch applied unchanged (`world_specs/earth.py`'s `ert_sarda` corridor through
+ref (-88, 30); `world-anchors.yaml` `sarda` ref (-104, 0) -> (-109, 44), target (57, 155) -> (52, 193);
+`worldAnchors.test.ts`): door (52, 192), arrival (52, 193), 42 steps from the west mouth's arrival (59, 158) (was 5).
+No other geography changed; no enemy, item, formula or band changed.
+
+**Why it broke the bands.** Measured per stage and per zone with the curve model on both compiled worlds (mainline
+cac07d51's and the moved one): the walk to the cave (S12, grind 7) and back to the Cavern of Earth (S13, grind 4)
+crosses `ert_sarda_coast`, which the NW-5 fit had left at the floor factor 0.67 (rate 7-15, a fight every 11 steps).
+S12's Sarda-coast fights went 3.8 -> 27.4 (6.0 k -> 43.0 k xp), S13's 2.2 -> 15.6 (3.4 k -> 24.6 k): +58 k xp, which
+carried every later stage up about 0.5 (S16 L25.02 and S21 L29.31 over), and the rush walk's gold past Gaia's wall
+(104,926 vs 103,696).
+
+**Levers.**
+1. Re-fit: `ert_sarda_coast` 0.67 -> **2.25** (rate 23-50; `world_balance.py`, clamp top, no `CAP`): the move's
+   coast fights fall to 8.2 (S12) / 4.6 (S13). Alone it leaves S12 +0.5 over today.
+2. Grind: **S12 7.0 -> 5.0** (quest.yaml). Swept S12 4.0-5.0 x S13 2.5-4.0 (in-memory overrides on the compiled
+   world, `/tmp/qw2/probe.ts`): S12 4.0 drops S12 to L14.96 (under [15, 17]); S12 4.5 leaves it at L15.02; S13 3.0
+   drops S20 / S22 to L24.96 (under [25, 28]). S12 5.0 with S13 kept at 4.0 is the closest single change: every stage
+   within 0.07 of today, the tightest margins S12 0.08 over 15, S20 / S22 0.10 over 25, S21 0.12 under 29.
+
+Levels (curve model, `npm run quest -- --strict`'s (d), witness order of (a); "today" = mainline cac07d51 before the
+move; "moved" = the patch alone):
+
+| Stage | Band | grind | today | moved | QW2 | vs today |
+|---|---|---|---|---|---|---|
+| S0 garland | [2, 3] | 2 | 2.71 | 2.71 | 2.71 | +0.00 |
+| S1 | [2, 3] | 1 | 2.95 | 2.95 | 2.95 | +0.00 |
+| S3 | [2, 6] | 2 | 3.86 | 3.86 | 3.86 | +0.00 |
+| S2 pirate | [3, 6] | 2.5 | 3.60 | 3.60 | 3.60 | +0.00 |
+| S4 | [5, 9] | 2 | 8.66 | 8.66 | 8.66 | +0.00 |
+| S5 piscodemon | [8, 11] | 2 | 8.57 | 8.57 | 8.57 | +0.00 |
+| S6 astos | [10, 13] | 4 | 10.54 | 10.54 | 10.54 | +0.00 |
+| S7 | [10, 13] | 1 | 10.86 | 10.86 | 10.86 | +0.00 |
+| S8 | [10, 13] | 1 | 10.96 | 10.96 | 10.96 | +0.00 |
+| S9 | [10, 13] | 1 | 10.96 | 10.96 | 10.96 | +0.00 |
+| S10 | [11, 14] | 6 | 11.39 | 11.39 | 11.39 | +0.00 |
+| S11 vampire | [13, 16] | 7 | 14.38 | 14.38 | 14.38 | +0.00 |
+| S12 | [15, 17] | **7 -> 5** | 15.10 | 16.13 | 15.08 | -0.02 |
+| S13 lich | [16, 19] | 4 | 17.00 | 18.26 | 17.07 | +0.07 |
+| S14 | [17, 20] | 6 | 18.03 | 19.16 | 18.09 | +0.06 |
+| S15 ashen_queen | [21, 24] | 3 | 21.76 | 22.55 | 21.81 | +0.05 |
+| S16 evil_eye | [21, 24] | 1.5 | 24.38 | 25.02 **over** | 24.41 | +0.03 |
+| S17 | [22, 25] | 3 | 24.96 | 25.56 | 24.99 | +0.03 |
+| S20 | [25, 28] | 7 | 25.07 | 25.66 | 25.10 | +0.03 |
+| S22 | [25, 28] | 2 | 25.07 | 25.66 | 25.10 | +0.03 |
+| S18 dragon_zombie | [24, 27] | 2 | 26.18 | 26.73 | 26.21 | +0.03 |
+| S19 | [24, 27] | 2 | 26.46 | 27.01 | 26.49 | +0.03 |
+| S23 | [26, 29] | 2 | 26.65 | 27.19 | 26.68 | +0.03 |
+| S24 drowned_sovereign | [27, 30] | 2 | 28.61 | 29.08 | 28.64 | +0.03 |
+| S25 | [28, 31] | 1 | 28.71 | 29.17 | 28.74 | +0.03 |
+| S26 | [28, 31] | 2 | 28.77 | 29.22 | 28.79 | +0.02 |
+| S21 | [25, 28] | 2 | 28.85 | 29.31 **over** | 28.88 | +0.03 |
+| S27 | [29, 32] | 1 | 30.33 | 30.78 | 30.36 | +0.03 |
+| S31 | none | 1 | 33.01 | 33.46 | 33.04 | +0.03 |
+| S28 hollow_seraph | [31, 34] | 1 | 33.89 | 34.33 | 33.91 | +0.02 |
+| S29 | [33, 35] | 1 | 34.00 | 34.45 | 34.03 | +0.03 |
+| S30 lich_2 | [34, 41] | 1 | 35.29 | 35.73 | 35.31 | +0.02 |
+
+Price walls (proof (f), the rush walk): Crescent 13,238 / 60,240 (unchanged), Gaia 94,351 today, 104,926 moved
+(**over** 40 % = 103,696), **96,340** after QW2.
+
+Seeded battles (`tests/balance/questCurve.test.ts`, 60 seeds; today -> QW2): garland 2.66 / 2.66, pirate 3.59 / 3.59,
+piscodemon 8.59 / 8.59, astos 10.55 / 10.55, vampire 14.36 / 14.36, lich 17.01 / 17.08, ashen_queen 21.73 / 21.76,
+evil_eye 24.37 / 24.38, dragon_zombie 26.17 / 26.18, drowned_sovereign 28.58 / 28.65, hollow_seraph 33.87 / 33.75,
+lich_2 35.30 / 35.22; Chaos's door 40.43 / 40.37. Wipes per run: required stages at most 0.05 / 0.03, optional S31
+0.42 / 0.30 (bound 0.45; NW2-BAL's 0.13 had already drifted on mainline). The test names and comments carry the QW2
+figures; `macroGeography.test.ts`'s s* figure 0.848 -> 0.849 (the moved anchor).
+
+Gates:
+
+| Gate | Result |
+|---|---|
+| `world.py` | 28 OK lines, exit 0; re-run leaves `assets-src/maps/overworld.yaml` byte-identical (sha1 5557e2ff) |
+| `build_map.py overworld` | OK, 326 s, peak footprint 15.6 GB; 6 chunks (`below_9_3`, `9_4`, `10_3`, `11_3`, `11_4`, `12_3`), the Mode 7 atlas and the compiled yaml changed |
+| `build_map.py --check-determinism overworld` | deterministic |
+| `mode7_atlas.py --check-determinism overworld` | deterministic (`mode7.png` 73c00610551a, `mode7_low.png` 2a81d768a1a8, `mode7.json` 55c0f78c68d1) |
+| `npm run quest -- --strict` | `quest-verify: OK`: (a)-(h) OK, (b) 423 withheld runs, (c) 847,265 states, (d) every band OK, (f) Crescent 13,238 / 60,240, Gaia 96,340 / 259,240, (g) s* 0.852 (31 pairs); 116 s, max RSS 3.8 GB |
+| `npm run quest -- --strict --from-reset` | `quest-verify: OK`: 195 reset states (32 stage entries, the 3 NW2 v4 saves, 160 mid-stage samples), 5,205,220 states searched; 653 s, max RSS 6.7 GB |
+| `npm run quest -- --strict --mutate` | `quest-verify: OK`, `mutations: OK (68 gate rows; 109 elements, each removal reported)`; 4,614 s (77 min, beside `--from-reset` and `test:fast`), max RSS 7.0 GB |
+| `tests/balance/*` | 16 files, 104 tests OK |
+| touched tests (EARTH, anchors, `worldSource`, `worldGates`, `mode7Atlas`, balance) | 26 files, 169 tests OK |
+| `npm run build` | OK |
+| `npm run test:fast -- --maxWorkers=2 --minWorkers=1` | 414 files, 10,044 tests OK (173 s; the first run caught `macroGeography`'s s* figure, fixed above) |
+
+**Browser** (headed Chromium, a dev server on 127.0.0.1:5317, every URL `?mute=1`; field scenarios appended by a
+request route; `~/temp/ff-game/qw2/`): `0_overview_tunnel_to_cave.png` (a compiled crop, x 40-72, y 150-198, grid),
+`1_giant_west_mouth_59_158.png`, `2_walk_west_coast_56_168.png`, `3_walk_south_54_182.png`,
+`4_sarda_cave_mouth_52_193.png`; then a live walk from the west mouth with encounters off (left 3, down 20, left 2,
+down 15, left 2: 42 steps, `5_walk_live_step_23.png`, `_40.png`, `6_walk_live_arrived_52_193.png`) and up into the
+cave (`7_entered_sage_cave.png`: `sage-cave` at its arrival (7, 10)). The cave sits in the cape's rocks between a
+copse and the coast, its mouth facing south onto the meadow. No console error or warning.
