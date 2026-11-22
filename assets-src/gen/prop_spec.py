@@ -8,7 +8,8 @@ from __future__ import annotations
 WALL = "wall"
 G = {"clean": {"green_y": 0.0}}
 # id: (render tag, render cache key, object #, (cells w, h), place, cut options)   place: floor | wall (a wall face)
-# options: fill (pix), clean (extra LP.clean kw), web (keep only the pale threads)
+# options: fill (pix), clean (extra LP.clean kw), web (keep only the pale threads); approved / purpose (pass CD): a
+# prop approved after the 2026-11-21 rulings, under another purpose (written to its record only, not its cut)
 SPEC = {
     # light sources (each has a FLAME entry)
     "wall_torch": ("torch_ultra_11", "2dcc06d2c7db940c92082e5f", 0, (1, 1), WALL, {}),
@@ -69,6 +70,9 @@ SPEC = {
     "ruin_column_rune": ("ruin_column_ultra_1", "8ccf729752df4c01b2117f5c", 3, (1, 2), "floor", {}),
     "sealed_coffin": ("sealed_coffin2_ultra_2", "0e622ba74f560cea86368e0b", 3, (1, 2), "floor", {"fill": 0.8}),
     "stone_coffin": ("sealed_coffin2_ultra_2", "0e622ba74f560cea86368e0b", 0, (1, 2), "floor", {"fill": 0.8}),
+    # pass CD (docs/CARDIA_PLAN.md 6.1): Cardia Deep's drake brazier, a single figure (object 0), purpose ar_dragon
+    "drake_brazier": ("cd_brazier", "7f2af0029275bb8d1f48d5a1", 0, (1, 2), "floor",
+                      {"approved": "2026-11-22", "purpose": "ar_dragon"}),
 }
 SPLIT = {"ruin_column_ultra_1": 4}          # four columns side by side: cut into vertical quarters
 # lit props: style, the flame rect (fractions of the figure's box [x0, y0, x1, y1]), tongue (the top quarter drops out),
@@ -82,5 +86,6 @@ FLAME = {
     "cauldron_brew": ("green", [0, 0, 1, 0.6], False, 26), "mushrooms_glow": ("green", [0, 0, 1, 1], False, 26),
     "console": ("cyan", [0, 0, 1, 1], False, 26), "light_pylon": ("cyan", [0, 0, 1, 1], False, 34),
     "bog_lantern": ("lamp", [0, 0.2, 0.55, 0.62], False, 26),
+    "drake_brazier": ("fire", [0, 0, 1, 0.4], True, 40),
 }
 HUES = {"fire": (0, 58), "purple": (255, 320), "green": (75, 150), "cyan": (175, 205), "lamp": (40, 75)}

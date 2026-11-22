@@ -4,8 +4,9 @@ The Citadel: a crescent island arc in the north centre, its bay open to the sout
 west and Gaia's to the east by open straits. A high spine runs along its outer (north and west) side, so the north
 rim is snow and rock; the inner side is a sheltered heath (a `warm` climate hint) whose broad west arm is the
 tableland of the Citadel of Trials, cut into a crag spur of the spine. South-east of the arc lies Cardia, an
-archipelago owned by ORDEAL: Bahamut's isle and five named islets (the hermit's the northernmost) among seeded
-look-only islets, warm enough for grass landings. A small group lies south of the arc's west horn. Dockless:
+archipelago owned by ORDEAL: Bahamut's isle and five named islets (the north islet the northernmost) among seeded
+look-only islets, warm enough for grass landings; a cave on every named islet but the hermit's (pass CD: each a stair
+into Cardia Deep), each with its own grass landing. A small group lies south of the arc's west horn. Dockless:
 airship only. The north sea (forced open water between the north continents and the south) is listed here.
 
 Every point is Cornelia-relative (spec.py): the arc is given as world-cell midline knots with an outer and an inner
@@ -77,7 +78,11 @@ def spec() -> RegionSpec:
         sites=sites("ordeal", extra=EXTRA),
         spots=[SpotDef("ord_s_citadel", "ord_meadow", (0, -1), "land"),
                SpotDef("ord_s_citadel_airship", "ord_meadow", (0, 0), "landing"),
-               SpotDef("ord_s_bahamut_airship", "ord_bahamut", (0, 2), "landing")],
+               SpotDef("ord_s_bahamut_airship", "ord_bahamut", (0, 2), "landing"),
+               SpotDef("ord_s_north_airship", "ord_isle_north", (0, 1), "landing"),   # pass CD (plan 3.3)
+               SpotDef("ord_s_east_airship", "ord_isle_east", (0, 1), "landing"),
+               SpotDef("ord_s_stack_airship", "ord_isle_stack", (0, 1), "landing"),
+               SpotDef("ord_s_west_airship", "ord_isle_west", (0, 1), "landing")],
         north=("ord_citadel", "ord_bahamut"),
     )
 

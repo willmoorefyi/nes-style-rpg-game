@@ -88,7 +88,7 @@ describe('originality: the pass W dungeons', () => {
   const rows = canonRows().filter((r) => r.kind === 'floor');
   const dungeons = new Map<string, typeof rows>();
   for (const r of rows) {
-    // floors without a floor label are named sites of one dungeon by their stem (`bahamut-cave`, `bahamut-lair`)
+    // floors without a floor label are grouped by their stem
     const d = floorOf(r.id)?.dungeon ?? r.id.replace(/-[a-z]+$/, '');
     dungeons.set(d, [...(dungeons.get(d) ?? []), r]);
   }

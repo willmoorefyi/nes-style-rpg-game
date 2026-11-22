@@ -1,8 +1,10 @@
 /**
- * The Citadel of Trials and Bahamut's cave and lair on the compiled maps (docs/WORLD_PLAN.md 4.0.2, 4.5; ORD-O): the
- * chests per floor, EXIT, the throne's arch (ORD_O_THRONE), the pad lattice (2 of 6 pads lead on, the north hall
- * only by pad), the trial hall's guardian (west of the arrival, inside the statues, the seal from its cutscene), the
- * one-way stair back to 1F, and Bahamut's trade (the seal for CLASS_UPGRADED, then the class change).
+ * The Citadel of Trials and Cardia Deep on the compiled maps (docs/WORLD_PLAN.md 4.0.2, 4.5; ORD-O; pass CD,
+ * docs/CARDIA_PLAN.md 9): the chests per floor, EXIT, the throne's arch (ORD_O_THRONE), the pad lattice (2 of 6 pads
+ * lead on, the north hall only by pad), the trial hall's guardian (west of the arrival, inside the statues, the seal
+ * from its cutscene), the one-way stair back to 1F; Cardia Deep's five island stairs (each paired with its islet's
+ * door, Bahamut's first), one village on foot, the warrens' encounter zone, and Bahamut's trade (the seal for
+ * CLASS_UPGRADED, then the class change).
  */
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -19,7 +21,7 @@ const map = (id: string): MapData => parse(readFileSync(`assets/maps/ai/${id}.ya
 const cutscene = (id: string): Array<Record<string, unknown>> =>
   (parse(readFileSync('assets/data/cutscenes.yaml', 'utf-8')) as Array<{ id: string; steps: Array<Record<string, unknown>> }>)
     .find((c) => c.id === id)!.steps;
-const [f1, f2, f3, cave, lair] = ['citadel-1f', 'citadel-2f', 'citadel-3f', 'bahamut-cave', 'bahamut-lair'].map(map);
+const [f1, f2, f3, deep, world] = ['citadel-1f', 'citadel-2f', 'citadel-3f', 'cardia-deep', 'overworld'].map(map);
 
 /** Cells reached on foot from `from` (gate cells in `closed` blocked), not stepping onto any transition. */
 function walk(m: MapData, from: [number, number], closed: Set<string> = new Set()): Set<string> {
@@ -44,11 +46,12 @@ const stairTo = (m: MapData, target: string): string[] =>
   m.transitions.filter((t) => t.targetMap === target).map((t) => `${t.x},${t.y}`);
 
 describe('ORD-O: the Citadel of Trials and Bahamut (S18, S19)', () => {
-  it('chests 3 / 4 / 3 in the citadel and 1 / 0 below the isle, each flag CHEST_ORD_O_; EXIT to the anchors', () => {
-    expect([f1, f2, f3, cave, lair].map((m) => chests(m).length)).toEqual([3, 4, 3, 1, 0]);
-    for (const m of [f1, f2, f3, cave]) for (const c of chests(m)) expect(c.chestFlag, c.id).toMatch(/^CHEST_ORD_O_/);
+  it('chests 3 / 4 / 3 in the citadel and 1 below the isles (the grotto\'s), each flag CHEST_ORD_O_; EXIT to the anchors', () => {
+    expect([f1, f2, f3, deep].map((m) => chests(m).length)).toEqual([3, 4, 3, 1]);
+    for (const m of [f1, f2, f3, deep]) for (const c of chests(m)) expect(c.chestFlag, c.id).toMatch(/^CHEST_ORD_O_/);
+    expect(chests(deep)[0]).toMatchObject({ chestItem: 'diamond_armlet', chestFlag: 'CHEST_ORD_O_GROTTO' });
     for (const m of [f1, f2, f3]) expect(m.exit).toEqual({ map: 'overworld', entrance: 'ord_citadel' });
-    for (const m of [cave, lair]) expect(m.exit).toEqual({ map: 'overworld', entrance: 'ord_bahamut' });
+    expect(deep.exit).toEqual({ map: 'overworld', entrance: 'ord_bahamut' });
     expect(f3.canSave).toBe(false);
   });
 
@@ -98,13 +101,62 @@ describe('ORD-O: the Citadel of Trials and Bahamut (S18, S19)', () => {
     expect(walk(f1, at(f1, 'chute')).has(at(f1, 'arrival').join(','))).toBe(true);
   });
 
-  it('the cave leads down to the lair, where six dragons and Bahamut wait', () => {
-    expect(stairTo(cave, 'bahamut-lair').some((k) => walk(cave, at(cave, 'arrival')).has(k))).toBe(true);
-    const dragons = lair.npcs.filter((n) => n.id.startsWith('dragon_'));
-    expect(dragons).toHaveLength(6);
-    const bahamut = lair.npcs.find((n) => n.id === 'bahamut')!;
+  it('Cardia Deep: every overworld door into it pairs with an entrance and a stair back up to the same islet', () => {
+    const doors = world.transitions.filter((t) => t.targetMap === 'cardia-deep');
+    expect(doors).toHaveLength(5);
+    for (const d of doors) {
+      const e = at(deep, d.targetEntrance!);
+      expect(e, d.targetEntrance).toBeDefined();
+      const back = deep.transitions.filter((t) => t.targetMap === 'overworld'
+        && Math.abs(t.x - e[0]) + Math.abs(t.y - e[1]) <= 2);
+      expect(back.length, `${d.targetEntrance}'s stair`).toBeGreaterThan(0);
+      const ent = world.entrances![back[0].targetEntrance!];
+      expect([d.x, d.y], `${d.targetEntrance} door one step north of its islet entrance`).toEqual([ent[0], ent[1] - 1]);
+    }
+  });
+
+  it('Cardia Deep: its first two transitions are the Sea Gate stair to ord_bahamut (NW2 wayOutSearch, plan 5.2)', () => {
+    expect(deep.transitions.slice(0, 2).map((t) => [t.targetMap, t.targetEntrance]))
+      .toEqual([['overworld', 'ord_bahamut'], ['overworld', 'ord_bahamut']]);
+  });
+
+  it('Cardia Deep is one village: every entrance reaches every other on foot, with no gate and no flag', () => {
+    expect((deep.keyItemGates ?? [])).toHaveLength(0);
+    for (const t of deep.transitions) expect(t.requiredFlag ?? t.requiredFlags, `${t.x},${t.y}`).toBeUndefined();
+    const names = Object.keys(deep.entrances!);
+    expect(names.sort()).toEqual(['bahamut_gate', 'court', 'east', 'north', 'stack', 'west']);
+    for (const a of names) {
+      const seen = walk(deep, at(deep, a));
+      for (const b of names) expect(seen.has(at(deep, b).join(',')), `${a} -> ${b}`).toBe(true);
+    }
+  });
+
+  it('Cardia Deep: the warrens roll the old cave\'s fights on 150-204 walkable cells; the village rolls none', () => {
+    // the map's rate is the warrens' (the field counts down on it until the first fight); no map table, so a village
+    // step never counts (EncounterSystem: no table, no step)
+    expect(deep.encounterRate).toEqual({ min: 24, max: 36 });
+    expect(deep.encounters ?? []).toEqual([]);
+    const zones = deep.encounterZones ?? [];
+    expect(zones.map((z) => z.id)).toEqual(['ord_deep_warrens']);
+    const z = zones[0];
+    expect(z.encounterRate).toEqual({ min: 24, max: 36 });
+    expect(z.encounters.map((e) => (e.groups ?? []).map((g) => g.id).join('+'))).toEqual(['wyrm', 'basilisk', 'wyvern']);
+    const inZone = new Set<string>();
+    for (const [x0, y0, x1, y1] of z.rects) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      if (terrainAllows('walking', baseTerrain(deep, x, y))) inZone.add(`${x},${y}`);
+    }
+    expect(inZone.size).toBeGreaterThanOrEqual(150);
+    expect(inZone.size).toBeLessThanOrEqual(204);
+    for (const e of ['court', 'bahamut_gate']) expect(inZone.has(at(deep, e).join(',')) === (e !== 'court'), e).toBe(true);
+  });
+
+  it('Cardia Deep: the six dragons of the old lair and Bahamut, his trade unchanged', () => {
+    const dragons = deep.npcs.filter((n) => n.id.startsWith('dragon_')).map((n) => n.id).sort();
+    expect(dragons).toEqual(['dragon_ash', 'dragon_ember', 'dragon_frost', 'dragon_moss', 'dragon_storm', 'dragon_tide']);
+    const bahamut = deep.npcs.find((n) => n.id === 'bahamut')!;
     expect(bahamut).toMatchObject({ requiredItem: 'ordeal_seal', action: 'classUpgrade', actionFlag: 'CLASS_UPGRADED',
       cutscene: { id: 'ord_bahamut_trial', onceFlag: 'CLASS_UPGRADED' }, hideIf: 'CLASS_UPGRADED' });
+    expect(deep.npcs.find((n) => n.id === 'bahamut_after')).toMatchObject({ showIf: 'CLASS_UPGRADED' });
     const steps = cutscene('ord_bahamut_trial');
     expect(steps).toContainEqual({ type: 'take_item', item: 'ordeal_seal' });
     expect(steps).toContainEqual({ type: 'set_flag', flag: 'CLASS_UPGRADED' });
@@ -117,7 +169,7 @@ describe('ORD-O: Bahamut in the field (FieldNpcActions)', () => {
     await ClassRegistry.init({ loadClasses: async () => CLASSES } as unknown as DataLoader);
   });
 
-  const bahamut = (): MapNPC => lair.npcs.find((n) => n.id === 'bahamut')!;
+  const bahamut = (): MapNPC => deep.npcs.find((n) => n.id === 'bahamut')!;
   const party = (): Character[] => ['warrior', 'black_mage'].map((c) => new Character({ name: c.toUpperCase(), classData: classOf(c), level: 25 }));
 
   it('with the seal: the cutscene plays, then the party is upgraded in the same talk', async () => {

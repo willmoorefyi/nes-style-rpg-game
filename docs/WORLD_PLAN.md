@@ -1031,6 +1031,8 @@ classic version of the region has.
 
 ### 4.5 ORDEAL: the Citadel of Trials and Bahamut
 
+Superseded by pass CD (docs/CARDIA_PLAN.md): both maps retired into `cardia-deep`.
+
 - **Shape and placement.**
   - A high northern plateau (about x 66-96, y 10-46) ringed by mountains, with the Citadel at (75, 28) and a grass
     landing meadow south of its gate.
@@ -3919,6 +3921,8 @@ ice_brand (the stair hall); B3 opal_helm, phoenix_down, hi_potion. The opal piec
 <!-- === end FIR-D2 === -->
 <!-- === ORD-O ORDEAL (pass W: owned by ORD-O) === -->
 ### ORD-O result: the Citadel of Trials and Bahamut (branch `w-ord-o` from `mainline` 62033ba)
+
+Superseded by pass CD (docs/CARDIA_PLAN.md): both maps retired into `cardia-deep`.
 
 No AI or paid calls. No kneel files. Scratch in `/tmp/w-ord-o/`.
 

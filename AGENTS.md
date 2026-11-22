@@ -272,7 +272,7 @@ Most compiled maps come from Python layout scripts, not hand-written YAML. Each 
 | `elf/town_elfheim.py`, `elf/town_elfheim_rooms.py` | ELF: `elfheim`, its castle (`elfheim-castle`, `-castle-chamber`), the vault, 6 houses and the shops; `elf/keep.py`: `western-keep-1f`, `-2f`; `elf/marsh_b1.py` .. `marsh_b3.py`: `marsh-cave-b1` .. `-b3` |
 | `earth/dwarf.py`, `earth/giant.py`, `earth/sage.py` | EARTH: `dwarf-hall` (Nerrick's canal, Smyth's forge for S31), `giant-tunnel`, `sage-cave`; `earth/town_melmond.py`, `earth/town_melmond_interiors.py`: `melmond` and its houses (Dr. Unne's among them) and shops; `earth/cavern_upper.py`, `cavern_lower.py`: `cavern-earth-b1` .. `-b5` |
 | `fire/town_crescent.py`, `fire/town_crescent_rooms.py`, `fire/town_crescent_circle.py` | FIRE: `crescent`, its houses and shops, `crescent-circle` (the sages); `fire/gurgu_upper.py`, `gurgu_lower.py`: `gurgu-b1` .. `-b5`; `fire/ice_b1.py` .. `ice_b3.py`: `ice-cavern-b1` .. `-b3` |
-| `ordeal/citadel.py`, `ordeal/bahamut.py` | ORDEAL: `citadel-1f` .. `-3f`; `bahamut-cave`, `bahamut-lair` |
+| `ordeal/citadel.py`, `ordeal/cardia_deep.py` (+ `cardia_people.py`) | ORDEAL: `citadel-1f` .. `-3f`; `cardia-deep` (pass CD: the dragon great village; `bahamut-cave` / `-lair` retired) |
 | `water/town_onrac.py`, `water/town_onrac_interiors.py` | WATER: `onrac`, its houses and shops; `water/caravan.py`: `caravan-camp` (the bottle, 40000 G); `water/waterfall.py`: `waterfall-cave`; `water/shrine_b1.py` .. `shrine_b5.py`: `sea-shrine-b1` .. `-b5` |
 | `wind/town_gaia.py`, `wind/town_gaia_interiors.py` | WIND: `gaia`, its houses, shops and `gaia-spring`; `wind/lufenia_town.py`, `lufenia_interiors.py`: `lufenia` and its houses and shops; `wind/mirage_floors.py`: `mirage-1f` .. `-3f`; `wind/sky_lower.py`, `sky_upper.py`: `sky-castle-1f` .. `-5f` |
 | `past/past_upper.py`, `past/past_lower.py` | PAST: `past-temple-1` .. `-5` and `past-chaos` (the Chaos door) |
@@ -286,7 +286,7 @@ The `*_common.py`, `*_people.py`, `*_homes.py`, `*_shops.py` and `*_site.py` fil
 - patch `art_ground` (FX-R) — the patch overlay is painted as this legend char instead of `ground` (same terrain only), e.g. the canal's stone-banked `~` over Water `o`.
 - `layouts/world_dress.py` (FX-R) — `scatter()` dresses a town icon with seeded 1x1 copses, bushes and stones (offsets, gaps, `collide: alpha`; the door's sides stay solid, the gate stays reachable): Melmond, Onrac.
 - A peak drawn near a chunk border reaches into the next chunk, so editing mountains in a chunk beside another region's chunk can repaint it. Check the changed chunk files against `world.py --owned-chunks <region>` after a compile.
-- **Dungeon props (AR, AR-P2).** 50 Bedrock props of art pass AR (user rulings 2026-11-21: AR-P's usable picks, the weak-but-usable chains, bog lantern, fire idol, robot husk, gold skull, 2x2 bookshelf and the ice block, and the re-rolls of the wall torch (a sconce on stone, `torch_ultra_11`) and the cobweb (thick threads, `web_ultra_23_k`)) in `gen/approved/dungeon/props_ar.{png,json}`, re-cut offline from the render cache by `python3 -I assets-src/gen/prop_cut.py` (`--check`: the committed sheet rebuilds; `--native DIR`; the picks, cut options and flame rects are `gen/prop_spec.py`; copy the cache PNGs from the main checkout into a worktree first). Cells `ar_<id>_<r>_<c>`; `tools/kit_props.py` loads them into every kit (code-drawn placeholders while the sheet is missing) and bakes a torch-like prop without its flame's tongue pixels (the runtime draws them). The maps are dressed by one table, `layouts/props_ar_maps.py` (`DRESS`: map id -> (prop, x, y)), which `common.Room.write` applies through `layouts/props_ar.py` `place`: a wall prop (torch, chains, cobweb, portcullis, iron door, bar gate) on two-row wall-face cells (`on_wall`), a tall floor prop with its upper rows on the face behind it (else `above_rows`), and every lit prop also gets its `flame` ambient entry. 266 props on 42 dungeon maps (every floor of Marsh Cave, the Western Keep, the Cavern of Earth, the Giant's Tunnel, Gurgu, the Ice Cavern (off the sheet ice and its neighbours only; no stopper changed), the Sea Shrine, the Waterfall Cave, the Sky Castle, the Mirage Tower, the Temple of the Past and the Citadel). The portcullis, iron door and bar gate are dressing only (no flag swaps their art; the open portcullis is in the sheet but not placed). Tests: `tests/data/arProps.test.ts`.
+- **Dungeon props (AR, AR-P2).** 51 Bedrock props of art pass AR (50, plus pass CD's `drake_brazier`, purpose `ar_dragon`, approved 2026-11-22: a prop's `approved` / `purpose` options go to its record only) (user rulings 2026-11-21: AR-P's usable picks, the weak-but-usable chains, bog lantern, fire idol, robot husk, gold skull, 2x2 bookshelf and the ice block, and the re-rolls of the wall torch (a sconce on stone, `torch_ultra_11`) and the cobweb (thick threads, `web_ultra_23_k`)) in `gen/approved/dungeon/props_ar.{png,json}`, re-cut offline from the render cache by `python3 -I assets-src/gen/prop_cut.py` (`--check`: the committed sheet rebuilds; `--native DIR`; the picks, cut options and flame rects are `gen/prop_spec.py`; copy the cache PNGs from the main checkout into a worktree first). Cells `ar_<id>_<r>_<c>`; `tools/kit_props.py` loads them into every kit (code-drawn placeholders while the sheet is missing) and bakes a torch-like prop without its flame's tongue pixels (the runtime draws them). The maps are dressed by one table, `layouts/props_ar_maps.py` (`DRESS`: map id -> (prop, x, y)), which `common.Room.write` applies through `layouts/props_ar.py` `place`: a wall prop (torch, chains, cobweb, portcullis, iron door, bar gate) on two-row wall-face cells (`on_wall`), a tall floor prop with its upper rows on the face behind it (else `above_rows`), and every lit prop also gets its `flame` ambient entry. 316 props on 43 dungeon maps (Cardia Deep's 50 since pass CD; every floor of Marsh Cave, the Western Keep, the Cavern of Earth, the Giant's Tunnel, Gurgu, the Ice Cavern (off the sheet ice and its neighbours only; no stopper changed), the Sea Shrine, the Waterfall Cave, the Sky Castle, the Mirage Tower, the Temple of the Past, the Citadel and Cardia Deep). The portcullis, iron door and bar gate are dressing only (no flag swaps their art; the open portcullis is in the sheet but not placed). Tests: `tests/data/arProps.test.ts`.
 
 After an edit:
 
@@ -463,6 +463,20 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   River / Lake walks; a cell that admits neither mode, or a stranded component, takes the D-NW8 reset. `--from-reset`
   adds three relocated v4 saves (`questResetNw2.ts`: S10 in `dwarf-hall`, S16 in `ice-cavern-b1`, S6 at the keep).
   Tests: `tests/systems/worldRevalidate.test.ts`, `tests/scenes/loadRevalidate.test.ts`, `resetStates.test.ts`.
+- **Cardia Deep (pass CD, `docs/CARDIA_PLAN.md`; brief `docs/DRAGON_CITY_BRIEF.md`).** Cardia works as in classic
+  FF1: a cave on Bahamut's isle and on the north, east, stack and west islets (`ordeal/world_ordeal_nw.py` `_mouth`,
+  `DOOR_ISLES`; the hermit's islet has none, ruling R1), each a door one step north of its entrance into **one** map,
+  `cardia-deep` (72x60, `layouts/ordeal/cardia_deep.py` + `cardia_people.py`): five wild warrens (zone
+  `ord_deep_warrens`, the old cave's `CAVE_FIGHTS` at 24-36 on 198 walkable `%` cells) through ward arches into a
+  quiet village of nine districts round the Wyrmhall, Bahamut's Court at the top of the Processional; every stair
+  leads back to its own islet, and the Sea Gate stair to `ord_bahamut` is the map's first transition (NW2's
+  `wayOutSearch` takes the first). The doors come from `world_specs/later_doors.py` (`DOORS`, and `RETARGET` re-points
+  pass W's frozen Bahamut door; `today_doors_data.py` stays frozen), the landings are the spots
+  `ord_s_{north,east,stack,west}_airship`. `bahamut-cave` and `bahamut-lair` are retired: a save inside one loads at
+  `cardia-deep` `bahamut_gate` / `court` (`src/systems/retiredMaps.ts`, applied first in `SaveManager.load`; a v1-v3
+  save that owns the airship still takes the D-NW8 reset). S19 is unchanged but for `maps` / `walk`. Airship only (S17
+  on). Previews: `?mute=1&scenario=cd_court | cd_isles | cd_warren` (and `w_ar_lair`, `w_ar_ember`). Tests:
+  `tests/quest/ordeal/ord_o_sites.test.ts`, `ord_o_world.test.ts`, `tests/systems/retiredMaps.test.ts`.
 - **Tests of the world.** Act 1: `tests/quest/a1/` (`a1Pins`, `a1Sites`, `a1Walks`, `nwA1.ts`), the regions
   `tests/quest/<r>/<r>_o_world.test.ts` (FIRE's `fireWorld.test.ts`) on the committed source and its owner grid,
   `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`; NW2's
@@ -635,6 +649,12 @@ pieces, Crescent's canals) before it writes its source. `build_map.styled()` loo
 `chimney@<roof>` replaces the chimney. Test: `tests/data/townThemes.test.ts`. AR-W3 redid Lufenia (`luf_roman`: a
 modular terracotta roof every house width can use, gold-ribbed domed villas, the rotunda inn; `clean` repaints SD3.5's
 wall cracks, `town_theme_clean.py`).
+
+**Cardia Deep (pass CD).** The dragon great village under the Cardia isles has its own approved brief,
+`docs/DRAGON_CITY_BRIEF.md` (concept, palette, architecture, districts, set pieces, NPC dress), with its concept art in
+`docs/art/cardia/` and its implementation plan `docs/CARDIA_PLAN.md`. Its cells are the `dragon` sheet of
+`town_theme_spec.py` (`theme_dragon`: `drg_*` set pieces, the `drg_wall` / `drg_floor` materials; cut option
+`bg_passes` for a two-tone backdrop) and the `drake_brazier` prop (`props_ar`, purpose `ar_dragon`).
 
 ### New Cutscene
 

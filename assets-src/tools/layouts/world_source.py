@@ -15,6 +15,7 @@ import numpy as np
 import yaml
 
 from a1 import world_a1_pins as P
+from world_specs import later_doors as LD
 from world_specs import today_doors as TD
 from worldgen import spec as S
 from worldgen.gates import BLOCK
@@ -31,19 +32,25 @@ def _a1(o: dict) -> dict:
 
 
 def doors() -> tuple[dict, dict]:
-    """(entrance -> door offset, entrance -> door targetMap): act 1's from its pins, the rest from today's world."""
+    """(entrance -> door offset, entrance -> door targetMap): act 1's from its pins, the rest from today's world, then
+    the later doors (pass CD, `world_specs/later_doors.py`)."""
     d = {**TD.door_of(P.ENTRANCES, P.TRANSITIONS), **TD.door_of(TD.entrances(), TD.transitions())}
-    return {e: off for e, (off, _t) in d.items()}, {e: t["targetMap"] for e, (_o, t) in d.items()}
+    return LD.doors({e: off for e, (off, _t) in d.items()}, {e: t["targetMap"] for e, (_o, t) in d.items()})
 
 
 def transitions(sites: dict) -> list[dict]:
-    """Every overworld transition at its entrance's new cell: act 1's pins, then today's others (today's order)."""
+    """Every overworld transition at its entrance's new cell: act 1's pins, then today's others (today's order), then
+    the later doors (pass CD: RETARGET applied to the frozen rows, the DOORS rows appended)."""
     out = [_a1(t) for t in P.TRANSITIONS]
     ents = TD.entrances()
+    moved = []
     for t in TD.transitions():
-        e = t.pop("_entrance")
+        e = t["_entrance"]
         ex, ey = ents[e]
-        out.append({**t, "x": int(sites[e][0] + t["x"] - ex), "y": int(sites[e][1] + t["y"] - ey)})
+        moved.append({**t, "x": int(sites[e][0] + t["x"] - ex), "y": int(sites[e][1] + t["y"] - ey)})
+    for t in LD.transitions(moved, sites):
+        t.pop("_entrance", None)
+        out.append(t)
     return out
 
 

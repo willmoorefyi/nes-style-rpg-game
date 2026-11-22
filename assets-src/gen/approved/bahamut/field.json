@@ -1,0 +1,153 @@
+{
+  "character": "bahamut",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 3,
+  "cache_key": "bd8d05db134ff540b20206b1",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s40_3",
+      "tag": "bahamut_s40_3",
+      "cache_key": "bd8d05db134ff540b20206b1",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "tol": 30,
+        "holes": 36,
+        "edge": 12
+      }
+    },
+    {
+      "alias": "b45_4",
+      "tag": "bahamut_b45_4",
+      "cache_key": "687fbf0e7a10bd0e3ab408cf",
+      "model": "structure",
+      "seed": 4,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "d45_5",
+      "tag": "bahamut_d45_5",
+      "cache_key": "b6802686452b042b96c4a989",
+      "model": "structure",
+      "seed": 5,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "tol": 30,
+        "holes": 36
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s40_3",
+        0,
+        false
+      ],
+      [
+        "s40_3",
+        1,
+        false
+      ],
+      [
+        "s40_3",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b45_4",
+        0,
+        false
+      ],
+      [
+        "b45_4",
+        1,
+        false
+      ],
+      [
+        "b45_4",
+        1,
+        true
+      ]
+    ],
+    [
+      [
+        "d45_5",
+        0,
+        false
+      ],
+      [
+        "d45_5",
+        1,
+        false
+      ],
+      [
+        "d45_5",
+        2,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [],
+  "figure_px": [
+    91,
+    93,
+    93,
+    92,
+    92,
+    92,
+    89,
+    88,
+    88
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "CD-N bahamut: front s40_3 row 0 (dragon_guard grey guide, 0.4, seed 3: a golden dragon-king, blue under-armour, white belly; green negated); back strip b45_4 cells 0, 1 + 1 mirrored (its cell 2 is off-model); side strip d45_5. At the hero's height (the 48x96 cell, plan 6.2); his size shows in the throne and the dais. Replaces the tinted garland_npc"
+}

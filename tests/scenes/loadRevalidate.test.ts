@@ -124,6 +124,20 @@ describe('loadRevalidate: LoadScene checks a v4 save on the NW2 world', () => {
     expect(g.restoreState.mock.calls[0][0].vehicles).toEqual([{ type: 'ship', map: 'overworld', at: 'a1_s_pravoka_ship' }]);
   });
 
+  it('pass CD: a v4 save in the retired bahamut-lair opens in cardia-deep\'s court, its airship kept', async () => {
+    const air = { type: 'airship' as const, map: 'overworld', ...spot(world(), 'ord_s_bahamut_airship') };
+    stored(4, 'bahamut-lair', { x: 19, y: 12 }, ['AIRSHIP_RAISED', ...CANOE], ['canoe'], [air]);
+    const g = game();
+    const scene = loadSlot(g);
+    await until(() => !scene.busy);
+    expect(requested).toEqual(['overworld', 'cardia-deep']);
+    const data = g.restoreState.mock.calls[0][0];
+    expect([data.currentMap, data.reset]).toEqual(['cardia-deep', false]);
+    expect(data.vehicles).toEqual([air]);
+    expect(g.pendingEntrance).toBe('court');
+    expect(g.pendingNotice).toBeNull();
+  });
+
   it('a v5 save loads at once, with no map read', () => {
     stored(5, 'overworld', entrance(world(), 'fir_ice'), ['BIKKE_DEFEATED'], [], []);
     const g = game();

@@ -4,7 +4,8 @@
  * `regions.<r>.raster` chunks; committed sources only). The two anchors at their NW targets with their doors one
  * step north; airship-only land (no dock, no walk or canoe path joins the arc, an islet or another region); a grass
  * landing within 8 steps of the Citadel and of every islet, the meadow below the gate; the crescent's cold north rim;
- * the icons (the Citadel between its pillars on the crag, Bahamut's cave mouth, the hermit's hut and slate); the
+ * the icons (the Citadel between its pillars on the crag, a cave mouth on Bahamut's isle and on each of four islets,
+ * pass CD's stairs into Cardia Deep, the hermit's hut and slate); the
  * zones with today's ids and rosters covering every walkable and canoe cell of ORDEAL's land (3.8 `coverage`) and
  * ORDEAL's water; the backdrops, snow and taiga included (D-NW9, NW2).
  */
@@ -39,6 +40,7 @@ const g = nw.ground.replace(/\n$/, '').split('\n').map((r) => [...r]);
 const N = g.length;
 const E = nw.entrances;
 const ISLES = ['ord_bahamut', 'ord_isle_hermit', 'ord_isle_north', 'ord_isle_east', 'ord_isle_stack', 'ord_isle_west'];
+const DOOR_ISLES = ['ord_isle_north', 'ord_isle_east', 'ord_isle_stack', 'ord_isle_west'];   // pass CD: not the hermit's
 const BLOCK = new Set(['o', 'm', 'r', '≈']);
 const CANOE = new Set(['r', '≈']);
 const walkable = (c: string): boolean => !BLOCK.has(c);
@@ -79,11 +81,26 @@ describe('ORDEAL on the NW world (NW-R)', () => {
       const [x, y] = E[a.entrance];
       expect(Math.max(Math.abs(x - a.target[0]), Math.abs(y - a.target[1])), a.entrance).toBeLessThanOrEqual(2);
     }
-    for (const [e, map] of [['ord_citadel', 'citadel-1f'], ['ord_bahamut', 'bahamut-cave']] as const) {
+    for (const [e, map, te] of [['ord_citadel', 'citadel-1f', 'arrival'], ['ord_bahamut', 'cardia-deep', 'bahamut_gate']] as const) {
       const [x, y] = E[e];
-      expect(nw.transitions.find((t) => t.x === x && t.y === y - 1), e).toMatchObject({ targetMap: map, targetEntrance: 'arrival' });
+      expect(nw.transitions.find((t) => t.x === x && t.y === y - 1), e).toMatchObject({ targetMap: map, targetEntrance: te });
       expect(walkable(g[y][x]) && walkable(g[y - 1][x]), e).toBe(true);
     }
+  });
+
+  it('pass CD: each of four islets has a door one step north of its entrance into Cardia Deep; the hermit\'s none', () => {
+    const into = nw.transitions.filter((t) => t.targetMap === 'cardia-deep');
+    expect(into).toHaveLength(5);
+    const want: Record<string, string> = { ord_isle_north: 'north', ord_isle_east: 'east', ord_isle_stack: 'stack',
+      ord_isle_west: 'west' };
+    for (const e of DOOR_ISLES) {
+      const [x, y] = E[e];
+      expect(nw.transitions.find((t) => t.x === x && t.y === y - 1), e)
+        .toMatchObject({ targetMap: 'cardia-deep', targetEntrance: want[e] });
+      expect(walkable(g[y][x]) && walkable(g[y - 1][x]), e).toBe(true);
+    }
+    const [hx, hy] = E.ord_isle_hermit;
+    expect(nw.transitions.some((t) => Math.abs(t.x - hx) + Math.abs(t.y - hy) <= 2), 'the hermit\'s islet has no door').toBe(false);
   });
 
   it('is airship-only: the arc and each islet are their own land, on ORDEAL\'s raster, with no dock', () => {
@@ -114,7 +131,8 @@ describe('ORDEAL on the NW world (NW-R)', () => {
     const [cx, cy] = E.ord_citadel;
     const [, my] = E.ord_meadow;
     for (let y = cy; y <= my; y++) expect(g[y][cx], `meadow (${cx}, ${y})`).toBe('.');
-    for (const s of ['ord_s_citadel_airship', 'ord_s_bahamut_airship']) {
+    for (const s of ['ord_s_citadel_airship', 'ord_s_bahamut_airship', 'ord_s_north_airship', 'ord_s_east_airship',
+      'ord_s_stack_airship', 'ord_s_west_airship']) {
       const [x, y] = nw.spots[s].at;
       expect([nw.spots[s].kind, g[y][x]], s).toEqual(['landing', '.']);
     }
@@ -138,8 +156,12 @@ describe('ORDEAL on the NW world (NW-R)', () => {
     const pillars = nw.objects.filter((o) => o.parts?.[0]?.[0] === 'tpillar_broken_top' && inRaster('ordeal', o.x, o.y));
     expect(pillars.map((o) => [o.x, o.y])).toEqual([[cit.x - 1, cit.y + 1], [cit.x + 3, cit.y + 1]]);
     const [bx, by] = E.ord_bahamut;
-    const cave = nw.objects.find((o) => o.name === 'cave_mouth' && inRaster('ordeal', o.x, o.y))!;   // ORDEAL's
+    const cave = nw.objects.find((o) => o.name === 'cave_mouth' && o.x === bx - 1 && o.y === by - 2)!;   // Bahamut's
     expect([cave.x, cave.y, cave.walk_cells]).toEqual([bx - 1, by - 2, [[1, 1]]]);
+    const mouths = nw.objects.filter((o) => o.name === 'cave_mouth' && inRaster('ordeal', o.x, o.y));
+    const at = ['ord_bahamut', ...DOOR_ISLES].map((e) => [E[e][0] - 1, E[e][1] - 2]);
+    expect(mouths.map((o) => [o.x, o.y]).sort()).toEqual(at.sort());
+    for (const o of mouths) expect(o.walk_cells).toEqual([[1, 1]]);
     const hut = nw.objects.find((o) => o.name === 'hermit_hut')!;
     expect(bfs(E.ord_isle_hermit, land).has(key(hut.x, hut.y)), 'the hut stands on the hermit\'s islet').toBe(true);
     const boulders = nw.objects.filter((o) => o.parts?.[0]?.[0] === 'boulder' && inRaster('ordeal', o.x, o.y));

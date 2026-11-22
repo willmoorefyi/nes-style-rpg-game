@@ -92,4 +92,22 @@ DRESS: dict[str, list[tuple[str, int, int]]] = {
         ("wall_torch", 17, 16), ("wall_chains", 26, 16), ("cage_floor", 33, 7)],
     "citadel-3f": [("standing_torch", 2, 4), ("standing_torch", 30, 4), ("candelabra", 15, 4), ("wall_torch", 22, 3),
         ("wall_torch", 9, 3)],
+    # pass CD (docs/CARDIA_PLAN.md 5.4): Cardia Deep. Village torches every 6-10 face cells, one torch at each
+    # warren stair; the Court's braziers flank the dais; a magma mound by each nest; the Sanctum lit green; the
+    # Grotto's sea props; the wyverns' bones in every warren
+    "cardia-deep": [
+        ("wall_torch", 45, 5), ("wall_torch", 51, 5), ("wall_torch", 58, 5), ("wall_torch", 65, 5),
+        ("brazier_tall", 48, 5), ("brazier_tall", 61, 5), ("sun_brazier", 49, 9), ("sun_brazier", 60, 9),
+        ("wall_torch", 15, 5), ("wall_torch", 23, 5), ("wall_torch", 31, 5),
+        ("wall_torch", 17, 22), ("wall_torch", 27, 22), ("wall_torch", 35, 22), ("wall_torch", 42, 22),
+        ("drake_brazier", 16, 28), ("drake_brazier", 44, 28),
+        ("candelabra", 6, 20), ("mushrooms_glow", 2, 21), ("mushrooms_glow", 10, 21), ("mushrooms_glow", 10, 32),
+        ("wall_torch", 54, 23), ("wall_torch", 64, 23), ("magma_mound", 53, 25), ("magma_mound", 62, 25),
+        ("magma_mound", 53, 32), ("magma_mound", 62, 32), ("lava_vent", 66, 24), ("lava_vent", 66, 36),
+        ("wall_torch", 22, 38), ("wall_torch", 34, 38), ("wall_torch", 48, 38),
+        ("wall_torch", 4, 36), ("wall_torch", 12, 36), ("coral_pink", 13, 40), ("coral_pink", 5, 44),
+        ("kelp", 2, 40), ("kelp", 16, 41), ("clam_altar", 2, 43), ("wall_torch", 3, 50),
+        ("wall_torch", 2, 5), ("wall_torch", 62, 41), ("wall_torch", 32, 51), ("wall_torch", 55, 51),
+        ("wall_torch", 19, 51),
+        ("bone_pile", 7, 8), ("bone_pile", 67, 44), ("bone_pile", 32, 56), ("bone_pile", 55, 55), ("bone_pile", 19, 55)],
 }

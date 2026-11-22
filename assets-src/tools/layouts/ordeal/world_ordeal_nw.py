@@ -8,8 +8,10 @@ spine runs along the outer side, so the north arm is a cold rim of rock and snow
 the broad west arm is a sheltered heath (the `warm` hints) of grass and pine stands: the tableland of the Citadel
 of Trials, whose gate is cut into a crag spur of the spine between two broken pillars, with the landing meadow
 below it. Cardia is an archipelago of about ten islets south-east of the bay: Bahamut's isle, bitten into a
-horseshoe whose bay opens east, with its cave mouth in a notch of rock; the hermit's islet, the northernmost, with
-his driftwood hut; four more named islets and the look-only ones between them. A small group lies south of the
+horseshoe whose bay opens east, with its cave mouth in a notch of rock; the hermit's islet with his driftwood hut;
+four more named islets (the north islet the northernmost), each with a cave mouth of its own, and the look-only ones
+between them. Pass CD (docs/CARDIA_PLAN.md 3): every mouth but the hermit's (he has none, ruling R1) is a stair into
+Cardia Deep, the one dragon village under all of them. A small group lies south of the
 arc's west horn. No dock, no land joined to Onrac or Gaia: the airship lands on the meadow and on every islet.
 Zones: `ord_heath` on the arc, `ord_isles` on every islet (both on foot and by canoe on the arc's streams),
 `ord_sea` on ORDEAL's water. Backdrops: the heath grassland (forest in the stands, dark_forest on taiga, the ice
@@ -35,6 +37,8 @@ COLD = {"taiga": "dark_forest", "snow": "ice_cave"}   # D-NW9, NW2 Q8: the cold 
 BOULDERS = ((3, 11), (-5, 6), (-6, 3))        # the heath's boulders: offsets from the Citadel's door
 HUT = (-1, -2)                                # the hermit's 2x2 hut: its offset from his islet's landing
 MEADOW_R = 2.5                                # NW2-T: the Citadel's landing meadow, grass round ord_meadow
+DOOR_ISLES = ("ord_isle_north", "ord_isle_east", "ord_isle_stack", "ord_isle_west")   # pass CD: a mouth on each
+MOUTH_MIN_WALK, MOUTH_LANDING = 12, 8         # pass CD (plan 3.2): an islet keeps a walk and a grass landing
 
 
 def _door(meta: dict, e: str) -> tuple[int, int]:
@@ -83,9 +87,12 @@ def _citadel(gr: _Ground, meta: dict) -> list[dict]:
             {"type": "deco", "parts": pillar, "x": x0 + 3, "y": y0 + 1}]
 
 
-def _cave(gr: _Ground, meta: dict) -> list[dict]:
-    """Bahamut's 2x2 cave mouth (its door the bottom right cell) in a notch of rock on his isle."""
-    dx, dy = _door(meta, "ord_bahamut")
+def _mouth(gr: _Ground, meta: dict, e: str) -> tuple[list[dict], str | None]:
+    """A 2x2 cave mouth (its door the bottom right cell) in a notch of rock on entrance e's isle; pass CD: one on
+    Bahamut's isle and on each DOOR_ISLES islet, every one a stair into Cardia Deep. The error string (or None):
+    the islet's walk component after the stamp is under MOUTH_MIN_WALK cells, or no grass within MOUTH_LANDING steps
+    of the entrance is left outside the mouth (plan 3.2; it joins the `pins` check, it never raises)."""
+    dx, dy = _door(meta, e)
     cx, cy = dx - 1, dy - 1
     for x in range(cx - 1, cx + 3):
         if gr.g[cy - 1, x] != "o":
@@ -97,7 +104,29 @@ def _cave(gr: _Ground, meta: dict) -> list[dict]:
         gr.put(dx + 1, dy, "m")                 # (the arrival; OW-2, warp_leaves)
     for x, y in ((cx, cy), (cx + 1, cy), (cx, cy + 1), (dx, dy), (dx, dy + 1)):
         gr.put(x, y, ".")
-    return [D._deco("cave_mouth", cx, cy, walk_cells=[[1, 1]])]
+    return [D._deco("cave_mouth", cx, cy, walk_cells=[[1, 1]])], _mouth_error(gr.g, meta, e, (cx, cy))
+
+
+def _mouth_error(g: np.ndarray, meta: dict, e: str, box: tuple[int, int]) -> str | None:
+    ex, ey = meta["entrances"][e]
+    walk = ~np.isin(g, BLOCK)
+    lab, _ = components(walk)
+    k = lab[ey, ex]
+    n = int((lab == k).sum()) if k else 0
+    mouth = {(box[0] + i, box[1] + j) for j in range(2) for i in range(2)}
+    dist, frontier, seen = 0, [(ex, ey)], {(ex, ey)}
+    grass = False
+    while frontier and dist <= MOUTH_LANDING and not grass:
+        grass = any(g[y, x] == "." and (x, y) not in mouth and (x, y) != (ex, ey - 1) for x, y in frontier)
+        nxt = []
+        for x, y in frontier:
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if (nx, ny) not in seen and walk[ny, nx]:
+                    seen.add((nx, ny)); nxt.append((nx, ny))
+        frontier, dist = nxt, dist + 1
+    if n < MOUTH_MIN_WALK or not grass:
+        return f"ordeal: {e} mouth leaves {n} walk cells" + ("" if grass else f" / no landing within {MOUTH_LANDING}")
+    return None
 
 
 def _hermit(gr: _Ground, meta: dict) -> tuple[list[dict], list[dict]]:
@@ -155,7 +184,11 @@ def zones(g: np.ndarray, own: np.ndarray, meta: dict) -> dict[str, set]:
 def content(g: np.ndarray, meta: dict) -> dict:
     own = meta["region"] == meta["regions"].index(REGION)
     gr = _Ground(g, own)
-    objs = _citadel(gr, meta) + _cave(gr, meta)
+    objs, errors = _citadel(gr, meta), []
+    for e in ("ord_bahamut", *DOOR_ISLES):
+        mouth, err = _mouth(gr, meta, e)
+        objs += mouth
+        errors += [err] if err else []
     hut, insp = _hermit(gr, meta)
     objs += hut
     taken = {(o["x"] + i, o["y"] + j) for o in objs for j in range(len(o["parts"])) for i in range(len(o["parts"][0]))}
@@ -165,4 +198,4 @@ def content(g: np.ndarray, meta: dict) -> dict:
           for z, (name, _m, table, _bg) in D.ZONES.items() if cells[z]]
     bgs = {z: ({**bg, "terrain": {**bg.get("terrain", {}), **COLD}} if z != "ord_sea" else dict(bg))
            for z, (_n, _m, _t, bg) in D.ZONES.items()}
-    return {"objects": objs, "inspect": insp, "encounterZones": ez, "battleBackgrounds": {"zones": bgs}}
+    return {"objects": objs, "inspect": insp, "encounterZones": ez, "battleBackgrounds": {"zones": bgs}, "errors": errors}

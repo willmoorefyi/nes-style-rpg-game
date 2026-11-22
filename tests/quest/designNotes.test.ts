@@ -31,8 +31,8 @@ describe('designNotes: the pass W maps', () => {
   const rows = canonRows();
   const built = rows.filter((r) => isBuilt(r.id));
 
-  it('the canon lists every pass W map id (137)', () => {
-    expect(rows.length).toBe(137);
+  it('the canon lists every pass W map id (136; pass CD: bahamut-cave and -lair retired into cardia-deep)', () => {
+    expect(rows.length).toBe(136);
   });
 
   it(`every built map has its design note (${built.length} built, ${rows.length - built.length} stubs pending)`, () => {

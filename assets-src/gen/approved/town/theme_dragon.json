@@ -1,0 +1,251 @@
+{
+ "kit": "town",
+ "sheet": "theme_dragon",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-22",
+ "theme": null,
+ "tints": [],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "drg_arch_0_0",
+   "drg_arch_0_1",
+   "drg_arch_0_2",
+   "drg_arch_0_3",
+   "drg_arch_1_0",
+   "drg_arch_1_1",
+   "drg_arch_1_2",
+   "drg_arch_1_3",
+   "drg_arch_2_0",
+   "drg_arch_2_1",
+   "drg_arch_2_2",
+   "drg_arch_2_3",
+   "drg_hoard_0_0",
+   "drg_hoard_0_1",
+   "drg_nest_0_0",
+   "drg_nest_0_1"
+  ],
+  [
+   "drg_nest_1_0",
+   "drg_nest_1_1",
+   "drg_perch_0_0",
+   "drg_perch_1_0",
+   "drg_pillar_0_0",
+   "drg_pillar_1_0",
+   "drg_pillar_slim_0_0",
+   "drg_pillar_slim_1_0",
+   "drg_statue_0_0",
+   "drg_statue_1_0",
+   "drg_statue_big_0_0",
+   "drg_statue_big_0_1",
+   "drg_statue_big_1_0",
+   "drg_statue_big_1_1",
+   "drg_throne_0_0",
+   "drg_throne_0_1"
+  ],
+  [
+   "drg_throne_0_2",
+   "drg_throne_1_0",
+   "drg_throne_1_1",
+   "drg_throne_1_2",
+   "drg_throne_2_0",
+   "drg_throne_2_1",
+   "drg_throne_2_2",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {
+  "drg_wall": [
+   0,
+   144,
+   96,
+   96
+  ],
+  "drg_floor": [
+   96,
+   144,
+   96,
+   96
+  ]
+ },
+ "sources": [
+  {
+   "id": "cd_statue",
+   "cache_key": "406fde010f96f10ccad24bc5",
+   "model": "ultra",
+   "seed": 213,
+   "pass": "AR",
+   "use": "sprite drg_statue 1x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_statue",
+   "cache_key": "406fde010f96f10ccad24bc5",
+   "model": "ultra",
+   "seed": 213,
+   "pass": "AR",
+   "use": "sprite drg_statue_big 2x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_pillar2",
+   "cache_key": "bf254f96c4f08a8651765a6b",
+   "model": "ultra",
+   "seed": 222,
+   "pass": "AR",
+   "use": "sprite drg_pillar 1x2",
+   "cut": {
+    "rim": 4,
+    "bg_passes": 3,
+    "tol": 30
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_pillar",
+   "cache_key": "46e7d9fa06a1e9a195c64379",
+   "model": "ultra",
+   "seed": 214,
+   "pass": "AR",
+   "use": "sprite drg_pillar_slim 1x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_arch",
+   "cache_key": "f29546b1e85d175ef327ebc8",
+   "model": "ultra",
+   "seed": 215,
+   "pass": "AR",
+   "use": "sprite drg_arch 4x3",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_throne",
+   "cache_key": "169697a8d235f6e3b16a161b",
+   "model": "ultra",
+   "seed": 216,
+   "pass": "AR",
+   "use": "sprite drg_throne 3x3",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_nest",
+   "cache_key": "5657a4ea62e661844244c20c",
+   "model": "ultra",
+   "seed": 218,
+   "pass": "AR",
+   "use": "sprite drg_nest 2x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_hoard5",
+   "cache_key": "21cba926731fee82978261b4",
+   "model": null,
+   "seed": null,
+   "pass": null,
+   "use": "sprite drg_hoard 2x1",
+   "cut": {
+    "rim": 4,
+    "bg_passes": 2,
+    "tol": 30
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_perch2",
+   "cache_key": "1ca97ad9948aad26fb283226",
+   "model": null,
+   "seed": null,
+   "pass": null,
+   "use": "sprite drg_perch 1x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "cd_wall2",
+   "cache_key": "7767886d3ca35f122b3870c5",
+   "model": "ultra",
+   "seed": 221,
+   "pass": "AR",
+   "use": "material drg_wall (swatch)",
+   "box": [
+    0,
+    0.1,
+    1,
+    1
+   ]
+  },
+  {
+   "id": "cd_floor",
+   "cache_key": "9041d0627c867ff07729afbc",
+   "model": "ultra",
+   "seed": 212,
+   "pass": "AR",
+   "use": "material drg_floor (swatch)",
+   "box": [
+    0,
+    0,
+    1,
+    1
+   ]
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of dragon (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

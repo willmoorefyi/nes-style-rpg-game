@@ -538,7 +538,7 @@
 - id: ord_bahamut_trial
   steps:
     - type: dialog
-      text: "You lay the seal on the gold cloth. Bahamut turns it over once with a claw that was a finger a moment ago."
+      text: "You lay the seal on the crimson cloth. Bahamut turns it over once with one gold-scaled claw, and the hall goes still."
     - type: take_item
       item: ordeal_seal
     - type: fade_out

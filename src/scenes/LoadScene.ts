@@ -137,7 +137,8 @@ export class LoadScene implements Scene {
     this.game.restoreState(data);
     // NW-5 (docs/NATURAL_WORLD_PLAN.md 5.3): a pre-NW save moved to Cornelia arrives at its south gate, facing
     // south, and the field says so once
-    this.game.pendingEntrance = data.reset ? RESET_ENTRANCE : null;
+    // pass CD: a save from a retired map arrives at its new map's entrance (retiredMaps.ts)
+    this.game.pendingEntrance = data.reset ? RESET_ENTRANCE : data.entrance ?? null;
     this.game.pendingFacing = data.reset ? 'down' : null;
     this.game.pendingNotice = data.reset ? RESET_NOTICE : null;
     this.game.battleRetry = null;

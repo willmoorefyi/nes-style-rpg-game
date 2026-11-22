@@ -124,4 +124,52 @@ AR_SPEC = {
         "note": "AR-N dr_unne B: s50_1 down cells 0, 2 + 2 mirrored (burgher guide, 0.5, seed 1; green coat), side "
                 "row 2; back strip b50_3. User ruling 2026-11-21: B, not A; one green jacket in every frame (the "
                 "side steps' brown waistcoat recoloured), no green stripe on the back stand"},
+    # ── pass CD (docs/CARDIA_PLAN.md 6.2, ruling R3; purpose ar_dragon): the Cardia Deep sheets. Guides: the AR-N2
+    # dragon-kin sheets x6 (greyscale from round 2); review sheets in ~/temp/ff-game/cardia/impl/npcs/ ──
+    "bahamut": {
+        "renders": {"s40_3": ["bahamut_s40_3", "bd8d05db134ff540b20206b1", 3],
+                    "b45_4": ["bahamut_b45_4", "687fbf0e7a10bd0e3ab408cf", 1],
+                    "d45_5": ["bahamut_d45_5", "b6802686452b042b96c4a989", 1]},
+        "cut": {"s40_3": {"tol": 30, "holes": 36, "edge": 12}, "b45_4": H20, "d45_5": {"tol": 30, "holes": 36}},
+        "cells": [S("s40_3"), S("b45_4", 0, (0, 1, 1), (0, 0, 1)), S("d45_5")],
+        "approved": "2026-11-22",
+        "note": "CD-N bahamut: front s40_3 row 0 (dragon_guard grey guide, 0.4, seed 3: a golden dragon-king, blue "
+                "under-armour, white belly; green negated); back strip b45_4 cells 0, 1 + 1 mirrored (its cell 2 is "
+                "off-model); side strip d45_5. At the hero's height (the 48x96 cell, plan 6.2); his size shows in the "
+                "throne and the dais. Replaces the tinted garland_npc"},
+    "dragon_sage": {
+        "renders": {"s40_2": ["dragon_sage_s40_2", "5e8241a33cf2fa7bc11f5e56", 3],
+                    "b45_5": ["dragon_sage_b45_5", "e4da3f9f4d2087469c6d5016", 1]},
+        "cut": {"s40_2": H20, "b45_5": H20},
+        "cells": [S("s40_2"), S("b45_5"), S("s40_2", 2)],
+        "shifts": {r: [[115, 40, 215, 0.22, 1.25]] for r in range(3)},
+        "approved": "2026-11-22",
+        "note": "CD-N dragon_sage: front and side s40_2 (dragon_elder grey guide, 0.4, seed 2); back strip b45_5. "
+                "The renders kept the guide's green in every try, so every row's green is shifted to a pale "
+                "snow-white blue (hue 115 -> 215, sat x0.22, val x1.25): a white-scaled elder in a cream robe"},
+    "dragon_matron": {
+        "renders": {"s40_3": ["dragon_matron_s40_3", "7f2c8d621605da997c58474e", 3],
+                    "b45_4": ["dragon_matron_b45_4", "4154175ed4a0ce1877874d89", 1],
+                    "d45_5": ["dragon_matron_d45_5", "434c304a77dbc40287b5fb8b", 1]},
+        "cut": {"s40_3": {"tol": 30, "holes": 36, "edge": 12}, "b45_4": H20, "d45_5": H20},
+        "cells": [S("s40_3"), S("b45_4"), S("d45_5")],
+        "shifts": {0: [[115, 40, 24, 1.25, 1.55]]},
+        "edits": [{"op": "ramp", "cells": [[2, 0]], "rect": [0, 40, 48, 96],
+                   "match": {"hue": [10, 45], "smax": 0.75, "vmax": 0.55},
+                   "to": {"cells": [[2, 1]], "hue": [15, 40], "smin": 0.6}, "mode": "rank",
+                   "why": "the side stand's brown dress -> the orange dress of the other frames"}],
+        "approved": "2026-11-22",
+        "note": "CD-N dragon_matron: front s40_3 row 0 (dragon_elder grey guide, 0.4, seed 3; its green dress shifted "
+                "to rust, hue 115 -> 24, sat x1.25, val x1.55); back strip b45_4; side strip d45_5. An amber "
+                "dragon-kin in a rust dress and cream apron (market, hatchery)"},
+    "dragon_hatchling": {
+        "renders": {"s50_1": ["dragon_hatchling_s50_1", "e731806e172fdd2d009aa369", 3],
+                    "b45_4": ["dragon_hatchling_b45_4", "6ff7d0c7a1d91f60ebe6db0c", 1]},
+        "cut": {"s50_1": H20, "b45_4": H20},
+        "scale": 0.7,
+        "cells": [S("s50_1"), S("b45_4"), S("s50_1", 2)],
+        "approved": "2026-11-22",
+        "note": "CD-N dragon_hatchling: front and side s50_1 (dragon_youth guide, 0.5, seed 1; coral pink, teal "
+                "tunic, gold pads); back strip b45_4. Cut at 0.7 scale (about 64 of the hero's 90 px, the fairy's "
+                "rule), small and round"},
 }
