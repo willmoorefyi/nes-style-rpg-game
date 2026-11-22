@@ -1212,3 +1212,105 @@
 {"event": "result", "key": "6ff7d0c7a1d91f60ebe6db0c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
 {"event": "request", "ts": "2026-11-22T10:55:32", "tool": "cdnpc.py", "model": "structure", "purpose": "ar_dragon", "seed": 5, "key": "e4da3f9f4d2087469c6d5016", "pass": "AR"}
 {"event": "result", "key": "e4da3f9f4d2087469c6d5016", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:52:50", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "f52527dcb0d9dac76ae106dc", "pass": "AR"}
+{"event": "result", "key": "f52527dcb0d9dac76ae106dc", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:05", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "917ac4d37649d73cdf27d96f", "pass": "AR"}
+{"event": "result", "key": "917ac4d37649d73cdf27d96f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:16", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "83356a28e12c1a1207be21d5", "pass": "AR"}
+{"event": "result", "key": "83356a28e12c1a1207be21d5", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:26", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "d6681c94aeb2e8c163fddf03", "pass": "AR"}
+{"event": "result", "key": "d6681c94aeb2e8c163fddf03", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:36", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "8a266401f91f1370c0f2d612", "pass": "AR"}
+{"event": "result", "key": "8a266401f91f1370c0f2d612", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:48", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "df32e1ece053f3695f63776f", "pass": "AR"}
+{"event": "result", "key": "df32e1ece053f3695f63776f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:53:58", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "f0c00f47ec6ac0f38a4cbb0a", "pass": "AR"}
+{"event": "result", "key": "f0c00f47ec6ac0f38a4cbb0a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:55:24", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "b6be792e2d21acee95eed245", "pass": "AR"}
+{"event": "result", "key": "b6be792e2d21acee95eed245", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:55:35", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 3, "key": "b445ece054b695b5abc1f9e7", "pass": "AR"}
+{"event": "result", "key": "b445ece054b695b5abc1f9e7", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:55:46", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "e51f1507a191ffae41ab72be", "pass": "AR"}
+{"event": "result", "key": "e51f1507a191ffae41ab72be", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:55:57", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 3, "key": "c642781eb91cbddae6d75d5b", "pass": "AR"}
+{"event": "result", "key": "c642781eb91cbddae6d75d5b", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:56:29", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "c9af0d81defa0634bac57483", "pass": "AR"}
+{"event": "result", "key": "c9af0d81defa0634bac57483", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:56:38", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "7757b04f716bb766cfdc49e7", "pass": "AR"}
+{"event": "result", "key": "7757b04f716bb766cfdc49e7", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:56:47", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "d0aadd25ae3217250bdd0b0d", "pass": "AR"}
+{"event": "result", "key": "d0aadd25ae3217250bdd0b0d", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:56:57", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "4719d72abd1f38e62ec12550", "pass": "AR"}
+{"event": "result", "key": "4719d72abd1f38e62ec12550", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:57:07", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "a50044baf365cf71e524ff89", "pass": "AR"}
+{"event": "result", "key": "a50044baf365cf71e524ff89", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:57:16", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "35c38611989a2bfe4a772332", "pass": "AR"}
+{"event": "result", "key": "35c38611989a2bfe4a772332", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:15", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "a642d0508f88e64cbf4a7f4c", "pass": "AR"}
+{"event": "result", "key": "a642d0508f88e64cbf4a7f4c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:28", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "c44d81792ebf7a6081f81e48", "pass": "AR"}
+{"event": "request", "ts": "2026-11-22T13:58:30", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "59f87920bf82dfc90544832e", "pass": "AR"}
+{"event": "result", "key": "c44d81792ebf7a6081f81e48", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:41", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 3, "key": "5a3f10398ea846217e20402c", "pass": "AR"}
+{"event": "result", "key": "59f87920bf82dfc90544832e", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:43", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "659dcdec4a9271c4f97d4ff8", "pass": "AR"}
+{"event": "result", "key": "5a3f10398ea846217e20402c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:51", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 3, "key": "87b14721f3667d823142752b", "pass": "AR"}
+{"event": "result", "key": "659dcdec4a9271c4f97d4ff8", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:58:54", "tool": "gen.py", "model": "control_structure", "purpose": "ar_airship", "seed": 7, "key": "ac7ef56ce676ea89a054a715", "pass": "AR"}
+{"event": "result", "key": "87b14721f3667d823142752b", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:00", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "f80bb78af128ae9a93d382b2", "pass": "AR"}
+{"event": "result", "key": "ac7ef56ce676ea89a054a715", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:06", "tool": "gen.py", "model": "control_structure", "purpose": "ar_airship", "seed": 7, "key": "c4986c654d7398989635c138", "pass": "AR"}
+{"event": "result", "key": "f80bb78af128ae9a93d382b2", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:11", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "9a2e2bc2645e4cef0b074022", "pass": "AR"}
+{"event": "result", "key": "c4986c654d7398989635c138", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:18", "tool": "gen.py", "model": "sd35", "purpose": "ar_airship", "seed": 7, "key": "039b17b50ea52352789934e1", "pass": "AR"}
+{"event": "result", "key": "9a2e2bc2645e4cef0b074022", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:24", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "52e7ad6a8156e042f5c3b5d3", "pass": "AR"}
+{"event": "result", "key": "039b17b50ea52352789934e1", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T13:59:26", "tool": "gen.py", "model": "sd35", "purpose": "ar_airship", "seed": 7, "key": "bbaabb2cc51114c93f3a8db4", "pass": "AR"}
+{"event": "result", "key": "52e7ad6a8156e042f5c3b5d3", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "bbaabb2cc51114c93f3a8db4", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:00:07", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "cad196b8fc6d453f6df3b274", "pass": "AR"}
+{"event": "result", "key": "cad196b8fc6d453f6df3b274", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:00:19", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "ff57871132bded99c5ca8533", "pass": "AR"}
+{"event": "result", "key": "ff57871132bded99c5ca8533", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:00:58", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "fcc2405fb13a696937f8aee3", "pass": "AR"}
+{"event": "result", "key": "fcc2405fb13a696937f8aee3", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:01:12", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "ce7f865440cd05a66f97d518", "pass": "AR"}
+{"event": "result", "key": "ce7f865440cd05a66f97d518", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:01:23", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 11, "key": "421f1da65bac7140b3d13bca", "pass": "AR"}
+{"event": "result", "key": "421f1da65bac7140b3d13bca", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:01:35", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 11, "key": "75754bf41cd2c420598d3199", "pass": "AR"}
+{"event": "result", "key": "75754bf41cd2c420598d3199", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:02:58", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "ad15a63023e3a9e0e336f8c3", "pass": "AR"}
+{"event": "result", "key": "ad15a63023e3a9e0e336f8c3", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:03:12", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "b4b3ba81e6a0b06ccca5c97f", "pass": "AR"}
+{"event": "result", "key": "b4b3ba81e6a0b06ccca5c97f", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:03:23", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "7bb4c02c37860344add12272", "pass": "AR"}
+{"event": "request", "ts": "2026-11-22T14:03:28", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "7a6ddca5dcaa3ad339b7a602", "pass": "AR"}
+{"event": "result", "key": "7bb4c02c37860344add12272", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:03:33", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 7, "key": "8a1a3e1e1ae4fb54e81e6f14", "pass": "AR"}
+{"event": "result", "key": "7a6ddca5dcaa3ad339b7a602", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "8a1a3e1e1ae4fb54e81e6f14", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:04:48", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "7e82429b71dc931ab559f82c", "pass": "AR"}
+{"event": "result", "key": "7e82429b71dc931ab559f82c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:04:58", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "5b9c8d81752f1eea46d2951a", "pass": "AR"}
+{"event": "request", "ts": "2026-11-22T14:04:58", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 3, "key": "7d64d68fee432713e9584c01", "pass": "AR"}
+{"event": "result", "key": "5b9c8d81752f1eea46d2951a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:05:07", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "31d06ddd881c2100eb225e53", "pass": "AR"}
+{"event": "result", "key": "7d64d68fee432713e9584c01", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:05:12", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 21, "key": "2157e1931433b122e148ae05", "pass": "AR"}
+{"event": "result", "key": "31d06ddd881c2100eb225e53", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "result", "key": "2157e1931433b122e148ae05", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:05:24", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 5, "key": "e03e5bc87c625a567d09ace8", "pass": "AR"}
+{"event": "result", "key": "e03e5bc87c625a567d09ace8", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:05:34", "tool": "gen.py", "model": "style_transfer", "purpose": "ar_airship", "seed": 3, "key": "efeb5e6230239d65a2999489", "pass": "AR"}
+{"event": "result", "key": "efeb5e6230239d65a2999489", "ok": true, "served": "us.stability.stable-style-transfer-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:09:13", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "c0d457f7ada7b199305c7188", "pass": "AR"}
+{"event": "result", "key": "c0d457f7ada7b199305c7188", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:09:24", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 2, "key": "58e9f860cde1d0016a61bfd9", "pass": "AR"}
+{"event": "result", "key": "58e9f860cde1d0016a61bfd9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-22T14:09:34", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "c52cd8952b52a0ca6ea52e90", "pass": "AR"}
+{"event": "result", "key": "c52cd8952b52a0ca6ea52e90", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
