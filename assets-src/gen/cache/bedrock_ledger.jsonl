@@ -1141,3 +1141,32 @@
 {"event": "request", "ts": "2026-11-22T10:05:45", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 211, "key": "d05aef9e549c44edd1b5d6fb", "pass": "AR"}
 {"event": "result", "key": "d05aef9e549c44edd1b5d6fb", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
 {"event": "request", "ts": "2026-11-22T10:05:56", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 212, "key": "9041d0627c867ff07729afbc", "pass": "AR"}
+{"event": "result", "key": "9041d0627c867ff07729afbc", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:06", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 213, "key": "406fde010f96f10ccad24bc5", "pass": "AR"}
+{"event": "result", "key": "406fde010f96f10ccad24bc5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:16", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 214, "key": "46e7d9fa06a1e9a195c64379", "pass": "AR"}
+{"event": "result", "key": "46e7d9fa06a1e9a195c64379", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:26", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 215, "key": "f29546b1e85d175ef327ebc8", "pass": "AR"}
+{"event": "result", "key": "f29546b1e85d175ef327ebc8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:37", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 216, "key": "169697a8d235f6e3b16a161b", "pass": "AR"}
+{"event": "result", "key": "169697a8d235f6e3b16a161b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:48", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 217, "key": "62682a495af8cb37312dfe11", "pass": "AR"}
+{"event": "result", "key": "62682a495af8cb37312dfe11", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:06:58", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 218, "key": "5657a4ea62e661844244c20c", "pass": "AR"}
+{"event": "result", "key": "5657a4ea62e661844244c20c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:07:08", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 219, "key": "7f2af0029275bb8d1f48d5a1", "pass": "AR"}
+{"event": "result", "key": "7f2af0029275bb8d1f48d5a1", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:07:19", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 220, "key": "065fe58b186ada11a3beeebe", "pass": "AR"}
+{"event": "result", "key": "065fe58b186ada11a3beeebe", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:08:18", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 205, "key": "7537e49248bf304a645b1d5b", "pass": "AR"}
+{"event": "result", "key": "7537e49248bf304a645b1d5b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:08:29", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 206, "key": "9cc266933ba87817e384a4df", "pass": "AR"}
+{"event": "result", "key": "9cc266933ba87817e384a4df", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:08:39", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 207, "key": "8fcbefd6f786f9136892c1f3", "pass": "AR"}
+{"event": "result", "key": "8fcbefd6f786f9136892c1f3", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:08:49", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 221, "key": "7767886d3ca35f122b3870c5", "pass": "AR"}
+{"event": "result", "key": "7767886d3ca35f122b3870c5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:08:59", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 222, "key": "bf254f96c4f08a8651765a6b", "pass": "AR"}
+{"event": "result", "key": "bf254f96c4f08a8651765a6b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:09:09", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 223, "key": "927350bf81c63899bac36c05", "pass": "AR"}
+{"event": "result", "key": "927350bf81c63899bac36c05", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
