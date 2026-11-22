@@ -34,3 +34,5 @@ BACKDROPS = {"ert_badlands": {"default": "cracked_earth"}}
 
 SHRINE_TEXT = ["A shrine to the earth, its roof fallen in. Grey roots have split the altar stone.",
                "Someone has scratched a line under the carved crystal: \"It will wake again.\""]
+# QW (playtest 2026-11-22): the signpost south-west of Melmond's east gate
+SIGN_TEXT = ["MELMOND. The way in is the east gate, by the harbour."]

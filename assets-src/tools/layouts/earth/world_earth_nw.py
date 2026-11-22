@@ -41,6 +41,7 @@ import numpy as np
 import kit
 import world_earth_nw_ground as GR
 import world_earth_sites as T
+from elf import world_nw_road as RD
 from world_dress import door_sides, ring_of, scatter
 from worldgen.gates import BLOCK
 from worldgen.geom import flood
@@ -49,6 +50,10 @@ REGION = "earth"
 BADLANDS_DY = 9                  # the badlands begin this many rows south of Melmond's gate (today 6 of 14)
 # entrance -> the mouth's walk column (today's: the hall, the west mouth and Sarda's door in column 1, the rest 0)
 MOUTHS = {"ert_dwarf": 1, "ert_giant": 0, "ert_giant_west": 1, "ert_sarda": 1, "ert_earth_cave": 0}
+# QW: Melmond's tracks (points: entrances or offsets from its gate): south from the east gate to the bend below the
+# art's south wall, then west under the wall to the giant's east mouth, and south-west to the Cavern's mouth
+SIGN_OFF = (-1, 2)                               # QW: the signpost south-west of the gate, above the track
+ROAD_CHAINS = (("ert_melmond", (0, 3)), ((0, 3), (-8, 3), "ert_giant"), ((0, 3), "ert_earth_cave"))
 WINDMILL_OFF, SHRINE_OFF, POST_OFF = (-7, -9), (5, 5), (-1, 2)   # today's offsets from Melmond, the Cavern, the dock
 
 
@@ -90,6 +95,10 @@ def objects(g: np.ndarray, ents: dict, doors: dict, docks: dict, taken: set) -> 
             if (x, y) not in taken:
                 g[y, x] = "m"
     out += melmond(g, ents, doors)
+    gx, gy = ents["ert_melmond"]
+    sx, sy = gx + SIGN_OFF[0], gy + SIGN_OFF[1]          # QW: the signpost by the track, its arrow east to the gate
+    out.append({"type": "deco", "parts": [["signpost"]], "x": sx, "y": sy})
+    insp = [{"x": sx, "y": sy, "text": list(T.SIGN_TEXT)}]
     taken = taken | {c for o in out for c in _box(o["x"], o["y"], len(o["parts"][0]), len(o["parts"]))}
     grass = lambda x, y: g[y, x] == "."  # noqa: E731
     mx, my = ents["ert_melmond"]
@@ -101,7 +110,7 @@ def objects(g: np.ndarray, ents: dict, doors: dict, docks: dict, taken: set) -> 
     shrine_ok = lambda x, y: land(x, y) and land(x, y + 1)  # noqa: E731   (its south row inspected from below)
     sx, sy = _fit(g, (cx + SHRINE_OFF[0], cy + SHRINE_OFF[1]), 2, 2, taken, shrine_ok)
     out.append(_deco("shrine", sx, sy, collide="alpha"))
-    insp = [{"x": sx + i, "y": sy + 1, "text": list(T.SHRINE_TEXT)} for i in (0, 1)]
+    insp += [{"x": sx + i, "y": sy + 1, "text": list(T.SHRINE_TEXT)} for i in (0, 1)]
     ddx, ddy = docks["ert_dwarf"]
     shore = lambda x, y: g[y, x] not in BLOCK and g[y, x] != "=" and any(  # noqa: E731
         g[y + b, x + a] == "o" for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1)))
@@ -205,7 +214,25 @@ def content(g: np.ndarray, meta: dict, doors: dict, taken: set) -> dict:
     GR.badlands(g, meta, ents, plain, ents["ert_melmond"][1] + BADLANDS_DY)
     docks = {d["id"]: (d["x"], d["y"]) for d in meta["docks"]}
     objs, insp = objects(g, ents, doors, docks, taken)
-    GR.tidy(g, meta, taken | {c for o in objs for c in _box(o["x"], o["y"], len(o["parts"][0]), len(o["parts"]))},
-         docks)
-    return {"objects": objs, "inspect": insp, "encounterZones": zones(g, meta, ents),
-            "backdrops": dict(T.BACKDROPS), "patches": {"canal": canal(meta["canal"])}}
+    covered = {c for o in objs for c in _box(o["x"], o["y"], len(o["parts"][0]), len(o["parts"]))}
+    errors = roads(g, ents, covered)
+    GR.tidy(g, meta, taken | covered, docks)
+    return {"objects": objs, "inspect": insp, "encounterZones": zones(g, meta, ents), "errors": errors,
+            "backdrops": dict(T.BACKDROPS), "patches": {"canal": canal(meta["canal"])},
+            "road_islands": [ents["ert_melmond"]]}       # Melmond's tracks are EARTH's own network (its gate cell)
+
+
+def roads(g: np.ndarray, ents: dict, covered: set) -> list[str]:
+    """QW (playtest 2026-11-22): Melmond's door is on its icon's east side while the art's wall gate faces south, so
+    a worn dirt track (ELF's wobbling router, round the icon and its dressing) leaves the east gate south past the
+    town's south wall to the bend, then forks to the giant's east mouth and to the Cavern's mouth: whoever comes from the tunnel,
+    the Cavern or the harbour sees the way in. Returns the routing errors."""
+    (gx, gy), out, used = ents["ert_melmond"], [], set()
+    for chain in ROAD_CHAINS:
+        pts = [ents[p] if isinstance(p, str) else (gx + p[0], gy + p[1]) for p in chain]
+        for a, b in zip(pts, pts[1:]):
+            path = RD.route(g, covered | (used - {a}), a, b)   # a fork never re-climbs the stem
+            if not path:
+                out.append(f"earth: Melmond's track {a} -> {b} cannot be routed")
+            used |= set(path or [])
+    return out
