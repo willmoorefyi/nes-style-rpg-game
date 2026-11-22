@@ -1,0 +1,138 @@
+{
+  "character": "dwarf_elder",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "83356a28e12c1a1207be21d5",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s",
+      "tag": "dw_elder_s50_1",
+      "cache_key": "83356a28e12c1a1207be21d5",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "d",
+      "tag": "dw_elder_d50_1",
+      "cache_key": "35c38611989a2bfe4a772332",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s",
+        0,
+        false
+      ],
+      [
+        "s",
+        1,
+        false
+      ],
+      [
+        "s",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "s",
+        5,
+        false
+      ],
+      [
+        "s",
+        5,
+        false
+      ],
+      [
+        "s",
+        5,
+        true
+      ]
+    ],
+    [
+      [
+        "d",
+        0,
+        false
+      ],
+      [
+        "d",
+        2,
+        false
+      ],
+      [
+        "d",
+        0,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [],
+  "figure_px": [
+    70,
+    70,
+    70,
+    70,
+    70,
+    70,
+    68,
+    68,
+    68
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "DW dwarf_elder: front s50_1 row 0 (dw_elder guide: old_man squashed, 0.5, seed 1; white beard, royal-blue robe); back = the same render's true back cell 5 (stand, stand, mirrored: the elder does not walk); side strip d50_1 cells 0, 2, 0 (cell 1 holds a sword)"
+}

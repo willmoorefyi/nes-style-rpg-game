@@ -93,11 +93,11 @@ def outdoor() -> list[dict]:
             ["When I was young, the castle's lamps burned all night and the hall rang with harps.",
              "Since the curse they burn all night still, but no one plays. We keep a light so he can find his way back."],
             awake=["The harps are back in the hall. I'm too old to dance, but I tap my stick."]), tint=ELDER),
-        npc("elfheim_dwarf_peddler", "master", 44, 35, talk(
+        npc("elfheim_dwarf_peddler", "dwarf_trader", 44, 35, talk(
             ["Don't stare, lad, dwarves travel too. I'm here for elven rope. The foreman back home has a mad plan.",
              "Nerrick wants to blast a canal through the isthmus and let the sea through. All he lacks is the powder."],
             awake=["Your prince keeps a cask of blasting powder in his vault, they tell me. Nerrick would trade his "
-                   "beard for it. Take it to the dwarves' hall, north across the strait."]), tint="#d2b48c"),
+                   "beard for it. Take it to the dwarves' hall, north across the strait."]), tint=None),
         npc("elfheim_scout", "ninja", 10, 9, talk(
             ["I ride the Keep Moor up the long arm. The keep's soldiers wave at me, but their king never comes out."],
             astos=["So the king at the keep was a mask over Astos. I watched that window every day and never saw "

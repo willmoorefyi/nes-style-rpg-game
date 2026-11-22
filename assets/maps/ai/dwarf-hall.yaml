@@ -32,7 +32,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: ert_nerrick
-  sprite: burgher
+  sprite: dwarf_nerrick
   x: 21
   y: 7
   dialog:
@@ -42,20 +42,18 @@ npcs:
     text: ['Is that blasting powder? Sealed and dry, too! Give it here before I wake from this dream!']
   - text: ['Nerrick, foreman. Those are the canal plans. Forty years I''ve redrawn them, and the saddle still stands.', Picks just ring off it. Fire can't crack it. We need something that bursts the rock
         from inside.]
-  tint: '#b08860'
   cutscene: {id: ert_canal_blast, onceFlag: CANAL_OPEN}
   requiredItem: tnt
 - id: ert_dwarf_scribe
-  sprite: old_man
+  sprite: dwarf_elder
   x: 16
   y: 7
   dialog:
   - condition: CANAL_OPEN
     text: ['I''m inking the plans at last as built, not as hoped. That''s a pleasure I never expected.']
   - text: [Every line on that table has been rubbed out and drawn again. The saddle beat us every time.]
-  tint: '#b08860'
 - id: ert_smyth
-  sprite: monk
+  sprite: dwarf_smith
   x: 7
   y: 6
   dialog:
@@ -64,98 +62,86 @@ npcs:
   - condition: item:adamant
     text: ['That ore is singing! Hand it over, and stand well back from the fire.']
   - text: ['Smyth, smith of this hall. My anvil has gone quiet for want of a metal worth hitting.', 'Bring me ore from a place nearer the stars than the earth, and I''ll show you what a dwarf can forge.']
-  tint: '#b08860'
   cutscene: {id: ert_smyth_forge, onceFlag: ERT_O_SWORD_FORGED}
   requiredItem: adamant
 - id: ert_dwarf_bellows
-  sprite: thief
+  sprite: dwarf_miner
   x: 4
   y: 8
   dialog: ['I work the bellows. Smyth says one day I''ll strike, too. One day.']
-  tint: '#b08860'
 - id: ert_dwarf_canal_hint
-  sprite: farmer
+  sprite: dwarf_miner
   x: 12
   y: 18
   dialog:
   - condition: CANAL_OPEN
     text: ['The canal''s open, and the ships of the Aldi can reach the open sea at last.']
   - text: ['Nerrick''s canal would join our sea to the ocean, but nothing we have can break the saddle.', They say the elves keep a powder that splits stone. It's locked away in Elfheim's vault.]
-  tint: '#b08860'
 - id: ert_dwarf_melmond_hint
-  sprite: burgher
+  sprite: dwarf_trader
   x: 27
   y: 22
   dialog:
   - condition: CANAL_OPEN
     text: ['West through the canal, then across the strait: that''s Melmond. Ask there about the rot.', The Cavern of Earth lies south-west of the town. Something in it is drinking the land.]
   - text: ['Across the western water is Melmond, farm country. Their fields have gone grey, I hear.', We could sail there in a morning if the canal were cut.]
-  tint: '#b08860'
 - id: ert_dwarf_miner_a
-  sprite: farmer
+  sprite: dwarf_miner
   x: 8
   y: 20
   dialog:
   - condition: CANAL_OPEN
     text: [Back to honest digging now the saddle's gone. Ore doesn't fight back.]
   - text: [I've broken six picks on that saddle. Six!]
-  tint: '#b08860'
   wander: true
 - id: ert_dwarf_miner_b
-  sprite: villager
+  sprite: dwarf_miner
   x: 25
   y: 18
   dialog: [Mind the carts. They roll when you least expect it.]
-  tint: '#b08860'
   wander: true
 - id: ert_dwarf_cook
-  sprite: villager_f
+  sprite: dwarf_woman
   x: 31
   y: 24
   dialog:
   - condition: CANAL_OPEN
     text: [Fresh fish from the canal tonight! I'd forgotten what anything but cave mushrooms tastes like.]
   - text: [Mushroom stew again. Don't make that face; it's good for your beard.]
-  tint: '#b08860'
 - id: ert_dwarf_child
-  sprite: villager_f
+  sprite: dwarf_child
   x: 15
   y: 23
   dialog: [When I'm grown I'll dig a tunnel all the way to the moon.]
-  tint: '#b08860'
   wander: true
 - id: ert_dwarf_elder
-  sprite: old_man
+  sprite: dwarf_elder
   x: 5
   y: 16
   dialog:
   - condition: CANAL_OPEN
     text: ['I felt the blast in my bones. The mountain sighed, as if it had waited for it too.']
   - text: [Our people came to this hall when the sea was still young. We have been patient.]
-  tint: '#b08860'
 - id: ert_dwarf_sentry
-  sprite: guard
+  sprite: dwarf_guard
   x: 22
   y: 26
   dialog:
   - condition: CANAL_OPEN
     text: [The landing will be busy now. I'll be checking every boat.]
   - text: ['You came by the landing cove, or across the downs from the south? Either way, welcome.']
-  tint: '#b08860'
 - id: ert_dwarf_lookout
-  sprite: warrior
+  sprite: dwarf_guard
   x: 35
   y: 16
   dialog:
   - condition: CANAL_OPEN
     text: ['From the ridge I watched the water run through. White foam, then calm. Beautiful.']
   - text: [I keep watch on the ridge. Nothing moves on the Aldi I don't see.]
-  tint: '#b08860'
 - id: dwarf-item-keeper
-  sprite: merchant
+  sprite: dwarf_trader
   x: 33
   y: 6
-  tint: '#b08860'
   dialog: ['Rope, lamps, tonics! Everything a body needs underground.']
   shopId: dwarf_item
 transitions:

@@ -1,0 +1,188 @@
+{
+  "character": "dwarf_woman",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "a642d0508f88e64cbf4a7f4c",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s",
+      "tag": "dw_woman2_s50_1",
+      "cache_key": "a642d0508f88e64cbf4a7f4c",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "b",
+      "tag": "dw_woman2_b50_2",
+      "cache_key": "ff57871132bded99c5ca8533",
+      "model": "structure",
+      "seed": 2,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "tol": 110,
+        "holes": 70
+      }
+    },
+    {
+      "alias": "d",
+      "tag": "dw_woman2_d60_1",
+      "cache_key": "c52cd8952b52a0ca6ea52e90",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s",
+        3,
+        false
+      ],
+      [
+        "s",
+        4,
+        false
+      ],
+      [
+        "s",
+        4,
+        true
+      ]
+    ],
+    [
+      [
+        "b",
+        1,
+        false
+      ],
+      [
+        "b",
+        2,
+        false
+      ],
+      [
+        "b",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "d",
+        0,
+        false
+      ],
+      [
+        "d",
+        1,
+        false
+      ],
+      [
+        "d",
+        2,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [
+    {
+      "op": "erase",
+      "why": "a speck of the render's floor beside the back step's foot",
+      "cell": [
+        1,
+        1
+      ],
+      "rects": [
+        [
+          34,
+          88,
+          48,
+          96
+        ]
+      ],
+      "cleared_px": 112,
+      "outlined_px": 6
+    },
+    {
+      "op": "erase",
+      "why": "the same speck, mirrored",
+      "cell": [
+        1,
+        2
+      ],
+      "rects": [
+        [
+          0,
+          88,
+          14,
+          96
+        ]
+      ],
+      "cleared_px": 112,
+      "outlined_px": 6
+    }
+  ],
+  "figure_px": [
+    73,
+    73,
+    73,
+    70,
+    71,
+    71,
+    71,
+    71,
+    71
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "DW dwarf_woman: front s50_1 row 1 cells 0, 1 + 1 mirrored (dw_woman2 guide: villager_f squashed, 0.5, seed 1; copper plaits, green dress, brown apron); back strip woman2 b50_2 cells 1, 2 + 2 mirrored (flood tol 110 cuts its grey floor strip; two floor specks erased); side strip d60_1 (0.6, seed 1)"
+}

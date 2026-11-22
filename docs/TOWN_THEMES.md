@@ -248,7 +248,8 @@ sheets are split into separate figures first (`cut.split`).
   - an anvil;
   - a hanging brazier;
   - mine carts on rails (not obtained yet).
-- **NPC dress:** leather aprons, braided beards, bronze helms (the ruddy `DWARF` tint stays).
+- **NPC dress:** leather aprons, braided beards, bronze helms. Since pass DW the dwarves wear their own field sheets
+  (`dwarf_*`, `gen/npc_field_dw.py`), untinted; the ruddy `DWARF` tint on human sheets is gone.
 - **Candidates:** `dwf_wall`, `dwf_statue`, `dwf_props` (pillar, forge, slim pillar, anvil), `dwf_props2` (coal, a
   chain brazier, a stand brazier; weak, and no mine cart).
 - **Approved (AR-W2):** the wall (material `dwf_wall`, the hall's `in_wall_face`), the king statue, pillar, forge

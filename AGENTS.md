@@ -636,6 +636,21 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   overrides `APPROVED_AR`. Two flavour-only robots (a line each, no action, flag or `wander`): `wnd_ancient_archive`
   on `sky-castle-3f` (30, 19) and `wnd_ancient_stoker` on `sky-castle-4f` (31, 13), both off the required path; the
   sentries stay on 1F / 2F. The lair's dragon-kin lines fit their dragon-kin sprites (no "man's shape"). Previews: `?mute=1&scenario=w_ar_sky3 | w_ar_sky4 | w_ar_ember`.
+- **Dwarf NPC sheets (pass DW, user feedback 2026-11-22: "dwarf NPCs needed for dwarf cave").** Eight sheets from
+  AR Stability control-structure renders (purpose `ar_dwarf`, 33 of 40 used), in `gen/npc_field_dw.py` (`DW_SPEC`,
+  merged into SPEC; the `cells` format): `dwarf_miner` (bronze helmet, teal), `dwarf_smith` (Smyth: bald, apron),
+  `dwarf_elder` (white beard, blue robe), `dwarf_guard` (bronze helm, blue), `dwarf_woman` (copper plaits, green
+  dress), `dwarf_child` (the woman's cells at 0.75 scale), `dwarf_trader` (green cap, backpack) and `dwarf_nerrick`
+  (the canal foreman: wide hat, leather vest). Their guides are approved field sheets squashed to a dwarf's build
+  (height x0.76, width x1.12) with a drawn beard hint, so the adults stand 65-73 px (about 3/4 of the hero's 86-90),
+  the child 53-55. A cut option `scale` per render (`npc_field_edit`) cuts a 3x1 strip or a large front at the 3x3
+  render's height. The flaws are fixed by recorded `ramp` / `erase` steps (helmets and hats matched across facings,
+  the back strips' green moved onto the front's colours). Placed untinted (the ruddy `DWARF` tint is gone): all 14
+  NPCs of `dwarf-hall` (Nerrick, Smyth, the elder and the scribe, two guards, four miners, the cook, the child, the
+  Melmond hint and the store keeper as traders), `melmond_dwarf_trader` (Melmond) and `elfheim_dwarf_peddler`
+  (Elfheim). Only the miner and the child `wander`; the smith's and the elder's side / back steps repeat their stand,
+  so do not give those `wander`. Test: `tests/data/dwNpcArt.test.ts`. Previews: `?mute=1&scenario=w_dw_hall |
+  w_dw_rooms | w_dw_forge`.
 
 ### Town themes (AR-W2)
 

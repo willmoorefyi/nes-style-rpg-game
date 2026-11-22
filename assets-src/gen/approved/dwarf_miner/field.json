@@ -1,0 +1,254 @@
+{
+  "character": "dwarf_miner",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 3,
+  "cache_key": "b445ece054b695b5abc1f9e7",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s",
+      "tag": "dw_miner_s50_3",
+      "cache_key": "b445ece054b695b5abc1f9e7",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20,
+        "edge": 12,
+        "scale": 0.78
+      }
+    },
+    {
+      "alias": "b",
+      "tag": "dw_miner_b50_3",
+      "cache_key": "5a3f10398ea846217e20402c",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "d",
+      "tag": "dw_miner_d50_3",
+      "cache_key": "87b14721f3667d823142752b",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s",
+        3,
+        false
+      ],
+      [
+        "s",
+        4,
+        false
+      ],
+      [
+        "s",
+        4,
+        true
+      ]
+    ],
+    [
+      [
+        "b",
+        1,
+        false
+      ],
+      [
+        "b",
+        2,
+        false
+      ],
+      [
+        "b",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "d",
+        0,
+        false
+      ],
+      [
+        "d",
+        1,
+        false
+      ],
+      [
+        "d",
+        2,
+        false
+      ]
+    ]
+  ],
+  "shifts": {
+    "1": [
+      [
+        120,
+        35,
+        178,
+        1.0,
+        1.0
+      ]
+    ],
+    "2": [
+      [
+        220,
+        30,
+        178,
+        1.0,
+        1.0
+      ]
+    ]
+  },
+  "edits": [
+    {
+      "op": "ramp",
+      "why": "the second front cell's teal helmet -> the first's bronze helmet",
+      "cells": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "map": {
+        "#29636b": "#f78c21",
+        "#318c8c": "#f78c21",
+        "#42bda5": "#f78c21"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the back strip's grey helmet -> the front's bronze helmet",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#7b8c9c": "#f78c21",
+        "#efefe7": "#f78c21"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the side strip's cap -> the front's bronze helmet",
+      "cells": [
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "map": {
+        "#29636b": "#f78c21",
+        "#318c8c": "#f78c21",
+        "#42bda5": "#f78c21"
+      }
+    },
+    {
+      "op": "erase",
+      "why": "the pickaxe head over the side stand (the steps carry none)",
+      "cell": [
+        2,
+        0
+      ],
+      "rects": [
+        [
+          0,
+          0,
+          24,
+          24
+        ]
+      ],
+      "cleared_px": 576,
+      "outlined_px": 7
+    }
+  ],
+  "figure_px": [
+    71,
+    68,
+    68,
+    69,
+    69,
+    69,
+    71,
+    69,
+    68
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "DW dwarf_miner: front s50_3 row 1 (dw_miner guide: villager squashed to a dwarf's build + beard hint, 0.5, seed 3; cut at 0.78 so its larger front matches the strips), its second / third front cell's teal helmet ramped to the first's bronze; back strip b50_3 cells 1, 2 + 2 mirrored (green shirt shifted to teal, grey helmet ramped to bronze); side strip d50_3 (blue shifted to teal, the cap ramped to bronze, the pickaxe head over the stand erased)"
+}

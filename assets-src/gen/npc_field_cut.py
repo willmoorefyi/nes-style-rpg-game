@@ -1,5 +1,6 @@
 """Re-cut the approved Bedrock NPC field sheets (pass LM5: the fairy and the mermaid; pass AR: the Lufenians, the
-dragon-kin, the robot sentry and the ancient robot, the Circle sages and Dr. Unne) from the render cache.
+dragon-kin, the robot sentry and the ancient robot, the Circle sages and Dr. Unne; pass DW: the dwarves) from the
+render cache.
 
     python3 -I assets-src/gen/npc_field_cut.py            # write approved/<id>/field.{png,json}
     python3 -I assets-src/gen/npc_field_cut.py --check    # rebuild in memory, exit 1 if a committed sheet differs
@@ -19,7 +20,8 @@ Post steps (LM5-INT, the user's rulings of 2026-11-19):
            down and side rows do not use is remapped to the down / side teal ramp colour of the nearest value
 Pass AR entries (`npc_field_ar.AR_SPEC`, merged into SPEC) use per-cell picks with mirror flags, per-row hue shifts,
 per-render flood tolerance and hole cuts, and offline edit steps (erase, ramp recolour, pixel patch): the format is
-in `npc_field_edit.py`. `--only id[,id]` limits a run to some ids.
+in `npc_field_edit.py`. Pass DW's dwarves (`npc_field_dw.DW_SPEC`) use the same format. `--only id[,id]` limits a
+run to some ids.
 The cut is deterministic (seeded k-means, no hash order).
 """
 from __future__ import annotations
@@ -38,6 +40,7 @@ from PIL import Image, ImageFilter  # noqa: E402
 
 from gen import bedrock as B  # noqa: E402
 from gen.npc_field_ar import APPROVED_AR, AR_SPEC  # noqa: E402
+from gen.npc_field_dw import DW_SPEC  # noqa: E402
 from gen.pixelize import OUTLINE, components, flood_bg, kmeans, snap15  # noqa: E402
 
 GW, GH, FOOT = 48, 96, 93
@@ -58,6 +61,7 @@ SPEC = {
                         "the down / side teal ramp (nearest value)"},
 }
 SPEC.update(AR_SPEC)
+SPEC.update(DW_SPEC)                                     # pass DW: the dwarves (purpose ar_dwarf)
 
 
 def _cached(key: str) -> Image.Image:

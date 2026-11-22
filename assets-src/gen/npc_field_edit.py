@@ -6,7 +6,8 @@ A `cells` SPEC entry:
   cut      {alias: {"tol": flood tolerance (default 14), "holes": colour distance, "edge": n}}: `holes` cuts away
            enclosed background-coloured areas of at least HOLE_MIN render px (between the legs, under a tail);
            `edge` (pass CD) paints the render's outer n px with the median colour of the ring just inside them
-           first, so a dark frame or floor strip along the border does not stop the background flood
+           first, so a dark frame or floor strip along the border does not stop the background flood; `scale` (DW)
+           overrides the entry's scale for that render (a 3x1 strip whose figure fills its frame)
   scale    optional (pass CD: the dragon hatchling): each render cell is pixelized at scale x 48x96 and centred
            in the cell, feet on row 93 (LM5's fairy rule); default 1.0
   cells    3 rows (down, up, side drawn facing right) of 3 cells [alias, cell index in the render, mirror]; a
@@ -228,7 +229,7 @@ def build(C, spec: dict) -> tuple[Image.Image, Image.Image, list[dict]]:
             _tag, key, rows = spec["renders"][alias]
             cut = spec.get("cut", {}).get(alias, {})
             cache[alias] = render_frames(C, C._cached(key), rows, cut.get("tol", 14), cut.get("holes"),
-                                         spec.get("scale", 1.0), cut.get("edge", 0))
+                                         cut.get("scale", spec.get("scale", 1.0)), cut.get("edge", 0))
         return cache[alias]
 
     picked, flips = [], []

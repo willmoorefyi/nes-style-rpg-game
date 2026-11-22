@@ -173,6 +173,38 @@
     "dr_unne": {
       "x": 288,
       "y": 1440
+    },
+    "dwarf_miner": {
+      "x": 0,
+      "y": 1600
+    },
+    "dwarf_smith": {
+      "x": 96,
+      "y": 1600
+    },
+    "dwarf_elder": {
+      "x": 192,
+      "y": 1600
+    },
+    "dwarf_guard": {
+      "x": 288,
+      "y": 1600
+    },
+    "dwarf_woman": {
+      "x": 0,
+      "y": 1760
+    },
+    "dwarf_child": {
+      "x": 96,
+      "y": 1760
+    },
+    "dwarf_trader": {
+      "x": 192,
+      "y": 1760
+    },
+    "dwarf_nerrick": {
+      "x": 288,
+      "y": 1760
     }
   }
 }
