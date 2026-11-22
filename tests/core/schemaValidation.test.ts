@@ -265,3 +265,24 @@ describe('schemaValidation: optional FF1 combat fields (T4a)', () => {
   });
 });
 
+
+// WR (docs/WORLD_WRAP_PLAN.md 3): only a streamed baked map of whole chunks may wrap
+describe('schemaValidation: MapData.wrap', () => {
+  const map = (w: number, h: number, chunk: number, extra: Record<string, unknown> = {}): Record<string, unknown> => {
+    const n = Math.ceil(w / chunk) * Math.ceil(h / chunk);
+    return { id: 'w', width: w, height: h, layers: [], tilesets: [], collision: Array(w * h).fill(2), npcs: [],
+      transitions: [], art: { tile: 48, chunk, below: Array(n).fill('c.png'), above: Array(n).fill(null) }, ...extra };
+  };
+
+  it('accepts wrap on a streamed map of whole chunks, and wrap: false anywhere', () => {
+    expect(validateMapData(map(144, 144, 16, { wrap: true })).wrap).toBe(true);
+    expect(() => validateMapData(map(32, 32, 16, { wrap: false }))).not.toThrow();
+  });
+
+  it('refuses wrap on a small (unstreamed) map, a part chunk, a map without art, or a non-boolean', () => {
+    expect(() => validateMapData(map(32, 32, 16, { wrap: true }))).toThrow(/streamed/);
+    expect(() => validateMapData(map(150, 144, 16, { wrap: true }))).toThrow(/whole chunks/);
+    expect(() => validateMapData({ ...map(144, 144, 16), art: undefined, wrap: true })).toThrow(/streamed/);
+    expect(() => validateMapData(map(144, 144, 16, { wrap: 'yes' }))).toThrow(/MapData.wrap/);
+  });
+});

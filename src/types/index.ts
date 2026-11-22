@@ -343,6 +343,8 @@ export interface MapData extends MapDataQuestFields {
   ambient?: AmbientEffect[];
   /** Baked 2x art from assets-src/tools/build_map.py; when set, `layers` is empty. */
   art?: BakedMapArt;
+  /** The map is a torus (pass WR: the world map; streamed baked maps only, src/systems/worldWrap.ts). */
+  wrap?: boolean;
 }
 
 /** An inspectable map cell; `text` resolves like NPC dialog (plain lines, or conditional entries). */

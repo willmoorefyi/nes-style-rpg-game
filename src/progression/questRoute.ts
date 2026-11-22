@@ -4,6 +4,7 @@
  * it takes and the component exits of questExits.ts (docks, banks, landings, boarding, EXIT). A step onto a scripted
  * encounter or a permanent gate's cell is not taken (those are events), as in `cellPath`.
  */
+import { stepTo } from '../systems/worldWrap.js';
 import { fieldStep } from '../systems/fieldRules.js';
 import type { FieldMode } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
@@ -78,8 +79,8 @@ export function route(model: QuestModel, from: QuestPlace, goal: (p: QuestPlace)
     if (!map) continue;
     const fs = { flags: state.flags, items: state.items, vehicles: state.vehicles, mode: p.mode };
     for (const [dx, dy] of DIRS) {
-      const to = { x: p.x + dx, y: p.y + dy };
-      if (to.x < 0 || to.y < 0 || to.x >= map.width || to.y >= map.height) continue;
+      const to = stepTo(map, p, dx, dy); // WR: across the seam on a wrapped map
+      if (!to) continue;
       const r = fieldStep(map, p, to, fs);
       if (!r.ok || r.encounter || r.setFlags.length) continue;
       let next: QuestPlace = { map: p.map, ...to, mode: r.mode };
