@@ -189,6 +189,40 @@ def bedrock_ok(meta: dict, cache: Path, ledger: list[dict] | None = None) -> boo
     return bool(keys) and all(k in asked and (cache / f"{k}.png").is_file() for k in keys)
 
 
+def kneel_ok(meta: dict, ledger: list[dict], br_ledger: list[dict], gen: Path) -> str | None:
+    """A pass-KA approved kneel key (approved/<id>/kneel.json, heroes battle_kneel.json; kneel_ai.py approve) is not a
+    `generate.py` sheet to re-plan: its request is kneel_ai_gem's, built from guide images in out/kneel_ai (not
+    committed). It is checked as kneel_ai.py approves and kneel_tools.py coverage counts it: the sheet fits the id
+    (battle_kneel for a hero class, kneel for a monster), its png sits beside it, the rig or class file says
+    `kneel: {source: ai}`, a key without a J0 PASS carries the user's review, and every key is a successful request
+    of pass KA in its ledger (the Gemini ledger for arm g, the BR ledger for a Bedrock arm). None when all hold, else
+    the reason."""
+    import yaml
+    cid, sheet = meta.get("character"), meta.get("sheet")
+    hero = (gen / "anim" / f"{cid}.yaml").is_file()
+    rig = gen / "anim" / f"{cid}.yaml" if hero else gen / "anim" / "monsters" / f"{cid}.yaml"
+    if sheet != ("battle_kneel" if hero else "kneel"):
+        return f"sheet {sheet} for a {'hero' if hero else 'monster'}"
+    if not (gen / "approved" / str(cid) / f"{sheet}.png").is_file():
+        return f"approved/{cid}/{sheet}.png missing"
+    block = (yaml.safe_load(rig.read_text()) or {}).get("kneel") if rig.is_file() else None
+    if not (isinstance(block, dict) and block.get("source") == "ai"):
+        return f"{rig.relative_to(gen)} has no kneel: {{source: ai}}"
+    if meta.get("j0") and not meta.get("user_review"):
+        return f"J0 {meta['j0']} without a user review"
+    if meta.get("arm") == "g":
+        keys, rows = meta.get("gemini_cache_keys") or [], ledger
+        asked = {r.get("key") for r in rows if r.get("event") == "attempt" and r.get("character") == cid
+                 and r.get("sheet") == sheet and str(r.get("pass", "")).startswith("KA")}
+        done = {r.get("key") for r in rows if r.get("event") == "result" and r.get("ok")}
+        ok = {k for k in asked if k in done}
+    else:
+        keys, rows = meta.get("br_cache_keys") or [], br_ledger
+        ok = {r.get("key") for r in rows if r.get("event") in ("request", "result")}
+    missing = [k for k in keys if k not in ok]
+    return f"keys {missing or '[]'} not successful pass-KA requests of {cid} {sheet}" if not keys or missing else None
+
+
 def _approved_keys(check: Callable[[bool, str], None]) -> None:
     """Every approved request (approved/*/*.json) re-planned from today's code and yaml reproduces its cache key."""
     from gen import generate as GEN
