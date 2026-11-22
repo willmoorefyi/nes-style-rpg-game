@@ -65,7 +65,8 @@ export class GroundStrips {
   split: number;
 
   constructor(texture: Texture, private readonly mapW: number, private readonly mapH: number,
-    near: Texture | null = null, private readonly rows = SCREEN_H, private readonly width = SCREEN_W) {
+    near: Texture | null = null, private readonly rows = SCREEN_H, private readonly width = SCREEN_W,
+    private readonly wrap = false) {
     this.split = rows;
     this.farStrip = new Strip(texture, rows);
     this.view.addChild(this.farStrip.mesh);
@@ -93,7 +94,7 @@ export class GroundStrips {
     const far = this.farStrip;
     fillStrips(p, table, 0, rows, this.mapW, this.mapH, far.positions, far.uvs, width);
     const near = this.nearStrip;
-    const map = { w: this.mapW, h: this.mapH };
+    const map = { w: this.mapW, h: this.mapH, wrap: this.wrap };   // WR: a wrapped map has no open sides
     this.split = near && sq ? nearSplit(p, table, sq.dSplit, sq.x0, sq.y0, sq.cells, rows, width, map) : rows;
     if (near && sq) {
       fillStrips(p, table, 0, rows, sq.cells, sq.cells, near.positions, near.uvs, width, sq.x0, sq.y0);

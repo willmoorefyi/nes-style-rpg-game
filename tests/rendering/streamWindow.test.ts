@@ -105,7 +105,7 @@ describe('M7-3: flightWindow', () => {
     for (let x = 40; x < 152; x++) starts.add(flightWindow(x, 100, 4, 16, 12, 12).c0);
     expect(starts.size).toBe(Math.ceil(112 / 16));
     expect(nearWindow(world(), NEAR_FULL, 100.5, 120.5)).toEqual({
-      rect: { c0: 4, r0: 6, c1: 7, r1: 9 }, x0: 64, y0: 96, cells: 64, dSplit: 25 });
+      rect: { c0: 4, r0: 6, c1: 7, r1: 9 }, x0: 64, y0: 96, ix0: 64, iy0: 96, cells: 64, dSplit: 25 });
     expect(nearWindow(world(), NEAR_LOW, 100.5, 120.5).cells).toBe(48);
   });
 });

@@ -8,17 +8,18 @@
 import { Sprite, type Container } from 'pixi.js';
 import { FOG_ALPHA, FOG_ROWS } from './FlightSky.js';
 import { horizonY, type ViewParams } from './mode7Math.js';
-import { placeProps, type PropSource, type PropSprite } from './propMath.js';
+import { placeProps, type PropSource, type PropSprite, type PropWrap } from './propMath.js';
 
 export class FlightProps {
   private readonly pool = new Map<PropSprite, Sprite>();
   /** The billboards drawn on the last frame (the report). */
   drawn = 0;
 
-  constructor(private readonly into: Container) {}
+  /** `wrap`: a wrapped map's size (WR), so each billboard draws at its image nearest P. */
+  constructor(private readonly into: Container, private readonly wrap: PropWrap | null = null) {}
 
   draw(view: ViewParams, sources: readonly PropSource[]): void {
-    const placed = placeProps(view, sources, horizonY(view), { rows: FOG_ROWS, alpha: FOG_ALPHA });
+    const placed = placeProps(view, sources, horizonY(view), { rows: FOG_ROWS, alpha: FOG_ALPHA }, this.wrap);
     const shown = new Set<PropSprite>();
     for (const { src, at } of placed) {
       const f = src.sprite;

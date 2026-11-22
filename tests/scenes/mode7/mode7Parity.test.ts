@@ -243,3 +243,60 @@ describe('M7-2 / M7-3: parity on a streamed world (192x192, late chunks on the r
     expect(onFrames - offFrames - on.tilted).toBe(on.perStep.reduce((a, n) => a + n, 0) - off.perStep.reduce((a, n) => a + n, 0));
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 7.3, 10): parity on the wrapped streamed world, across the east seam and the corner
+describe('WR: parity on a wrapped streamed world (192x192)', () => {
+  beforeEach(() => resetStub());
+  afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
+
+  /** Take off at `start`, fly `path` (each a direction and a count), land; the near window's rect changes in flight. */
+  async function wrappedRun(mode7: Mode7Setup, wrap: boolean, start: { x: number; y: number },
+    path: Array<['up' | 'down' | 'left' | 'right', number]>) {
+    resetStub();   // no frame of the last run
+    const chunks = fakeChunks({ allRows: true });
+    const f = await flightField({ mode7, map: streamedWorld({ wrap }), start });
+    let rects = 0;
+    let last = '';
+    f.setOnFrame(async () => {
+      chunks.tick();
+      await flush();
+      const r = stub.last?.near?.rect;
+      const key = r ? `${r.c0},${r.r0},${r.c1},${r.r1}` : '';
+      if (key && last && key !== last) rects++;
+      if (key) last = key;
+    });
+    await f.idle(4);
+    await f.confirm();
+    await f.idle(1);
+    await throughTilt(f);
+    const cells: string[] = [];
+    for (const [dir, n] of path) {
+      for (let i = 0; i < n; i++) { await f.step(dir); cells.push(`${f.game.playerPosition.x},${f.game.playerPosition.y}`); }
+    }
+    await f.idle(1);
+    await f.confirm();
+    await f.idle(1);
+    await throughTilt(f);
+    await f.idle(1);
+    vi.restoreAllMocks();
+    return { f, cells, rects };
+  }
+
+  it('30 steps east across x 191 | 0 then the corner: the same cells and end state as top-down, no seam recentre', async () => {
+    const N = 192;
+    const path: Array<['up' | 'down' | 'left' | 'right', number]> = [['right', 20], ['down', 10]];
+    const start = { x: N - 8, y: N - 6 };
+    const off = await wrappedRun('off', true, start, path);
+    const on = await wrappedRun('on', true, start, path);
+    expect(on.cells).toEqual(off.cells);
+    expect(on.cells.slice(7, 9)).toEqual([`0,${N - 6}`, `1,${N - 6}`]);
+    expect(on.cells[on.cells.length - 1]).toBe(`12,${(N - 6 + 10) % N}`);
+    const { frames: _a, ...offEnd } = off.f.outcome();
+    const { frames: _b, ...onEnd } = on.f.outcome();
+    expect(onEnd).toEqual(offEnd);
+    // the near window recentres exactly as often as the same flight would far from any seam (same chunk phase)
+    const flat = await wrappedRun('on', false, { x: start.x - 96, y: start.y - 96 }, path);
+    expect(on.rects).toBe(flat.rects);
+    expect(on.rects).toBeGreaterThan(0);
+  });
+});

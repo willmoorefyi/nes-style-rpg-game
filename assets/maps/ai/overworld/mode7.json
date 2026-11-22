@@ -2,7 +2,7 @@
   "version": 1,
   "cellPx": 12,
   "size": 3072,
-  "lowCellPx": 6,
-  "lowSize": 1536,
+  "lowCellPx": 8,
+  "lowSize": 2048,
   "inputs": "2b10139a8fae690a495c80d877735f474ff96ca13d3d8d0b67b2e8fe5b90cac8"
 }

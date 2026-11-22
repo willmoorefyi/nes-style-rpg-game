@@ -72,7 +72,7 @@ export class FlightRenderer {
     const { map } = this.opts;
     this.atlas = new WorldAtlas({ map, profile: this.opts.profile, webgl2: this.opts.webgl2,
       renderer: this.opts.renderer, hasFlag: this.opts.hasFlag });
-    const billboards = new FlightBillboards();
+    const billboards = new FlightBillboards(undefined, { w: map.width, h: map.height, wrap: map.wrap });
     await Promise.all([this.atlas.load(), billboards.load()]).catch((err: unknown) => {
       billboards.destroy();
       throw err;
@@ -83,10 +83,11 @@ export class FlightRenderer {
       if (this.destroyed) return;
       throw new Error('Mode 7: the far atlas did not compose');
     }
-    this.sky = new FlightSky();
+    this.sky = new FlightSky(map.wrap ? map.width : 0);
     this.near = map.art ? new NearDetail({ renderer: this.opts.renderer, map, atlas: this.atlas,
       prof: nearProfile(this.opts.profile), hasFlag: this.opts.hasFlag }) : null;
-    this.strips = new GroundStrips(texture, map.width, map.height, this.near?.texture ?? null);
+    this.strips = new GroundStrips(texture, map.width, map.height, this.near?.texture ?? null, undefined, undefined,
+      map.wrap === true);
     this.billboards = billboards;
     this.container.addChild(this.sky.view, this.sky.clouds, this.strips.view, this.sky.fog, billboards.container);
   }
@@ -117,7 +118,8 @@ export class FlightRenderer {
     const near = this.near && frame.near && frame.chunks ? frame.near : null;
     if (near && frame.chunks) this.near?.update(near, frame.chunks);
     else if (this.near) this.near.heavy = false;
-    const table = this.strips.update(frame.view, near);
+    // WR: the near square draws at its image nearest the ship (ix0, iy0); the far atlas repeats
+    const table = this.strips.update(frame.view, near && { ...near, x0: near.ix0, y0: near.iy0 });
     if (table.firstRow !== this.horizon) {
       this.horizon = table.firstRow;
       this.sky.draw(table.firstRow);

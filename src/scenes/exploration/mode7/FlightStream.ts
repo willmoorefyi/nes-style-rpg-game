@@ -37,22 +37,31 @@ export function nearProfile(profile: 'full' | 'low'): NearProfile {
   return profile === 'low' ? NEAR_LOW : NEAR_FULL;
 }
 
-/** The near window of one frame: its chunk rect and its cell square (origin and side, in cells). */
+/** The near window of one frame: its chunk rect and its cell square (origin and side, in cells). On a wrapped map
+ *  (WR) the rect and (x0, y0) are canonical and (ix0, iy0) is the square's image nearest the ship; flat, they agree. */
 export interface NearWindow {
   rect: ChunkRect;
   x0: number;
   y0: number;
+  ix0: number;
+  iy0: number;
   cells: number;
   dSplit: number;
 }
 
 /** The window for the ship at cell point (px, py) on `map`. */
-export function nearWindow(map: Pick<MapData, 'width' | 'height' | 'art'>, prof: NearProfile, px: number,
+export function nearWindow(map: Pick<MapData, 'width' | 'height' | 'art' | 'wrap'>, prof: NearProfile, px: number,
   py: number): NearWindow {
   const chunk = map.art?.chunk ?? 16;
+  const wrap = map.wrap === true;
   const rect = flightWindow(Math.floor(px), Math.floor(py), prof.n, chunk, Math.ceil(map.width / chunk),
-    Math.ceil(map.height / chunk));
-  return { rect, x0: rect.c0 * chunk, y0: rect.r0 * chunk, cells: prof.n * chunk, dSplit: prof.dSplit };
+    Math.ceil(map.height / chunk), wrap);
+  const x0 = rect.c0 * chunk;
+  const y0 = rect.r0 * chunk;
+  const cells = prof.n * chunk;
+  const ix0 = wrap ? x0 + map.width * Math.round((px - (x0 + cells / 2)) / map.width) : x0;
+  const iy0 = wrap ? y0 + map.height * Math.round((py - (y0 + cells / 2)) / map.height) : y0;
+  return { rect, x0, y0, ix0, iy0, cells, dSplit: prof.dSplit };
 }
 
 function same(a: ChunkRect | null, b: ChunkRect | null): boolean {
