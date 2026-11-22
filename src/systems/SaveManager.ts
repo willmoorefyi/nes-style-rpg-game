@@ -5,6 +5,7 @@ import { Inventory } from '../entities/Inventory.js';
 import { GameFlags } from '../core/GameFlags.js';
 import { parseBoosts, type Boosts } from '../core/Boosts.js';
 import { isPreNw2, NW_SAVE_VERSION, NW2_SAVE_VERSION, resetSave } from './worldReset.js';
+import { relocateRetired } from './retiredMaps.js';
 
 const SAVE_KEY_PREFIX = 'ff1_save_';
 const MAX_SLOTS = 3;
@@ -47,6 +48,8 @@ export interface LoadedSave {
   reset: boolean;
   /** A v4 save (the first NW world): the loader revalidates it on the NW2 world before the field opens. */
   revalidate: boolean;
+  /** Pass CD: a save inside a retired map (retiredMaps.ts) loads at this entrance of its new map; else null. */
+  entrance: string | null;
 }
 
 const VEHICLE_TYPES = ['canoe', 'ship', 'airship'];
@@ -149,7 +152,13 @@ export class SaveManager {
       if (!ACCEPTED_VERSIONS.includes(stored.version)) {
         console.warn(`Save version mismatch: expected ${SAVE_VERSION}, got ${stored.version}`);
       }
-      const { data, vehicles, moved } = resetSave({ ...stored, vehicles: v1 ? [] : savedVehicles(stored.vehicles) });
+      // pass CD (docs/CARDIA_PLAN.md 8): a retired map's save moves first, so the reset and the NW2 check see its new map
+      const retired = relocateRetired(stored);
+      if (retired.entrance) {
+        console.info(`Save: ${stored.currentMap} is retired; loading at ${retired.data.currentMap} ${retired.entrance}`);
+      }
+      const { data, vehicles, moved } = resetSave({ ...retired.data,
+        vehicles: v1 ? [] : savedVehicles(stored.vehicles) });
       return {
         party: PartyManager.fromJSON(data.party),
         inventory: Inventory.fromJSON(data.inventory),
@@ -162,6 +171,7 @@ export class SaveManager {
         boosts: parseBoosts(data.boosts),   // v1 / v2: none saved, the defaults
         reset: moved,
         revalidate: isPreNw2(stored),
+        entrance: moved ? null : retired.entrance,
       };
     } catch (e) {
       console.error(`Failed to load save slot ${slotId}:`, e);
