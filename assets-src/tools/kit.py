@@ -44,6 +44,9 @@ MATERIALS = {
     "sand": ((215, 195, 140), "speckle"),
     "ocean": ((35, 80, 170), "ripple"),
     "swamp": ((75, 100, 60), "marsh"),           # W1-D: the `w` fens (was build_map's recoloured-grass fallback)
+    # AR-T2: offline placeholders only; compiled maps take the approved AR sheet's taiga / snow (AR_SHEET)
+    "taiga": ((40, 80, 60), "speckle"),
+    "snow": ((225, 232, 240), "speckle"),
 }
 # W1-D (QUEST_PLAN 4.3, WORLD_PLAN 4.9): material remap presets, name -> (default base material, hue shift in
 # degrees, saturation factor, value factor). remap() expands one into a map's `materials:` entry
@@ -59,6 +62,7 @@ REMAPS = {
     "pale_dune": ("sand", 0, 0.5, 1.05),
 }
 RECOLORS = {"elf": (110, 0.5, 0.75),             # green slate roofs on the town kit
+            "cold_rock": (180, 0.15, 1.0),         # AR-T2: grey rock (cold ranges' peaks; gen/terrain_cut.COLD_ROCK)
             **{n: REMAPS[n][1:] for n in ("snow", "dune", "pale_dune")}}
 
 
@@ -162,6 +166,9 @@ LANDMARKS = {
 LANDMARK_SHEETS = (APPROVED / "overworld" / "landmarks_lm", APPROVED / "overworld" / "landmarks_lm4",
                    APPROVED / "overworld" / "landmarks_lm5")
 LANDMARK_SHEET = LANDMARK_SHEETS[0]
+# AR-T2: the pass-AR ground sheet (assets-src/gen/terrain_cut.py), loaded into every kit like the landmark sheets: its
+# names (`ar_<m>`, the new materials, the dungeon floors, `ar_tree_clump`, `conifer_clump`) are used by no other sheet
+AR_SHEET = APPROVED / "overworld" / "terrain_ar"
 
 
 def landmark_parts(name: str) -> list[list[str]]:
@@ -441,6 +448,25 @@ def approved_landmarks(approved_dir: Path = APPROVED) -> dict[str, Image.Image]:
     return out
 
 
+@lru_cache(maxsize=None)
+def approved_ar(approved_dir: Path = APPROVED) -> tuple[dict[str, np.ndarray], dict[str, Image.Image]]:
+    """The AR sheet's (materials, parts); a missing sheet adds nothing. A name an older sheet uses is an error."""
+    meta_path = (approved_dir / AR_SHEET.relative_to(APPROVED)).with_suffix(".json")
+    if not meta_path.is_file():
+        return {}, {}
+    meta = json.loads(meta_path.read_text())
+    img = Image.open(meta_path.with_suffix(".png")).convert("RGBA")
+    t = meta.get("tile", T)
+    mats = {n: np.asarray(img.convert("RGB").crop((x, y, x + w, y + h))).copy()
+            for n, (x, y, w, h) in meta["materials"].items()}
+    parts = {n: img.crop((c * t, r * t, (c + 1) * t, (r + 1) * t))
+             for r, row in enumerate(meta["cells"]) for c, n in enumerate(row) if n}
+    clash = sorted((set(mats) | set(parts)) & (set(_PARTS) | {m for m in MATERIALS if m not in ("taiga", "snow", "swamp")}))
+    if clash:
+        raise ValueError(f"{meta_path.name}: names an older sheet uses: {clash}")
+    return mats, parts
+
+
 def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool = False) -> Kit:
     kit = Kit(kit_id, {n: placeholder_part(n) for n in PART_NAMES}, {n: placeholder_material(n) for n in MATERIALS})
     root = approved_dir / kit_id
@@ -449,10 +475,17 @@ def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool
     for name, cell in {**approved_landmarks(approved_dir), **KP.approved(approved_dir)}.items():
         kit.parts[name] = cell                         # the landmark and dungeon-prop sheets, in every kit
         kit.approved.add(name)
+    mats, parts = approved_ar(approved_dir)
+    for name, m in mats.items():
+        kit.materials[name] = m
+        kit.approved.add(name)
+    for name, p in parts.items():
+        kit.parts[name] = p
+        kit.approved.add(name)
     if not root.is_dir():
         return kit
     for meta_path in sorted(root.glob("*.json")):
-        if any(meta_path.stem == s.name and root.name == s.parent.name for s in LANDMARK_SHEETS):
+        if any(meta_path.stem == s.name and root.name == s.parent.name for s in (*LANDMARK_SHEETS, AR_SHEET)):
             continue                                   # loaded above, for every kit
         meta = json.loads(meta_path.read_text())
         sheet = Image.open(meta_path.with_suffix(".png")).convert("RGBA")

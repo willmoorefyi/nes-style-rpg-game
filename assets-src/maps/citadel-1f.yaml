@@ -14,7 +14,7 @@ kits:
 music: dungeon
 materials:
   floor_stone:
-    from: temple_floor
+    from: ar_temple_floor_cool
     shade: 0.95
     hue: 20
     sat: 0.6
@@ -26,7 +26,7 @@ materials:
     from: slate
     shade: 0.4
   rubble:
-    from: temple_rubble
+    from: ar_temple_rubble_cool
     shade: 0.9
 ground: |
   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW

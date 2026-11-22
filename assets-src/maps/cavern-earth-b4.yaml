@@ -14,12 +14,9 @@ kits:
 music: dungeon
 materials:
   floor_stone:
-    from: floor_stone
-    hue: 170
-    sat: 1.8
-    shade: 1.1
+    from: ar_ice
   rubble:
-    from: temple_rubble
+    from: ar_temple_rubble_cool
     hue: 170
     sat: 1.8
     shade: 1.2

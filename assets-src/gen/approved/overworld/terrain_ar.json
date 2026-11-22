@@ -1,0 +1,1092 @@
+{
+ "kit": "overworld",
+ "sheet": "terrain_ar",
+ "backend": "bedrock",
+ "pass": "AR",
+ "purpose": "ar_tiles",
+ "approved": "2026-11-21",
+ "tile": 48,
+ "cells": [
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  [
+   "ar_tree_clump",
+   "conifer_clump",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {
+  "ar_grass": [
+   0,
+   0,
+   192,
+   192
+  ],
+  "ar_grass@b": [
+   192,
+   0,
+   192,
+   192
+  ],
+  "ar_forest": [
+   384,
+   0,
+   192,
+   192
+  ],
+  "ar_forest@b": [
+   576,
+   0,
+   192,
+   192
+  ],
+  "taiga": [
+   768,
+   0,
+   192,
+   192
+  ],
+  "snow": [
+   960,
+   0,
+   192,
+   192
+  ],
+  "ar_mountain": [
+   0,
+   192,
+   192,
+   192
+  ],
+  "ar_mountain@b": [
+   192,
+   192,
+   192,
+   192
+  ],
+  "ar_sand": [
+   384,
+   192,
+   192,
+   192
+  ],
+  "beach": [
+   576,
+   192,
+   192,
+   192
+  ],
+  "swamp": [
+   768,
+   192,
+   192,
+   192
+  ],
+  "ar_ocean": [
+   960,
+   192,
+   192,
+   192
+  ],
+  "shallows": [
+   0,
+   384,
+   192,
+   192
+  ],
+  "water_calm_shallow": [
+   192,
+   384,
+   192,
+   192
+  ],
+  "ar_dirt": [
+   384,
+   384,
+   192,
+   192
+  ],
+  "ar_cobble": [
+   576,
+   384,
+   192,
+   192
+  ],
+  "ar_temple_floor": [
+   768,
+   384,
+   192,
+   192
+  ],
+  "ar_temple_rubble": [
+   960,
+   384,
+   192,
+   192
+  ],
+  "ar_cave": [
+   0,
+   576,
+   192,
+   192
+  ],
+  "ar_wood_floor": [
+   192,
+   576,
+   192,
+   192
+  ],
+  "ar_marble": [
+   384,
+   576,
+   192,
+   192
+  ],
+  "ar_lava": [
+   576,
+   576,
+   192,
+   192
+  ],
+  "ar_ice": [
+   768,
+   576,
+   192,
+   192
+  ],
+  "water_calm": [
+   960,
+   576,
+   192,
+   192
+  ],
+  "mountain_cold": [
+   0,
+   768,
+   192,
+   192
+  ],
+  "mountain_cold@b": [
+   192,
+   768,
+   192,
+   192
+  ],
+  "ar_temple_floor_cool": [
+   384,
+   768,
+   192,
+   192
+  ],
+  "ar_temple_rubble_cool": [
+   576,
+   768,
+   192,
+   192
+  ]
+ },
+ "sources": [
+  {
+   "material": "ar_grass",
+   "render": "grass_b_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "4192a5a59bb3c1119f9ba710",
+   "settings": {
+    "k": 9,
+    "gain": 1.12,
+    "sat": 0.9
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_grass@b",
+   "render": "grass_b_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "964ca93455b295b141b5dbb9",
+   "settings": {
+    "k": 9,
+    "gain": 1.12,
+    "sat": 0.9
+   },
+   "colours": 7
+  },
+  {
+   "material": "ar_forest",
+   "render": "forest_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "86d973a147788ae1a303e145",
+   "settings": {
+    "k": 9,
+    "gain": 0.72,
+    "sat": 0.65
+   },
+   "colours": 9
+  },
+  {
+   "material": "ar_forest@b",
+   "render": "forest_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "1480fa11266e2a1d5546626e",
+   "settings": {
+    "k": 9,
+    "gain": 0.72,
+    "sat": 0.65
+   },
+   "colours": 9
+  },
+  {
+   "material": "taiga",
+   "render": "taiga_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "b7b8a34a3ff0002e5344b5e3",
+   "settings": {
+    "k": 9,
+    "win": [
+     0.0,
+     0.0,
+     0.42
+    ],
+    "gain": 1.0,
+    "sat": 0.8,
+    "lift": 0.3
+   },
+   "colours": 9
+  },
+  {
+   "material": "snow",
+   "render": "snow_b_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "1079bf9e773717fbb5bcc2c0",
+   "settings": {
+    "k": 7,
+    "con": 0.7
+   },
+   "colours": 7
+  },
+  {
+   "material": "ar_mountain",
+   "render": "mountain_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "ff36bde7d07c903d152c3ac4",
+   "settings": {
+    "k": 9,
+    "sat": 0.85
+   },
+   "colours": 9
+  },
+  {
+   "material": "ar_mountain@b",
+   "render": "mountain_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "9dc79db94acaff1de2f6330c",
+   "settings": {
+    "k": 9,
+    "sat": 0.85
+   },
+   "colours": 9
+  },
+  {
+   "material": "ar_sand",
+   "render": "desert_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "caacb6ac4c6638263e48de1c",
+   "settings": {
+    "k": 7,
+    "con": 0.45,
+    "sat": 0.85,
+    "gain": 1.05
+   },
+   "colours": 7
+  },
+  {
+   "material": "beach",
+   "render": "beach_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "c87e5812c6fb2207c44d59c1",
+   "settings": {
+    "k": 7
+   },
+   "colours": 7
+  },
+  {
+   "material": "swamp",
+   "render": "swamp_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "26eda99749ea2fbcfe9f8857",
+   "settings": {
+    "k": 9,
+    "gain": 0.8,
+    "sat": 0.65,
+    "con": 0.75
+   },
+   "colours": 9
+  },
+  {
+   "material": "ar_ocean",
+   "render": "ocean_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "cdb80ce32cffa5e5cd184eff",
+   "settings": {
+    "k": 7,
+    "con": 0.45
+   },
+   "colours": 7
+  },
+  {
+   "material": "shallows",
+   "render": "shallows_b_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "44f5bf6ff46e3d93ec9d902b",
+   "settings": {
+    "k": 7,
+    "win": [
+     0.63,
+     0.27,
+     0.33
+    ],
+    "con": 0.8
+   },
+   "colours": 7
+  },
+  {
+   "material": "water_calm_shallow",
+   "render": "shallows_b_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "44f5bf6ff46e3d93ec9d902b",
+   "settings": {
+    "k": 6,
+    "win": [
+     0.0,
+     0.42,
+     0.16
+    ],
+    "con": 0.55
+   },
+   "colours": 4
+  },
+  {
+   "material": "ar_dirt",
+   "render": "dirt_b_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "ead80bf40da774964ad93667",
+   "settings": {
+    "k": 7,
+    "con": 0.8
+   },
+   "colours": 7
+  },
+  {
+   "material": "ar_cobble",
+   "render": "cobble_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "528101b01d1a8853e75e63f6",
+   "settings": {
+    "k": 8,
+    "crop": 0.6
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_temple_floor",
+   "render": "temple_floor_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "b32a201a140d65e5580d9f7e",
+   "settings": {
+    "k": 8,
+    "crop": 0.6
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_temple_rubble",
+   "render": "rubble_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "7e98901167ae0c1fe5c4192c",
+   "settings": {
+    "k": 8,
+    "crop": 0.6
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_cave",
+   "render": "cave_b_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "d77f7334f00433cd2ba84bf6",
+   "settings": {
+    "k": 8,
+    "crop": 0.7
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_wood_floor",
+   "render": "wood_floor_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "74dce84e68e2b7185df9fb1e",
+   "settings": {
+    "k": 8,
+    "crop": 0.6
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_marble",
+   "render": "marble_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "82314d361d4d6ee8c34571de",
+   "settings": {
+    "k": 8,
+    "crop": 0.7
+   },
+   "colours": 8
+  },
+  {
+   "material": "ar_lava",
+   "render": "lava_1",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 1,
+   "cache_key": "55c34e8f98d5e00214d2871b",
+   "settings": {
+    "k": 9,
+    "crop": 0.8
+   },
+   "colours": 9
+  },
+  {
+   "material": "ar_ice",
+   "render": "ice_b_2",
+   "model": "stability.stable-image-core-v1:1",
+   "seed": 2,
+   "cache_key": "523444fb9c5990188c0dd521",
+   "settings": {
+    "k": 8,
+    "crop": 0.8
+   },
+   "colours": 7
+  }
+ ],
+ "derived": {
+  "water_calm": {
+   "how": "rank",
+   "from": "water_calm_shallow",
+   "args": [
+    "ar_ocean",
+    2,
+    5
+   ],
+   "colours": 3
+  },
+  "mountain_cold": {
+   "how": "recolor",
+   "from": "ar_mountain",
+   "args": [
+    180,
+    0.15,
+    1.0
+   ],
+   "colours": 9
+  },
+  "mountain_cold@b": {
+   "how": "recolor",
+   "from": "ar_mountain@b",
+   "args": [
+    180,
+    0.15,
+    1.0
+   ],
+   "colours": 9
+  },
+  "ar_temple_floor_cool": {
+   "how": "recolor",
+   "from": "ar_temple_floor",
+   "args": [
+    141,
+    2.4,
+    0.75
+   ],
+   "colours": 8
+  },
+  "ar_temple_rubble_cool": {
+   "how": "recolor",
+   "from": "ar_temple_rubble",
+   "args": [
+    165,
+    2.45,
+    0.62
+   ],
+   "colours": 8
+  }
+ },
+ "parts": {
+  "ar_tree_clump": {
+   "how": "remap",
+   "from": "ar_forest"
+  },
+  "conifer_clump": {
+   "how": "conifer",
+   "from": "taiga"
+  }
+ },
+ "note": "AR-T picks (user-approved 2026-11-21); AR-T2: calm river / lake water, lifted taiga, cold rock, conifer clump. Re-cut by assets-src/gen/terrain_cut.py."
+}

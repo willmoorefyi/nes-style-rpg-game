@@ -21,8 +21,8 @@ from kit import remap  # noqa: E402
 
 KITS = ["temple", "castle", "interior", "town"]
 CAVE = remap("cave")
-MATS = {"floor_stone": CAVE, "carpet": {**CAVE, "shade": 0.7},
-        "rubble": {**remap("cave", "temple_rubble"), "shade": 1.2},
+MATS = {"floor_stone": {"from": "ar_cave"}, "carpet": {"from": "ar_cave", "shade": 0.7},     # AR-T2: the AR cave floor
+        "rubble": {**remap("cave", "ar_temple_rubble_cool"), "shade": 1.2},
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.35},
         "in_wall_face": {**remap("cave", "temple_wall_face"), "shade": 1.1},
         "floor": {"from": "floor", "shade": 0.75},

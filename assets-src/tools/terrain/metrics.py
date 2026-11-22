@@ -5,6 +5,7 @@ import numpy as np
 
 import kit as K
 from .base import CORE, MARGIN, T, TEX, WILD, _blur, _tile, _up
+from .ecotone import tex_name
 from .outline import _cached_partition
 from .peaks import plan_peaks
 
@@ -14,11 +15,21 @@ GROUPS = {"coast": (("ocean", "water"), ("grass", "sand", "forest", "mountain", 
           "mountain_grass": (("mountain",), ("grass",))}
 
 
-PART_OF = {"forest": ("tree_clump",), "mountain": ("peak", "boulder"),
-           "taiga": ("tree_clump@taiga",)}          # NW2: the recoloured clump (build_map.map_kit)
+PART_OF = {"forest": ("tree_clump", "ar_tree_clump"), "mountain": ("peak", "boulder"),
+           "taiga": ("conifer_clump",)}             # AR-T2: the AR sheet's clumps
 
 
-def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray:
+EXTRA = {"ocean": ("shallows",), "water": ("water_calm", "water_calm_shallow"), "sand": ("beach",),
+         "mountain": ("mountain_cold",)}
+
+
+def textures(kit: K.Kit, m: str) -> list[str]:
+    """The textures (and macro variants) material m is drawn with by the organic painter (AR-T2), or the kit's own."""
+    base = [tex_name(kit, m)] + [n for n in EXTRA.get(m, ()) if n in kit.materials]
+    return [v for n in base for v in (n, f"{n}@b") if v in kit.materials]
+
+
+def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...], organic: bool = True) -> np.ndarray:
     """Per pixel, the index into mats of the texture (tiled at that pixel) it is closest to. Shadows and rims are
     not materials: the texture is also tried at the shading factors both painters use."""
     H, W = below.shape[:2]
@@ -26,8 +37,10 @@ def classify(below: np.ndarray, kit: K.Kit, mats: tuple[str, ...]) -> np.ndarray
     out = np.zeros((H, W), np.uint8)
     b = below.astype(np.float32)
     for i, m in enumerate(mats):
-        t = _tile(kit.material(m), H, W).astype(np.float32)
-        d = np.min([np.abs(b - t * f).sum(axis=2) for f in (1.0, 0.85, 0.8, 0.72, 0.6, 0.55)], axis=0)
+        d = np.full((H, W), np.inf, np.float32)
+        for name in (textures(kit, m) if organic else [m]):   # AR-T2: the organic painter's textures
+            t = _tile(kit.material(name), H, W).astype(np.float32)
+            d = np.minimum(d, np.min([np.abs(b - t * f).sum(axis=2) for f in (1.0, 0.85, 0.8, 0.72, 0.6, 0.55)], axis=0))
         parts = [kit.parts[p] for p in PART_OF.get(m, ()) if p in kit.parts and p.split("@")[0] in kit.approved]
         if parts:                                  # stamped art (clumps, peaks, rocks) counts as its material
             pal = np.unique(np.concatenate([np.asarray(p.convert("RGBA"))[..., :3][np.asarray(p)[..., 3] > 127]
@@ -144,11 +157,12 @@ def peak_stats(placements: list[tuple[str, int, int]]) -> dict[str, float]:
             "anchor_std_mod48": round(float(min(xs.std(), ys.std())), 1)}
 
 
-def foothill_share(below: np.ndarray, mat: np.ndarray, kit: K.Kit) -> float:
+def foothill_share(below: np.ndarray, mat: np.ndarray, kit: K.Kit, organic: bool = True) -> float:
     """Share of grass cells 4-next to a mountain cell whose centre holds foothill pixels (mountain texture or rock)."""
     H, W = below.shape[:2]
-    mtex = _tile(kit.material("mountain"), H, W)
-    gtex = _tile(kit.material("grass"), H, W)
+    name = (lambda m: tex_name(kit, m)) if organic else (lambda m: m)  # noqa: E731
+    mtex = _tile(kit.material(name("mountain")), H, W)
+    gtex = _tile(kit.material(name("grass")), H, W)
     hgt, wid = mat.shape
     hits = total = 0
     for y in range(hgt):

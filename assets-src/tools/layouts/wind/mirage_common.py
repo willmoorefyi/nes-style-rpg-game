@@ -13,11 +13,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import Room as BaseRoom  # noqa: E402
 
 KITS = ["castle", "interior", "temple"]
-MATS = {"floor_stone": {"from": "temple_floor", "hue": -170, "sat": 0.9, "shade": 1.6},
+MATS = {"floor_stone": {"from": "ar_temple_floor_cool", "hue": -170, "sat": 0.9, "shade": 1.6},
         "in_wall_face": {"from": "temple_wall_face", "hue": -170, "sat": 0.9, "shade": 1.45},
         "in_wall_top": {"from": "slate", "hue": -170, "sat": 1.0, "shade": 0.8},
-        "carpet": {"from": "marble", "hue": -20, "sat": 3.5, "shade": 0.65},
-        "rubble": {"from": "temple_rubble", "hue": -170, "sat": 0.9, "shade": 1.3}}
+        "carpet": {"from": "ar_marble", "hue": -20, "sat": 3.5, "shade": 0.65},
+        "rubble": {"from": "ar_temple_rubble_cool", "hue": -170, "sat": 0.9, "shade": 1.3}}
 TRIM = [176, 132, 64]                          # the bronze inlay's rim
 LEGEND = "legend: W wall top  F wall face  - sandstone  + bronze inlay / bridge  % fallen masonry  x the open shaft"
 NOTE = ("Concept: a tower that was raised in one night by people who left the ground for good; each floor is a stage of "

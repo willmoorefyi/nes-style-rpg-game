@@ -13,6 +13,7 @@ import numpy as np
 
 import kit as K
 from .base import ROADS, T, _bayer, _dist, _shade, _tile, _up, _vnoise
+from .ecotone import tex_name
 
 ROAD_HALF = 14.0               # px either side of the centre line (a 28 px track in a 48 px cell)
 ROAD_WOBBLE = 2.0              # px: the edge wanders this much (value noise)
@@ -123,5 +124,5 @@ def paint_roads(below: np.ndarray, mat: np.ndarray, kit: K.Kit, seed: int) -> No
         show = (solid | fringe) & allow
         rim = solid & (d > r - 1.5) & allow
         sub = below[y0:y1, x0:x1]
-        sub[show] = _tile(kit.material(m), H, W)[y0:y1, x0:x1][show]
+        sub[show] = _tile(kit.material(tex_name(kit, m)), H, W)[y0:y1, x0:x1][show]
         _shade(sub, rim, 0.85)

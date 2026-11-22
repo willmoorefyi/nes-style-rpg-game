@@ -22,9 +22,9 @@ KITS = ["temple", "castle", "interior", "town"]
 # kit.py's `coral` preset turns its castle_face base by 150 degrees; the temple stone sits elsewhere on the wheel (150
 # turns it crimson), so the temple parts take -35 to land on the same teal
 TEAL = {"hue": -35, "sat": 2.2}
-MATS = {"floor_stone": {"from": "temple_floor", **TEAL, "shade": 1.0},
-        "carpet": {"from": "temple_floor", **TEAL, "shade": 0.62},
-        "rubble": {"from": "temple_rubble", **TEAL, "shade": 1.1},
+MATS = {"floor_stone": {"from": "ar_temple_floor_cool", **TEAL, "shade": 1.0},
+        "carpet": {"from": "ar_temple_floor_cool", **TEAL, "shade": 0.62},
+        "rubble": {"from": "ar_temple_rubble_cool", **TEAL, "shade": 1.1},
         "in_wall_top": {"from": "temple_wall_top", **TEAL, "shade": 0.3},
         "in_wall_face": {"from": "temple_wall_face", **TEAL, "shade": 0.85},
         "floor": {"from": "floor", "sat": 0.6, "shade": 0.7},                     # wet planks

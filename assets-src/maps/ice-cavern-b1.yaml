@@ -18,14 +18,11 @@ materials:
     sat: 0.25
     shade: 1.45
   rubble:
-    from: temple_rubble
+    from: ar_temple_rubble_cool
     sat: 0.2
     shade: 1.25
   floor_stone:
-    from: floor_stone
-    hue: 170
-    sat: 1.8
-    shade: 1.1
+    from: ar_ice
   carpet:
     from: floor_stone
     shade: 1.3

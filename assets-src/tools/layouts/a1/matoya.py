@@ -18,7 +18,7 @@ from kit import remap  # noqa: E402
 
 KITS = ["interior", "town", "castle", "temple"]
 # earthen walls and a packed-earth floor: the temple stone recoloured brown (kit.REMAPS "cave", as the dwarf hall)
-MATS = {"floor_stone": remap("cave"), "in_wall_top": remap("cave", "temple_wall_top"),
+MATS = {"floor_stone": {"from": "ar_cave"}, "in_wall_top": remap("cave", "temple_wall_top"),
         "in_wall_face": remap("cave", "temple_wall_face")}
 QUIET = {"encounterRate": {"min": 999, "max": 999}, "encounters": []}
 LEGEND = "legend: W wall top  F wall face  - stone / earth floor  + carpet"
