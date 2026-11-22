@@ -247,16 +247,17 @@
   ],
   "bedrock": {
     "pass": "AR",
-    "cap": 390,
+    "cap": 450,
     "per_purpose_caps": {
       "ar_tiles": 90,
       "ar_npc": 100,
       "ar_props": 70,
       "ar_towns": 110,
-      "reserve": 20
+      "reserve": 20,
+      "ar_dragon": 60
     },
     "gemini_before": 553,
     "reserve_max_usd": 0.08,
-    "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl. Extended 2026-11-22 by user permission (\"feel free to extend the bedrock budget if you must\"): ar_towns 80->110, ar_tiles 70->90, cap 340->390."
+    "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl. Extended 2026-11-22 by user permission (\"feel free to extend the bedrock budget if you must\"): ar_towns 80->110, ar_tiles 70->90, cap 340->390. Extended 2026-11-22: ar_dragon 60 (the Cardia dragon great village: brief concept boards and its kit), cap 390->450."
   }
 }
