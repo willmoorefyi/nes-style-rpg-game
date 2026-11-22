@@ -98,7 +98,7 @@ The shape of the design:
 | D-M6 | The near detail comes from the streamed chunks, in a 4x4-chunk window (3.2) | It reuses the streamer and the textures it already loads |
 | D-M7 | Mode 7 runs only on the world map (`overworld`) | The only streamed map, and the only one where the airship flies in the game |
 | D-M8 | **User ruling 2026-11-19:** Mode 7 by default, with Top-down as a Config option and `?mode7=0`. The default turns on in M7-3, once the near detail exists; the atlas-missing fallback lands before that, in M7-2 (7) | The user asked for it |
-| D-M9 | The ship uses b_7's side view for every heading (11) | T-2's ruling of 2026-11-19 |
+| D-M9 | ~~The ship uses b_7's side view for every heading (11)~~ **Superseded by pass AV (2026-11-22, `docs/AIRSHIP_VIEWS_PLAN.md`): back and front 3/4 views and turn frames** | T-2's ruling of 2026-11-19 |
 | D-M10 | **User ruling 2026-11-19:** smooth filtering: mipmaps, anisotropy where it exists, and fog | It stops the far shimmer |
 | D-M11 | The streamed step hold stays in flight and reads the flight window (3.3) | No movement change: a step still waits at most `MISS_HOLD_FRAMES` per miss, as today |
 
@@ -745,6 +745,9 @@ Each tranche is a branch from `mainline`, mergeable on its own.
 Core T-1 (M7-0 to M7-6 plus M7-INT) is about 35 h.
 
 ## 11. The airship back view (T-2)
+
+**Superseded (2026-11-22):** pass AV built the back and front 3/4 views and the turn frames for both the top-down
+field and the flight view (`docs/AIRSHIP_VIEWS_PLAN.md`); T-2 is done. The text below is kept as history.
 
 **Mode 7 does not need a back view for T-1.** With north up, the ship is seen from behind only while it flies north,
 and T-2's ruling applies (b_7's side view for every heading, revisited after live testing). M7-0 to M7-6 ship with b_7.

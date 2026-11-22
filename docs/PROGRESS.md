@@ -265,6 +265,20 @@ all joined into one village with many ways in and out. Brief `docs/DRAGON_CITY_B
   own islet. `bahamut-cave` / `bahamut-lair` retired; saves inside them load in the village (`retiredMaps.ts`).
 - **Progression:** S19 unchanged but for its maps; the curve within 0.02 of the baseline at every stage.
 
+
+### Pass AV: airship front and back views (T-2) ✅
+
+The user's feedback (2026-11-22): the airship had no view for flying away from or toward the camera. Plan and result
+`docs/AIRSHIP_VIEWS_PLAN.md`, art `docs/art/airship_views/`.
+- **Art:** back and front 3/4 views and two turn in-betweens, matched to b_7: PA's pseudo-3D proxies restyled by
+  Bedrock style transfer, re-cut offline by `assets-src/gen/vehicle_view_cut.py` with cleanup edits and the centroid
+  anchor rule (the ship's visual centre stays put when it turns). No new Bedrock call. Self-approved under the
+  integrator's R6 ruling; the user may veto.
+- **Runtime:** one pure heading model (`airshipHeading.ts`) with one owner (`FieldVehicleSprites`); up shows the back
+  view, down the front, left / right b_7, in the top-down field and in Mode 7 alike (D-M9 superseded). Boarding keeps
+  the parked heading; a landed airship keeps its heading. Movement, the field rules and the verifier are unchanged.
+- **Gates:** `test:fast` 413 files, 10,025 tests; `quest --strict` OK; browser shots in `~/temp/ff-game/airship_views/int/`.
+
 ---
 
 ## Current Metrics
