@@ -1,0 +1,212 @@
+{
+ "kit": "town",
+ "sheet": "theme_crescent",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "cre_venice",
+ "tints": [
+  "cre_venice_ochre",
+  "cre_venice_sienna"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "chimney@cre_venice",
+   "cre_gondola2_0_0",
+   "cre_gondola2_1_0",
+   "cre_gondola_0_0",
+   "cre_gondola_0_1",
+   "cre_gondola_1_0",
+   "cre_gondola_1_1",
+   "cre_wellhead_0_0",
+   "cre_wellhead_1_0",
+   "inn_cre_venice_0_0",
+   "inn_cre_venice_0_1",
+   "inn_cre_venice_0_2",
+   "inn_cre_venice_0_3",
+   "inn_cre_venice_1_0",
+   "inn_cre_venice_1_1",
+   "inn_cre_venice_1_2"
+  ],
+  [
+   "inn_cre_venice_1_3",
+   "inn_cre_venice_2_0",
+   "inn_cre_venice_2_1",
+   "inn_cre_venice_2_2",
+   "inn_cre_venice_2_3",
+   "inn_cre_venice_3_0",
+   "inn_cre_venice_3_1",
+   "inn_cre_venice_3_2",
+   "inn_cre_venice_3_3",
+   "inn_cre_venice_4_0",
+   "inn_cre_venice_4_1",
+   "inn_cre_venice_4_2",
+   "inn_cre_venice_4_3",
+   "roof_eave_l@cre_venice",
+   "roof_eave_m@cre_venice",
+   "roof_eave_r@cre_venice"
+  ],
+  [
+   "roof_mid_l@cre_venice",
+   "roof_mid_m@cre_venice",
+   "roof_mid_r@cre_venice",
+   "roof_ridge_l@cre_venice",
+   "roof_ridge_m@cre_venice",
+   "roof_ridge_r@cre_venice",
+   "wall_door_bottom@cre_venice",
+   "wall_door_bottom@cre_venice_ochre",
+   "wall_door_bottom@cre_venice_sienna",
+   "wall_door_top@cre_venice",
+   "wall_door_top@cre_venice_ochre",
+   "wall_door_top@cre_venice_sienna",
+   "wall_lo_l@cre_venice",
+   "wall_lo_l@cre_venice_ochre",
+   "wall_lo_l@cre_venice_sienna",
+   "wall_lo_l@cre_venice_sienna_ochre"
+  ],
+  [
+   "wall_lo_plain@cre_venice",
+   "wall_lo_plain@cre_venice_ochre",
+   "wall_lo_plain@cre_venice_sienna",
+   "wall_lo_plain@cre_venice_sienna_ochre",
+   "wall_lo_r@cre_venice",
+   "wall_lo_r@cre_venice_ochre",
+   "wall_lo_r@cre_venice_sienna",
+   "wall_lo_r@cre_venice_sienna_ochre",
+   "wall_up2_l@cre_venice",
+   "wall_up2_l@cre_venice_ochre",
+   "wall_up2_l@cre_venice_sienna",
+   "wall_up2_l@cre_venice_sienna_ochre",
+   "wall_up2_plain@cre_venice",
+   "wall_up2_plain@cre_venice_ochre",
+   "wall_up2_plain@cre_venice_sienna",
+   "wall_up2_plain@cre_venice_sienna_ochre"
+  ],
+  [
+   "wall_up2_r@cre_venice",
+   "wall_up2_r@cre_venice_ochre",
+   "wall_up2_r@cre_venice_sienna",
+   "wall_up2_r@cre_venice_sienna_ochre",
+   "wall_up2_window@cre_venice",
+   "wall_up2_window@cre_venice_ochre",
+   "wall_up2_window@cre_venice_sienna",
+   "wall_up2_window@cre_venice_sienna_ochre",
+   "wall_up_l@cre_venice",
+   "wall_up_l@cre_venice_ochre",
+   "wall_up_l@cre_venice_sienna",
+   "wall_up_l@cre_venice_sienna_ochre",
+   "wall_up_plain@cre_venice",
+   "wall_up_plain@cre_venice_ochre",
+   "wall_up_plain@cre_venice_sienna",
+   "wall_up_plain@cre_venice_sienna_ochre"
+  ],
+  [
+   "wall_up_r@cre_venice",
+   "wall_up_r@cre_venice_ochre",
+   "wall_up_r@cre_venice_sienna",
+   "wall_up_r@cre_venice_sienna_ochre",
+   "wall_up_window@cre_venice",
+   "wall_up_window@cre_venice_ochre",
+   "wall_up_window@cre_venice_sienna",
+   "wall_up_window@cre_venice_sienna_ochre",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {
+  "cre_bridge_v": [
+   0,
+   288,
+   96,
+   96
+  ]
+ },
+ "sources": [
+  {
+   "id": "cre_house_i2",
+   "cache_key": "273291777c6b0f5ff8e95f53",
+   "model": "sd35",
+   "seed": 26,
+   "pass": "AR",
+   "use": "house modules @cre_venice",
+   "strength": 0.76,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "cre_venice_ochre": [
+     25,
+     1.6,
+     1.05
+    ],
+    "cre_venice_sienna": [
+     8,
+     1.4,
+     0.9
+    ]
+   }
+  },
+  {
+   "id": "cre_inn",
+   "cache_key": "e19d2a12f5b8caabe2dbb717",
+   "model": "sd35",
+   "seed": 64,
+   "pass": "AR",
+   "use": "grid cut inn_cre_venice 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "cre_gondola",
+   "cache_key": "8a19fdb5208b4174626c9fd9",
+   "model": "ultra",
+   "seed": 45,
+   "pass": "AR",
+   "use": "props cre_gondola 2x2, cre_gondola2 1x2, cre_wellhead 1x2",
+   "cut": {
+    "rim": 4
+   }
+  },
+  {
+   "id": "cre_chimney",
+   "cache_key": "54e83509b6680c7749c0397b",
+   "model": "ultra",
+   "seed": 76,
+   "pass": "AR",
+   "use": "props chimney@cre_venice 1x1",
+   "cut": {
+    "rim": 4,
+    "base_y": 0.5
+   }
+  },
+  {
+   "id": "cre_bridge3",
+   "cache_key": "b13a4ddd1a4fac7c901dcbcd",
+   "model": "sd35",
+   "seed": 75,
+   "pass": "AR",
+   "use": "material cre_bridge_v (deck)",
+   "strength": 0.7,
+   "cells": [
+    2,
+    4
+   ]
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of crescent (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

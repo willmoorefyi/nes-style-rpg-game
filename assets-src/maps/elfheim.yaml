@@ -120,8 +120,8 @@ objects:
   y: 18
   h: 5
   storeys: 2
-  roof: teal
-  wall: plaster
+  roof: elf_moon
+  wall: elf_moon
   sign: weapon
   enter: {map: elfheim-weapon-shop, entrance: door}
 - type: house
@@ -133,8 +133,8 @@ objects:
   y: 18
   h: 5
   storeys: 2
-  roof: elf
-  wall: white
+  roof: elf_moon
+  wall: elf_moon
   sign: armor
   enter: {map: elfheim-armor-shop, entrance: door}
 - type: house
@@ -146,8 +146,8 @@ objects:
   y: 32
   h: 5
   storeys: 2
-  roof: elf
-  wall: ochre
+  roof: elf_moon
+  wall: elf_moon_jade
   sign: item
   enter: {map: elfheim-item-shop, entrance: door}
 - type: house
@@ -159,8 +159,8 @@ objects:
   y: 39
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: elf_moon
+  wall: elf_moon
   sign: white_magic
   enter: {map: elfheim-white-magic, entrance: door}
 - type: house
@@ -172,8 +172,8 @@ objects:
   y: 39
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: elf_moon
+  wall: elf_moon_lilac
   sign: black_magic
   enter: {map: elfheim-black-magic, entrance: door}
 - type: house
@@ -185,8 +185,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: elf
-  wall: rose
+  roof: elf_moon
+  wall: elf_moon_lilac
   chimney: 1
   enter: {map: elfheim-house-herbalist, entrance: door}
 - type: house
@@ -198,8 +198,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: green
-  wall: ochre
+  roof: elf_moon
+  wall: elf_moon_jade
   chimney: 3
   enter: {map: elfheim-house-bowyer, entrance: door}
 - type: house
@@ -211,8 +211,8 @@ objects:
   y: 18
   h: 5
   storeys: 2
-  roof: elf
-  wall: white
+  roof: elf_moon
+  wall: elf_moon
   enter: {map: elfheim-house-scribe, entrance: door}
 - type: house
   w: 5
@@ -223,8 +223,8 @@ objects:
   y: 30
   h: 4
   storeys: 1
-  roof: elf
-  wall: white
+  roof: elf_moon
+  wall: elf_moon
   sign: shrine
   chimney: 3
   enter: {map: elfheim-house-healer, entrance: door}
@@ -237,8 +237,8 @@ objects:
   y: 33
   h: 4
   storeys: 1
-  roof: green
-  wall: rose
+  roof: elf_moon
+  wall: elf_moon_lilac
   chimney: 1
   enter: {map: elfheim-house-bard, entrance: door}
 - type: house
@@ -250,12 +250,12 @@ objects:
   y: 28
   h: 4
   storeys: 1
-  roof: elf
-  wall: stone
+  roof: elf_moon
+  wall: elf_moon_lilac
   chimney: 3
   enter: {map: elfheim-house-warden, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_elf_moon
   name: inn
   x: 28
   y: 34
@@ -3253,6 +3253,42 @@ objects:
   - [hedge]
   x: 51
   y: 49
+- type: deco
+  parts:
+  - [elf_tree_0_0, elf_tree_0_1, elf_tree_0_2]
+  - [elf_tree_1_0, elf_tree_1_1, elf_tree_1_2]
+  - [elf_tree_2_0, elf_tree_2_1, elf_tree_2_2]
+  - [elf_tree_3_0, elf_tree_3_1, elf_tree_3_2]
+  x: 37
+  y: 28
+  collide: alpha
+- type: deco
+  parts:
+  - [elf_moongate_0_0, elf_moongate_0_1]
+  - [elf_moongate_1_0, elf_moongate_1_1]
+  x: 39
+  y: 34
+  collide: alpha
+- type: deco
+  parts:
+  - [elf_pool_0_0, elf_pool_0_1]
+  x: 31
+  y: 40
+  collide: alpha
+- type: deco
+  parts:
+  - [elf_lamp_0_0]
+  - [elf_lamp_1_0]
+  x: 16
+  y: 24
+  collide: alpha
+- type: deco
+  parts:
+  - [elf_lamp_0_0]
+  - [elf_lamp_1_0]
+  x: 24
+  y: 35
+  collide: alpha
 npcs:
 - id: elfheim_gate_warden
   sprite: guard

@@ -57,9 +57,11 @@ export function countTown(t: TownTarget, maps: (id: string) => TownMap | null, s
   const hints = all.filter((n) => n.id.endsWith('_hint'));
   const text = hints.flatMap((n) => lines(n.dialog)).join('\n');
   const innShop = all.map((n) => shops.find((s) => s.id === n.shopId)).find((s) => s?.type === 'inn');
-  const src = (parse(source) as { objects?: Array<{ type?: string }> }) ?? {};
+  const src = (parse(source) as { objects?: Array<{ type?: string; prefab?: string }> }) ?? {};
   return {
-    houses: (src.objects ?? []).filter((o) => o.type === 'house').length,
+    // AR-W2: a themed whole-house prefab (Lufenia's domed villas, Pravoka's tavern) counts as a house; the inn does not
+    houses: (src.objects ?? []).filter((o) => o.type === 'house' || (o.type === 'prefab' && !o.prefab?.startsWith('inn')))
+      .length,
     interiors: houses.length,
     outdoorNpcs: town.npcs.filter((n) => !keeper(n)).length,
     interiorNpcs: houses.reduce((s, m) => s + m.npcs.length, 0),

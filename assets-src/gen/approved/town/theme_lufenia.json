@@ -1,0 +1,254 @@
+{
+ "kit": "town",
+ "sheet": "theme_lufenia",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "luf_marble",
+ "tints": [
+  "luf_marble_azure"
+ ],
+ "roofs": [
+  "luf_marble_flat"
+ ],
+ "tile": 48,
+ "cells": [
+  [
+   "inn_luf_marble_0_0",
+   "inn_luf_marble_0_1",
+   "inn_luf_marble_0_2",
+   "inn_luf_marble_0_3",
+   "inn_luf_marble_1_0",
+   "inn_luf_marble_1_1",
+   "inn_luf_marble_1_2",
+   "inn_luf_marble_1_3",
+   "inn_luf_marble_2_0",
+   "inn_luf_marble_2_1",
+   "inn_luf_marble_2_2",
+   "inn_luf_marble_2_3",
+   "inn_luf_marble_3_0",
+   "inn_luf_marble_3_1",
+   "inn_luf_marble_3_2",
+   "inn_luf_marble_3_3"
+  ],
+  [
+   "inn_luf_marble_4_0",
+   "inn_luf_marble_4_1",
+   "inn_luf_marble_4_2",
+   "inn_luf_marble_4_3",
+   "luf_aqueduct_0_0",
+   "luf_aqueduct_0_1",
+   "luf_aqueduct_0_2",
+   "luf_aqueduct_1_0",
+   "luf_aqueduct_1_1",
+   "luf_aqueduct_1_2",
+   "luf_forum_0_0",
+   "luf_forum_0_1",
+   "luf_forum_1_0",
+   "luf_forum_1_1",
+   "luf_forum_2_0",
+   "luf_forum_2_1"
+  ],
+  [
+   "luf_legionary_0_0",
+   "luf_legionary_1_0",
+   "luf_pylon_0_0",
+   "luf_pylon_1_0",
+   "luf_villa4_0_0",
+   "luf_villa4_0_1",
+   "luf_villa4_0_2",
+   "luf_villa4_0_3",
+   "luf_villa4_0_4",
+   "luf_villa4_1_0",
+   "luf_villa4_1_1",
+   "luf_villa4_1_2",
+   "luf_villa4_1_3",
+   "luf_villa4_1_4",
+   "luf_villa4_2_0",
+   "luf_villa4_2_1"
+  ],
+  [
+   "luf_villa4_2_2",
+   "luf_villa4_2_3",
+   "luf_villa4_2_4",
+   "luf_villa4_3_0",
+   "luf_villa4_3_1",
+   "luf_villa4_3_2",
+   "luf_villa4_3_3",
+   "luf_villa4_3_4",
+   "luf_villa5_0_0",
+   "luf_villa5_0_1",
+   "luf_villa5_0_2",
+   "luf_villa5_0_3",
+   "luf_villa5_0_4",
+   "luf_villa5_1_0",
+   "luf_villa5_1_1",
+   "luf_villa5_1_2"
+  ],
+  [
+   "luf_villa5_1_3",
+   "luf_villa5_1_4",
+   "luf_villa5_2_0",
+   "luf_villa5_2_1",
+   "luf_villa5_2_2",
+   "luf_villa5_2_3",
+   "luf_villa5_2_4",
+   "luf_villa5_3_0",
+   "luf_villa5_3_1",
+   "luf_villa5_3_2",
+   "luf_villa5_3_3",
+   "luf_villa5_3_4",
+   "luf_villa5_4_0",
+   "luf_villa5_4_1",
+   "luf_villa5_4_2",
+   "luf_villa5_4_3"
+  ],
+  [
+   "luf_villa5_4_4",
+   "roof_eave_l@luf_marble",
+   "roof_eave_l@luf_marble_flat",
+   "roof_eave_m@luf_marble",
+   "roof_eave_m@luf_marble_flat",
+   "roof_eave_r@luf_marble",
+   "roof_eave_r@luf_marble_flat",
+   "roof_mid_l@luf_marble",
+   "roof_mid_l@luf_marble_flat",
+   "roof_mid_m@luf_marble",
+   "roof_mid_m@luf_marble_flat",
+   "roof_mid_r@luf_marble",
+   "roof_mid_r@luf_marble_flat",
+   "roof_ridge_l@luf_marble",
+   "roof_ridge_l@luf_marble_flat",
+   "roof_ridge_m@luf_marble"
+  ],
+  [
+   "roof_ridge_m@luf_marble_flat",
+   "roof_ridge_r@luf_marble",
+   "roof_ridge_r@luf_marble_flat",
+   "wall_door_bottom@luf_marble",
+   "wall_door_bottom@luf_marble_azure",
+   "wall_door_top@luf_marble",
+   "wall_door_top@luf_marble_azure",
+   "wall_lo_l@luf_marble",
+   "wall_lo_l@luf_marble_azure",
+   "wall_lo_plain@luf_marble",
+   "wall_lo_plain@luf_marble_azure",
+   "wall_lo_r@luf_marble",
+   "wall_lo_r@luf_marble_azure",
+   "wall_up2_l@luf_marble",
+   "wall_up2_l@luf_marble_azure",
+   "wall_up2_plain@luf_marble"
+  ],
+  [
+   "wall_up2_plain@luf_marble_azure",
+   "wall_up2_r@luf_marble",
+   "wall_up2_r@luf_marble_azure",
+   "wall_up2_window@luf_marble",
+   "wall_up2_window@luf_marble_azure",
+   "wall_up_l@luf_marble",
+   "wall_up_l@luf_marble_azure",
+   "wall_up_plain@luf_marble",
+   "wall_up_plain@luf_marble_azure",
+   "wall_up_r@luf_marble",
+   "wall_up_r@luf_marble_azure",
+   "wall_up_window@luf_marble",
+   "wall_up_window@luf_marble_azure",
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "luf_house3",
+   "cache_key": "566262229b79c2a5ca7434c0",
+   "model": "sd35",
+   "seed": 81,
+   "pass": "AR",
+   "use": "house modules @luf_marble",
+   "strength": 0.62,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6,
+    "flat_roof": "luf_marble_flat",
+    "cornice_y": 40
+   },
+   "tints": {
+    "luf_marble_azure": [
+     200,
+     0.4,
+     0.97
+    ]
+   }
+  },
+  {
+   "id": "luf_inn2",
+   "cache_key": "8d10679e4a0caf56501a5a1c",
+   "model": "sd35",
+   "seed": 80,
+   "pass": "AR",
+   "use": "grid cut inn_luf_marble 4x5",
+   "strength": 0.74,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "luf_house3",
+   "cache_key": "566262229b79c2a5ca7434c0",
+   "model": "sd35",
+   "seed": 81,
+   "pass": "AR",
+   "use": "grid cut luf_villa 5x5 (+ 5x4)",
+   "strength": 0.62,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "luf_forum",
+   "cache_key": "00b694d65b48f5307191d8ad",
+   "model": "ultra",
+   "seed": 37,
+   "pass": "AR",
+   "use": "sprite luf_forum 2x3",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "luf_props",
+   "cache_key": "9e1acb27791b2c61b7d2c724",
+   "model": "ultra",
+   "seed": 47,
+   "pass": "AR",
+   "use": "props luf_pylon 1x2",
+   "cut": {
+    "rim": 4
+   }
+  },
+  {
+   "id": "luf_props2",
+   "cache_key": "15994cab6612f245f65a8c4b",
+   "model": "ultra",
+   "seed": 55,
+   "pass": "AR",
+   "use": "props luf_legionary 1x2, luf_aqueduct 3x2",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of lufenia (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}
