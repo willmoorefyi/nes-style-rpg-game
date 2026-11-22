@@ -132,13 +132,15 @@ describe('ORD-O: the Citadel of Trials and Bahamut (S18, S19)', () => {
   });
 
   it('Cardia Deep: the warrens roll the old cave\'s fights on 150-204 walkable cells; the village rolls none', () => {
-    expect(deep.encounterRate).toEqual({ min: 999, max: 999 });
+    // the map's rate is the warrens' (the field counts down on it until the first fight); no map table, so a village
+    // step never counts (EncounterSystem: no table, no step)
+    expect(deep.encounterRate).toEqual({ min: 24, max: 36 });
     expect(deep.encounters ?? []).toEqual([]);
     const zones = deep.encounterZones ?? [];
     expect(zones.map((z) => z.id)).toEqual(['ord_deep_warrens']);
     const z = zones[0];
     expect(z.encounterRate).toEqual({ min: 24, max: 36 });
-    expect(z.encounters.map((e) => e.groups.map((g) => g.id).join('+'))).toEqual(['wyrm', 'basilisk', 'wyvern']);
+    expect(z.encounters.map((e) => (e.groups ?? []).map((g) => g.id).join('+'))).toEqual(['wyrm', 'basilisk', 'wyvern']);
     const inZone = new Set<string>();
     for (const [x0, y0, x1, y1] of z.rects) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
       if (terrainAllows('walking', baseTerrain(deep, x, y))) inZone.add(`${x},${y}`);

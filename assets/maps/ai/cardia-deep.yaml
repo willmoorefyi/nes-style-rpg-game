@@ -219,7 +219,7 @@ npcs:
   sprite: dragon_hatchling
   x: 55
   y: 35
-  dialog: [Shh. My sister is still in her shell. She is slow.]
+  dialog: [My sister is still in her shell. She is slow. Do not knock; she bites.]
 - id: ord_cd_pearl
   sprite: dragon_matron
   x: 23
@@ -289,7 +289,7 @@ transitions:
 - {x: 17, y: 51, targetMap: overworld, targetEntrance: ord_isle_west}
 name: Cardia Deep
 music: town
-encounterRate: {min: 999, max: 999}
+encounterRate: &id001 {min: 24, max: 36}
 encounters: []
 battleBackgrounds: {default: cave}
 canSave: true
@@ -302,7 +302,7 @@ encounterZones:
   - [56, 38, 67, 44]
   - [27, 49, 37, 56]
   - [11, 52, 19, 55]
-  encounterRate: {min: 24, max: 36}
+  encounterRate: *id001
   encounters:
   - groups:
     - {id: wyrm, min: 1}

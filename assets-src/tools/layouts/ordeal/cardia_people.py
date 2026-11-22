@@ -75,7 +75,7 @@ def people() -> list[dict]:
             ["One of the eggs turned toward you when you came in. They know a change when they feel one."]),
         npc("ord_cd_hatchling", "dragon_youth", 63, 30, ["I hatched in the spring! I can almost breathe a spark."],
             wander=True),
-        npc("ord_cd_chick", "dragon_youth", 55, 35, ["Shh. My sister is still in her shell. She is slow."]),
+        npc("ord_cd_chick", "dragon_youth", 55, 35, ["My sister is still in her shell. She is slow. Do not knock; she bites."]),
         # ── the Ember Market ──
         npc("ord_cd_pearl", "dragon_youth", 23, 42,
             ["Pearls for scales, scales for fish. We trade among ourselves; your gold would only be something to sleep on."]),

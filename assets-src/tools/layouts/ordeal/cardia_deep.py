@@ -43,6 +43,10 @@ CAVE_FIGHTS = [{"groups": [{"id": "wyrm", "min": 1}], "weight": 2},           # 
                {"groups": [{"id": "basilisk", "min": 1, "max": 2}], "weight": 3},
                {"groups": [{"id": "wyvern", "min": 1, "max": 2}], "weight": 2}]
 WARREN_CELLS = (150, 204)                      # D-CD5: 177 (the old cave's walkable cells) +- 15 %
+# the map's rate is the warrens' too: EncounterSystem counts down on the map's rate until the first fight (a zone's rate
+# only resets the counter after a battle in it), and a step where no table applies does not count, so the village
+# (no map table) stays quiet while the first warren fight comes at 24-36 steps, as in the old cave (plan 5.3 said 999)
+WARREN_RATE = {"min": 24, "max": 36}
 
 D = {"court": (42, 6, 67, 17), "roost": (12, 6, 34, 15), "hall": (14, 23, 46, 34), "sanctum": (2, 21, 10, 32),
      "hatchery": (52, 24, 66, 37), "market": (20, 39, 38, 48), "gatehall": (42, 39, 50, 47),
@@ -130,11 +134,11 @@ assert "." not in g.text(), "cardia-deep: a '.' cell would take the remapped gra
 n_warren = sum(1 for x, y in warren if g[x, y] == "%")
 assert WARREN_CELLS[0] <= n_warren <= WARREN_CELLS[1], f"cardia-deep: {n_warren} warren cells, want {WARREN_CELLS}"
 r.write("Cardia Deep: the dragon great village under the Cardia isles (pass CD).\n" + NOTE, ents, kits=KITS,
-        mats=MATS, trim=TRIM, quiet={"encounterRate": {"min": 999, "max": 999}, "encounters": []},
+        mats=MATS, trim=TRIM, quiet={"encounterRate": WARREN_RATE, "encounters": []},
         script="ordeal/cardia_deep.py", legend=LEGEND, music="town",
         extra={"exit": {"map": "overworld", "entrance": "ord_bahamut"}, "battleBackgrounds": {"default": "cave"},
                "encounterZones": [{"id": "ord_deep_warrens", "name": "Cardia Warrens", "rects": zone_rects,
-                                   "encounterRate": {"min": 24, "max": 36}, "encounters": CAVE_FIGHTS}],
+                                   "encounterRate": WARREN_RATE, "encounters": CAVE_FIGHTS}],
                "contrast": [{"a": "W", "b": "-", "min": 0.2}, {"a": "W", "b": "%", "min": 0.2}],
                "no_static_chokepoints": True, "no_unreachable_walkable": True})
 print(f"cardia-deep written ({n_warren} warren cells; zone rects {zone_rects})")
