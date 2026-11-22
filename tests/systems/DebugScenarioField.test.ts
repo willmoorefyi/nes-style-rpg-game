@@ -146,9 +146,10 @@ describe('DebugScenarioLoader field mode', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
     const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE'];
     for (const s of scenarios) {
-      // pass W's w_* stage starts (and pass CD's cd_* Cardia starts) hold later story flags (WORLD 6.5): any known flag
+      // pass W's w_* stage starts (and pass CD's cd_* Cardia starts, AV's av_* airship previews) hold later story flags
+      // (WORLD 6.5): any known flag
       for (const f of s.flags ?? []) {
-        if (s.id.startsWith('w_') || s.id.startsWith('m7_') || s.id.startsWith('cd_')) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
+        if (s.id.startsWith('w_') || s.id.startsWith('m7_') || s.id.startsWith('cd_') || s.id.startsWith('av_')) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
         else expect(known, `${s.id} flag ${f}`).toContain(f);
       }
       // pass F's f_* scenarios also start members stoned and afraid
