@@ -269,6 +269,8 @@ def _recolor(img: Image.Image, hue: float, sat: float, val: float) -> Image.Imag
 
 
 def styled(kit: K.Kit, name: str, style: str | None) -> Image.Image:
+    if style and f"{name}@{style}" in kit.approved:            # AR-W2: a themed cell (an upper storey keeps its own)
+        return kit.parts[f"{name}@{style}"]
     if name.startswith("wall_up2_") and name not in kit.approved and name.replace("wall_up2_", "wall_up_") in kit.approved:
         name = name.replace("wall_up2_", "wall_up_")          # upper storey: the approved ground-floor upper row
     if style and f"{name}@{style}" in kit.parts:
@@ -678,7 +680,8 @@ def _objects(src: dict, objects, kit: K.Kit, grid, coll: np.ndarray | None, entr
                 if o.get("sign"):
                     _paste(canvas, kit.part(f"sign_{o['sign']}"), x + door, y + h - 1 - wall_rows)   # on the eave
                 if o.get("chimney") is not None:
-                    _paste(top, kit.part("chimney"), x + o["chimney"], y)
+                    chim = f"chimney@{o.get('roof')}"               # AR-W2: a theme's own chimney, never a recolour
+                    _paste(top, kit.parts[chim] if chim in kit.approved else kit.part("chimney"), x + o["chimney"], y)
                 continue
             for j in range(h):
                 for i in range(w):

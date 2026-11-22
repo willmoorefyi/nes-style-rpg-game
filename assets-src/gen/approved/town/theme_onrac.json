@@ -1,0 +1,182 @@
+{
+ "kit": "town",
+ "sheet": "theme_onrac",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "onr_coral",
+ "tints": [
+  "onr_coral_pink",
+  "onr_coral_sea"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "inn_onr_coral_0_0",
+   "inn_onr_coral_0_1",
+   "inn_onr_coral_0_2",
+   "inn_onr_coral_0_3",
+   "inn_onr_coral_1_0",
+   "inn_onr_coral_1_1",
+   "inn_onr_coral_1_2",
+   "inn_onr_coral_1_3",
+   "inn_onr_coral_2_0",
+   "inn_onr_coral_2_1",
+   "inn_onr_coral_2_2",
+   "inn_onr_coral_2_3",
+   "inn_onr_coral_3_0",
+   "inn_onr_coral_3_1",
+   "inn_onr_coral_3_2",
+   "inn_onr_coral_3_3"
+  ],
+  [
+   "inn_onr_coral_4_0",
+   "inn_onr_coral_4_1",
+   "inn_onr_coral_4_2",
+   "inn_onr_coral_4_3",
+   "onr_lantern_0_0",
+   "onr_lantern_1_0",
+   "onr_netrack_0_0",
+   "onr_netrack_1_0",
+   "onr_shells_0_0",
+   "roof_eave_l@onr_coral",
+   "roof_eave_m@onr_coral",
+   "roof_eave_r@onr_coral",
+   "roof_mid_l@onr_coral",
+   "roof_mid_m@onr_coral",
+   "roof_mid_r@onr_coral",
+   "roof_ridge_l@onr_coral"
+  ],
+  [
+   "roof_ridge_m@onr_coral",
+   "roof_ridge_r@onr_coral",
+   "wall_door_bottom@onr_coral",
+   "wall_door_bottom@onr_coral_pink",
+   "wall_door_bottom@onr_coral_sea",
+   "wall_door_top@onr_coral",
+   "wall_door_top@onr_coral_pink",
+   "wall_door_top@onr_coral_sea",
+   "wall_lo_l@onr_coral",
+   "wall_lo_l@onr_coral_pink",
+   "wall_lo_l@onr_coral_sea",
+   "wall_lo_l@onr_coral_sea_pink",
+   "wall_lo_plain@onr_coral",
+   "wall_lo_plain@onr_coral_pink",
+   "wall_lo_plain@onr_coral_sea",
+   "wall_lo_plain@onr_coral_sea_pink"
+  ],
+  [
+   "wall_lo_r@onr_coral",
+   "wall_lo_r@onr_coral_pink",
+   "wall_lo_r@onr_coral_sea",
+   "wall_lo_r@onr_coral_sea_pink",
+   "wall_up2_l@onr_coral",
+   "wall_up2_l@onr_coral_pink",
+   "wall_up2_l@onr_coral_sea",
+   "wall_up2_l@onr_coral_sea_pink",
+   "wall_up2_plain@onr_coral",
+   "wall_up2_plain@onr_coral_pink",
+   "wall_up2_plain@onr_coral_sea",
+   "wall_up2_plain@onr_coral_sea_pink",
+   "wall_up2_r@onr_coral",
+   "wall_up2_r@onr_coral_pink",
+   "wall_up2_r@onr_coral_sea",
+   "wall_up2_r@onr_coral_sea_pink"
+  ],
+  [
+   "wall_up2_window@onr_coral",
+   "wall_up2_window@onr_coral_pink",
+   "wall_up2_window@onr_coral_sea",
+   "wall_up2_window@onr_coral_sea_pink",
+   "wall_up_l@onr_coral",
+   "wall_up_l@onr_coral_pink",
+   "wall_up_l@onr_coral_sea",
+   "wall_up_l@onr_coral_sea_pink",
+   "wall_up_plain@onr_coral",
+   "wall_up_plain@onr_coral_pink",
+   "wall_up_plain@onr_coral_sea",
+   "wall_up_plain@onr_coral_sea_pink",
+   "wall_up_r@onr_coral",
+   "wall_up_r@onr_coral_pink",
+   "wall_up_r@onr_coral_sea",
+   "wall_up_r@onr_coral_sea_pink"
+  ],
+  [
+   "wall_up_window@onr_coral",
+   "wall_up_window@onr_coral_pink",
+   "wall_up_window@onr_coral_sea",
+   "wall_up_window@onr_coral_sea_pink",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "onr_house",
+   "cache_key": "dec92ebee967a9ac4bf73822",
+   "model": "sd35",
+   "seed": 28,
+   "pass": "AR",
+   "use": "house modules @onr_coral",
+   "strength": 0.76,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "onr_coral_pink": [
+     "abs",
+     10,
+     0.2,
+     0.98
+    ],
+    "onr_coral_sea": [
+     "abs",
+     170,
+     0.22,
+     0.95
+    ]
+   }
+  },
+  {
+   "id": "onr_inn",
+   "cache_key": "be36fb4eac6ac51d1cbfb7ea",
+   "model": "sd35",
+   "seed": 66,
+   "pass": "AR",
+   "use": "grid cut inn_onr_coral 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "onr_props",
+   "cache_key": "23bbf4b1138c30300d18d63e",
+   "model": "ultra",
+   "seed": 48,
+   "pass": "AR",
+   "use": "props onr_netrack 1x2, onr_shells 1x1, onr_lantern 1x2",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of onrac (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

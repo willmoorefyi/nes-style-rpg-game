@@ -14,6 +14,8 @@ kits:
 - castle
 - overworld
 music: town
+materials:
+  bridge_v: cre_bridge_v
 ground: |
   mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm~~~~~~~~~
   mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm~~~~~~~~~
@@ -25,8 +27,8 @@ ground: |
   mm.............................................~~~~~~~
   mm:::::::::::::::::::::::::::::::::::::::::::::~~~~~~~
   mm:::::::::::::::::::::::::::::::::::::::::::::~~~~~~~
-  mmmmmmmmmmmmmmmmmmmmm::mmmmmmmmmmmmmmmmmmmmmm::~~~~~~~
-  mmmmmmmmmmmmmmmmmmmmm::mmmmmmmmmmmmmmmmmmmmmm::~~~~~~~
+  mm~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~::~~~~~~~
+  mm~~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~::~~~~~~~
   mm...................:::::::.................::~~~~~~~
   mm...................:::::::.................::~~~~~~~
   mm...................:::::::.................::~~~~~~~
@@ -39,8 +41,8 @@ ground: |
   mm.......,,..................,,...............~~~~~~~~
   mm.......,,..................,,...............~~~~~~~~
   mm,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,~~~~~~~~~
-  mmmmmmmmm::mmmmmmmmmmmmmmmmmm::mmmmmmmmmmmmmm~~~~~~~~~
-  mmmmmmmmm::mmmmmmmmmmmmmmmmmm::mmmmmmmmmmmmm~~~~~~~~~~
+  mm~~~~~~~==~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~
+  mm~~~~~~~==~~~~~~~~~~~~~~~~~~==~~~~~~~~~~~~~~~~~~~~~~~
   mm.......,,..................,,..........,,,~~~~~~~~~~
   mm.......,,..................,,.........,,,~~~~~~~~~~~
   mm.......,,..................,,........,,,,,,~~~~~~~~~
@@ -74,8 +76,8 @@ objects:
   y: 3
   h: 5
   storeys: 2
-  roof: red
-  wall: plaster
+  roof: cre_venice
+  wall: cre_venice
   chimney: 3
   enter: {map: crescent-house-tutor, entrance: door}
 - type: house
@@ -87,8 +89,8 @@ objects:
   y: 3
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: cre_venice
+  wall: cre_venice_sienna
   chimney: 1
   enter: {map: crescent-house-archivist, entrance: door}
 - type: house
@@ -100,8 +102,8 @@ objects:
   y: 4
   h: 4
   storeys: 1
-  roof: teal
-  wall: white
+  roof: cre_venice
+  wall: cre_venice
 - type: house
   w: 5
   door: 2
@@ -111,8 +113,8 @@ objects:
   y: 4
   h: 4
   storeys: 1
-  roof: blue
-  wall: white
+  roof: cre_venice
+  wall: cre_venice
   chimney: 3
   enter: {map: crescent-house-astronomer, entrance: door}
 - type: house
@@ -124,8 +126,8 @@ objects:
   y: 3
   h: 5
   storeys: 2
-  roof: blue
-  wall: stone
+  roof: cre_venice
+  wall: cre_venice_sienna
 - type: deco
   parts:
   - [tower_0_0, tower_0_1]
@@ -142,8 +144,8 @@ objects:
   y: 13
   h: 4
   storeys: 1
-  roof: red
-  wall: stone
+  roof: cre_venice
+  wall: cre_venice_sienna
   sign: weapon
   enter: {map: crescent-weapon-shop, entrance: door}
 - type: house
@@ -155,8 +157,8 @@ objects:
   y: 13
   h: 4
   storeys: 1
-  roof: brown
-  wall: plaster
+  roof: cre_venice
+  wall: cre_venice
   sign: armor
   chimney: 1
   enter: {map: crescent-armor-shop, entrance: door}
@@ -169,13 +171,13 @@ objects:
   y: 13
   h: 4
   storeys: 1
-  roof: teal
-  wall: ochre
+  roof: cre_venice
+  wall: cre_venice_ochre
   sign: item
   chimney: 3
   enter: {map: crescent-item-shop, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_cre_venice
   name: inn
   x: 29
   y: 12
@@ -193,8 +195,8 @@ objects:
   y: 13
   h: 4
   storeys: 1
-  roof: blue
-  wall: white
+  roof: cre_venice
+  wall: cre_venice
   sign: white_magic
   enter: {map: crescent-white-magic, entrance: door}
 - type: house
@@ -206,8 +208,8 @@ objects:
   y: 13
   h: 4
   storeys: 1
-  roof: slate
-  wall: stone
+  roof: cre_venice
+  wall: cre_venice_sienna
   sign: black_magic
   chimney: 3
   enter: {map: crescent-black-magic, entrance: door}
@@ -220,8 +222,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: rose
-  wall: white
+  roof: cre_venice
+  wall: cre_venice
   chimney: 1
   enter: {map: crescent-house-healer, entrance: door}
 - type: house
@@ -233,8 +235,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: brown
-  wall: ochre
+  roof: cre_venice
+  wall: cre_venice_ochre
   chimney: 3
   enter: {map: crescent-house-potter, entrance: door}
 - type: house
@@ -246,8 +248,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: slate
-  wall: plaster
+  roof: cre_venice
+  wall: cre_venice
 - type: house
   w: 5
   door: 2
@@ -257,8 +259,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: green
-  wall: white
+  roof: cre_venice
+  wall: cre_venice
 - type: house
   w: 5
   door: 2
@@ -268,8 +270,8 @@ objects:
   y: 26
   h: 4
   storeys: 1
-  roof: green
-  wall: ochre
+  roof: cre_venice
+  wall: cre_venice_ochre
   chimney: 3
   enter: {map: crescent-house-boatwright, entrance: door}
 - type: house
@@ -281,8 +283,8 @@ objects:
   y: 28
   h: 4
   storeys: 1
-  roof: brown
-  wall: stone
+  roof: cre_venice
+  wall: cre_venice_sienna
   on_water: true
 - type: house
   w: 5
@@ -293,8 +295,8 @@ objects:
   y: 33
   h: 4
   storeys: 1
-  roof: brown
-  wall: plaster
+  roof: cre_venice
+  wall: cre_venice
   on_water: true
 - {type: fountain, x: 23, y: 13}
 - {type: bench, x: 22, y: 16}
@@ -509,6 +511,34 @@ objects:
 - {type: bush, x: 11, y: 31}
 - {type: bush, x: 27, y: 34}
 - {type: signpost, x: 2, y: 19}
+- type: deco
+  parts:
+  - [cre_wellhead_0_0]
+  - [cre_wellhead_1_0]
+  x: 11
+  y: 33
+  collide: alpha
+- type: deco
+  parts:
+  - [cre_gondola_0_0, cre_gondola_0_1]
+  - [cre_gondola_1_0, cre_gondola_1_1]
+  x: 8
+  y: 10
+  on_water: true
+- type: deco
+  parts:
+  - [cre_gondola2_0_0]
+  - [cre_gondola2_1_0]
+  x: 35
+  y: 24
+  on_water: true
+- type: deco
+  parts:
+  - [cre_gondola_0_0, cre_gondola_0_1]
+  - [cre_gondola_1_0, cre_gondola_1_1]
+  x: 16
+  y: 24
+  on_water: true
 npcs:
 - id: ferryman_hint
   sprite: old_man

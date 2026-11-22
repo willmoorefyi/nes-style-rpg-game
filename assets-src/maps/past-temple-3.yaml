@@ -115,6 +115,49 @@ objects:
   - [tpillar_bottom]
   x: 21
   y: 3
+- type: deco
+  parts:
+  - [ar_iron_door_0_0, ar_iron_door_0_1]
+  - [ar_iron_door_1_0, ar_iron_door_1_1]
+  x: 11
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_sealed_coffin_0_0]
+  - [ar_sealed_coffin_1_0]
+  x: 4
+  y: 40
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 27
+  y: 40
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 28
+  y: 25
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 27
+  y: 7
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 5
+  y: 21
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 5
+  y: 31
 npcs:
 - id: chest_nave_chapel_north
   sprite: chest
@@ -190,3 +233,7 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: pst_drowned_falls
   message: The flood behind him rises in a wall, and his robes tear open on a body of coils.
+ambient:
+- {kind: flame, prop: wall_torch, x: 28, y: 25}
+- {kind: flame, prop: wall_torch, x: 27, y: 7}
+- {kind: flame, prop: fiend_brazier, x: 5, y: 21}

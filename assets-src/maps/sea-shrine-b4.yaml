@@ -249,6 +249,35 @@ objects:
   x: 37
   y: 24
   on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 36
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 3
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 38
+  y: 19
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 11
+  y: 31
+- type: deco
+  parts:
+  - [ar_barrel_tipped_0_0]
+  x: 42
+  y: 5
 npcs:
 - id: chest_wat_d_b4_alcove
   sprite: chest

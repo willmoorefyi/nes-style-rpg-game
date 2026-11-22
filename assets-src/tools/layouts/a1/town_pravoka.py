@@ -23,6 +23,7 @@ sys.path.insert(1, str(HERE.parent.parent))
 from common import Grid, write_map  # noqa: E402
 from kit import landmark_parts  # noqa: E402
 from town_common import Outdoor  # noqa: E402
+import town_theme as THEME  # noqa: E402
 import town_pravoka_people as PEOPLE  # noqa: E402
 import town_pravoka_site as SITE  # noqa: E402
 
@@ -192,4 +193,5 @@ Distinct: two warehouses on piles over the water beside a plank landing; a cliff
 Topology: one map, no stairs: the west land gate -> the high street -> the quay; Lantern Street north to the cliff
   path and the lighthouse shelf; the captain's fight at the brig pier's end (the boss, an NPC).
 ground legend: . grass  : cobble  , dirt  ~ water  = planks  m cliff"""
+THEME.apply(doc, "pravoka", g)               # AR-W2: the approved town theme (docs/TOWN_THEMES.md)
 print(write_map(SITE.TOWN, HEADER, doc, g.text()))

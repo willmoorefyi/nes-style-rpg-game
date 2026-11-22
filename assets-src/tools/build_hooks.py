@@ -59,14 +59,18 @@ def passthrough(src: dict, out: dict) -> None:
         art["patches"] = {p["id"]: f"{folder}/patch_{p['id']}.png" for p in patches}
 
 
-AMBIENT_KINDS = ("smoke",)                   # LM-INT: looping field effects drawn by src/scenes/exploration/FieldAmbient.ts
+AMBIENT_KINDS = ("smoke", "flame")          # LM-INT: looping field effects drawn by src/scenes/exploration/FieldAmbient.ts
 
 
 def ambient(entries: list, width: int, height: int) -> list[dict]:
     """The checked `ambient` list: {kind, x, y (the map cell), ox, oy (art px inside it, 0-47; default the cell's
-    centre)}; a bad entry fails the compile."""
+    centre)}; a `flame` entry is resolved by ambient_flame.py (AR-P2); a bad entry fails the compile."""
     out = []
     for i, e in enumerate(entries):
+        if isinstance(e, dict) and e.get("kind") == "flame":          # AR-P2: a prop's flame, ambient_flame.py
+            import ambient_flame  # noqa: PLC0415
+            out.append(ambient_flame.flame_entry(i, e, width, height))
+            continue
         if not isinstance(e, dict) or set(e) - {"kind", "x", "y", "ox", "oy"} or e.get("kind") not in AMBIENT_KINDS:
             raise ValueError(f"ambient[{i}]: expected {{kind: {'|'.join(AMBIENT_KINDS)}, x, y, ox?, oy?}}, got {e!r}")
         x, y, ox, oy = e.get("x"), e.get("y"), e.get("ox", 24), e.get("oy", 24)

@@ -128,8 +128,7 @@ npcs:
   showIf: CLASS_UPGRADED
   dialog: ['Bahamut: Your new names fit you. Wear them where the light has gone out of the world.']
 - id: dragon_ember
-  sprite: knight
-  tint: '#c86a4a'
+  sprite: dragon_guard
   x: 12
   y: 8
   dialog:
@@ -137,8 +136,7 @@ npcs:
     text: [Even in this shape I can smell the change on you. You burn hotter now.]
   - text: [I am wearing a man's shape for your sake. Do not stare; the scales show at the wrists.]
 - id: dragon_tide
-  sprite: mage
-  tint: '#4a8ec8'
+  sprite: dragon_youth
   x: 27
   y: 8
   dialog:
@@ -146,8 +144,7 @@ npcs:
     text: [The tide will carry the news of you to every shore. That is how dragons gossip.]
   - text: [We came here when the sea still remembered the sky. Bahamut came first.]
 - id: dragon_moss
-  sprite: old_man
-  tint: '#7aa05a'
+  sprite: dragon_elder
   x: 12
   y: 15
   dialog:
@@ -155,8 +152,7 @@ npcs:
     text: ['You held it, and you let it go. That is the part the builders never understood.']
   - text: [The citadel was built by people who wanted proof of courage they could hold in a hand. Bahamut humours them.]
 - id: dragon_ash
-  sprite: monk
-  tint: '#8a8a8a'
+  sprite: dragon_youth
   x: 27
   y: 15
   dialog:
@@ -164,8 +160,7 @@ npcs:
     text: ['Do not touch the gold. Now that you are named, I would have to argue.']
   - text: ['I sleep on the gold. Not for greed. It is warm, and it does not argue.']
 - id: dragon_frost
-  sprite: white_mage
-  tint: '#b8d8e8'
+  sprite: dragon_elder
   x: 16
   y: 17
   dialog:
@@ -173,8 +168,7 @@ npcs:
     text: ['If you brought down the old guardian, then it can rest. Thank you for that.']
   - text: [The guardian in the citadel was one of us once. It forgot when to stop guarding.]
 - id: dragon_storm
-  sprite: black_mage
-  tint: '#6a5aa0'
+  sprite: dragon_guard
   x: 23
   y: 17
   dialog:

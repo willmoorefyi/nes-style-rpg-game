@@ -49,7 +49,7 @@ def unne(out: list[Path]) -> None:
     r.one("globe", 1, 8)
     r.one("desk", 9, 8)
     r.tall("bed", 12, 4)
-    r.npc("ert_unne", "old_man", 6, 4, [
+    r.npc("ert_unne", "dr_unne", 6, 4, [
         {"condition": LEARNED, "text": [
             "Now you can read the sky-folk's letters as well as I can. Lufenia is on a mesa in the far north-east.",
             "No road climbs to it and no ship can reach it. You will have to fly. Ask their elder about the Mirage."]},

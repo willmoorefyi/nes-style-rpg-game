@@ -145,6 +145,25 @@ objects:
   x: 16
   y: 24
   fit: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 8
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 17
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 10
+  y: 30
 npcs:
 - id: chest_alcove_west
   sprite: chest
@@ -212,3 +231,7 @@ scriptedEncounters:
   postVictoryCutscene: wnd_seraph_falls
   message: The plates snap together into a shell with four blades of light for wings, and the crystal coughs out one hard gust that spins into
     a whirlwind at her side.
+ambient:
+- {kind: flame, prop: light_pylon, x: 8, y: 4}
+- {kind: flame, prop: light_pylon, x: 17, y: 4}
+- {kind: flame, prop: console, x: 10, y: 30}

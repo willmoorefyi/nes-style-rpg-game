@@ -109,6 +109,50 @@
     "burgher": {
       "x": 288,
       "y": 800
+    },
+    "luf_citizen_m": {
+      "x": 0,
+      "y": 960
+    },
+    "luf_citizen_f": {
+      "x": 96,
+      "y": 960
+    },
+    "luf_senator": {
+      "x": 192,
+      "y": 960
+    },
+    "dragon_guard": {
+      "x": 288,
+      "y": 960
+    },
+    "dragon_elder": {
+      "x": 0,
+      "y": 1120
+    },
+    "dragon_youth": {
+      "x": 96,
+      "y": 1120
+    },
+    "robot_sentry": {
+      "x": 192,
+      "y": 1120
+    },
+    "sage_star": {
+      "x": 288,
+      "y": 1120
+    },
+    "sage_earth": {
+      "x": 0,
+      "y": 1280
+    },
+    "sage_flame": {
+      "x": 96,
+      "y": 1280
+    },
+    "dr_unne": {
+      "x": 192,
+      "y": 1280
     }
   }
 }

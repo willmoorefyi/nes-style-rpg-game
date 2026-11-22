@@ -145,6 +145,55 @@ objects:
   x: 4
   y: 20
   block: false
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 17
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_sealed_coffin_0_0]
+  - [ar_sealed_coffin_1_0]
+  x: 6
+  y: 30
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_hanging_0_0]
+  - [ar_cage_hanging_1_0]
+  x: 33
+  y: 30
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 36
+  y: 10
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 3
+  y: 10
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 16
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 19
+  y: 32
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 26
+  y: 13
 npcs:
 - id: chest_cloister_west
   sprite: chest
@@ -239,3 +288,7 @@ inspect:
   y: 3
   text: ['A plaque under the brazier is worn smooth, but two lines can still be read: "Two stairs, two houses." "What the west stair keeps shut,
       the east stair opens to those who go down by it."']
+ambient:
+- {kind: flame, prop: wall_torch, x: 36, y: 10}
+- {kind: flame, prop: wall_torch, x: 3, y: 10}
+- {kind: flame, prop: fiend_brazier, x: 19, y: 32}

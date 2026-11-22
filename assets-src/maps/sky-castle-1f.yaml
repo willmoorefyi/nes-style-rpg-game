@@ -130,6 +130,37 @@ objects:
   - [statue_bottom]
   x: 26
   y: 29
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 9
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 34
+  y: 10
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 11
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 29
+  y: 29
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 21
+  y: 7
 npcs:
 - id: chest_berth_north
   sprite: chest
@@ -152,6 +183,11 @@ npcs:
   chestItem: ether
   chestFlag: CHEST_WND_D2_BERTH_SOUTHEAST
   dialog: [You found an Ether!]
+- id: wnd_sentry_hub
+  sprite: robot_sentry
+  x: 23
+  y: 17
+  dialog: ['The sentry''s lens turns to follow you. A thin voice crackles: "BERTH... UNASSIGNED. AWAIT... THE STEWARD."']
 transitions:
 - {x: 17, y: 14, targetMap: sky-castle-2f, targetEntrance: arrival}
 - {x: 18, y: 14, targetMap: sky-castle-2f, targetEntrance: arrival}
@@ -192,3 +228,7 @@ inspect:
   y: 19
   text: ['A chart of the castle''s berths is cut into the table. Every berth is marked with a ship''s name, and every name has been scratched
       through.']
+ambient:
+- {kind: flame, prop: light_pylon, x: 9, y: 5}
+- {kind: flame, prop: light_pylon, x: 11, y: 28}
+- {kind: flame, prop: console, x: 29, y: 29}

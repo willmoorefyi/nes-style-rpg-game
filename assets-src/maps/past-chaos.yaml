@@ -127,6 +127,42 @@ objects:
   - [brazier]
   x: 20
   y: 3
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 4
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 6
+  y: 25
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 25
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 23
+  y: 24
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 16
+  y: 4
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 14
+  y: 26
 npcs:
 - id: chest_shrine_west
   sprite: chest
@@ -179,3 +215,8 @@ inspect:
 - x: 15
   y: 11
   text: ['The paint of the shadow is still wet. It has run down the wall in four thin streaks, one for each of the fiends.']
+ambient:
+- {kind: flame, prop: wall_torch, x: 25, y: 1}
+- {kind: flame, prop: wall_torch, x: 23, y: 24}
+- {kind: flame, prop: fiend_brazier, x: 16, y: 4}
+- {kind: flame, prop: fiend_brazier, x: 14, y: 26}

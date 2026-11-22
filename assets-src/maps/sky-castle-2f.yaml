@@ -134,6 +134,35 @@ objects:
   - [brazier]
   x: 23
   y: 13
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 18
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 40
+  y: 23
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 8
+  y: 29
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 4
+  y: 6
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 21
+  y: 17
 npcs:
 - id: chest_bridge_south
   sprite: chest
@@ -156,6 +185,11 @@ npcs:
   chestItem: hi_potion
   chestFlag: CHEST_WND_D2_BRIDGE_EAST
   dialog: [You found a Hi-Potion!]
+- id: wnd_sentry_east
+  sprite: robot_sentry
+  x: 41
+  y: 30
+  dialog: ['Rust has fused the sentry''s joints. Somewhere inside it a gear ticks once, and stops.']
 transitions:
 - {x: 35, y: 20, targetMap: sky-castle-2f, targetEntrance: d_belt}
 - {x: 35, y: 21, targetMap: sky-castle-2f, targetEntrance: d_belt}
@@ -212,3 +246,7 @@ inspect:
 - x: 34
   y: 25
   text: ['Scratched under the brazier''s rim: "A belt does not carry you back. Look for the island that feeds the stair before you trust a bridge."']
+ambient:
+- {kind: flame, prop: light_pylon, x: 40, y: 23}
+- {kind: flame, prop: console, x: 8, y: 29}
+- {kind: flame, prop: console, x: 21, y: 17}

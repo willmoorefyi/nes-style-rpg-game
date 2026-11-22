@@ -23,7 +23,7 @@ LEGEND = "legend: W rock  F rock face  - hewn floor  _ plank floor  % rubble  c 
 CAVE = remap("cave")                                     # the brown temple stone of 4.9 ("cave remap")
 MATS = {"floor_stone": CAVE, "rubble": {**remap("cave", "temple_rubble"), "shade": 1.3},
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.35},
-        "in_wall_face": {**remap("cave", "temple_wall_face"), "shade": 1.1}, "floor": {"from": "floor", "shade": 0.8}}
+        "in_wall_face": {"from": "dwf_wall"}, "floor": {"from": "floor", "shade": 0.8}}
 NOTE = ("Concept: the dwarves' hall hewn under the isthmus, a working mine town in one cave: a long hall, the forge, "
         "the drafting room and the store off its north wall.\n"
         "Distinct: the canal plans spread on the drafting table where the foreman keeps watch over them; the store "
@@ -63,10 +63,10 @@ def build() -> Path:
     g.carve(28, 7, 37, 7, "c")                           # the store counter, wall to wall
     g.faces(2)
     deco, obj = r.deco, r.objects.append
-    deco([["fireplace_0_0", "fireplace_0_1"], ["fireplace_1_0", "fireplace_1_1"]], 5, 2, on_wall=True)   # the forge
+    deco([["dwf_forge_0_0", "dwf_forge_0_1"], ["dwf_forge_1_0", "dwf_forge_1_1"]], 5, 2, on_wall=True)   # the forge
     deco([["weapon_rack"]], 9, 3, on_wall=True)
     deco([["torch"]], 3, 3, on_wall=True)
-    deco([["stone_bench"]], 5, 6)                        # Smyth's anvil block
+    deco([["dwf_anvil_0_0"]], 5, 6)                      # Smyth's anvil
     deco([["armor_stand"]], 10, 5)
     obj({"type": "barrel", "x": 2, "y": 9})
     obj({"type": "barrel", "x": 3, "y": 9})
@@ -82,11 +82,13 @@ def build() -> Path:
     for x in (12, 26):
         deco([["torch"]], x, 12, on_wall=True)
     for x in (16, 23):
-        r.statue(x, 14)                                  # two stone dwarf-kings flank the drafting room's door
+        deco([["dwf_king_0_0"], ["dwf_king_1_0"]], x, 14)   # two dwarf-kings flank the drafting room's door
     for x, y in ((9, 17), (30, 19)):
-        r.pillar(x, y)
-    for x, y in ((4, 26), (5, 26), (6, 26), (33, 26), (34, 26), (35, 26)):
-        obj({"type": "crate", "x": x, "y": y})          # ore carts on the south wall
+        deco([["dwf_pillar_0_0"], ["dwf_pillar_1_0"]], x, y, fit=True)   # AR-W2: the granite hall's own art
+    for x, y in ((6, 26), (35, 26)):
+        obj({"type": "crate", "x": x, "y": y})
+    for x in (4, 33):
+        deco([["dwf_cart_0_0", "dwf_cart_0_1"], ["dwf_cart_1_0", "dwf_cart_1_1"]], x, 25, collide="alpha")  # ore carts
     deco([["gold_heap"]], 36, 22)                        # a heap of sorted ore
     deco([["skulls"]], 3, 22)                            # the slag of a bad seam
     npc = lambda i, s, x, y, d, **kw: r.npcs.append({"id": i, "sprite": s, "x": x, "y": y, "dialog": d, "tint": DWARF, **kw})  # noqa: E731

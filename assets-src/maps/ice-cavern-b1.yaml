@@ -172,6 +172,35 @@ objects:
   - [fallen_l, fallen_r]
   x: 12
   y: 27
+- type: deco
+  parts:
+  - [ar_ice_pillar_0_0]
+  - [ar_ice_pillar_1_0]
+  x: 4
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_frozen_knight_0_0]
+  - [ar_frozen_knight_1_0]
+  x: 31
+  y: 12
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ice_shards_0_0]
+  x: 13
+  y: 24
+- type: deco
+  parts:
+  - [ar_ice_block_0_0]
+  x: 17
+  y: 5
+- type: deco
+  parts:
+  - [ar_skeleton_slumped_0_0]
+  x: 26
+  y: 26
 npcs:
 - id: chest_fir_d2_b1_grotto
   sprite: chest

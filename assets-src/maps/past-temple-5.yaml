@@ -115,6 +115,56 @@ objects:
   - [tpillar_bottom]
   x: 7
   y: 23
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 4
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_sealed_coffin_0_0]
+  - [ar_sealed_coffin_1_0]
+  x: 41
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 10
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 32
+  y: 25
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 20
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 30
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 5
+  y: 15
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 35
+  y: 14
 npcs:
 - id: chest_eyes_colonnade
   sprite: chest
@@ -203,3 +253,8 @@ inspect:
 - x: 33
   y: 14
   text: ['Eyes are carved on this wall in a ring, every one of them looking inward at its empty centre.']
+ambient:
+- {kind: flame, prop: wall_torch, x: 32, y: 25}
+- {kind: flame, prop: wall_torch, x: 20, y: 1}
+- {kind: flame, prop: fiend_brazier, x: 5, y: 15}
+- {kind: flame, prop: fiend_brazier, x: 35, y: 14}

@@ -1,0 +1,132 @@
+{
+  "character": "luf_citizen_f",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 2,
+  "cache_key": "1023cccbd396c0fbef339aa2",
+  "pass": "AR",
+  "approved": "2026-11-21",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s55_2",
+      "tag": "luf_citizen_f_s55_2",
+      "cache_key": "1023cccbd396c0fbef339aa2",
+      "model": "structure",
+      "seed": 2,
+      "pass": "AR",
+      "render_rows": 3
+    },
+    {
+      "alias": "s55_1",
+      "tag": "luf_citizen_f_s55_1",
+      "cache_key": "68ceacc844eded51c93b4858",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s55_2",
+        0,
+        false
+      ],
+      [
+        "s55_2",
+        1,
+        false
+      ],
+      [
+        "s55_2",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "s55_2",
+        4,
+        false
+      ],
+      [
+        "s55_2",
+        5,
+        false
+      ],
+      [
+        "s55_2",
+        5,
+        true
+      ]
+    ],
+    [
+      [
+        "s55_1",
+        6,
+        false
+      ],
+      [
+        "s55_1",
+        7,
+        false
+      ],
+      [
+        "s55_1",
+        8,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [],
+  "figure_px": [
+    92,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N luf_citizen_f: A's down and up rows (s55_2, villager_f guide, 0.55, seed 2; its own back cells r1c2, r1c3) with B's side row (s55_1, seed 1), one shared palette (user ruling 2026-11-21: A's side walk misplaced the feet and dress and lost the hands)"
+}

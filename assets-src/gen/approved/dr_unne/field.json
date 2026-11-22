@@ -1,0 +1,167 @@
+{
+  "character": "dr_unne",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "29dc17e130a89fac826a5b43",
+  "pass": "AR",
+  "approved": "2026-11-21",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s50_1",
+      "tag": "dr_unne_s50_1",
+      "cache_key": "29dc17e130a89fac826a5b43",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3
+    },
+    {
+      "alias": "b50_3",
+      "tag": "dr_unne_b50_3_burgher_up",
+      "cache_key": "7cc6dfe78dd000fcb4bd078c",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 1
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s50_1",
+        0,
+        false
+      ],
+      [
+        "s50_1",
+        2,
+        false
+      ],
+      [
+        "s50_1",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "b50_3",
+        0,
+        false
+      ],
+      [
+        "b50_3",
+        1,
+        false
+      ],
+      [
+        "b50_3",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "s50_1",
+        6,
+        false
+      ],
+      [
+        "s50_1",
+        7,
+        false
+      ],
+      [
+        "s50_1",
+        8,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [
+    {
+      "op": "ramp",
+      "why": "the side steps' brown waistcoat -> the coat's green ramp",
+      "cells": [
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "map": {
+        "#421808": "#183918",
+        "#7b4218": "#296329"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the green stripe down the back stand's white coat -> the coat's white ramp",
+      "cells": [
+        [
+          1,
+          0
+        ]
+      ],
+      "map": {
+        "#183918": "#8494b5",
+        "#214231": "#adb5d6",
+        "#296329": "#adb5d6",
+        "#397b42": "#dee7ef"
+      }
+    }
+  ],
+  "figure_px": [
+    90,
+    90,
+    90,
+    85,
+    85,
+    85,
+    90,
+    90,
+    90
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N dr_unne B: s50_1 down cells 0, 2 + 2 mirrored (burgher guide, 0.5, seed 1; green coat), side row 2; back strip b50_3. User ruling 2026-11-21: B, not A; one green jacket in every frame (the side steps' brown waistcoat recoloured), no green stripe on the back stand"
+}

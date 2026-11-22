@@ -94,16 +94,14 @@ NPCS = [
         ["The earth is mended. Now the fire under the south swells, as if the land had to breathe out somewhere."],
         ["Put your hand on the stone behind me. Cold, isn't it? It used to be warm. The earth is dying under it."]),
         tint="#c0b8a8"),
-    sage("sage_east", "mage", 17, 9, said(
+    sage("sage_east", "sage_star", 17, 9, said(
         ["Rivers are roads that move. You have the canoe; keep to the middle, where the current is honest."],
         ["Fire and frost lie side by side south of the ring. One crystal sleeps in each, I think. Or one in neither."],
-        ["Under the western plain something drinks the earth's strength. We feel it as a chill in the stones."]),
-        tint="#a8b8c8"),
-    sage("sage_moss", "white_mage", 8, 11, said(
+        ["Under the western plain something drinks the earth's strength. We feel it as a chill in the stones."])),
+    sage("sage_moss", "sage_earth", 8, 11, said(
         ["I have nothing to add. The elder said it all. That doesn't happen often; enjoy it."],
         ["Last night the urn's water steamed on one side and froze on the other. We did not sleep."],
-        ["Moss is dying on the stones. In three hundred years it has never died. I count the patches each dawn."]),
-        tint="#b8c8b0"),
+        ["Moss is dying on the stones. In three hundred years it has never died. I count the patches each dawn."])),
     sage("sage_tide", "red_wizard", 18, 11, said(
         ["When you reach the fire, remember: it was here before the world, and it will be here after. Respect it."],
         ["The lake has warmed by a finger's breadth along its south shore. The fire mountain is stirring."],
@@ -112,11 +110,10 @@ NPCS = [
         ["The frozen hollow keeps something that was never meant to be found. Go armed, and go warm."],
         ["Frost has a voice in the south. It is not a kind one. Something in the ice is watching."],
         ["The roots of the trees on the western shore have gone soft as rope. The earth has a fever."])),
-    sage("sage_ash", "mage", 16, 13, said(
+    sage("sage_ash", "sage_flame", 16, 13, said(
         ["We have given away our oldest boat. I feel lighter. Sages should own less, I always said."],
         ["The fire crystal sleeps in the mountain's heart, under a tyrant made of ash. So the stones say."],
-        ["The earth crystal is dimming. The stones are certain. We are only less certain how long it has."]),
-        tint="#c8a8a0"),
+        ["The earth crystal is dimming. The stones are certain. We are only less certain how long it has."])),
     sage("sage_north", "white_mage", 4, 10, said(
         ["From the islet's edge I watched you push off. The ripples are still reaching the far shore."],
         ["Look south over the water: smoke by day, a pale light by night. Two shrines are waking."],

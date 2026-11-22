@@ -550,8 +550,8 @@ objects:
   y: 33
   h: 5
   storeys: 2
-  roof: red
-  wall: plaster
+  roof: cor_timber
+  wall: cor_timber
   sign: weapon
   enter: {map: cornelia-weapon-shop, entrance: door}
 - type: house
@@ -563,8 +563,8 @@ objects:
   y: 33
   h: 5
   storeys: 2
-  roof: brown
-  wall: plaster
+  roof: cor_timber
+  wall: cor_timber
   sign: armor
   enter: {map: cornelia-armor-shop, entrance: door}
 - type: house
@@ -575,8 +575,8 @@ objects:
   x: 42
   y: 40
   h: 4
-  roof: teal
-  wall: ochre
+  roof: cor_timber
+  wall: cor_timber_ochre
   sign: item
   chimney: 3
   enter: {map: cornelia-item-shop, entrance: door}
@@ -589,8 +589,8 @@ objects:
   y: 49
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: cor_timber
+  wall: cor_timber
   sign: white_magic
   enter: {map: cornelia-white-magic, entrance: door}
 - type: house
@@ -602,12 +602,12 @@ objects:
   y: 49
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: cor_timber
+  wall: cor_timber_rose
   sign: black_magic
   enter: {map: cornelia-black-magic, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_cor_timber
   name: inn
   x: 22
   y: 55
@@ -625,8 +625,8 @@ objects:
   y: 32
   h: 5
   storeys: 2
-  roof: blue
-  wall: plaster
+  roof: cor_timber
+  wall: cor_timber
   chimney: 1
   enter: {map: cornelia-house-scholar, entrance: door}
 - type: house
@@ -638,8 +638,8 @@ objects:
   y: 34
   h: 4
   storeys: 1
-  roof: green
-  wall: white
+  roof: cor_timber
+  wall: cor_timber
   enter: {map: cornelia-house-fisher, entrance: door}
 - type: house
   w: 5
@@ -650,8 +650,8 @@ objects:
   y: 46
   h: 4
   storeys: 1
-  roof: red
-  wall: ochre
+  roof: cor_timber
+  wall: cor_timber_ochre
   chimney: 3
   enter: {map: cornelia-house-farm, entrance: door}
 - type: house
@@ -663,8 +663,8 @@ objects:
   y: 52
   h: 5
   storeys: 2
-  roof: slate
-  wall: white
+  roof: cor_timber
+  wall: cor_timber
   chimney: 3
   enter: {map: cornelia-house-knight, entrance: door}
 - type: house
@@ -676,8 +676,8 @@ objects:
   y: 53
   h: 4
   storeys: 1
-  roof: brown
-  wall: rose
+  roof: cor_timber
+  wall: cor_timber_rose
   enter: {map: cornelia-house-weaver, entrance: door}
 - type: house
   w: 5
@@ -688,8 +688,8 @@ objects:
   y: 33
   h: 4
   storeys: 1
-  roof: green
-  wall: plaster
+  roof: cor_timber
+  wall: cor_timber
   chimney: 1
   enter: {map: cornelia-house-gardener, entrance: door}
 - type: house
@@ -701,8 +701,8 @@ objects:
   y: 60
   h: 4
   storeys: 1
-  roof: red
-  wall: white
+  roof: cor_timber
+  wall: cor_timber
   enter: {map: cornelia-house-family, entrance: door}
 - type: house
   w: 5
@@ -713,8 +713,8 @@ objects:
   y: 38
   h: 4
   storeys: 1
-  roof: teal
-  wall: plaster
+  roof: cor_timber
+  wall: cor_timber
   chimney: 3
   enter: {map: cornelia-house-apprentice, entrance: door}
 - type: house
@@ -726,8 +726,8 @@ objects:
   y: 57
   h: 4
   storeys: 1
-  roof: blue
-  wall: ochre
+  roof: cor_timber
+  wall: cor_timber_ochre
   sign: tavern
   chimney: 1
   enter: {map: cornelia-house-tavern, entrance: door}
@@ -740,8 +740,8 @@ objects:
   y: 58
   h: 5
   storeys: 2
-  roof: red
-  wall: stone
+  roof: cor_timber
+  wall: cor_timber_rose
   sign: shrine
   enter: {map: cornelia-house-shrine, entrance: door}
 - type: deco
@@ -772,10 +772,6 @@ objects:
   parts: *id003
   x: 36
   y: 39
-- type: deco
-  parts: *id003
-  x: 23
-  y: 46
 - type: deco
   parts: *id003
   x: 36
@@ -1005,7 +1001,6 @@ objects:
 - {type: flowers, x: 15, y: 56}
 - {type: flowers, x: 34, y: 50}
 - {type: flowers, x: 36, y: 52}
-- {type: flowers, x: 24, y: 49}
 - {type: flowers, x: 26, y: 51}
 - {type: flowers, x: 11, y: 46}
 - {type: flowers, x: 12, y: 46}
@@ -1215,6 +1210,35 @@ objects:
   passage: true
   on_wall: true
 - {type: bush, x: 7, y: 2}
+- type: deco
+  parts:
+  - [cor_hall_0_0, cor_hall_0_1, cor_hall_0_2, cor_hall_0_3]
+  - [cor_hall_1_0, cor_hall_1_1, cor_hall_1_2, cor_hall_1_3]
+  - [cor_hall_2_0, cor_hall_2_1, cor_hall_2_2, cor_hall_2_3]
+  - [cor_hall_3_0, cor_hall_3_1, cor_hall_3_2, cor_hall_3_3]
+  x: 22
+  y: 46
+  collide: alpha
+- type: deco
+  parts:
+  - [cor_well_0_0, cor_well_0_1]
+  - [cor_well_1_0, cor_well_1_1]
+  x: 17
+  y: 53
+  collide: alpha
+- type: deco
+  parts:
+  - [cor_haycart_0_0, cor_haycart_0_1]
+  - [cor_haycart_1_0, cor_haycart_1_1]
+  x: 42
+  y: 63
+  collide: alpha
+- type: deco
+  parts:
+  - [cor_board_0_0, cor_board_0_1]
+  x: 27
+  y: 61
+  collide: alpha
 npcs:
 - id: castle_door_guard_w
   sprite: guard

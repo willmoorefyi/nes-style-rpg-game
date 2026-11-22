@@ -96,6 +96,46 @@ objects:
   - [brazier]
   x: 31
   y: 28
+- type: deco
+  parts:
+  - [ar_magma_mound_0_0, ar_magma_mound_0_1]
+  x: 6
+  y: 4
+- type: deco
+  parts:
+  - [ar_obsidian_spire_0_0]
+  - [ar_obsidian_spire_1_0]
+  x: 37
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fire_idol_0_0]
+  - [ar_fire_idol_1_0]
+  x: 30
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 22
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_lava_vent_0_0]
+  x: 36
+  y: 28
+- type: deco
+  parts:
+  - [ar_cauldron_fire_0_0]
+  x: 31
+  y: 31
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 3
+  y: 7
 npcs:
 - id: chest_maze_north
   sprite: chest
@@ -194,3 +234,9 @@ hazards:
   - [9, 27, 20, 27]
   - [23, 27, 26, 27]
   - [9, 28, 26, 28]
+ambient:
+- {kind: flame, prop: magma_mound, x: 6, y: 4}
+- {kind: flame, prop: fire_idol, x: 30, y: 26}
+- {kind: flame, prop: wall_torch, x: 22, y: 4}
+- {kind: flame, prop: lava_vent, x: 36, y: 28}
+- {kind: flame, prop: cauldron_fire, x: 31, y: 31}

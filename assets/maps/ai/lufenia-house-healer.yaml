@@ -24,14 +24,13 @@ npcs:
   showIf: LUFENIAN_LEARNED
   tint: '#dfe6f5'
 - id: lufenia_patient
-  sprite: villager
+  sprite: luf_citizen_m
   x: 8
   y: 5
   dialog:
   - condition: LUFENIAN_LEARNED
     text: [I climbed the rim to look at the castle and fell. The healer says I was lucky. I was looking at the castle.]
   - text: [Aun'tirel... aun'tirel vasso.]
-  tint: '#dfe6f5'
 transitions:
 - {x: 3, y: 7, targetMap: lufenia, targetEntrance: house_healer}
 name: Healer's House

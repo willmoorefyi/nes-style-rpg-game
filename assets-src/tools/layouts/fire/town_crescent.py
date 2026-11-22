@@ -28,6 +28,7 @@ sys.path.insert(1, str(HERE.parent.parent))
 from common import Grid, write_map  # noqa: E402
 from kit import landmark_parts  # noqa: E402
 from town_common import TURRET, Outdoor, flag  # noqa: E402
+import town_theme as THEME  # noqa: E402
 import town_crescent_people as PEOPLE  # noqa: E402
 import town_crescent_site as SITE  # noqa: E402
 
@@ -208,4 +209,5 @@ Distinct: the town's terraces are cut by rock bands with stone stairs instead of
 Topology: one map, no stairs to other floors: the west land gate -> the Sea Road on the middle terrace; stone stairs
   north to the Star Terrace and south to the Lakeside; the causeway south to the Circle (crescent-circle). No boss.
 ground legend: . grass  : cobble  , dirt  ~ water  = planks  m rock"""
+THEME.apply(doc, "crescent", g)               # AR-W2: the approved town theme (docs/TOWN_THEMES.md)
 print(write_map(SITE.TOWN, HEADER, doc, g.text()))

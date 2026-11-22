@@ -77,16 +77,16 @@ def build() -> list[Path]:
     r.tall("bed", 12, 5)
     r.one("table", 11, 8)
     chime = {"id": "wnd_chime_given", "requiredFlags": [LEARNED], "onceFlag": "CHIME_GIVEN"}
-    r.npc("lufenia_elder", "old_man", 5, 4, [
+    r.npc("lufenia_elder", "luf_senator", 5, 4, [
         {"condition": "CHIME_GIVEN", "text": [
             "The chime will hum as you near the Mirage. Strike it at the inner door, not before.",
             "When you stand in the sky, remember that our makers meant the castle to keep the wind, not cage it."]},
         {"condition": LEARNED, "text": [
             "You read our letters. Then you are the ones the slab was waiting for.",
             "Six hundred years we have kept one thing for the people who would climb the Mirage. Take it now."]},
-        {"text": ["Sae'qat, ven doloth. Lun... thrim?"]}], cutscene=chime, tint=TINT)
-    r.npc("lufenia_attendant", "white_mage", 11, 6, talk([
-        "The elder has not slept since the wind died. He listens for it at the window every night."], 14), tint=TINT)
+        {"text": ["Sae'qat, ven doloth. Lun... thrim?"]}], cutscene=chime)
+    r.npc("lufenia_attendant", "luf_citizen_f", 11, 6, talk([
+        "The elder has not slept since the wind died. He listens for it at the window every night."], 14))
     out.append(r.save(note("the elder's long hall with a carpeted dais and two pillars, an attendant's room beside it",
                            "a dais under three hangings where the chime is kept; a side room off the hall's east end",
                            "two rooms joined by an inner doorway; the door is the only way in or out"),
@@ -109,9 +109,9 @@ def build() -> list[Path]:
     r.npc("lufenia-healer-keeper", "white_mage", 3, 3,
           ["Fallen friends? Lay them here. The wind's breath can still be called back."],
           action="clinic", clinicPrice=150, showIf=LEARNED, tint=TINT)       # GAP-16, B8: 150 G per level
-    r.npc("lufenia_patient", "villager", 8, 5, talk([
+    r.npc("lufenia_patient", "luf_citizen_m", 8, 5, talk([
         "I climbed the rim to look at the castle and fell. The healer says I was lucky. I was looking at the castle."],
-        15), tint=TINT)
+        15))
     out.append(r.save(note("a healer's ward of cots under shelves of salves",
                            "three cots along the back wall; a white orb by the door that the healer calls on"),
                       {"floor_stone": "marble", **PALE}, [200, 215, 235]))

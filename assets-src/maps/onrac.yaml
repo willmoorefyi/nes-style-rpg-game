@@ -79,8 +79,8 @@ objects:
   y: 8
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: onr_coral
+  wall: onr_coral
   sign: white_magic
   enter: {map: onrac-white-magic, entrance: door}
 - type: house
@@ -92,8 +92,8 @@ objects:
   y: 8
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
   sign: black_magic
   chimney: 3
   enter: {map: onrac-black-magic, entrance: door}
@@ -106,8 +106,8 @@ objects:
   y: 9
   h: 4
   storeys: 1
-  roof: slate
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
   chimney: 1
   enter: {map: onrac-house-bellringer, entrance: door}
 - type: house
@@ -119,8 +119,8 @@ objects:
   y: 9
   h: 4
   storeys: 1
-  roof: brown
-  wall: plaster
+  roof: onr_coral
+  wall: onr_coral
   chimney: 3
   enter: {map: onrac-house-netmender, entrance: door}
 - type: house
@@ -132,8 +132,8 @@ objects:
   y: 8
   h: 5
   storeys: 2
-  roof: brown
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
   sign: weapon
   chimney: 1
   enter: {map: onrac-weapon-shop, entrance: door}
@@ -146,8 +146,8 @@ objects:
   y: 8
   h: 5
   storeys: 2
-  roof: slate
-  wall: plaster
+  roof: onr_coral
+  wall: onr_coral
   sign: armor
   enter: {map: onrac-armor-shop, entrance: door}
 - type: house
@@ -159,8 +159,8 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: brown
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
   chimney: 1
   enter: {map: onrac-house-smoker, entrance: door}
 - type: house
@@ -172,13 +172,13 @@ objects:
   y: 19
   h: 4
   storeys: 1
-  roof: teal
-  wall: plaster
+  roof: onr_coral
+  wall: onr_coral
   sign: item
   chimney: 3
   enter: {map: onrac-item-shop, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_onr_coral
   name: inn
   x: 30
   y: 18
@@ -196,8 +196,8 @@ objects:
   y: 26
   h: 5
   storeys: 2
-  roof: slate
-  wall: white
+  roof: onr_coral
+  wall: onr_coral
   sign: shrine
   enter: {map: onrac-house-healer, entrance: door}
 - type: house
@@ -209,8 +209,8 @@ objects:
   y: 27
   h: 4
   storeys: 1
-  roof: brown
-  wall: plaster
+  roof: onr_coral
+  wall: onr_coral
   chimney: 3
   enter: {map: onrac-house-tanner, entrance: door}
 - type: house
@@ -221,8 +221,8 @@ objects:
   x: 16
   y: 27
   h: 4
-  roof: slate
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
 - type: house
   w: 5
   door: 2
@@ -231,8 +231,8 @@ objects:
   x: 27
   y: 27
   h: 4
-  roof: teal
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
 - type: house
   w: 5
   door: 2
@@ -242,8 +242,8 @@ objects:
   y: 16
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: onr_coral
+  wall: onr_coral_sea
   chimney: 3
   enter: {map: onrac-house-shipwright, entrance: door}
 - type: deco
@@ -459,6 +459,33 @@ objects:
   on_water: true
   collide: alpha
   waterline: 62
+- type: deco
+  parts:
+  - [onr_netrack_0_0]
+  - [onr_netrack_1_0]
+  x: 22
+  y: 11
+  collide: alpha
+- type: deco
+  parts:
+  - [onr_shells_0_0]
+  x: 11
+  y: 25
+  collide: alpha
+- type: deco
+  parts:
+  - [onr_lantern_0_0]
+  - [onr_lantern_1_0]
+  x: 36
+  y: 19
+  collide: alpha
+- type: deco
+  parts:
+  - [onr_lantern_0_0]
+  - [onr_lantern_1_0]
+  x: 16
+  y: 21
+  collide: alpha
 npcs:
 - id: onrac_gate_watch
   sprite: guard
