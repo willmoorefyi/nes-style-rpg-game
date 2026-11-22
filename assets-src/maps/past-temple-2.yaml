@@ -142,6 +142,63 @@ objects:
   - [fiend_statue_bottom]
   x: 24
   y: 3
+- type: deco
+  parts:
+  - [ar_bookshelf_ruined_0_0, ar_bookshelf_ruined_0_1]
+  - [ar_bookshelf_ruined_1_0, ar_bookshelf_ruined_1_1]
+  x: 18
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 25
+  y: 35
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 36
+  y: 18
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 6
+  y: 18
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 19
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 25
+  y: 15
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 12
+  y: 17
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 16
+  y: 38
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 23
+  y: 7
 npcs:
 - id: ward_hub
   sprite: mage
@@ -265,3 +322,8 @@ keyItemGates:
   requiredFlags: [PST_WARD_WEST]
   permanent: false
   message: A ward of pale light fills the north arm's door. Heat beats against it from the far side.
+ambient:
+- {kind: flame, prop: candelabra, x: 36, y: 18}
+- {kind: flame, prop: wall_torch, x: 19, y: 28}
+- {kind: flame, prop: fiend_brazier, x: 16, y: 38}
+- {kind: flame, prop: fiend_brazier, x: 23, y: 7}

@@ -109,6 +109,44 @@ objects:
   x: 20
   y: 12
   fit: true
+- type: deco
+  parts:
+  - [ar_fire_idol_0_0]
+  - [ar_fire_idol_1_0]
+  x: 12
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fire_idol_0_0]
+  - [ar_fire_idol_1_0]
+  x: 25
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_brazier_tall_0_0]
+  - [ar_brazier_tall_1_0]
+  x: 4
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 3
+  y: 23
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 26
+  y: 23
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_lava_vent_0_0]
+  x: 14
+  y: 14
 npcs:
 - id: chest_court_west
   sprite: chest
@@ -199,3 +237,10 @@ hazards:
   - [22, 25, 24, 25]
   - [5, 26, 7, 26]
   - [22, 26, 24, 26]
+ambient:
+- {kind: flame, prop: fire_idol, x: 12, y: 3}
+- {kind: flame, prop: fire_idol, x: 25, y: 11}
+- {kind: flame, prop: brazier_tall, x: 4, y: 11}
+- {kind: flame, prop: wall_torch, x: 3, y: 23}
+- {kind: flame, prop: wall_torch, x: 26, y: 23}
+- {kind: flame, prop: lava_vent, x: 14, y: 14}

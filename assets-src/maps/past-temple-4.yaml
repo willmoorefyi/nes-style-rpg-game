@@ -93,6 +93,44 @@ objects:
   x: 18
   y: 16
   walkable_rows: [0]
+- type: deco
+  parts:
+  - [ar_ruin_column_rune_0_0]
+  - [ar_ruin_column_rune_1_0]
+  x: 6
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_hanging_0_0]
+  - [ar_cage_hanging_1_0]
+  x: 31
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 15
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 4
+  y: 30
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 28
+  y: 30
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_fiend_brazier_0_0]
+  x: 18
+  y: 20
 npcs:
 - id: chest_spiral_outer_east
   sprite: chest
@@ -175,3 +213,7 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: pst_seraph_falls
   message: The blades stop turning, and every one of them turns toward you.
+ambient:
+- {kind: flame, prop: candelabra, x: 15, y: 11}
+- {kind: flame, prop: wall_torch, x: 4, y: 30}
+- {kind: flame, prop: fiend_brazier, x: 18, y: 20}

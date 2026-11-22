@@ -143,6 +143,59 @@ objects:
   - [brazier]
   x: 17
   y: 28
+- type: deco
+  parts:
+  - [ar_magma_mound_0_0, ar_magma_mound_0_1]
+  x: 12
+  y: 27
+- type: deco
+  parts:
+  - [ar_fire_idol_0_0]
+  - [ar_fire_idol_1_0]
+  x: 14
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_brazier_tall_0_0]
+  - [ar_brazier_tall_1_0]
+  x: 21
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_obsidian_spire_0_0]
+  - [ar_obsidian_spire_1_0]
+  x: 20
+  y: 8
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 9
+  y: 12
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 28
+  y: 19
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_lava_vent_0_0]
+  x: 3
+  y: 21
+- type: deco
+  parts:
+  - [ar_barrels_0_0]
+  x: 12
+  y: 36
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 20
+  y: 24
 npcs:
 - id: chest_forge_anvil
   sprite: chest
@@ -225,3 +278,10 @@ hazards:
   - [9, 34, 11, 34]
   - [9, 35, 11, 35]
   - [9, 36, 11, 36]
+ambient:
+- {kind: flame, prop: magma_mound, x: 12, y: 27}
+- {kind: flame, prop: fire_idol, x: 14, y: 3}
+- {kind: flame, prop: brazier_tall, x: 21, y: 16}
+- {kind: flame, prop: wall_torch, x: 9, y: 12}
+- {kind: flame, prop: wall_torch, x: 28, y: 19}
+- {kind: flame, prop: lava_vent, x: 3, y: 21}

@@ -170,6 +170,37 @@ objects:
   - [fallen_l, fallen_r]
   x: 22
   y: 27
+- type: deco
+  parts:
+  - [ar_ice_pillar_0_0]
+  - [ar_ice_pillar_1_0]
+  x: 26
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ice_spire_0_0]
+  - [ar_ice_spire_1_0]
+  x: 20
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_frozen_knight_0_0]
+  - [ar_frozen_knight_1_0]
+  x: 2
+  y: 25
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ice_shards_0_0]
+  x: 36
+  y: 23
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 6
+  y: 17
 npcs:
 - id: chest_fir_d2_b3_cleft
   sprite: chest

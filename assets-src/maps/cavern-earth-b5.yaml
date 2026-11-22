@@ -133,6 +133,42 @@ objects:
   - [brazier]
   x: 17
   y: 28
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 9
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 11
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 23
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 7
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_crystal_cluster_0_0]
+  x: 19
+  y: 12
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 10
+  y: 9
 npcs:
 - id: chest_ert_d_b5_drift_w
   sprite: chest
@@ -200,3 +236,6 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: ert_lich_falls
   message: 'The Sovereign stands, and the cavern walls bulge: two shapes of living rock tear free to stand at his side.'
+ambient:
+- {kind: flame, prop: wall_torch, x: 23, y: 2}
+- {kind: flame, prop: wall_torch, x: 7, y: 16}

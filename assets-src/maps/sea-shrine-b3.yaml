@@ -196,6 +196,37 @@ objects:
   - [skulls]
   x: 3
   y: 16
+- type: deco
+  parts:
+  - [ar_bookshelf_ruined_0_0, ar_bookshelf_ruined_0_1]
+  - [ar_bookshelf_ruined_1_0, ar_bookshelf_ruined_1_1]
+  x: 8
+  y: 7
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 40
+  y: 7
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 26
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 10
+  y: 24
+- type: deco
+  parts:
+  - [ar_skeleton_slumped_0_0]
+  x: 26
+  y: 24
 npcs:
 - id: chest_wat_d_b3_berth
   sprite: chest
@@ -265,3 +296,5 @@ inspect:
   y: 2
   text: ['A mural over the font: a king with a crown of shells, walking down into the sea, and a city following him under the waves, roof by roof.',
     'Below it, cut later and less carefully: HE SAVED US FROM THE STORM BY GIVING US TO THE SEA.']
+ambient:
+- {kind: flame, prop: candelabra, x: 26, y: 5}

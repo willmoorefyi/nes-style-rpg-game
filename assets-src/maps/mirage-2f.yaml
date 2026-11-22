@@ -150,6 +150,36 @@ objects:
   x: 9
   y: 20
   on_wall: true
+- type: deco
+  parts:
+  - [ar_obelisk_0_0]
+  - [ar_obelisk_1_0]
+  x: 27
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_standing_torch_0_0]
+  - [ar_standing_torch_1_0]
+  x: 5
+  y: 21
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 9
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_sand_urn_0_0]
+  x: 28
+  y: 26
+- type: deco
+  parts:
+  - [ar_sun_brazier_0_0]
+  x: 26
+  y: 15
 npcs:
 - id: chest_north_spur
   sprite: chest
@@ -200,3 +230,7 @@ no_static_chokepoints: true
 no_unreachable_walkable: true
 canSave: true
 exit: {map: overworld, entrance: wnd_mirage}
+ambient:
+- {kind: flame, prop: standing_torch, x: 5, y: 21}
+- {kind: flame, prop: wall_torch, x: 9, y: 3}
+- {kind: flame, prop: sun_brazier, x: 26, y: 15}

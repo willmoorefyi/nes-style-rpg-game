@@ -1044,3 +1044,15 @@
 {"event": "result", "key": "12bc7728c31f0cf3714b1f45", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
 {"event": "request", "ts": "2026-11-21T13:22:21", "tool": "argen.py", "model": "structure", "purpose": "ar_npc", "seed": 3, "key": "35d883af5646fcb941283d90", "pass": "AR"}
 {"event": "result", "key": "35d883af5646fcb941283d90", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-21T22:54:22", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 11, "key": "2dcc06d2c7db940c92082e5f", "pass": "AR"}
+{"event": "result", "key": "2dcc06d2c7db940c92082e5f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T22:54:34", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 12, "key": "5435c8a4115c76ded7f9a256", "pass": "AR"}
+{"event": "result", "key": "5435c8a4115c76ded7f9a256", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T22:54:45", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 13, "key": "9731a5e84f1245b175817526", "pass": "AR"}
+{"event": "result", "key": "9731a5e84f1245b175817526", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T22:54:56", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 21, "key": "1f25586e04a155141ecf2ec4", "pass": "AR"}
+{"event": "result", "key": "1f25586e04a155141ecf2ec4", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T22:55:07", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 22, "key": "9999b08c0b9fb3fe4fc7812c", "pass": "AR"}
+{"event": "result", "key": "9999b08c0b9fb3fe4fc7812c", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-21T22:55:17", "tool": "reroll.py", "model": "ultra", "purpose": "ar_props", "seed": 23, "key": "98c3bdab1be9abe4f0c5e51f", "pass": "AR"}
+{"event": "result", "key": "98c3bdab1be9abe4f0c5e51f", "ok": true, "served": "stability.stable-image-ultra-v1:1"}

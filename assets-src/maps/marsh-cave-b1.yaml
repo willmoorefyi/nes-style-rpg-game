@@ -140,6 +140,40 @@ objects:
   - [tpillar_broken_bottom]
   x: 24
   y: 4
+- type: deco
+  parts:
+  - [ar_stone_coffin_0_0]
+  - [ar_stone_coffin_1_0]
+  x: 16
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_hanging_0_0]
+  - [ar_cage_hanging_1_0]
+  x: 23
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_bog_lantern_0_0]
+  x: 18
+  y: 26
+- type: deco
+  parts:
+  - [ar_mushrooms_glow_0_0]
+  x: 31
+  y: 17
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 7
+  y: 15
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 23
+  y: 26
 npcs:
 - id: chest_elf_d_b1_west
   sprite: chest
@@ -212,3 +246,6 @@ hazards:
   - [33, 21, 35, 24]
   - [8, 23, 12, 24]
   damage: 1
+ambient:
+- {kind: flame, prop: bog_lantern, x: 18, y: 26}
+- {kind: flame, prop: mushrooms_glow, x: 31, y: 17}

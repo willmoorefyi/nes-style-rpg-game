@@ -116,6 +116,42 @@ objects:
   - [gold_heap]
   x: 18
   y: 10
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 11
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 27
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 18
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 12
+  y: 18
+- type: deco
+  parts:
+  - [ar_barrel_tipped_0_0]
+  x: 24
+  y: 18
+- type: deco
+  parts:
+  - [ar_skeleton_slumped_0_0]
+  x: 7
+  y: 11
 npcs:
 - id: chest_wat_d_b1_west
   sprite: chest
@@ -183,3 +219,5 @@ inspect:
   y: 1
   text: ['Fresh water drips from a crack in the dome, one drop at a time, into a shell set there to catch it.', Someone has worn a smooth seat
       into the rock beside it.]
+ambient:
+- {kind: flame, prop: candelabra, x: 27, y: 5}

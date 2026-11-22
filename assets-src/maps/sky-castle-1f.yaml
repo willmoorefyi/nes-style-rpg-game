@@ -130,6 +130,37 @@ objects:
   - [statue_bottom]
   x: 26
   y: 29
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 9
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 34
+  y: 10
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 11
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 29
+  y: 29
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 21
+  y: 7
 npcs:
 - id: chest_berth_north
   sprite: chest
@@ -192,3 +223,7 @@ inspect:
   y: 19
   text: ['A chart of the castle''s berths is cut into the table. Every berth is marked with a ship''s name, and every name has been scratched
       through.']
+ambient:
+- {kind: flame, prop: light_pylon, x: 9, y: 5}
+- {kind: flame, prop: light_pylon, x: 11, y: 28}
+- {kind: flame, prop: console, x: 29, y: 29}

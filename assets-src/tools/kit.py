@@ -171,7 +171,10 @@ def landmark_parts(name: str) -> list[list[str]]:
 
 _LANDMARK_CELL = {p: (n, r, c) for n in LANDMARKS for r, row in enumerate(landmark_parts(n)) for c, p in enumerate(row)}
 
-PART_NAMES = tuple(_PARTS) + tuple(_LANDMARK_CELL)
+sys.path.insert(0, str(Path(__file__).resolve().parent)) if str(Path(__file__).resolve().parent) not in sys.path else None
+import kit_props as KP  # noqa: E402  (AR-P2: the dungeon props, ar_<id>_<r>_<c>)
+
+PART_NAMES = tuple(_PARTS) + tuple(_LANDMARK_CELL) + tuple(KP.CELLS)
 
 
 def _font():
@@ -263,6 +266,8 @@ def placeholder_landmark(name: str) -> Image.Image:
 
 
 def placeholder_part(name: str) -> Image.Image:
+    if name in KP.CELLS:
+        return KP.placeholder(name)
     if name in _LANDMARK_CELL:
         lm, r, c = _LANDMARK_CELL[name]
         return placeholder_landmark(lm).crop((c * T, r * T, (c + 1) * T, (r + 1) * T))
@@ -441,8 +446,8 @@ def load_kit(kit_id: str, approved_dir: Path = APPROVED, placeholders_only: bool
     root = approved_dir / kit_id
     if placeholders_only:
         return kit
-    for name, cell in approved_landmarks(approved_dir).items():
-        kit.parts[name] = cell
+    for name, cell in {**approved_landmarks(approved_dir), **KP.approved(approved_dir)}.items():
+        kit.parts[name] = cell                         # the landmark and dungeon-prop sheets, in every kit
         kit.approved.add(name)
     if not root.is_dir():
         return kit

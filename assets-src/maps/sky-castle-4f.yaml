@@ -160,6 +160,37 @@ objects:
   - [tpillar_broken_bottom]
   x: 22
   y: 6
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 8
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 39
+  y: 12
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 8
+  y: 21
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 24
+  y: 5
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 23
+  y: 23
 npcs:
 - id: chest_bay_north
   sprite: chest
@@ -241,3 +272,7 @@ inspect:
 - x: 22
   y: 7
   text: ['A piston lies snapped in two, its iron scored by something that walks on more feet than a man. The scoring runs on down the hall.']
+ambient:
+- {kind: flame, prop: light_pylon, x: 39, y: 12}
+- {kind: flame, prop: light_pylon, x: 8, y: 21}
+- {kind: flame, prop: console, x: 24, y: 5}

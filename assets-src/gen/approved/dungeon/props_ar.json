@@ -1,0 +1,2602 @@
+{
+  "kit": "dungeon",
+  "sheet": "props_ar",
+  "backend": "bedrock",
+  "tool": "assets-src/gen/prop_cut.py",
+  "approved": "2026-11-21",
+  "tile": 48,
+  "cells": [
+    [
+      "ar_wall_torch_0_0",
+      "ar_standing_torch_0_0",
+      "ar_brazier_tall_0_0",
+      "ar_candelabra_0_0",
+      "ar_cauldron_brew_0_0",
+      "ar_cauldron_fire_0_0",
+      "ar_fiend_brazier_0_0",
+      "ar_sun_brazier_0_0",
+      "ar_bog_lantern_0_0",
+      "ar_fire_idol_0_0",
+      "ar_lava_vent_0_0",
+      "ar_magma_mound_0_0",
+      "ar_magma_mound_0_1",
+      "ar_mushrooms_glow_0_0",
+      "ar_console_0_0",
+      "ar_light_pylon_0_0"
+    ],
+    [
+      null,
+      "ar_standing_torch_1_0",
+      "ar_brazier_tall_1_0",
+      "ar_candelabra_1_0",
+      null,
+      null,
+      null,
+      null,
+      null,
+      "ar_fire_idol_1_0",
+      null,
+      null,
+      null,
+      null,
+      null,
+      "ar_light_pylon_1_0"
+    ],
+    [
+      "ar_portcullis_closed_0_0",
+      "ar_portcullis_closed_0_1",
+      "ar_portcullis_open_0_0",
+      "ar_portcullis_open_0_1",
+      "ar_iron_door_0_0",
+      "ar_iron_door_0_1",
+      "ar_bar_gate_0_0",
+      "ar_bar_gate_0_1",
+      "ar_cage_floor_0_0",
+      "ar_cage_hanging_0_0",
+      "ar_wall_chains_0_0",
+      "ar_cobweb_0_0",
+      "ar_bone_pile_0_0",
+      "ar_skull_0_0",
+      "ar_skeleton_slumped_0_0",
+      "ar_barrels_0_0"
+    ],
+    [
+      "ar_portcullis_closed_1_0",
+      "ar_portcullis_closed_1_1",
+      "ar_portcullis_open_1_0",
+      "ar_portcullis_open_1_1",
+      "ar_iron_door_1_0",
+      "ar_iron_door_1_1",
+      "ar_bar_gate_1_0",
+      "ar_bar_gate_1_1",
+      null,
+      "ar_cage_hanging_1_0",
+      "ar_wall_chains_1_0",
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ar_barrel_tipped_0_0",
+      "ar_bookshelf_ruined_0_0",
+      "ar_bookshelf_ruined_0_1",
+      "ar_crystal_cluster_0_0",
+      "ar_crystal_tall_0_0",
+      "ar_mine_cart_gold_0_0",
+      "ar_mine_cart_ore_0_0",
+      "ar_stalagmite_0_0",
+      "ar_obsidian_spire_0_0",
+      "ar_ice_pillar_0_0",
+      "ar_ice_spire_0_0",
+      "ar_ice_shards_0_0",
+      "ar_frozen_knight_0_0",
+      "ar_ice_block_0_0",
+      "ar_coral_pink_0_0",
+      "ar_kelp_0_0"
+    ],
+    [
+      null,
+      "ar_bookshelf_ruined_1_0",
+      "ar_bookshelf_ruined_1_1",
+      null,
+      "ar_crystal_tall_1_0",
+      null,
+      null,
+      "ar_stalagmite_1_0",
+      "ar_obsidian_spire_1_0",
+      "ar_ice_pillar_1_0",
+      "ar_ice_spire_1_0",
+      null,
+      "ar_frozen_knight_1_0",
+      null,
+      null,
+      "ar_kelp_1_0"
+    ],
+    [
+      "ar_clam_altar_0_0",
+      "ar_clam_altar_0_1",
+      "ar_pipes_0_0",
+      "ar_robot_husk_0_0",
+      "ar_sand_urn_0_0",
+      "ar_obelisk_0_0",
+      "ar_ruin_column_rune_0_0",
+      "ar_sealed_coffin_0_0",
+      "ar_stone_coffin_0_0",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      "ar_clam_altar_1_0",
+      "ar_clam_altar_1_1",
+      "ar_pipes_1_0",
+      null,
+      null,
+      "ar_obelisk_1_0",
+      "ar_ruin_column_rune_1_0",
+      "ar_sealed_coffin_1_0",
+      "ar_stone_coffin_1_0",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "materials": {},
+  "props": {
+    "wall_torch": {
+      "tag": "torch_ultra_11",
+      "cache_key": "2dcc06d2c7db940c92082e5f",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 11,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        34,
+        43
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 17,
+        "y": 6,
+        "rows": [
+          "......1.......",
+          "......1.......",
+          ".......13.....",
+          ".......113....",
+          "......1111....",
+          ".....11113....",
+          "....11113.....",
+          "...111313.....",
+          "...113311.....",
+          "..311.3111....",
+          "...33.3111....",
+          "..133.3331....",
+          "..133..3331...",
+          ".1333..33311..",
+          "1133....3331..",
+          "133......333..",
+          "333......3331.",
+          "..............",
+          "..............",
+          ".............1"
+        ],
+        "tongue": true,
+        "glow": 40,
+        "rect": [
+          0,
+          0,
+          1,
+          0.5
+        ]
+      },
+      "at": [
+        0,
+        0
+      ]
+    },
+    "standing_torch": {
+      "tag": "wall_torch2_ultra_2",
+      "cache_key": "14237c1b59c9149369d267f0",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        18,
+        87
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 16,
+        "y": 9,
+        "rows": [
+          "......1.........",
+          ".....11.........",
+          "....1...........",
+          ".....11.........",
+          "....111.........",
+          ".....1111.......",
+          ".......111......",
+          ".......111......",
+          ".......111......",
+          ".......1111.....",
+          "...11.1111111...",
+          "...1111131111...",
+          "...1111331111...",
+          "..11111333311...",
+          "...111133331.1..",
+          "..1111333.311.1.",
+          "1.111333..311...",
+          ".111333....311..",
+          ".11133.....31111",
+          ".11333.....3111.",
+          ".133........331.",
+          "..133.......331.",
+          "................",
+          ".......11......."
+        ],
+        "tongue": true,
+        "glow": 40,
+        "rect": [
+          0,
+          0,
+          1,
+          0.4
+        ]
+      },
+      "at": [
+        0,
+        1
+      ]
+    },
+    "brazier_tall": {
+      "tag": "brazier_tall2_ultra_2",
+      "cache_key": "ccbc137f3ffb3769db36f61a",
+      "object": 1,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        33,
+        87
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 11,
+        "y": 10,
+        "rows": [
+          "..........1.....2........",
+          "..........1....41........",
+          "..........11...21........",
+          "..........11...21........",
+          "..........111..412.......",
+          ".........1111...114......",
+          ".......411111.....1......",
+          "......1124111.....1......",
+          "......11211221...422.....",
+          ".....211112221111222.....",
+          ".....1211112211112212....",
+          "2....121242142112221....2",
+          ".....122442144212221.....",
+          "....11444442244442111....",
+          ".212122444444444221......"
+        ],
+        "tongue": true,
+        "glow": 40,
+        "rect": [
+          0,
+          0,
+          1,
+          0.35
+        ]
+      },
+      "at": [
+        0,
+        2
+      ]
+    },
+    "candelabra": {
+      "tag": "candelabra_ultra_1",
+      "cache_key": "a9797047fa588a2533505b72",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        24,
+        87
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 14,
+        "y": 10,
+        "rows": [
+          ".........11.........",
+          ".........11.........",
+          ".........11.........",
+          ".........11.........",
+          "..........1.........",
+          "....................",
+          "....................",
+          "....................",
+          ".1................11",
+          "11................11",
+          "11................11",
+          "1..................1",
+          "....................",
+          "....................",
+          "....................",
+          "....................",
+          "....................",
+          "....................",
+          "..........1.........",
+          "....................",
+          "....................",
+          "..........11........"
+        ],
+        "tongue": true,
+        "glow": 26,
+        "rect": [
+          0,
+          0,
+          1,
+          0.3
+        ]
+      },
+      "at": [
+        0,
+        3
+      ]
+    },
+    "cauldron_brew": {
+      "tag": "wall_torch_cauldron_ultra_1",
+      "cache_key": "8d61b82e6d07294deff3f1f0",
+      "object": 3,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        28,
+        41
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "green",
+        "x": 15,
+        "y": 9,
+        "rows": [
+          "..........2.2......",
+          "...2.....2..1......",
+          "..2.2....22211.12..",
+          ".1..21...121111..1.",
+          ".12211...111111.11.",
+          "..1111121222211211.",
+          "2222222..2.22222222",
+          "12..............21.",
+          "........2.........."
+        ],
+        "tongue": false,
+        "glow": 26,
+        "rect": [
+          0,
+          0,
+          1,
+          0.6
+        ]
+      },
+      "at": [
+        0,
+        4
+      ]
+    },
+    "cauldron_fire": {
+      "tag": "wall_torch_cauldron_ultra_1",
+      "cache_key": "8d61b82e6d07294deff3f1f0",
+      "object": 1,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        21,
+        41
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 18,
+        "y": 8,
+        "rows": [
+          "....11.....",
+          "...11......",
+          "..111......",
+          "..111..3...",
+          "..1113.1...",
+          "..111111...",
+          "..111111...",
+          "...11113...",
+          ".131111....",
+          ".1113111...",
+          ".1113311...",
+          ".11133111..",
+          "1113333111.",
+          "1133333311.",
+          "1133.333311",
+          "133....3311",
+          "333.33.3331"
+        ],
+        "tongue": false,
+        "glow": 34,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        5
+      ]
+    },
+    "fiend_brazier": {
+      "tag": "fiend_brazier_ultra_1",
+      "cache_key": "96af8232203b9b629b8c2c63",
+      "object": 1,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        34,
+        41
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "purple",
+        "x": 13,
+        "y": 7,
+        "rows": [
+          "......1................",
+          ".....11................",
+          "....111.........33.....",
+          "...111..........31..1..",
+          "...113...........11.11.",
+          "...11............311.11",
+          ".3113...11.......311..1",
+          "1111..............111..",
+          "111...............111..",
+          "1113..1...........131..",
+          ".1333133..3......3331..",
+          "....13333.331..3333...."
+        ],
+        "tongue": true,
+        "glow": 34,
+        "rect": [
+          0,
+          0,
+          1,
+          0.55
+        ]
+      },
+      "at": [
+        0,
+        6
+      ]
+    },
+    "sun_brazier": {
+      "tag": "sun_brazier_ultra_1",
+      "cache_key": "8e6d00cec0e6b278e8a812f7",
+      "object": 2,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        29,
+        41
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 14,
+        "y": 8,
+        "rows": [
+          ".........2..........",
+          ".........2..........",
+          ".........2..........",
+          ".........22.........",
+          ".........222........",
+          ".........222........",
+          "........22221.......",
+          ".......122222.......",
+          "...111.22222..1.....",
+          "1......22.22......2.",
+          "......221.222.......",
+          "......21..122.......",
+          "......21....1.......",
+          "....11.......11.....",
+          "11...............211",
+          "...11..........11..."
+        ],
+        "tongue": true,
+        "glow": 34,
+        "rect": [
+          0.15,
+          0,
+          0.85,
+          0.42
+        ]
+      },
+      "at": [
+        0,
+        7
+      ]
+    },
+    "bog_lantern": {
+      "tag": "bog_lantern_ultra_1",
+      "cache_key": "8d1858cb280ed25386a41943",
+      "object": 3,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.95,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        40,
+        46
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "lamp",
+        "x": 15,
+        "y": 11,
+        "rows": [
+          ".......11",
+          ".......11",
+          ".......11",
+          ".111...11",
+          ".11131.11",
+          ".33331.11",
+          "133331..1",
+          "133331..1",
+          "13..31..1",
+          "1...31..1",
+          "313..3..1",
+          "........1",
+          "........1",
+          "........1",
+          ".........",
+          ".........",
+          ".........",
+          ".........",
+          "....1...."
+        ],
+        "tongue": false,
+        "glow": 26,
+        "rect": [
+          0,
+          0.2,
+          0.55,
+          0.62
+        ]
+      },
+      "at": [
+        0,
+        8
+      ]
+    },
+    "fire_idol": {
+      "tag": "fire_idol_ultra_1",
+      "cache_key": "7ddd3af3d85c64a7b6d26cf8",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.7,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        34,
+        49
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 11,
+        "y": 47,
+        "rows": [
+          "..............1..............",
+          ".............1...............",
+          "............11........3......",
+          "...1.......11........13......",
+          "...........31................",
+          "..........1313...............",
+          "..........13333..............",
+          "........1.31333..1...........",
+          "........1..11131.1...........",
+          "........1.31311111...........",
+          "3......1311131.1131..........",
+          ".......1313331.3131.........1",
+          "......1.33311..1333.........."
+        ],
+        "tongue": true,
+        "glow": 34,
+        "rect": [
+          0,
+          0,
+          1,
+          0.28
+        ]
+      },
+      "at": [
+        0,
+        9
+      ]
+    },
+    "lava_vent": {
+      "tag": "lava_vent_ultra_1",
+      "cache_key": "77035343fd8f73f1d4ee7fb6",
+      "object": 2,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        36
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 19,
+        "y": 18,
+        "rows": [
+          "......1........",
+          "......1........",
+          ".....11........",
+          ".....11........",
+          "....111........",
+          "....111........",
+          "....1111.......",
+          "....1111.......",
+          "....1111.......",
+          "....1111.......",
+          "...11111.......",
+          "..1114111......",
+          "..1114111......",
+          "1111441111.....",
+          "1144444411.....",
+          "..4444441......",
+          "...44444.......",
+          ".......4.......",
+          "........11.....",
+          ".........111...",
+          "............11.",
+          "..............1"
+        ],
+        "tongue": false,
+        "glow": 34,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        10
+      ]
+    },
+    "magma_mound": {
+      "tag": "lava_vent_ultra_1",
+      "cache_key": "77035343fd8f73f1d4ee7fb6",
+      "object": 3,
+      "cells": [
+        2,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        61,
+        43
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "fire",
+        "x": 42,
+        "y": 8,
+        "rows": [
+          ".......111.",
+          "....1111111",
+          "....1111111",
+          "1111111111.",
+          ".11111111..",
+          ".11111111..",
+          "..1111111..",
+          "..111111...",
+          "..111111...",
+          "...11111...",
+          "...1111....",
+          "....111....",
+          "....111....",
+          "....111....",
+          "....111....",
+          "....111....",
+          "....11.....",
+          "....11.....",
+          ".....1.....",
+          ".....1.....",
+          ".....11....",
+          ".....11....",
+          ".....11....",
+          ".....11....",
+          ".....11....",
+          "......1....",
+          "......11...",
+          "......11...",
+          ".....1111..",
+          "....111111."
+        ],
+        "tongue": false,
+        "glow": 40,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        11
+      ]
+    },
+    "mushrooms_glow": {
+      "tag": "mushrooms_glow_ultra_1",
+      "cache_key": "74946855990ce6e3e2cfaa78",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        36
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "green",
+        "x": 7,
+        "y": 12,
+        "rows": [
+          "..............223...............",
+          ".............22322..............",
+          "............3123213......222....",
+          "...........2..1211.2...32.321...",
+          "....................3.22333211..",
+          "...................2332233221...",
+          "............332.233.31112221....",
+          "....32333..........1..111111..2.",
+          "...31233323.....3.2.....11......",
+          "....12333222...33.3............1",
+          "..1.1122221.12.33..2............",
+          ".3..111111....333....321.......1",
+          "3............1.33.........3.....",
+          "...........13..333..............",
+          "1......11......233.111..........",
+          "..333...........33..............",
+          "...............13...............",
+          "................1....1..........",
+          "................................",
+          "................................",
+          "...................1............",
+          "..............1................."
+        ],
+        "tongue": false,
+        "glow": 26,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        13
+      ]
+    },
+    "console": {
+      "tag": "console_light_pillar_ultra_1",
+      "cache_key": "b341dc07a71e654739fcd46a",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        43
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "cyan",
+        "x": 16,
+        "y": 13,
+        "rows": [
+          "....1222221....12......",
+          "...22...222....2.......",
+          "...22..2222.....1......",
+          "...22222222............",
+          "...22222222............",
+          "...22222221............",
+          "....1111...............",
+          ".......................",
+          "...................12..",
+          ".......1.211...1....11.",
+          "....1..11.22.......1112",
+          "2.1...1..1.11.1........",
+          "121...11..1............",
+          ".......................",
+          ".......................",
+          ".......................",
+          ".......................",
+          ".......................",
+          ".......................",
+          ".......................",
+          "........11.............",
+          "........1..............",
+          "........11....12......."
+        ],
+        "tongue": false,
+        "glow": 26,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        14
+      ]
+    },
+    "light_pylon": {
+      "tag": "console_light_pillar_ultra_1",
+      "cache_key": "b341dc07a71e654739fcd46a",
+      "object": 2,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        37,
+        82
+      ],
+      "approved": "2026-11-21",
+      "flame": {
+        "style": "cyan",
+        "x": 20,
+        "y": 27,
+        "rows": [
+          ".....1..",
+          ".111111.",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "111...11",
+          "1111..11",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "1.111111",
+          "1..11111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "111...11",
+          "111...11",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "11111111",
+          "111..111",
+          "111...11",
+          "111...11",
+          "11111111",
+          ".111111.",
+          "..1111.."
+        ],
+        "tongue": false,
+        "glow": 34,
+        "rect": [
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "at": [
+        0,
+        15
+      ]
+    },
+    "portcullis_closed": {
+      "tag": "portcullis_closed2_ultra_2",
+      "cache_key": "c3dc513e17a1ad5a67a7696a",
+      "object": 0,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        87,
+        84
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        0
+      ]
+    },
+    "portcullis_open": {
+      "tag": "portcullis_open2_ultra_2",
+      "cache_key": "6de2b4b8ac73f81d051d1c63",
+      "object": 1,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        87,
+        80
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        2
+      ]
+    },
+    "iron_door": {
+      "tag": "iron_ultra_1",
+      "cache_key": "ff1ae9b19d2bdd9f1c586389",
+      "object": 0,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0,
+        "clean": {
+          "green_y": 0.0
+        }
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        83,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        4
+      ]
+    },
+    "bar_gate": {
+      "tag": "iron_ultra_1",
+      "cache_key": "ff1ae9b19d2bdd9f1c586389",
+      "object": 2,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0,
+        "clean": {
+          "green_y": 0.0
+        }
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        83,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        6
+      ]
+    },
+    "cage_floor": {
+      "tag": "cage_floor_ultra_1",
+      "cache_key": "4ea6214822494e8d6e81088f",
+      "object": 3,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        41,
+        41
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        8
+      ]
+    },
+    "cage_hanging": {
+      "tag": "cage_hanging_ultra_1",
+      "cache_key": "ed9c33b340d186a35fa566e5",
+      "object": 2,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        21,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        9
+      ]
+    },
+    "wall_chains": {
+      "tag": "wall_chains_ultra_1",
+      "cache_key": "d7eafeffd4bb6085333cf1f8",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        17,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        10
+      ]
+    },
+    "cobweb": {
+      "tag": "web_ultra_23_k",
+      "cache_key": "98c3bdab1be9abe4f0c5e51f",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "wall",
+      "model": "ultra",
+      "seed": 23,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0,
+        "web": true
+      },
+      "pixelize": {
+        "fill": 0.95,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        44,
+        46
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        11
+      ]
+    },
+    "bone_pile": {
+      "tag": "bone_pile2_ultra_2",
+      "cache_key": "2e53150bbfe87182a66c2902",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        29
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        12
+      ]
+    },
+    "skull": {
+      "tag": "bone_pile_rubble_ultra_1",
+      "cache_key": "6e7f8e5ea8ff7dfad0919147",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.5,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        25,
+        18
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        13
+      ]
+    },
+    "skeleton_slumped": {
+      "tag": "skeleton_slumped_ultra_1",
+      "cache_key": "e988c951e234896ed561573b",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        34
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        14
+      ]
+    },
+    "barrels": {
+      "tag": "barrels_crates_ultra_1",
+      "cache_key": "22626eadcade4aa342ca4f91",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        31
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        2,
+        15
+      ]
+    },
+    "barrel_tipped": {
+      "tag": "barrels_crates_ultra_1",
+      "cache_key": "22626eadcade4aa342ca4f91",
+      "object": 2,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        41,
+        37
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        0
+      ]
+    },
+    "bookshelf_ruined": {
+      "tag": "bookshelf_ruined_ultra_1",
+      "cache_key": "864ef7001356b7c4ef3babd2",
+      "object": 1,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.7,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        61,
+        68
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        1
+      ]
+    },
+    "crystal_cluster": {
+      "tag": "crystal_cluster_crystal_tall_ultra_1",
+      "cache_key": "d7f1cb4fdabc0788a70babe2",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        41,
+        43
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        3
+      ]
+    },
+    "crystal_tall": {
+      "tag": "crystal_cluster_crystal_tall_ultra_1",
+      "cache_key": "d7f1cb4fdabc0788a70babe2",
+      "object": 1,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        39,
+        54
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        4
+      ]
+    },
+    "mine_cart_gold": {
+      "tag": "mine_cart_ultra_1",
+      "cache_key": "4b2635a7c2e9f50c11773779",
+      "object": 3,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        37
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        5
+      ]
+    },
+    "mine_cart_ore": {
+      "tag": "mine_cart_ultra_1",
+      "cache_key": "4b2635a7c2e9f50c11773779",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        37
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        6
+      ]
+    },
+    "stalagmite": {
+      "tag": "stalagmite_ultra_1",
+      "cache_key": "76b54f1e675922604d1dc877",
+      "object": 1,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        32,
+        77
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        7
+      ]
+    },
+    "obsidian_spire": {
+      "tag": "obsidian_spire_ultra_1",
+      "cache_key": "09431249dfa53dd7b599b990",
+      "object": 3,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        18,
+        77
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        8
+      ]
+    },
+    "ice_pillar": {
+      "tag": "ice_pillar_ice_crystals_ultra_1",
+      "cache_key": "891ac99d2f5558b9ce38be46",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        39,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        9
+      ]
+    },
+    "ice_spire": {
+      "tag": "ice_pillar_ice_crystals_ultra_1",
+      "cache_key": "891ac99d2f5558b9ce38be46",
+      "object": 5,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        41,
+        63
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        10
+      ]
+    },
+    "ice_shards": {
+      "tag": "ice_pillar_ice_crystals_ultra_1",
+      "cache_key": "891ac99d2f5558b9ce38be46",
+      "object": 6,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        31
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        11
+      ]
+    },
+    "frozen_knight": {
+      "tag": "frozen_statue_ultra_1",
+      "cache_key": "feb5e27da15dbc964dde8244",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.75,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        36,
+        51
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        12
+      ]
+    },
+    "ice_block": {
+      "tag": "frozen_statue2_ultra_2",
+      "cache_key": "d319cc64e87a060853961761",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        36,
+        43
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        13
+      ]
+    },
+    "coral_pink": {
+      "tag": "coral_kelp_ultra_1",
+      "cache_key": "9c65b1238c9e896ec4ce7094",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        29,
+        43
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        14
+      ]
+    },
+    "kelp": {
+      "tag": "coral_kelp_ultra_1",
+      "cache_key": "9c65b1238c9e896ec4ce7094",
+      "object": 3,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        39,
+        61
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        4,
+        15
+      ]
+    },
+    "clam_altar": {
+      "tag": "clam_altar_ultra_1",
+      "cache_key": "d883d8fb2d4415bd1ee82355",
+      "object": 1,
+      "cells": [
+        2,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        69,
+        77
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        0
+      ]
+    },
+    "pipes": {
+      "tag": "pipes_ultra_1",
+      "cache_key": "5773c5bbfb900f5c9fa3b9fb",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        19,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        2
+      ]
+    },
+    "robot_husk": {
+      "tag": "robot_husk_ultra_1",
+      "cache_key": "719f5929b4ade006c8bd3343",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        41,
+        33
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        3
+      ]
+    },
+    "sand_urn": {
+      "tag": "sand_urn_obelisk_ultra_1",
+      "cache_key": "caed11b6d747bab814732d45",
+      "object": 0,
+      "cells": [
+        1,
+        1
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.85,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        37,
+        41
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        4
+      ]
+    },
+    "obelisk": {
+      "tag": "sand_urn_obelisk_ultra_1",
+      "cache_key": "caed11b6d747bab814732d45",
+      "object": 4,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        79
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        5
+      ]
+    },
+    "ruin_column_rune": {
+      "tag": "ruin_column_ultra_1",
+      "cache_key": "8ccf729752df4c01b2117f5c",
+      "object": 3,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 1,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 4
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        23,
+        87
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        6
+      ]
+    },
+    "sealed_coffin": {
+      "tag": "sealed_coffin2_ultra_2",
+      "cache_key": "0e622ba74f560cea86368e0b",
+      "object": 3,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        39,
+        70
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        7
+      ]
+    },
+    "stone_coffin": {
+      "tag": "sealed_coffin2_ultra_2",
+      "cache_key": "0e622ba74f560cea86368e0b",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 2,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.8,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        39,
+        68
+      ],
+      "approved": "2026-11-21",
+      "at": [
+        6,
+        8
+      ]
+    }
+  },
+  "note": "AR-P2: the dungeon props of art pass AR (Stability Ultra renders, 2x2 variant grids, purpose ar_props), re-cut offline from the render cache: AR-P's usable picks plus the AR-P2 re-rolls of the wall torch (a sconce on stone) and the cobweb (thick threads); user rulings 2026-11-21"
+}
