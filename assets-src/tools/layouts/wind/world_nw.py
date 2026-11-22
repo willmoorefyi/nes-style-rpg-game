@@ -30,6 +30,7 @@ from worldgen.geom import components, flood, sdist
 from worldgen.noise import XX, YY, fbm
 from wind import world_nw_objects as OB
 from wind import world_sites as WS
+import sea_tables as ST  # noqa: E402  (WR F-WR)
 from world_specs import wind as SPEC
 
 R = REGIONS.index("wind")
@@ -46,6 +47,7 @@ BACKDROPS = {
                                                            "snow": SNOW}},
     "wnd_tarns": {"default": "river"},
     "wnd_sea": {"default": "ocean"},
+    "wnd_seam_n": {"default": "ocean"},   # WR F-WR
 }
 TABLES = {z[0]: (z[1], z[3]) for z in WS.ZONES}  # pass W's names and rosters, by zone id
 
@@ -151,8 +153,11 @@ def zones(g, mine, ent) -> tuple[list[dict], dict]:
     if tarns.any():
         out.append({"id": "wnd_tarns", "name": "Highland Tarns", "modes": ["canoe"], "rects": row_rects(tarns),
                     "encounters": WS.TARNS})
-    out.append({"id": "wnd_sea", "name": "North Seas", "modes": ["ship"], "rects": row_rects((g == "o") & mine),
+    seam = (g == "o") & mine & ST.north(g.shape, 170, g.shape[1] - 1)   # WR F-WR (8.4): meets FIRE's sea
+    out.append({"id": "wnd_sea", "name": "North Seas", "modes": ["ship"], "rects": row_rects((g == "o") & mine & ~seam),
                 "encounters": WS.SEA})
+    out.append({"id": "wnd_seam_n", "name": "North Seas, far rim", "modes": ["ship"], "rects": row_rects(seam),
+                "encounters": ST.EARLY_EAST})
     return out, {z["id"]: BACKDROPS[z["id"]] for z in out}
 
 

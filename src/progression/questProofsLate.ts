@@ -10,6 +10,7 @@
 import type { ProofFailure, ProofId, ProofResult } from './questTypes.js';
 import { fail, result, type QuestContext } from './questProofs.js';
 import { curveOf } from './questCurve.js';
+import { seamReport } from './questWrap.js';
 import { kitPrice, lateOf } from './questLateData.js';
 import { BAND_GOLD_SHARE, proofEarlyShops, proofPriceWalls, townBuilt } from './questShops.js';
 import { proofGeo } from './questGeo.js';
@@ -64,7 +65,8 @@ export function proofBands(ctx: QuestContext): ProofResult {
     }
   }
   const pend = pending ? `  (${pending} pending)` : '';
-  return result('d', 'bands', failures, `${shown.join('  ')}${pend}  prices: OK (${prices} takeGold)`);
+  const seam = world.maps.get(world.worldMap)?.wrap ? `  ${seamReport(curve.seam)}` : '';   // WR: report only (8.3)
+  return result('d', 'bands', failures, `${shown.join('  ')}${pend}  prices: OK (${prices} takeGold)${seam}`);
 }
 
 /** Proofs (d)-(h), or the subset named by `only`. */

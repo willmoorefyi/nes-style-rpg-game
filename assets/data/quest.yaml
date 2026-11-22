@@ -571,7 +571,8 @@ stages:
     band: [25, 28]
     kit: w_s20
     maps: [onrac, onrac-*]
-    zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
+    zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea, overworld:wat_seam_w,
+      overworld:wat_seam_n, overworld:ord_seam_n, overworld:wnd_seam_n]   # WR F-WR (WORLD_WRAP_PLAN 8.4)
     grind: 7.0
     # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
     # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door

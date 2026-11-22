@@ -241,7 +241,8 @@ describe('NW-R WATER: the encounter zones on the owner grid (3.3, 3.8 coverage)'
   const applies = (z: Zone, m: string): boolean => (z.modes ?? ['walking', 'canoe']).includes(m);
 
   it("WATER's zones keep today's ids, order and modes, and lie inside WATER's raster", () => {
-    expect(zones.map((z) => `${z.id}:${(z.modes ?? []).join('+')}`)).toEqual(['wat_streams:canoe', 'wat_dunes:', 'wat_isles:', 'wat_sea:ship']);
+    expect(zones.map((z) => `${z.id}:${(z.modes ?? []).join('+')}`)).toEqual(['wat_streams:canoe', 'wat_dunes:', 'wat_isles:', 'wat_sea:ship',
+      'wat_seam_w:ship', 'wat_seam_n:ship']);   // WR F-WR (WORLD_WRAP_PLAN 8.4): the seam bands
     for (const z of zones) for (const [x0, y0, x1, y1] of z.rects) expect(inRaster([x0, y0]) && inRaster([x1, y1]), z.id).toBe(true);
   });
 
@@ -270,13 +271,14 @@ describe('NW-R WATER: the encounter zones on the owner grid (3.3, 3.8 coverage)'
     const count = new Map<string, number>();
     for (const z of ship) for (const [x0, y0, x1, y1] of z.rects) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
       count.set(key([x, y]), (count.get(key([x, y])) ?? 0) + 1);
-      if (z.id === 'wat_sea') expect(at([x, y])).toBe('o');
+      if (z.id.startsWith('wat_sea') || z.id.startsWith('wat_seam')) expect(at([x, y])).toBe('o');
     }
     expect([...count.values()].filter((v) => v > 1)).toEqual([]);
   });
 
-  it('neighbouring zones share no species', () => {
+  it('neighbouring zones share no species (the F-WR seam bands copy the early seas\' tables, so they are left out)', () => {
     const species = (z: Zone): Set<string> => new Set(z.encounters.flatMap((e) => (e.groups ?? []).map((q) => q.id)));
+    const zones = src.encounterZones.filter((z) => z.id.startsWith('wat_') && !z.id.startsWith('wat_seam'));
     for (let i = 0; i < zones.length; i++) for (let j = i + 1; j < zones.length; j++) {
       const a = species(zones[i]);
       expect([...species(zones[j])].filter((s) => a.has(s)), `${zones[i].id} / ${zones[j].id}`).toEqual([]);
@@ -288,6 +290,7 @@ describe('NW-R WATER: the encounter zones on the owner grid (3.3, 3.8 coverage)'
     expect(b.wat_streams.default).toBe('waterfall');
     expect(b.wat_dunes.default).toBe('desert');
     expect(b.wat_sea.default).toBe('ocean');
+    expect([b.wat_seam_w.default, b.wat_seam_n.default]).toEqual(['ocean', 'ocean']);
     expect(b.wat_isles.terrain).toMatchObject({ forest: 'forest', snow: 'ice_cave', taiga: 'dark_forest' });
     const ids = Object.values(b).flatMap((t) => [t.default, ...Object.values(t.terrain ?? {})]).filter((v): v is string => !!v);
     for (const id of ids) expect(existsSync(`assets/backgrounds/${id}.webp`), id).toBe(true);

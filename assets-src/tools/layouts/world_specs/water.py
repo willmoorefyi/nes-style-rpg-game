@@ -53,7 +53,8 @@ def spec() -> RegionSpec:
         sites=sites("water", {"wat_caravan": (2, 2)}),   # the camp at the dunes' edge (inside the +-2 window)
         towns=("wat_onrac",),
         spots=[SpotDef("wat_s_onrac", "wat_onrac", (0, 0), "land"),
-               *(SpotDef(name, site, off, "landing") for name, site, off in NW.HIKES)],
+               *(SpotDef(name, site, off, "landing") for name, site, off in NW.HIKES),
+               SpotDef("wat_s_seam_nw", "wat_onrac", (-64, -66), "dock")],     # WR: at sea by the corner
         hikes=[Hike(site, name) for name, site, _off in NW.HIKES],     # NW2-W (7): the three hikes
         north=("wat_onrac", "wat_waterfall", "wat_caravan"),
         ledges=("wat_waterfall",),           # NW-4: the cave mouth is a ledge on R-waterfall, reached by canoe only

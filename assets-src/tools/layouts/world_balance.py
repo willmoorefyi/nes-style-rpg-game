@@ -40,6 +40,8 @@ STEP_FACTOR = {
     "temple_approach": 0.81,
     "wat_dunes": 0.67, "wat_isles": 2.0, "wat_sea": 2.25, "wat_streams": 2.0,
     "wnd_highlands": 2.25, "wnd_lufen_moor": 1.9, "wnd_mirage_sands": 2.1,
+    # WR F-WR (docs/WORLD_WRAP_PLAN.md 8.4): the seam bands at the factor of the early sea whose table they copy
+    "wat_seam_w": 2.25, "wnd_seam_n": 2.25,   # fir_sea's; wat_seam_n and ord_seam_n are elf_sea's (none: 1.0)
 }
 
 # NW2-BAL (docs/NW2_EDITS_PLAN.md 11, D-NW2-3): the most a factor may be, so the gorges and hikes keep their expected

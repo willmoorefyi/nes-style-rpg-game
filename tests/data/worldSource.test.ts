@@ -101,7 +101,7 @@ describe('the NW world source (NW-2)', () => {
       else if (s.kind === 'dock') expect(c, name).toBe('o');
       else expect(['.', 't'], name).toContain(c);
     }
-    expect(Object.keys(src.spots)).toHaveLength(48);        // NW2-W: + wat_s_waterfall_airship; NW2-F: + fir_s_ice_ship, fir_s_ice_shore; CD-W: + ord_s_{north,east,stack,west}_airship
+    expect(Object.keys(src.spots)).toHaveLength(52);        // WR: + the four seam spots (fir_s_seam_e, elf_s_seam_s, wat_s_seam_nw, wnd_s_seam_landing); NW2-W: + wat_s_waterfall_airship; NW2-F: + fir_s_ice_ship, fir_s_ice_shore; CD-W: + ord_s_{north,east,stack,west}_airship
     for (const d of src.docks) expect(g[d.y][d.x], d.id).toBe('o');
     expect(src.docks.map((d) => d.id).sort()).toEqual(['a1_pravoka', 'elf_port', 'ert_dwarf', 'ert_melmond', 'fir_crescent',
       'fir_ice']);

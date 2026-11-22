@@ -151,6 +151,10 @@ def run(B) -> int:
     expect_error({**open_map, "sealed_edges": True}, "sealed_edges")
     assert ok_src({"id": "s", "ground": "ooooo\no...o\nooooo", "entrances": {"a": [1, 1]}, "sealed_edges": True})
     ok += 1
+    sealed = {"id": "s", "ground": "ooooo\no...o\nooooo", "entrances": {"a": [1, 1]}}
+    expect_error({**sealed, "wrap": True}, "needs sealed_edges")             # WR: a wrapped map's seam is open sea
+    assert ok_src({**sealed, "wrap": True, "sealed_edges": True})
+    ok += _seam_stripe()
     road = {"id": "r", "ground": "..........\n.,,,,,,,..\n..........", "entrances": {"a": [0, 1]}}
     expect_error({**road, "road_check": {"materials": ["dirt"]}}, "dead ends")
     assert ok_src({**road, "road_check": {"materials": ["dirt"], "ends": [[7, 1]]}})
@@ -291,3 +295,27 @@ def run(B) -> int:
     ok += __import__("nw1_selftest").run(B)         # NW-1: spots (passthrough, kinds), the atlas cell size
     ok += __import__("nw2_selftest").run(B)         # NW-2, NW2: taiga and snow (legend, TerrainType, walk, landing)
     return ok
+
+
+def _seam_stripe() -> int:
+    """WR: a synthetic wrapped world of 2x2 uniform sea chunks passes check_seam; a stripe down chunk (0, 1)'s last
+    column (the E-W seam) fails it."""
+    import map_checks_wrap as MW  # noqa: PLC0415
+    with tempfile.TemporaryDirectory() as tmp:
+        d = Path(tmp) / "w"
+        d.mkdir()
+        sea = np.zeros((96, 96, 3), np.uint8) + np.array([30, 70, 160], np.uint8)
+        for r in range(2):
+            for c in range(2):
+                Image.fromarray(sea).save(d / f"below_{r}_{c}.png")
+        src = {"wrap": True, "sealed_edges": True}
+        assert MW.check_seam("w", src, Path(tmp))["x"] == 0
+        stripe = sea.copy()
+        stripe[:, -1] = (250, 250, 250)
+        Image.fromarray(stripe).save(d / "below_0_1.png")
+        try:
+            MW.check_seam("w", src, Path(tmp))
+        except MW.SeamError as e:
+            assert "x seam" in str(e), str(e)
+            return 2
+    raise AssertionError("check_seam passed a seam with a stripe")

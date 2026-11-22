@@ -27,6 +27,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import world_ordeal_data as D  # noqa: E402
 from overworld_zones import row_rects  # noqa: E402
+import sea_tables as ST  # noqa: E402  (WR F-WR)
 from worldgen.geom import components  # noqa: E402
 
 REGION = "ordeal"
@@ -194,8 +195,14 @@ def content(g: np.ndarray, meta: dict) -> dict:
     taken = {(o["x"] + i, o["y"] + j) for o in objs for j in range(len(o["parts"])) for i in range(len(o["parts"][0]))}
     objs += _boulders(g, own, meta, taken)
     cells = zones(g, own, meta)
+    seam = {c for c in cells["ord_sea"] if c[1] < ST.SEAM_BAND}   # WR F-WR (8.4): the band that meets ELF's sea
+    cells["ord_sea"] -= seam
     ez = [{"id": z, "name": name, "modes": MODES[z], "rects": row_rects(cells[z]), "encounters": table}
           for z, (name, _m, table, _bg) in D.ZONES.items() if cells[z]]
+    if seam:
+        ez.append({"id": "ord_seam_n", "name": "Cardia Sound, far rim", "modes": ["ship"], "rects": row_rects(seam),
+                   "encounters": ST.EARLY_SOUTH})
     bgs = {z: ({**bg, "terrain": {**bg.get("terrain", {}), **COLD}} if z != "ord_sea" else dict(bg))
            for z, (_n, _m, _t, bg) in D.ZONES.items()}
+    bgs["ord_seam_n"] = {"default": "ocean"}
     return {"objects": objs, "inspect": insp, "encounterZones": ez, "battleBackgrounds": {"zones": bgs}, "errors": errors}

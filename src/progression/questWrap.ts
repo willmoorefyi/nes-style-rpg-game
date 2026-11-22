@@ -82,3 +82,29 @@ export function wrapInvariant(map: MapData): ProofFailure[] {
 export function wrapFailures(map: MapData | undefined): ProofFailure[] {
   return map ? wrapInvariant(map) : [];
 }
+
+/** WR report (plan 8.3): the late seas of `layouts/world_api.SEA_CLASS` (mirrored here for the report only). */
+export const LATE_SEAS: ReadonlySet<string> = new Set(['ord_sea', 'wat_sea', 'wnd_sea']);
+
+/** A stage's witness across the seam: its seam crossings and the late-sea cells it sails. */
+export interface SeamNote { crossings: number; late: number }
+
+/** Count one witness step `c` (after `prev`) on a wrapped map into `acc[stage]`. */
+export function noteSeam(acc: Map<string, SeamNote>, stage: string, map: MapData,
+  prev: { map: string; x: number; y: number } | null, c: { map: string; x: number; y: number; mode: string }): void {
+  if (!map.wrap) return;
+  const n = acc.get(stage) ?? { crossings: 0, late: 0 };
+  if (prev && prev.map === c.map && (Math.abs(prev.x - c.x) > 1 || Math.abs(prev.y - c.y) > 1)) n.crossings++;
+  if (c.mode === 'ship') {
+    const z = map.encounterZones?.find((e) => (e.modes ?? []).includes('ship')
+      && e.rects.some(([x0, y0, x1, y1]) => c.x >= x0 && c.x <= x1 && c.y >= y0 && c.y <= y1));
+    if (z && LATE_SEAS.has(z.id)) n.late++;
+  }
+  if (n.crossings || n.late) acc.set(stage, n);
+}
+
+/** The report text: each stage whose witness crosses a seam, with its late-sea cells. */
+export function seamReport(acc: ReadonlyMap<string, SeamNote>): string {
+  const rows = [...acc].filter(([, n]) => n.crossings > 0).map(([s, n]) => `${s} x${n.crossings} late ${n.late}`);
+  return rows.length ? `seam: ${rows.join(', ')}` : 'seam: no crossing';
+}

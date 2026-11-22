@@ -22,7 +22,7 @@ const quest = read('assets/data/quest.yaml') as {
   stages: Array<{ id: string; entry?: Place & { vehicles?: Place[] };
     nonLoadBearing: Array<{ map: string; kind: string; ref?: string; at?: unknown }> }>;
 };
-const scenarios = read('assets/data/debug-scenarios.yaml') as Array<{ id: string; map?: string; spot?: string;
+const scenarios = read('assets/data/debug-scenarios.yaml') as Array<{ id: string; map?: string; spot?: string; fieldMode?: string;
   spawn?: unknown; frame?: string; vehicles?: Place[] }>;
 const cutscenes = read('assets/data/cutscenes.yaml') as Array<{ id: string; steps: Array<Place & { vehicle?: string }> }>;
 const KIND: Record<string, SpotKind> = { ship: 'dock', airship: 'landing', canoe: 'land' };
@@ -35,7 +35,9 @@ function places(): Array<{ where: string; place: Place; kind: SpotKind }> {
     for (const v of s.entry?.vehicles ?? []) out.push({ where: `quest ${s.id} ${v.type}`, place: v, kind: KIND[v.type!] });
   }
   for (const sc of scenarios) {
-    if (sc.spot) out.push({ where: `scenario ${sc.id}`, place: { map: sc.map!, at: sc.spot }, kind: 'land' });
+    // WR: a spawn on the ship starts at a dock spot (open sea), one in flight at a dock or landing spot
+    const spawn = sc.fieldMode === 'ship' ? 'dock' : sc.fieldMode === 'airship' && sc.id.startsWith('wr_') ? undefined : 'land';
+    if (sc.spot && spawn) out.push({ where: `scenario ${sc.id}`, place: { map: sc.map!, at: sc.spot }, kind: spawn });
     for (const v of sc.vehicles ?? []) out.push({ where: `scenario ${sc.id} ${v.type}`, place: v, kind: KIND[v.type!] });
   }
   for (const c of cutscenes) {

@@ -182,9 +182,11 @@ describe('ORDEAL on the NW world (NW-R)', () => {
   it('zones: today\'s ids, names and rosters; the heath on foot and by canoe, the isles too, the sound by ship', () => {
     expect(zones.map((z) => [z.id, z.name, z.modes])).toEqual([
       ['ord_heath', 'Citadel Heath', ['walking', 'canoe']], ['ord_isles', 'Cardia Isles', ['walking', 'canoe']],
-      ['ord_sea', 'Cardia Sound', ['ship']]]);
+      ['ord_sea', 'Cardia Sound', ['ship']], ['ord_seam_n', 'Cardia Sound, far rim', ['ship']]]);   // WR F-WR (8.4)
     const was = new Map(((today as unknown as { encounterZones: Zone[] }).encounterZones).map((z) => [z.id, z.encounters]));
-    for (const z of zones) expect(z.encounters, z.id).toEqual(was.get(z.id));
+    for (const z of zones.filter((x) => was.has(x.id))) expect(z.encounters, z.id).toEqual(was.get(z.id));   // pass W's ids
+    const elfSea = (nw.encounterZones ?? []).find((z) => z.id === 'elf_sea')!;
+    expect(zones.find((z) => z.id === 'ord_seam_n')!.encounters).toEqual(elfSea.encounters);
   });
 
   it('coverage (3.8): every walkable and canoe cell of ORDEAL\'s land is in one ORDEAL zone, the heath\'s on the arc', () => {
@@ -196,7 +198,7 @@ describe('ORDEAL on the NW world (NW-R)', () => {
       expect(ids.length, k).toBe(1);
       expect(inRaster('ordeal', x, y), k).toBe(true);
       const c = g[y][x];
-      if (ids[0] === 'ord_sea') expect(c, k).toBe('o');
+      if (ids[0] === 'ord_sea' || ids[0] === 'ord_seam_n') expect(c, k).toBe('o');
       else {
         expect(walkable(c) || CANOE.has(c), k).toBe(true);
         expect(arc.has(k), `${k} ${ids[0]}`).toBe(ids[0] === 'ord_heath');

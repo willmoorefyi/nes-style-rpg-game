@@ -124,7 +124,7 @@ def document(g: np.ndarray, meta: dict, trans: list, objs: list, insp: list, spo
     pex = rc["patches"]
     doc = {
         "id": "overworld", "name": "World Map", "kits": ["overworld", "town", "temple"], "music": "overworld",
-        "camp": True, "terrain": "organic", "sealed_edges": True,
+        "camp": True, "terrain": "organic", "sealed_edges": True, "wrap": True,   # WR: a torus (D-WR-1)
         "no_unreachable_walkable": {"reach_roots": reach_roots(g, ents, covered(objs))},
         "unreachable_ok": unreachable(g, ents),
         "road_check": {"materials": ["dirt"], "ends": [list(S.world(P.TOMB_END))], "check_under": True,
