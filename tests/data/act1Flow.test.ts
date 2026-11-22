@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { WalkingMode } from '../../src/entities/WalkingMode.js';
-import type { MapData } from '../../src/types/index.js';
+import { resolveNPCDialog, type MapData } from '../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const readMap = (id: string) => parse(readFileSync(join(root, 'assets/maps/ai', `${id}.yaml`), 'utf-8')) as MapData;
@@ -154,6 +154,20 @@ describe('act 1 flow (the compiled 2x maps the game plays)', () => {
           expect(d.text.join(' '), `${id} ${npc.id}`).not.toMatch(/bridge[^.]*(stands|finished|is built)|(finished|completed) the bridge/i);
         }
       }
+    }
+  });
+
+  it('after BRIDGE_BUILT the King and the chancellor say the bridge is done, not that the builders are at work (P1-1-02)', () => {
+    const npcs = readMap('cornelia-castle-2f').npcs;
+    const act1 = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'INTRO_COMPLETE', 'GOT_LUTE'];
+    for (const id of ['king', 'chancellor']) {
+      const npc = npcs.find((n) => n.id === id);
+      expect(npc, id).toBeDefined();
+      const say = (flags: string[]) => resolveNPCDialog(npc?.dialog ?? [], (f) => flags.includes(f)).join(' ');
+      expect(say(act1), `${id} before the bridge`).toMatch(/builders are (hard )?at work/i);
+      const after = say([...act1, 'BRIDGE_BUILT']);
+      expect(after, `${id} after the bridge`).not.toMatch(/at work|will (order|rebuild)/i);
+      expect(after, `${id} after the bridge`).toMatch(/bridge[^.]*(stands|finished)/i);
     }
   });
 });

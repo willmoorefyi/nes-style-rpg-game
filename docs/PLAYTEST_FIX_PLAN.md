@@ -16,7 +16,7 @@ ratios within 0.86-1.16, largest bearing error 21 degrees (act-1-frozen Matoya).
 ## Tranches
 
 ### FX-A: act-1 and Elfheim text and test data (data and dialogue only)
-- P1-1-02 (P2): the King (21,8) and chancellor (18,10) in `cornelia-castle-2f` still say the builders are at work after BRIDGE_BUILT; give them post-bridge lines.
+- P1-1-02 (P2): the King (21,8) and chancellor (18,10) in `cornelia-castle-2f` still say the builders are at work after BRIDGE_BUILT; give them post-bridge lines. **Done** (FX-A, f1ed5bc9: both have a first-match `BRIDGE_BUILT` entry in `layouts/castle.py`, compiled); FX-S re-checked it in the compiled map and added the regression test `tests/data/act1Flow.test.ts` ("after BRIDGE_BUILT the King and the chancellor ..."). `castle.py` is at 364 lines, 4 over AGENTS.md's 360 ceiling since FX-A; FX-S did not touch it.
 - P1-1-03 (P2): pirate count (nine and a Captain vs nine pirates and no captain): make the lines match the fight.
 - P1-1-06 (P3) and P3-07 (PLAY-3): gift lines read "... Received the Herb." / "Received the Mystic Key." glued to speech, and Smyth's Excalibur has no pickup line: use the shared pickup text consistently.
 - P1-1-07 (P2): before the Marsh Cave the Western Keep 2F throne is empty while the 1F courtiers say the king sits there: make the 1F lines conditional on MARSH_GUARD_DEFEATED (or seat the king).
