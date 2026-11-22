@@ -377,13 +377,30 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
     and stamps the landing meadow; `hikes` checks d and E_hike >= 1.0. Gaia, the Citadel and Bahamut keep their
     landings (the Citadel's meadow is stamped).
 - **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time;
-  NW2-INT: 236 s, peak footprint 14.6 GB; `--check-determinism` 401 s) writes the 256 chunks, the patch overlays and
+  NW2-INT: 236 s, peak footprint 14.6 GB; AR-T2 (the ecotone painter): 335 s, 15.0 GB) writes the 256 chunks
+  (palette-indexed PNGs, `build_map.save_chunk`: 38.8 MB at AR-T2, 43.9 MB of RGB before), the patch overlays and
   the Mode 7 atlas (`mode7.png` 3072x3072 at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).
   A map over 192x192 cells is painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality). Gates:
   `build_map.py --check-determinism overworld`, `mode7_atlas.py --check-determinism overworld`, and re-running
   `world.py` leaves `git diff --exit-code assets-src/maps` clean. A source with rasters compiles in **chunk-digest
   mode** (`terrain/region_chunks.py`): `build.chunks` per chunk; `--region r` repaints r's raster plus every chunk
   whose digest differs from the base's (at most `PAINT_LIMIT` 160 painted chunks, ring included).
+- **Terrain painting (AR-T2).** `tools/terrain/` paints the organic ground from the AR sheet (`kit.AR_SHEET`;
+  `ecotone.tex_name` prefers `ar_<m>`, then the kit's own, then a fallback such as `beach` -> sand, so placeholder
+  kits still compile). The partition is unchanged except the clamped cell core, now a disc of `CORE_R` 9 px
+  (`base._core`; the metrics still read the 28 px square). On top: `@b` macro textures by low-frequency noise
+  (`ecotone.macro`); water by depth (`water.depth`: shallows -> deep in clustered steps, foam at 2.2 px, a 3 px bank
+  shadow under N / W shores; the sea draws `shallows` / `ar_ocean`, rivers and lakes the calm `water_calm_shallow` /
+  `water_calm`, handing over to the sea's colours within 2 cells of it); a beach on grass / sand / swamp meeting the
+  sea (none on snow); the land ecotones of `bands.py` (dry grass and tufts at the desert, drifts at snow and taiga,
+  scree at the mountain foot lifted to the ground's luma (W14), a mud fringe at swamps), 4 px earth banks; cold
+  ranges (mountain cells within `bands.COLD` 6 cells of snow or taiga) in `mountain_cold` and `_cold` peak variants
+  (`kit.RECOLORS["cold_rock"]`); `conifer_clump` taiga edges, `ar_tree_clump` forest edges; the lit NW rim and the SE
+  shadow on mountain and taiga; every px snapped to 15 bits. Band noise is evaluated on each band's bounding box
+  (`ecotone.band`), so the painter stays local (the region and chunk-digest selftests pass unchanged). Retunes: the
+  selftest's `classify` / `foothill_share` take `organic` (the classic comparison reads the kit's own textures) and
+  read every texture the organic painter uses (`metrics.textures`); the W14 dark-px case runs on the scree band (the
+  Bayer foothill haze, `sand_band` and the old beach / bank / shallows code are gone); no threshold changed.
 - **Progression.** `assets/data/quest.yaml`: the goal CHAOS_DEFEATED, stages S0-S31 (S19 and S31 optional), each with
   `after`, `requires`, `grants`, `boss`, `band`, `kit` (kits.yaml), `maps`, `zones`, `grind`, `walk`, `entry`,
   `milestones` and `nonLoadBearing`, plus the 8 shop `towns` (`opensAfter`, `bandStage`, `kit`).
