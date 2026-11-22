@@ -2794,6 +2794,87 @@
   items: {}
   gold: 100
   enemies: []
+# AR (AR-N2): the pass-AR NPC field sheets in place.
+- id: w_ar_lufenia
+  name: "AR - Lufenia (the citizens and the senator)"
+  mode: field
+  map: lufenia
+  spawn: [9, 16]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_elder
+  name: "AR - the Lufenian elder and his attendant"
+  mode: field
+  map: lufenia-house-elder
+  spawn: [8, 6]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_healer
+  name: "AR - the Lufenian healer's patient"
+  mode: field
+  map: lufenia-house-healer
+  spawn: [7, 5]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_lair
+  name: "AR - the dragon-kin of Bahamut's lair"
+  mode: field
+  map: bahamut-lair
+  spawn: [19, 12]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_circle
+  name: "AR - the Circle of Sages (star, earth and flame sages)"
+  mode: field
+  map: crescent-circle
+  spawn: [12, 11]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_unne
+  name: "AR - Dr. Unne in his Melmond house"
+  mode: field
+  map: melmond-house-unne
+  spawn: [6, 6]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_sky1
+  name: "AR - the robot sentry on the sky castle 1F hub"
+  mode: field
+  map: sky-castle-1f
+  spawn: [21, 17]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_sky2
+  name: "AR - the robot sentry on the sky castle 2F east island"
+  mode: field
+  map: sky-castle-2f
+  spawn: [39, 27]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
 # M7 (docs/MODE7_PLAN.md 8, 9): the Mode 7 flight scenarios.
 # M7-5 (sections 5, 9): the airship in flight at Pravoka's gate (entrance a1_pravoka, 131, 101), the ship parked at the
 # dock beside it (132, 102) and the tomb's chest (117, 107) 14 cells west: the upright billboards, their depth order

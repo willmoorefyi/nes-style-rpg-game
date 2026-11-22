@@ -63,6 +63,8 @@ f1.npcs += [
     chest("berth_west", "phoenix_down", "a Phoenix Down", 1, 18),
     chest("berth_southeast", "ether", "an Ether", 38, 26),
 ]
+f1.npcs.append({"id": "wnd_sentry_hub", "sprite": "robot_sentry", "x": 23, "y": 17, "dialog": [   # AR: flavour only
+    "The sentry's lens turns to follow you. A thin voice crackles: \"BERTH... UNASSIGNED. AWAIT... THE STEWARD.\""]})
 f1.write("Sky Castle 1F: the dock ring round a well of sky; four spokes to the hub, whose stair climbs to 2F.",
          {"arrival": [19, 34], "up": [17, 16], "up_east": [37, 21]}, table=LOWER, bg="sky_palace", script=SCRIPT,
          # the berth's ward opens for those the console sent up (it is always open in play: mirage_ascent sets the
@@ -104,6 +106,8 @@ f2.npcs += [
     chest("bridge_west", "cabin", "a Cabin", 10, 18),
     chest("bridge_east", "hi_potion", "a Hi-Potion", 41, 14),
 ]
+f2.npcs.append({"id": "wnd_sentry_east", "sprite": "robot_sentry", "x": 41, "y": 30, "dialog": [  # AR: flavour only
+    "Rust has fused the sentry's joints. Somewhere inside it a gear ticks once, and stops."]})
 f2.write("Sky Castle 2F: the light-bridge maze; islands over the sky, joined by bridges and one-way belts.",
          {"arrival": [8, 26], "east": [36, 26], "up": [21, 5], "c_belt": [7, 8], "d_belt": [31, 15],
           "e_belt": [24, 6], "f_belt": [19, 15]}, table=LOWER, bg="sky_palace", script=SCRIPT,

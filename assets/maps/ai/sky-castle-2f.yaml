@@ -64,6 +64,11 @@ npcs:
   chestItem: hi_potion
   chestFlag: CHEST_WND_D2_BRIDGE_EAST
   dialog: [You found a Hi-Potion!]
+- id: wnd_sentry_east
+  sprite: robot_sentry
+  x: 41
+  y: 30
+  dialog: ['Rust has fused the sentry''s joints. Somewhere inside it a gear ticks once, and stops.']
 transitions:
 - {x: 35, y: 20, targetMap: sky-castle-2f, targetEntrance: d_belt}
 - {x: 35, y: 21, targetMap: sky-castle-2f, targetEntrance: d_belt}

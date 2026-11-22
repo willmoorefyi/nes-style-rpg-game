@@ -1,0 +1,179 @@
+{
+  "character": "dragon_youth",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 2,
+  "cache_key": "e4c758ec67328ad98e089363",
+  "pass": "AR",
+  "approved": "2026-11-21",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s42_2",
+      "tag": "dragon_youth_s42_2",
+      "cache_key": "e4c758ec67328ad98e089363",
+      "model": "structure",
+      "seed": 2,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "b45_1",
+      "tag": "dragon_youth_b45_1_dragon_youth_up",
+      "cache_key": "42c8498b1ff417709f9279ea",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "d45_1",
+      "tag": "dragon_youth_d45_1_dragon_youth_side",
+      "cache_key": "9e425e394d1ebd53d4f396e6",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s42_2",
+        0,
+        false
+      ],
+      [
+        "s42_2",
+        1,
+        false
+      ],
+      [
+        "s42_2",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b45_1",
+        1,
+        false
+      ],
+      [
+        "b45_1",
+        2,
+        false
+      ],
+      [
+        "b45_1",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "d45_1",
+        0,
+        false
+      ],
+      [
+        "d45_1",
+        1,
+        true
+      ],
+      [
+        "d45_1",
+        2,
+        true
+      ]
+    ]
+  ],
+  "shifts": {
+    "1": [
+      [
+        110,
+        30,
+        195,
+        1.0,
+        1.0
+      ]
+    ]
+  },
+  "edits": [
+    {
+      "op": "erase",
+      "why": "the tail segment sticking forward in the side stand frame",
+      "cell": [
+        2,
+        0
+      ],
+      "rects": [
+        [
+          32,
+          66,
+          48,
+          80
+        ]
+      ],
+      "cleared_px": 224,
+      "outlined_px": 14
+    }
+  ],
+  "figure_px": [
+    90,
+    90,
+    90,
+    94,
+    94,
+    94,
+    89,
+    87,
+    89
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N dragon_youth B: front s42_2 row 0 (dragon_youth guide, 0.42, seed 2); back b45_1 cells 1, 2 + 2 mirrored (green back panel shifted blue, hue 110 -> 195); side strip d45_1. User ruling 2026-11-21: the side row's frames 2 and 3 faced left, so they are mirrored (all three face right, the sheet's side direction); the side stand's forward tail segment is erased"
+}

@@ -1,0 +1,132 @@
+{
+  "character": "sage_star",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "851bb2f371b5dfe10764fae2",
+  "pass": "AR",
+  "approved": "2026-11-21",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s50_1",
+      "tag": "sage_star_s50_1",
+      "cache_key": "851bb2f371b5dfe10764fae2",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3
+    },
+    {
+      "alias": "b50_1",
+      "tag": "sage_star_b50_1_mage_up",
+      "cache_key": "7e6b4d5c4a91a1a81fd5d95a",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s50_1",
+        0,
+        false
+      ],
+      [
+        "s50_1",
+        1,
+        false
+      ],
+      [
+        "s50_1",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b50_1",
+        0,
+        false
+      ],
+      [
+        "b50_1",
+        2,
+        false
+      ],
+      [
+        "b50_1",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "s50_1",
+        6,
+        false
+      ],
+      [
+        "s50_1",
+        7,
+        false
+      ],
+      [
+        "s50_1",
+        8,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [],
+  "figure_px": [
+    90,
+    90,
+    90,
+    93,
+    93,
+    93,
+    92,
+    92,
+    92
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N sage_star A: s50_1 (mage guide, 0.5, seed 1; blue cone hat, gold stars); back strip b50_1 cells 0, 2 + 2 mirrored. Its side frames turn the head but do not walk: fine while the Crescent sages stand still; do not give it `wander` unless the side row is regenerated"
+}

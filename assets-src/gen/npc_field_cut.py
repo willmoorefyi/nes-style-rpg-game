@@ -1,4 +1,5 @@
-"""Re-cut the approved Bedrock NPC field sheets (pass LM5: the fairy and the mermaid) from the render cache.
+"""Re-cut the approved Bedrock NPC field sheets (pass LM5: the fairy and the mermaid; pass AR: the Lufenians, the
+dragon-kin, the robot sentry, the Circle sages and Dr. Unne) from the render cache.
 
     python3 -I assets-src/gen/npc_field_cut.py            # write approved/<id>/field.{png,json}
     python3 -I assets-src/gen/npc_field_cut.py --check    # rebuild in memory, exit 1 if a committed sheet differs
@@ -16,6 +17,9 @@ Post steps (LM5-INT, the user's rulings of 2026-11-19):
            mirrored (the render's step_right is a stand)
   mermaid  the back row (a separate render, btail60_2) has greener hair and tail: each of its green colours that the
            down and side rows do not use is remapped to the down / side teal ramp colour of the nearest value
+Pass AR entries (`npc_field_ar.AR_SPEC`, merged into SPEC) use per-cell picks with mirror flags, per-row hue shifts,
+per-render flood tolerance and hole cuts, and offline edit steps (erase, ramp recolour, pixel patch): the format is
+in `npc_field_edit.py`. `--only id[,id]` limits a run to some ids.
 The cut is deterministic (seeded k-means, no hash order).
 """
 from __future__ import annotations
@@ -33,6 +37,7 @@ import numpy as np  # noqa: E402
 from PIL import Image, ImageFilter  # noqa: E402
 
 from gen import bedrock as B  # noqa: E402
+from gen.npc_field_ar import APPROVED_AR, AR_SPEC  # noqa: E402
 from gen.pixelize import OUTLINE, components, flood_bg, kmeans, snap15  # noqa: E402
 
 GW, GH, FOOT = 48, 96, 93
@@ -52,6 +57,7 @@ SPEC = {
                         "the back-strip render btail60_2, seed 2); LM5-INT: the back row's greens remapped onto "
                         "the down / side teal ramp (nearest value)"},
 }
+SPEC.update(AR_SPEC)
 
 
 def _cached(key: str) -> Image.Image:
@@ -197,6 +203,8 @@ def recolor_row(sheet: Image.Image, row: int, ref_rows: tuple[int, ...], share: 
 def sheet(cid: str) -> tuple[Image.Image, Image.Image, dict]:
     """(the sheet before its post recolour, the approved sheet, meta)."""
     spec = SPEC[cid]
+    if "cells" in spec:
+        return sheet_cells(cid)
     scale = spec.get("scale", 1.0)
     picked = []
     for _tag, key, rows, ri in spec["rows"]:
@@ -238,19 +246,53 @@ def sheet(cid: str) -> tuple[Image.Image, Image.Image, dict]:
     return before, out, meta
 
 
+def _figure_px(im: Image.Image) -> list[int]:
+    a = np.asarray(im)[..., 3] > 0
+    return [int(np.ptp(np.where(a[r * GH:(r + 1) * GH, c * GW:(c + 1) * GW].any(1))[0]) + 1)
+            for r in range(3) for c in range(3)]
+
+
+def sheet_cells(cid: str) -> tuple[Image.Image, Image.Image, dict]:
+    """A pass-AR `cells` entry: (the sheet before its edits, the approved sheet, meta)."""
+    from gen import npc_field_edit as E
+    spec = SPEC[cid]
+    before, out, log = E.build(sys.modules[__name__], spec)
+    led = _ledger()
+    srcs = []
+    for alias, (tag, key, rows) in spec["renders"].items():
+        row = led.get(key, {})
+        srcs.append({"alias": alias, "tag": tag, "cache_key": key, "model": row.get("model"), "seed": row.get("seed"),
+                     "pass": row.get("pass"), "render_rows": rows} | ({"cut": spec["cut"][alias]}
+                                                                       if alias in spec.get("cut", {}) else {}))
+    first = srcs[0]
+    meta = {"character": cid, "sheet": "field", "backend": "bedrock", "model": first["model"], "seed": first["seed"],
+            "cache_key": first["cache_key"], "pass": first["pass"], "approved": APPROVED_AR,
+            "tool": "assets-src/gen/npc_field_cut.py", "sources": srcs,
+            "cut": {"flood_tol": 14, "erode": ERODE, "resample": "box", "sharpen": "unsharp 1/60/2", "alpha": 170,
+                    "colors": spec.get("colors", 16), "kmeans_seed": 0, "outline": "selective 1 px", "scale": 1.0,
+                    "hole_min_px": E.HOLE_MIN},
+            "cells": spec["cells"], "shifts": {str(k): v for k, v in spec.get("shifts", {}).items()},
+            "edits": log, "figure_px": _figure_px(out),
+            "grid": [GW, GH], "bottom_row": FOOT, "layout": [3, 3], "rows": ["down", "up", "left"],
+            "frames": ["stand", "step_left", "step_right"], "flip_rows": ["left"], "note": spec["note"]}
+    return before, out, meta
+
+
 def _png_bytes(im: Image.Image) -> bytes:
     buf = io.BytesIO(); im.save(buf, "PNG", optimize=False); return buf.getvalue()
 
 
 def main(argv: list[str]) -> int:
     bad = 0
-    for cid in SPEC:
+    only = argv[argv.index("--only") + 1].split(",") if "--only" in argv else list(SPEC)
+    for cid in only:
         before, im, meta = sheet(cid)
         text = json.dumps(meta, indent=2) + "\n"
         out = HERE / "approved" / cid / "field"
         if "--raw" in argv:
             d = Path(argv[argv.index("--raw") + 1]); d.mkdir(parents=True, exist_ok=True)
             before.save(d / f"{cid}_before_post.png")
+            im.save(d / f"{cid}_after.png")
         if "--check" in argv:
             png, js = out.with_suffix(".png"), out.with_suffix(".json")
             same = (png.is_file() and js.is_file() and js.read_text() == text
