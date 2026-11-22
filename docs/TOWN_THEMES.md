@@ -409,3 +409,12 @@ a themed whole-house prefab as a house.
 **Adding to a theme.** Render through `gen/bedrock.invoke(..., purpose=...)` from the main checkout, add the render to
 the town's entry in `town_theme_spec.py`, run `town_theme_cut.py`, use the cells from the town's row in
 `town_theme.py`, recompile the town, and update this brief and its concept art.
+
+## 11. Cardia Deep: the dragon great village (pass CD)
+
+A separate brief, in this document's format: `docs/DRAGON_CITY_BRIEF.md` (the user's request of 2026-11-22: every
+Cardia islet's cave leads down into one interconnected dragon village). Concept art: `docs/art/cardia/`
+(`concept_cd_hall2.png` the main board; the not-chosen board kept). The cells are cut by `town_theme_cut.py` into
+`approved/town/theme_dragon.{png,json}` (the throne, statues, pillars, the wing arch, nests, the hoard, the perch, and
+the `drg_wall` / `drg_floor` materials); the drake brazier is a lit AR prop (`prop_spec.py`). The plan and its result:
+`docs/CARDIA_PLAN.md`.

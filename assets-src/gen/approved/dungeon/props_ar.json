@@ -124,7 +124,7 @@
       "ar_ruin_column_rune_0_0",
       "ar_sealed_coffin_0_0",
       "ar_stone_coffin_0_0",
-      null,
+      "ar_drake_brazier_0_0",
       null,
       null,
       null,
@@ -142,7 +142,7 @@
       "ar_ruin_column_rune_1_0",
       "ar_sealed_coffin_1_0",
       "ar_stone_coffin_1_0",
-      null,
+      "ar_drake_brazier_1_0",
       null,
       null,
       null,
@@ -2595,6 +2595,76 @@
       "at": [
         6,
         8
+      ]
+    },
+    "drake_brazier": {
+      "tag": "cd_brazier",
+      "cache_key": "7f2af0029275bb8d1f48d5a1",
+      "object": 0,
+      "cells": [
+        1,
+        2
+      ],
+      "place": "floor",
+      "model": "ultra",
+      "seed": 219,
+      "pass": "AR",
+      "cut": {
+        "mode": "flood",
+        "tol": 30,
+        "rim": 4,
+        "pocket": 6,
+        "join": 3,
+        "split": 0
+      },
+      "pixelize": {
+        "fill": 0.9,
+        "colors": 14,
+        "seed": 0,
+        "sharpen": 1.0,
+        "outline": "selective",
+        "apron": 0.0
+      },
+      "fig_px": [
+        43,
+        46
+      ],
+      "approved": "2026-11-22",
+      "purpose": "ar_dragon",
+      "flame": {
+        "style": "fire",
+        "x": 10,
+        "y": 51,
+        "rows": [
+          ".............1........",
+          "............1.........",
+          "...........11.........",
+          "...........11.........",
+          "..........1111........",
+          "..........1111........",
+          ".........111111.......",
+          "........11111111......",
+          "........111111111.....",
+          "........1111111111....",
+          "........111111111111..",
+          ".......11111111111111.",
+          "......1111111111111111",
+          "......1111111111111111",
+          "1111111111111111111111",
+          ".....11111111111111111"
+        ],
+        "tongue": true,
+        "glow": 40,
+        "rect": [
+          0,
+          0,
+          1,
+          0.4
+        ]
+      },
+      "at": [
+        6,
+        9
       ]
     }
   },

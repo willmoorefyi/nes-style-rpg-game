@@ -166,8 +166,21 @@ def tint(cellset: dict, theme: str, new: str, hsv: tuple, ref: str = "wall_lo_pl
     return out
 
 
+def whiten(raw: Image.Image, tol: float, passes: int) -> Image.Image:
+    """Pass CD (`bg_passes`): flood the border colour to white `passes` times, for a two-tone backdrop (a grey
+    vignette or letterbox bars over white) that one flood cannot take (CD-P's cdcut2.py `whiten`)."""
+    a = np.asarray(raw.convert("RGB")).copy()
+    for _ in range(passes):
+        a[flood_bg(a, tol)] = 255
+    return Image.fromarray(a)
+
+
 def sprite(raw: Image.Image, size: tuple[int, int], cut: dict | None = None, px: dict | None = None) -> Image.Image:
-    rgb, fg = LP.cutout(raw, None, **({"rim": 4} | (cut or {})))
+    cut = dict(cut or {})
+    passes = cut.pop("bg_passes", 0)
+    if passes:
+        raw = whiten(raw, cut.get("tol", 28), passes)
+    rgb, fg = LP.cutout(raw, None, **({"rim": 4} | cut))
     return LP.pix(size, rgb, fg, **({"fill": 0.95, "colors": 16} | (px or {})))[0]
 
 

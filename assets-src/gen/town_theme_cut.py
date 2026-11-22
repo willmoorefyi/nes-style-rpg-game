@@ -142,7 +142,7 @@ def build(town: str) -> tuple[Image.Image, dict]:
         mat_box[n] = [x, rows * T, m.shape[1], m.shape[0]]
         x += m.shape[1]
     meta = {"kit": "town", "sheet": f"theme_{town}", "backend": "bedrock", "tool": "assets-src/gen/town_theme_cut.py",
-            "approved": APPROVED, "theme": TOWNS[town].get("theme"), "tints": sorted(TOWNS[town].get("tints", {})),
+            "approved": TOWNS[town].get("approved", APPROVED), "theme": TOWNS[town].get("theme"), "tints": sorted(TOWNS[town].get("tints", {})),
             "roofs": [r for r in [(TOWNS[town].get("house") or (0, 0, 0, {}))[3].get("flat_roof")] if r],
             "tile": T, "cells": grid, "materials": mat_box, "sources": src, "note": NOTE.format(town=town)}
     return sheet, meta

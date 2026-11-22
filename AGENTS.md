@@ -636,6 +636,12 @@ pieces, Crescent's canals) before it writes its source. `build_map.styled()` loo
 modular terracotta roof every house width can use, gold-ribbed domed villas, the rotunda inn; `clean` repaints SD3.5's
 wall cracks, `town_theme_clean.py`).
 
+**Cardia Deep (pass CD).** The dragon great village under the Cardia isles has its own approved brief,
+`docs/DRAGON_CITY_BRIEF.md` (concept, palette, architecture, districts, set pieces, NPC dress), with its concept art in
+`docs/art/cardia/` and its implementation plan `docs/CARDIA_PLAN.md`. Its cells are the `dragon` sheet of
+`town_theme_spec.py` (`theme_dragon`: `drg_*` set pieces, the `drg_wall` / `drg_floor` materials; cut option
+`bg_passes` for a two-tone backdrop) and the `drake_brazier` prop (`props_ar`, purpose `ar_dragon`).
+
 ### New Cutscene
 
 Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManager` (`src/systems/`) through injected `CutsceneDeps`.

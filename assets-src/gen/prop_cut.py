@@ -37,6 +37,7 @@ T = 48
 OUT = HERE / "approved" / "dungeon" / "props_ar"
 APPROVED = "2026-11-21"
 SHEET_W = 16
+RECORD = ("approved", "purpose")   # pass CD (docs/CARDIA_PLAN.md 6.1): options written to the prop's record, not its cut
 from gen.prop_spec import FLAME, HUES, SPEC, SPLIT  # noqa: E402,F401
 
 
@@ -117,10 +118,12 @@ def prop(pid: str, ledger: dict) -> tuple[Image.Image, dict]:
     meta = {"tag": tag, "cache_key": key, "object": n, "cells": list(size), "place": place,
             "model": row.get("model"), "seed": row.get("seed"), "pass": row.get("pass"),
             "cut": {"mode": "flood", "tol": 30, "rim": 4, "pocket": 6, "join": 3, "split": SPLIT.get(tag, 0),
-                    **{k: v for k, v in o.items() if k != "fill"}},
+                    **{k: v for k, v in o.items() if k not in ("fill", *RECORD)}},
             "pixelize": {"fill": o.get("fill", 0.9), "colors": 14, "seed": 0, "sharpen": 1.0, "outline": "selective",
                          "apron": 0.0},
-            "fig_px": fig, "approved": APPROVED}
+            "fig_px": fig, "approved": o.get("approved", APPROVED)}
+    if "purpose" in o:                                  # pass CD: a prop approved later, under another purpose
+        meta["purpose"] = o["purpose"]
     fl = flame(pid, im)
     if fl:
         meta["flame"] = fl

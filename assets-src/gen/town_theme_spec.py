@@ -10,9 +10,11 @@ docs/TOWN_THEMES.md). One entry per sheet `approved/town/theme_<town>`; every re
           (5x4); opt {clean: {...}} repaints hairline cracks (town_theme_clean.py; also a house option)
   derived:[(name, grid name, (x0, y0, x1, y1) native px of its cut, (w, h))] a piece of a grid cut shrunk to w x h cells
           (town_theme_clean.shrink; its colours only), cells <name>_<r>_<c>
-  sprites:[(name, render id, key, (w, h), cut, pix)] Ultra sprites -> <name>_<r>_<c>; name 'chimney@<s>' is one cell
+  sprites:[(name, render id, key, (w, h), cut, pix)] Ultra sprites -> <name>_<r>_<c>; name 'chimney@<s>' is one cell;
+          cut `bg_passes` n (pass CD): flood the border colour to white n times first (a two-tone backdrop)
   props:  [(render id, key, [(name, (w, h)), ...], cut)] a sheet split into its figures, left to right
   mats:   [(name, render id, key, kind, settings)] materials: 'swatch' (a seamless crop, box fractions) or 'deck'
+  approved: the sheet's approval date when it is not town_theme_cut.APPROVED (pass CD's dragon sheet)
 """
 INN = (4, 5)
 H5 = (5, 5)
@@ -65,6 +67,19 @@ TOWNS = {
         props=[("dwf_props", "c821f9c8fda048a11e782ac7",
                 [("dwf_forge", (2, 2)), ("dwf_pillar", (1, 2)), ("dwf_pillar_slim", (1, 2)), ("dwf_anvil", (1, 1))], {})],
         mats=[("dwf_wall", "dwf_wall", "afa167b6666cfb6335c96fb8", "swatch", {"box": (0, 0.30, 1, 1)})]),
+    "dragon": dict(        # pass CD (docs/CARDIA_PLAN.md 6.1, docs/DRAGON_CITY_BRIEF.md): Cardia Deep, purpose ar_dragon
+        theme=None, approved="2026-11-22",
+        sprites=[("drg_statue", "cd_statue", "406fde010f96f10ccad24bc5", (1, 2), {}, {}),
+                 ("drg_statue_big", "cd_statue", "406fde010f96f10ccad24bc5", (2, 2), {}, {}),
+                 ("drg_pillar", "cd_pillar2", "bf254f96c4f08a8651765a6b", (1, 2), {"bg_passes": 3, "tol": 30}, {}),
+                 ("drg_pillar_slim", "cd_pillar", "46e7d9fa06a1e9a195c64379", (1, 2), {}, {}),
+                 ("drg_arch", "cd_arch", "f29546b1e85d175ef327ebc8", (4, 3), {}, {}),
+                 ("drg_throne", "cd_throne", "169697a8d235f6e3b16a161b", (3, 3), {}, {}),
+                 ("drg_nest", "cd_nest", "5657a4ea62e661844244c20c", (2, 2), {}, {}),
+                 ("drg_hoard", "cd_hoard5", "21cba926731fee82978261b4", (2, 1), {"bg_passes": 2, "tol": 30}, {}),
+                 ("drg_perch", "cd_perch2", "1ca97ad9948aad26fb283226", (1, 2), {}, {})],
+        mats=[("drg_wall", "cd_wall2", "7767886d3ca35f122b3870c5", "swatch", {"box": (0, 0.10, 1, 1)}),
+              ("drg_floor", "cd_floor", "9041d0627c867ff07729afbc", "swatch", {"box": (0, 0, 1, 1)})]),
     "lufenia": dict(       # AR-W3 (user ruling 2026-11-22): stucco townhouse modules under a terracotta roof that
         # repeats across any width (the elder's 8-wide hall), two gold-ribbed domed villas, the ribbed rotunda inn
         theme="luf_roman", house=("luf3_modular2", "0b283fbef7ea5a55b178b953", 0.55, {"clean": {}}),
