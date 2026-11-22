@@ -1,0 +1,132 @@
+{
+  "character": "luf_senator",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 2,
+  "cache_key": "f1f8db07e1ba17227c5ed12e",
+  "pass": "AR",
+  "approved": "2026-11-21",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s50_2",
+      "tag": "luf_senator_s50_2",
+      "cache_key": "f1f8db07e1ba17227c5ed12e",
+      "model": "structure",
+      "seed": 2,
+      "pass": "AR",
+      "render_rows": 3
+    },
+    {
+      "alias": "b50_4",
+      "tag": "luf_senator_b50_4_old_man_up",
+      "cache_key": "8cfc56a2fb9c527806dc703d",
+      "model": "structure",
+      "seed": 4,
+      "pass": "AR",
+      "render_rows": 1
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s50_2",
+        0,
+        false
+      ],
+      [
+        "s50_2",
+        1,
+        false
+      ],
+      [
+        "s50_2",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b50_4",
+        0,
+        false
+      ],
+      [
+        "b50_4",
+        2,
+        false
+      ],
+      [
+        "b50_4",
+        2,
+        true
+      ]
+    ],
+    [
+      [
+        "s50_2",
+        6,
+        false
+      ],
+      [
+        "s50_2",
+        7,
+        false
+      ],
+      [
+        "s50_2",
+        8,
+        false
+      ]
+    ]
+  ],
+  "shifts": {},
+  "edits": [],
+  "figure_px": [
+    93,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92,
+    92
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N luf_senator A: s50_2 down + side (old_man guide, 0.5, seed 2, round goggles); back strip b50_4 cells 0, 2 + 2 mirrored"
+}

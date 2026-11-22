@@ -571,6 +571,21 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   | w_lm5_mermaids`.
 - No placeholder NPCs left: the fairy (`sprite: fairy`, Gaia's spring) and the sea-shrine mermaids (`sprite:
   mermaid`, all four on `sea-shrine-b1`, the elder included) have their own sheets, untinted.
+- **AR NPC sheets (AR-N, AR-N2; user rulings 2026-11-21).** 11 more field sheets from AR Stability
+  control-structure renders (purpose `ar_npc`), re-cut offline by `npc_field_cut.py` (`--check` rebuilds all 13 with
+  the fairy and the mermaid; `--only id[,id]`; `--raw DIR` writes each sheet before and after its edits): Lufenia's
+  `luf_citizen_m`, `luf_citizen_f` (A's down / up rows, B's side row, one palette) and `luf_senator` (the elder, the
+  archivist, the orrery tender), the lair's `dragon_guard` / `dragon_elder` / `dragon_youth` (two each), the Circle's
+  `sage_star` (`sage_east`), `sage_earth` (`sage_moss`), `sage_flame` (`sage_ash`), `dr_unne` (`ert_unne`, Melmond)
+  and `robot_sentry` (two flavour-only NPCs on `sky-castle-1f` / `-2f`), all untinted, each with a 1x `Look` in
+  `characters.py`. **`sage_star`'s side row turns the head but does not walk: never give it `wander`** unless the
+  side row is regenerated (`tests/data/arNpcArt.test.ts` checks it). The AR entries live in `gen/npc_field_ar.py`
+  (`AR_SPEC`, merged into SPEC) in the `cells` format of `gen/npc_field_edit.py`: per-cell picks with a mirror flag,
+  per-row pre-quantize hue shifts, per-render `cut` (`tol` flood tolerance, `holes`: enclosed background areas of
+  >= 400 render px cut away), and post edit steps `erase` (rects, re-outlined), `ramp` (recolour the colours that
+  pass a hue / sat / value predicate onto a target ramp of the sheet's own colours, `nearest` or `rank`), `fill`
+  (see-through holes) and `patch` (15-bit pixels); each step's colour map is logged in the sheet's json `edits`. The
+  ancient robot (`robot_ancient`) is not integrated: its side-row candidates are in `~/temp/ff-game/ar/npcs/edits/`.
 
 ### New Cutscene
 

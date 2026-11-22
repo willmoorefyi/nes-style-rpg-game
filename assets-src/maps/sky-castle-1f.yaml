@@ -152,6 +152,11 @@ npcs:
   chestItem: ether
   chestFlag: CHEST_WND_D2_BERTH_SOUTHEAST
   dialog: [You found an Ether!]
+- id: wnd_sentry_hub
+  sprite: robot_sentry
+  x: 23
+  y: 17
+  dialog: ['The sentry''s lens turns to follow you. A thin voice crackles: "BERTH... UNASSIGNED. AWAIT... THE STEWARD."']
 transitions:
 - {x: 17, y: 14, targetMap: sky-castle-2f, targetEntrance: arrival}
 - {x: 18, y: 14, targetMap: sky-castle-2f, targetEntrance: arrival}

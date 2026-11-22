@@ -46,8 +46,8 @@ class Room(BaseRoom):
                              legend=LEGEND, music="dungeon", extra={"exit": EXIT, **(extra or {})})
 
 
-def dragon(did: str, sprite: str, tint: str, x: int, y: int, before: list[str], after: list[str]) -> dict:
-    return {"id": did, "sprite": sprite, "tint": tint, "x": x, "y": y,
+def dragon(did: str, sprite: str, tint: str | None, x: int, y: int, before: list[str], after: list[str]) -> dict:
+    return {"id": did, "sprite": sprite, **({"tint": tint} if tint else {}), "x": x, "y": y,
             "dialog": [{"condition": DONE, "text": after}, {"text": before}]}
 
 
@@ -105,22 +105,22 @@ lair.npcs += [
                           "Bring me its seal and I will name you as you deserve."]}]},
     {"id": "bahamut_after", "sprite": "garland_npc", "tint": "#d8b450", "x": 19, "y": 6, "showIf": DONE,
      "dialog": ["Bahamut: Your new names fit you. Wear them where the light has gone out of the world."]},
-    dragon("dragon_ember", "knight", "#c86a4a", 12, 8,
+    dragon("dragon_ember", "dragon_guard", None, 12, 8,
            ["I am wearing a man's shape for your sake. Do not stare; the scales show at the wrists."],
            ["Even in this shape I can smell the change on you. You burn hotter now."]),
-    dragon("dragon_tide", "mage", "#4a8ec8", 27, 8,
+    dragon("dragon_tide", "dragon_youth", None, 27, 8,
            ["We came here when the sea still remembered the sky. Bahamut came first."],
            ["The tide will carry the news of you to every shore. That is how dragons gossip."]),
-    dragon("dragon_moss", "old_man", "#7aa05a", 12, 15,
+    dragon("dragon_moss", "dragon_elder", None, 12, 15,
            ["The citadel was built by people who wanted proof of courage they could hold in a hand. Bahamut humours them."],
            ["You held it, and you let it go. That is the part the builders never understood."]),
-    dragon("dragon_ash", "monk", "#8a8a8a", 27, 15,
+    dragon("dragon_ash", "dragon_youth", None, 27, 15,
            ["I sleep on the gold. Not for greed. It is warm, and it does not argue."],
            ["Do not touch the gold. Now that you are named, I would have to argue."]),
-    dragon("dragon_frost", "white_mage", "#b8d8e8", 16, 17,
+    dragon("dragon_frost", "dragon_elder", None, 16, 17,
            ["The guardian in the citadel was one of us once. It forgot when to stop guarding."],
            ["If you brought down the old guardian, then it can rest. Thank you for that."]),
-    dragon("dragon_storm", "black_mage", "#6a5aa0", 23, 17,
+    dragon("dragon_storm", "dragon_guard", None, 23, 17,
            ["Hatchlings dream of flying through the clouds above the plateau. The old ones dream of quiet."],
            ["Go well. When the four lights are lit again, come and tell us how the sky looks."]),
 ]

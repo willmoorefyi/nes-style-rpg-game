@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 8, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: lufenia_elder
-  sprite: old_man
+  sprite: luf_senator
   x: 5
   y: 4
   dialog:
@@ -29,16 +29,14 @@ npcs:
     id: wnd_chime_given
     requiredFlags: [LUFENIAN_LEARNED]
     onceFlag: CHIME_GIVEN
-  tint: '#dfe6f5'
 - id: lufenia_attendant
-  sprite: white_mage
+  sprite: luf_citizen_f
   x: 11
   y: 6
   dialog:
   - condition: LUFENIAN_LEARNED
     text: [The elder has not slept since the wind died. He listens for it at the window every night.]
   - text: [Hesh. Doru lai mennath sor.]
-  tint: '#dfe6f5'
 transitions:
 - {x: 7, y: 9, targetMap: lufenia, targetEntrance: house_elder}
 name: Elder's Hall

@@ -116,7 +116,7 @@ objects:
   collide: alpha
 npcs:
 - id: ert_unne
-  sprite: old_man
+  sprite: dr_unne
   x: 6
   y: 4
   dialog:
