@@ -59,7 +59,6 @@ export class FlightView {
   private shown = false;
   private generation = 0;
   private boardAt = -Infinity;
-  private facing: 'left' | 'right' = 'right';
   private mismatchLogged = false;
   /** The playing tilt's start (from the live camera) and the machine's state count when it began. */
   private tilt: TiltStart | null = null;
@@ -196,7 +195,7 @@ export class FlightView {
   }
 
   private frame(map: MapData, player: PlayerController): FlightFrame {
-    if (player.direction === 'left' || player.direction === 'right') this.facing = player.direction;
+    this.deps.vehicles.noteHeading();   // this tick's heading, whatever the order of the render callbacks (AV 5.3)
     const m = this.machine;
     const tilt = m.busy && this.tilt ? tiltParams(m.t, this.tilt, TILE_SIZE) : null;
     const view: ViewParams = { ...(tilt?.view ?? FLIGHT_VIEW), px: player.x / TILE_SIZE, py: player.y / TILE_SIZE };
@@ -225,7 +224,7 @@ export class FlightView {
     const footY = tilt ? tilt.ship.y - AIRSHIP_LIFT * nativeScale(TILE_SIZE) : SHIP_FOOT_Y;
     const sinceBoard = m.state === 'tiltOut' ? m.t * TILT_MS : Number.isFinite(this.boardAt) ? now - this.boardAt : TAKEOFF_MS;
     return { view, near: chunks ? near : null, chunks, marker, shadow, props: propSources(this.deps.world, this.deps.npcs?.()),
-      ship: { x: tilt?.ship.x ?? view.cx, footY, facing: this.facing, tMs: now, sinceBoard } };
+      ship: { x: tilt?.ship.x ?? view.cx, footY, heading: this.deps.vehicles.airshipHeading(), tMs: now, sinceBoard } };
   }
 
   /** The report and the steady-flight p95s (flightStats: the settle frames and the upload frames are left out). */
@@ -239,7 +238,7 @@ export class FlightView {
     Object.assign(this.report, {
       state: this.machine.state, reason: this.machine.reason, profile: this.profile(), ready: this.ready,
       failed: this.failed, slow: slowThisSession(), lost: this.fallback.lost, busy: this.machine.busy,
-      gl: this.caps?.gl ?? '', samples: s.samples,
+      gl: this.caps?.gl ?? '', samples: s.samples, ship: this.renderer?.shipPick ?? null,
       textures: this.renderer
         ? { ...this.renderer.textures, chunks: chunkHost(this.deps.tilemap())?.residentTextures ?? 0 } : null,
       heavy: { frames: s.heavyFrames, frameMax: +s.heavyFrameMax.toFixed(2), updateMax: +s.heavyUpdateMax.toFixed(3) },

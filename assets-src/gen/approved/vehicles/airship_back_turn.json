@@ -1,0 +1,55 @@
+{
+  "vehicle": "airship",
+  "frame": "airship_back_turn",
+  "pass": "AR",
+  "view": "turn in-between, side -> back (yaw 55)",
+  "tag": "back30y55_st0.6_7",
+  "cache_key": "7bb4c02c37860344add12272",
+  "model": "style_transfer",
+  "seed": 7,
+  "purpose": "ar_airship",
+  "proxy": {
+    "yaw": 55,
+    "elevation": 30,
+    "guide_sha256": "9cbe44a0e40dfe5e"
+  },
+  "tool": "assets-src/gen/vehicle_view_cut.py",
+  "cut_settings": {
+    "flood_tol": 30,
+    "min_piece": 0.03,
+    "pocket_px": 150,
+    "match": "b_7 mean / std per channel",
+    "resample": "box",
+    "width": 128,
+    "unsharp": [
+      1,
+      72,
+      2
+    ],
+    "snap": "b_7 colour set, argmin",
+    "alpha": 110,
+    "outline": "1 px, b_7's darkest colour"
+  },
+  "edits": {
+    "seam_boost": {
+      "delta": 60,
+      "px": 264
+    },
+    "highlight": {
+      "px": 536
+    }
+  },
+  "native_size": [
+    128,
+    104
+  ],
+  "anchor": [
+    0.3899,
+    1.0
+  ],
+  "d7": 13.7979,
+  "faces": "right",
+  "mirrored": false,
+  "approved": "2026-11-22",
+  "review": "self-approved by the AV-1 implementer under the integrator's R6 ruling (2026-11-22); review sheet airship_views/av1/; the user may veto (T-2 reopens)"
+}

@@ -1,4 +1,5 @@
 import type { VehicleType } from '../../types/index.js';
+import type { HeadingEnd } from './airshipHeading.js';
 
 /**
  * The field vehicles' layout rules (VEH-INT), pure so the tests can pin them: the `vehicles` sheet contract
@@ -33,11 +34,15 @@ export interface VehicleSheetMeta {
   native: number;
   frames: Record<string, VehicleFrame>;
   canoe: CanoeSeat;
-  sources?: Partial<Record<VehicleType, 'approved' | 'code'>>;
+  sources?: Partial<Record<VehicleType | OptionalVehicleFrame, 'approved' | 'code'>>;
 }
 
 /** Every frame the field draws: the three vehicles, the canoe's near-side layer and its ripple strip. */
 export const VEHICLE_FRAMES = ['ship', 'airship', 'canoe', 'canoe_front', 'canoe_ripple'] as const;
+
+/** The airship's end and turn views (docs/AIRSHIP_VIEWS_PLAN.md D-AV7): loaded when present; a missing one shows b_7. */
+export const OPTIONAL_VEHICLE_FRAMES = ['airship_back', 'airship_front', 'airship_back_turn', 'airship_front_turn'] as const;
+export type OptionalVehicleFrame = (typeof OPTIONAL_VEHICLE_FRAMES)[number];
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
 
@@ -46,8 +51,9 @@ export function parseVehicleMeta(raw: unknown): VehicleSheetMeta {
   const m = raw as Partial<VehicleSheetMeta> | null;
   if (!m || m.version !== 2) throw new Error('vehicles.json: expected version 2');
   if (m.native !== NATIVE_TILE) throw new Error(`vehicles.json: native ${String(m.native)}, expected ${NATIVE_TILE}`);
-  for (const name of VEHICLE_FRAMES) {
+  for (const name of [...VEHICLE_FRAMES, ...OPTIONAL_VEHICLE_FRAMES]) {
     const f = m.frames?.[name];
+    if (!f && (OPTIONAL_VEHICLE_FRAMES as readonly string[]).includes(name)) continue;
     if (!f || ![f.x, f.y, f.w, f.h, f.footRow].every(isNum) || f.w <= 0 || f.h <= 0
       || !Array.isArray(f.anchor) || f.anchor.length !== 2 || !f.anchor.every(isNum)
       || f.footRow < 0 || f.footRow >= f.h) {
@@ -91,10 +97,11 @@ export function airshipLift(pose: VehiclePose, msSinceTakeoff: number): number {
   return Math.round(AIRSHIP_LIFT * Math.min(1, Math.max(0, msSinceTakeoff) / TAKEOFF_MS));
 }
 
-/** The airship's shadow ellipse on the ground (native px): wide and soft in flight, tight under the keel parked. */
-export function airshipShadow(hullW: number, pose: VehiclePose): { w: number; h: number; alpha: number } {
+/** The airship's shadow ellipse on the ground (native px): wide and soft in flight (deeper under an end view, D-AV8),
+ *  tight under the keel parked. `hullW` is the drawn frame's width. */
+export function airshipShadow(hullW: number, pose: VehiclePose, end: HeadingEnd = 'side'): { w: number; h: number; alpha: number } {
   return pose === 'ridden'
-    ? { w: Math.round(hullW * 0.6), h: 8, alpha: 0.3 }
+    ? { w: Math.round(hullW * 0.6), h: end === 'side' ? 8 : 10, alpha: 0.3 }
     : { w: Math.round(hullW * 0.5), h: 4, alpha: 0.35 };
 }
 

@@ -10,7 +10,7 @@ import { foundText, leftBehindText, receivedText, cantCarryText, itemPhrase } fr
 import { ClinicScene } from '../ClinicScene.js';
 import { PurchaseScene } from '../PurchaseScene.js';
 import { openShopScene } from './FieldSystems.js';
-import { fieldStateOf } from './FieldVehicles.js';
+import { fieldStateOf } from './fieldState.js';
 
 /** What the NPC actions need from the exploration scene. */
 export interface NpcActionHost {

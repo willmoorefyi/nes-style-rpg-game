@@ -1,0 +1,60 @@
+{
+  "vehicle": "airship",
+  "frame": "airship_front_turn",
+  "pass": "AR",
+  "view": "turn in-between, side -> front (yaw 125)",
+  "tag": "front30y125_st0.6_7",
+  "cache_key": "8a1a3e1e1ae4fb54e81e6f14",
+  "model": "style_transfer",
+  "seed": 7,
+  "purpose": "ar_airship",
+  "proxy": {
+    "yaw": 125,
+    "elevation": 30,
+    "guide_sha256": "b410a58a3e11a981"
+  },
+  "tool": "assets-src/gen/vehicle_view_cut.py",
+  "cut_settings": {
+    "flood_tol": 30,
+    "min_piece": 0.03,
+    "pocket_px": 150,
+    "match": "b_7 mean / std per channel",
+    "resample": "box",
+    "width": 128,
+    "unsharp": [
+      1,
+      72,
+      2
+    ],
+    "snap": "b_7 colour set, argmin",
+    "alpha": 110,
+    "outline": "1 px, b_7's darkest colour"
+  },
+  "edits": {
+    "seam_boost": {
+      "delta": 60,
+      "px": 169
+    },
+    "highlight": {
+      "px": 844
+    },
+    "trim_plumb": {
+      "below_row": 102,
+      "px": 2
+    },
+    "pixels": 14
+  },
+  "native_size": [
+    128,
+    104
+  ],
+  "anchor": [
+    0.3893,
+    1.0
+  ],
+  "d7": 13.7979,
+  "faces": "right",
+  "mirrored": false,
+  "approved": "2026-11-22",
+  "review": "self-approved by the AV-1 implementer under the integrator's R6 ruling (2026-11-22); review sheet airship_views/av1/; the user may veto (T-2 reopens)"
+}

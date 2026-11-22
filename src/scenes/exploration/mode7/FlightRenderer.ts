@@ -13,7 +13,7 @@ import type { MapData } from '../../../types/index.js';
 import { FOG_ROWS, FlightSky } from './FlightSky.js';
 import { GroundStrips } from './GroundStrips.js';
 import { WorldAtlas, type AtlasProfile } from './WorldAtlas.js';
-import { FlightBillboards, type BillboardFrame } from './FlightBillboards.js';
+import { FlightBillboards, type BillboardFrame, type ShipPick } from './FlightBillboards.js';
 import { NearDetail } from './NearDetail.js';
 import { nearProfile, type ChunkHost, type NearWindow } from './FlightStream.js';
 import { horizonY, type ViewParams } from './mode7Math.js';
@@ -107,6 +107,8 @@ export class FlightRenderer {
 
   /** The last draw drew into a render texture (a recentre or a late chunk): an upload frame, out of the p95s. */
   get heavy(): boolean { return !!this.near?.heavy; }
+  /** The frame, mirror and heading the airship was last drawn with (AIRSHIP_VIEWS 5.1; `__mode7.ship`). */
+  get shipPick(): ShipPick | null { return this.billboards?.lastPick ?? null; }
 
   /** One flight frame: the atlas's patches, the strips' UVs, the sky down to the horizon, the billboards. */
   draw(frame: FlightFrame): void {

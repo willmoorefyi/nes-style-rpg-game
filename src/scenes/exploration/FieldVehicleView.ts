@@ -4,6 +4,7 @@ import { TILE_SIZE } from '../../core/LayoutConstants.js';
 import {
   FLYING_Z, airshipLift, airshipShadow, bobPx, nativeScale, type CanoeSeat, type VehicleFrame, type VehiclePose,
 } from './vehicleLayout.js';
+import type { HeadingEnd } from './airshipHeading.js';
 
 /** The loaded sheet: a texture and its frame record per frame name, and the canoe seat. */
 export interface VehicleArt {
@@ -26,6 +27,9 @@ export interface VehiclePlacement {
   sinceBoard: number;
   /** The z of the hull (the canoe's near side goes 2 above it, the ripple 1 below). */
   z: number;
+  /** The sheet frame to draw (default the vehicle's own: the airship's heading frames, D-AV4) and its heading end. */
+  frame?: string;
+  end?: HeadingEnd;
 }
 
 /**
@@ -41,9 +45,12 @@ export class VehicleView {
   /** The hull's lift on screen this frame (bob plus flight), px; the canoe's hero follows it. */
   rise = 0;
   private readonly k = nativeScale(TILE_SIZE);
+  /** The frame drawn now (a missing one keeps the vehicle's own). */
+  private current: string;
 
   constructor(readonly type: VehicleType, private readonly art: VehicleArt | null) {
     this.main.label = `vehicle:${type}`;
+    this.current = type;
     const f = art?.frames[type];
     if (f) {
       this.dress(this.main, f.tex, f.frame);
@@ -76,9 +83,14 @@ export class VehicleView {
     s.scale.set(this.k, this.k);
   }
 
-  /** The hull frame (null for a placeholder). */
+  /** The hull frame drawn now (null for a placeholder). */
   get frame(): VehicleFrame | null {
-    return this.art?.frames[this.type]?.frame ?? null;
+    return this.art?.frames[this.current]?.frame ?? null;
+  }
+
+  /** The name of the frame drawn now. */
+  get frameName(): string {
+    return this.current;
   }
 
   /** Every display object, bottom first. */
@@ -97,6 +109,12 @@ export class VehicleView {
   /** Put every part for this frame. */
   place(p: VehiclePlacement): void {
     const k = this.k;
+    const want = p.frame ?? this.type;
+    const f = this.art?.frames[want];
+    if (want !== this.current && f) {
+      this.dress(this.main, f.tex, f.frame);
+      this.current = want;
+    }
     const lift = this.type === 'airship' ? airshipLift(p.pose, p.sinceBoard) : 0;
     this.rise = (bobPx(this.type, p.pose, p.tMs) + lift) * k;
     const flip = p.facing === 'left' ? -1 : 1;
@@ -123,11 +141,12 @@ export class VehicleView {
   /** The shadow ellipse, centred under the keel on the cell's bottom edge, under the hull. */
   private drawShadow(p: VehiclePlacement, frame: VehicleFrame): void {
     const g = this.shadow!;
-    if (this.shadowPose !== p.pose) {
-      const s = airshipShadow(frame.w, p.pose);
+    const key = `${p.pose}:${this.current}:${p.end ?? 'side'}`;
+    if (this.shadowKey !== key) {
+      const s = airshipShadow(frame.w, p.pose, p.end);
       g.clear();
       g.ellipse(0, 0, (s.w * this.k) / 2, (s.h * this.k) / 2).fill({ color: 0x000000, alpha: s.alpha });
-      this.shadowPose = p.pose;
+      this.shadowKey = key;
       this.shadowSize = s;
     }
     g.x = p.footX;
@@ -135,7 +154,7 @@ export class VehicleView {
     g.zIndex = p.pose === 'ridden' ? FLYING_Z - 1 : p.z - 1;   // in flight it falls on the treetops too
   }
 
-  private shadowPose: VehiclePose | null = null;
+  private shadowKey: string | null = null;
   /** The shadow drawn now (native px), for tests. */
   shadowSize: { w: number; h: number; alpha: number } | null = null;
 }

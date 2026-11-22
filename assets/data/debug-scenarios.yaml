@@ -3009,3 +3009,35 @@
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
+- id: av_headings
+  name: AV - the airship parked by Cornelia's south gate (board it and fly 4 ways; ?mode7=0 for top-down)
+  mode: field
+  map: overworld
+  entrance: cornelia  # (146, 155), docs/AIRSHIP_VIEWS_PLAN.md 6: the airship is the cell east; step onto it, confirm takes off
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, at: a1_s_airship }
+  flags: *w_s18_flags
+  party:
+    - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
+- id: av_flight
+  name: AV - in flight over the meadow north of Cornelia (the end views over grass)
+  mode: field
+  map: overworld
+  entrance: cornelia_north  # (146, 150)
+  fieldMode: airship
+  flags: *w_s18_flags
+  party:
+    - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []

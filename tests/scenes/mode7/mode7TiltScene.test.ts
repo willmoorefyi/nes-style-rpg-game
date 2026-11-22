@@ -3,6 +3,7 @@ import { TILE_SIZE } from '../../../src/core/LayoutConstants.js';
 import { AIRSHIP_LIFT, nativeScale } from '../../../src/scenes/exploration/vehicleLayout.js';
 import { FLIGHT_VIEW, SHIP_FOOT_Y, TILT_HOLDOFF_FRAMES, tiltParams, type TiltStart } from '../../../src/scenes/exploration/mode7/mode7Tilt.js';
 import { flightField, flightMap, resetStub, stub } from './flightHarness.js';
+import { FieldVehicles } from '../../../src/scenes/exploration/FieldVehicles.js';
 
 vi.mock('../../../src/scenes/exploration/mode7/FlightRenderer.js', async () => (await import('./flightHarness.js')).rendererModule);
 
@@ -120,5 +121,41 @@ describe('M7-4: the tilt in the field', () => {
     expect(stub.visible).toBe(false);
     expect(tiltHoldOffs(f) - before).toBe(1);
     expect(f.report().history).toEqual(['off', 'flying', 'tiltOut', 'off']);
+  });
+
+  it('AIRSHIP_VIEWS: the first tilt frame draws the field\'s heading (back flying north, front after landing south)', async () => {
+    const spy = vi.spyOn(FieldVehicles.prototype, 'airshipHeading');
+    const f = await flightField({ mode7: 'on', map: flightMap({ width: 60, height: 60 }), start: { x: 30, y: 30 },
+      fieldMode: 'airship', vehicles: [] });
+    await f.idle(2);
+    const vehicles = spy.mock.instances[0] as unknown as FieldVehicles;   // the spied method's this (vitest types it as the return)
+    await f.step('up');
+    await f.idle(2);
+    await f.confirm();                                   // land facing north
+    await f.frame();
+    expect(f.report().state).toBe('tiltOut');
+    expect(stub.last!.ship.heading).toEqual(vehicles.airshipHeading());
+    expect(stub.last!.ship.heading.end).toBe('back');
+    await tilt(f);
+    expect(f.report().state).toBe('off');
+    await f.idle(30);
+    await f.confirm();                                   // take off again: the parked heading is kept (D-AV10)
+    await f.frame();
+    expect(f.report().state).toBe('tiltIn');
+    expect(stub.last!.ship.heading).toEqual(vehicles.airshipHeading());
+    expect(stub.last!.ship.heading.end).toBe('back');
+    await tilt(f);
+    await f.idle(10);
+    await f.step('down');
+    await f.idle(2);
+    await f.confirm();                                   // land facing south
+    await f.frame();
+    await tilt(f);
+    await f.idle(30);
+    await f.confirm();                                   // take off from the airship that landed facing down
+    await f.frame();
+    expect(f.report().state).toBe('tiltIn');
+    expect(stub.last!.ship.heading).toEqual(vehicles.airshipHeading());
+    expect(stub.last!.ship.heading.end).toBe('front');
   });
 });
