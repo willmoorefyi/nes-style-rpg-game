@@ -757,3 +757,77 @@ There were 20 calls, all Stable Image Ultra text-to-image, through `gen/bedrock.
 purpose='ar_dragon')`, from the main checkout, with seeds 201-207 and 211-223. There were no Gemini calls and no
 failures. The keys are in the brief's section 8 and in `raw/<id>.json`. `ar_dragon` has used 20 of 60, and pass AR
 276 of 450.
+
+## 15. CD result (branch `cd` from `mainline` 8b676cd8)
+
+All tranches landed on the one branch, in the plan's order: CD-A, CD-N, CD-M, CD-W, CD-Q, CD-S, a CD-M follow-up and
+CD-INT (one commit each). CD-M and CD-W form one batch: CD-M alone points the frozen overworld door at a deleted map.
+
+**What was built**
+- **World (CD-W).** Five doors into `cardia-deep`: Bahamut's frozen door re-pointed (`later_doors.RETARGET`) and four
+  new islet doors (`later_doors.DOORS`), each one step north of its entrance under a `cave_mouth` in a notch of rock
+  (`_mouth`, ORDEAL's content). The hermit's islet has no door (R1). Landing spots `ord_s_{north,east,stack,west}_airship`.
+  `world.py`: every line OK; land 26,948 (unchanged); **exemptions 440, cap 600** (unchanged: `stamps.sites` already
+  exempts the door cells); G-NW1 6, G-NW2 33.9, G-NW3 6; spots 44 -> 48; ORDEAL coverage 6,117 -> 6,108 (the mouths' rock).
+  The full compile (367 s) changed only four ORDEAL-owned chunks (`below_3_9`, `4_9`, `4_10`, `5_9`) and the Mode 7 atlas.
+- **The village (CD-M).** As section 5, with these choices:
+  - the theme sheet `theme_dragon` (CD-A) gives every set piece; `drg_perch` (re-roll `cd_perch2`) stands in the Roost
+    and `drg_hoard` (re-roll `cd_hoard5`, 2x1) in the Hoard Vaults beside one `gold_heap`;
+  - the ward arches stand over the three north-south mouths (east, stack, Sea Gate), jambs `on_wall`, the opening
+    `passage`; the two side mouths (north, west) have two `drg_statue` gate-posts each (K13's fallback, in the NOTE);
+  - 50 AR props (`DRESS`), the two `drake_brazier`s among them;
+  - 24 named NPCs plus `bahamut_after` (25 entries): the draft's 23 named and `ord_cd_porter` (the Sea Gate hall);
+  - floor `drg_floor` at shade 0.9; rubble shade 1.2 (0.85 failed the `W` / `%` contrast rule, 0.134 < 0.2);
+    water `water_calm`; no Hatchery steam (the one smoke style, `VOLCANO_SMOKE`, reads as volcanic billows, not
+    steam: left out as 5.4 allows).
+- **Deviation: the map's encounter rate.** 5.3 said the map rate is a quiet 999. `EncounterSystem` counts down on the
+  map's rate until the first fight (a zone's `encounterRate` only resets the counter after a battle in that zone), so
+  at 999 the warrens would almost never fight. The map rate is the warrens' 24-36 and the map has no table, so a
+  village step never counts (a step where no table applies is skipped). Browser: a basilisk after 25 warren steps;
+  90 Wyrmhall steps without a battle. The curve model reads the zone's rate, so the proofs are not affected.
+- **NPC sheets (CD-N).** `bahamut` (a golden dragon-king, blue under-armour; at the hero's height), `dragon_sage`
+  (white-scaled; the renders kept the guide's green in every try, so every row's green is hue-shifted to pale white),
+  `dragon_matron` (amber, rust dress, cream apron) and `dragon_hatchling` (coral pink, cut at 0.7 scale, 64 px). New
+  cut options: `edge` (a dark frame on a render's border) and `scale` in `npc_field_edit`; every older sheet
+  rebuilds byte for byte. No fallback was needed.
+- **Saves (CD-S).** `retiredMaps.ts` as section 8; `LoadedSave.entrance`.
+- **Witness (4.3).** The witness of (a) enters by the **east islet's stair** ((165, 74) -> `east`), 12.72 S19 fights
+  (13.13 at CD-0 through `bahamut-cave`).
+
+**Gates**
+
+| Gate | Result |
+|---|---|
+| `world.py` | every line OK; land 26,948; exemptions 440 / 600 |
+| `build_map.py overworld` | OK, 367 s |
+| `build_map.py --check-determinism overworld` | deterministic (633 s) |
+| `mode7_atlas.py --check-determinism overworld` | deterministic |
+| `build_map.py cardia-deep`, `--check-determinism cardia-deep` | OK, deterministic |
+| re-run `world.py`, `cardia_deep.py`, `citadel.py`: `git diff --exit-code assets-src/maps` | clean |
+| `stubs.py --check all`; `world_canon.check()` | `stubs: 0 left`; `[]` (canon 136 rows) |
+| `town_theme_cut.py --check`, `prop_cut.py --check`, `npc_field_cut.py --check` | every sheet rebuilds |
+| `gen/selftest.py` | the approved-key, kit and theme checks pass (`theme_dragon`, `props_ar`, the four NPC sheets); three failures are mainline's (`stage_backgrounds.py` 255 lines, the KA budget block, `kneel_ai budget --check`), and the KA-G Gemini batch selftest hangs on a pipe here (stopped) |
+| `npm run quest -- --strict` | OK: 847,265 states (835,121 at CD-0), 891 places |
+| `npm run quest -- --strict --from-reset` | OK: 195 reset states (32 stage entries, 3 NW2 v4 saves, 160 mid-stage samples), 5,205,220 states searched |
+| `npm run quest -- --strict --mutate` | OK: 68 gate rows, 109 elements, each removal reported (76 min) |
+| `npm run build` | OK |
+| `npm run test:fast` (2 workers) | OK: 411 files, 9,998 tests |
+
+**Curve (proof (d), CD-0 -> CD; the curve model's fractional levels)**: S17 24.96 / 24.96, S18 boss 26.18 / 26.18,
+**S19 26.47 / 26.46**, S20 25.07 / 25.07, S21 28.84 / 28.85, S22 25.07 / 25.07, S23 26.64 / 26.65, S24 boss 28.60 /
+28.61, S25 28.70 / 28.71, S26 28.75 / 28.77, S27 30.32 / 30.33, S28 boss 33.87 / 33.89, S29 33.99 / 34.00, S30 boss
+35.28 / 35.29: every stage within 0.02 (the tolerance is 0.11).
+
+**Bedrock.** 21 `ar_dragon` calls, no failure and no Gemini: CD-A 4 re-rolls (`cd_hoard3` with a dragon on it,
+`cd_hoard4` with a chest, `cd_hoard5` used; `cd_perch2` used) and CD-N 17 (Bahamut 5, the sage 5, the matron 5, the
+hatchling 2). `ar_dragon` 41 of 60, pass AR 297 of 450. Scripts and review sheets: `~/temp/ff-game/cardia/impl/`
+(`scripts/`, `npcs/`); browser checkpoints in `~/temp/ff-game/cardia/impl/int/`.
+
+**Browser** (`?mute=1`, dev server on 127.0.0.1:5191): each islet's landing and mouth, the way in through each, the
+nine districts, Bahamut's trade and class change (WAR / THF / WHM / BLM -> KNIGHT / NINJA / W.WIZ / B.WIZ,
+`CLASS_UPGRADED`), a warren battle, the way out by each stair to its own islet (all five), and a v4 save made inside
+`bahamut-lair` (airship at `ord_s_bahamut_airship`) loading at `cardia-deep` `court` with the airship kept. No console
+error from the game.
+
+**Open.** The integrator's `test:full`. `docs/TOWN_THEMES.md` and the brief name `docs/art/cardia/` (the integrator's
+path) instead of the plan's `docs/art/town_themes/cardia/`.

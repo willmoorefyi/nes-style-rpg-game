@@ -252,6 +252,19 @@ results at the end of the plan). Every stage's `requires`, `grants`, `after` and
   `world.py` line OK; `npm run quest -- --strict` and `--from-reset` OK; `--mutate` OK (68 gate rows, 109 elements, 72 min);
   `npm run build`; `test:fast` 403 files, 9,680 tests. Browser checkpoints in `~/temp/ff-game/nw2/int/`.
 
+### Pass CD: Cardia Deep, the dragon great village ✅
+
+The user's request (2026-11-22): Cardia's islands should work as in classic FF1, each with a way down to the dragons,
+all joined into one village with many ways in and out. Brief `docs/DRAGON_CITY_BRIEF.md`, plan and result
+`docs/CARDIA_PLAN.md`, concept art `docs/art/cardia/`.
+- **World:** a cave mouth on Bahamut's isle and on the north, east, stack and west islets, five doors into one map
+  (`world_specs/later_doors.py`); four new airship landings; every `world.py` check OK (exemptions 440 of 600).
+- **The village:** `cardia-deep` (72x60): nine districts round the Wyrmhall, Bahamut's Court, five wild warrens with
+  the old cave's fights, ward arches, the new `dragon` theme sheet and the drake brazier, 24 named dragon-kin plus
+  `bahamut_after`, four new NPC sheets (Bahamut, the hatchling, the matron, the sage). Every stair leads back to its
+  own islet. `bahamut-cave` / `bahamut-lair` retired; saves inside them load in the village (`retiredMaps.ts`).
+- **Progression:** S19 unchanged but for its maps; the curve within 0.02 of the baseline at every stage.
+
 ---
 
 ## Current Metrics
