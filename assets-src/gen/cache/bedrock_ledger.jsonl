@@ -1130,3 +1130,14 @@
 {"event": "result", "key": "2f1ffbb1e7bb82a9b3e975fd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
 {"event": "request", "ts": "2026-11-22T00:22:39", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 124, "key": "0b283fbef7ea5a55b178b953", "pass": "AR"}
 {"event": "result", "key": "0b283fbef7ea5a55b178b953", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T10:04:55", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 201, "key": "5b846e859eaddb1ff64725ec", "pass": "AR"}
+{"event": "result", "key": "5b846e859eaddb1ff64725ec", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:05:11", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 202, "key": "c426316d859b47d24e3616bd", "pass": "AR"}
+{"event": "result", "key": "c426316d859b47d24e3616bd", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:05:23", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 203, "key": "1457d762c813906563201d45", "pass": "AR"}
+{"event": "result", "key": "1457d762c813906563201d45", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:05:35", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 204, "key": "78e707e39bdd6aad2f6623f7", "pass": "AR"}
+{"event": "result", "key": "78e707e39bdd6aad2f6623f7", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:05:45", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 211, "key": "d05aef9e549c44edd1b5d6fb", "pass": "AR"}
+{"event": "result", "key": "d05aef9e549c44edd1b5d6fb", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-22T10:05:56", "tool": "cdgen.py", "model": "ultra", "purpose": "ar_dragon", "seed": 212, "key": "9041d0627c867ff07729afbc", "pass": "AR"}
