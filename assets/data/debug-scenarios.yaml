@@ -2875,6 +2875,36 @@
   items: {}
   gold: 100
   enemies: []
+- id: w_ar_ember
+  name: "AR - Ember, the dragon-kin guard of Bahamut's lair (AR-N3's line)"
+  mode: field
+  map: bahamut-lair
+  spawn: [12, 9]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_sky3
+  name: "AR - the ancient robot in the sky castle 3F archive"
+  mode: field
+  map: sky-castle-3f
+  spawn: [29, 19]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_ar_sky4
+  name: "AR - the ancient robot at a cold furnace, sky castle 4F"
+  mode: field
+  map: sky-castle-4f
+  spawn: [31, 14]
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
 # M7 (docs/MODE7_PLAN.md 8, 9): the Mode 7 flight scenarios.
 # M7-5 (sections 5, 9): the airship in flight at Pravoka's gate (entrance a1_pravoka, 131, 101), the ship parked at the
 # dock beside it (132, 102) and the tomb's chest (117, 107) 14 cells west: the upright billboards, their depth order

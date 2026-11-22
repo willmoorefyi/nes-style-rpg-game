@@ -213,6 +213,11 @@ npcs:
   chestItem: cabin
   chestFlag: CHEST_WND_D2_BAY_SOUTH_EAST
   dialog: [You found a Cabin!]
+- id: wnd_ancient_stoker
+  sprite: robot_ancient
+  x: 31
+  y: 13
+  dialog: ['The old robot tends the furnace with an empty shovel. It swings it to the fire, and lifts it again.']
 transitions:
 - {x: 3, y: 16, targetMap: sky-castle-3f, targetEntrance: up}
 - {x: 4, y: 16, targetMap: sky-castle-3f, targetEntrance: up}

@@ -602,8 +602,13 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   per-row pre-quantize hue shifts, per-render `cut` (`tol` flood tolerance, `holes`: enclosed background areas of
   >= 400 render px cut away), and post edit steps `erase` (rects, re-outlined), `ramp` (recolour the colours that
   pass a hue / sat / value predicate onto a target ramp of the sheet's own colours, `nearest` or `rank`), `fill`
-  (see-through holes) and `patch` (15-bit pixels); each step's colour map is logged in the sheet's json `edits`. The
-  ancient robot (`robot_ancient`) is not integrated: its side-row candidates are in `~/temp/ff-game/ar/npcs/edits/`.
+  (see-through holes) and `patch` (15-bit pixels); each step's colour map is logged in the sheet's json `edits`.
+  **AR-N3 (user ruling 2026-11-22):** the ancient robot `robot_ancient` is AR-N2's candidate C2: A's down row and
+  back strip (green shifted to verdigris) with a true-profile walking side strip (`robot_ancient3_v1_d65_3`, flood tol
+  34, holes 40; its orange accents shifted to rusty bronze, hue 32 -> 24, val x0.62); an entry's own `approved` date
+  overrides `APPROVED_AR`. Two flavour-only robots (a line each, no action, flag or `wander`): `wnd_ancient_archive`
+  on `sky-castle-3f` (30, 19) and `wnd_ancient_stoker` on `sky-castle-4f` (31, 13), both off the required path; the
+  sentries stay on 1F / 2F. The lair's dragon-kin lines fit their dragon-kin sprites (no "man's shape"). Previews: `?mute=1&scenario=w_ar_sky3 | w_ar_sky4 | w_ar_ember`.
 
 ### Town themes (AR-W2)
 

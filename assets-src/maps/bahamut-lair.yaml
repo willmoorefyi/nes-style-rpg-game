@@ -133,8 +133,8 @@ npcs:
   y: 8
   dialog:
   - condition: CLASS_UPGRADED
-    text: [Even in this shape I can smell the change on you. You burn hotter now.]
-  - text: [I am wearing a man's shape for your sake. Do not stare; the scales show at the wrists.]
+    text: [I can smell the change on you from across the hall. You burn hotter now.]
+  - text: [I keep the door of this hall. Stare at the horns if you must; every guest does. Mind the claws instead.]
 - id: dragon_tide
   sprite: dragon_youth
   x: 27

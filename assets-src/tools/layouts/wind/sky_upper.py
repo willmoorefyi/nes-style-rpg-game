@@ -61,6 +61,8 @@ f3.npcs += [
          {"text": ["A brass figure in a scholar's gown dusts a shelf that has no dust on it.",
                    "Archivist: The charts are in order. The stars have not moved. Only the wind is wrong, and the "
                    "steward upstairs will not let me write it down."]}]},
+    {"id": "wnd_ancient_archive", "sprite": "robot_ancient", "x": 30, "y": 19, "dialog": [   # AR-N3: flavour only
+        "An old robot, green with age, stands in the corner of the hall. Its eyes brighten as you pass, then dim."]},
 ]
 f3.write("Sky Castle 3F: the archive; shelf stacks and star charts, a sealed vault down a west passage.",
          {"arrival": [20, 25], "up": [20, 7]}, table=UPPER, bg="sky_palace", script=SCRIPT,
@@ -95,6 +97,8 @@ f4.npcs += [
     chest("bay_north", "hi_potion", "a Hi-Potion", 20, 1),
     chest("bay_east", "diamond_shield", "a Diamond Shield", 42, 6),
     chest("bay_south_east", "cabin", "a Cabin", 42, 24),
+    {"id": "wnd_ancient_stoker", "sprite": "robot_ancient", "x": 31, "y": 13, "dialog": [   # AR-N3: flavour only
+        "The old robot tends the furnace with an empty shovel. It swings it to the fire, and lifts it again."]},
 ]
 f4.write("Sky Castle 4F: the engine halls; three halls of furnaces and pistons, the Warmech's beat.",
          {"arrival": [5, 14], "up": [36, 23]}, table=UPPER, bg="sky_palace", script=SCRIPT,
