@@ -128,7 +128,10 @@ describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => 
   // measured at INT (60 seeds): garland L2.7 [2,3], pirate L3.6, piscodemon L8.6, astos L10.6, vampire L14.5, lich
   // L17.2, ashen_queen L22.0, evil_eye L24.6 [21,24] (the tightest: 0.4 below 25), dragon_zombie L26.3, drowned_sovereign
   // L28.5, hollow_seraph L33.8 [31,34], lich_2 L35.2 [34,41]. NW2-BAL (docs/NW2_EDITS_PLAN.md 11): ashen_queen L21.8,
-  // evil_eye L24.4, dragon_zombie L26.2, drowned_sovereign L28.6, hollow_seraph L33.9, lich_2 L35.3
+  // evil_eye L24.4, dragon_zombie L26.2, drowned_sovereign L28.6, hollow_seraph L33.9, lich_2 L35.3. QW2 (Sarda's
+  // cave on the south cape; NW2_EDITS_PLAN "QW2 result"): garland L2.7, pirate L3.6, piscodemon L8.6, astos L10.6,
+  // vampire L14.4, lich L17.1, ashen_queen L21.8, evil_eye L24.4, dragon_zombie L26.2, drowned_sovereign L28.7,
+  // hollow_seraph L33.8, lich_2 L35.2
   it('the median whole-party level at each boss is inside its stage\'s band (12 bosses; tightest evil_eye L24.4 [21,24])', () => {
     const rows: string[] = [];
     for (const s of ctx.world.quest.stages) {
@@ -141,7 +144,7 @@ describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => 
     expect(rows.length).toBeGreaterThanOrEqual(12);
   });
 
-  it('the median at Chaos\'s door is in [38, 41] (measured 40.5)', () => {
+  it('the median at Chaos\'s door is in [38, 41] (measured 40.4)', () => {
     const lv = median(runs.map((r) => r.chaosDoor));
     expect(lv).toBeGreaterThanOrEqual(38);
     expect(lv).toBeLessThanOrEqual(41);
@@ -153,8 +156,9 @@ describe('questCurve: seeded battles along the witness walk (QUEST 6.4)', () => 
   // Aldi fights where pass W's walk had none), which drains the party's charges before the engine halls (this model
   // rests only below 45 % HP); every one of the 0.40 wipes per run is in `sky-castle-4f:wnd_d2_engine`, the party's
   // level is pass W's (L33.1 / 33.0). An exception for the optional stage: its bound is 0.45 (0.05 above it).
-  // NW2-BAL: 0.13 (S31's walk no longer sails the Aldi first); required stages at most 0.05 (S28).
-  it('wipes stay under 0.2 per required stage, 0.45 per optional one (measured: at most 0.05; optional S31 (the Warmech of the sky castle\'s engine halls) 0.13)', () => {
+  // NW2-BAL: 0.13 (S31's walk no longer sails the Aldi first); required stages at most 0.05 (S28). QW2: mainline
+  // before the Sarda move measured 0.42 (seeded noise on a changed walk); after it 0.30, required stages at most 0.03.
+  it('wipes stay under 0.2 per required stage, 0.45 per optional one (measured: at most 0.03; optional S31 (the Warmech of the sky castle\'s engine halls) 0.30)', () => {
     for (const s of ctx.world.quest.stages) {
       const w = runs.reduce((a, r) => a + (r.wipes.get(s.id) ?? 0), 0) / runs.length;
       expect(w, `${s.id} wipes ${w.toFixed(2)} per run`).toBeLessThan(s.optional ? 0.45 : 0.2);
