@@ -21,8 +21,8 @@ sys.path.insert(1, str(Path(__file__).resolve().parents[2]))
 from common import Room as BaseRoom  # noqa: E402
 
 KITS = ["temple", "castle", "interior", "town"]
-MATS = {"floor_stone": {"from": "temple_floor", "hue": 25, "sat": 0.55, "shade": 1.45},        # pale stone, whole and unworn
-        "rubble": {"from": "temple_rubble", "hue": 25, "sat": 0.5, "shade": 1.3},             # fallen masonry, `%`
+MATS = {"floor_stone": {"from": "ar_temple_floor_cool", "hue": 25, "sat": 0.55, "shade": 1.45},        # pale stone, whole and unworn
+        "rubble": {"from": "ar_temple_rubble_cool", "hue": 25, "sat": 0.5, "shade": 1.3},             # fallen masonry, `%`
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.4},
         "in_wall_face": {"from": "temple_wall_face", "hue": 25, "sat": 0.7, "shade": 1.35},
         "water": {"from": "water", "hue": 15, "sat": 0.6, "shade": 0.45}}                     # the nave's flood, `≈`

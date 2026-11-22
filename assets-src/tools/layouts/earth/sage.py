@@ -12,6 +12,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dwarf import KITS, LEGEND, MATS  # noqa: E402  (the shared cave materials)
+
+MATS = {**MATS, "floor_stone": {"from": "ar_cave"}, "rubble": {**MATS["rubble"], "from": "ar_temple_rubble_cool"}}   # AR-T2
 from common import Room  # noqa: E402
 
 NOTE = ("Concept: a hermit's sea cave above the surf of Sarda's coast, half library, half tide pool.\n"

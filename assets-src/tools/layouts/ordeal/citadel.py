@@ -19,9 +19,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import Room as BaseRoom  # noqa: E402
 
 KITS = ["castle", "interior", "temple", "town"]
-MATS = {"floor_stone": {"from": "temple_floor", "shade": 0.95, "hue": 20, "sat": 0.6},
+MATS = {"floor_stone": {"from": "ar_temple_floor_cool", "shade": 0.95, "hue": 20, "sat": 0.6},
         "in_wall_face": {"from": "temple_wall_face", "shade": 0.95, "sat": 0.5},
-        "in_wall_top": {"from": "slate", "shade": 0.4}, "rubble": {"from": "temple_rubble", "shade": 0.9}}
+        "in_wall_top": {"from": "slate", "shade": 0.4}, "rubble": {"from": "ar_temple_rubble_cool", "shade": 0.9}}
 TRIM = [150, 170, 200]                        # the pads' cold blue-grey rim
 LEGEND = "legend: W wall top  F wall face  - flagstone  + rune pad / runner  % rubble"
 NOTE = ("Concept: a citadel cut into a mountain for one purpose, to test whoever climbs it, and long empty of anyone but "

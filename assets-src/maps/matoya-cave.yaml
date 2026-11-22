@@ -14,10 +14,7 @@ kits:
 music: town
 materials:
   floor_stone:
-    from: temple_floor
-    hue: -170
-    sat: 1.3
-    shade: 1.5
+    from: ar_cave
   in_wall_top:
     from: temple_wall_top
     hue: -170

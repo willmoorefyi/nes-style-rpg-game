@@ -16,7 +16,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parents[2]))
 from common import Room  # noqa: E402
-from kit import remap  # noqa: E402
 
 MAP, W, H = "waterfall-cave", 30, 22
 GAP = (14, 15)                                   # the exit on the bottom row, back to the ledge
@@ -28,7 +27,8 @@ Topology: one floor, no stairs: entry ramp -> spray hall (footbridge over the ch
   automaton); the west gallery leaves the hall's north bank, the east gallery its south bank, each a dead end with a
   chest. No boss.
 legend: W wall top  F wall face  - wet stone floor  ≈ falls water  = footbridge"""
-MATS = {"floor_stone": remap("cave"), "in_wall_top": {"from": "temple_wall_top", "shade": 0.4},
+MATS = {"floor_stone": {"from": "ar_cave"},                     # AR-T2: the AR cave floor
+        "in_wall_top": {"from": "temple_wall_top", "shade": 0.4},
         "in_wall_face": {"from": "temple_wall_face", "hue": 150, "sat": 0.6, "shade": 1.0}}
 AUTOMATON = {
     "id": "automaton", "x": 14, "y": 4, "sprite": "knight", "tint": "#c8a860",

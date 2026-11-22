@@ -1164,6 +1164,37 @@ def chunks(img: np.ndarray, hgt: int, wid: int):
             yield r // CHUNK, cc // CHUNK, img[r * T:min(hgt, r + CHUNK) * T, cc * T:min(wid, cc + CHUNK) * T]
 
 
+def save_chunk(part: np.ndarray, path: Path) -> None:
+    """AR-T2: a chunk PNG, palette-indexed when it has at most 256 colours (every 15-bit chunk does; a smaller
+    download, the same RGBA when decoded: an RGBA chunk is indexed only when its alpha is binary and every clear px
+    is (0, 0, 0, 0), the one transparent index), else RGB / RGBA. Deterministic: the palette is the sorted colours."""
+    flat = np.ascontiguousarray(part).reshape(-1, part.shape[2])
+    rgba = part.shape[2] == 4
+    if rgba:
+        a = flat[:, 3]
+        if not np.isin(a, (0, 255)).all() or flat[a == 0].any():
+            Image.fromarray(part).save(path, optimize=True)
+            return
+    packed = np.zeros(len(flat), np.uint32)
+    for i in range(part.shape[2]):
+        packed = (packed << 8) | flat[:, i]
+    cols, idx = np.unique(packed, return_inverse=True)
+    if len(cols) > 256:
+        Image.fromarray(part).save(path, optimize=True)
+        return
+    n = part.shape[2]
+    pal = np.stack([(cols >> (8 * (n - 1 - i))) & 255 for i in range(n)], axis=1).astype(np.uint8)
+    h, w = part.shape[:2]
+    im = Image.frombytes("P", (w, h), idx.astype(np.uint8).tobytes())
+    im.putpalette(pal[:, :3].reshape(-1).tolist())
+    extra = {}
+    if rgba:
+        clear = np.nonzero(pal[:, 3] == 0)[0]
+        if len(clear):
+            extra["transparency"] = int(clear[0])
+    im.save(path, optimize=True, **extra)
+
+
 def write(src: dict, c: Compiled, out_dir: Path = OUT, kit: K.Kit | None = None, only: set | None = None,
           base: dict | None = None) -> Path:
     """Write the chunks and the runtime map. `only` (a `--region` compile): the (col, row) chunks to write; the other
@@ -1181,14 +1212,14 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT, kit: K.Kit | None = None,
     for r, cc, part in chunks(c.below, c.height, c.width):
         name = f"below_{r}_{cc}.png"
         if mine(r, cc):
-            Image.fromarray(part).save(d / name, optimize=True)
+            save_chunk(part, d / name)
         below.append(f"{rel}/{name}")
     for r, cc, part in chunks(c.above, c.height, c.width):
         if not mine(r, cc):
             above.append(base["art"]["above"][r * cols + cc])
         elif part[..., 3].any():
             name = f"above_{r}_{cc}.png"
-            Image.fromarray(part).save(d / name, optimize=True)
+            save_chunk(part, d / name)
             above.append(f"{rel}/{name}")
         else:
             above.append(None)

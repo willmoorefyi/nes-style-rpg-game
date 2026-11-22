@@ -710,6 +710,18 @@
    768,
    192,
    192
+  ],
+  "ar_temple_floor_cool": [
+   384,
+   768,
+   192,
+   192
+  ],
+  "ar_temple_rubble_cool": [
+   576,
+   768,
+   192,
+   192
   ]
  },
  "sources": [
@@ -1044,6 +1056,26 @@
     1.0
    ],
    "colours": 9
+  },
+  "ar_temple_floor_cool": {
+   "how": "recolor",
+   "from": "ar_temple_floor",
+   "args": [
+    141,
+    2.4,
+    0.75
+   ],
+   "colours": 8
+  },
+  "ar_temple_rubble_cool": {
+   "how": "recolor",
+   "from": "ar_temple_rubble",
+   "args": [
+    165,
+    2.45,
+    0.62
+   ],
+   "colours": 8
   }
  },
  "parts": {

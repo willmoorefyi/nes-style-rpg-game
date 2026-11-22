@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import Room as BaseRoom  # noqa: E402
 
 KITS = ["castle", "interior", "town"]
-MATS = {"floor_stone": {"from": "marble", "shade": 0.78}, "in_wall_face": {"from": "castle_wall_in", "shade": 0.8},
+MATS = {"floor_stone": {"from": "ar_marble", "shade": 0.78}, "in_wall_face": {"from": "castle_wall_in", "shade": 0.8},
         "in_wall_top": {"from": "slate", "shade": 0.42}, "floor": {"from": "floor", "shade": 0.7}}
 TRIM = [120, 150, 110]                        # tarnished elven green-gold
 LEGEND = "legend: W wall top  F wall face  - flagstone  _ wood floor  + mirror-hall runner  % rubble"

@@ -13,7 +13,7 @@ kits:
 music: dungeon
 materials:
   floor_stone:
-    from: marble
+    from: ar_marble
     shade: 0.78
   in_wall_face:
     from: castle_wall_in

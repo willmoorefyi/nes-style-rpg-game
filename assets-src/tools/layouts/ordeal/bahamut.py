@@ -18,8 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from common import Room as BaseRoom  # noqa: E402
 
 KITS = ["castle", "interior", "temple", "town"]
-MATS = {"floor_stone": {"from": "temple_rubble", "shade": 0.85, "hue": 12, "sat": 0.8},
-        "rubble": {"from": "temple_rubble", "shade": 0.7, "hue": 12},
+MATS = {"floor_stone": {"from": "ar_temple_rubble_cool", "shade": 0.85, "hue": 12, "sat": 0.8},
+        "rubble": {"from": "ar_temple_rubble_cool", "shade": 0.7, "hue": 12},
         "in_wall_face": {"from": "temple_wall_face", "shade": 0.7, "hue": 18, "sat": 0.7},
         "in_wall_top": {"from": "slate", "shade": 0.3}}
 TRIM = [200, 160, 70]                         # the dais's tarnished gold

@@ -60,7 +60,7 @@ def approved_cells() -> set[str]:
     for meta in sorted(K.APPROVED.glob("*/*.json")):
         if meta.with_suffix("") in K.LANDMARK_SHEETS:    # the landmark sheets are the ones meant to fill these cells
             continue
-        names |= {c for row in json.loads(meta.read_text()).get("cells", []) for c in row if c}
+        names |= {c for row in json.loads(meta.read_text()).get("cells", []) for c in row if isinstance(c, str)}
     return names
 
 

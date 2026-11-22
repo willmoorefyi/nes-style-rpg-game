@@ -12,12 +12,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parents[2]))
 from common import Room as BaseRoom  # noqa: E402
-from kit import remap  # noqa: E402
 
 KITS = ["temple", "castle", "interior", "town"]
-MATS = {"floor_stone": {"from": "temple_floor", "hue": -170, "sat": 0.45, "shade": 0.75},     # dark basalt
-        "rubble": remap("lava"),                                                          # the lava, `%`
-        "carpet": {"from": "temple_floor", "sat": 0.12, "shade": 1.15},                   # pale ash, `+`
+MATS = {"floor_stone": {"from": "ar_cave", "sat": 0.6, "shade": 0.55},                     # dark basalt (AR-T2)
+        "rubble": {"from": "ar_lava"},                                                    # the lava, `%` (AR-T2)
+        "carpet": {"from": "ar_temple_floor_cool", "sat": 0.12, "shade": 1.15},                   # pale ash, `+`
         "in_wall_face": {"from": "temple_wall_face", "hue": -170, "sat": 1.3, "shade": 0.8},
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.32}}
 LEGEND = "legend: W rock top  F rock face  - basalt  % lava (hazard, 1 HP a step)  + ash"

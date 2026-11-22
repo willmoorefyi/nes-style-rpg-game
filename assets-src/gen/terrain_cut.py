@@ -17,8 +17,8 @@ The sheet is loaded into every kit (kit.AR_SHEET) under these names, none of whi
   fresh water `water_calm` / `water_calm_shallow` (AR-T2: rivers and lakes, derived from a rock-free window of the
   shallows render and the ocean's ramp; no streaks), so the classic painter finds them too (swamp, taiga and snow
   were build_map fallbacks before);
-- the dungeon floors `ar_temple_floor`, `ar_temple_rubble`, `ar_cave`, `ar_wood_floor`, `ar_marble`, `ar_lava`,
-  `ar_ice`, used through the layout scripts' `materials:` remaps;
+- the dungeon floors `ar_temple_floor`, `ar_temple_rubble` (and their `_cool` slate recolours), `ar_cave`,
+  `ar_wood_floor`, `ar_marble`, `ar_lava`, `ar_ice`, used through the layout scripts' `materials:` remaps;
 - the parts `ar_tree_clump` (the approved tree_clump in the new forest's ramp) and `conifer_clump` (the taiga's edge
   clump, code-drawn in the taiga's ramp: four pines, snow on the lit side).
 """
@@ -80,6 +80,10 @@ DERIVED = {
     "water_calm": ("rank", "water_calm_shallow", ("ar_ocean", 2, 5)),
     "mountain_cold": ("recolor", "ar_mountain", COLD_ROCK),
     "mountain_cold@b": ("recolor", "ar_mountain@b", COLD_ROCK),
+    # the temple floors in the old temple kit's cool slate (hue 200, sat 0.3, val 0.3), so the dungeons' tuned
+    # recolours (sea shrine, citadel, past, mirage, Bahamut) keep their look on the new stone
+    "ar_temple_floor_cool": ("recolor", "ar_temple_floor", (141, 2.4, 0.75)),
+    "ar_temple_rubble_cool": ("recolor", "ar_temple_rubble", (165, 2.45, 0.62)),
 }
 PARTS = {"ar_tree_clump": ("remap", "ar_forest"), "conifer_clump": ("conifer", "taiga")}
 

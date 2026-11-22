@@ -6796,7 +6796,7 @@ patches:
   - [100, 142]
   terrain: 2
 build:
-  compiler: cc0e60060ed4d2dd
+  compiler: b8e6bf8bf5eea465
   chunks: {'0,0': 1bc215718ae323ff, '1,0': a9f5e311adb1556d, '2,0': 73a601da9d02980a, '3,0': 5c3dde896cc62ad9, '4,0': 7cb4003480987124, '5,0': 64f97bcac6c600e3, '6,0': 755105345bf5a698, '7,0': 53c7cef873721dc7,
     '8,0': 109b7649349bb0e3, '9,0': fd1675fea40d04da, '10,0': 97f2f5a6cb6d71e0, '11,0': 3cc25baf277223d0, '12,0': 8e4d7babf4945489, '13,0': 523ce6a2bf36f718, '14,0': 9e7e44439d50a16d, '15,0': 53d4b61d56b0d143,
     '0,1': 4b2a0ad0020ee666, '1,1': c3f628af83acee4d, '2,1': 0c526625da78bc07, '3,1': ea8ed6e9a15883e0, '4,1': ccee96e04fc85d19, '5,1': abca5674d46bdde8, '6,1': 85b8bdb79d89cb1f, '7,1': 8dad7180944742b0,

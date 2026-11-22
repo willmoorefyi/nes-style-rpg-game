@@ -19,12 +19,12 @@ materials:
     sat: 0.45
     shade: 1.75
   floor_stone:
-    from: marble
+    from: ar_marble
     hue: 15
     sat: 0.6
     shade: 1.05
   carpet:
-    from: marble
+    from: ar_marble
     hue: 175
     sat: 2.2
     shade: 1.3

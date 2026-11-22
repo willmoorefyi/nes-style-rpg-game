@@ -19,8 +19,8 @@ from kit import remap  # noqa: E402
 KITS = ["castle", "interior", "temple", "town"]
 # in_wall_top first: it recolours the kit's own red carpet (a soft weave) before `carpet` is remapped below
 MATS = {"in_wall_top": {"from": "carpet", "hue": 215, "sat": 0.45, "shade": 1.75},             # the open sky below
-        "floor_stone": {"from": "marble", "hue": 15, "sat": 0.6, "shade": 1.05},              # pale sky-marble walks
-        "carpet": {"from": "marble", "hue": 175, "sat": 2.2, "shade": 1.3},                     # light-bridges, `+`
+        "floor_stone": {"from": "ar_marble", "hue": 15, "sat": 0.6, "shade": 1.05},              # pale sky-marble walks
+        "carpet": {"from": "ar_marble", "hue": 175, "sat": 2.2, "shade": 1.3},                     # light-bridges, `+`
         "rubble": {"from": "floor", "hue": 8, "sat": 1.3, "shade": 1.45},                      # amber belts, `%`
         "in_wall_face": remap("sky")}                                                           # slate parapets
 LEGEND = "legend: W open sky / masonry top  F parapet face  - marble walk  + light-bridge  % conveyor belt (one way)"

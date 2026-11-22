@@ -18,13 +18,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parents[2]))
 from common import Room as BaseRoom  # noqa: E402
-from kit import landmark_parts, remap  # noqa: E402
+from kit import landmark_parts  # noqa: E402
 
 KITS = ["temple", "castle", "interior", "town"]
-ICE = remap("ice")
+ICE = {"from": "ar_ice"}                                                        # AR-T2: the AR ice floor
 # the remaps apply in order, so the later entries recolour the ice floor_stone once more only by shade
 MATS = {"floor": {"from": "floor_stone", "sat": 0.25, "shade": 1.45},          # packed snow (`_`)
-        "rubble": {"from": "temple_rubble", "sat": 0.2, "shade": 1.25},         # cracked ice (`%`)
+        "rubble": {"from": "ar_temple_rubble_cool", "sat": 0.2, "shade": 1.25},         # cracked ice (`%`)
         "floor_stone": ICE,
         "carpet": {"from": "floor_stone", "shade": 1.3},                        # sheet ice (`+`)
         "in_wall_top": {"from": "floor_stone", "shade": 0.38},

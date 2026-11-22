@@ -14,10 +14,10 @@ from kit import remap  # noqa: E402
 
 KITS = ["temple", "castle", "interior", "town"]
 LEGEND = "legend: W rock  F rock face  - cave floor  % rubble  ~ cave water"
-CAVE = {"floor_stone": {**remap("cave"), "shade": 1.2}, "rubble": {**remap("cave", "temple_rubble"), "shade": 1.2},
+CAVE = {"floor_stone": {"from": "ar_cave", "shade": 0.8}, "rubble": {**remap("cave", "ar_temple_rubble_cool"), "shade": 1.2},
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.3},
         "in_wall_face": {**remap("cave", "temple_wall_face"), "shade": 0.95}}
-ICE = {"floor_stone": remap("ice"), "rubble": {**remap("ice", "temple_rubble"), "shade": 1.2},
+ICE = {"floor_stone": {"from": "ar_ice"}, "rubble": {**remap("ice", "ar_temple_rubble_cool"), "shade": 1.2},
        "in_wall_top": {"from": "temple_wall_top", "shade": 0.4},
        "in_wall_face": {**remap("ice", "temple_wall_face"), "shade": 0.9}}
 EXIT = {"map": "overworld", "entrance": "ert_earth_cave"}
