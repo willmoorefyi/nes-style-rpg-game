@@ -266,26 +266,11 @@ objects:
 - type: deco
   parts:
   - [windmill_icon_0_0, windmill_icon_0_1]
+  - [windmill_icon_1_0, windmill_icon_1_1]
+  - [windmill_icon_2_0, windmill_icon_2_1]
   x: 37
   y: 3
   style: stone
-  offset: [12, 0]
-  collide: alpha
-- type: deco
-  parts:
-  - [windmill_icon_1_0, windmill_icon_1_1]
-  x: 37
-  y: 4
-  style: stone
-  offset: [6, 0]
-  collide: alpha
-- type: deco
-  parts:
-  - [windmill_icon_2_0, windmill_icon_2_1]
-  x: 37
-  y: 5
-  style: stone
-  offset: [0, 0]
   collide: alpha
 - {type: crate, x: 36, y: 7}
 - {type: crate, x: 38, y: 7}
