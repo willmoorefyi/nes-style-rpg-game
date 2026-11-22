@@ -16,7 +16,7 @@ ratios within 0.86-1.16, largest bearing error 21 degrees (act-1-frozen Matoya).
 ## Tranches
 
 ### FX-A: act-1 and Elfheim text and test data (data and dialogue only)
-- P1-1-02 (P2): the King (21,8) and chancellor (18,10) in `cornelia-castle-2f` still say the builders are at work after BRIDGE_BUILT; give them post-bridge lines.
+- P1-1-02 (P2): the King (21,8) and chancellor (18,10) in `cornelia-castle-2f` still say the builders are at work after BRIDGE_BUILT; give them post-bridge lines. **Done** (FX-A, f1ed5bc9: both have a first-match `BRIDGE_BUILT` entry in `layouts/castle.py`, compiled); FX-S re-checked it in the compiled map and added the regression test `tests/data/act1Flow.test.ts` ("after BRIDGE_BUILT the King and the chancellor ..."). `castle.py` is at 364 lines, 4 over AGENTS.md's 360 ceiling since FX-A; FX-S did not touch it.
 - P1-1-03 (P2): pirate count (nine and a Captain vs nine pirates and no captain): make the lines match the fight.
 - P1-1-06 (P3) and P3-07 (PLAY-3): gift lines read "... Received the Herb." / "Received the Mystic Key." glued to speech, and Smyth's Excalibur has no pickup line: use the shared pickup text consistently.
 - P1-1-07 (P2): before the Marsh Cave the Western Keep 2F throne is empty while the 1F courtiers say the king sits there: make the 1F lines conditional on MARSH_GUARD_DEFEATED (or seat the king).
@@ -27,7 +27,7 @@ ratios within 0.86-1.16, largest bearing error 21 degrees (act-1-frozen Matoya).
 
 ### FX-B: balance and economy (investigate first; report before big changes)
 - P1-1-04 (P2): the pirate fight is won by pressing Fight alone at level 3; P1-1-05 (P2): Iron Sword 175 G (attack 14) is almost as good as the Short Sword and Hand Axe at 550 G.
-- P1-1-09 (P2): the piscodemon x3 fight is a coin flip for a Fight-only level-8 party and nothing in the cave hints at magic and potions. Add an in-cave hint NPC or a signpost; keep the fight's win rate bounds.
+- P1-1-09 (P2): the piscodemon x3 fight is a coin flip for a Fight-only level-8 party and nothing in the cave hints at magic and potions. Add an in-cave hint NPC or a signpost; keep the fight's win rate bounds. **Done** (FX-S): a knight of the king's escort (`elf_d_last_escort`, `layouts/elf/marsh_b3.py`) at (7, 13) on Marsh Cave B3's burial gallery, the row every way to the bier passes, says the three keepers strike together and to cast (fire and the white healing) and keep potions to hand; after MARSH_GUARD_DEFEATED he only rests. No enemy or balance data changed (`tests/balance/w_elf_d.test.ts` unchanged); tests in `tests/quest/elf/elf_d_marsh.test.ts`.
 - P1-1-12, P2-02 and P3-02: gold balloons (the Western Keep pays 1,200 to 7,061 G in one visit; dungeons add 12-72k G per pass; the Mirage Tower about 5,000 G a fight). Compare our per-enemy gold and the shop prices with FF1's, enemy by enemy and zone by zone (INT-W2c's `xp_compare.md` method). If we match FF1, leave it as designed and say so; if we are well above, lower gold rewards or raise prices so the 40,000 G bottle and Crescent's gear matter. Report numbers to the integrator before changing more than a handful of records.
 - P3-04 (PLAY-3): the five past-temple fights (four refights and Death Eye) are soft at L34 for a Fight-mashing party; P3-03: Warmech wins 3 of 3 without a KO. Tune toward the plan's win-rate bounds (WORLD 3.7), keeping the seeded balance tests within the 3-point rule.
 

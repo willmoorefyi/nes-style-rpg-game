@@ -246,9 +246,15 @@ def test_style_lock() -> None:
         return
     knight = GEN.load_character("knight")
     check(bool(knight.get("locked")), "knight is locked in characters.yaml")
+    from gen import selftest_roster as SRo_
+    from gen import bedrock as B_
+    from gen.approve import KNEEL_SHEETS
+    gem_ledger, br_ledger = GEN.read_ledger(), B_.read_br_ledger()
+    kneel_keys = 0
     for path in sorted((HERE / "approved").glob("*/*.json")):
         meta = json.loads(path.read_text())
-        meta.setdefault("character", meta.get("kit"))       # kit sheets are keyed by kit id
+        meta.setdefault("character", meta.get("kit") or meta.get("vehicle"))   # kit sheets by kit id, vehicles by name
+        meta.setdefault("sheet", path.stem)                  # a vehicle record names no sheet: its file's
         if meta.get("revived_from"):                         # FW-RT revival: the archived key's committed cache file
             from gen import selftest_roster as SRo
             check(SRo.revived_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: revived from "
@@ -259,12 +265,28 @@ def test_style_lock() -> None:
             check(SRo.bedrock_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: Bedrock keys "
                                                    f"{SRo.bedrock_keys(meta)} BR-ledgered and cached")
             continue
+        if meta.get("sheet") in KNEEL_SHEETS:              # pass KA: kneel_ai_gem's requests, checked as kneel_ai approves
+            kneel_keys += 1
+            why = SRo_.kneel_ok(meta, gem_ledger, br_ledger, HERE)
+            if why:
+                check(False, f"{meta['character']} {meta['sheet']}: {why}")
+            continue
         char = GEN.load_character(meta["character"])
         req = GEN.plan_request(char, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"])
         check(req.key == meta["cache_key"] and req.cached,
               f"{meta['character']} {meta['sheet']}: planned key {req.key} == approved {meta['cache_key']}")
         if meta["character"] == "knight":
             check("HOUSE STYLE" not in req.prompt, f"knight {meta['sheet']}: no house-style reference in its own request")
+    check(kneel_keys >= 135, f"pass KA: all {kneel_keys} approved kneel keys (kneel.json, battle_kneel.json) "
+                             "ledgered, reviewed and wired as `kneel: {source: ai}`")
+    gob = json.loads((HERE / "approved" / "goblin" / "kneel.json").read_text())
+    mutated = [("an unledgered key", {**gob, "gemini_cache_keys": ["0" * 24]}),
+               ("a hero's sheet name", {**gob, "sheet": "battle_kneel"}),
+               ("a J0 FAIL without a review", {k: v for k, v in gob.items() if k != "user_review"} | {"j0": "FAIL"}),
+               ("no keys", {**gob, "gemini_cache_keys": []})]
+    check(all(SRo_.kneel_ok(m, gem_ledger, br_ledger, HERE) for _, m in mutated)
+          and SRo_.kneel_ok(gob, gem_ledger, br_ledger, HERE) is None,
+          f"pass KA: the kneel check refuses {', '.join(n for n, _ in mutated)}")
 
     def refused(fn) -> bool:
         try:

@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import type { MapData } from '../../../src/types/index.js';
+import { resolveNPCDialog, type MapData } from '../../../src/types/index.js';
 import { npcOutcome, type FieldState } from '../../../src/systems/fieldRules.js';
 import { loadQuestWorld } from '../../../src/progression/questData.js';
 import { closure, createQuestContext } from '../../../src/progression/questProofs.js';
@@ -85,6 +85,31 @@ describe('ELF-D: the Marsh Cave floors', () => {
     }
     expect(b3.canSave).toBe(false);
     expect(b3.entrances?.boss).toBeDefined();
+  });
+});
+
+describe('P1-1-09 (FX-S): the hint before the keepers', () => {
+  const knight = b3.npcs.find((n) => n.id === 'elf_d_last_escort');
+  const lines = (flags: string[]): string => resolveNPCDialog(knight?.dialog ?? [], (f) => flags.includes(f)).join(' ');
+
+  it('a knight of the escort on B3 recommends magic and potions before the fight, other words after it', () => {
+    expect(knight).toBeDefined();
+    expect(lines([])).toMatch(/mages? cast/i);
+    expect(lines([])).toMatch(/potions/i);
+    expect(lines([])).toMatch(/three keepers/i);
+    expect(lines(['MARSH_GUARD_DEFEATED'])).not.toMatch(/potions/i);
+  });
+
+  it('every way from B3\'s arrivals to the bier passes the knight\'s row, and he blocks none of them', () => {
+    const k = knight as NonNullable<typeof knight>;
+    const bier = b3.npcs.find((n) => n.id === 'elf_d_bier') as NonNullable<typeof knight>;
+    const row = new Set<string>();
+    for (let x = 0; x < b3.width; x++) row.add(`${x},${k.y}`);
+    for (const e of ['arrival', 'pit']) {
+      expect(distances(b3, at(b3, e)).has(`${bier.x},${bier.y}`), e).toBe(true);
+      expect(distances(b3, at(b3, e)).has(`${k.x},${k.y}`), e).toBe(true);
+      expect(distances(b3, at(b3, e), row).has(`${bier.x},${bier.y}`), `${e} without the knight's row`).toBe(false);
+    }
   });
 });
 

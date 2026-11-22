@@ -56,6 +56,25 @@ describe('M7-2: activation', () => {
     expect(f.report().history).toEqual(['off', 'flying', 'off']);
   });
 
+  it('FX-S: a scene change mid-flight (exit, enter again) frees the renderer once and flies on a new one', async () => {
+    const f = await flightField({ mode7: 'on', fieldMode: 'airship', vehicles: [] });
+    await f.frame();
+    expect(f.report().state).toBe('flying');
+    f.scene.exit();                                        // a debug scenario or a battle retry switches scenes
+    expect(stub.destroyed).toBe(1);
+    expect(world(f).visible).toBe(true);
+    await f.scene.enter();
+    await flush();
+    expect(stub.created).toBe(2);
+    await f.frame();
+    await f.frame();
+    expect(f.report().state).toBe('flying');               // a fresh renderer, restored with no tilt
+    expect(stub.destroyed).toBe(1);
+    expect(stub.visible).toBe(true);
+    f.scene.exit();
+    expect(stub.destroyed).toBe(2);
+  });
+
   it('?mode7=0 flies top-down and loads nothing, even with a renderer', async () => {
     const off = await flightField({ mode7: 'off', fieldMode: 'airship', vehicles: [] });
     await off.idle(3);

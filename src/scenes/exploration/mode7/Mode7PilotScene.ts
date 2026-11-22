@@ -10,6 +10,7 @@ import type { MapData, Scene } from '../../../types/index.js';
 import { DebugScenarioLoader, pickScenario } from '../../../systems/DebugScenarioLoader.js';
 import { FlightSky } from './FlightSky.js';
 import { GroundStrips } from './GroundStrips.js';
+import { releaseMeshTextures } from './meshRelease.js';
 import { depthAt, type ViewParams } from './mode7Math.js';
 import { pickPreset, presetView, type PilotPreset } from './pilotPresets.js';
 import { atlasCellPx, atlasTexture, composeStandIn, fillTexture, glInfo, meanRgb, readMip, readScreenRow, rowDiff,
@@ -146,6 +147,7 @@ export class Mode7PilotScene implements Scene {
   exit(): void {
     this.strips?.destroy();
     this.sky?.destroy();
+    releaseMeshTextures(this.game.app.renderer);   // before the atlas the far mesh drew is freed (meshRelease.ts)
     this.atlas?.texture.destroy(true);
     this.strips = null;
     this.sky = null;
