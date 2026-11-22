@@ -14,6 +14,8 @@ import { ShipMode } from '../../entities/ShipMode.js';
 import { AirshipMode } from '../../entities/AirshipMode.js';
 import { FieldVehicleSprites } from './FieldVehicleSprites.js';
 import { bankHintFor } from './FieldBankHint.js';
+import { fieldStateOf } from './fieldState.js';
+import type { AirshipHeading } from './airshipHeading.js';
 
 /** The field-rule mode of a movement mode (an unknown id counts as walking, the rules' strictest). */
 export function fieldModeOf(mode: MovementMode): FieldMode {
@@ -230,18 +232,12 @@ export class FieldVehicles {
     return { parked: this.sprites.parkedTypes, ridden: this.sprites.riddenType };
   }
 
+  /** The airship's heading (one owner: the sprites, D-AV4) and one frame of the hero's direction taken into it. */
+  airshipHeading(): AirshipHeading { return this.sprites.heading; }
+  noteHeading(): void { this.sprites.noteHeading(); }
+
   /** The field-rule state now: the game's flags and items, the party's mode and these vehicles. */
   fieldState(mode: FieldMode): FieldState {
     return fieldStateOf(this.game, mode, this.states);
   }
-}
-
-/** The field-rule state of a game: its flags and held items, `mode` and `vehicles`. */
-export function fieldStateOf(game: Game, mode: FieldMode, vehicles: readonly VehicleState[] = []): FieldState {
-  return {
-    flags: new Set(Object.keys(game.gameFlags.getAll())),
-    items: new Set(game.inventory.getAll().map((i) => i.itemId)),
-    mode,
-    vehicles,
-  };
 }

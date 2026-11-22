@@ -10,8 +10,10 @@ import { TILE_SIZE } from '../../src/core/LayoutConstants.js';
 import { FieldVehicleSprites, vehicleArt } from '../../src/scenes/exploration/FieldVehicleSprites.js';
 import { FALLBACK_TINT } from '../../src/scenes/exploration/FieldVehicleView.js';
 import {
-  AIRSHIP_LIFT, FLYING_Z, TAKEOFF_MS, VEHICLE_FRAMES, bobPx, nativeScale, parseVehicleMeta, type VehicleSheetMeta,
+  AIRSHIP_LIFT, FLYING_Z, OPTIONAL_VEHICLE_FRAMES, TAKEOFF_MS, VEHICLE_FRAMES, bobPx, nativeScale, parseVehicleMeta,
+  type VehicleSheetMeta,
 } from '../../src/scenes/exploration/vehicleLayout.js';
+import { TURN_MS } from '../../src/scenes/exploration/airshipHeading.js';
 import { PlayerController } from '../../src/entities/PlayerController.js';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import type { Game } from '../../src/core/Game.js';
@@ -34,15 +36,18 @@ function sheet(): Texture {
 }
 
 /** A field with a world, a fake clock, the real sheet json (or a failing load), and a hero on an open map. */
-async function rig(opts: { fail?: boolean } = {}) {
+async function rig(opts: { fail?: boolean; late?: boolean; raw?: unknown } = {}) {
   let t = 1000;
   const world = new Container();
   world.sortableChildren = true;
+  let release: () => void = () => {};
+  const gate = new Promise<void>((res) => { release = res; });
   const load = opts.fail
     ? () => Promise.reject(new Error('404'))
-    : () => Promise.resolve<[unknown, Texture]>([RAW, sheet()]);
+    : () => (opts.late ? gate : Promise.resolve()).then((): [unknown, Texture] => [opts.raw ?? RAW, sheet()]);
   const sprites = new FieldVehicleSprites(world, () => t, load);
-  await sprites.ensure();
+  const loaded = sprites.ensure();
+  if (!opts.late) await loaded;
   let held: Direction | null = null;
   const input = { isPressed: (a: string) => a === held, isJustPressed: () => false };
   const player = new PlayerController({ startX: 5, startY: 5, texture: Texture.WHITE,
@@ -50,7 +55,11 @@ async function rig(opts: { fail?: boolean } = {}) {
     input: input as unknown as Game['input'], events: { emit: vi.fn() } as unknown as Game['events'] });
   world.addChild(player.animation.sprite);
   const face = (d: Direction): void => { held = d; player.update(0); held = null; player.setPosition(5, 5); };
-  return { world, sprites, player, face, tick: (ms: number) => { t += ms; }, follow: () => sprites.views.ridden?.main.onRender?.(null as never) };
+  /** Start a step in `d` (the hero is moving after it). */
+  const step = (d: Direction): void => { held = d; player.update(0); held = null; };
+  const finish = async (): Promise<void> => { release(); await loaded; };
+  return { world, sprites, player, face, step, finish, tick: (ms: number) => { t += ms; },
+    follow: () => sprites.views.ridden?.main.onRender?.(null as never) };
 }
 
 describe('vehicle art: the sheet contract (assets-src/vehicles.py)', () => {
@@ -201,5 +210,93 @@ describe('vehicle art: the fallback', () => {
       const f = META.frames[name];
       expect([art.frames[name].tex.frame.x, art.frames[name].tex.frame.width]).toEqual([f.x, f.w]);
     }
+  });
+});
+
+/** The texture frame's x on the sheet of the ridden or parked view's hull (which frame is drawn). */
+const frameX = (v: { main: { texture: Texture } }): number => v.main.texture.frame.x;
+
+describe('vehicle art: the airship views (docs/AIRSHIP_VIEWS_PLAN.md)', () => {
+  it('the real vehicles.json gives the four optional airship frames through vehicleArt, sized as the plan says', () => {
+    const art = vehicleArt(RAW, sheet());
+    const sizes = { airship_back: [87, 112], airship_front: [87, 110], airship_back_turn: [126, 102],
+      airship_front_turn: [126, 103] } as const;
+    for (const name of OPTIONAL_VEHICLE_FRAMES) {
+      const f = META.frames[name];
+      expect(art.frames[name].frame, name).toEqual(f);
+      expect(Math.abs(f.w - sizes[name][0]), name).toBeLessThanOrEqual(3);
+      expect(Math.abs(f.h - sizes[name][1]), name).toBeLessThanOrEqual(3);
+      const j = JSON.parse(readFileSync(`assets-src/gen/approved/vehicles/${name}.json`, 'utf-8'));
+      expect(f.anchor, name).toEqual([j.anchor[0], 1]);
+      expect(j.review, name).toMatch(/R6/);
+    }
+  });
+
+  it('a sheet without the new frames still parses, and the airship shows b_7 for every heading', async () => {
+    const old = structuredClone(RAW) as VehicleSheetMeta;
+    for (const name of OPTIONAL_VEHICLE_FRAMES) delete (old.frames as Record<string, unknown>)[name];
+    expect(() => parseVehicleMeta(old)).not.toThrow();
+    expect(vehicleArt(old, sheet()).frames.airship_back).toBeUndefined();
+    const r = await rig({ raw: old });
+    r.sprites.ride('airship', r.player);
+    const v = r.sprites.views.ridden!;
+    for (const d of ['up', 'down', 'left', 'right'] as const) {
+      r.face(d); r.follow(); r.tick(TURN_MS); r.follow();
+      expect(frameX(v), d).toBe(META.frames.airship.x);
+      expect(v.main.scale.x > 0, d).toBe(d !== 'left' && !(d !== 'right' && r.sprites.heading.side === 'left'));
+    }
+  });
+
+  it('up shows the back view, down the front view, left b_7 mirrored; the end views lean the last side', async () => {
+    const r = await rig();
+    r.sprites.ride('airship', r.player);
+    const v = r.sprites.views.ridden!;
+    r.face('up'); r.follow();
+    expect(frameX(v)).toBe(META.frames.airship_back_turn.x);     // the turn frame first
+    r.tick(TURN_MS); r.follow();
+    expect(frameX(v)).toBe(META.frames.airship_back.x);
+    expect(v.main.anchor.x).toBeCloseTo(META.frames.airship_back.anchor[0]);
+    expect(v.main.scale.x).toBeGreaterThan(0);
+    expect(v.shadowSize).toEqual({ w: Math.round(META.frames.airship_back.w * 0.6), h: 10, alpha: 0.3 });
+    r.face('down'); r.follow();
+    expect(frameX(v)).toBe(META.frames.airship_front.x);          // back to front: instant
+    r.face('left'); r.follow();
+    expect(frameX(v)).toBe(META.frames.airship.x);                // front (leaning right) to left: a flip, instant
+    expect(v.main.scale.x).toBeLessThan(0);
+    expect(v.shadowSize).toEqual({ w: Math.round(META.frames.airship.w * 0.6), h: 8, alpha: 0.3 });
+    r.face('up'); r.follow(); r.tick(TURN_MS); r.follow();
+    expect(frameX(v)).toBe(META.frames.airship_back.x);
+    expect(v.main.scale.x).toBeLessThan(0);                       // leaning left: mirrored
+  });
+
+  it('boarding keeps the parked heading until the hero\'s direction changes or a step starts (D-AV10)', async () => {
+    const r = await rig();
+    r.face('right');                                              // the hero starts facing down
+    r.sprites.ride('airship', r.player);
+    r.face('down'); r.follow(); r.tick(TURN_MS); r.follow();
+    expect(r.sprites.heading.end).toBe('front');
+    r.sprites.ride(null, r.player);                               // landed
+    r.sprites.showParked([{ type: 'airship', map: 'm', x: 5, y: 5 }]);
+    expect(frameX(r.sprites.views.parked[0])).toBe(META.frames.airship_front.x);   // parked keeps it (D-AV6)
+    r.face('up');                                                 // walk back and face the ship
+    r.sprites.showParked([]);
+    r.sprites.ride('airship', r.player);
+    const v = r.sprites.views.ridden!;
+    r.follow(); r.tick(TURN_MS); r.follow();
+    expect(r.sprites.heading.end).toBe('front');
+    expect(frameX(v)).toBe(META.frames.airship_front.x);
+    r.step('up'); r.follow();                                     // a step starts in the same direction: taken
+    expect(r.sprites.heading.end).toBe('back');
+  });
+
+  it('a late sheet load keeps the heading (rebuild rides again from the stored heading)', async () => {
+    const r = await rig({ late: true });
+    r.sprites.ride('airship', r.player);
+    r.face('up'); r.follow();
+    expect(r.sprites.heading.end).toBe('back');
+    await r.finish();
+    expect(r.sprites.heading.end).toBe('back');
+    r.tick(TURN_MS); r.follow();
+    expect(frameX(r.sprites.views.ridden!)).toBe(META.frames.airship_back.x);
   });
 });
