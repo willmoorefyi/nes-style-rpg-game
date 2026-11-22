@@ -18,6 +18,7 @@ import { NearDetail } from './NearDetail.js';
 import { nearProfile, type ChunkHost, type NearWindow } from './FlightStream.js';
 import { horizonY, type ViewParams } from './mode7Math.js';
 import { watchFlightContext, type ContextEvent } from './FlightContext.js';
+import { releaseMeshTextures } from './meshRelease.js';
 
 export interface FlightRendererOptions {
   parent: Container;
@@ -135,6 +136,8 @@ export class FlightRenderer {
     this.strips?.destroy();
     this.sky?.destroy();
     this.billboards?.destroy();
+    // the strips' last texture may still be bound in Pixi's shared mesh shader: rebind it before freeing (meshRelease)
+    releaseMeshTextures(this.opts.renderer);
     this.near?.destroy();
     this.atlas?.destroy();
     this.container.destroy({ children: true });

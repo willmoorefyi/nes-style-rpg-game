@@ -572,6 +572,15 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `?mode7=1` / `?mode7=low` keep the view (they still warn), and choosing Mode 7 again in Config clears it. Tests:
   `tests/scenes/mode7/mode7Fallback.test.ts`. Browser check: `WEBGL_lose_context` (`loseContext`, `restoreContext`)
   on `app.renderer.gl`; a slow GPU can be faked from the page with a busy-wait `requestAnimationFrame` callback.
+- **Mode 7 teardown (FX-S).** Pixi 8 draws every unbatched mesh without a shader of its own (the ground strips)
+  through one shared shader of the mesh pipe, whose bind group destroys itself when the last texture source bound in
+  it is destroyed; the next such mesh then throws "Cannot read properties of null (reading '0')" in
+  `BindGroup.setResource` every frame (the crash on a scene change or a teleport mid-flight). So
+  `FlightRenderer.destroy` (and `Mode7PilotScene.exit`) destroy the meshes, then call `releaseMeshTextures(renderer)`
+  (`mode7/meshRelease.ts`: one unbatched `Texture.EMPTY` quad drawn into a 1x1 target), and only then free the atlas
+  and the near detail. Any new unbatched mesh over a texture it frees must do the same. Tests:
+  `tests/scenes/mode7/mode7Teardown.test.ts` (the real renderer over a stub that binds like `GlMeshAdaptor`),
+  `mode7Activation.test.ts` (exit and enter mid-flight).
 - **LM5-INT.** A third sheet `landmarks_lm5.*` (SPEC5, pass LM5): `western_keep` 2x3 at (59, 122) (door (60, 124),
   the stair foot at the bottom right; anchor `elf_keep` (60, 125); its top two rows on the watchtower's rock `m`, the
   moat at x 61) and `citadel` 3x3 at (74, 25) (door (75, 27) bottom centre; anchor `ord_citadel` (75, 28); the broken
