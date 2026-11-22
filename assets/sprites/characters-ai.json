@@ -140,52 +140,56 @@
       "x": 672,
       "y": 2304
     },
-    "robot_sentry": {
+    "robot_ancient": {
       "x": 1008,
       "y": 2304
     },
-    "sage_earth": {
+    "robot_sentry": {
       "x": 0,
+      "y": 2688
+    },
+    "sage_earth": {
+      "x": 336,
       "y": 2688
     },
     "sage_flame": {
-      "x": 336,
+      "x": 672,
       "y": 2688
     },
     "sage_star": {
-      "x": 672,
+      "x": 1008,
       "y": 2688
     },
     "thief": {
-      "x": 1008,
-      "y": 2688
+      "x": 0,
+      "y": 3072
     },
     "vendor_f": {
-      "x": 0,
+      "x": 336,
       "y": 3072
     },
     "villager": {
-      "x": 336,
+      "x": 672,
       "y": 3072
     },
     "villager_f": {
-      "x": 672,
-      "y": 3072
-    },
-    "warrior": {
       "x": 1008,
       "y": 3072
     },
-    "white_mage": {
+    "warrior": {
       "x": 0,
       "y": 3456
     },
-    "white_wizard": {
+    "white_mage": {
       "x": 336,
       "y": 3456
     },
-    "chest": {
+    "white_wizard": {
       "x": 672,
+      "y": 3456
+    },
+    "chest": {
+      "x": 1008,
       "y": 3456
     }
   },

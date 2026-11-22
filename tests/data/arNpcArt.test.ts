@@ -33,6 +33,20 @@ describe('AR: the new NPC field sheets', () => {
     }
   });
 
+  it('the ancient robot is AR-N2\'s candidate C2 (user ruling 2026-11-22): A\'s front and back, a profile side strip', () => {
+    const m = meta('robot_ancient');
+    expect([m.backend, m.pass, m.approved, m.grid, m.bottom_row]).toEqual(['bedrock', 'AR', '2026-11-22', [48, 96], 93]);
+    for (const s of m.sources) {
+      const row = ledger.find((r) => r.event === 'request' && r.key === s.cache_key);
+      expect([row?.pass, row?.purpose], s.cache_key).toEqual(['AR', 'ar_npc']);
+    }
+    expect(m.sources.map((s) => s.cache_key)).toEqual(['b17a82a4b94a637b57ca16de', '5495bcf0e9c6bde34f0d68bd',
+      'a2164dec4999f32b063f64e0']);
+    expect(m.cells.map((r) => r[0][0]), 'down, up, side').toEqual(['s50_1', 'b50_2', 'd65_3']);
+    for (const h of m.figure_px) expect(h).toBeGreaterThanOrEqual(84);
+    expect(atlas.sheets.robot_ancient).toBeDefined();
+  });
+
   it('carry the user\'s edit rulings of 2026-11-21', () => {
     expect(meta('dragon_youth').cells[2].map((c) => c[2]), 'the youth\'s side steps mirrored').toEqual([false, true, true]);
     expect(meta('dragon_youth').edits.map((e) => e.op)).toEqual(['erase']);
@@ -77,5 +91,21 @@ describe('AR: where the maps place them', () => {
       expect([n.action, n.cutscene, n.showIf, n.hideIf, n.chestItem, n.requiredItem, n.takeItem, n.setFlag, n.wander], n.id)
         .toEqual(Array(9).fill(undefined));
     }
+  });
+
+  it('the ancient robots on 3F and 4F are flavour only, off the sentries\' floors', () => {
+    const ancients = ['sky-castle-1f', 'sky-castle-2f', 'sky-castle-3f', 'sky-castle-4f', 'sky-castle-5f']
+      .flatMap((m) => npcs(m).filter((n) => n.sprite === 'robot_ancient').map((n) => [m, n] as const));
+    expect(ancients.map(([m, n]) => `${m}:${n.id}`)).toEqual(['sky-castle-3f:wnd_ancient_archive',
+      'sky-castle-4f:wnd_ancient_stoker']);
+    for (const [, n] of ancients) {
+      expect([n.action, n.cutscene, n.showIf, n.hideIf, n.chestItem, n.requiredItem, n.takeItem, n.setFlag, n.wander, n.tint],
+        n.id).toEqual(Array(10).fill(undefined));
+    }
+  });
+
+  it('the dragon-kin guards no longer speak of wearing a man\'s shape', () => {
+    const text = JSON.stringify(npcs('bahamut-lair').filter((n) => n.id.startsWith('dragon_')));
+    expect(text).not.toMatch(/man's shape|in this shape|scales show/);
   });
 });

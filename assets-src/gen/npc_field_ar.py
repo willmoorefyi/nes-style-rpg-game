@@ -80,6 +80,19 @@ AR_SPEC = {
         "note": "AR-N robot_sentry B: s50_2 down + side (knight + antenna guide, 0.5, seed 2); back strip b50_1 cells "
                 "0, 2 + 2 mirrored. User ruling 2026-11-21: B instead of A; the back row's red visor recoloured to "
                 "the figure's own grey"},
+    "robot_ancient": {
+        "renders": {"s50_1": ["robot_ancient2_s50_1", "b17a82a4b94a637b57ca16de", 3],
+                    "b50_2": ["robot_ancient2_b50_2_knight_up", "5495bcf0e9c6bde34f0d68bd", 1],
+                    "d65_3": ["robot_ancient3_v1_d65_3_knight_side", "a2164dec4999f32b063f64e0", 1]},
+        "cut": {"s50_1": H20, "b50_2": H20, "d65_3": {"tol": 34, "holes": 40}},
+        "cells": [S("s50_1"), S("b50_2"), S("d65_3")],
+        "shifts": {1: [[120, 30, 165, 0.85, 1.0]], 2: [[32, 14, 24, 0.95, 0.62, 0.3]]},
+        "approved": "2026-11-22",
+        "note": "AR-N2 robot_ancient C2: A's down row (robot_ancient2 s50_1, knight guide, 0.5, seed 1) and back strip "
+                "b50_2 (seed 2; its green shifted to verdigris, hue 120 -> 165, sat x0.85), with a true-profile "
+                "walking side strip d65_3 (knight_side guide, 0.65, seed 3; flood tol 34, holes 40) whose orange "
+                "accents are shifted to rusty bronze (hue 32 -> 24, sat x0.95, val x0.62). User ruling 2026-11-22: "
+                "integrate C2"},
     "sage_star": {
         "renders": {"s50_1": ["sage_star_s50_1", "851bb2f371b5dfe10764fae2", 3],
                     "b50_1": ["sage_star_b50_1_mage_up", "7e6b4d5c4a91a1a81fd5d95a", 1]},

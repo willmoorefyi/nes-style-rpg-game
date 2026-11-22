@@ -1,5 +1,5 @@
 """Re-cut the approved Bedrock NPC field sheets (pass LM5: the fairy and the mermaid; pass AR: the Lufenians, the
-dragon-kin, the robot sentry, the Circle sages and Dr. Unne) from the render cache.
+dragon-kin, the robot sentry and the ancient robot, the Circle sages and Dr. Unne) from the render cache.
 
     python3 -I assets-src/gen/npc_field_cut.py            # write approved/<id>/field.{png,json}
     python3 -I assets-src/gen/npc_field_cut.py --check    # rebuild in memory, exit 1 if a committed sheet differs
@@ -266,7 +266,7 @@ def sheet_cells(cid: str) -> tuple[Image.Image, Image.Image, dict]:
                                                                        if alias in spec.get("cut", {}) else {}))
     first = srcs[0]
     meta = {"character": cid, "sheet": "field", "backend": "bedrock", "model": first["model"], "seed": first["seed"],
-            "cache_key": first["cache_key"], "pass": first["pass"], "approved": APPROVED_AR,
+            "cache_key": first["cache_key"], "pass": first["pass"], "approved": spec.get("approved", APPROVED_AR),
             "tool": "assets-src/gen/npc_field_cut.py", "sources": srcs,
             "cut": {"flood_tol": 14, "erode": ERODE, "resample": "box", "sharpen": "unsharp 1/60/2", "alpha": 170,
                     "colors": spec.get("colors", 16), "kmeans_seed": 0, "outline": "selective 1 px", "scale": 1.0,

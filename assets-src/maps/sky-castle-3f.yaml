@@ -405,6 +405,11 @@ npcs:
     text: ['Archivist: The vane on the spire is turning. I had stopped recording the wind. I shall have to begin again.']
   - text: [A brass figure in a scholar's gown dusts a shelf that has no dust on it., 'Archivist: The charts are in order. The stars have not moved.
         Only the wind is wrong, and the steward upstairs will not let me write it down.']
+- id: wnd_ancient_archive
+  sprite: robot_ancient
+  x: 30
+  y: 19
+  dialog: ['An old robot, green with age, stands in the corner of the hall. Its eyes brighten as you pass, then dim.']
 transitions:
 - {x: 18, y: 26, targetMap: sky-castle-2f, targetEntrance: up}
 - {x: 19, y: 26, targetMap: sky-castle-2f, targetEntrance: up}

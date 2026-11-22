@@ -1,0 +1,171 @@
+{
+  "character": "robot_ancient",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "b17a82a4b94a637b57ca16de",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s50_1",
+      "tag": "robot_ancient2_s50_1",
+      "cache_key": "b17a82a4b94a637b57ca16de",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "b50_2",
+      "tag": "robot_ancient2_b50_2_knight_up",
+      "cache_key": "5495bcf0e9c6bde34f0d68bd",
+      "model": "structure",
+      "seed": 2,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "d65_3",
+      "tag": "robot_ancient3_v1_d65_3_knight_side",
+      "cache_key": "a2164dec4999f32b063f64e0",
+      "model": "structure",
+      "seed": 3,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "tol": 34,
+        "holes": 40
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s50_1",
+        0,
+        false
+      ],
+      [
+        "s50_1",
+        1,
+        false
+      ],
+      [
+        "s50_1",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b50_2",
+        0,
+        false
+      ],
+      [
+        "b50_2",
+        1,
+        false
+      ],
+      [
+        "b50_2",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "d65_3",
+        0,
+        false
+      ],
+      [
+        "d65_3",
+        1,
+        false
+      ],
+      [
+        "d65_3",
+        2,
+        false
+      ]
+    ]
+  ],
+  "shifts": {
+    "1": [
+      [
+        120,
+        30,
+        165,
+        0.85,
+        1.0
+      ]
+    ],
+    "2": [
+      [
+        32,
+        14,
+        24,
+        0.95,
+        0.62,
+        0.3
+      ]
+    ]
+  },
+  "edits": [],
+  "figure_px": [
+    92,
+    92,
+    92,
+    88,
+    88,
+    88,
+    86,
+    85,
+    86
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "AR-N2 robot_ancient C2: A's down row (robot_ancient2 s50_1, knight guide, 0.5, seed 1) and back strip b50_2 (seed 2; its green shifted to verdigris, hue 120 -> 165, sat x0.85), with a true-profile walking side strip d65_3 (knight_side guide, 0.65, seed 3; flood tol 34, holes 40) whose orange accents are shifted to rusty bronze (hue 32 -> 24, sat x0.95, val x0.62). User ruling 2026-11-22: integrate C2"
+}
