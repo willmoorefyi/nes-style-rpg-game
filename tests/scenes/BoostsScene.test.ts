@@ -3,6 +3,10 @@
  * indicator of the boosts off their defaults.
  */
 import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { BitmapText, Container } from 'pixi.js';
+import { HELP_RECT } from '../../src/ui/HelpWindow.js';
+import { Window } from '../../src/ui/Window.js';
+import { MENU_LINE_HEIGHT } from '../../src/core/LayoutConstants.js';
 import { BoostsScene } from '../../src/scenes/BoostsScene.js';
 import { FieldMenuScene } from '../../src/scenes/FieldMenuScene.js';
 import { PartyManager } from '../../src/entities/PartyManager.js';
@@ -26,7 +30,7 @@ describe('BoostsScene', () => {
   it('lists the six rows with their values; the cursor starts on Gold with its help line', () => {
     const { scene } = open();
     const labels = visibleLabels(scene.container);
-    for (const l of ['Boosts', 'Gold', 'Experience', 'Encounters', 'Battle speed', 'Walk speed', 'Escape']) {
+    for (const l of ['Cheats (Boosts)', 'Gold multiplier', 'XP multiplier', 'Encounters', 'Battle speed', 'Walk speed', 'Escape']) {
       expect(labels).toContain(l);
     }
     expect(scene.valueLines).toEqual(['< x1 >', '< x1 >', '< x1 >', '< x1 >', '< x1 >', '< Off >']);
@@ -45,7 +49,7 @@ describe('BoostsScene', () => {
     tap('left', 9);
     expect(game.boosts.gold).toBe(0);
     expect(scene.valueLines[0]).toBe('< x0 >');
-    expect(scene.statusLine).toContain('Boosts on');
+    expect(scene.statusLine).toContain('Cheats on');
   });
 
   it('down moves to each row in turn; every row changes only its own value', () => {
@@ -122,5 +126,49 @@ describe('the field menu shows when boosts are on', () => {
     scene.onPause();
     scene.onResume();
     expect(visibleLabels(scene.container).some((l) => l.startsWith('BOOST'))).toBe(false);
+  });
+});
+
+describe('QF (playtest 2026-11-22, "no XP or gold multiplier on cheats menu"): the multipliers are found', () => {
+  it('the field menu names the screen Cheats, its help names the gold and XP multipliers, and it opens Boosts', () => {
+    const exploration = { canSave: () => true, getMapName: () => 'Cornelia' };
+    const game = { party: new PartyManager(), playTime: 0, boosts: defaultBoosts(), input: tapInput(),
+      scenes: { get: vi.fn(() => exploration), push: vi.fn(), pop: vi.fn() } };
+    const scene = new FieldMenuScene(game as unknown as Game);
+    scene.enter();
+    expect(visibleLabels(scene.container)).toContain('Cheats');
+    game.input.tap('up', () => scene.update(1));
+    game.input.tap('up', () => scene.update(1));          // Config is last, Cheats above it
+    expect(visibleLabels(scene.container).join('\n')).toMatch(/gold and XP multipliers/);
+    game.input.tap('confirm', () => scene.update(1));
+    expect(game.scenes.push).toHaveBeenLastCalledWith('boosts');
+  });
+
+  it('the Gold and XP multiplier rows come first, and all six rows sit inside the window, above the help bar', () => {
+    const { scene } = open();
+    const texts: BitmapText[] = [];
+    const walk = (c: Container): void => {
+      for (const ch of c.children) {
+        if (ch instanceof BitmapText) texts.push(ch);
+        if (ch instanceof Container) walk(ch);
+      }
+    };
+    walk(scene.container);
+    const win = scene.container.children[0] as Window;
+    const top = win.y + win.contentY;
+    const bottom = top + win.contentHeight;          // the text area inside the window's border
+    const rows = ['Gold multiplier', 'XP multiplier', 'Encounters', 'Battle speed', 'Walk speed', 'Escape'];
+    const ys = rows.map((label) => {
+      const t = texts.find((x) => x.text === label);
+      expect(t, label).toBeDefined();
+      expect(t!.visible, label).toBe(true);
+      const y = t!.getGlobalPosition().y;
+      expect(y, label).toBeGreaterThanOrEqual(top);
+      expect(y + MENU_LINE_HEIGHT, label).toBeLessThanOrEqual(bottom);
+      expect(y + MENU_LINE_HEIGHT, label).toBeLessThan(HELP_RECT.y);
+      return y;
+    });
+    expect([...ys].sort((a, b) => a - b)).toEqual(ys);
+    expect(scene.selectedKey).toBe('gold');
   });
 });

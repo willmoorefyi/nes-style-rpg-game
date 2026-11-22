@@ -682,17 +682,22 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 
 ### Boosts (pass CHT)
 
-Player-side "cheats" in the Pixel Remaster style: field menu > **Boosts** (`src/scenes/BoostsScene.ts`, lazy `boosts`;
+Player-side "cheats" in the Pixel Remaster style: field menu > **Cheats** (QF, playtest 2026-11-22: the user looked
+for "cheats" and missed the old "Boosts" label; the screen is titled "Cheats (Boosts)", its first rows read "Gold
+multiplier" and "XP multiplier"; `src/scenes/BoostsScene.ts`, lazy `boosts`;
 up / down move, left / right change and stop at the ends, confirm steps forward and wraps, cancel closes). Rules and
 steps live in the pure `src/core/Boosts.ts` (no PixiJS); the values are `Game.boosts`.
-- **Options** (defaults x1, Escape Off): Gold and Experience x0 / x0.5 / x1 / x2 / x3 / x4 (the x0.5 steps go beyond
+- **Options** (defaults x1, Escape Off): Gold and XP multipliers x0 / x0.5 / x1 / x2 / x3 / x4 (the x0.5 steps go beyond
   the user's "x0 to x4"); Encounters Off / x0.5 / x1 / x2; Battle speed x1 / x2 / x4; Walk speed x1 / x2; Escape
   Off / On.
 - **Hook points:** gold and XP in `BattleStateMachine.finish` (`BattleConfig.boosts`, `scaleReward` rounds down: x0.5
   of 7 G is 3 G; the victory line shows the boosted numbers, `BattleTrigger.onBattleEnd` grants them); the encounter
   rate in `ExplorationScene` (`EncounterSystem.setRateMultiplier(mode x boost)`; Off rolls no random battle, scripted
   and boss battles still start); battle speed as one time scale on `BattleScene.update`'s `dt` (messages, waits and
-  animations); walk speed in `PlayerController.speedBoost` (every mode, vehicles too); escape in the Run check of
+  animations); walk speed in `PlayerController.speedBoost` (on foot, ship and canoe; **not the airship**, user ruling
+  2026-11-22: it flies at its own `AIRSHIP_SPEED` 3.0 x walking, `src/entities/AirshipMode.ts`, raised from 2.0 by QF;
+  measured at QF on the M4 Pro: 15 tiles/s, top-down no placeholder chunk, Mode 7 full 0 late draws and frame p95
+  9.8 ms, low 7 late draws as at 2.0, p95 10.1 ms); escape in the Run check of
   `BattleStateMachine.executeCommand` (certain, but `canRun` false still refuses: bosses, the Chaos form chain).
   `BattleTrigger` passes `battleBoosts(game.boosts)` in the scene config.
 - **Storage:** per playthrough in the save (v3, `SaveData.boosts`, `parseBoosts`; a v1 / v2 save loads the defaults,

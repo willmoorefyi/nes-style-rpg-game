@@ -47,7 +47,7 @@ describe('FieldMenuScene', () => {
       expect(game.scenes.get).toHaveBeenCalledWith('exploration');
       expect(visibleLabels(scene.container)).toContain('Load');
       game.input.tap('up', () => scene.update(1));          // wraps to the last item (Config, Fb)
-      game.input.tap('up', () => scene.update(1));          // Boosts (pass CHT)
+      game.input.tap('up', () => scene.update(1));          // Cheats: the Boosts screen (pass CHT)
       game.input.tap('up', () => scene.update(1));          // Load
       game.input.tap('confirm', () => scene.update(1));
       expect(game.scenes.push).toHaveBeenCalledWith('loadMenu');
@@ -174,15 +174,15 @@ describe('FieldMenuScene', () => {
 });
 
 describe('Fh: the Bestiary row (docs/BESTIARY_PLAN.md BS-1)', () => {
-  const ROWS = ['Items', 'Magic', 'Equip', 'Status', 'Order', 'Bestiary', 'Save', 'Load', 'Boosts', 'Config'];
+  const ROWS = ['Items', 'Magic', 'Equip', 'Status', 'Order', 'Bestiary', 'Save', 'Load', 'Cheats', 'Config'];
 
-  it('the rows read Items, Magic, Equip, Status, Order, Bestiary, Save, Load, Boosts, Config', () => {
+  it('the rows read Items, Magic, Equip, Status, Order, Bestiary, Save, Load, Cheats, Config', () => {
     const scene = new FieldMenuScene(createMockGameForMenu() as unknown as Game);
     scene.enter();
     expect(visibleLabels(scene.container).filter((l) => ROWS.includes(l))).toEqual(ROWS);
   });
 
-  it('selecting Bestiary pushes the bestiary; Config is last, Boosts second to last, Load before them', () => {
+  it('selecting Bestiary pushes the bestiary; Config is last, Cheats (the Boosts screen) second to last, Load before them', () => {
     const game = createMockGameForMenu();
     const scene = new FieldMenuScene(game as unknown as Game);
     scene.enter();
@@ -193,7 +193,7 @@ describe('Fh: the Bestiary row (docs/BESTIARY_PLAN.md BS-1)', () => {
     game.input.tap('down', () => scene.update(1));     // Load
     game.input.tap('confirm', () => scene.update(1));
     expect(game.scenes.push).toHaveBeenLastCalledWith('loadMenu');
-    game.input.tap('down', () => scene.update(1));     // Boosts (pass CHT)
+    game.input.tap('down', () => scene.update(1));     // Cheats: the Boosts screen (pass CHT)
     game.input.tap('confirm', () => scene.update(1));
     expect(game.scenes.push).toHaveBeenLastCalledWith('boosts');
     game.input.tap('down', () => scene.update(1));     // Config

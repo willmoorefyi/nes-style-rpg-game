@@ -54,7 +54,8 @@ export class PlayerController {
   /** Pixels the sprite is lifted so a taller-than-tile frame keeps its feet on the tile. */
   private spriteOffsetY = 0;
   private frameHeight = TILE_SIZE;
-  /** The Walk speed boost (src/core/Boosts.ts): multiplies every mode's step speed, on foot and in vehicles. */
+  /** The Walk speed boost (src/core/Boosts.ts): multiplies the step speed on foot, by ship and by canoe; never the
+   *  airship's, which has its own fixed speed (AirshipMode.AIRSHIP_SPEED; user ruling 2026-11-22). */
   speedBoost = 1;
 
   constructor(config: PlayerControllerConfig) {
@@ -113,10 +114,12 @@ export class PlayerController {
     }
   }
 
-  /** The share of a tile walked in `dt` toward the target (the mode's terrain speed times the Walk speed boost). */
+  /** The share of a tile walked in `dt` toward the target (the mode's terrain speed times the Walk speed boost, which
+   *  the airship ignores). */
   private stepRate(dt: number): number {
     const speedMultiplier = this._currentMode.getSpeedMultiplier(this.collisionMap.getTerrainType(this.targetX, this.targetY));
-    return (dt * 16.67) / (this.moveSpeed / Math.max(0.1, speedMultiplier * this.speedBoost));
+    const boost = this._currentMode.id === 'airship' ? 1 : this.speedBoost;
+    return (dt * 16.67) / (this.moveSpeed / Math.max(0.1, speedMultiplier * boost));
   }
 
   private handleInput(dt: number): void {

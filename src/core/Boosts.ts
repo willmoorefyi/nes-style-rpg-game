@@ -7,7 +7,8 @@
  * - `encounters`: the random-encounter rate multiplier (0 = Off; ExplorationScene feeds it to EncounterSystem beside
  *   the vehicle's own multiplier). Scripted and boss battles never roll, so Off leaves them in place.
  * - `battleSpeed`: one time scale for the whole battle scene (messages, waits and animations; BattleScene.update).
- * - `walkSpeed`: the field step speed, on foot and in every vehicle (PlayerController.speedBoost).
+ * - `walkSpeed`: the field step speed on foot, by ship and by canoe; the airship keeps its own speed
+ *   (PlayerController.speedBoost, AirshipMode.AIRSHIP_SPEED).
  * - `alwaysEscape`: Run always succeeds, except where the battle forbids it (`canRun` false: bosses, the form chain).
  *
  * Stored in the save (v3, SaveManager); a new game and an older save start from `DEFAULT_BOOSTS`. The progression
@@ -84,16 +85,16 @@ const offOr = (v: StepValue): string => (v === 0 ? 'Off' : mult(v));
 const onOff = (v: StepValue): string => (v ? 'On' : 'Off');
 
 export const BOOST_ROWS: readonly BoostRow[] = [
-  { key: 'gold', label: 'Gold', steps: REWARD_STEPS, format: mult,
+  { key: 'gold', label: 'Gold multiplier', steps: REWARD_STEPS, format: mult,
     help: 'Gold won in battle. x0 gives none, x4 four times as much.' },
-  { key: 'xp', label: 'Experience', steps: REWARD_STEPS, format: mult,
-    help: 'Experience won in battle. x0 gives none, x4 four times as much.' },
+  { key: 'xp', label: 'XP multiplier', steps: REWARD_STEPS, format: mult,
+    help: 'Experience (XP) won in battle. x0 gives none, x4 four times as much.' },
   { key: 'encounters', label: 'Encounters', steps: ENCOUNTER_STEPS, format: offOr,
     help: 'Random battles. Off stops them; story and boss battles still happen.' },
   { key: 'battleSpeed', label: 'Battle speed', steps: BATTLE_SPEED_STEPS, format: mult,
     help: 'Speeds up battle messages, waits and animations.' },
   { key: 'walkSpeed', label: 'Walk speed', steps: WALK_SPEED_STEPS, format: mult,
-    help: 'Field movement speed, on foot and in vehicles.' },
+    help: 'Field movement speed: on foot, ship and canoe (not the airship).' },
   { key: 'alwaysEscape', label: 'Escape', steps: ESCAPE_STEPS, format: onOff,
     help: 'On: Run always works, except in battles that cannot be fled (bosses).' },
 ];

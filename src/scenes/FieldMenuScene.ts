@@ -27,7 +27,8 @@ const COMMANDS: ReadonlyArray<MenuItem & { help: string }> = [
   { label: 'Bestiary', value: 'bestiary', help: 'Look up the monsters: stats, weaknesses and moves.' },
   { label: 'Save', value: 'save', help: 'Record your journey.' },
   { label: 'Load', value: 'load', help: 'Resume a saved journey.' },
-  { label: 'Boosts', value: 'boosts', help: 'Gold, experience, encounter, speed and escape boosts.' },
+  // the user's word for it (playtest 2026-11-22): the Pixel Remaster's "Boosts", here named Cheats so it is found
+  { label: 'Cheats', value: 'boosts', help: 'Cheats: gold and XP multipliers, encounters, battle and walk speed, escape.' },
   { label: 'Config', value: 'config', help: 'Set the battle message speed.' },
 ];
 

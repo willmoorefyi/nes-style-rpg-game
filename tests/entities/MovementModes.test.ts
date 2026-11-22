@@ -135,8 +135,8 @@ describe('AirshipMode', () => {
     expect(mode.canLand(TerrainType.Desert)).toBe(false);
   });
 
-  it('has 2.0x speed', () => {
-    expect(mode.getSpeedMultiplier(TerrainType.Grass)).toBe(2.0);
+  it('has 3.0x speed (QF: raised from 2.0, playtest 2026-11-22 "the airship should fly faster")', () => {
+    expect(mode.getSpeedMultiplier(TerrainType.Grass)).toBe(3.0);
   });
 
   it('has 0 encounter rate', () => {

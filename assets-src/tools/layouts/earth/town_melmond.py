@@ -140,11 +140,11 @@ for (x, y, t) in [(29, 17, "barrel"), (29, 18, "crate"), (24, 25, "barrel")]:
 for (x, y) in [(8, 21), (16, 21), (29, 21), (35, 21)]:         # lamps along the harbour road's south side
     deco([["lamp_top"], ["lamp_bottom"]], x, y, above_rows=1)
 
-# ── the windmill, leaning on its mound (each row of the sails' art set a little further east) ──
+# ── the windmill on its mound: one whole deco (QF: the old per-row east offsets sheared the art into visible
+# horizontal breaks); it blocks where its art is. No above rows: its top row stands on the hill rock (36-39, 2-3),
+# where no hero walks, so there is nothing to pass behind ──
 MILL = (37, 3)
-for r in range(3):
-    deco([[f"windmill_icon_{r}_{c}" for c in range(2)]], MILL[0], MILL[1] + r, style=DEAD, offset=[12 - 6 * r, 0],
-         collide="alpha")
+deco([[f"windmill_icon_{r}_{c}" for c in range(2)] for r in range(3)], MILL[0], MILL[1], style=DEAD, collide="alpha")
 for (x, y, t) in [(36, 7, "crate"), (38, 7, "crate"), (38, 8, "barrel"), (34, 13, "crate")]:
     obj(type=t, x=x, y=y)
 

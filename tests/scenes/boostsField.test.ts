@@ -1,6 +1,7 @@
 /**
  * Pass CHT: the field boosts. Encounters Off rolls no random battle (scripted ones still start), x2 halves the steps
- * between battles; Walk speed x2 halves the frames per tile, on foot and in a vehicle.
+ * between battles; Walk speed x2 halves the frames per tile on foot, by ship and by canoe, never the airship's (QF,
+ * user ruling 2026-11-22: the airship flies at its own AIRSHIP_SPEED).
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { Texture } from 'pixi.js';
@@ -9,6 +10,9 @@ import { EncounterSystem } from '../../src/systems/EncounterSystem.js';
 import { BattleTrigger } from '../../src/systems/BattleTrigger.js';
 import { PlayerController } from '../../src/entities/PlayerController.js';
 import { ShipMode } from '../../src/entities/ShipMode.js';
+import { CanoeMode } from '../../src/entities/CanoeMode.js';
+import { AirshipMode, AIRSHIP_SPEED } from '../../src/entities/AirshipMode.js';
+import type { MovementMode } from '../../src/entities/MovementMode.js';
 import { CollisionMap } from '../../src/rendering/CollisionMap.js';
 import { InputManager } from '../../src/core/InputManager.js';
 import { EventBus } from '../../src/core/EventBus.js';
@@ -85,13 +89,20 @@ describe('the Encounters boost', () => {
 });
 
 describe('the Walk speed boost', () => {
-  function framesPerTile(boost: number, ship = false): number {
+  type Vehicle = 'ship' | 'canoe' | 'airship';
+  const MODES: Record<Vehicle, { mode: () => MovementMode; terrain: TerrainType }> = {
+    ship: { mode: () => new ShipMode(), terrain: TerrainType.Water },
+    canoe: { mode: () => new CanoeMode(), terrain: TerrainType.River },
+    airship: { mode: () => new AirshipMode(), terrain: TerrainType.Mountain },
+  };
+  function framesPerTile(boost: number, ship: boolean | Vehicle = false): number {
     const input = new InputManager();
     vi.spyOn(input, 'isPressed').mockImplementation((a) => a === 'right');
-    const terrain = ship ? TerrainType.Water : TerrainType.Grass;
+    const vehicle = ship === true ? 'ship' : ship || null;
+    const terrain = vehicle ? MODES[vehicle].terrain : TerrainType.Grass;
     const map = createMapData({ id: 't', width: 8, height: 8, collision: Array(64).fill(terrain) });
     const player = new PlayerController({ startX: 1, startY: 1, texture: Texture.WHITE, collisionMap: new CollisionMap(map),
-      input, events: new EventBus(), moveSpeed: 200, ...(ship ? { movementMode: new ShipMode() } : {}) });
+      input, events: new EventBus(), moveSpeed: 200, ...(vehicle ? { movementMode: MODES[vehicle].mode() } : {}) });
     player.speedBoost = boost;
     // a held direction over 4 tiles: no idle frame between tiles (the step's carry), so the mean is exact
     let frames = 0;
@@ -129,6 +140,20 @@ describe('the Walk speed boost', () => {
     const base = framesPerTile(1, true);
     expect(base).toBeGreaterThan(1);
     expect(Math.abs(framesPerTile(2, true) - base / 2)).toBeLessThanOrEqual(1);
+  });
+
+  it('x2 takes half the frames per tile by canoe', () => {
+    const base = framesPerTile(1, 'canoe');
+    expect(base).toBeGreaterThan(1);
+    expect(Math.abs(framesPerTile(2, 'canoe') - base / 2)).toBeLessThanOrEqual(1);
+  });
+
+  it('QF: the airship ignores Walk speed: the same frames per tile at x1 and x2, AIRSHIP_SPEED (3) times walking', () => {
+    expect(AIRSHIP_SPEED).toBe(3);
+    const air = framesPerTile(1, 'airship');
+    expect(framesPerTile(2, 'airship')).toBe(air);
+    expect(air).toBe(4);              // 12 frames a tile on foot / 3
+    expect(new AirshipMode().getEncounterRateMultiplier()).toBe(0);
   });
 
   it('the field scene applies the boost to its player every frame', async () => {

@@ -48,7 +48,7 @@ export class BoostsScene implements Scene {
     };
     const height = (BOOST_ROWS.length + 2) * MENU_LINE_HEIGHT + 2 * WINDOW_PADDING;
     const win = new Window({ x: BOOSTS_PANE.x, y: SCREEN_MARGIN, width: BOOSTS_PANE.width, height });
-    text(win, win.contentX, win.contentY, 'Boosts');
+    text(win, win.contentX, win.contentY, 'Cheats (Boosts)');
     const top = win.contentY + MENU_LINE_HEIGHT;
     this.menu = new Menu({
       items: BOOST_ROWS.map((r) => ({ label: r.label, value: r.key })),
@@ -110,7 +110,7 @@ export class BoostsScene implements Scene {
       this.values[i].text = VALUE_TEXT(row.format(b[row.key]));
       this.values[i].tint = b[row.key] === DEFAULT_BOOSTS[row.key] ? WHITE : CHANGED;
     });
-    this.status.text = isDefaultBoosts(b) ? 'All at normal.' : 'Boosts on: shown in the party panel.';
+    this.status.text = isDefaultBoosts(b) ? 'All at normal.' : 'Cheats on: shown in the party panel.';
     this.shownIndex = -1;
     this.showHelp();
   }

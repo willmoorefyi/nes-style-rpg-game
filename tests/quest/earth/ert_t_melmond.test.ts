@@ -135,3 +135,25 @@ describe('Melmond: doors, exits, keepers', () => {
     expect(town.name).toBe('Melmond');
   });
 });
+
+describe('Melmond: the windmill (QF, playtest 2026-11-22: "split horizontally about halfway up")', () => {
+  type Deco = { type: string; parts?: string[][]; x: number; y: number; offset?: number[]; style?: string; collide?: string };
+  const source = parse(readFileSync('assets-src/maps/melmond.yaml', 'utf-8')) as { objects: Deco[] };
+  const mills = source.objects.filter((o) => o.type === 'deco' && JSON.stringify(o.parts).includes('windmill_icon'));
+
+  it('is one whole deco of the icon\'s 3 rows at (37, 3), unsheared (no offset), grey, blocking where its art is', () => {
+    expect(mills).toHaveLength(1);
+    const [mill] = mills;
+    expect(mill.parts).toEqual([0, 1, 2].map((r) => [0, 1].map((c) => `windmill_icon_${r}_${c}`)));
+    expect([mill.x, mill.y]).toEqual([37, 3]);
+    expect(mill.offset ?? [0, 0]).toEqual([0, 0]);
+    expect(mill.style).toBe('stone');
+    expect(mill.collide).toBe('alpha');
+  });
+
+  it('the mill track still runs up to its foot: (37, 6) .. (37, 11) walk', () => {
+    for (let y = 6; y <= 11; y++) {
+      expect(terrainAllows('walking', baseTerrain(town, 37, y)), `(37, ${y})`).toBe(true);
+    }
+  });
+});
