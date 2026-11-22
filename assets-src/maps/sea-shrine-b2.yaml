@@ -136,6 +136,35 @@ objects:
   x: 5
   y: 4
   on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 6
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 33
+  y: 18
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 27
+  y: 20
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 3
+  y: 9
+- type: deco
+  parts:
+  - [ar_barrel_tipped_0_0]
+  x: 7
+  y: 9
 npcs:
 - id: chest_wat_d_b2_cell_w
   sprite: chest

@@ -342,6 +342,30 @@ objects:
   - [crown_cushion]
   x: 5
   y: 22
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 5
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 31
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 16
+  y: 26
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 2
+  y: 23
 npcs:
 - id: chest_adamant
   sprite: chest
@@ -414,3 +438,6 @@ inspect:
   y: 18
   text: ['A star chart lies open on the table, every star joined to the next by a line of fine brass wire. In one corner a note: the hard ore
       for the forge below the isthmus is kept in the vault.']
+ambient:
+- {kind: flame, prop: light_pylon, x: 5, y: 5}
+- {kind: flame, prop: console, x: 16, y: 26}

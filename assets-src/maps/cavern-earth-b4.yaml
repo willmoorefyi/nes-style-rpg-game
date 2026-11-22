@@ -140,6 +140,48 @@ objects:
   - [tpillar_broken_bottom]
   x: 19
   y: 6
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 5
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_stone_coffin_0_0]
+  - [ar_stone_coffin_1_0]
+  x: 38
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 19
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 21
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_crystal_cluster_0_0]
+  x: 32
+  y: 17
+- type: deco
+  parts:
+  - [ar_skeleton_slumped_0_0]
+  x: 7
+  y: 15
+- type: deco
+  parts:
+  - [ar_mine_cart_ore_0_0]
+  x: 18
+  y: 15
 npcs:
 - id: chest_ert_d_b4_drift_w
   sprite: chest
@@ -209,3 +251,5 @@ no_unreachable_walkable:
   reach_roots: [pocket]
 canSave: true
 exit: {map: overworld, entrance: ert_earth_cave}
+ambient:
+- {kind: flame, prop: wall_torch, x: 19, y: 26}

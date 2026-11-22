@@ -160,6 +160,56 @@ objects:
   x: 26
   y: 6
 - {type: flowers, x: 17, y: 21}
+- type: deco
+  parts:
+  - [ar_iron_door_0_0, ar_iron_door_0_1]
+  - [ar_iron_door_1_0, ar_iron_door_1_1]
+  x: 2
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 31
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_standing_torch_0_0]
+  - [ar_standing_torch_1_0]
+  x: 22
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 11
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 8
+  y: 12
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 23
+  y: 12
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_floor_0_0]
+  x: 6
+  y: 21
+- type: deco
+  parts:
+  - [ar_barrels_0_0]
+  x: 27
+  y: 21
 npcs:
 - id: chest_reliquary
   sprite: chest
@@ -251,3 +301,8 @@ scriptedEncounters:
   postVictoryCutscene: elf_astos_unmasked
   message: 'His face runs like wet wax, and the stone sentinels on the plinths stir and spread wings. Astos: The crown, and the keep, and now
     your lives. A fair trade!'
+ambient:
+- {kind: flame, prop: candelabra, x: 31, y: 5}
+- {kind: flame, prop: standing_torch, x: 22, y: 4}
+- {kind: flame, prop: wall_torch, x: 11, y: 3}
+- {kind: flame, prop: wall_torch, x: 8, y: 12}

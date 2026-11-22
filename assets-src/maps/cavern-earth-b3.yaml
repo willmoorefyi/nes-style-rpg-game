@@ -141,6 +141,54 @@ objects:
   - [skulls]
   x: 30
   y: 11
+- type: deco
+  parts:
+  - [ar_bar_gate_0_0, ar_bar_gate_0_1]
+  - [ar_bar_gate_1_0, ar_bar_gate_1_1]
+  x: 13
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_stalagmite_0_0]
+  - [ar_stalagmite_1_0]
+  x: 35
+  y: 8
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 2
+  y: 10
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 25
+  y: 7
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 10
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_floor_0_0]
+  x: 26
+  y: 16
+- type: deco
+  parts:
+  - [ar_crystal_cluster_0_0]
+  x: 17
+  y: 14
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 33
+  y: 16
 npcs:
 - id: chest_ert_d_b3_niche_w
   sprite: chest
@@ -231,3 +279,5 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: ert_vampire_falls
   message: He rises off the bier in one smooth motion, and three wrapped shapes climb out of the niches behind him.
+ambient:
+- {kind: flame, prop: wall_torch, x: 25, y: 7}

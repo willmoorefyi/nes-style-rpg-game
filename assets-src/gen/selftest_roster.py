@@ -171,16 +171,16 @@ def revived_ok(meta: dict, cache: Path) -> bool:
 
 def bedrock_keys(meta: dict) -> list[str]:
     """The render keys of a Bedrock-cut approved sheet: a landmark sheet's per-landmark keys (and remove_bg keys), or
-    an NPC field sheet's `sources` (npc_field_cut.py)."""
+    an NPC field sheet's `sources` (npc_field_cut.py), or a dungeon prop sheet's per-prop keys (prop_cut.py, AR-P2)."""
     keys = [meta["cache_key"]] if meta.get("cache_key") else []
-    for lm in (meta.get("landmarks") or {}).values():
+    for lm in [*(meta.get("landmarks") or {}).values(), *(meta.get("props") or {}).values()]:
         keys += [k for k in (lm.get("cache_key"), lm.get("nobg_key")) if k]
     keys += [s["cache_key"] for s in meta.get("sources") or []]
     return sorted(set(keys))
 
 
 def bedrock_ok(meta: dict, cache: Path, ledger: list[dict] | None = None) -> bool:
-    """A Bedrock-cut approved sheet (Stability renders re-cut offline: landmark_cut.py, npc_field_cut.py) is not a
+    """A Bedrock-cut approved sheet (Stability renders re-cut offline: landmark_cut.py, npc_field_cut.py, prop_cut.py) is not a
     Gemini request to re-plan: each of its render keys must be a request in the tracked BR ledger and in the cache."""
     from gen import bedrock as B
     rows = B.read_br_ledger() if ledger is None else ledger

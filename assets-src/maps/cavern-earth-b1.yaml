@@ -110,6 +110,52 @@ objects:
   y: 16
 - {type: crate, x: 23, y: 3}
 - {type: crate, x: 30, y: 3}
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 2
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_stalagmite_0_0]
+  - [ar_stalagmite_1_0]
+  x: 29
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 15
+  y: 8
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 27
+  y: 15
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_mine_cart_ore_0_0]
+  x: 11
+  y: 20
+- type: deco
+  parts:
+  - [ar_crystal_cluster_0_0]
+  x: 4
+  y: 11
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 19
+  y: 16
+- type: deco
+  parts:
+  - [ar_barrels_0_0]
+  x: 23
+  y: 5
 npcs:
 - id: chest_ert_d_b1_drift_w
   sprite: chest
@@ -169,3 +215,5 @@ no_static_chokepoints: true
 no_unreachable_walkable: true
 canSave: true
 exit: {map: overworld, entrance: ert_earth_cave}
+ambient:
+- {kind: flame, prop: wall_torch, x: 15, y: 8}

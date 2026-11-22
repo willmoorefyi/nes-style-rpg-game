@@ -110,6 +110,41 @@ objects:
   - [tpillar_broken_bottom]
   x: 33
   y: 21
+- type: deco
+  parts:
+  - [ar_magma_mound_0_0, ar_magma_mound_0_1]
+  x: 6
+  y: 8
+- type: deco
+  parts:
+  - [ar_obsidian_spire_0_0]
+  - [ar_obsidian_spire_1_0]
+  x: 36
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_brazier_tall_0_0]
+  - [ar_brazier_tall_1_0]
+  x: 9
+  y: 24
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 21
+  y: 6
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_lava_vent_0_0]
+  x: 24
+  y: 27
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 35
+  y: 23
 npcs:
 - id: chest_rim_north
   sprite: chest
@@ -172,3 +207,8 @@ hazards:
   - [17, 10, 20, 10]
   - [30, 10, 31, 10]
   - [17, 11, 20, 11]
+ambient:
+- {kind: flame, prop: magma_mound, x: 6, y: 8}
+- {kind: flame, prop: brazier_tall, x: 9, y: 24}
+- {kind: flame, prop: wall_torch, x: 21, y: 6}
+- {kind: flame, prop: lava_vent, x: 24, y: 27}

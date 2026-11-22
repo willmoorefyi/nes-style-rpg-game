@@ -163,6 +163,25 @@ objects:
   x: 21
   y: 28
   on_wall: true
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 13
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 18
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_coral_pink_0_0]
+  x: 3
+  y: 24
 npcs:
 - id: chest_wat_d_b5_niche_w
   sprite: chest
@@ -226,3 +245,5 @@ scriptedEncounters:
   isBoss: true
   postVictoryCutscene: wat_drowned_falls
   message: The king lifts his head. "You came down through my sea. Then you know it is calm. Stay, and you will never be afraid of a storm again."
+ambient:
+- {kind: flame, prop: candelabra, x: 18, y: 28}

@@ -115,6 +115,53 @@ objects:
   - [gold_heap]
   x: 7
   y: 22
+- type: deco
+  parts:
+  - [ar_crystal_tall_0_0]
+  - [ar_crystal_tall_1_0]
+  x: 2
+  y: 5
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_stalagmite_0_0]
+  - [ar_stalagmite_1_0]
+  x: 36
+  y: 11
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 17
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 2
+  y: 18
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_mine_cart_gold_0_0]
+  x: 19
+  y: 21
+- type: deco
+  parts:
+  - [ar_crystal_cluster_0_0]
+  x: 26
+  y: 7
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 11
+  y: 12
+- type: deco
+  parts:
+  - [ar_mushrooms_glow_0_0]
+  x: 28
+  y: 15
 npcs:
 - id: chest_ert_d_b2_south_cut
   sprite: chest
@@ -174,3 +221,6 @@ no_unreachable_walkable:
   reach_roots: [annex]
 canSave: true
 exit: {map: overworld, entrance: ert_earth_cave}
+ambient:
+- {kind: flame, prop: wall_torch, x: 17, y: 4}
+- {kind: flame, prop: mushrooms_glow, x: 28, y: 15}

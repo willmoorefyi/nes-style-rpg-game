@@ -135,6 +135,30 @@ objects:
   - [skulls]
   x: 24
   y: 33
+- type: deco
+  parts:
+  - [ar_ice_spire_0_0]
+  - [ar_ice_spire_1_0]
+  x: 18
+  y: 1
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_frozen_knight_0_0]
+  - [ar_frozen_knight_1_0]
+  x: 13
+  y: 30
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_ice_shards_0_0]
+  x: 26
+  y: 32
+- type: deco
+  parts:
+  - [ar_ice_block_0_0]
+  x: 19
+  y: 32
 npcs:
 - id: chest_fir_d2_b2_alcove
   sprite: chest

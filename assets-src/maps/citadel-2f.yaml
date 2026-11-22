@@ -110,6 +110,51 @@ objects:
   x: 26
   y: 2
   on_wall: true
+- type: deco
+  parts:
+  - [ar_iron_door_0_0, ar_iron_door_0_1]
+  - [ar_iron_door_1_0, ar_iron_door_1_1]
+  x: 7
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 35
+  y: 17
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_brazier_tall_0_0]
+  - [ar_brazier_tall_1_0]
+  x: 4
+  y: 17
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 24
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 17
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 26
+  y: 16
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_floor_0_0]
+  x: 33
+  y: 7
 npcs:
 - id: chest_ring_west
   sprite: chest
@@ -175,3 +220,8 @@ no_unreachable_walkable:
   reach_roots: [hall_west]
 canSave: true
 exit: {map: overworld, entrance: ord_citadel}
+ambient:
+- {kind: flame, prop: candelabra, x: 35, y: 17}
+- {kind: flame, prop: brazier_tall, x: 4, y: 17}
+- {kind: flame, prop: wall_torch, x: 24, y: 2}
+- {kind: flame, prop: wall_torch, x: 17, y: 16}

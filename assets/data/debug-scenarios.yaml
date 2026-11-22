@@ -2626,6 +2626,129 @@
   items: {}
   gold: 100
   enemies: []
+# AR-P2: the AR dungeon props and their flame lights (?mute=1&scenario=ar_flames; one per themed dungeon: ar_marsh,
+# ar_keep, ar_earth, ar_gurgu, ar_ice, ar_shrine, ar_sky, ar_mirage, ar_past, ar_citadel), the hero among the props
+- id: ar_flames
+  name: AR-P2 - the lights of Gurgu B3 (braziers, the fire idol, wall torches, the magma)
+  mode: field
+  map: gurgu-b3
+  spawn: [17, 12]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_marsh
+  name: AR-P2 - Marsh Cave B2
+  mode: field
+  map: marsh-cave-b2
+  spawn: [32, 21]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_keep
+  name: AR-P2 - Western Keep 1F
+  mode: field
+  map: western-keep-1f
+  spawn: [18, 14]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_earth
+  name: AR-P2 - Cavern of Earth B2
+  mode: field
+  map: cavern-earth-b2
+  spawn: [19, 8]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_gurgu
+  name: AR-P2 - Gurgu Volcano B5
+  mode: field
+  map: gurgu-b5
+  spawn: [17, 7]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_ice
+  name: AR-P2 - Ice Cavern B3 (no lights; ice props off the sheet ice)
+  mode: field
+  map: ice-cavern-b3
+  spawn: [28, 27]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_shrine
+  name: AR-P2 - Sea Shrine B5
+  mode: field
+  map: sea-shrine-b5
+  spawn: [16, 29]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_sky
+  name: AR-P2 - Sky Castle 1F
+  mode: field
+  map: sky-castle-1f
+  spawn: [17, 6]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_mirage
+  name: AR-P2 - Mirage Tower 1F
+  mode: field
+  map: mirage-1f
+  spawn: [19, 18]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_past
+  name: AR-P2 - Temple of the Past 2
+  mode: field
+  map: past-temple-2
+  spawn: [22, 11]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: ar_citadel
+  name: AR-P2 - Citadel of Trials 1F
+  mode: field
+  map: citadel-1f
+  spawn: [16, 8]
+  fieldMode: walking
+  party:
+    - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
 # LM5-INT: the new art in the field (?mute=1&scenario=w_lm5_*; `w_` ids are world scenarios): the Western Keep's door,
 # the Citadel's gate, the freed fairy at Gaia's spring (FAIRY_FREED) and the sea-shrine mermaids
 - id: w_lm5_keep

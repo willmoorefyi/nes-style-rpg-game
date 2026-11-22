@@ -134,6 +134,35 @@ objects:
   - [brazier]
   x: 23
   y: 13
+- type: deco
+  parts:
+  - [ar_pipes_0_0]
+  - [ar_pipes_1_0]
+  x: 18
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_light_pylon_0_0]
+  - [ar_light_pylon_1_0]
+  x: 40
+  y: 23
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 8
+  y: 29
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 4
+  y: 6
+- type: deco
+  parts:
+  - [ar_console_0_0]
+  x: 21
+  y: 17
 npcs:
 - id: chest_bridge_south
   sprite: chest
@@ -212,3 +241,7 @@ inspect:
 - x: 34
   y: 25
   text: ['Scratched under the brazier''s rim: "A belt does not carry you back. Look for the island that feeds the stair before you trust a bridge."']
+ambient:
+- {kind: flame, prop: light_pylon, x: 40, y: 23}
+- {kind: flame, prop: console, x: 8, y: 29}
+- {kind: flame, prop: console, x: 21, y: 17}

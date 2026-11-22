@@ -86,6 +86,45 @@ objects:
   x: 5
   y: 7
 - {type: crate, x: 28, y: 4}
+- type: deco
+  parts:
+  - [ar_stalagmite_0_0]
+  - [ar_stalagmite_1_0]
+  x: 25
+  y: 0
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 1
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 12
+  y: 6
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_mine_cart_ore_0_0]
+  x: 27
+  y: 14
+- type: deco
+  parts:
+  - [ar_barrels_0_0]
+  x: 2
+  y: 13
+- type: deco
+  parts:
+  - [ar_barrel_tipped_0_0]
+  x: 19
+  y: 9
+- type: deco
+  parts:
+  - [ar_cage_floor_0_0]
+  x: 25
+  y: 7
 npcs:
 - id: ert_giant
   sprite: monk
@@ -137,3 +176,6 @@ unreachable_ok: [west]
 contrast:
 - {a: W, b: '-', min: 0.2}
 exit: {map: overworld, entrance: ert_giant}
+ambient:
+- {kind: flame, prop: wall_torch, x: 1, y: 3}
+- {kind: flame, prop: wall_torch, x: 12, y: 6}

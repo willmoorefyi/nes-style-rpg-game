@@ -185,6 +185,61 @@ objects:
   x: 28
   y: 25
   on_wall: true
+- type: deco
+  parts:
+  - [ar_stone_coffin_0_0]
+  - [ar_stone_coffin_1_0]
+  x: 2
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_sealed_coffin_0_0]
+  - [ar_sealed_coffin_1_0]
+  x: 35
+  y: 26
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cage_hanging_0_0]
+  - [ar_cage_hanging_1_0]
+  x: 18
+  y: 13
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 34
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_chains_0_0]
+  - [ar_wall_chains_1_0]
+  x: 8
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_cobweb_0_0]
+  x: 21
+  y: 28
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_bone_pile_0_0]
+  x: 5
+  y: 16
+- type: deco
+  parts:
+  - [ar_mushrooms_glow_0_0]
+  x: 10
+  y: 5
+- type: deco
+  parts:
+  - [ar_cage_floor_0_0]
+  x: 28
+  y: 9
 npcs:
 - id: chest_elf_d_b3_niche
   sprite: chest
@@ -260,3 +315,6 @@ hazards:
   rects:
   - [12, 30, 19, 31]
   damage: 1
+ambient:
+- {kind: flame, prop: wall_torch, x: 34, y: 2}
+- {kind: flame, prop: mushrooms_glow, x: 10, y: 5}

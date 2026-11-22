@@ -32,6 +32,11 @@ const NEW_FILES = [
   'src/scenes/exploration/smoke/smokeMotion.ts', 'src/scenes/exploration/smoke/SmokeColumn.ts',
   // WL: the boats' waterline blend
   'assets-src/tools/waterline.py',
+  // AR-P2: the dungeon props (the re-cut tool, the kit, the placements) and the flame ambient
+  'assets-src/gen/prop_cut.py', 'assets-src/gen/prop_spec.py', 'assets-src/tools/kit_props.py',
+  'assets-src/tools/ambient_flame.py', 'assets-src/tools/layouts/props_ar.py', 'assets-src/tools/layouts/props_ar_maps.py',
+  'src/scenes/exploration/flame/flameMotion.ts', 'src/scenes/exploration/flame/flameStyles.ts',
+  'src/scenes/exploration/flame/FlameLight.ts',
 ];
 
 describe('file-size ceilings', () => {

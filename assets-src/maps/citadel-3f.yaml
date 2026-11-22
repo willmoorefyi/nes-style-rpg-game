@@ -152,6 +152,39 @@ objects:
   x: 8
   y: 3
   on_wall: true
+- type: deco
+  parts:
+  - [ar_standing_torch_0_0]
+  - [ar_standing_torch_1_0]
+  x: 2
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_standing_torch_0_0]
+  - [ar_standing_torch_1_0]
+  x: 30
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_candelabra_0_0]
+  - [ar_candelabra_1_0]
+  x: 15
+  y: 4
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 22
+  y: 3
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 9
+  y: 3
+  on_wall: true
 npcs:
 - id: chest_niche_west
   sprite: chest
@@ -220,3 +253,9 @@ scriptedEncounters:
   postVictoryCutscene: ord_seal_won
   message: 'Two more keepers rise from the statues'' shadows. The bones behind them unfold until a dragon''s skull scrapes the vault, and a voice
     like wind through ribs says: Climb me.'
+ambient:
+- {kind: flame, prop: standing_torch, x: 2, y: 4}
+- {kind: flame, prop: standing_torch, x: 30, y: 4}
+- {kind: flame, prop: candelabra, x: 15, y: 4}
+- {kind: flame, prop: wall_torch, x: 22, y: 3}
+- {kind: flame, prop: wall_torch, x: 9, y: 3}

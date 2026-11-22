@@ -123,6 +123,34 @@ objects:
   - [urn]
   x: 23
   y: 11
+- type: deco
+  parts:
+  - [ar_kelp_0_0]
+  - [ar_kelp_1_0]
+  x: 8
+  y: 2
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_wall_torch_0_0]
+  x: 25
+  y: 13
+  on_wall: true
+- type: deco
+  parts:
+  - [ar_robot_husk_0_0]
+  x: 8
+  y: 15
+- type: deco
+  parts:
+  - [ar_barrel_tipped_0_0]
+  x: 20
+  y: 4
+- type: deco
+  parts:
+  - [ar_skull_0_0]
+  x: 16
+  y: 15
 npcs:
 - id: automaton
   x: 14
@@ -166,3 +194,5 @@ inspect:
 exit: {map: overworld, entrance: wat_waterfall}
 no_static_chokepoints: true
 no_unreachable_walkable: true
+ambient:
+- {kind: flame, prop: wall_torch, x: 25, y: 13}
