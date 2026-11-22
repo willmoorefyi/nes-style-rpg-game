@@ -5,8 +5,11 @@ docs/TOWN_THEMES.md). One entry per sheet `approved/town/theme_<town>`; every re
           <part>@<theme>; flat_roof: a roof style of the eave's cornice only (a dome cannot repeat across a width)
   tints:  {style: (hue, sat, val) | ('abs', hue, sat, val)} wall-colour variants of the theme's wall cells
   patch:  {part: (render id, key, w, h, col, row)} a cell taken from another module render (Melmond's boarded window)
-  grids:  [(name, render id, key, strength, (w, h), one_storey?)] i2i renders on the grid cut whole into <name>_<r>_<c>
-          (the inn prefab inn_<theme>, whole-house prefabs, the market hall); one_storey adds <name>4 (5x4)
+  grids:  [(name, render id, key, strength, (w, h), one_storey?[, opt])] i2i renders on the grid cut whole into
+          <name>_<r>_<c> (the inn prefab inn_<theme>, whole-house prefabs, the market hall); one_storey adds <name>4
+          (5x4); opt {clean: {...}} repaints hairline cracks (town_theme_clean.py; also a house option)
+  derived:[(name, grid name, (x0, y0, x1, y1) native px of its cut, (w, h))] a piece of a grid cut shrunk to w x h cells
+          (town_theme_clean.shrink; its colours only), cells <name>_<r>_<c>
   sprites:[(name, render id, key, (w, h), cut, pix)] Ultra sprites -> <name>_<r>_<c>; name 'chimney@<s>' is one cell
   props:  [(render id, key, [(name, (w, h)), ...], cut)] a sheet split into its figures, left to right
   mats:   [(name, render id, key, kind, settings)] materials: 'swatch' (a seamless crop, box fractions) or 'deck'
@@ -62,12 +65,14 @@ TOWNS = {
         props=[("dwf_props", "c821f9c8fda048a11e782ac7",
                 [("dwf_forge", (2, 2)), ("dwf_pillar", (1, 2)), ("dwf_pillar_slim", (1, 2)), ("dwf_anvil", (1, 1))], {})],
         mats=[("dwf_wall", "dwf_wall", "afa167b6666cfb6335c96fb8", "swatch", {"box": (0, 0.30, 1, 1)})]),
-    "lufenia": dict(
-        theme="luf_marble", house=("luf_house3", "566262229b79c2a5ca7434c0", 0.62,
-                                   {"flat_roof": "luf_marble_flat", "cornice_y": 40}),
-        tints={"luf_marble_azure": (200, 0.4, 0.97)},
-        grids=[("inn_luf_marble", "luf_inn2", "8d10679e4a0caf56501a5a1c", 0.74, INN, False),
-               ("luf_villa", "luf_house3", "566262229b79c2a5ca7434c0", 0.62, H5, True)],
+    "lufenia": dict(       # AR-W3 (user ruling 2026-11-22): stucco townhouse modules under a terracotta roof that
+        # repeats across any width (the elder's 8-wide hall), two gold-ribbed domed villas, the ribbed rotunda inn
+        theme="luf_roman", house=("luf3_modular2", "0b283fbef7ea5a55b178b953", 0.55, {"clean": {}}),
+        tints={"luf_roman_azure": (200, 0.4, 0.97)},
+        grids=[("inn_luf_roman", "luf3_rotunda2", "dada28b923fc100f95415064", 0.6, INN, False, {"clean": {}}),
+               ("luf_villa_t", "luf3_villa_t2", "2f1ffbb1e7bb82a9b3e975fd", 0.6, H5, True, {"clean": {}}),
+               ("luf_villa_m", "luf3_villa_m2", "8baff5d3e408492c3154af34", 0.6, H5, True, {"clean": {}})],
+        derived=[("luf_cupola", "luf_villa_t", (14, 0, 226, 92), (2, 1))],     # the elder hall's dome cap
         sprites=[("luf_forum", "luf_forum", "00b694d65b48f5307191d8ad", (2, 3), {}, {})],
         props=[("luf_props", "9e1acb27791b2c61b7d2c724", [("luf_pylon", (1, 2))], {}),
                ("luf_props2", "15994cab6612f245f65a8c4b", [("luf_legionary", (1, 2)), ("luf_aqueduct", (3, 2))], {})]),

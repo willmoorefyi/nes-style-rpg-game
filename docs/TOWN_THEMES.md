@@ -268,8 +268,11 @@ sheets are split into separate figures first (`cut.split`).
   - imperial blue (4,6,16) (7,10,22)
   - laurel (10,17,8)
 - **Building language:**
-  - roof: white metal domes with gold ribs (two cells tall);
-  - walls: veined marble with fluted pilasters and gilded capitals;
+  - roof (AR-W3): red terracotta Roman tile roofs with a gilded ridge on the modular houses (they repeat across any
+    width), terracotta or white domes with bold gold ribs and a cyan-orb finial on the villas and the inn (two cells
+    tall);
+  - walls (AR-W3): smooth white stucco with fluted pilasters and gilded capitals, a gold plinth (no veins or cracks
+    at 2x);
   - windows: narrow arched blue glass;
   - doors: brass sliding doors under a lit lintel.
 - **Set pieces:**
@@ -283,11 +286,31 @@ sheets are split into separate figures first (`cut.split`).
 - **NPC dress:** white tunics with gold trim, cyan visors.
 - **Candidates:** `luf_house` (modules @luf_marble; tint `_azure`), `luf_inn` (a small domed rotunda, a good
   signature building), `luf_forum`, `luf_props` (pylon), `luf_props2` (legionary, aqueduct).
-- **Approved (AR-W2):** the re-rendered clean marble `luf_house3` (i2i at 0.62 with a no-cracks negative; the dome
-  is plain) and `luf_inn2` (the rotunda, cleaner), luf_forum, the pylon, legionary and aqueduct. A dome cannot repeat
-  across a width, so the 5x4 houses are whole-house prefabs `luf_villa4` (the domed villa) and the 8-wide elder's
-  house takes the flat roof style `luf_marble_flat` (the cornice only). Rejected: `luf_house` (cracked),
-  `luf_house2` (glowing cracks over the dome).
+- **Approved (AR-W2), replaced by AR-W3:** the marble `luf_house3` modules and villa, the flat cornice roof
+  `luf_marble_flat` of the elder's hall and the rotunda `luf_inn2`. The user's ruling (2026-11-22): Lufenia "definitely
+  needs another try (one house doesn't even have a roof)". The roofless house was the 8-wide elder's hall: a dome
+  cannot repeat across a width, so AR-W2 gave it `luf_marble_flat`, whose ridge and mid cells are empty and whose eave
+  keeps only its bottom 8 px (the cornice), so the hall showed a bare wall top on the grass. The villas' domes were
+  blank grey and the inn's marble was cracked.
+- **Approved (AR-W3, theme `luf_roman`):** board `docs/art/town_themes/lufenia/concept_luf3_board.png` (guide,
+  render, cut; the elder's hall before and after). Four SD3.5 image-to-image renders of flat colour guides on the part
+  grid (scratch guides drawn with the gold ribs, pediments and tile courses in colour, strength 0.55-0.6, the walls
+  worded "smooth white stucco" because "marble" keeps bringing cracks back):
+  - `luf3_modular2` -> the house modules `@luf_roman` (tint `luf_roman_azure`): a terracotta imbrex roof with a gilded
+    ridge whose middle cells repeat, so every `house` of any width has a real roof. The elder's hall (8x5, 2 storeys)
+    uses them, with the dome cap `luf_cupola` (2x1 deco on the cell row behind its ridge: the terracotta villa's dome
+    at half scale, `derived` in the spec, the module's own colours only);
+  - `luf3_villa_t2` / `luf3_villa_m2` -> whole-house prefabs `luf_villa_t5/_t4` and `luf_villa_m5/_m4`: a terracotta
+    and a white dome with gold ribs on a drum, a pedimented porch over the door; the four 5x4 houses alternate them
+    (stargazer and black magic white, healer and white magic terracotta);
+  - `luf3_rotunda2` -> `inn_luf_roman`: the rotunda inn under a white gold-ribbed dome, a ring of columns.
+  - Every one of them is cut with `clean` (`gen/town_theme_clean.py`): the hairline cracks SD3.5 still paints on pale
+    walls are repainted with the wall colour round them (thin pale-grey lines only; straight runs and colours kept).
+  - Kept: the forum fountain, pylons, legionaries and aqueduct (AR-W2), the observatory domes, and AR-N2's
+    `luf_citizen_m`, `luf_citizen_f` and `luf_senator`. Bedrock: 16 `ar_towns` calls (6 at strength 0.7, which
+    still cracked, 10 at 0.55-0.6); the raw renders and the scratch guides are in `~/temp/ff-game/ar/towns/lufenia2/`.
+  - The tech accents came through thinner than hoped (the cyan orb finials, the drum's light band and the door
+    lintels; the cornice strip is mostly lost at 48 px). The ground is still the shared cobble.
 
 ## 8. Onrac: a tidal pilgrim harbour (APPROVED: the main concept)
 
@@ -357,9 +380,9 @@ on `docs/art/town_themes/reroll_comparison.png`.
 
 **The cutter.** `assets-src/gen/town_theme_cut.py` (functions `town_theme_pix.py`, data `town_theme_spec.py`) re-cuts
 every approved cell offline from the render cache into `assets-src/gen/approved/town/theme_<town>.{png,json}` (one
-per themed town and `theme_dwarf`): `<part>@<style>` module cells for the theme and its tints (and Lufenia's flat
-roof), prefab and deco cells `<name>_<r>_<c>`, `chimney@cre_venice`, and the materials `cre_bridge_v`, `dwf_wall`.
-Each json's `sources` lists every render's cache key, model, seed, pass, strength and cut settings. `--check`
+per themed town and `theme_dwarf`): `<part>@<style>` module cells for the theme and its tints, prefab and deco cells `<name>_<r>_<c>`, `chimney@cre_venice`, and the materials `cre_bridge_v`, `dwf_wall`
+(AR-W3: a module or grid cut may take `clean` (`town_theme_clean.py`, the crack repaint), and `derived` cells shrink a
+piece of a grid cut, Lufenia's dome cap `luf_cupola`). Each json's `sources` lists every render's cache key, model, seed, pass, strength and cut settings. `--check`
 rebuilds every committed sheet exactly; the gen selftests check each key against the BR ledger and the cache (the
 `backend: bedrock` rule of the landmark sheets). Copy the renders from the main checkout's cache into a worktree first.
 
@@ -371,7 +394,7 @@ swap (a themed upper storey keeps its own windows); a house's chimney is `chimne
 per-town table) before it writes its source: every house takes `roof=<theme>` and a wall style from its old wall
 colour (plaster / white the theme, ochre tint 1, rose / stone tint 2), the inn `inn_<theme>` (same 4x5 footprint, door
 column 2, sign row), named houses whole-house prefabs of the same footprint (Pravoka: the pirates' den -> the tavern,
-the harbourmaster's and the cooper's houses; Lufenia: the four domed villas), and the set pieces are `collide: alpha`
+the harbourmaster's and the cooper's houses; Lufenia: the four domed villas, `luf_villa_t4` / `luf_villa_m4`), and the set pieces are `collide: alpha`
 decos (gondolas `on_water`) placed off every NPC, door and street, each checked by the compiler's map checks.
 Crescent's rows 10-11 and 24-25 (x 2..44) become canals and their stairs bridges, the east road stays (its source maps
 `bridge_v` to `cre_bridge_v`). Cornelia's market hall stands on the square in place of one stall and a flower bed.
