@@ -1,55 +1,17 @@
-"""Mountains: peak variants (scaled, mirrored, snow-capped), their Poisson-disc placement, the foothill texture
-and the scattered foothill rocks."""
+"""Mountains: peak variants (scaled, mirrored, snow-capped, AR-T2's grey cold rock), their Poisson-disc placement and
+the scattered foothill rocks (the foothill ground itself is AR-T2's scree band, terrain/bands.py)."""
 from __future__ import annotations
 
 import numpy as np
 from PIL import Image
 
 import kit as K
-from .base import (BAYER4, FOOT, FOOT_COVER, FOOT_FADE, FOOT_FLOOR, FOOT_FLOOR_R, FOOT_PATCH, FOOT_RISE, FOOT_SCALES,
-                   OVERHANG, PEAK_SCALES, PEAK_SPACING, ROCK_CORE, SNOW, T, _blur, _core, _dist, _low_dist, _luma,
-                   _poisson, _resized, _shade, _up, _vnoise)
+from .base import (BAYER4, FOOT, FOOT_SCALES, OVERHANG, PEAK_SCALES, PEAK_SPACING, ROCK_CORE, SNOW, T, _core, _dist,
+                   _low_dist, _poisson, _resized, _up)
 from .frame import CPX, CTX, chunk_rng, window_chunks
 from .outline import _cached_partition
 
 _VARIANTS: dict[bytes, dict[str, tuple[np.ndarray, tuple[int, int]]]] = {}   # peak art -> variants
-
-
-def foothills(below: np.ndarray, mountain: np.ndarray, grass: np.ndarray, ocean: np.ndarray, core: np.ndarray,
-              bayer: np.ndarray, mtex: np.ndarray | None, seed: int) -> None:
-    """Grass within a cell of a mountain shows the mountain texture at 40 -> 10 % (a little less on the first px, so
-    the range keeps its own edge; fading out past a noisy reach), dithered with Bayer plus some low-frequency noise
-    so the rock gathers a little; and a dark rock rim where mountains meet the sea."""
-    if not mountain.any():
-        return
-    H, W = below.shape[:2]
-    d = _low_dist(mountain, FOOT + FOOT_FADE + 16)
-    reach = FOOT - 8 + 16 * (_vnoise(H, W, 48, seed + 15) * 0.5 + 0.5)
-    ramp = FOOT_RISE[0] + (1 - FOOT_RISE[0]) * np.clip(d / FOOT_RISE[1], 0, 1)
-    line = lambda v: FOOT_COVER[0] - (FOOT_COVER[0] - FOOT_COVER[1]) * v / FOOT  # noqa: E731
-    cover = np.where(d <= reach, line(d), line(reach) * np.clip(1 - (d - reach) / FOOT_FADE, 0, 1)) * ramp
-    cover = np.where(core, np.minimum(cover, 0.33), cover)    # a grass cell's centre stays mostly grass
-    a = FOOT_PATCH                                  # share of the low-frequency noise in the threshold
-    t = (1 - a) * bayer + a * np.clip(_vnoise(H, W, 8, seed + 13) * 0.6 + 0.5, 0, 1)
-    b = 1 - a                                       # the CDF of the mix, so that cover = coverage
-    thr = np.where(t < a, t * t / (2 * a * b), np.where(t <= b, (t - a / 2) / b, 1 - (1 - t) ** 2 / (2 * a * b)))
-    foot = grass & ~mountain & (d > 0) & (cover > thr)
-    below[foot] = _lifted(mtex, below, grass, foot)
-    if ocean.any():                                  # a dark rock rim where mountains meet the sea
-        dm = _dist(ocean, 3)
-        _shade(below, mountain & (dm <= 1.5), 0.5)
-        _shade(below, mountain & (dm > 1.5) & (dm <= 3) & (bayer < 0.5), 0.7)
-
-
-def _lifted(mtex: np.ndarray, below: np.ndarray, grass: np.ndarray, foot: np.ndarray) -> np.ndarray:
-    """The mountain texture's px under `foot`, each lifted to at least FOOT_FLOOR of the local grass luma (the
-    grass px blurred over FOOT_FLOOR_R), so the texture's dark crevice px don't land on the grass as isolated black
-    dots (W14)."""
-    w = grass.astype(np.float32)
-    local = (_blur(_luma(below) * w, FOOT_FLOOR_R) / np.maximum(_blur(w, FOOT_FLOOR_R), 1e-3))[foot]
-    px = mtex[foot].astype(np.float32)
-    k = np.maximum(1.0, FOOT_FLOOR * local / np.maximum(_luma(px), 1.0))
-    return np.clip(px * k[:, None], 0, 255).astype(np.uint8)
 
 
 def _fill_holes(part: Image.Image) -> Image.Image:
@@ -111,12 +73,40 @@ def variants(kit: K.Kit) -> dict[str, tuple[np.ndarray, tuple[int, int]]]:
             b = _fill_holes(kit.part("boulder"))
             for s in FOOT_SCALES:
                 out[f"boulder_{s}{'m' if mirror else ''}"] = _resized(b, s, mirror)
+    if "cold_rock" in K.RECOLORS:                   # AR-T2: every peak and rock again in grey rock (cold ranges)
+        out.update({f"{n}_cold": _cold_rock(img) for n, img in list(out.items())})
     res = {}
     for name, img in out.items():
         ys, xs = np.nonzero(img[..., 3] > 127)
         res[name] = (img, (int((xs.min() + xs.max()) // 2), int(ys.max())))
     _VARIANTS[key] = res
     return res
+
+
+def _cold_rock(img: np.ndarray) -> np.ndarray:
+    """An RGBA variant recoloured to K.RECOLORS["cold_rock"] (HSV hue shift, saturation and value factors)."""
+    hue, sat, val = K.RECOLORS["cold_rock"]
+    hsv = np.asarray(Image.fromarray(np.ascontiguousarray(img[..., :3])).convert("HSV")).astype(np.float32)
+    hsv[..., 0] = (hsv[..., 0] + hue * 255 / 360) % 256
+    hsv[..., 1] = np.clip(hsv[..., 1] * sat, 0, 255)
+    hsv[..., 2] = np.clip(hsv[..., 2] * val, 0, 255)
+    out = img.copy()
+    out[..., :3] = np.asarray(Image.frombytes("HSV", (img.shape[1], img.shape[0]), hsv.astype(np.uint8).tobytes())
+                              .convert("RGB"))
+    return out
+
+
+def _coldify(plan: list, mat: np.ndarray, var: dict) -> list:
+    """AR-T2: a peak or rock anchored in (or a cell from) a cold range takes its grey-rock variant."""
+    from .bands import cold_cells  # noqa: PLC0415
+    cc = cold_cells(mat)
+    if not cc.any():
+        return plan
+    p = np.pad(cc, 1)
+    cc = cc | p[:-2, 1:-1] | p[2:, 1:-1] | p[1:-1, :-2] | p[1:-1, 2:]
+    hgt, wid = mat.shape
+    return [(k, f"{n}_cold" if f"{n}_cold" in var and cc[min(hgt - 1, y // T), min(wid - 1, x // T)] else n, x, y)
+            for k, n, x, y in plan]
 
 
 def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None) -> list[tuple[str, int, int]]:
@@ -168,6 +158,7 @@ def plan_peaks(mat: np.ndarray, owner: dict, kit: K.Kit, seed: int | None = None
                 plan.append((y, name, x, y))
                 break
     plan += _foothill_rocks(mat, label, names, free, var, H, W)
+    plan = _coldify(plan, mat, var)
     plan.sort(key=lambda p: (p[0], p[2]))
     return [(n, x, y) for _, n, x, y in plan]
 
@@ -212,7 +203,7 @@ def _foothill_rocks(mat, label, names, free, var, H, W) -> list[tuple[float, str
     core = _core(H, W)
     d = _low_dist(label == names.index("mountain"), FOOT + 8)
     zone = ok & (d >= 6) & (d <= FOOT * 0.8)
-    rocks = [n for n in var if n.startswith(("boulder_", "foot_"))]
+    rocks = [n for n in var if n.startswith(("boulder_", "foot_")) and not n.endswith("_cold")]
     plan = []
     for col, row, (ay0, ay1, ax0, ax1) in _inner_boxes(H, W, int(np.ceil(2.2 * T / 2))):
         pts = np.argwhere(zone[ay0:ay1, ax0:ax1]) + (ay0, ax0)

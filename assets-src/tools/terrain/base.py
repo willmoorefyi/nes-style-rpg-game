@@ -30,18 +30,13 @@ WARP_FINE = ((24, 2.5), (6, 1.0))
 WARP_EPS, WARP_STRETCH = 0.01, 2
 WARP_MEANDER = (40, 6.5, 0.65)                     # (mean half-wave px, amplitude px, least share of it); 0: off
 WARP_GAP = (4.0, 12.0)                             # (px kept off zero, total warp reach px); 0: off
-CORE = 28                                          # px: the centre of every cell always shows its own material
+CORE = 28                                          # px: the cell-centre square the metrics read (fidelity)
+CORE_R = 9                                         # px: AR-T2's round core (base._core) always shows its own material
 MARGIN = (T - CORE) // 2
 CORE_PULL, CORE_REACH = 0.3, 3.0                   # corner cells: own-material bonus at the centre's edge, 3 px
-SAND_BAND = 10                                     # px: dithered grass / sand band
-BEACH = (6, 10)                                    # px: automatic beach where the ocean meets grass
-SHALLOW, SHALLOW_TINT, CYAN = 10, 0.35, np.array((96, 200, 216), np.float32)
-BANK = 3                                           # px: dithered earth banks along rivers and lakes
 CLUMP_STEP, CLUMP_OUT, CLUMP_BULGE = 40, 14, (2, 14)  # px: tree_clump spacing along forest outlines, stick-out
-FOOT, FOOT_COVER = 48, (0.30, 0.10)                 # px: foothill reach (one cell); rock cover at the range, at one cell
+FOOT = 48                                          # px: foothill reach (one cell; the foothill rocks)
 FOOT_FLOOR, FOOT_FLOOR_R = 0.8, 12                 # W14: a foothill px is at least this share of the local grass luma
-FOOT_PATCH = 0.3                                   # foothill dither: Bayer, plus this much patchy noise
-FOOT_RISE, FOOT_FADE = (0.6, 8), 12                # cover starts at 60 % of itself, full after 8 px; fade px past the reach
 PEAK_SCALES = (0.6, 0.8, 1.0, 1.25)
 PEAK_SPACING = 34                                  # px x scale between peak anchors (the plan's minimum is 30)
 FOOT_SCALES = (0.5, 0.6)
@@ -155,9 +150,10 @@ def _bayer(h: int, w: int) -> np.ndarray:
 
 
 def _core(h: int, w: int) -> np.ndarray:
-    """Pixels in the central CORE x CORE square of their cell."""
-    iy, ix = np.arange(h) % T, np.arange(w) % T
-    return ((iy >= MARGIN) & (iy < MARGIN + CORE))[:, None] & ((ix >= MARGIN) & (ix < MARGIN + CORE))[None, :]
+    """Pixels in the round core of their cell (AR-T2: a disc of radius CORE_R px instead of the CORE x CORE square,
+    which drew per-cell scallops on concave coasts); the partition clamps it to the cell's own material."""
+    iy, ix = np.arange(h) % T - (T - 1) / 2, np.arange(w) % T - (T - 1) / 2
+    return (iy[:, None] ** 2 + ix[None, :] ** 2) <= CORE_R ** 2
 
 
 def _shade(img: np.ndarray, mask: np.ndarray, f: float) -> None:

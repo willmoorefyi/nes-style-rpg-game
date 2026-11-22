@@ -7,10 +7,10 @@ import numpy as np
 from PIL import Image
 
 import kit as K
-from .base import FOOT_FLOOR, T, _bayer, _core, _luma, _tile
+from .base import FOOT_FLOOR, T, _luma, _tile
 from .metrics import RUN_MAX, _Recorder, boundary_stats, classify, fidelity, foothill_share, peak_stats
 from .outline import _PARTITION
-from .peaks import foothills, place_peaks, plan_peaks
+from .peaks import place_peaks, plan_peaks
 
 
 def _ground(mat_rows: list[str], kit: K.Kit, organic: bool, seed: int = 99) -> tuple[np.ndarray, np.ndarray]:
@@ -25,7 +25,7 @@ def _ground(mat_rows: list[str], kit: K.Kit, organic: bool, seed: int = 99) -> t
 def _boundary_case(rows, kit, organic, ga, gb, window):
     mat, below = _ground(rows, kit, organic)
     mats = ("grass", "sand", "forest", "mountain", "ocean", "water", "dirt")
-    cls = classify(below, kit, mats)
+    cls = classify(below, kit, mats, organic)
     a, b = np.isin(cls, [mats.index(m) for m in ga]), np.isin(cls, [mats.index(m) for m in gb])
     return boundary_stats(a, b, window), mat, below
 
@@ -71,7 +71,7 @@ def selftest() -> int:
     B.place_peaks(old_canvas, mat, {}, kit, np.random.default_rng(0))
     old = peak_stats([(n, x + 24, y + 47) for n, (x, y) in rec.pastes])
     assert old["variants"] < 4 and old["anchor_std_mod48"] < 10, f"classic peaks pass ({old})"
-    assert foothill_share(np.asarray(old_canvas.convert("RGB")), mat, kit) < 0.9, "classic has foothills"
+    assert foothill_share(np.asarray(old_canvas.convert("RGB")), mat, kit, organic=False) < 0.9, "classic has foothills"
     ok += 1
     # the lake: no stone rim, a soft natural edge (no rim texture in it), and collision stays water
     lake = {"id": "lk", "terrain": "organic", "kits": ["overworld", "town"],
@@ -167,17 +167,21 @@ def _road_case(B, kit: K.Kit) -> int:
 
 
 def _foothill_dark_case(kit: K.Kit) -> int:
-    """W14: on a grass strip beside a mountain strip, at most 1 % of the foothill px are darker than FOOT_FLOOR (0.8)
-    of the grass texture's 5th percentile (the raw copy dropped the rock's crevice px, luma 34 on grass of 120, as
-    black dots). The plan's bound, the 5th percentile itself, can't be met by a 0.8 floor: the grass is nearly flat."""
+    """W14 (AR-T2: on the scree band): on a grass strip beside a mountain strip, at most 1 % of the scree px are
+    darker than FOOT_FLOOR (0.8) of the grass texture's 5th percentile (the raw rock's crevice px would land on the
+    grass as black dots)."""
+    from .bands import land_bands  # noqa: PLC0415
+    from .ecotone import tex_name  # noqa: PLC0415
     H, W = 4 * T, 8 * T
-    grass_tex, mtex = _tile(kit.material("grass"), H, W), _tile(kit.material("mountain"), H, W)
+    grass_tex = _tile(kit.material(tex_name(kit, "grass")), H, W)
     mountain = np.zeros((H, W), bool)
     mountain[:, :3 * T] = True
     below = grass_tex.copy()
-    foothills(below, mountain, ~mountain, np.zeros((H, W), bool), _core(H, W), _bayer(H, W), mtex, 5)
+    masks = {"grass": ~mountain, "mountain": mountain}
+    none = np.zeros((H, W), bool)
+    land_bands(below, lambda m: masks.get(m, none), kit, 5, np.ones((H, W), bool), none)
     foot = np.any(below != grass_tex, axis=2) & ~mountain
-    assert foot.sum() > 0.02 * (~mountain).sum(), f"foothills: only {int(foot.sum())} px"
+    assert foot.sum() > 0.02 * (~mountain).sum(), f"scree: only {int(foot.sum())} px"
     dark = _luma(below[foot]) < FOOT_FLOOR * np.percentile(_luma(grass_tex), 5) - 0.5
-    assert dark.mean() <= 0.01, f"foothills: {dark.mean():.1%} of the foothill px are darker than the grass"
+    assert dark.mean() <= 0.01, f"scree: {dark.mean():.1%} of the scree px are darker than the grass"
     return 1

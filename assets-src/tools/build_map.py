@@ -86,13 +86,8 @@ TERRAIN = {"grass": GRASS, "cobble": ROAD, "dirt": ROAD, "water": WATER, "wall":
            "lake": LAKE, "swamp": SWAMP, "taiga": TAIGA, "snow": SNOW}
 # on foot: walls, water, counters, mountains (3), rivers (7) and lakes (11, pass W; the canoe's)
 BLOCKED = MC.BLOCKED
-# materials a kit may not have yet: (base material, hue shift, saturation factor, value factor[, snow speckle share])
-# of a recoloured copy. NW2 (docs/NW2_EDITS_PLAN.md 3): taiga is the forest darkened toward blue-green, with snow
-# on the crowns' lit upper-left (`_speckle`); its tree_clump edges take the same recolour (`TAIGA_CLUMP`)
-FALLBACK_MATERIALS = {"swamp": ("grass", 25, 0.55, 0.7),
-                      "taiga": ("forest", 25, 0.55, 0.55, 1.0), "snow": ("sand", 0, 0.08, 1.25)}
-COLD_MATS = {"taiga": "t", "snow": "n"}             # fallbacks only on a map whose ground has them
-TAIGA_CLUMP = "tree_clump@taiga"
+# AR-T2: swamp, taiga and snow come from the approved AR sheet (kit.AR_SHEET, every kit); the build_map fallbacks
+# (recoloured grass / forest / sand, the snow speckle, the recoloured taiga clump) are retired
 OBJ_REACH = R.OBJ_REACH  # cells: an object's art reaches at most this far outside its footprint (raster windows)
 RING_PAD = R.RING_PAD    # cells beyond a raster window's 1-chunk ring (what a ring chunk's placements read)
 BAND_ABOVE, BAND_ROWS = 192 * 192, 64    # NW-2 (G-NW8): a map over 192x192 cells paints in bands of 64 rows
@@ -371,23 +366,12 @@ def door_effect(src: dict) -> dict:
 def map_kit(src: dict, kit: K.Kit) -> K.Kit:
     """The kit with the map's material remaps applied: `materials: {name: alias}` (another material) or
     `{from: alias, shade: f, hue: deg, sat: f}` (a recoloured copy: hue shift and saturation factor in HSV, then the
-    RGB shade factor), plus the fallback textures of materials a kit may not have yet (swamp; taiga and snow only
-    on a map whose ground has them; taiga also its recoloured tree_clump)."""
-    used = set(src.get("ground") or "")
-    extra = {m: f for m, f in FALLBACK_MATERIALS.items()
-             if m not in kit.materials and (m not in COLD_MATS or COLD_MATS[m] in used)}
-    if not src.get("materials") and not extra:
+    RGB shade factor)."""
+    if not src.get("materials"):
         return kit
     import copy
     kit = copy.copy(kit)
     kit.materials, kit.parts = dict(kit.materials), dict(kit.parts)
-    for name, (base, hue, sat, val, *speck) in extra.items():
-        kit.materials[name] = _speckle(_recolor_rgb(kit.material(base), hue, sat, val), *speck)
-        if name == "taiga" and "tree_clump" in kit.parts:
-            clump = _recolor(kit.part("tree_clump"), hue, sat, val)
-            rgba = np.asarray(clump).copy()
-            rgba[..., :3] = _speckle(rgba[..., :3], *speck, alpha=rgba[..., 3] > 127)
-            kit.parts[TAIGA_CLUMP] = Image.fromarray(rgba)          # (H, W, 4) uint8: RGBA
     for name, alias in (src.get("materials") or {}).items():
         if isinstance(alias, dict):                    # {from: castle_face, shade: 0.4, hue: 20, sat: 0.6}
             unknown = set(alias) - {"from", "shade", "hue", "sat"}
@@ -400,25 +384,6 @@ def map_kit(src: dict, kit: K.Kit) -> K.Kit:
         else:
             kit.materials[name] = kit.material(alias)
     return kit
-
-
-def _speckle(rgb: np.ndarray, share: float = 0.0, alpha: np.ndarray | None = None) -> np.ndarray:
-    """NW2: snow on the crowns' lit upper-left: a px brighter than its lower-right neighbour (the lit side, light
-    from the top-left) and in the brightest third of the texture takes a snow tone, on a fixed 4x4 pattern of
-    `share` of the px (deterministic, no rng); the snow is a 15-bit tone. `alpha`: only these px (a part)."""
-    if not share:
-        return rgb
-    a = rgb.astype(np.float32)
-    luma = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
-    on = np.ones(luma.shape, bool) if alpha is None else alpha
-    lit = luma - np.roll(luma, (-2, -2), (0, 1)) > 6
-    top = luma >= np.quantile(luma[on], 0.66)
-    yy, xx = np.mgrid[0:luma.shape[0], 0:luma.shape[1]]
-    keep = (np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]])[yy % 4, xx % 4] + 0.5) / 16 < share
-    snow = on & lit & top & keep
-    out = rgb.copy()
-    out[snow] = np.where(luma[snow, None] > np.quantile(luma[on], 0.85), (232, 240, 248), (184, 200, 216))
-    return out
 
 
 def _recolor_rgb(tex: np.ndarray, hue: float, sat: float, val: float) -> np.ndarray:

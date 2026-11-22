@@ -1,5 +1,5 @@
 """Organic outlines: the per-pixel material partition (blurred, domain-warped cell masks with clamped cell
-centres), the grass / sand band and the forest edges (tree clumps, canopy rim, shadow)."""
+centres) and the forest edges (tree clumps, canopy rim, shadow)."""
 from __future__ import annotations
 
 import numpy as np
@@ -7,28 +7,11 @@ import numpy as np
 import kit as K
 from .frame import CPX, CTX, chunk_rng, map_px, window_chunks
 from .base import (BLUR_R, CLUMP_BULGE, CLUMP_OUT, CLUMP_STEP, CORE, CORE_PULL, CORE_REACH, LOW, MARGIN, NEAR_LINE,
-                   ROADS, SAND_BAND, T, WARP_COARSE, WARP_EPS, WARP_FINE, WARP_GAP, WARP_MEANDER, WARP_STRETCH, WATERS,
+                   ROADS, T, WARP_COARSE, WARP_EPS, WARP_FINE, WARP_GAP, WARP_MEANDER, WARP_STRETCH, WATERS,
                    WILD, _blur, _core, _dist, _edge, _inner_depth, _key, _meander, _poisson, _resized, _shade, _stamp,
                    _up, _vnoise)
 
 _PARTITION: dict[tuple, tuple[int, list[str], np.ndarray]] = {}   # (mat, frame) -> (seed, names, label), by paint_soft
-
-
-def sand_band(below: np.ndarray, grass: np.ndarray, sand: np.ndarray, core: np.ndarray, bayer: np.ndarray,
-              sand_tex: np.ndarray, grass_tex: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Grass / sand: a 10 px band dithered with a 4x4 Bayer matrix instead of a dark line. Returns (grass, sand)."""
-    if not (grass.any() and sand.any()):
-        return grass, sand
-    half = SAND_BAND / 2
-    ds, dg = _dist(sand, int(half) + 1), _dist(grass, int(half) + 1)
-    s = np.where(sand, 0.5 + (dg - 1) / SAND_BAND, 0.5 - ds / SAND_BAND)
-    band = (sand & (dg <= half)) | (grass & (ds <= half))
-    band &= ~core
-    to_sand = band & grass & (s > bayer)
-    to_grass = band & sand & (s <= bayer)
-    below[to_sand] = sand_tex[to_sand]
-    below[to_grass] = grass_tex[to_grass]
-    return (grass & ~to_sand) | to_grass, (sand & ~to_grass) | to_sand
 
 
 def wild_cells(mat: np.ndarray) -> np.ndarray:

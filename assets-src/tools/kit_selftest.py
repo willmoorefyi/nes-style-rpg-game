@@ -26,6 +26,7 @@ EXPECT = {
     "dune": ((20, 40), (0.4, 1), (0.6, 1)),        # warm sand
     "pale_dune": ((30, 55), (0, 0.25), (0.8, 1)),  # bleached sand
     "elf": ((80, 160), (0.2, 1), (0.2, 1)),        # green roofs (a part recolour of the roof)
+    "cold_rock": (None, (0, 0.15), (0.3, 1)),      # AR-T2: grey rock (a part recolour of the peak)
 }
 
 
@@ -150,5 +151,13 @@ def main() -> int:
         bad = [p for p in lm if p not in kit.approved or not np.array_equal(np.asarray(kit.part(p)), np.asarray(lm[p]))]
         assert not bad, f"kit {kid}: approved landmark cells not used: {bad[:4]}"
     print(f"OK approved landmarks ({len(lm)} cells in every kit)")
+    mats, parts = K.approved_ar()                               # AR-T2: the AR ground sheet, in every kit too
+    assert mats and parts, "the AR sheet (approved/overworld/terrain_ar) is missing"
+    for kid in ("overworld", "temple", "town", "castle", "interior"):
+        kit = K.load_kit(kid)
+        bad = [n for n in mats if not np.array_equal(kit.material(n), mats[n])] + [n for n in parts if n not in kit.parts]
+        assert not bad, f"kit {kid}: AR sheet names not used: {bad[:4]}"
+    n += 1
+    print(f"OK AR sheet ({len(mats)} materials, {len(parts)} parts in every kit)")
     print(f"kit selftest: {n + 1} names OK")
     return 0
