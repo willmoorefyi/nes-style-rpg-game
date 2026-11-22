@@ -4,6 +4,7 @@ import { createFlightRenderer, type FlightFrame } from '../../../src/scenes/expl
 import { releaseMeshTextures } from '../../../src/scenes/exploration/mode7/meshRelease.js';
 import { FLIGHT_VIEW } from '../../../src/scenes/exploration/mode7/mode7Tilt.js';
 import type { MapData } from '../../../src/types/index.js';
+import { SIDE_RIGHT } from '../../../src/scenes/exploration/airshipHeading.js';
 
 /**
  * FX-S: the crash "Cannot read properties of null (reading '0')" on a scene change or a teleport mid-flight. Pixi 8
@@ -39,7 +40,7 @@ function world(): MapData {
 function frame(): FlightFrame {
   return { view: { ...FLIGHT_VIEW, px: 8.5, py: 8.5 }, near: null, chunks: null, marker: null,
     shadow: { x: 960, y: 700, scale: 48 }, props: [],
-    ship: { x: 960, footY: 750, facing: 'right', tMs: 0, sinceBoard: 1000 } } as unknown as FlightFrame;
+    ship: { x: 960, footY: 750, heading: { ...SIDE_RIGHT, seenDir: 'right', seenMoving: false }, tMs: 0, sinceBoard: 1000 } } as unknown as FlightFrame;
 }
 
 /** One flight: load (the atlas over stubbed assets), draw, render the view; returns the renderer to drop. */
