@@ -1,0 +1,71 @@
+{
+  "vehicle": "airship",
+  "frame": "airship_front",
+  "pass": "AR",
+  "view": "front 3/4 (from above and in front, flying toward the viewer), nose to the lower right",
+  "tag": "front25y30_st0.6_3",
+  "cache_key": "efeb5e6230239d65a2999489",
+  "model": "style_transfer",
+  "seed": 3,
+  "purpose": "ar_airship",
+  "proxy": {
+    "yaw": 150,
+    "elevation": 25,
+    "guide_sha256": "6506120813c6e59d"
+  },
+  "tool": "assets-src/gen/vehicle_view_cut.py",
+  "cut_settings": {
+    "flood_tol": 30,
+    "min_piece": 0.03,
+    "pocket_px": 150,
+    "match": "b_7 mean / std per channel",
+    "resample": "box",
+    "width": 89,
+    "unsharp": [
+      1,
+      72,
+      2
+    ],
+    "snap": "b_7 colour set, argmin",
+    "alpha": 110,
+    "outline": "1 px, b_7's darkest colour"
+  },
+  "edits": {
+    "recolor": [
+      {
+        "box": [
+          48,
+          40,
+          82,
+          74
+        ],
+        "px": 273
+      }
+    ],
+    "seam_boost": {
+      "delta": 60,
+      "px": 153
+    },
+    "highlight": {
+      "px": 760
+    },
+    "trim_plumb": {
+      "below_row": 110,
+      "px": 2
+    },
+    "pixels": 7
+  },
+  "native_size": [
+    89,
+    112
+  ],
+  "anchor": [
+    0.3143,
+    1.0
+  ],
+  "d7": 13.7979,
+  "faces": "right",
+  "mirrored": false,
+  "approved": "2026-11-22",
+  "review": "self-approved by the AV-1 implementer under the integrator's R6 ruling (2026-11-22); review sheet airship_views/av1/; the user may veto (T-2 reopens)"
+}

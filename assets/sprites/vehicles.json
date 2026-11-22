@@ -56,6 +56,50 @@
         1.0
       ],
       "footRow": 2
+    },
+    "airship_back": {
+      "x": 510,
+      "y": 0,
+      "w": 87,
+      "h": 112,
+      "anchor": [
+        0.3199,
+        1.0
+      ],
+      "footRow": 111
+    },
+    "airship_front": {
+      "x": 599,
+      "y": 0,
+      "w": 87,
+      "h": 110,
+      "anchor": [
+        0.3143,
+        1.0
+      ],
+      "footRow": 109
+    },
+    "airship_back_turn": {
+      "x": 688,
+      "y": 0,
+      "w": 126,
+      "h": 102,
+      "anchor": [
+        0.3899,
+        1.0
+      ],
+      "footRow": 101
+    },
+    "airship_front_turn": {
+      "x": 816,
+      "y": 0,
+      "w": 126,
+      "h": 102,
+      "anchor": [
+        0.3893,
+        1.0
+      ],
+      "footRow": 101
     }
   },
   "canoe": {
@@ -66,6 +110,10 @@
   "sources": {
     "ship": "approved",
     "airship": "approved",
-    "canoe": "approved"
+    "canoe": "approved",
+    "airship_back": "approved",
+    "airship_front": "approved",
+    "airship_back_turn": "approved",
+    "airship_front_turn": "approved"
   }
 }

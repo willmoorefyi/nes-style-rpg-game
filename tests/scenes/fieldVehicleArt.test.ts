@@ -63,7 +63,10 @@ describe('vehicle art: the sheet contract (assets-src/vehicles.py)', () => {
       expect(f.footRow, name).toBe(f.h - 1);
       expect(f.anchor[1], name).toBe(1);
     }
-    expect(META.sources).toEqual({ ship: 'approved', airship: 'approved', canoe: 'approved' });
+    expect(META.sources).toEqual({
+      ship: 'approved', airship: 'approved', canoe: 'approved', airship_back: 'approved', airship_front: 'approved',
+      airship_back_turn: 'approved', airship_front_turn: 'approved',
+    });
     expect([META.frames.canoe_front.w, META.frames.canoe_front.h]).toEqual([META.frames.canoe.w, META.frames.canoe.h]);
   });
 
