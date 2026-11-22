@@ -102,6 +102,7 @@ export const SITE_TARGETS: readonly { map: string; owner: string; npcs: number; 
   { map: 'matoya-cave', owner: 'A1-O', npcs: 4, note: 'Matoya and three enchanted brooms with lines' },
   { map: 'sage-cave', owner: 'ERT-O', npcs: 3, note: "Sarda's cave" },
   { map: 'caravan-camp', owner: 'WAT-O', npcs: 5, note: 'including the trader' },
-  { map: 'bahamut-lair', owner: 'ORD-O', npcs: 6, note: '6 dragons' },
+  { map: 'cardia-deep', owner: 'ORD-O', npcs: 24,
+    note: 'the dragon great village: Bahamut, the six of the old lair and the villagers' },
   { map: 'crescent-circle', owner: 'FIR-T', npcs: 12, note: 'the Circle of Sages, Lukahn included' },
 ];

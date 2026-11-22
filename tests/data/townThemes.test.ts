@@ -32,8 +32,8 @@ const WALL = ['wall_up_l', 'wall_up_r', 'wall_up_window', 'wall_up_plain', 'wall
 const UP2 = ['wall_up2_l', 'wall_up2_r', 'wall_up2_window', 'wall_up2_plain'];
 
 describe('the town themes', () => {
-  it('has a sheet per themed town plus the dwarf hall, every render BR-ledgered', () => {
-    expect(sheets.length).toBe(9);
+  it('has a sheet per themed town plus the dwarf hall and Cardia Deep, every render BR-ledgered', () => {
+    expect(sheets.length).toBe(10);
     for (const s of sheets) for (const r of s.sources) expect(ledger.has(r.cache_key), r.id).toBe(true);
   });
 
@@ -79,5 +79,27 @@ describe('the town themes', () => {
     for (const p of parts.filter((x) => x.startsWith('dwf_'))) expect(cells.has(p), p).toBe(true);
     expect(d.materials.in_wall_face.from).toBe('dwf_wall');
     expect(sheets.some((x) => 'dwf_wall' in x.materials)).toBe(true);
+  });
+
+  it('pass CD: the dragon sheet (Cardia Deep) has its set pieces and its two materials', () => {
+    const d = sheets.find((x) => x.sources.some((r) => r.id === 'cd_throne'))!;
+    expect(d).toBeDefined();
+    const SET: [string, number, number][] = [['drg_statue', 1, 2], ['drg_statue_big', 2, 2], ['drg_pillar', 1, 2],
+      ['drg_pillar_slim', 1, 2], ['drg_arch', 4, 3], ['drg_throne', 3, 3], ['drg_nest', 2, 2], ['drg_hoard', 2, 1],
+      ['drg_perch', 1, 2]];
+    for (const [n, w, h] of SET) for (let r = 0; r < h; r++) for (let c = 0; c < w; c++) {
+      expect(cells.has(`${n}_${r}_${c}`), `${n}_${r}_${c}`).toBe(true);
+    }
+    expect(Object.keys(d.materials).sort()).toEqual(['drg_floor', 'drg_wall']);
+  });
+
+  it('pass CD: Cardia Deep uses only approved drg_* cells and the dragon materials', () => {
+    const d = parse(readFileSync('assets-src/maps/cardia-deep.yaml', 'utf-8')) as
+      { objects: Obj[]; materials: Record<string, { from: string }> };
+    const drg = d.objects.flatMap((o) => o.parts?.flat() ?? []).filter((p) => p.startsWith('drg_'));
+    expect(drg.length).toBeGreaterThan(0);
+    for (const p of drg) expect(cells.has(p), p).toBe(true);
+    expect(d.materials.in_wall_face.from).toBe('drg_wall');
+    expect(d.materials.floor_stone.from).toBe('drg_floor');
   });
 });

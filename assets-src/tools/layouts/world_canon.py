@@ -122,8 +122,15 @@ floors([f"ice-cavern-b{i}" for i in (1, 2, 3)], "FIR-D2", "Ice Cavern", "fir_ice
 
 # ── ORDEAL (4.5) ──
 floors([f"citadel-{i}f" for i in (1, 2, 3)], "ORD-O", "Citadel of Trials", "ord_citadel", way="up", bosses=(3,))
-floors(["bahamut-cave", "bahamut-lair"], "ORD-O", "Bahamut", "ord_bahamut", labels=["Bahamut's Cave",
-                                                                                   "Bahamut's Lair"])
+# pass CD (docs/CARDIA_PLAN.md 5.6; integrator sign-off 2026-11-22): the dragon great village replaced the
+# bahamut-cave / bahamut-lair floors (retired: src/systems/retiredMaps.ts); five island stairs, each to its own islet
+room("cardia-deep", "ORD-O", "site", "Cardia Deep",
+     (("bahamut_gate", "the Sea Gate, from Bahamut's isle"), ("north", "the north islet's stair"),
+      ("east", "the east islet's stair"), ("stack", "the stack islet's stair"), ("west", "the west islet's stair"),
+      ("court", "before Bahamut's dais (retired-save relocation, debug start)")),
+     ("overworld", "ord_bahamut"),
+     (("north", "overworld", "ord_isle_north"), ("east", "overworld", "ord_isle_east"),
+      ("stack", "overworld", "ord_isle_stack"), ("west", "overworld", "ord_isle_west")))
 
 # ── WATER (4.6) ──
 room("waterfall-cave", "WAT-O", "site", "Waterfall Cave", (("arrival", "from the overworld"),),

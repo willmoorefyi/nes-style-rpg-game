@@ -28,7 +28,11 @@ const STRONG = ['portcullis_closed', 'portcullis_open', 'iron_door', 'bar_gate',
   'skeleton_slumped', 'mushrooms_glow', 'barrels', 'barrel_tipped', 'stalagmite'];
 const WEAK = ['wall_chains', 'bog_lantern', 'fire_idol', 'robot_husk', 'skull', 'bookshelf_ruined', 'ice_block'];
 const REROLLED: Record<string, string> = { wall_torch: 'torch_ultra_11', cobweb: 'web_ultra_23_k' };
-const LIT = ['wall_torch', 'standing_torch', 'brazier_tall', 'candelabra', 'cauldron_brew', 'cauldron_fire',
+// pass CD (docs/CARDIA_PLAN.md 6.1): props approved after the 2026-11-21 rulings
+const LATER: Record<string, { purpose: string; approved: string }> = {
+  drake_brazier: { purpose: 'ar_dragon', approved: '2026-11-22' },
+};
+const LIT = ['drake_brazier', 'wall_torch', 'standing_torch', 'brazier_tall', 'candelabra', 'cauldron_brew', 'cauldron_fire',
   'fiend_brazier', 'sun_brazier', 'bog_lantern', 'fire_idol', 'lava_vent', 'magma_mound', 'mushrooms_glow', 'console',
   'light_pylon'];
 
@@ -38,7 +42,7 @@ const DUNGEONS = ['marsh-cave-b1', 'marsh-cave-b2', 'marsh-cave-b3', 'western-ke
   'sea-shrine-b1', 'sea-shrine-b2', 'sea-shrine-b3', 'sea-shrine-b4', 'sea-shrine-b5', 'waterfall-cave',
   'sky-castle-1f', 'sky-castle-2f', 'sky-castle-3f', 'sky-castle-4f', 'sky-castle-5f', 'mirage-1f', 'mirage-2f',
   'mirage-3f', 'past-temple-1', 'past-temple-2', 'past-temple-3', 'past-temple-4', 'past-temple-5', 'past-chaos',
-  'citadel-1f', 'citadel-2f', 'citadel-3f'];
+  'citadel-1f', 'citadel-2f', 'citadel-3f', 'cardia-deep'];
 
 interface Obj { type: string; parts?: (string | null)[][]; x: number; y: number; on_wall?: boolean; above_rows?: number }
 const source = (id: string) => parse(readFileSync(`assets-src/maps/${id}.yaml`, 'utf-8')) as {
@@ -51,15 +55,16 @@ const propOf = (o: Obj): string | null => {
 
 describe('the AR dungeon-prop sheet', () => {
   it('holds exactly the usable set of the rulings, each from a ledgered AR ar_props render', () => {
-    expect(Object.keys(sheet.props).sort()).toEqual([...STRONG, ...WEAK, ...Object.keys(REROLLED)].sort());
+    expect(Object.keys(sheet.props).sort())
+      .toEqual([...STRONG, ...WEAK, ...Object.keys(REROLLED), ...Object.keys(LATER)].sort());
     expect(sheet.backend).toBe('bedrock');
     for (const [id, p] of Object.entries(sheet.props)) {
       const row = ledger.find((r) => r.event === 'request' && r.key === p.cache_key);
       expect(row, `${id}: ${p.cache_key} in the BR ledger`).toBeDefined();
       expect(row!.pass).toBe('AR');
-      expect(row!.purpose).toBe('ar_props');
-      expect(p.pass).toBe('AR');
-      expect(p.approved).toBe('2026-11-21');
+      expect(row!.purpose).toBe(id in LATER ? LATER[id].purpose : 'ar_props');
+      expect(p.pass).toBe('AR');                       // ar_dragon is a pass AR purpose too
+      expect(p.approved).toBe(id in LATER ? LATER[id].approved : '2026-11-21');
     }
     for (const [id, tag] of Object.entries(REROLLED)) expect(sheet.props[id].tag).toBe(tag);
   });

@@ -2107,6 +2107,56 @@
   items: { potion: 8, hi_potion: 4, ordeal_seal: 1, canoe: 1, lute: 1 }
   gold: 8000
   enemies: []
+# pass CD (docs/CARDIA_PLAN.md 5.6): Cardia Deep, the dragon great village. cd_court: before Bahamut's dais with the
+# seal (talk to him: ord_bahamut_trial, then the class change); cd_isles: the east islet with the airship landed, its
+# cave mouth one step north; cd_warren: the north islet's stair, at the head of its wild warren
+- id: cd_court
+  name: "CD - Cardia Deep, Bahamut's Court (ordeal seal held)"
+  mode: field
+  map: cardia-deep
+  entrance: court
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, at: fir_s_crescent_ship }
+    - { type: airship, map: overworld, at: ord_s_bahamut_airship }
+  flags: [GOT_LUTE, GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED, ORD_O_THRONE,
+          ORDEALS_GUARD_DEFEATED]
+  party: *w_s19_party
+  items: { potion: 8, hi_potion: 4, ordeal_seal: 1, canoe: 1, lute: 1 }
+  gold: 8000
+  enemies: []
+- id: cd_isles
+  name: "CD - the east Cardia islet, its cave mouth (airship landed)"
+  mode: field
+  map: overworld
+  entrance: ord_isle_east
+  fieldMode: walking
+  vehicles:
+    - { type: ship, map: overworld, at: fir_s_crescent_ship }
+    - { type: airship, map: overworld, at: ord_s_east_airship }
+  flags: [GOT_LUTE, GARLAND_DEFEATED, PRINCESS_RESCUED, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED, MARSH_GUARD_DEFEATED,
+          ASTOS_DEFEATED, PRINCE_AWAKE, CANAL_OPEN, VAMPIRE_DEFEATED, TITAN_FED, EARTH_SEAL_BROKEN, EARTH_CAVE_COMPLETE,
+          EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED, ORD_O_THRONE,
+          ORDEALS_GUARD_DEFEATED]
+  party: *w_s19_party
+  items: { potion: 8, hi_potion: 4, ordeal_seal: 1, canoe: 1, lute: 1 }
+  gold: 8000
+  enemies: []
+- id: cd_warren
+  name: "CD - the north islet's stair into its warren"
+  mode: field
+  map: cardia-deep
+  entrance: north
+  fieldMode: walking
+  vehicles:
+    - { type: airship, map: overworld, at: ord_s_north_airship }
+  flags: [AIRSHIP_RAISED, CANOE_GIVEN, CANAL_OPEN, BIKKE_DEFEATED, BRIDGE_BUILT]
+  party: *w_s19_party
+  items: { potion: 8, hi_potion: 4, canoe: 1 }
+  gold: 8000
+  enemies: []
 # the S18 boss at the band's level 25 with the stage kit (w_s18, the B6 tier), in the trial hall's backdrop
 - id: w_boss_dragon_zombie
   name: ORD-O - S18 boss, the trial guardian (dragon_zombie)
@@ -2826,10 +2876,10 @@
   gold: 100
   enemies: []
 - id: w_ar_lair
-  name: "AR - the dragon-kin of Bahamut's lair"
+  name: "AR - the dragon-kin of Cardia Deep's court"
   mode: field
-  map: bahamut-lair
-  spawn: [19, 12]
+  map: cardia-deep
+  spawn: [54, 12]
   party:
     - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
   items: {}
@@ -2876,10 +2926,10 @@
   gold: 100
   enemies: []
 - id: w_ar_ember
-  name: "AR - Ember, the dragon-kin guard of Bahamut's lair (AR-N3's line)"
+  name: "AR - Ember, the dragon-kin guard of Bahamut's court (AR-N3's line)"
   mode: field
-  map: bahamut-lair
-  spawn: [12, 9]
+  map: cardia-deep
+  spawn: [46, 16]
   party:
     - { class: warrior, name: WAR, level: 30, equipment: [iron_sword, chain_mail], spells: [] }
   items: {}

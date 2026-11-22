@@ -70,8 +70,8 @@ describe('AR: where the maps place them', () => {
     for (const [m, id, s] of want) expect([sprite(m, id)?.sprite, sprite(m, id)?.tint], id).toEqual([s, undefined]);
   });
 
-  it('the dragons of Bahamut\'s lair, the Circle\'s three sages and Dr. Unne', () => {
-    const lair = Object.fromEntries(npcs('bahamut-lair').filter((n) => n.id.startsWith('dragon_')).map((n) => [n.id, n.sprite]));
+  it('the dragons of Bahamut\'s court (Cardia Deep), the Circle\'s three sages and Dr. Unne', () => {
+    const lair = Object.fromEntries(npcs('cardia-deep').filter((n) => n.id.startsWith('dragon_')).map((n) => [n.id, n.sprite]));
     expect(lair).toEqual({ dragon_ember: 'dragon_guard', dragon_storm: 'dragon_guard', dragon_moss: 'dragon_elder',
       dragon_frost: 'dragon_elder', dragon_tide: 'dragon_youth', dragon_ash: 'dragon_youth' });
     const circle = npcs('crescent-circle');
@@ -105,7 +105,39 @@ describe('AR: where the maps place them', () => {
   });
 
   it('the dragon-kin guards no longer speak of wearing a man\'s shape', () => {
-    const text = JSON.stringify(npcs('bahamut-lair').filter((n) => n.id.startsWith('dragon_')));
+    const text = JSON.stringify(npcs('cardia-deep').filter((n) => n.id.startsWith('dragon_')));
     expect(text).not.toMatch(/man's shape|in this shape|scales show/);
+  });
+});
+
+describe('pass CD (docs/CARDIA_PLAN.md 6.2): Cardia Deep\'s four dragon-kin sheets', () => {
+  const CD = ['bahamut', 'dragon_hatchling', 'dragon_matron', 'dragon_sage'];
+
+  it('are ar_dragon renders re-cut offline: 48x96 cells, feet on row 93, at most the hero\'s height', () => {
+    for (const id of CD) {
+      const m = meta(id);
+      expect([m.backend, m.pass, m.approved, m.grid, m.bottom_row], id).toEqual(['bedrock', 'AR', '2026-11-22', [48, 96], 93]);
+      for (const s of m.sources) {
+        const row = ledger.find((r) => r.event === 'request' && r.key === s.cache_key);
+        expect([row?.pass, row?.purpose], `${id} ${s.cache_key}`).toEqual(['AR', 'ar_dragon']);
+      }
+      for (const h of m.figure_px) expect(h, id).toBeLessThanOrEqual(94);       // Bahamut capped at the cell (6.2)
+      expect(atlas.sheets[id], id).toBeDefined();
+    }
+    for (const id of ['bahamut', 'dragon_matron', 'dragon_sage']) for (const h of meta(id).figure_px) expect(h, id).toBeGreaterThanOrEqual(84);
+    for (const h of meta('dragon_hatchling').figure_px) expect(h, 'a hatchling is small').toBeLessThanOrEqual(70);
+  });
+
+  it('Cardia Deep places them untinted: Bahamut, the hatchlings, the matrons and the sages', () => {
+    const deep = npcs('cardia-deep');
+    const want: [string, string][] = [['bahamut', 'bahamut'], ['bahamut_after', 'bahamut'],
+      ['ord_cd_hatchling', 'dragon_hatchling'], ['ord_cd_chick', 'dragon_hatchling'], ['ord_cd_pearl', 'dragon_matron'],
+      ['ord_cd_baker', 'dragon_matron'], ['ord_cd_eggwarden', 'dragon_matron'], ['ord_cd_archivist', 'dragon_sage'],
+      ['ord_cd_sleeper', 'dragon_sage']];
+    for (const [id, s] of want) {
+      const n = deep.find((x) => x.id === id)!;
+      expect([n.sprite, n.tint], id).toEqual([s, undefined]);
+    }
+    expect(deep.some((n) => n.sprite === 'garland_npc')).toBe(false);
   });
 });
