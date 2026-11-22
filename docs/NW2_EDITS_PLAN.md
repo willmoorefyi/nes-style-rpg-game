@@ -950,3 +950,18 @@ streamer's normal late-chunk path at the hollow). Things that look off, reported
 **Docs.** AGENTS.md's world section (the NW2 plan, the `fir_ice` dock, the barriers and new checks, an "NW2
 geography" bullet for the gorges, Duergar, the dock audit and the hikes, the taiga share, the NW2 re-fit and grinds,
 GT-40-43, the state count, save v5) and its quick reference; `docs/PROGRESS.md` (pass NW2); this section; the TODOs.
+
+### QW result (2026-11-22, playtest fixes on the world map)
+
+- **Melmond's entry cue (done).** The door is the icon's east cell, the art's wall gate faces south. EARTH's content
+  now lays dirt tracks from the east gate (82, 158): south to (82, 161), west under the south wall to the giant's east
+  mouth (68, 158), and south-west to the Cavern's mouth (70, 176). A signpost at (81, 160) points east, and its
+  inspect line names the east gate. These are 50 ground cells, all on EARTH's land. The tracks form their own road
+  network (`road_islands`). No zone, spot, door or walk changed.
+- **Sarda's cave (held, not merged).** The user ruled that the cave should go to the far tip of the land the giant's
+  west mouth opens onto. The south cape works: anchor ref (-109, 44), target (52, 193), was (-104, 0) / (57, 155).
+  The walk from the west mouth grows from 5 steps to 42, every `world.py` check is OK, (g) gives s* 0.852, and the
+  EARTH, anchor and world tests pass. Proof (d), though, fails on the added Sarda-coast fights. S12 goes 15.10 ->
+  16.13 and S13 17.00 -> 18.26. The evil eye reaches L25.02 [21,24] and S21 L29.31 [25,28], and Gaia's price wall
+  fails. Lowering S12's grind 7.0 -> 3.0 still leaves S21 at 29.06. Per the brief, the move waits for a rebalance
+  ruling.
