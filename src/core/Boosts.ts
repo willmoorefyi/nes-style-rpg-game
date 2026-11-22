@@ -84,10 +84,10 @@ const offOr = (v: StepValue): string => (v === 0 ? 'Off' : mult(v));
 const onOff = (v: StepValue): string => (v ? 'On' : 'Off');
 
 export const BOOST_ROWS: readonly BoostRow[] = [
-  { key: 'gold', label: 'Gold', steps: REWARD_STEPS, format: mult,
+  { key: 'gold', label: 'Gold multiplier', steps: REWARD_STEPS, format: mult,
     help: 'Gold won in battle. x0 gives none, x4 four times as much.' },
-  { key: 'xp', label: 'Experience', steps: REWARD_STEPS, format: mult,
-    help: 'Experience won in battle. x0 gives none, x4 four times as much.' },
+  { key: 'xp', label: 'XP multiplier', steps: REWARD_STEPS, format: mult,
+    help: 'Experience (XP) won in battle. x0 gives none, x4 four times as much.' },
   { key: 'encounters', label: 'Encounters', steps: ENCOUNTER_STEPS, format: offOr,
     help: 'Random battles. Off stops them; story and boss battles still happen.' },
   { key: 'battleSpeed', label: 'Battle speed', steps: BATTLE_SPEED_STEPS, format: mult,

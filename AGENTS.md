@@ -682,10 +682,12 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 
 ### Boosts (pass CHT)
 
-Player-side "cheats" in the Pixel Remaster style: field menu > **Boosts** (`src/scenes/BoostsScene.ts`, lazy `boosts`;
+Player-side "cheats" in the Pixel Remaster style: field menu > **Cheats** (QF, playtest 2026-11-22: the user looked
+for "cheats" and missed the old "Boosts" label; the screen is titled "Cheats (Boosts)", its first rows read "Gold
+multiplier" and "XP multiplier"; `src/scenes/BoostsScene.ts`, lazy `boosts`;
 up / down move, left / right change and stop at the ends, confirm steps forward and wraps, cancel closes). Rules and
 steps live in the pure `src/core/Boosts.ts` (no PixiJS); the values are `Game.boosts`.
-- **Options** (defaults x1, Escape Off): Gold and Experience x0 / x0.5 / x1 / x2 / x3 / x4 (the x0.5 steps go beyond
+- **Options** (defaults x1, Escape Off): Gold and XP multipliers x0 / x0.5 / x1 / x2 / x3 / x4 (the x0.5 steps go beyond
   the user's "x0 to x4"); Encounters Off / x0.5 / x1 / x2; Battle speed x1 / x2 / x4; Walk speed x1 / x2; Escape
   Off / On.
 - **Hook points:** gold and XP in `BattleStateMachine.finish` (`BattleConfig.boosts`, `scaleReward` rounds down: x0.5
