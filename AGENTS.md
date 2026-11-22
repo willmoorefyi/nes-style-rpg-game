@@ -467,7 +467,11 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `tests/quest/<r>/<r>_o_world.test.ts` (FIRE's `fireWorld.test.ts`) on the committed source and its owner grid,
   `tests/data/worldSource.test.ts`, `worldGates.test.ts`, `tests/progression/worldAnchors.test.ts`; NW2's
   `tests/data/canoeGorges.test.ts` (the gorge figures with the canoe's rate) and the hike d / E checks in
-  `tests/quest/water/wat_o_world.test.ts` and `tests/quest/wind/wnd_o_world.test.ts`. Pass W's world
+  `tests/quest/water/wat_o_world.test.ts` and `tests/quest/wind/wnd_o_world.test.ts`; FX-S's
+  `tests/data/northHikes.test.ts` (`world.py`'s `hikes` line: K 25 / U 50 from `world-anchors.yaml`'s `hike:`, the
+  five sites' floor and cap) and `tests/data/dockTowns.test.ts` (`dock_towns`, re-derived from quest.yaml, plus plan
+  6's other dock sites, `fir_ice` canoe-only through its own dock), both over `tests/helpers/worldGrid.ts` (the
+  source's ground with `gates.with_patches`' patches, BFS) and each failing on a mutated world or input. Pass W's world
   source and anchors are frozen in `tests/fixtures/passW/` (never edit them): the act-1 pins and the regions' kept ids
   and rosters are compared with them.
 - **Landmark art** below gives pass W's cells for the icons; on the NW world each icon is placed by its door offset.
