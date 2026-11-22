@@ -68,7 +68,7 @@ entrances:
   spring: [24, 4]
 objects:
 - type: prefab
-  prefab: inn
+  prefab: inn_gai_turf
   name: inn
   x: 10
   y: 36
@@ -86,8 +86,8 @@ objects:
   y: 36
   h: 5
   storeys: 2
-  roof: teal
-  wall: plaster
+  roof: gai_turf
+  wall: gai_turf
   sign: item
   chimney: 3
   enter: {map: gaia-item-shop, entrance: door}
@@ -100,8 +100,8 @@ objects:
   y: 36
   h: 5
   storeys: 2
-  roof: brown
-  wall: stone
+  roof: gai_turf
+  wall: gai_turf_slate
   sign: weapon
   enter: {map: gaia-weapon-shop, entrance: door}
 - type: house
@@ -113,8 +113,8 @@ objects:
   y: 36
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: gai_turf
+  wall: gai_turf_slate
   sign: armor
   chimney: 1
   enter: {map: gaia-armor-shop, entrance: door}
@@ -126,8 +126,8 @@ objects:
   x: 10
   y: 26
   h: 4
-  roof: brown
-  wall: ochre
+  roof: gai_turf
+  wall: gai_turf_sand
   chimney: 1
   enter: {map: gaia-house-windmiller, entrance: door}
 - type: house
@@ -139,8 +139,8 @@ objects:
   y: 25
   h: 5
   storeys: 2
-  roof: red
-  wall: plaster
+  roof: gai_turf
+  wall: gai_turf
   chimney: 3
   enter: {map: gaia-house-ropemaker, entrance: door}
 - type: house
@@ -152,8 +152,8 @@ objects:
   y: 25
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: gai_turf
+  wall: gai_turf
   sign: white_magic
   enter: {map: gaia-white-magic, entrance: door}
 - type: house
@@ -165,8 +165,8 @@ objects:
   y: 25
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: gai_turf
+  wall: gai_turf_slate
   sign: black_magic
   enter: {map: gaia-black-magic, entrance: door}
 - type: house
@@ -177,8 +177,8 @@ objects:
   x: 5
   y: 15
   h: 4
-  roof: red
-  wall: white
+  roof: gai_turf
+  wall: gai_turf
   sign: shrine
   enter: {map: gaia-house-healer, entrance: door}
 - type: house
@@ -190,8 +190,8 @@ objects:
   y: 14
   h: 5
   storeys: 2
-  roof: teal
-  wall: rose
+  roof: gai_turf
+  wall: gai_turf_slate
   chimney: 1
   enter: {map: gaia-house-spinner, entrance: door}
 - type: house
@@ -202,8 +202,8 @@ objects:
   x: 24
   y: 15
   h: 4
-  roof: brown
-  wall: ochre
+  roof: gai_turf
+  wall: gai_turf_sand
   chimney: 3
   enter: {map: gaia-house-beekeeper, entrance: door}
 - type: house
@@ -214,16 +214,16 @@ objects:
   x: 37
   y: 15
   h: 4
-  roof: green
-  wall: stone
+  roof: gai_turf
+  wall: gai_turf_slate
   chimney: 1
   enter: {map: gaia-house-shepherd, entrance: door}
 - type: house
   w: 4
   windows: [1, 2]
   storeys: 2
-  roof: slate
-  wall: white
+  roof: gai_turf
+  wall: gai_turf
   x: 29
   y: 14
   h: 5
@@ -575,6 +575,29 @@ objects:
   y: 16
   block: false
 - {type: signpost, x: 19, y: 43}
+- type: deco
+  parts:
+  - [gai_kite_0_0, gai_kite_0_1]
+  - [gai_kite_1_0, gai_kite_1_1]
+  - [gai_kite_2_0, gai_kite_2_1]
+  x: 7
+  y: 25
+  collide: alpha
+- type: deco
+  parts:
+  - [gai_flagpole_0_0]
+  - [gai_flagpole_1_0]
+  - [gai_flagpole_2_0]
+  x: 17
+  y: 36
+  collide: alpha
+- type: deco
+  parts:
+  - [gai_shrine_0_0]
+  - [gai_shrine_1_0]
+  x: 14
+  y: 6
+  collide: alpha
 npcs:
 - id: gaia_gate_warden
   sprite: guard

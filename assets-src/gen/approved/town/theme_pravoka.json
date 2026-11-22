@@ -1,0 +1,301 @@
+{
+ "kit": "town",
+ "sheet": "theme_pravoka",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "pra_tar",
+ "tints": [
+  "pra_tar_drift",
+  "pra_tar_red"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "inn_pra_tar_0_0",
+   "inn_pra_tar_0_1",
+   "inn_pra_tar_0_2",
+   "inn_pra_tar_0_3",
+   "inn_pra_tar_1_0",
+   "inn_pra_tar_1_1",
+   "inn_pra_tar_1_2",
+   "inn_pra_tar_1_3",
+   "inn_pra_tar_2_0",
+   "inn_pra_tar_2_1",
+   "inn_pra_tar_2_2",
+   "inn_pra_tar_2_3",
+   "inn_pra_tar_3_0",
+   "inn_pra_tar_3_1",
+   "inn_pra_tar_3_2",
+   "inn_pra_tar_3_3"
+  ],
+  [
+   "inn_pra_tar_4_0",
+   "inn_pra_tar_4_1",
+   "inn_pra_tar_4_2",
+   "inn_pra_tar_4_3",
+   "pra_cargo_0_0",
+   "pra_cargo_0_1",
+   "pra_house_a4_0_0",
+   "pra_house_a4_0_1",
+   "pra_house_a4_0_2",
+   "pra_house_a4_0_3",
+   "pra_house_a4_0_4",
+   "pra_house_a4_1_0",
+   "pra_house_a4_1_1",
+   "pra_house_a4_1_2",
+   "pra_house_a4_1_3",
+   "pra_house_a4_1_4"
+  ],
+  [
+   "pra_house_a4_2_0",
+   "pra_house_a4_2_1",
+   "pra_house_a4_2_2",
+   "pra_house_a4_2_3",
+   "pra_house_a4_2_4",
+   "pra_house_a4_3_0",
+   "pra_house_a4_3_1",
+   "pra_house_a4_3_2",
+   "pra_house_a4_3_3",
+   "pra_house_a4_3_4",
+   "pra_house_a5_0_0",
+   "pra_house_a5_0_1",
+   "pra_house_a5_0_2",
+   "pra_house_a5_0_3",
+   "pra_house_a5_0_4",
+   "pra_house_a5_1_0"
+  ],
+  [
+   "pra_house_a5_1_1",
+   "pra_house_a5_1_2",
+   "pra_house_a5_1_3",
+   "pra_house_a5_1_4",
+   "pra_house_a5_2_0",
+   "pra_house_a5_2_1",
+   "pra_house_a5_2_2",
+   "pra_house_a5_2_3",
+   "pra_house_a5_2_4",
+   "pra_house_a5_3_0",
+   "pra_house_a5_3_1",
+   "pra_house_a5_3_2",
+   "pra_house_a5_3_3",
+   "pra_house_a5_3_4",
+   "pra_house_a5_4_0",
+   "pra_house_a5_4_1"
+  ],
+  [
+   "pra_house_a5_4_2",
+   "pra_house_a5_4_3",
+   "pra_house_a5_4_4",
+   "pra_stall_0_0",
+   "pra_stall_0_1",
+   "pra_stall_1_0",
+   "pra_stall_1_1",
+   "pra_tavern_0_0",
+   "pra_tavern_0_1",
+   "pra_tavern_0_2",
+   "pra_tavern_0_3",
+   "pra_tavern_0_4",
+   "pra_tavern_1_0",
+   "pra_tavern_1_1",
+   "pra_tavern_1_2",
+   "pra_tavern_1_3"
+  ],
+  [
+   "pra_tavern_1_4",
+   "pra_tavern_2_0",
+   "pra_tavern_2_1",
+   "pra_tavern_2_2",
+   "pra_tavern_2_3",
+   "pra_tavern_2_4",
+   "pra_tavern_3_0",
+   "pra_tavern_3_1",
+   "pra_tavern_3_2",
+   "pra_tavern_3_3",
+   "pra_tavern_3_4",
+   "roof_eave_l@pra_tar",
+   "roof_eave_m@pra_tar",
+   "roof_eave_r@pra_tar",
+   "roof_mid_l@pra_tar",
+   "roof_mid_m@pra_tar"
+  ],
+  [
+   "roof_mid_r@pra_tar",
+   "roof_ridge_l@pra_tar",
+   "roof_ridge_m@pra_tar",
+   "roof_ridge_r@pra_tar",
+   "wall_door_bottom@pra_tar",
+   "wall_door_bottom@pra_tar_drift",
+   "wall_door_bottom@pra_tar_red",
+   "wall_door_top@pra_tar",
+   "wall_door_top@pra_tar_drift",
+   "wall_door_top@pra_tar_red",
+   "wall_lo_l@pra_tar",
+   "wall_lo_l@pra_tar_drift",
+   "wall_lo_l@pra_tar_red",
+   "wall_lo_l@pra_tar_red_drift",
+   "wall_lo_plain@pra_tar",
+   "wall_lo_plain@pra_tar_drift"
+  ],
+  [
+   "wall_lo_plain@pra_tar_red",
+   "wall_lo_plain@pra_tar_red_drift",
+   "wall_lo_r@pra_tar",
+   "wall_lo_r@pra_tar_drift",
+   "wall_lo_r@pra_tar_red",
+   "wall_lo_r@pra_tar_red_drift",
+   "wall_up2_l@pra_tar",
+   "wall_up2_l@pra_tar_drift",
+   "wall_up2_l@pra_tar_red",
+   "wall_up2_l@pra_tar_red_drift",
+   "wall_up2_plain@pra_tar",
+   "wall_up2_plain@pra_tar_drift",
+   "wall_up2_plain@pra_tar_red",
+   "wall_up2_plain@pra_tar_red_drift",
+   "wall_up2_r@pra_tar",
+   "wall_up2_r@pra_tar_drift"
+  ],
+  [
+   "wall_up2_r@pra_tar_red",
+   "wall_up2_r@pra_tar_red_drift",
+   "wall_up2_window@pra_tar",
+   "wall_up2_window@pra_tar_drift",
+   "wall_up2_window@pra_tar_red",
+   "wall_up2_window@pra_tar_red_drift",
+   "wall_up_l@pra_tar",
+   "wall_up_l@pra_tar_drift",
+   "wall_up_l@pra_tar_red",
+   "wall_up_l@pra_tar_red_drift",
+   "wall_up_plain@pra_tar",
+   "wall_up_plain@pra_tar_drift",
+   "wall_up_plain@pra_tar_red",
+   "wall_up_plain@pra_tar_red_drift",
+   "wall_up_r@pra_tar",
+   "wall_up_r@pra_tar_drift"
+  ],
+  [
+   "wall_up_r@pra_tar_red",
+   "wall_up_r@pra_tar_red_drift",
+   "wall_up_window@pra_tar",
+   "wall_up_window@pra_tar_drift",
+   "wall_up_window@pra_tar_red",
+   "wall_up_window@pra_tar_red_drift",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "pra_house4",
+   "cache_key": "a934d294777dd1482caff3de",
+   "model": "sd35",
+   "seed": 71,
+   "pass": "AR",
+   "use": "house modules @pra_tar",
+   "strength": 0.74,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6,
+    "crops": {
+     "wall_up_window": [
+      40,
+      124
+     ],
+     "wall_up_l": [
+      0,
+      96
+     ],
+     "wall_up_r": [
+      192,
+      96
+     ]
+    },
+    "plain_band": [
+     48,
+     100,
+     18
+    ],
+    "tint_ref": "wall_up_plain"
+   },
+   "tints": {
+    "pra_tar_drift": [
+     0,
+     0.6,
+     1.6
+    ],
+    "pra_tar_red": [
+     -10,
+     1.4,
+     1.25
+    ]
+   }
+  },
+  {
+   "id": "pra_inn",
+   "cache_key": "1a8425ba2e882d9bec1da57e",
+   "model": "sd35",
+   "seed": 61,
+   "pass": "AR",
+   "use": "grid cut inn_pra_tar 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "pra_house2",
+   "cache_key": "efb603c875775a9dcec23357",
+   "model": "sd35",
+   "seed": 52,
+   "pass": "AR",
+   "use": "grid cut pra_house_a 5x5 (+ 5x4)",
+   "strength": 0.82,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "pra_tavern",
+   "cache_key": "42a474c49cb2bd30613debc3",
+   "model": "ultra",
+   "seed": 32,
+   "pass": "AR",
+   "use": "sprite pra_tavern 5x4",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "pra_stalls",
+   "cache_key": "db8fde8bf8a3f7a5bbdab1ad",
+   "model": "ultra",
+   "seed": 42,
+   "pass": "AR",
+   "use": "props pra_stall 2x2, pra_cargo 2x1",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of pravoka (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

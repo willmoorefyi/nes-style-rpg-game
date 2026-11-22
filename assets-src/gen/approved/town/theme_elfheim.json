@@ -1,0 +1,226 @@
+{
+ "kit": "town",
+ "sheet": "theme_elfheim",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "elf_moon",
+ "tints": [
+  "elf_moon_jade",
+  "elf_moon_lilac"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "elf_lamp_0_0",
+   "elf_lamp_1_0",
+   "elf_moongate_0_0",
+   "elf_moongate_0_1",
+   "elf_moongate_1_0",
+   "elf_moongate_1_1",
+   "elf_pool_0_0",
+   "elf_pool_0_1",
+   "elf_tree_0_0",
+   "elf_tree_0_1",
+   "elf_tree_0_2",
+   "elf_tree_1_0",
+   "elf_tree_1_1",
+   "elf_tree_1_2",
+   "elf_tree_2_0",
+   "elf_tree_2_1"
+  ],
+  [
+   "elf_tree_2_2",
+   "elf_tree_3_0",
+   "elf_tree_3_1",
+   "elf_tree_3_2",
+   "inn_elf_moon_0_0",
+   "inn_elf_moon_0_1",
+   "inn_elf_moon_0_2",
+   "inn_elf_moon_0_3",
+   "inn_elf_moon_1_0",
+   "inn_elf_moon_1_1",
+   "inn_elf_moon_1_2",
+   "inn_elf_moon_1_3",
+   "inn_elf_moon_2_0",
+   "inn_elf_moon_2_1",
+   "inn_elf_moon_2_2",
+   "inn_elf_moon_2_3"
+  ],
+  [
+   "inn_elf_moon_3_0",
+   "inn_elf_moon_3_1",
+   "inn_elf_moon_3_2",
+   "inn_elf_moon_3_3",
+   "inn_elf_moon_4_0",
+   "inn_elf_moon_4_1",
+   "inn_elf_moon_4_2",
+   "inn_elf_moon_4_3",
+   "roof_eave_l@elf_moon",
+   "roof_eave_m@elf_moon",
+   "roof_eave_r@elf_moon",
+   "roof_mid_l@elf_moon",
+   "roof_mid_m@elf_moon",
+   "roof_mid_r@elf_moon",
+   "roof_ridge_l@elf_moon",
+   "roof_ridge_m@elf_moon"
+  ],
+  [
+   "roof_ridge_r@elf_moon",
+   "wall_door_bottom@elf_moon",
+   "wall_door_bottom@elf_moon_jade",
+   "wall_door_bottom@elf_moon_lilac",
+   "wall_door_top@elf_moon",
+   "wall_door_top@elf_moon_jade",
+   "wall_door_top@elf_moon_lilac",
+   "wall_lo_l@elf_moon",
+   "wall_lo_l@elf_moon_jade",
+   "wall_lo_l@elf_moon_lilac",
+   "wall_lo_l@elf_moon_lilac_jade",
+   "wall_lo_plain@elf_moon",
+   "wall_lo_plain@elf_moon_jade",
+   "wall_lo_plain@elf_moon_lilac",
+   "wall_lo_plain@elf_moon_lilac_jade",
+   "wall_lo_r@elf_moon"
+  ],
+  [
+   "wall_lo_r@elf_moon_jade",
+   "wall_lo_r@elf_moon_lilac",
+   "wall_lo_r@elf_moon_lilac_jade",
+   "wall_up2_l@elf_moon",
+   "wall_up2_l@elf_moon_jade",
+   "wall_up2_l@elf_moon_lilac",
+   "wall_up2_l@elf_moon_lilac_jade",
+   "wall_up2_plain@elf_moon",
+   "wall_up2_plain@elf_moon_jade",
+   "wall_up2_plain@elf_moon_lilac",
+   "wall_up2_plain@elf_moon_lilac_jade",
+   "wall_up2_r@elf_moon",
+   "wall_up2_r@elf_moon_jade",
+   "wall_up2_r@elf_moon_lilac",
+   "wall_up2_r@elf_moon_lilac_jade",
+   "wall_up2_window@elf_moon"
+  ],
+  [
+   "wall_up2_window@elf_moon_jade",
+   "wall_up2_window@elf_moon_lilac",
+   "wall_up2_window@elf_moon_lilac_jade",
+   "wall_up_l@elf_moon",
+   "wall_up_l@elf_moon_jade",
+   "wall_up_l@elf_moon_lilac",
+   "wall_up_l@elf_moon_lilac_jade",
+   "wall_up_plain@elf_moon",
+   "wall_up_plain@elf_moon_jade",
+   "wall_up_plain@elf_moon_lilac",
+   "wall_up_plain@elf_moon_lilac_jade",
+   "wall_up_r@elf_moon",
+   "wall_up_r@elf_moon_jade",
+   "wall_up_r@elf_moon_lilac",
+   "wall_up_r@elf_moon_lilac_jade",
+   "wall_up_window@elf_moon"
+  ],
+  [
+   "wall_up_window@elf_moon_jade",
+   "wall_up_window@elf_moon_lilac",
+   "wall_up_window@elf_moon_lilac_jade",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "elf_house",
+   "cache_key": "90c2e7c3239765262748966f",
+   "model": "sd35",
+   "seed": 23,
+   "pass": "AR",
+   "use": "house modules @elf_moon",
+   "strength": 0.76,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "elf_moon_jade": [
+     "abs",
+     150,
+     0.16,
+     0.97
+    ],
+    "elf_moon_lilac": [
+     "abs",
+     270,
+     0.13,
+     1.0
+    ]
+   }
+  },
+  {
+   "id": "elf_inn",
+   "cache_key": "d57f913959ce729bb9bdb5c9",
+   "model": "sd35",
+   "seed": 62,
+   "pass": "AR",
+   "use": "grid cut inn_elf_moon 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "elf_tree",
+   "cache_key": "a772d824cfbfcab933554783",
+   "model": "ultra",
+   "seed": 33,
+   "pass": "AR",
+   "use": "sprite elf_tree 3x4",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "elf_props",
+   "cache_key": "03f2b4cf72682cd59bb7889a",
+   "model": "ultra",
+   "seed": 43,
+   "pass": "AR",
+   "use": "props elf_lamp 1x2, elf_pool 2x1",
+   "cut": {
+    "rim": 4
+   }
+  },
+  {
+   "id": "elf_props2",
+   "cache_key": "bce0fa0a0adb066797f02942",
+   "model": "ultra",
+   "seed": 53,
+   "pass": "AR",
+   "use": "props elf_moongate 2x2",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of elfheim (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

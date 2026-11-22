@@ -1,0 +1,196 @@
+{
+ "kit": "town",
+ "sheet": "theme_melmond",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "mel_siege",
+ "tints": [
+  "mel_siege_ash",
+  "mel_siege_rot"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "inn_mel_siege_0_0",
+   "inn_mel_siege_0_1",
+   "inn_mel_siege_0_2",
+   "inn_mel_siege_0_3",
+   "inn_mel_siege_1_0",
+   "inn_mel_siege_1_1",
+   "inn_mel_siege_1_2",
+   "inn_mel_siege_1_3",
+   "inn_mel_siege_2_0",
+   "inn_mel_siege_2_1",
+   "inn_mel_siege_2_2",
+   "inn_mel_siege_2_3",
+   "inn_mel_siege_3_0",
+   "inn_mel_siege_3_1",
+   "inn_mel_siege_3_2",
+   "inn_mel_siege_3_3"
+  ],
+  [
+   "inn_mel_siege_4_0",
+   "inn_mel_siege_4_1",
+   "inn_mel_siege_4_2",
+   "inn_mel_siege_4_3",
+   "mel_barricade_0_0",
+   "mel_barricade_0_1",
+   "mel_barricade_0_2",
+   "mel_barricade_1_0",
+   "mel_barricade_1_1",
+   "mel_barricade_1_2",
+   "mel_brazier_0_0",
+   "mel_cross_0_0",
+   "mel_stone_0_0",
+   "roof_eave_l@mel_siege",
+   "roof_eave_m@mel_siege",
+   "roof_eave_r@mel_siege"
+  ],
+  [
+   "roof_mid_l@mel_siege",
+   "roof_mid_m@mel_siege",
+   "roof_mid_r@mel_siege",
+   "roof_ridge_l@mel_siege",
+   "roof_ridge_m@mel_siege",
+   "roof_ridge_r@mel_siege",
+   "wall_door_bottom@mel_siege",
+   "wall_door_bottom@mel_siege_ash",
+   "wall_door_bottom@mel_siege_rot",
+   "wall_door_top@mel_siege",
+   "wall_door_top@mel_siege_ash",
+   "wall_door_top@mel_siege_rot",
+   "wall_lo_l@mel_siege",
+   "wall_lo_l@mel_siege_ash",
+   "wall_lo_l@mel_siege_rot",
+   "wall_lo_l@mel_siege_rot_ash"
+  ],
+  [
+   "wall_lo_plain@mel_siege",
+   "wall_lo_plain@mel_siege_ash",
+   "wall_lo_plain@mel_siege_rot",
+   "wall_lo_plain@mel_siege_rot_ash",
+   "wall_lo_r@mel_siege",
+   "wall_lo_r@mel_siege_ash",
+   "wall_lo_r@mel_siege_rot",
+   "wall_lo_r@mel_siege_rot_ash",
+   "wall_up2_l@mel_siege",
+   "wall_up2_l@mel_siege_ash",
+   "wall_up2_l@mel_siege_rot",
+   "wall_up2_l@mel_siege_rot_ash",
+   "wall_up2_plain@mel_siege",
+   "wall_up2_plain@mel_siege_ash",
+   "wall_up2_plain@mel_siege_rot",
+   "wall_up2_plain@mel_siege_rot_ash"
+  ],
+  [
+   "wall_up2_r@mel_siege",
+   "wall_up2_r@mel_siege_ash",
+   "wall_up2_r@mel_siege_rot",
+   "wall_up2_r@mel_siege_rot_ash",
+   "wall_up2_window@mel_siege",
+   "wall_up2_window@mel_siege_ash",
+   "wall_up2_window@mel_siege_rot",
+   "wall_up2_window@mel_siege_rot_ash",
+   "wall_up_l@mel_siege",
+   "wall_up_l@mel_siege_ash",
+   "wall_up_l@mel_siege_rot",
+   "wall_up_l@mel_siege_rot_ash",
+   "wall_up_plain@mel_siege",
+   "wall_up_plain@mel_siege_ash",
+   "wall_up_plain@mel_siege_rot",
+   "wall_up_plain@mel_siege_rot_ash"
+  ],
+  [
+   "wall_up_r@mel_siege",
+   "wall_up_r@mel_siege_ash",
+   "wall_up_r@mel_siege_rot",
+   "wall_up_r@mel_siege_rot_ash",
+   "wall_up_window@mel_siege",
+   "wall_up_window@mel_siege_ash",
+   "wall_up_window@mel_siege_rot",
+   "wall_up_window@mel_siege_rot_ash",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "mel_house2",
+   "cache_key": "a1a42d031c0532730733a57a",
+   "model": "sd35",
+   "seed": 58,
+   "pass": "AR",
+   "use": "house modules @mel_siege",
+   "strength": 0.8,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "mel_siege_ash": [
+     0,
+     0.3,
+     1.2
+    ],
+    "mel_siege_rot": [
+     10,
+     1.1,
+     0.8
+    ]
+   }
+  },
+  {
+   "id": "mel_inn",
+   "cache_key": "2ae53aa0b7681fd45918e013",
+   "model": "sd35",
+   "seed": 63,
+   "pass": "AR",
+   "use": "grid cut inn_mel_siege 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "mel_barricade",
+   "cache_key": "88e21abd54a51749aeb6147d",
+   "model": "ultra",
+   "seed": 34,
+   "pass": "AR",
+   "use": "sprite mel_barricade 3x2",
+   "cut": {
+    "rim": 4,
+    "pocket": 5
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "mel_props",
+   "cache_key": "1dfac1c274994669efab59a7",
+   "model": "ultra",
+   "seed": 44,
+   "pass": "AR",
+   "use": "props mel_cross 1x1, mel_stone 1x1, mel_brazier 1x1",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of melmond (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

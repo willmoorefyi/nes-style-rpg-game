@@ -573,6 +573,17 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
 - No placeholder NPCs left: the fairy (`sprite: fairy`, Gaia's spring) and the sea-shrine mermaids (`sprite:
   mermaid`, all four on `sea-shrine-b1`, the elder included) have their own sheets, untinted.
 
+### Town themes (AR-W2)
+
+**The reference for any future town art is `docs/TOWN_THEMES.md` with its concept art in `docs/art/town_themes/<town>/`**
+(the user-approved theme per town: concept, 15-bit palette, building language, set pieces; Onrac and Gaia the main
+concepts, their alternatives not chosen; Crescent's canals; Melmond's siege static; exteriors only so far). The cells
+are re-cut offline by `python3 -I assets-src/gen/town_theme_cut.py` (`--check`; data `town_theme_spec.py`) into
+`assets-src/gen/approved/town/theme_<town>.{png,json}`, and each town script applies its row of
+`assets-src/tools/layouts/town_theme.py` (`roof=` / `wall=` theme styles, the themed inn and house prefabs, the set
+pieces, Crescent's canals) before it writes its source. `build_map.styled()` looks up an approved `name@style` first;
+`chimney@<roof>` replaces the chimney. Test: `tests/data/townThemes.test.ts`.
+
 ### New Cutscene
 
 Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManager` (`src/systems/`) through injected `CutsceneDeps`.

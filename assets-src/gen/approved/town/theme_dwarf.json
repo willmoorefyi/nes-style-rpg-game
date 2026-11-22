@@ -1,0 +1,97 @@
+{
+ "kit": "town",
+ "sheet": "theme_dwarf",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": null,
+ "tints": [],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "dwf_anvil_0_0",
+   "dwf_cart_0_0",
+   "dwf_cart_0_1",
+   "dwf_cart_1_0",
+   "dwf_cart_1_1",
+   "dwf_forge_0_0",
+   "dwf_forge_0_1",
+   "dwf_forge_1_0",
+   "dwf_forge_1_1",
+   "dwf_king_0_0",
+   "dwf_king_1_0",
+   "dwf_pillar_0_0",
+   "dwf_pillar_1_0",
+   "dwf_pillar_slim_0_0",
+   "dwf_pillar_slim_1_0",
+   null
+  ]
+ ],
+ "materials": {
+  "dwf_wall": [
+   0,
+   48,
+   96,
+   96
+  ]
+ },
+ "sources": [
+  {
+   "id": "dwf_statue",
+   "cache_key": "488956422acaa44362bceb4d",
+   "model": "ultra",
+   "seed": 36,
+   "pass": "AR",
+   "use": "sprite dwf_king 1x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "dwf_cart",
+   "cache_key": "c31373434ff2481933c7f320",
+   "model": "ultra",
+   "seed": 78,
+   "pass": "AR",
+   "use": "sprite dwf_cart 2x2",
+   "cut": {
+    "rim": 4
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "dwf_props",
+   "cache_key": "c821f9c8fda048a11e782ac7",
+   "model": "ultra",
+   "seed": 46,
+   "pass": "AR",
+   "use": "props dwf_forge 2x2, dwf_pillar 1x2, dwf_pillar_slim 1x2, dwf_anvil 1x1",
+   "cut": {
+    "rim": 4
+   }
+  },
+  {
+   "id": "dwf_wall",
+   "cache_key": "afa167b6666cfb6335c96fb8",
+   "model": "ultra",
+   "seed": 26,
+   "pass": "AR",
+   "use": "material dwf_wall (swatch)",
+   "box": [
+    0,
+    0.3,
+    1,
+    1
+   ]
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of dwarf (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

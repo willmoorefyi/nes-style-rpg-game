@@ -1,0 +1,196 @@
+{
+ "kit": "town",
+ "sheet": "theme_gaia",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "gai_turf",
+ "tints": [
+  "gai_turf_sand",
+  "gai_turf_slate"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "gai_flagpole_0_0",
+   "gai_flagpole_1_0",
+   "gai_flagpole_2_0",
+   "gai_glass_0_0",
+   "gai_glass_1_0",
+   "gai_kite_0_0",
+   "gai_kite_0_1",
+   "gai_kite_1_0",
+   "gai_kite_1_1",
+   "gai_kite_2_0",
+   "gai_kite_2_1",
+   "gai_shrine_0_0",
+   "gai_shrine_1_0",
+   "inn_gai_turf_0_0",
+   "inn_gai_turf_0_1",
+   "inn_gai_turf_0_2"
+  ],
+  [
+   "inn_gai_turf_0_3",
+   "inn_gai_turf_1_0",
+   "inn_gai_turf_1_1",
+   "inn_gai_turf_1_2",
+   "inn_gai_turf_1_3",
+   "inn_gai_turf_2_0",
+   "inn_gai_turf_2_1",
+   "inn_gai_turf_2_2",
+   "inn_gai_turf_2_3",
+   "inn_gai_turf_3_0",
+   "inn_gai_turf_3_1",
+   "inn_gai_turf_3_2",
+   "inn_gai_turf_3_3",
+   "inn_gai_turf_4_0",
+   "inn_gai_turf_4_1",
+   "inn_gai_turf_4_2"
+  ],
+  [
+   "inn_gai_turf_4_3",
+   "roof_eave_l@gai_turf",
+   "roof_eave_m@gai_turf",
+   "roof_eave_r@gai_turf",
+   "roof_mid_l@gai_turf",
+   "roof_mid_m@gai_turf",
+   "roof_mid_r@gai_turf",
+   "roof_ridge_l@gai_turf",
+   "roof_ridge_m@gai_turf",
+   "roof_ridge_r@gai_turf",
+   "wall_door_bottom@gai_turf",
+   "wall_door_bottom@gai_turf_sand",
+   "wall_door_bottom@gai_turf_slate",
+   "wall_door_top@gai_turf",
+   "wall_door_top@gai_turf_sand",
+   "wall_door_top@gai_turf_slate"
+  ],
+  [
+   "wall_lo_l@gai_turf",
+   "wall_lo_l@gai_turf_sand",
+   "wall_lo_l@gai_turf_sand_slate",
+   "wall_lo_l@gai_turf_slate",
+   "wall_lo_plain@gai_turf",
+   "wall_lo_plain@gai_turf_sand",
+   "wall_lo_plain@gai_turf_sand_slate",
+   "wall_lo_plain@gai_turf_slate",
+   "wall_lo_r@gai_turf",
+   "wall_lo_r@gai_turf_sand",
+   "wall_lo_r@gai_turf_sand_slate",
+   "wall_lo_r@gai_turf_slate",
+   "wall_up2_l@gai_turf",
+   "wall_up2_l@gai_turf_sand",
+   "wall_up2_l@gai_turf_sand_slate",
+   "wall_up2_l@gai_turf_slate"
+  ],
+  [
+   "wall_up2_plain@gai_turf",
+   "wall_up2_plain@gai_turf_sand",
+   "wall_up2_plain@gai_turf_sand_slate",
+   "wall_up2_plain@gai_turf_slate",
+   "wall_up2_r@gai_turf",
+   "wall_up2_r@gai_turf_sand",
+   "wall_up2_r@gai_turf_sand_slate",
+   "wall_up2_r@gai_turf_slate",
+   "wall_up2_window@gai_turf",
+   "wall_up2_window@gai_turf_sand",
+   "wall_up2_window@gai_turf_sand_slate",
+   "wall_up2_window@gai_turf_slate",
+   "wall_up_l@gai_turf",
+   "wall_up_l@gai_turf_sand",
+   "wall_up_l@gai_turf_sand_slate",
+   "wall_up_l@gai_turf_slate"
+  ],
+  [
+   "wall_up_plain@gai_turf",
+   "wall_up_plain@gai_turf_sand",
+   "wall_up_plain@gai_turf_sand_slate",
+   "wall_up_plain@gai_turf_slate",
+   "wall_up_r@gai_turf",
+   "wall_up_r@gai_turf_sand",
+   "wall_up_r@gai_turf_sand_slate",
+   "wall_up_r@gai_turf_slate",
+   "wall_up_window@gai_turf",
+   "wall_up_window@gai_turf_sand",
+   "wall_up_window@gai_turf_sand_slate",
+   "wall_up_window@gai_turf_slate",
+   null,
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "gai_house",
+   "cache_key": "150c6d2834d38223a4b79b77",
+   "model": "sd35",
+   "seed": 30,
+   "pass": "AR",
+   "use": "house modules @gai_turf",
+   "strength": 0.76,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "gai_turf_slate": [
+     200,
+     0.6,
+     0.9
+    ],
+    "gai_turf_sand": [
+     25,
+     1.4,
+     1.1
+    ]
+   }
+  },
+  {
+   "id": "gai_inn",
+   "cache_key": "860b7cf705c92c4b8b211362",
+   "model": "sd35",
+   "seed": 67,
+   "pass": "AR",
+   "use": "grid cut inn_gai_turf 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "gai_kite2",
+   "cache_key": "5f5664c49bd24ee655a5dcef",
+   "model": "ultra",
+   "seed": 82,
+   "pass": "AR",
+   "use": "sprite gai_kite 2x3",
+   "cut": {
+    "rim": 4,
+    "green_y": 0.72
+   },
+   "pixelize": {
+    "fill": 0.95,
+    "colors": 16
+   }
+  },
+  {
+   "id": "gai_props",
+   "cache_key": "b8e5c1ea89447b8ed57eca08",
+   "model": "ultra",
+   "seed": 49,
+   "pass": "AR",
+   "use": "props gai_flagpole 1x3, gai_glass 1x2, gai_shrine 1x2",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of gaia (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}

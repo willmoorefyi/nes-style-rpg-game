@@ -71,8 +71,8 @@ objects:
   y: 10
   h: 4
   storeys: 1
-  roof: green
-  wall: plaster
+  roof: pra_tar
+  wall: pra_tar
   chimney: 1
   enter: {map: pravoka-house-netmaker, entrance: door}
 - type: house
@@ -84,8 +84,8 @@ objects:
   y: 9
   h: 5
   storeys: 2
-  roof: brown
-  wall: ochre
+  roof: pra_tar
+  wall: pra_tar_drift
   chimney: 3
   enter: {map: pravoka-house-chandler, entrance: door}
 - type: house
@@ -97,23 +97,20 @@ objects:
   y: 9
   h: 5
   storeys: 2
-  roof: red
-  wall: stone
+  roof: pra_tar
+  wall: pra_tar_red
   sign: weapon
   enter: {map: pravoka-weapon-shop, entrance: door}
-- type: house
+- type: prefab
   w: 5
   door: 2
-  windows: *id001
   name: house_harbormaster
   x: 23
   y: 9
   h: 5
-  storeys: 2
-  roof: slate
-  wall: white
-  chimney: 1
   enter: {map: pravoka-house-harbormaster, entrance: door}
+  prefab: pra_house_a5
+  ridge_rows: 1
 - type: house
   w: 5
   door: 2
@@ -123,8 +120,8 @@ objects:
   y: 19
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: pra_tar
+  wall: pra_tar
   sign: white_magic
   enter: {map: pravoka-white-magic, entrance: door}
 - type: house
@@ -136,8 +133,8 @@ objects:
   y: 19
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: pra_tar
+  wall: pra_tar_red
   sign: black_magic
   chimney: 3
   enter: {map: pravoka-black-magic, entrance: door}
@@ -150,13 +147,13 @@ objects:
   y: 20
   h: 4
   storeys: 1
-  roof: teal
-  wall: ochre
+  roof: pra_tar
+  wall: pra_tar_drift
   sign: item
   chimney: 3
   enter: {map: pravoka-item-shop, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_pra_tar
   name: inn
   x: 23
   y: 19
@@ -174,8 +171,8 @@ objects:
   y: 29
   h: 5
   storeys: 2
-  roof: brown
-  wall: plaster
+  roof: pra_tar
+  wall: pra_tar
   sign: armor
   chimney: 1
   enter: {map: pravoka-armor-shop, entrance: door}
@@ -187,31 +184,19 @@ objects:
   x: 8
   y: 30
   h: 4
-  roof: rose
-  wall: white
-- type: house
+  roof: pra_tar
+  wall: pra_tar
+- {type: prefab, w: 5, name: pirates_den, x: 17, y: 30, h: 4, prefab: pra_tavern, ridge_rows: 1}
+- type: prefab
   w: 5
   door: 2
-  windows: [3]
-  name: pirates_den
-  x: 17
-  y: 30
-  h: 4
-  roof: slate
-  wall: stone
-- type: house
-  w: 5
-  door: 2
-  windows: *id001
   name: house_cooper
   x: 3
   y: 36
   h: 4
-  storeys: 1
-  roof: red
-  wall: ochre
-  chimney: 3
   enter: {map: pravoka-house-cooper, entrance: door}
+  prefab: pra_house_a4
+  ridge_rows: 1
 - type: house
   w: 5
   door: 2
@@ -220,8 +205,8 @@ objects:
   x: 8
   y: 36
   h: 4
-  roof: brown
-  wall: rose
+  roof: pra_tar
+  wall: pra_tar_red
 - type: house
   w: 5
   door: 2
@@ -231,8 +216,8 @@ objects:
   y: 15
   h: 4
   storeys: 1
-  roof: brown
-  wall: stone
+  roof: pra_tar
+  wall: pra_tar_red
   on_water: true
   enter: {map: pravoka-house-warehouse, entrance: door}
 - type: house
@@ -243,8 +228,8 @@ objects:
   x: 37
   y: 15
   h: 4
-  roof: slate
-  wall: stone
+  roof: pra_tar
+  wall: pra_tar_red
   on_water: true
 - type: house
   w: 5
@@ -255,8 +240,8 @@ objects:
   y: 2
   h: 4
   storeys: 1
-  roof: red
-  wall: white
+  roof: pra_tar
+  wall: pra_tar
   chimney: 3
   enter: {map: pravoka-house-lighthouse, entrance: door}
 - type: deco
@@ -528,6 +513,26 @@ objects:
 - {type: bush, x: 38, y: 11}
 - {type: bush, x: 43, y: 8}
 - {type: signpost, x: 2, y: 33}
+- type: deco
+  parts:
+  - [pra_stall_0_0, pra_stall_0_1]
+  - [pra_stall_1_0, pra_stall_1_1]
+  x: 23
+  y: 31
+  collide: alpha
+- type: deco
+  parts:
+  - [pra_cargo_0_0, pra_cargo_0_1]
+  x: 17
+  y: 18
+  collide: alpha
+- type: deco
+  parts:
+  - [pra_stall_0_0, pra_stall_0_1]
+  - [pra_stall_1_0, pra_stall_1_1]
+  x: 21
+  y: 4
+  collide: alpha
 npcs:
 - id: pirate_gate
   sprite: guard

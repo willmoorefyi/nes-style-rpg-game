@@ -74,8 +74,8 @@ objects:
   y: 14
   h: 5
   storeys: 2
-  roof: brown
-  wall: plaster
+  roof: mel_siege
+  wall: mel_siege
   sign: weapon
   enter: {map: melmond-weapon-shop, entrance: door}
 - type: house
@@ -87,8 +87,8 @@ objects:
   y: 14
   h: 5
   storeys: 2
-  roof: red
-  wall: ochre
+  roof: mel_siege
+  wall: mel_siege_ash
   sign: armor
   enter: {map: melmond-armor-shop, entrance: door}
 - type: house
@@ -100,8 +100,8 @@ objects:
   y: 14
   h: 5
   storeys: 2
-  roof: blue
-  wall: white
+  roof: mel_siege
+  wall: mel_siege
   sign: white_magic
   enter: {map: melmond-white-magic, entrance: door}
 - type: house
@@ -113,8 +113,8 @@ objects:
   y: 14
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: mel_siege
+  wall: mel_siege_rot
   sign: black_magic
   enter: {map: melmond-black-magic, entrance: door}
 - type: house
@@ -125,13 +125,13 @@ objects:
   x: 30
   y: 26
   h: 4
-  roof: teal
-  wall: ochre
+  roof: mel_siege
+  wall: mel_siege_ash
   sign: item
   chimney: 3
   enter: {map: melmond-item-shop, entrance: door}
 - type: prefab
-  prefab: inn
+  prefab: inn_mel_siege
   name: inn
   x: 16
   y: 25
@@ -149,8 +149,8 @@ objects:
   y: 8
   h: 4
   storeys: 1
-  roof: brown
-  wall: ochre
+  roof: mel_siege
+  wall: mel_siege_ash
   chimney: 1
   enter: {map: melmond-house-vintner, entrance: door}
 - type: house
@@ -162,8 +162,8 @@ objects:
   y: 7
   h: 5
   storeys: 2
-  roof: slate
-  wall: stone
+  roof: mel_siege
+  wall: mel_siege_rot
   chimney: 3
   enter: {map: melmond-house-unne, entrance: door}
 - type: house
@@ -175,8 +175,8 @@ objects:
   y: 8
   h: 4
   storeys: 1
-  roof: red
-  wall: plaster
+  roof: mel_siege
+  wall: mel_siege
   chimney: 3
   enter: {map: melmond-house-miller, entrance: door}
 - type: house
@@ -188,8 +188,8 @@ objects:
   y: 26
   h: 4
   storeys: 1
-  roof: brown
-  wall: plaster
+  roof: mel_siege
+  wall: mel_siege
   enter: {map: melmond-house-ploughman, entrance: door}
 - type: house
   w: 5
@@ -200,15 +200,15 @@ objects:
   y: 25
   h: 5
   storeys: 2
-  roof: red
-  wall: white
+  roof: mel_siege
+  wall: mel_siege
   sign: shrine
   enter: {map: melmond-house-healer, entrance: door}
 - type: house
   w: 5
   windows: [1, 3]
-  roof: brown
-  wall: rose
+  roof: mel_siege
+  wall: mel_siege_rot
   x: 12
   y: 8
   h: 4
@@ -1067,6 +1067,43 @@ objects:
   x: 28
   y: 13
   style: stone
+- type: deco
+  parts:
+  - [mel_barricade_0_0, mel_barricade_0_1, mel_barricade_0_2]
+  - [mel_barricade_1_0, mel_barricade_1_1, mel_barricade_1_2]
+  x: 26
+  y: 26
+  collide: alpha
+- type: deco
+  parts:
+  - [mel_cross_0_0]
+  x: 37
+  y: 31
+  collide: alpha
+- type: deco
+  parts:
+  - [mel_stone_0_0]
+  x: 34
+  y: 31
+  collide: alpha
+- type: deco
+  parts:
+  - [mel_stone_0_0]
+  x: 31
+  y: 31
+  collide: alpha
+- type: deco
+  parts:
+  - [mel_brazier_0_0]
+  x: 16
+  y: 31
+  collide: alpha
+- type: deco
+  parts:
+  - [mel_brazier_0_0]
+  x: 27
+  y: 11
+  collide: alpha
 npcs:
 - id: melmond_quay_warden
   sprite: guard

@@ -37,6 +37,9 @@ const NEW_FILES = [
   'assets-src/tools/ambient_flame.py', 'assets-src/tools/layouts/props_ar.py', 'assets-src/tools/layouts/props_ar_maps.py',
   'src/scenes/exploration/flame/flameMotion.ts', 'src/scenes/exploration/flame/flameStyles.ts',
   'src/scenes/exploration/flame/FlameLight.ts',
+  // AR-W2: the town-theme cutter and the towns' theme table
+  'assets-src/gen/town_theme_cut.py', 'assets-src/gen/town_theme_pix.py', 'assets-src/gen/town_theme_spec.py',
+  'assets-src/tools/layouts/town_theme.py',
 ];
 
 describe('file-size ceilings', () => {

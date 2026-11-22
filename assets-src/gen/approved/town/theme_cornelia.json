@@ -1,0 +1,212 @@
+{
+ "kit": "town",
+ "sheet": "theme_cornelia",
+ "backend": "bedrock",
+ "tool": "assets-src/gen/town_theme_cut.py",
+ "approved": "2026-11-21",
+ "theme": "cor_timber",
+ "tints": [
+  "cor_timber_ochre",
+  "cor_timber_rose"
+ ],
+ "roofs": [],
+ "tile": 48,
+ "cells": [
+  [
+   "cor_board_0_0",
+   "cor_board_0_1",
+   "cor_hall_0_0",
+   "cor_hall_0_1",
+   "cor_hall_0_2",
+   "cor_hall_0_3",
+   "cor_hall_1_0",
+   "cor_hall_1_1",
+   "cor_hall_1_2",
+   "cor_hall_1_3",
+   "cor_hall_2_0",
+   "cor_hall_2_1",
+   "cor_hall_2_2",
+   "cor_hall_2_3",
+   "cor_hall_3_0",
+   "cor_hall_3_1"
+  ],
+  [
+   "cor_hall_3_2",
+   "cor_hall_3_3",
+   "cor_haycart_0_0",
+   "cor_haycart_0_1",
+   "cor_haycart_1_0",
+   "cor_haycart_1_1",
+   "cor_shed_0_0",
+   "cor_shed_0_1",
+   "cor_shed_1_0",
+   "cor_shed_1_1",
+   "cor_well_0_0",
+   "cor_well_0_1",
+   "cor_well_1_0",
+   "cor_well_1_1",
+   "inn_cor_timber_0_0",
+   "inn_cor_timber_0_1"
+  ],
+  [
+   "inn_cor_timber_0_2",
+   "inn_cor_timber_0_3",
+   "inn_cor_timber_1_0",
+   "inn_cor_timber_1_1",
+   "inn_cor_timber_1_2",
+   "inn_cor_timber_1_3",
+   "inn_cor_timber_2_0",
+   "inn_cor_timber_2_1",
+   "inn_cor_timber_2_2",
+   "inn_cor_timber_2_3",
+   "inn_cor_timber_3_0",
+   "inn_cor_timber_3_1",
+   "inn_cor_timber_3_2",
+   "inn_cor_timber_3_3",
+   "inn_cor_timber_4_0",
+   "inn_cor_timber_4_1"
+  ],
+  [
+   "inn_cor_timber_4_2",
+   "inn_cor_timber_4_3",
+   "roof_eave_l@cor_timber",
+   "roof_eave_m@cor_timber",
+   "roof_eave_r@cor_timber",
+   "roof_mid_l@cor_timber",
+   "roof_mid_m@cor_timber",
+   "roof_mid_r@cor_timber",
+   "roof_ridge_l@cor_timber",
+   "roof_ridge_m@cor_timber",
+   "roof_ridge_r@cor_timber",
+   "wall_door_bottom@cor_timber",
+   "wall_door_bottom@cor_timber_ochre",
+   "wall_door_bottom@cor_timber_rose",
+   "wall_door_top@cor_timber",
+   "wall_door_top@cor_timber_ochre"
+  ],
+  [
+   "wall_door_top@cor_timber_rose",
+   "wall_lo_l@cor_timber",
+   "wall_lo_l@cor_timber_ochre",
+   "wall_lo_l@cor_timber_rose",
+   "wall_lo_l@cor_timber_rose_ochre",
+   "wall_lo_plain@cor_timber",
+   "wall_lo_plain@cor_timber_ochre",
+   "wall_lo_plain@cor_timber_rose",
+   "wall_lo_plain@cor_timber_rose_ochre",
+   "wall_lo_r@cor_timber",
+   "wall_lo_r@cor_timber_ochre",
+   "wall_lo_r@cor_timber_rose",
+   "wall_lo_r@cor_timber_rose_ochre",
+   "wall_up2_l@cor_timber",
+   "wall_up2_l@cor_timber_ochre",
+   "wall_up2_l@cor_timber_rose"
+  ],
+  [
+   "wall_up2_l@cor_timber_rose_ochre",
+   "wall_up2_plain@cor_timber",
+   "wall_up2_plain@cor_timber_ochre",
+   "wall_up2_plain@cor_timber_rose",
+   "wall_up2_plain@cor_timber_rose_ochre",
+   "wall_up2_r@cor_timber",
+   "wall_up2_r@cor_timber_ochre",
+   "wall_up2_r@cor_timber_rose",
+   "wall_up2_r@cor_timber_rose_ochre",
+   "wall_up2_window@cor_timber",
+   "wall_up2_window@cor_timber_ochre",
+   "wall_up2_window@cor_timber_rose",
+   "wall_up2_window@cor_timber_rose_ochre",
+   "wall_up_l@cor_timber",
+   "wall_up_l@cor_timber_ochre",
+   "wall_up_l@cor_timber_rose"
+  ],
+  [
+   "wall_up_l@cor_timber_rose_ochre",
+   "wall_up_plain@cor_timber",
+   "wall_up_plain@cor_timber_ochre",
+   "wall_up_plain@cor_timber_rose",
+   "wall_up_plain@cor_timber_rose_ochre",
+   "wall_up_r@cor_timber",
+   "wall_up_r@cor_timber_ochre",
+   "wall_up_r@cor_timber_rose",
+   "wall_up_r@cor_timber_rose_ochre",
+   "wall_up_window@cor_timber",
+   "wall_up_window@cor_timber_ochre",
+   "wall_up_window@cor_timber_rose",
+   "wall_up_window@cor_timber_rose_ochre",
+   null,
+   null,
+   null
+  ]
+ ],
+ "materials": {},
+ "sources": [
+  {
+   "id": "cor_house",
+   "cache_key": "82bce45522034f727a9c3feb",
+   "model": "sd35",
+   "seed": 21,
+   "pass": "AR",
+   "use": "house modules @cor_timber",
+   "strength": 0.76,
+   "guide": "5x5, 2 storeys, roof rows 2",
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   },
+   "tints": {
+    "cor_timber_ochre": [
+     -14,
+     1.6,
+     0.95
+    ],
+    "cor_timber_rose": [
+     -30,
+     1.3,
+     0.97
+    ]
+   }
+  },
+  {
+   "id": "cor_inn",
+   "cache_key": "6ec4d5d8f350daf0e7163051",
+   "model": "sd35",
+   "seed": 60,
+   "pass": "AR",
+   "use": "grid cut inn_cor_timber 4x5",
+   "strength": 0.78,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "cor_hall4",
+   "cache_key": "bd6a3f8bf1f65e65383dea8b",
+   "model": "sd35",
+   "seed": 74,
+   "pass": "AR",
+   "use": "grid cut cor_hall 4x4",
+   "strength": 0.74,
+   "cut": {
+    "colors": 20,
+    "tol": 24,
+    "sharpen": 0.6
+   }
+  },
+  {
+   "id": "cor_props",
+   "cache_key": "aaa733a7b25009a328824f8c",
+   "model": "ultra",
+   "seed": 41,
+   "pass": "AR",
+   "use": "props cor_haycart 2x2, cor_well 2x2, cor_shed 2x2, cor_board 2x1",
+   "cut": {
+    "rim": 4
+   }
+  }
+ ],
+ "note": "AR-W2: the user's approved town theme of cornelia (rulings 2026-11-21, docs/TOWN_THEMES.md; concept art in docs/art/town_themes/), Stability renders (SD3.5 image-to-image on grid guides, Ultra sprites) re-cut offline from the render cache"
+}
