@@ -63,7 +63,7 @@ def spec() -> RegionSpec:
                    Corridor("ert_melmond", (MELMOND_DOCK, "ert_melmond")),
                    Corridor("ert_cave", ("ert_melmond", (-70, 10), (-75, 17), "ert_earth_cave")),
                    Corridor("ert_giant", ("ert_melmond", (-72, 4), "ert_giant")),
-                   Corridor("ert_sarda", ("ert_giant_west", "ert_sarda"))],
+                   Corridor("ert_sarda", ("ert_giant_west", (-88, 30), "ert_sarda"))],
         dock_links=("ert_dwarf", "ert_melmond"),
         canal=((-15, -14, -13), (-53, -46)),
         barrier_seeds={"western_range": ("ert_melmond", ("ert_sarda",), True, False),

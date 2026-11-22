@@ -263,7 +263,7 @@ stages:
     kit: w_s12
     maps: [giant-tunnel, sage-cave]
     zones: [overworld:ert_badlands, overworld:ert_sarda_coast]
-    grind: 7.0
+    grind: 5.0    # QW2: 7.0 -> 5.0 (Sarda's cave moved to the south cape, a 42-step walk from the tunnel)
     # on foot at the tunnel's east mouth, the ship moored at Melmond's harbour (the `ert_melmond` dock)
     entry: {map: overworld, at: ert_s_giant, mode: walking, vehicles: [{type: ship, map: overworld, at: ert_s_melmond_ship}]}
     walk: [overworld:warp:giant-tunnel, giant-tunnel:npc:ert_giant, giant-tunnel:warp:ert_giant_west,

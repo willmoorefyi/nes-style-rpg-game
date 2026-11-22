@@ -418,7 +418,10 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `fir_tundra` 2.0, `wnd_mirage_sands` 2.1) under the `CAP` dict that `apply` asserts (`fir_rivers` 0.75 for E_canoe;
   `wat_isles` 2.0, `wat_streams` 2.0, `wnd_lufen_moor` 1.9, `wnd_mirage_sands` 2.1 for E_hike), and lowered two
   `grind`s (S16 2.0 -> 1.5, S17 4.0 -> 3.0; D-NW2-10: 0.5 steps, never below 1.0); every stage is within 0.11 of
-  NW's level. Re-fit after a change that moves the witness's walks a lot.
+  NW's level. QW2 (user ruling 2026-11-22) moved Sarda's cave to the south cape (door (52, 192), anchor `sarda`
+  ref (-109, 44), target (52, 193); 42 steps from the giant's west mouth, was 5) and re-balanced it with
+  `ert_sarda_coast` 0.67 -> 2.25 and S12's `grind` 7.0 -> 5.0 (every stage within 0.07 of its level before the
+  move; `docs/NW2_EDITS_PLAN.md`, "QW2 result"). Re-fit after a change that moves the witness's walks a lot.
 - **The verifier** (`src/progression/`, CLI `scripts/quest-verify.ts`): a state search over flags, key items,
   vehicles and places, firing the field rules the game runs (`src/systems/fieldRules.ts`). Proofs (a) order, (b) no
   skip, (c) no soft-lock, (d) bands (the curve model's whole-party level at each boss in its `band`, up to the top
@@ -512,6 +515,12 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `tree_clump` part stands in it (Elfheim's top corners, Melmond's top-right) so the door keeps one way in (OW-2).
   WL dropped the two windmill decos beside Gaia's icon (it draws its own windmill); a `tree_clump` deco
   `gaia_door_west` (149, 13) blocks the door's west side.
+  QW (playtest 2026-11-22): Melmond's door is the icon's east cell [3, 1] while its art's wall gate faces south, so
+  `earth/world_earth_nw.roads` lays worn dirt tracks (ELF's router `elf/world_nw_road.route`, round the objects;
+  `ROAD_CHAINS`): from the east gate (82, 158) south to (82, 161), west under the south wall to the giant's east mouth
+  (68, 158), and south-west to the Cavern's mouth (70, 176); a `signpost` deco at (81, 160) points east to the gate
+  (inspect: "MELMOND. The way in is the east gate, by the harbour."). The tracks are EARTH's own road network
+  (`road_islands`: the gate cell); the door keeps its single way in.
   The generic `town_icon` is no longer placed anywhere, and `buried_hull` is only FIRE's airship hull. Recolours
   kept: tower `slate` (the watchtower beside the Western Keep), tent `dune` (the caravan camp), windmill `stone` (Melmond), cave_mouth
   `snow` (the Ice Cavern); LM4-INT dropped tower `bright` / `stone`, buried_hull `slate`, shrine `pale_stone`, the

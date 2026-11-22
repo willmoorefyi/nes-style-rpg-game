@@ -19,11 +19,11 @@ const targets = (): Map<string, XY> => new Map(geo.anchors.map((a) => [a.name, [
 const codes = (cells: Map<string, XY>): string[] => geoCheck({ geo, cells }).failures.map((f) => f.message);
 
 describe('macroGeography: the anchors at their targets', () => {
-  it('31 pairs, s* = 0.848 (NW2-F: the Ice Cavern on the tip), no failure', () => {
+  it('31 pairs, s* = 0.849 (NW2-F: the Ice Cavern on the tip; QW2: Sarda\'s cave on the south cape), no failure', () => {
     const out = geoCheck({ geo, cells: targets() });
     expect(geo.pairs).toHaveLength(31);
     expect(out.failures).toEqual([]);
-    expect(out.scale).toBeCloseTo(0.848, 3);
+    expect(out.scale).toBeCloseTo(0.849, 3);
     expect(out.assumed).toEqual([]);
   });
 

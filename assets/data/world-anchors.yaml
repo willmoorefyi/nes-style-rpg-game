@@ -46,8 +46,8 @@ anchors:
      ref: [-88, 24], target: [70, 176]}
   - {name: giant, entrance: ert_giant, place: "Giant's tunnel, east mouth", region: earth, owner: NW-R,
      ref: [-92, 4], target: [67, 158]}
-  - {name: sarda, entrance: ert_sarda, place: "Sarda's cave", region: earth, owner: NW-R,
-     ref: [-104, 0], target: [57, 155]}
+  - {name: sarda, entrance: ert_sarda, place: "Sarda's cave", region: earth, owner: QW,
+     ref: [-109, 44], target: [52, 193], note: "QW (user ruling 2026-11-22): moved to the far south tip of the land the giant's west mouth opens onto, a real walk from the tunnel (was 5 steps); was ref [-104, 0], target [57, 155]"}
   - {name: crescent, entrance: fir_crescent, place: "Crescent Lake's land gate", region: fire, owner: NW-R,
      ref: [68, 20], target: [204, 172], note: "NW-0 pins it at (206, 172), +2 x inside the window (2.2)"}
   - {name: volcano, entrance: fir_volcano, place: "Gurgu Volcano mouth", region: fire, owner: NW-R,
