@@ -2,8 +2,9 @@ import { Sprite, Texture, type Container } from 'pixi.js';
 import type { BakedMapArt, MapData } from '../types/index.js';
 import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from './Camera.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
-import { chunkRect, ChunkStreamer, dominantColour, flightWindow, MISS_HOLD_FRAMES, STREAM_TEXTURE_CAP, viewSpan,
-  type ChunkRect, type ChunkSource } from './chunkStreaming.js';
+import { chunkRect, ChunkStreamer, dominantColour, flightWindow, MISS_HOLD_FRAMES, rectChunks, STREAM_TEXTURE_CAP,
+  viewSpan, type ChunkRect, type ChunkSource } from './chunkStreaming.js';
+import { wrapDelta } from '../systems/worldWrap.js';
 
 interface Slot {
   below: Sprite | null;
@@ -38,11 +39,15 @@ export class StreamedChunks {
   private override: ChunkRect | null = null;
   private flightN = 0;
   private readonly listeners = new Set<(i: number) => void>();
+  /** WR: the map wraps; the image (unwrapped column and row) each wanted chunk draws at this frame. */
+  private readonly wrap: boolean;
+  private readonly image = new Map<number, { col: number; row: number }>();
 
   constructor(private readonly map: MapData, private readonly art: BakedMapArt, source: ChunkSource,
     private readonly below: Container, private readonly above: Container, private readonly sprite: ChunkSpriteFactory) {
     this.cols = Math.ceil(map.width / art.chunk);
     this.rows = Math.ceil(map.height / art.chunk);
+    this.wrap = map.wrap === true;
     this.streamer = new ChunkStreamer(source, STREAM_TEXTURE_CAP, (url) => this.evicted(url), (url) => this.arrived(url));
     art.below.forEach((url, i) => {
       this.slots.push({ below: null, above: null, placeholder: null, missAt: null, logged: false });
@@ -81,20 +86,28 @@ export class StreamedChunks {
   /** One frame: `vis` is the chunks in view, (`camX`, `camY`) the camera, whose motion gives the direction of travel. */
   update(vis: ChunkRect, camX: number, camY: number): void {
     this.frame++;
-    if (this.last) {
-      if (camX !== this.last.x) this.dir.x = Math.sign(camX - this.last.x);
-      if (camY !== this.last.y) this.dir.y = Math.sign(camY - this.last.y);
+    const px = this.art.chunk * TILE_SIZE;
+    if (this.last) { // WR: the camera's period jump at a seam step does not flip the look-ahead
+      const dx = wrapDelta(this.last.x, camX, this.wrap ? this.cols * px : 0);
+      const dy = wrapDelta(this.last.y, camY, this.wrap ? this.rows * px : 0);
+      if (dx !== 0) this.dir.x = Math.sign(dx);
+      if (dy !== 0) this.dir.y = Math.sign(dy);
     }
     this.last = { x: camX, y: camY };
     const src = this.override ?? vis;   // in flight: the window, plus 1 chunk ahead (no ring)
     const ring = this.override ? 0 : 1;
+    const lo = (v: number): number => (this.wrap ? v : Math.max(0, v));
     const win: ChunkRect = {
-      c0: Math.max(0, src.c0 - ring - (this.dir.x < 0 ? 1 : 0)), c1: Math.min(this.cols - 1, src.c1 + ring + (this.dir.x > 0 ? 1 : 0)),
-      r0: Math.max(0, src.r0 - ring - (this.dir.y < 0 ? 1 : 0)), r1: Math.min(this.rows - 1, src.r1 + ring + (this.dir.y > 0 ? 1 : 0)),
+      c0: lo(src.c0 - ring - (this.dir.x < 0 ? 1 : 0)), r0: lo(src.r0 - ring - (this.dir.y < 0 ? 1 : 0)),
+      c1: this.wrap ? src.c1 + ring + (this.dir.x > 0 ? 1 : 0) : Math.min(this.cols - 1, src.c1 + ring + (this.dir.x > 0 ? 1 : 0)),
+      r1: this.wrap ? src.r1 + ring + (this.dir.y > 0 ? 1 : 0) : Math.min(this.rows - 1, src.r1 + ring + (this.dir.y > 0 ? 1 : 0)),
     };
-    const isVisible = (i: number): boolean => inRect(vis, i % this.cols, Math.floor(i / this.cols));
-    const order: number[] = [];
-    for (let row = win.r0; row <= win.r1; row++) for (let col = win.c0; col <= win.c1; col++) order.push(row * this.cols + col);
+    const seen = rectChunks(vis, this.cols, this.rows);
+    const shown = new Set(seen.map((c) => c.i));
+    const isVisible = (i: number): boolean => shown.has(i);
+    this.image.clear();
+    for (const c of [...rectChunks(win, this.cols, this.rows), ...seen]) this.image.set(c.i, c);   // vis's image wins
+    const order = [...this.image.keys()];
     order.sort((a, b) => Number(isVisible(b)) - Number(isVisible(a)));   // the visible chunks load first
     this.window = new Set(order);
     this.visible = vis;
@@ -102,6 +115,7 @@ export class StreamedChunks {
     for (const i of order) { const up = this.art.above[i]; if (up) urls.push(up); }
     this.streamer.want(urls, this.frame);
     this.slots.forEach((slot, i) => this.updateSlot(slot, i, isVisible(i)));
+    if (this.wrap) for (const [i, at] of this.image) this.placeSlot(this.slots[i], at.col * px, at.row * px);
     this.checkReady();
   }
 
@@ -109,24 +123,22 @@ export class StreamedChunks {
    *  flight the view there is the window recentring would choose for (x, y) (D-M11). */
   stepHeld(x: number, y: number): boolean {
     if (!this.visible) return false;
-    const r = this.override ? flightWindow(x, y, this.flightN, this.art.chunk, this.cols, this.rows) : this.viewAt(x, y);
+    const r = this.override ? flightWindow(x, y, this.flightN, this.art.chunk, this.cols, this.rows, this.wrap)
+      : this.viewAt(x, y);
     let held = false;
-    for (let row = r.r0; row <= r.r1; row++) {
-      for (let col = r.c0; col <= r.c1; col++) {
-        const i = row * this.cols + col;
-        if (!this.window.has(i) || this.loaded(i)) continue;   // chunks outside the window never hold a step
-        const slot = this.slots[i];
-        slot.missAt ??= this.frame;
-        if (this.frame - slot.missAt < MISS_HOLD_FRAMES) held = true;
-      }
+    for (const { i } of rectChunks(r, this.cols, this.rows)) {
+      if (!this.window.has(i) || this.loaded(i)) continue;   // chunks outside the window never hold a step
+      const slot = this.slots[i];
+      slot.missAt ??= this.frame;
+      if (this.frame - slot.missAt < MISS_HOLD_FRAMES) held = true;
     }
     return held;
   }
 
   private viewAt(x: number, y: number): ChunkRect {
-    const [x0, x1] = viewSpan(x, VIEWPORT_WIDTH / TILE_SIZE, this.map.width);
-    const [y0, y1] = viewSpan(y, VIEWPORT_HEIGHT / TILE_SIZE, this.map.height);
-    return chunkRect(x0, y0, x1, y1, this.art.chunk, this.cols, this.rows);
+    const [x0, x1] = viewSpan(x, VIEWPORT_WIDTH / TILE_SIZE, this.map.width, this.wrap);
+    const [y0, y1] = viewSpan(y, VIEWPORT_HEIGHT / TILE_SIZE, this.map.height, this.wrap);
+    return chunkRect(x0, y0, x1, y1, this.art.chunk, this.cols, this.rows, this.wrap);
   }
 
   /** Resolves once every chunk in view is loaded. */
@@ -164,6 +176,11 @@ export class StreamedChunks {
       slot.placeholder.visible = show;
       if (below) { slot.placeholder.destroy(); slot.placeholder = null; }   // the real texture replaces it
     }
+  }
+
+  /** WR: move a wanted slot's sprites to its image (px). */
+  private placeSlot(slot: Slot, x: number, y: number): void {
+    for (const s of [slot.below, slot.above, slot.placeholder]) s?.position.set(x, y);
   }
 
   /** A flat chunk in its dominant terrain's colour. */
@@ -208,15 +225,9 @@ export class StreamedChunks {
   private checkReady(): void {
     const vis = this.visible;
     if (!vis || this.waiters.length === 0) return;
-    for (let row = vis.r0; row <= vis.r1; row++) for (let col = vis.c0; col <= vis.c1; col++) {
-      if (!this.loaded(row * this.cols + col)) return;
-    }
+    for (const { i } of rectChunks(vis, this.cols, this.rows)) if (!this.loaded(i)) return;
     const waiters = this.waiters;
     this.waiters = [];
     for (const w of waiters) w();
   }
-}
-
-function inRect(r: ChunkRect, col: number, row: number): boolean {
-  return col >= r.c0 && col <= r.c1 && row >= r.r0 && row <= r.r1;
 }

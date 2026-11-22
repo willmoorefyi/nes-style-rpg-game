@@ -15,6 +15,8 @@ export class Camera {
   private _y = 0;
   private mapWidth = 0;
   private mapHeight = 0;
+  /** WR: the map is a torus, so the view never clamps (docs/WORLD_WRAP_PLAN.md 4). */
+  private wrap = false;
   private target: CameraTarget | null = null;
   /** Screen pixels at the bottom covered by UI (the field HUD's party strip, M12). */
   private insetBottom = 0;
@@ -26,9 +28,10 @@ export class Camera {
     this.container = container;
   }
 
-  setMapBounds(widthTiles: number, heightTiles: number): void {
+  setMapBounds(widthTiles: number, heightTiles: number, wrap = false): void {
     this.mapWidth = widthTiles * TILE_SIZE;
     this.mapHeight = heightTiles * TILE_SIZE;
+    this.wrap = wrap;
   }
 
   /**
@@ -65,6 +68,10 @@ export class Camera {
     const targetY = this.target.y - this.usableHeight / 2;
 
     if (this.smooth) {
+      if (this.wrap) { // the hero's step-end jump by a period: move the camera by whole periods first
+        this._x += this.mapWidth * Math.round((targetX - this._x) / this.mapWidth);
+        this._y += this.mapHeight * Math.round((targetY - this._y) / this.mapHeight);
+      }
       this._x += (this.clampX(targetX) - this._x) * this.smoothSpeed;
       this._y += (this.clampY(targetY) - this._y) * this.smoothSpeed;
     } else {
@@ -76,10 +83,12 @@ export class Camera {
   }
 
   private clampX(x: number): number {
+    if (this.wrap) return x;
     return Camera.clampAxis(x, this.mapWidth, VIEWPORT_WIDTH);
   }
 
   private clampY(y: number): number {
+    if (this.wrap) return y;
     return Camera.clampAxis(y, this.mapHeight, this.usableHeight);
   }
 
@@ -107,6 +116,10 @@ export class Camera {
 
   get x(): number { return this._x; }
   get y(): number { return this._y; }
+  /** WR: the map's period in px per axis (0 on a flat map). */
+  get period(): { x: number; y: number } {
+    return this.wrap ? { x: this.mapWidth, y: this.mapHeight } : { x: 0, y: 0 };
+  }
 
   getVisibleTileBounds(): { startX: number; startY: number; endX: number; endY: number } {
     const startX = Math.floor(this._x / TILE_SIZE);

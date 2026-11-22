@@ -41,7 +41,7 @@ const NEW_FILES = [
   'assets-src/gen/town_theme_cut.py', 'assets-src/gen/town_theme_pix.py', 'assets-src/gen/town_theme_spec.py',
   'assets-src/tools/layouts/town_theme.py',
   // WR: the world wrap (docs/WORLD_WRAP_PLAN.md 10)
-  'src/systems/worldWrap.ts',
+  'src/systems/worldWrap.ts', 'src/rendering/wrapImages.ts', 'src/scenes/exploration/fieldProbe.ts',
 ];
 
 describe('file-size ceilings', () => {

@@ -5,6 +5,8 @@ import type { MapRenderer } from './MapRenderer.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
 import { assetChunkSource, chunkRect, streams, type ChunkRect, type ChunkSource } from './chunkStreaming.js';
 import { StreamedChunks } from './StreamedChunks.js';
+import { nearestImage } from '../systems/worldWrap.js';
+import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from './Camera.js';
 
 export interface BakedTextures {
   /** Every chunk of a small map; all null on a streamed map (its chunks load as the view moves). */
@@ -27,9 +29,14 @@ export async function loadBakedTextures(art: BakedMapArt, source: ChunkSource = 
   return { below, above, patches };
 }
 
+/** WR (D-WR-10): on a wrapped map the layers take sentinels, so a character's image shifted by a period (about +-50,000)
+ *  never sorts under the below layer or over the above one; the smoke (`aboveZIndex + 1`) and flying parts stay above. */
+export const WRAP_BELOW_Z = -1_000_000;
+export const WRAP_ABOVE_Z = 1_000_000;
+
 /** z-order of the above layer: higher than any character's feet (`zIndex = y + frameHeight`) on this map. */
-export function aboveZIndex(map: Pick<MapData, 'height'>): number {
-  return (map.height + 2) * TILE_SIZE;
+export function aboveZIndex(map: Pick<MapData, 'height' | 'wrap'>): number {
+  return map.wrap ? WRAP_ABOVE_Z : (map.height + 2) * TILE_SIZE;
 }
 
 export interface BakedMapOptions {
@@ -67,7 +74,7 @@ export class BakedMapRenderer implements MapRenderer {
     this.chunkPx = art.chunk * TILE_SIZE;
     this.cols = Math.ceil(mapData.width / art.chunk);
     this.rows = Math.ceil(mapData.height / art.chunk);
-    this.container.zIndex = -1;
+    this.container.zIndex = mapData.wrap ? WRAP_BELOW_Z : -1;
     this.aboveContainer.zIndex = aboveZIndex(mapData);
     if (streams(art)) {
       this.container.sortableChildren = true;
@@ -99,14 +106,33 @@ export class BakedMapRenderer implements MapRenderer {
     const b = this.camera.getVisibleTileBounds();
     const inView = (x0: number, y0: number, x1: number, y1: number): boolean =>
       x0 < b.endX && x1 > b.startX && y0 < b.endY && y1 > b.startY;
+    const wrap = this.mapData.wrap === true;
+    if (wrap) this.placePatches();
     for (const c of this.chunks) {
       const x0 = c.col * this.chunkTiles;
       const y0 = c.row * this.chunkTiles;
       c.sprite.visible = inView(x0, y0, x0 + this.chunkTiles, y0 + this.chunkTiles);
     }
-    for (const p of this.patchSprites) p.sprite.visible = (this.hasFlag?.(p.flag) ?? false) && inView(p.x0, p.y0, p.x1, p.y1);
-    this.streamed?.update(chunkRect(b.startX, b.startY, b.endX, b.endY, this.chunkTiles, this.cols, this.rows),
+    for (const p of this.patchSprites) {
+      const dx = p.sprite.x / TILE_SIZE - p.x0;
+      const dy = p.sprite.y / TILE_SIZE - p.y0;
+      p.sprite.visible = (this.hasFlag?.(p.flag) ?? false) && inView(p.x0 + dx, p.y0 + dy, p.x1 + dx, p.y1 + dy);
+    }
+    this.streamed?.update(chunkRect(b.startX, b.startY, b.endX, b.endY, this.chunkTiles, this.cols, this.rows, wrap),
       this.camera.x, this.camera.y);
+  }
+
+  /** WR: each patch overlay at its image nearest the camera's centre. */
+  private placePatches(): void {
+    const cam = this.camera;
+    if (!cam) return;
+    const cx = cam.x + VIEWPORT_WIDTH / 2;
+    const cy = cam.y + VIEWPORT_HEIGHT / 2;
+    const pw = this.mapData.width * TILE_SIZE;
+    const ph = this.mapData.height * TILE_SIZE;
+    for (const p of this.patchSprites) {
+      p.sprite.position.set(nearestImage(p.x0 * TILE_SIZE, cx, pw), nearestImage(p.y0 * TILE_SIZE, cy, ph));
+    }
   }
 
   /** A step onto tile (x, y) waits (true) while the view there is not loaded yet, for at most 6 frames per miss.

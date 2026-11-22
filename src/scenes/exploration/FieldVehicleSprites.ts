@@ -16,6 +16,17 @@ export type { VehicleSheetMeta } from './vehicleLayout.js';
 
 type Facing = 'left' | 'right';
 
+/** WR (docs/WORLD_WRAP_PLAN.md 5, D-WR-9): every part this module puts in the world (the parked and ridden views, the
+ *  canoe's hero mask). The scene's WrapImages skips them: a parked view places its own image, a ridden one follows the
+ *  hero. */
+export const vehicleParts = new WeakSet<object>();
+type WrapOffset = (x: number, y: number) => { dx: number; dy: number };
+let wrapOffset: WrapOffset = () => ({ dx: 0, dy: 0 });
+/** WR: the image shift of a parked vehicle's foot point (from the scene's live camera; zero on a flat map). */
+export function setVehicleWrapOffset(fn: WrapOffset | null): void {
+  wrapOffset = fn ?? (() => ({ dx: 0, dy: 0 }));
+}
+
 /** Build the per-frame textures of a loaded sheet (exported for the tests). */
 export function vehicleArt(raw: unknown, sheet: Texture): VehicleArt {
   const meta = parseVehicleMeta(raw);
@@ -85,6 +96,7 @@ export class FieldVehicleSprites {
     for (const state of vehicles) {
       const view = this.view(state.type);
       view.attach(this.world);
+      for (const part of view.parts) vehicleParts.add(part);
       const entry = { view, state };
       this.parked.push(entry);
       this.placeParked(entry);
@@ -93,9 +105,12 @@ export class FieldVehicleSprites {
   }
 
   private placeParked(p: { view: VehicleView; state: VehicleState }): void {
-    const footY = (p.state.y + 1) * TILE_SIZE;
+    const x0 = p.state.x * TILE_SIZE + TILE_SIZE / 2;
+    const y0 = (p.state.y + 1) * TILE_SIZE;
+    const o = wrapOffset(x0, y0); // WR: the image nearest the camera; it runs on onRender, after WrapImages
+    const footY = y0 + o.dy;
     p.view.place({
-      footX: p.state.x * TILE_SIZE + TILE_SIZE / 2, footY, facing: this.facing[p.state.type] ?? 'right',
+      footX: x0 + o.dx, footY, facing: this.facing[p.state.type] ?? 'right',
       pose: 'parked', tMs: this.now(), sinceBoard: 0, z: footY - 1,   // just behind a hero standing on the same row
       ...(p.state.type === 'airship' ? this.airshipPick() : {}),
     });
@@ -108,6 +123,7 @@ export class FieldVehicleSprites {
     if (!type || !player || !this.world || this.ridden) return;
     const view = this.view(type);
     view.attach(this.world);
+    for (const part of view.parts) vehicleParts.add(part);
     if (type === 'airship') this.airship = boardHeading(this.airship, player.direction, player.isMoving);
     this.ridden = { view, player, since: this.now() };
     view.main.onRender = () => this.follow();
@@ -160,6 +176,7 @@ export class FieldVehicleSprites {
     if (!this.heroMask) {
       this.heroMask = new Graphics();
       this.heroMask.label = 'vehicle:canoe_mask';
+      vehicleParts.add(this.heroMask);
       this.world.addChild(this.heroMask);
       hero.mask = this.heroMask;
     }

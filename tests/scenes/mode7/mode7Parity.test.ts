@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Assets, Texture } from 'pixi.js';
 import { CANT_LAND } from '../../../src/scenes/exploration/FieldVehicles.js';
 import { MISS_HOLD_FRAMES } from '../../../src/rendering/chunkStreaming.js';
 import type { MapData } from '../../../src/types/index.js';
 import { deferred, flightField, flush, resetStub, stub, type Mode7Setup } from './flightHarness.js';
+import { fakeChunks, streamedWorld } from '../../helpers/streamedWorld.js';
 
 vi.mock('../../../src/scenes/exploration/mode7/FlightRenderer.js', async () => (await import('./flightHarness.js')).rendererModule);
 
@@ -200,29 +200,6 @@ describe('M7-2: parity, Mode 7 on and off', () => {
 describe('M7-2 / M7-3: parity on a streamed world (192x192, late chunks on the route)', () => {
   beforeEach(() => resetStub());
   afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
-
-  /** A 192x192 grass world in 144 chunks: `StreamedCollisionMap` holds a step while the view there is missing. */
-  function streamedWorld(): MapData {
-    const at = (i: number): string => `assets/maps/ai/overworld/below_${Math.floor(i / 12)}_${i % 12}.png`;
-    return {
-      id: 'overworld', width: 192, height: 192, layers: [], tilesets: [], collision: new Array(192 * 192).fill(0),
-      npcs: [], transitions: [],
-      art: { tile: 48, chunk: 16, below: Array.from({ length: 144 }, (_, i) => at(i)), above: Array(144).fill(null) },
-    };
-  }
-
-  /** Chunk loads resolve a frame after they start, except those of rows 0-4 (north of the route's start): never. */
-  function fakeChunks() {
-    const original = Assets.load.bind(Assets);
-    const pending: Array<{ url: string; resolve: (t: Texture) => void }> = [];
-    vi.spyOn(Assets, 'unload').mockResolvedValue(undefined);
-    vi.spyOn(Assets, 'load').mockImplementation(((url: string) => {
-      const m = /below_(\d+)_\d+\.png$/.exec(String(url));
-      if (!m) return original(url);
-      return new Promise<Texture>((resolve) => { if (Number(m[1]) > 4) pending.push({ url, resolve }); });
-    }) as typeof Assets.load);
-    return { tick: () => { for (const p of pending.splice(0)) p.resolve(Texture.EMPTY); } };
-  }
 
   async function streamedRun(mode7: Mode7Setup) {
     const chunks = fakeChunks();
