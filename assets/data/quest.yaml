@@ -507,11 +507,12 @@ stages:
     boss: []
     band: [24, 27]
     kit: w_s19
-    maps: [bahamut-cave, bahamut-lair]
+    maps: [cardia-deep]
     zones: [overworld:ord_isles]
     grind: 2.0
-    # fly from the citadel's meadow to Bahamut's isle; down the cave; lay the seal before Bahamut
-    walk: ["bahamut-lair:cutscene:bahamut"]
+    # fly from the citadel's meadow to Bahamut's isle (or any Cardia islet with a cave); down its stair, through the
+    # warren into Cardia Deep; lay the seal before Bahamut in his Court (pass CD, docs/CARDIA_PLAN.md 4.1)
+    walk: ["cardia-deep:cutscene:bahamut"]
     entry: {map: overworld, at: ord_s_citadel, mode: walking, vehicles: [{type: airship, map: overworld, at: ord_s_citadel_airship}, {type: ship, map: overworld, at: fir_s_crescent_ship}]}
     basins: {}
     nonLoadBearing: []
