@@ -204,7 +204,7 @@ npcs:
   - text: ['When I was young, the castle''s lamps burned all night and the hall rang with harps.', 'Since the curse they burn all night still, but no one plays. We keep a light so he can find his way back.']
   tint: '#e4e9d6'
 - id: elfheim_dwarf_peddler
-  sprite: master
+  sprite: dwarf_trader
   x: 44
   y: 35
   dialog:
@@ -212,7 +212,6 @@ npcs:
     text: ['Your prince keeps a cask of blasting powder in his vault, they tell me. Nerrick would trade his beard for it. Take it to the dwarves'' hall, north across the strait.']
   - text: ['Don''t stare, lad, dwarves travel too. I''m here for elven rope. The foreman back home has a mad plan.', Nerrick wants to blast a canal through the isthmus and let the sea through. All he lacks
         is the powder.]
-  tint: '#d2b48c'
 - id: elfheim_scout
   sprite: ninja
   x: 10

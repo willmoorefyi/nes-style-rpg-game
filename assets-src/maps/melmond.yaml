@@ -1211,14 +1211,13 @@ npcs:
     text: [The pond is filling from the springs again. Give it a season and my grandson can swim in it.]
   - text: [When I was a boy this millpond turned the wheel all summer. Look at it. A puddle with ideas.]
 - id: melmond_dwarf_trader
-  sprite: burgher
+  sprite: dwarf_trader
   x: 42
   y: 18
   dialog:
   - condition: EARTH_CRYSTAL_LIT
     text: ['Melmond grain for dwarf iron, a fair trade at last. Nerrick sends his regards.']
   - text: [Nerrick's canal brought me here with a hold full of picks and spades., Turns out nobody needs a spade for soil that's turned to dust.]
-  tint: '#b08860'
 - id: melmond_wayfarer
   sprite: monk
   x: 27

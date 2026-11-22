@@ -9,7 +9,6 @@ wins, so the later flag always comes first.
 from __future__ import annotations
 
 LIT, VAMP, LEARNED = "EARTH_CRYSTAL_LIT", "VAMPIRE_DEFEATED", "LUFENIAN_LEARNED"
-DWARF = "#b08860"                                # the dwarves' ruddy tint (as in the dwarf hall)
 
 BOARDED_TEXT = [
     "The farmstead is shut up, its shutters nailed. A note is tacked to the wall, its ink run by the rain.",
@@ -88,10 +87,10 @@ def outdoor() -> list[dict]:
         npc("melmond_pond_elder", "old_man", 28, 32, when(
             (LIT, ["The pond is filling from the springs again. Give it a season and my grandson can swim in it."]),
             default=["When I was a boy this millpond turned the wheel all summer. Look at it. A puddle with ideas."])),
-        npc("melmond_dwarf_trader", "burgher", 42, 18, when(
+        npc("melmond_dwarf_trader", "dwarf_trader", 42, 18, when(
             (LIT, ["Melmond grain for dwarf iron, a fair trade at last. Nerrick sends his regards."]),
             default=["Nerrick's canal brought me here with a hold full of picks and spades.",
-                     "Turns out nobody needs a spade for soil that's turned to dust."]), tint=DWARF),
+                     "Turns out nobody needs a spade for soil that's turned to dust."])),
         npc("melmond_wayfarer", "monk", 27, 30, when(
             (LIT, ["I felt the crystal wake from the road. It was like a held breath let go.",
                    "The earth is whole. Three more lights to go, they say: fire, water and wind."]),

@@ -2955,6 +2955,38 @@
   items: {}
   gold: 100
   enemies: []
+# DW: the dwarf field sheets in the dwarf hall: the long hall (miners, the elder, the cook, the child, the guards), and
+# the north rooms (Nerrick at the canal plans, Smyth at his forge).
+- id: w_dw_hall
+  name: "DW - the dwarves of the dwarf hall"
+  mode: field
+  map: dwarf-hall
+  spawn: [19, 21]
+  party:
+    - { class: warrior, name: WAR, level: 11, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_dw_rooms
+  name: "DW - Nerrick and the scribe at the canal plans"
+  mode: field
+  map: dwarf-hall
+  spawn: [20, 11]
+  party:
+    - { class: warrior, name: WAR, level: 11, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
+- id: w_dw_forge
+  name: "DW - Smyth at his forge"
+  mode: field
+  map: dwarf-hall
+  spawn: [8, 9]
+  party:
+    - { class: warrior, name: WAR, level: 11, equipment: [iron_sword, chain_mail], spells: [] }
+  items: {}
+  gold: 100
+  enemies: []
 # M7 (docs/MODE7_PLAN.md 8, 9): the Mode 7 flight scenarios.
 # M7-5 (sections 5, 9): the airship in flight at Pravoka's gate (entrance a1_pravoka, 131, 101), the ship parked at the
 # dock beside it (132, 102) and the tomb's chest (117, 107) 14 cells west: the upright billboards, their depth order

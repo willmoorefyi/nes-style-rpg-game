@@ -4,7 +4,8 @@ where Nerrick keeps the canal plans, the store), the way out to the overworld (`
 
 Nerrick takes the TNT through his cutscene `ert_canal_blast` (CANAL_OPEN); Smyth forges `excalibur` from `adamant`
 (`ert_smyth_forge`, S31, optional). Thirteen dwarves talk, nine change their lines on CANAL_OPEN, two are hint NPCs
-(`canal`, `Melmond`); the store keeper sells `dwarf_item` across a wall-to-wall counter.
+(`canal`, `Melmond`); the store keeper sells `dwarf_item` across a wall-to-wall counter. Pass DW: every dwarf wears
+one of the dwarf field sheets (`dwarf_*`, gen/npc_field_dw.py), untinted.
 
   python3 -I assets-src/tools/layouts/earth/dwarf.py
 """
@@ -30,7 +31,6 @@ NOTE = ("Concept: the dwarves' hall hewn under the isthmus, a working mine town 
         "sells across a wall-to-wall counter cut from the living rock; crates of ore stand along the hall's south "
         "wall, with a heap of sorted ore and a slag pile at either end.\n"
         "Topology: one map, no stairs: overworld (ert_dwarf) -> hall -> forge | drafting room | store; exit south.")
-DWARF = "#b08860"                                        # the dwarves' ruddy tint on the human field sheets
 OPEN = "CANAL_OPEN"
 # S31 (optional, after S27): Smyth's forge trade (cutscene `ert_smyth_forge`): the adamant from the sky castle's 3F
 # vault chest (CHEST_WND_D2_ADAMANT) for Excalibur, as soon as the party brings it (user ruling 2026-11-18: the
@@ -91,51 +91,51 @@ def build() -> Path:
         deco([["dwf_cart_0_0", "dwf_cart_0_1"], ["dwf_cart_1_0", "dwf_cart_1_1"]], x, 25, collide="alpha")  # ore carts
     deco([["gold_heap"]], 36, 22)                        # a heap of sorted ore
     deco([["skulls"]], 3, 22)                            # the slag of a bad seam
-    npc = lambda i, s, x, y, d, **kw: r.npcs.append({"id": i, "sprite": s, "x": x, "y": y, "dialog": d, "tint": DWARF, **kw})  # noqa: E731
-    npc("ert_nerrick", "burgher", 21, 7, when(
+    npc = lambda i, s, x, y, d, **kw: r.npcs.append({"id": i, "sprite": s, "x": x, "y": y, "dialog": d, **kw})  # noqa: E731
+    npc("ert_nerrick", "dwarf_nerrick", 21, 7, when(
         OPEN, say("Hear that hiss? That's the sea in my canal! Forty years of chalk, and it's water at last.",
                   "Your ship can run west through the cut now. The strait is beyond, and Melmond past it."),
         say("Nerrick, foreman. Those are the canal plans. Forty years I've redrawn them, and the saddle still stands.",
             "Picks just ring off it. Fire can't crack it. We need something that bursts the rock from inside."),
         "tnt", say("Is that blasting powder? Sealed and dry, too! Give it here before I wake from this dream!")),
         cutscene={"id": "ert_canal_blast", "onceFlag": OPEN}, requiredItem="tnt")
-    npc("ert_dwarf_scribe", "old_man", 16, 7, when(
+    npc("ert_dwarf_scribe", "dwarf_elder", 16, 7, when(
         OPEN, say("I'm inking the plans at last as built, not as hoped. That's a pleasure I never expected."),
         say("Every line on that table has been rubbed out and drawn again. The saddle beat us every time.")))
     smyth = say("Smyth, smith of this hall. My anvil has gone quiet for want of a metal worth hitting.",
                 "Bring me ore from a place nearer the stars than the earth, and I'll show you what a dwarf can forge.")
-    npc("ert_smyth", "monk", 7, 6, when(
+    npc("ert_smyth", "dwarf_smith", 7, 6, when(
         "ERT_O_SWORD_FORGED", say("Mind the edge. I'll never make a keener thing, and I don't mean to try."), smyth,
         "adamant", say("That ore is singing! Hand it over, and stand well back from the fire."))
         if SMYTH_TRADE else smyth, **SMYTH_TRADE)
-    npc("ert_dwarf_bellows", "thief", 4, 8, say("I work the bellows. Smyth says one day I'll strike, too. One day."))
-    npc("ert_dwarf_canal_hint", "farmer", 12, 18, when(
+    npc("ert_dwarf_bellows", "dwarf_miner", 4, 8, say("I work the bellows. Smyth says one day I'll strike, too. One day."))
+    npc("ert_dwarf_canal_hint", "dwarf_miner", 12, 18, when(
         OPEN, say("The canal's open, and the ships of the Aldi can reach the open sea at last."),
         say("Nerrick's canal would join our sea to the ocean, but nothing we have can break the saddle.",
             "They say the elves keep a powder that splits stone. It's locked away in Elfheim's vault.")))
-    npc("ert_dwarf_melmond_hint", "burgher", 27, 22, when(
+    npc("ert_dwarf_melmond_hint", "dwarf_trader", 27, 22, when(
         OPEN, say("West through the canal, then across the strait: that's Melmond. Ask there about the rot.",
                   "The Cavern of Earth lies south-west of the town. Something in it is drinking the land."),
         say("Across the western water is Melmond, farm country. Their fields have gone grey, I hear.",
             "We could sail there in a morning if the canal were cut.")))
-    npc("ert_dwarf_miner_a", "farmer", 8, 20, when(
+    npc("ert_dwarf_miner_a", "dwarf_miner", 8, 20, when(
         OPEN, say("Back to honest digging now the saddle's gone. Ore doesn't fight back."),
         say("I've broken six picks on that saddle. Six!")), wander=True)
-    npc("ert_dwarf_miner_b", "villager", 25, 18, say("Mind the carts. They roll when you least expect it."), wander=True)
-    npc("ert_dwarf_cook", "villager_f", 31, 24, when(
+    npc("ert_dwarf_miner_b", "dwarf_miner", 25, 18, say("Mind the carts. They roll when you least expect it."), wander=True)
+    npc("ert_dwarf_cook", "dwarf_woman", 31, 24, when(
         OPEN, say("Fresh fish from the canal tonight! I'd forgotten what anything but cave mushrooms tastes like."),
         say("Mushroom stew again. Don't make that face; it's good for your beard.")))
-    npc("ert_dwarf_child", "villager_f", 15, 23, say("When I'm grown I'll dig a tunnel all the way to the moon."), wander=True)
-    npc("ert_dwarf_elder", "old_man", 5, 16, when(
+    npc("ert_dwarf_child", "dwarf_child", 15, 23, say("When I'm grown I'll dig a tunnel all the way to the moon."), wander=True)
+    npc("ert_dwarf_elder", "dwarf_elder", 5, 16, when(
         OPEN, say("I felt the blast in my bones. The mountain sighed, as if it had waited for it too."),
         say("Our people came to this hall when the sea was still young. We have been patient.")))
-    npc("ert_dwarf_sentry", "guard", 22, 26, when(
+    npc("ert_dwarf_sentry", "dwarf_guard", 22, 26, when(
         OPEN, say("The landing will be busy now. I'll be checking every boat."),
         say("You came by the landing cove, or across the downs from the south? Either way, welcome.")))
-    npc("ert_dwarf_lookout", "warrior", 35, 16, when(
+    npc("ert_dwarf_lookout", "dwarf_guard", 35, 16, when(
         OPEN, say("From the ridge I watched the water run through. White foam, then calm. Beautiful."),
         say("I keep watch on the ridge. Nothing moves on the Aldi I don't see.")))
-    r.npcs.append({"id": "dwarf-item-keeper", "sprite": "merchant", "x": 33, "y": 6, "tint": DWARF,
+    r.npcs.append({"id": "dwarf-item-keeper", "sprite": "dwarf_trader", "x": 33, "y": 6,
                    "dialog": ["Rope, lamps, tonics! Everything a body needs underground."], "shopId": "dwarf_item"})
     staff = [[x, y] for y in range(4, 7) for x in range(28, 38)]
     r.transitions += [{"x": x, "y": 29, "targetMap": "overworld", "targetEntrance": "ert_dwarf"} for x in (19, 20)]

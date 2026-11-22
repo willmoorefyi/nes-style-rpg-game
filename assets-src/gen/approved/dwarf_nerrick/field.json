@@ -1,0 +1,257 @@
+{
+  "character": "dwarf_nerrick",
+  "sheet": "field",
+  "backend": "bedrock",
+  "model": "structure",
+  "seed": 1,
+  "cache_key": "f0c00f47ec6ac0f38a4cbb0a",
+  "pass": "AR",
+  "approved": "2026-11-22",
+  "tool": "assets-src/gen/npc_field_cut.py",
+  "sources": [
+    {
+      "alias": "s",
+      "tag": "dw_foreman_s50_1",
+      "cache_key": "f0c00f47ec6ac0f38a4cbb0a",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 3,
+      "cut": {
+        "holes": 20
+      }
+    },
+    {
+      "alias": "b",
+      "tag": "dw_foreman_b65_1",
+      "cache_key": "5b9c8d81752f1eea46d2951a",
+      "model": "structure",
+      "seed": 1,
+      "pass": "AR",
+      "render_rows": 1,
+      "cut": {
+        "holes": 20,
+        "scale": 1.0
+      }
+    }
+  ],
+  "cut": {
+    "flood_tol": 14,
+    "erode": 7,
+    "resample": "box",
+    "sharpen": "unsharp 1/60/2",
+    "alpha": 170,
+    "colors": 16,
+    "kmeans_seed": 0,
+    "outline": "selective 1 px",
+    "scale": 1.0,
+    "hole_min_px": 400
+  },
+  "cells": [
+    [
+      [
+        "s",
+        0,
+        false
+      ],
+      [
+        "s",
+        1,
+        false
+      ],
+      [
+        "s",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "b",
+        0,
+        false
+      ],
+      [
+        "b",
+        1,
+        false
+      ],
+      [
+        "b",
+        2,
+        false
+      ]
+    ],
+    [
+      [
+        "s",
+        6,
+        false
+      ],
+      [
+        "s",
+        7,
+        false
+      ],
+      [
+        "s",
+        8,
+        false
+      ]
+    ]
+  ],
+  "shifts": {
+    "1": [
+      [
+        110,
+        40,
+        30,
+        0.75,
+        0.75
+      ]
+    ]
+  },
+  "edits": [
+    {
+      "op": "ramp",
+      "why": "the back strip's cap -> the front's tan hat",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#103939": "#181008",
+        "#424221": "#b57342"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the yellow lumps at the back strip's hat brim -> the hat's browns",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#efa529": "#b57342"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the back strip's yellow left hand -> the front's skin",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#efa529": "#f7b594"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the back strip's yellow right hand -> the front's skin",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#efa529": "#f7b594"
+      }
+    },
+    {
+      "op": "ramp",
+      "why": "the back strip's olive tunic -> the front's brown leather vest",
+      "cells": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "map": {
+        "#424221": "#181008",
+        "#6b5a31": "#b57342"
+      }
+    }
+  ],
+  "figure_px": [
+    65,
+    65,
+    65,
+    69,
+    69,
+    68,
+    69,
+    70,
+    69
+  ],
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "layout": [
+    3,
+    3
+  ],
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [
+    "left"
+  ],
+  "note": "DW dwarf_nerrick (Nerrick, the canal foreman): front s50_1 row 0 and side row 2 (dw_foreman guide: farmer squashed + beard hint, 0.5, seed 1; wide-brimmed hat, leather vest, white sleeves); back strip b65_1 (0.65, the stocky build; its green shifted to brown, then the cap ramped to the hat's tan, the brim lumps to the hat's browns, the hands to skin, the tunic to the vest's brown)"
+}
