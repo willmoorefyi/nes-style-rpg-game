@@ -1098,3 +1098,35 @@
 {"event": "result", "key": "b0dad004851f760423ca281a", "ok": true, "served": "stability.stable-image-core-v1:1"}
 {"event": "request", "ts": "2026-11-21T23:36:25", "tool": "gen_clump.py", "model": "core", "purpose": "ar_tiles", "seed": 2, "key": "12499c3189ce86fcf60a0dc5", "pass": "AR"}
 {"event": "result", "key": "12499c3189ce86fcf60a0dc5", "ok": true, "served": "stability.stable-image-core-v1:1"}
+{"event": "request", "ts": "2026-11-22T00:18:15", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 101, "key": "332ee1232b002e253c2b5d84", "pass": "AR"}
+{"event": "result", "key": "332ee1232b002e253c2b5d84", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:18:25", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 102, "key": "f1fa1f1cf7baa882773a397d", "pass": "AR"}
+{"event": "result", "key": "f1fa1f1cf7baa882773a397d", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:18:34", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 103, "key": "deb376d8de0a1a5ba163cb95", "pass": "AR"}
+{"event": "result", "key": "deb376d8de0a1a5ba163cb95", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:18:43", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 104, "key": "42aad71b5c53fe9fe2ca7ba3", "pass": "AR"}
+{"event": "result", "key": "42aad71b5c53fe9fe2ca7ba3", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:18:52", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 105, "key": "2043f7d7828a337685c231cf", "pass": "AR"}
+{"event": "result", "key": "2043f7d7828a337685c231cf", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:19:00", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 106, "key": "ab09d6649e711d025c1a640f", "pass": "AR"}
+{"event": "result", "key": "ab09d6649e711d025c1a640f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:19:30", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 111, "key": "bea1c5f3419f64f4c522b793", "pass": "AR"}
+{"event": "result", "key": "bea1c5f3419f64f4c522b793", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:19:42", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 112, "key": "f5ea0812d3912b8f8a5adb12", "pass": "AR"}
+{"event": "result", "key": "f5ea0812d3912b8f8a5adb12", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:19:53", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 113, "key": "62559fde4126af3cd0f39913", "pass": "AR"}
+{"event": "result", "key": "62559fde4126af3cd0f39913", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:20:03", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 114, "key": "295ca74190dd87c331044938", "pass": "AR"}
+{"event": "result", "key": "295ca74190dd87c331044938", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:20:09", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 115, "key": "9cb8d3400c48d6be909e5f1a", "pass": "AR"}
+{"event": "result", "key": "9cb8d3400c48d6be909e5f1a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:21:36", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 121, "key": "dada28b923fc100f95415064", "pass": "AR"}
+{"event": "result", "key": "dada28b923fc100f95415064", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:21:45", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 122, "key": "8baff5d3e408492c3154af34", "pass": "AR"}
+{"event": "result", "key": "8baff5d3e408492c3154af34", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:21:52", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 123, "key": "7635133c2601e49d0ab1a4d8", "pass": "AR"}
+{"event": "result", "key": "7635133c2601e49d0ab1a4d8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:22:29", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 125, "key": "2f1ffbb1e7bb82a9b3e975fd", "pass": "AR"}
+{"event": "result", "key": "2f1ffbb1e7bb82a9b3e975fd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-22T00:22:39", "tool": "gen3.py", "model": "sd35", "purpose": "ar_towns", "seed": 124, "key": "0b283fbef7ea5a55b178b953", "pass": "AR"}
+{"event": "result", "key": "0b283fbef7ea5a55b178b953", "ok": true, "served": "stability.sd3-5-large-v1:0"}

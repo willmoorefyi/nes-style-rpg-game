@@ -43,10 +43,11 @@ TOWNS: dict[str, dict] = {
                      decos=[("cre_wellhead", 1, 2, 11, 33, ALPHA), ("cre_gondola", 2, 2, 8, 10, WATER),
                             ("cre_gondola2", 1, 2, 35, 24, WATER), ("cre_gondola", 2, 2, 16, 24, WATER)],
                      materials={"bridge_v": "cre_bridge_v"}),
-    "lufenia": dict(theme="luf_marble", walls=["luf_marble", "luf_marble_azure", "luf_marble"], roof="luf_marble_flat",
-                    swaps={n: ("luf_villa4", 5, 4, 2) for n in ("house_stargazer", "house_healer", "white_magic",
-                                                                "black_magic")},       # the domed villas, whole
-                    decos=[("luf_forum", 2, 3, 11, 19, ALPHA), ("luf_pylon", 1, 2, 12, 10, ALPHA),
+    "lufenia": dict(theme="luf_roman", walls=["luf_roman", "luf_roman_azure", "luf_roman"],   # AR-W3
+                    swaps={"house_stargazer": ("luf_villa_m4", 5, 4, 2), "house_healer": ("luf_villa_t4", 5, 4, 2),
+                           "white_magic": ("luf_villa_t4", 5, 4, 2), "black_magic": ("luf_villa_m4", 5, 4, 2)},
+                    decos=[("luf_cupola", 2, 1, 17, 4, ALPHA),         # the dome cap behind the elder hall's ridge
+                           ("luf_forum", 2, 3, 11, 19, ALPHA), ("luf_pylon", 1, 2, 12, 10, ALPHA),
                            ("luf_pylon", 1, 2, 24, 18, ALPHA), ("luf_legionary", 1, 2, 4, 25, ALPHA),
                            ("luf_legionary", 1, 2, 21, 11, ALPHA), ("luf_aqueduct", 3, 2, 28, 5, ALPHA)]),
     "onrac": dict(theme="onr_coral", walls=["onr_coral", "onr_coral_pink", "onr_coral_sea"],

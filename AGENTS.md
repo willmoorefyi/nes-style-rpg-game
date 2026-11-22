@@ -597,7 +597,9 @@ are re-cut offline by `python3 -I assets-src/gen/town_theme_cut.py` (`--check`; 
 `assets-src/gen/approved/town/theme_<town>.{png,json}`, and each town script applies its row of
 `assets-src/tools/layouts/town_theme.py` (`roof=` / `wall=` theme styles, the themed inn and house prefabs, the set
 pieces, Crescent's canals) before it writes its source. `build_map.styled()` looks up an approved `name@style` first;
-`chimney@<roof>` replaces the chimney. Test: `tests/data/townThemes.test.ts`.
+`chimney@<roof>` replaces the chimney. Test: `tests/data/townThemes.test.ts`. AR-W3 redid Lufenia (`luf_roman`: a
+modular terracotta roof every house width can use, gold-ribbed domed villas, the rotunda inn; `clean` repaints SD3.5's
+wall cracks, `town_theme_clean.py`).
 
 ### New Cutscene
 

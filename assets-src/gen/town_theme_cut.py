@@ -24,6 +24,7 @@ import numpy as np  # noqa: E402
 from PIL import Image  # noqa: E402
 
 from gen import bedrock as B  # noqa: E402
+from gen import town_theme_clean as CL  # noqa: E402
 from gen import town_theme_pix as P  # noqa: E402
 from gen.town_theme_spec import TOWNS  # noqa: E402
 
@@ -62,6 +63,7 @@ def cut_town(town: str) -> tuple[dict[str, Image.Image], dict[str, np.ndarray], 
     cells: dict[str, Image.Image] = {}
     mats: dict[str, np.ndarray] = {}
     src: list[dict] = []
+    mods: dict[str, Image.Image] = {}
     led = _ledger()
 
     def source(rid, key, use, **kw):
@@ -73,6 +75,8 @@ def cut_town(town: str) -> tuple[dict[str, Image.Image], dict[str, np.ndarray], 
     if sp.get("house"):
         rid, key, strength, opt = sp["house"]
         house = P.module(_cached(key), 5, 5)
+        if opt.get("clean") is not None:
+            house = CL.clean(house, **opt["clean"])
         cells |= P.cells(house, theme, crops=opt.get("crops"), plain_band=opt.get("plain_band"))
         for part, (prid, pkey, w, h, col, row) in (sp.get("patch") or {}).items():
             pim = P.module(_cached(pkey), w, h)
@@ -83,14 +87,20 @@ def cut_town(town: str) -> tuple[dict[str, Image.Image], dict[str, np.ndarray], 
             cells |= P.tint(cells, theme, new, hsv, opt.get("tint_ref", "wall_lo_plain"))
         source(rid, key, f"house modules @{theme}", strength=strength, guide="5x5, 2 storeys, roof rows 2",
                cut={"colors": 20, "tol": 24, "sharpen": 0.6, **opt}, tints=sp.get("tints", {}))
-    for name, rid, key, strength, (w, h), one in sp.get("grids", []):
+    for name, rid, key, strength, (w, h), one, *more in sp.get("grids", []):
+        gopt = more[0] if more else {}
         im = P.module(_cached(key), w, h)
+        if gopt.get("clean") is not None:
+            im = CL.clean(im, **gopt["clean"])
+        mods[name] = im
         if one:
             cells |= _whole(im, f"{name}5") | _whole(P.one_storey(im), f"{name}4")
         else:
             cells |= _whole(im, name)
         source(rid, key, f"grid cut {name} {w}x{h}" + (" (+ 5x4)" if one else ""), strength=strength,
-               cut={"colors": 20, "tol": 24, "sharpen": 0.6})
+               cut={"colors": 20, "tol": 24, "sharpen": 0.6, **gopt})
+    for name, base, box, size in sp.get("derived", []):     # AR-W3: a smaller copy of a piece of a grid cut
+        cells |= _whole(CL.shrink(mods[base], box, size), name)
     for name, rid, key, size, cut, px in sp.get("sprites", []):
         cells |= _sprite_cells(name, P.sprite(_cached(key), size, cut, px))
         source(rid, key, f"sprite {name} {size[0]}x{size[1]}", cut={"rim": 4, **cut}, pixelize={"fill": 0.95,
