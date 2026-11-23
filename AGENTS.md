@@ -124,7 +124,7 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 504 / 590 (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 424 / 442, `SpellExecutor.ts` 311 / 314, `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
+- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 581 / 590 (at WR) (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 424 / 442, `SpellExecutor.ts` 311 / 314, `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
 - Pass W: every file of `src/progression/`, the field rules (`src/systems/fieldRules*.ts`), `src/types/quest.ts`, `src/core/schemaValidationQuest.ts`, `FieldVehicles.ts`, `FieldNpcActions.ts`, the `layouts/world*.py` files and every `.py` under the region directories (`a1`, `elf`, `earth`, `fire`, `ordeal`, `water`, `wind`, `past`) stay under 250 lines, with no exceptions (`tests/data/questCeilings.test.ts`, which finds new files as they land).
 - Also over 250 and not split: `src/core/schemaValidation.ts` (380), and the tools `build_map.py`, `kit.py`, `map_selftest.py` and `stage_backgrounds.py` (255).
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
@@ -310,6 +310,26 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `world.frames`, `shiftA1`, `Game.pendingFrame` and `worldOffsetOf`). Cornelia's south-gate arrival is
   `CORNELIA_NW` (146, 155); every other anchor's target is `CORNELIA_NW + S_STAR x ref` (s* 0.86, the reference offsets
   of `assets/data/world-anchors.yaml`).
+- **The wrap (pass WR, `docs/WORLD_WRAP_PLAN.md`; its result at the end).** The world map is a torus, as FF1's: every
+  mode steps from x 255 to 0 and y 255 to 0 (and back). `MapData.wrap: true` is written by `world.py`
+  (`world_source.py`) and passed through by the compiler; the schema allows it only on a streamed baked map of whole
+  chunks, so every other map (and the legacy 64x64 overworld) stays flat. One pure module, `src/systems/worldWrap.ts`
+  (`canonCell`, `canonOf`, `cellIndex`, `stepTo`, `stepIndex`, `isStep`, `wrapDelta`, `nearestImage`, `SEAM_MARGIN`),
+  does the maths for the game, the field rules and the verifier. Cells are canonical everywhere but in drawing:
+  `fieldStep`, `canEnter`, `cellReader` and `modeAfterStep` canonicalise at the top, the lookups (`baseTerrain`,
+  `gateAt`, ...) stay strict. The seam is open ocean (D-WR-2): `world.py`'s gated `wrap` line (`worldgen/gates_wrap.py`:
+  every edge cell Water, no land within `SEAM_MARGIN` 4 of an edge, the components on foot, by canoe and by ship equal
+  with and without the seam, patches off and on) and `seam_zones` (the ship zones on both sides of each seam of one
+  `SEA_CLASS`, gated since F-WR); the compile's `check_seam` (`map_checks_wrap.py`: `wrap` needs `sealed_edges`; the
+  seam's 1-px colour step against the interior chunk lines, `seam: x 5.7 (interior max 6.7), y 7.3 (7.7)`). F-WR (plan
+  8.4): the late seas' bands along the seams are early-table zones `wat_seam_w`, `wat_seam_n`, `ord_seam_n`,
+  `wnd_seam_n` (`layouts/sea_tables.py`). Relocation (`worldRevalidate`, `worldReset`, `MapTransition.safeSpawn`) and
+  proof (g) stay planar. `build_map.py --preview` reads a wrapped map mod W (`--preview overworld 240 90 272 120 ...`)
+  and `--grid` marks the seam in magenta. Seam spots `fir_s_seam_e`, `elf_s_seam_s`, `wat_s_seam_nw` (docks at sea) and
+  `wnd_s_seam_landing`; previews `?mute=1&scenario=wr_ship_east | wr_ship_south | wr_air_corner | wr_air_land |
+  wr_parked`. Tests: `tests/systems/worldWrap.test.ts`, `tests/entities/playerWrap.test.ts`,
+  `tests/rendering/wrapImages.test.ts`, `tests/scenes/wrapField.test.ts`, `tests/scenes/mode7/mode7Wrap.test.ts`,
+  `tests/progression/wrapWorld.test.ts`, `tests/data/worldWrap.test.ts`; `python3 -I assets-src/tools/worldgen/selftest_wrap.py`.
 - **Act 1** is generated with the rest round its pins: `layouts/a1/world_a1_pins.py` (the source since NW-5; derived
   by NW-3 from pass W's world) holds every act-1 site, door, gate, patch cell, spot, object, inspect cell and road
   point **Cornelia-relative** (world = CORNELIA_NW + rel; pass W's cell + (54, 44)), and `a1/world_a1_checks.py` its
@@ -379,7 +399,7 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
 - **Compile.** `python3 -I assets-src/tools/build_map.py overworld` (under the world-compile lock, one at a time;
   NW2-INT: 236 s, peak footprint 14.6 GB; AR-T2 (the ecotone painter): 335 s, 15.0 GB) writes the 256 chunks
   (palette-indexed PNGs, `build_map.save_chunk`: 38.8 MB at AR-T2, 43.9 MB of RGB before), the patch overlays and
-  the Mode 7 atlas (`mode7.png` 3072x3072 at 12 px per cell, `mode7_low.png` 1536x1536 at 6; the runtime and the dev pilot read `cellPx` from `mode7.json`).
+  the Mode 7 atlas (`mode7.png` 3072x3072 at 12 px per cell, `mode7_low.png` 2048x2048 at 8 since WR, a power of two; the runtime and the dev pilot read `cellPx` from `mode7.json`).
   A map over 192x192 cells is painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality). Gates:
   `build_map.py --check-determinism overworld`, `mode7_atlas.py --check-determinism overworld`, and re-running
   `world.py` leaves `git diff --exit-code assets-src/maps` clean. A source with rasters compiles in **chunk-digest
@@ -428,7 +448,10 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   level + 1; kits affordable; (d3) every `takeGold` price at most 80 % of the stage's starting gold), (e) early shops,
   (f) price walls (Crescent, Gaia), (g) geography (the anchors of `assets/data/world-anchors.yaml` within the fitted
   scale [0.75, 0.95], distance, bearing and detour bands), (h) the travel matrix (rows T0-T10, T6b, the two basin
-  rows; the seeds from the map's `world.basins`; T6's landing is a BFS in the anchor's hike mode, bounded by U).
+  rows; the seeds from the map's `world.basins`; T6's landing is a BFS in the anchor's hike mode, bounded by U; WR:
+  `WRAP`, `questWrap.wrapInvariant`, the flat and wrapped labellings of walk, walk+canoe and ship equal, the line ends
+  `; WRAP OK` on a wrapped world). WR: every neighbour loop steps through `worldWrap.stepTo` / `stepIndex`, so routes
+  cross the seams; (g) stays planar; (d)'s line reports each stage's seam crossings and late-sea cells (`seam: ...`).
   `--mutate` adds the no-skip mutation suite (GT-1 to GT-37 + GT-5b and NW2's GT-40 to GT-43, `questMutateRows.ts`,
   and the generic elements); an uncaught element needs a `nonLoadBearing` entry (GT-43, `ice_neck` opened, is one by
   design).
@@ -532,14 +555,16 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `src/scenes/exploration/FieldAmbient.ts` over the map and the characters: `smoke` is the steam billows of the
   Field engine notes ("Ambient smoke"). X  `ambient`).
 - **Mode 7 far atlas (M7-1, `docs/MODE7_PLAN.md` 3.1).** Every full and `--region` world compile re-bakes
-  `assets/maps/ai/overworld/mode7.png` (3072x3072 RGB, 12 px per cell on the 256-cell world since NW-5: `cellPx = 3072 // width`), `mode7_low.png` (1536x1536, 6 px per cell)
+  `assets/maps/ai/overworld/mode7.png` (3072x3072 RGB, 12 px per cell on the 256-cell world since NW-5: `cellPx = 3072 // width`), `mode7_low.png` (2048x2048, 8 px per cell since WR: `POT_LOW // width`, a power of two that repeats and mips under WebGL1)
   and `mode7.json` (`version`, `cellPx`, `size`, `lowCellPx`, `lowSize`, `inputs` = the sha256 over the 256 chunk
   files in `art.below` order) through `build_hooks.bake_mode7`, called in `build_map.write()` right after
   `bake_patches` (only for `MODE7_MAPS` = `overworld`, so the selftest worlds bake none). The baker,
   `assets-src/tools/mode7_atlas.py`, box-averages the below chunks (4x4, 8x8 at 12 px per cell; integers, round half up), adds no
   border and refuses a world whose 4 edges are not all Water; the patches stay out (the runtime `WorldAtlas`,
-  `src/scenes/exploration/mode7/WorldAtlas.ts`, draws them over it while their flags are set, builds the mips with
-  WebGL2 only, and frees the source image after the compose). Gates: `mode7_atlas.py --check-determinism overworld`
+  `src/scenes/exploration/mode7/WorldAtlas.ts`, draws them over it while their flags are set, builds the mips when
+  `atlasMips` (WebGL2, or a power of two under WebGL1), samples it with `REPEAT` on a wrapped map (clamp-to-edge on a
+  flat one; `atlasSize` rejects an NPOT atlas of a wrapped map under WebGL1 into the `failed` path), and frees the
+  source image after the compose). Gates: `mode7_atlas.py --check-determinism overworld`
   (two bakes under PYTHONHASHSEED 0 / 1 into temp dirs) and `build_map.py overworld && git diff --exit-code assets
   assets-src/maps`; `tests/data/mode7Atlas.test.ts` fails on a stale atlas. Never hand-merge `mode7*.png`:
   recompile the world at the merge (risk R13). A by-hand bake: `mode7_atlas.py overworld [--maps DIR] [--out DIR]`
@@ -576,7 +601,10 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   tilt plays `FlightView.busy` holds the field (the one behavioural change; a held direction moves on the frame it
   ends), the marker hides, the shadow check holds; at its end `holdOff(TILT_HOLDOFF_FRAMES)` (8). The near mesh's
   square is open on the map's edges and rows wholly off the map are the far atlas's (`rowFits(..., map)`,
-  `rowOffMap`), so the near detail draws by a clamped edge too. Tests: `tests/scenes/mode7/mode7Tilt.test.ts` (the
+  `rowOffMap`), so the near detail draws by a clamped edge too; on a wrapped map (WR) there is no edge: no open side,
+  no off-map row, the near window's rect is canonical with its image origin `ix0` / `iy0` nearest the ship (no recentre
+  at a seam step), `NearDetail.wrapBoxes` splits its underlay at the seams, billboards stand at their image nearest P
+  and the clouds read an odometer; the camera never clamps, so a tilt starts centred. Tests: `tests/scenes/mode7/mode7Tilt.test.ts` (the
   t 0 match corner by corner against a real `Camera`), `mode7TiltScene.test.ts`, the parity tests (each tilt 42 held
   frames, the end state equal).
 - **Mode 7 billboards and clouds (M7-5, `docs/MODE7_PLAN.md` 5).** In flight the parked vehicles (the field's
@@ -698,6 +726,16 @@ Cutscenes are scripts in `assets/data/cutscenes.yaml`, played by `CutsceneManage
 - **controls hint (FX-R, P3-R1):** the first-run hint over the field (`ControlsHint`, until `ff1_controlsSeen` is stored) is dismissed by any key and the key still acts on that frame; it used to swallow the first press of a fresh browser (the airship did not land on the first confirm).
 
 ### Field engine notes (FX-C)
+
+- **The wrap (WR):** on a wrapped map `PlayerController` steps to an unwrapped drawn target (-1 or W) and normalises
+  tile, sprite and camera at the step's end (one period jump, invisible); `playerMove`, `gridX`, `targetTile` and
+  `facingTile` are canonical. The camera never clamps (`Camera.setMapBounds(w, h, wrap)`). Each frame
+  `ExplorationScene.update` restores, runs the field (`step`), then `WrapImages.apply` (`src/rendering/wrapImages.ts`)
+  shifts every world child to its image nearest the camera by its bounds; the layers take the sentinels
+  `WRAP_BELOW_Z` / `WRAP_ABOVE_Z` (D-WR-10). Chunks draw at their images (`chunkStreaming.rectChunks`), patches by
+  `nearestImage`. A child that places itself in `onRender` must be skipped: the vehicle parts are
+  (`FieldVehicleSprites.vehicleParts`, `setVehicleWrapOffset`; D-WR-9). Dev probe: `window.__field = { cell, mode,
+  zone }` (`fieldProbe.ts`).
 
 - **Encounter zone of a step:** `playerMove` fires before `FieldVehicles.afterStep` changes the mode, so `EncounterSystem.setStepModeResolver` (set by the exploration scene to `modeAfterStep` from the step origin) makes the lookup use the mode the step ends in. A canoe step onto a river cell rolls the canoe zone, not the walking zones with a hole. `tests/data/overworldZoneCoverage.test.ts` fails when a walking or canoe cell outside act 1 falls through to the act-1 table (the Water and Wind tarns have canoe zones `wat_streams` / `wnd_tarns`).
 - **Flag-driven NPCs:** `ExplorationScene.refreshNpcPresence` follows `showIf` / `hideIf` as flags change (polled each field frame by a cheap signature, plus cutscenes and `onResume`); NPCs leave and arrive (`NpcPresence.ts`, `MapLoader.createNpc`, `MapLoadResult.npcDefs` = the whole NPC list). An NPC never appears on the hero's cell or the one about to be entered.

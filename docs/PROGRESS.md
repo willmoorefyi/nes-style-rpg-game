@@ -279,6 +279,20 @@ The user's feedback (2026-11-22): the airship had no view for flying away from o
   the parked heading; a landed airship keeps its heading. Movement, the field rules and the verifier are unchanged.
 - **Gates:** `test:fast` 413 files, 10,025 tests; `quest --strict` OK; browser shots in `~/temp/ff-game/airship_views/int/`.
 
+
+### Pass WR: the world map wraps (FF1's torus)
+
+The user's request (2026-11-22): "the edge of the world is weird from the airship ... in classic FF you could fly from
+north to south and east to west". Plan and result `docs/WORLD_WRAP_PLAN.md`.
+- **Runtime:** every mode crosses x 255 | 0 and y 255 | 0 on the world map (`MapData.wrap`, `src/systems/worldWrap.ts`);
+  the camera never clamps there; chunks, patches, NPCs, smoke and parked vehicles draw at their image nearest the
+  camera (`WrapImages`, the layer sentinels, `vehicleParts`). Mode 7's far atlas repeats; the low atlas is 2048² (POT).
+- **World:** the seam stays open ocean (`wrap` and `check_seam` gates); four seam spots and the `wr_*` previews; F-WR's
+  four seam-band zones copy the early seas' tables. Chunks unchanged.
+- **Verifier:** routes cross the seam; (c) unchanged at 847,265 states; `WRAP` in (h); (g) planar.
+- **Open:** the curve gate fails at S21 (L29.2 against [25, 28]; +0.32 from the wrapped witnesses) even with F-WR; no
+  factor re-fit within the method's caps fixes it. A ruling is needed (plan, result section).
+
 ---
 
 ## Current Metrics
