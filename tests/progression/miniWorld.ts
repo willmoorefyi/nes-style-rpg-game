@@ -34,3 +34,9 @@ export const MINI_LATE: LateInput = {
 export function miniContext(stage?: string, name = 'mini'): QuestContext {
   return attachLate(createQuestContext(loadFixture(name), { stage }), buildLateData(MINI_LATE));
 }
+
+/** The clean fixture (tests/fixtures/quest/clean.yaml) with the mini late data: a world with a 6-job mutation suite,
+ *  for the pool's tests (questMutatePool.test.ts). */
+export function cleanContext(stage?: string): QuestContext {
+  return miniContext(stage, 'clean');
+}

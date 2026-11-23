@@ -120,7 +120,12 @@ describe('code: the bundle closure', async () => {
   it('holds the verifier and the modules it runs', () => {
     for (const p of ['src/progression/questMutate.ts', 'src/progression/questProofs.ts', 'src/progression/questInputs.ts',
       'src/systems/fieldRules.ts', 'src/systems/worldReset.ts', 'src/systems/worldRevalidate.ts',
-      'src/core/schemaValidation.ts', 'src/entities/ExperienceTable.ts']) expect(paths).toContain(p);
+      'src/core/schemaValidation.ts', 'src/entities/ExperienceTable.ts',
+      // WR (docs/TEST_SPEED_PLAN.md 11): the wrapped world's step and the verifier's wrap
+      'src/systems/worldWrap.ts', 'src/progression/questWrap.ts',
+      // TS-P: the pool, its lock and worker
+      'src/progression/questMutatePool.ts', 'src/progression/questMutateLock.ts', 'src/progression/questMutateWorker.ts',
+    ]) expect(paths).toContain(p);
     expect(paths.every((p) => p.startsWith('src/'))).toBe(true);
   });
 

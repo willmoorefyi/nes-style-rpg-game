@@ -85,7 +85,13 @@ export interface CheckKey {
   stage?: string;
 }
 
-const keyText = (k: CheckKey): string => `${k.proof}:${k.stage ?? ''}`;
+export const keyText = (k: CheckKey): string => `${k.proof}:${k.stage ?? ''}`;
+
+/** A key back from its text (`b:S4`, `c:`). */
+export function keyOf(text: string): CheckKey {
+  const [proof, stage] = text.split(':');
+  return stage ? { proof: proof as ProofId, stage } : { proof: proof as ProofId };
+}
 
 /** Runs one check on a context. */
 export function runCheck(ctx: QuestContext, k: CheckKey): ProofFailure[] {
@@ -105,8 +111,7 @@ export function runCheck(ctx: QuestContext, k: CheckKey): ProofFailure[] {
 /**
  * The checks of mutated worlds, by base world and late data, then by stage, state cap, element and check key. A
  * mutated context is built from exactly those (`mutatedContext`: never strict), so a second suite on the same world
- * (questMutateWorld.test.ts: plain, then --strict, each about half an hour) reuses the first one's runs; its own
- * baseline still decides what is fresh.
+ * (the plain run, then --strict) reuses the first one's runs; its own baseline still decides what is fresh.
  */
 const RUNS = new WeakMap<QuestWorld, WeakMap<LateData, Map<string, ProofFailure[]>>>();
 
@@ -119,26 +124,84 @@ function runsOf(ctx: QuestContext): Map<string, ProofFailure[]> {
   return runs;
 }
 
+/** A raw run's key: `stage|maxStates|elementId|proof:stage` (the context's scope, the element, the check). */
+export const rawKey = (ctx: QuestContext, id: string, k: CheckKey): string =>
+  `${ctx.stage ?? ''}|${ctx.maxStates}|${id}|${keyText(k)}`;
+
+/** A baseline run's key: `plain|a:`, `strict|b:S4`. */
+export const baselineKey = (ctx: QuestContext, k: CheckKey): string => `${ctx.strict ? 'strict' : 'plain'}|${keyText(k)}`;
+
+/**
+ * Where `Baseline` takes its raw runs from (docs/TEST_SPEED_PLAN.md 5.1, D-TS3): `serial` computes them in-process
+ * (the `--jobs 1` reference, with RUNS), `recording` returns nothing and records each request (the pool's planner),
+ * `prefilled` reads computed runs and throws on one it lacks (the derivation).
+ */
+export interface RunSource {
+  element(ctx: QuestContext, id: string, k: CheckKey, make: () => QuestContext): ProofFailure[];
+  /** The failure messages of the unmutated context. */
+  baseline(ctx: QuestContext, k: CheckKey): string[];
+}
+
+export const serialSource: RunSource = {
+  element(ctx, id, k, make) {
+    const runs = runsOf(ctx);
+    const key = rawKey(ctx, id, k);
+    let got = runs.get(key);
+    if (!got) runs.set(key, got = runCheck(make(), k));
+    return got;
+  },
+  baseline: (ctx, k) => runCheck(ctx, k).map((f) => f.message),
+};
+
+/** The planner's source: every element request (element id -> the keys asked of it, in order). */
+export class RecordingSource implements RunSource {
+  readonly elements = new Map<string, Set<string>>();
+
+  element(_ctx: QuestContext, id: string, k: CheckKey): ProofFailure[] {
+    let keys = this.elements.get(id);
+    if (!keys) this.elements.set(id, keys = new Set());
+    keys.add(keyText(k));
+    return [];
+  }
+
+  baseline(): string[] {
+    return [];
+  }
+}
+
+/** The derivation's source: the computed raw runs and baselines; a request it lacks throws (fail-closed). */
+export class PrefilledSource implements RunSource {
+  constructor(readonly raw: ReadonlyMap<string, ProofFailure[]>, readonly base: ReadonlyMap<string, string[]>) {}
+
+  element(ctx: QuestContext, id: string, k: CheckKey): ProofFailure[] {
+    const got = this.raw.get(rawKey(ctx, id, k));
+    if (!got) throw new Error(`mutation suite: no raw run ${rawKey(ctx, id, k)}`);
+    return got;
+  }
+
+  baseline(ctx: QuestContext, k: CheckKey): string[] {
+    const got = this.base.get(baselineKey(ctx, k));
+    if (!got) throw new Error(`mutation suite: no baseline run ${baselineKey(ctx, k)}`);
+    return got;
+  }
+}
+
 /** The checks of the unmutated world, cached by key (a failure already there catches nothing). */
 export class Baseline {
   private cache = new Map<string, Set<string>>();
 
-  constructor(private readonly ctx: QuestContext) {}
+  constructor(private readonly ctx: QuestContext, private readonly source: RunSource = serialSource) {}
 
   /**
-   * The failures the baseline lacks of the mutated context `make` builds (lazily) for element `id` (unique in the
-   * base world's mutation list); the mutated checks are cached in RUNS.
+   * The failures the baseline lacks of the mutated context `make` builds (lazily, once) for element `id` (unique in
+   * the base world's mutation list); the raw runs come from the source.
    */
   freshFor(id: string, make: () => QuestContext, keys: CheckKey[]): ProofFailure[] {
-    const runs = runsOf(this.ctx);
-    const scope = `${this.ctx.stage ?? ''}|${this.ctx.maxStates}|${id}|`;
     let mctx: QuestContext | undefined;
+    const once = (): QuestContext => (mctx ??= make());
     const out: ProofFailure[] = [];
     for (const k of keys) {
-      const key = scope + keyText(k);
-      let got = runs.get(key);
-      if (!got) runs.set(key, got = runCheck(mctx ??= make(), k));
-      for (const f of got) if (!this.has(k, f.message)) out.push(f);
+      for (const f of this.source.element(this.ctx, id, k, once)) if (!this.has(k, f.message)) out.push(f);
     }
     return out;
   }
@@ -147,7 +210,7 @@ export class Baseline {
     const key = keyText(k);
     let set = this.cache.get(key);
     if (!set) {
-      set = new Set(runCheck(this.ctx, k).map((f) => f.message));
+      set = new Set(this.source.baseline(this.ctx, k));
       this.cache.set(key, set);
     }
     return set.has(message);

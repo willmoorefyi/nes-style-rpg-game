@@ -110,10 +110,11 @@ export function runtimeVersions(from: string = process.cwd()): Record<string, st
   return { node: process.version, yaml: installedVersion('yaml', from), esbuild: installedVersion('esbuild', from) };
 }
 
-/** The verifier's entry points (TS-0; TS-P bundles its worker, which imports them). */
+/** The verifier's entry points: the pool worker (the suite, the checks, the loaders), the pool and lock (through the
+ *  suite), the report and the late and reset proofs. Their closure is the fingerprint's `code`. */
 export const VERIFIER_ENTRIES: readonly string[] = [
-  'src/progression/questMutate.ts', 'src/progression/questReport.ts', 'src/progression/questData.ts',
-  'src/progression/questLateData.ts', 'src/progression/questReset.ts', 'src/progression/questProofsLate.ts',
+  'src/progression/questMutateWorker.ts', 'src/progression/questReport.ts',
+  'src/progression/questReset.ts', 'src/progression/questProofsLate.ts',
 ];
 
 export interface BundleResult {
@@ -121,16 +122,18 @@ export interface BundleResult {
   code: InputRecord[];
   /** The esbuild metafile's inputs: path -> the paths (and externals) it imports. */
   imports: Record<string, string[]>;
-  /** The bundle's text when `outfile` was not given (one entry), else the files written. */
+  /** The files written (with `outdir`), else none. */
   outputs: string[];
 }
 
 export interface BundleOptions {
   /** The root the entries and the closure are read from (default: the working directory). */
   codeRoot?: string;
-  entries?: readonly string[];
-  /** Write the bundle here (one entry, ESM); otherwise nothing is written. */
-  outfile?: string;
+  /** Entry paths, or output name -> entry path. */
+  entries?: readonly string[] | Readonly<Record<string, string>>;
+  /** Write the bundle here (ESM `<name>.mjs` per entry, shared code split into chunks); otherwise nothing is
+   *  written. */
+  outdir?: string;
 }
 
 /** Bundles the verifier with esbuild (about 30 ms) and returns its code closure from the metafile. */
@@ -140,21 +143,23 @@ export async function verifierBundle(opts: BundleOptions = {}): Promise<BundleRe
   const { build } = await import('esbuild');
   const r = await build({
     absWorkingDir: codeRoot,
-    entryPoints: [...entries],
+    entryPoints: Array.isArray(entries) ? [...entries] : { ...(entries as Record<string, string>) },
     bundle: true, platform: 'node', format: 'esm', external: ['yaml', 'esbuild'], metafile: true, logLevel: 'error',
-    ...(opts.outfile ? { outfile: opts.outfile, write: true } : { outdir: join(codeRoot, '.ff-bundle'), write: false }),
+    splitting: true, outExtension: { '.js': '.mjs' },
+    ...(opts.outdir ? { outdir: opts.outdir, write: true } : { outdir: join(codeRoot, '.ff-bundle'), write: false }),
   });
   const inputs = r.metafile.inputs;
   const code: InputRecord[] = Object.keys(inputs).sort().map((p) => [p, sha256(readFileSync(join(codeRoot, p)))]);
   const imports: Record<string, string[]> = {};
   for (const [p, v] of Object.entries(inputs)) imports[p] = v.imports.map((i) => i.path);
-  return { code, imports, outputs: opts.outfile ? [opts.outfile] : r.outputFiles?.map((f) => f.text) ?? [] };
+  return { code, imports, outputs: opts.outdir ? Object.keys(r.metafile.outputs) : [] };
 }
 
 /** The modules allowed to import `fs`: the input recorder, and (TS-P / TS-C) the pool and the cache, which read and
  *  write only their own lock, bundle and store. */
 export const FS_ALLOWED: readonly string[] = [
   'src/progression/questInputs.ts', 'src/progression/questMutateCache.ts', 'src/progression/questMutatePool.ts',
+  'src/progression/questMutateLock.ts',
 ];
 
 const FS_MODULES = new Set(['fs', 'node:fs', 'fs/promises', 'node:fs/promises']);
