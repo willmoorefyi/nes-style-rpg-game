@@ -20,8 +20,8 @@ from .region_chunks import RegionError
 ASSETS_SRC = Path(__file__).resolve().parent.parent.parent
 REPO = ASSETS_SRC.parent
 LAZY_IMPORTS = ("build_map", "build_hooks", "map_checks_region", "mode7_atlas", "waterline", "kit_props",
-                "ambient_flame")
-LAZY_OPTIONAL = ("map_checks_wrap",)           # WR's seam check (imported when it exists)
+                "ambient_flame", "map_checks_wrap")
+LAZY_OPTIONAL: tuple[str, ...] = ()
 NOT_COMPILER = re.compile(r"(^|/)([A-Za-z0-9_]*selftest[A-Za-z0-9_]*|det_changed)\.py$")
 _RECORDED: set[str] = set()
 _PRE: set[str] | None = None

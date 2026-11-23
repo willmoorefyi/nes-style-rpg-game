@@ -1459,6 +1459,9 @@ def build(ids: list[str] | None = None, region: str | None = None, src_dir: Path
                 c, kit = compile_source(src)
                 path = write(src, c, out_dir, kit=kit)
                 what = ""
+        if is_world(src):           # TS-D: write() checked it (guard_closure); the gate's record
+            print(f"{c.id}: compiler closure {len(R.loaded_closure())} files, all in the pre-compile closure "
+                  f"({len(R.compiler_closure())})")
         placeholder = sorted(set(K.PART_NAMES) - kit.approved)
         shown = path.relative_to(ROOT) if path.resolve().is_relative_to(ROOT) else path
         print(f"{c.id}: {what}{c.width}x{c.height} -> {shown} "
