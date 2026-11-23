@@ -56,7 +56,7 @@ def selftest() -> int:
         B.write(src, c, d, kit=kit)
         full = _snapshot(d)
         build = yaml.safe_load(full["rworld.yaml"])["build"]
-        assert set(build) == {"compiler", "chunks"} and len(build["chunks"]) == 12, build
+        assert set(build) == {"compiler", "chunks", "runtime"} and len(build["chunks"]) == 12, build
         B.build_region(src, NAMES["a"], d)
         assert not _diff(full, _snapshot(d)), _diff(full, _snapshot(d))
         print("chunk digests: OK (build.chunks has 12 digests; --region over its own full compile equals it)")
