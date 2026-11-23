@@ -181,7 +181,8 @@ def _stage_rim(check) -> None:
     import stage_backgrounds as SB
     import stage_rim as SR
     lines = len((TOOLS / "stage_backgrounds.py").read_text().splitlines())
-    check(lines <= 249, f"stage_backgrounds.py stays line-neutral ({lines} <= 249 lines)")
+    # the accepted ceiling since pass INT (AGENTS.md "over 250 and not split": 255); C1 had pinned 249 before it
+    check(lines <= 255, f"stage_backgrounds.py stays line-neutral ({lines} <= 255 lines)")
     check(SR.RIM == ("rim-src-up.png", 485, 1.05, "center", 370), f"stage_rim: the user-accepted entry {SR.RIM}")
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)

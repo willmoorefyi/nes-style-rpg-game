@@ -243,23 +243,25 @@
       "note": "User 2026-11-19: Western Keep and citadel icons, fairy and mermaid field sprites; no Gemini. gemini_before as LM4 (the Gemini ledger is unchanged). One row per logical request in cache/bedrock_ledger.jsonl. structure (control-structure, pixel-art preset, approved field sheets as shape guides) ran under lm5_gen for the NPC sheets.",
       "used": 36,
       "closed": "2026-11-19, 36 of 80 (LM5 done: Western Keep and citadel icons, fairy and mermaid field sheets rendered; awaiting the user's review; no remove_bg, no reserve)"
-    }
-  ],
-  "bedrock": {
-    "pass": "AR",
-    "cap": 520,
-    "per_purpose_caps": {
-      "ar_tiles": 90,
-      "ar_npc": 100,
-      "ar_props": 70,
-      "ar_towns": 110,
-      "reserve": 20,
-      "ar_dragon": 60,
-      "ar_dwarf": 40,
-      "ar_airship": 30
     },
-    "gemini_before": 553,
-    "reserve_max_usd": 0.08,
-    "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl. Extended 2026-11-22 by user permission (\"feel free to extend the bedrock budget if you must\"): ar_towns 80->110, ar_tiles 70->90, cap 340->390. Extended 2026-11-22: ar_dragon 60 (the Cardia dragon great village: brief concept boards and its kit), cap 390->450. Extended 2026-11-22 (playtest feedback): ar_dwarf 40 (dwarf NPC sheets), ar_airship 30 (airship toward/away views, TODO T-2), cap 450->520."
-  }
+    {
+      "pass": "AR",
+      "cap": 520,
+      "per_purpose_caps": {
+        "ar_tiles": 90,
+        "ar_npc": 100,
+        "ar_props": 70,
+        "ar_towns": 110,
+        "reserve": 20,
+        "ar_dragon": 60,
+        "ar_dwarf": 40,
+        "ar_airship": 30
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl. Extended 2026-11-22 by user permission (\"feel free to extend the bedrock budget if you must\"): ar_towns 80->110, ar_tiles 70->90, cap 340->390. Extended 2026-11-22: ar_dragon 60 (the Cardia dragon great village: brief concept boards and its kit), cap 390->450. Extended 2026-11-22 (playtest feedback): ar_dwarf 40 (dwarf NPC sheets), ar_airship 30 (airship toward/away views, TODO T-2), cap 450->520.",
+      "used": 348,
+      "closed": "2026-11-23, 348 of 520 (AR done: terrain, props, town themes, AR/dwarf/dragon NPCs, Cardia Deep kit, airship views; per purpose {'ar_npc': 69, 'ar_props': 47, 'ar_tiles': 58, 'ar_towns': 82, 'ar_dragon': 41, 'ar_dwarf': 33, 'ar_airship': 18}; no Gemini)"
+    }
+  ]
 }
