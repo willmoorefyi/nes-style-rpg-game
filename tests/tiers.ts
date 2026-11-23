@@ -10,8 +10,9 @@
 export const HEAVY_TESTS: ReadonlyArray<{ file: string; why: string }> = [
   {
     file: 'tests/progression/questMutateWorld.test.ts',
-    why: 'the real-world no-skip mutation suite (`npm run quest -- --mutate`), plain and --strict: every gate-table '
-      + 'and generic element re-runs the proofs on the world (about half an hour on one worker at pass W\'s 192x192)',
+    why: 'the real-world mutation suite (`npm run quest -- --mutate`), plain and --strict, through the mutation cache '
+      + '(docs/TEST_SPEED_PLAN.md 4): a cache hit takes about 3 min (the live audit), a miss runs the parallel suite live '
+      + '(about 13 min at 6 workers, 20 at the 4 workers of vitest)',
   },
   {
     file: 'tests/progression/questGraph.test.ts',

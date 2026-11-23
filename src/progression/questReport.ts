@@ -48,10 +48,17 @@ export interface VerifyArgs {
   fromReset: boolean;
   /** `--reset-samples N`: mid-stage samples per stage of `--from-reset` (default questReset.RESET_SAMPLES). */
   resetSamples?: number;
+  /** TS-P `--jobs N`: the mutate pool's workers (1: in-process, the serial reference; default questMutatePool's). */
+  jobs?: number;
+  /** TS-C `--cache use|refresh|off` (default QUEST_MUTATE_CACHE, else use). */
+  cache?: 'use' | 'refresh' | 'off';
+  /** TS-C `--audit N|all`: heavy jobs a cache hit re-runs live (default QUEST_MUTATE_AUDIT, else 1). */
+  audit?: number | 'all';
 }
 
 /** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR] [--maps DIR] [--anchors FILE]
- *  [--worst-canoe] [--from-reset] [--reset-samples N]`. Throws on a bad argument. */
+ *  [--worst-canoe] [--from-reset] [--reset-samples N] [--jobs N] [--cache use|refresh|off] [--audit N|all]`.
+ *  Throws on a bad argument. */
 export function parseArgs(argv: readonly string[]): VerifyArgs {
   const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false, fromReset: false };
   for (let i = 0; i < argv.length; i++) {
@@ -71,6 +78,16 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     else if (a === '--worst-canoe') out.worstCanoe = true;
     else if (a === '--from-reset') out.fromReset = true;
     else if (a === '--reset-samples') out.resetSamples = Number(value());
+    else if (a === '--jobs') out.jobs = Number(value());
+    else if (a === '--cache') {
+      const v = value();
+      if (v !== 'use' && v !== 'refresh' && v !== 'off') throw new Error(`--cache: expected use, refresh or off, got ${v}`);
+      out.cache = v;
+    } else if (a === '--audit') {
+      const v = value();
+      out.audit = v === 'all' ? 'all' : Number(v);
+      if (out.audit !== 'all' && !(Number.isInteger(out.audit) && out.audit >= 0)) throw new Error(`--audit: expected a count or all, got ${v}`);
+    }
     else if (a === '--only') {
       const letters = value();
       const bad = [...letters].filter((c) => !(ALL_PROOFS as readonly string[]).includes(c));
@@ -83,6 +100,7 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
   if (out.resetSamples !== undefined && !(Number.isInteger(out.resetSamples) && out.resetSamples >= 0)) {
     throw new Error('--reset-samples: expected a whole number');
   }
+  if (out.jobs !== undefined && !(Number.isInteger(out.jobs) && out.jobs >= 1)) throw new Error('--jobs: expected a whole number >= 1');
   return out;
 }
 
@@ -117,6 +135,11 @@ export function mutationLine(mutations: MutationResult[]): string {
   return missed.length
     ? `mutations: FAIL  (${missed.length} of ${mutations.length} elements not caught)`
     : `mutations: OK  (${rows} gate rows; ${mutations.length} elements, each removal reported)`;
+}
+
+/** TS-P: the pool's line after the mutation line (`cache` added by TS-C). */
+export function mutateLine(jobs: number, workers: number, wallS: number, cache?: string): string {
+  return `mutate: ${jobs} jobs on ${workers} worker${workers === 1 ? '' : 's'}, wall ${Math.round(wallS)} s${cache ? `, cache ${cache}` : ''}`;
 }
 
 /** The CLI's lines, in QUEST 5.3's form. */

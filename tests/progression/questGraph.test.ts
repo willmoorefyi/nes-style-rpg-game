@@ -213,7 +213,9 @@ describe('questGraph: the import rule', () => {
     /^\.\.\/systems\/worldReset\.js$/,
     // NW2-S (docs/NW2_EDITS_PLAN.md 12): `--from-reset`'s relocated v4 saves (questResetNw2.ts) run the game's own
     // pure revalidateNw2 (it imports only the types, fieldRules*, and worldReset)
-    /^\.\.\/systems\/worldRevalidate\.js$/];
+    /^\.\.\/systems\/worldRevalidate\.js$/,
+    // WR (docs/WORLD_WRAP_PLAN.md): the wrapped world's pure step helpers (questExits.ts, questWrap.ts)
+    /^\.\.\/systems\/worldWrap\.js$/];
 
   it('src/progression imports nothing else', () => {
     const dir = 'src/progression';

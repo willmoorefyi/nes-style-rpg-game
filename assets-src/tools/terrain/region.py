@@ -4,8 +4,9 @@ the regions of a map source, the build digests that make `--region` safe, and th
 - **Regions.** A source lists them as `regions: {name: [[x0, y0, x1, y1], ...]}` (inclusive cells, chunk-aligned;
   one or more rects each, GAP-19), `{name: {rects: [...]}}` or, for the composed world, `{name: {raster: [...]}}` (pass
   NW; pass W's box fallback retired at NW-5). A map without regions compiles as before.
-- **Build digests.** A compiled map with regions records `build: {compiler, boxes}`: a digest of the compiler (its
-  code and the kit art it painted with) and one per region of what its pixels depend on (the region's ground
+- **Build digests.** A compiled map with regions records `build: {compiler, boxes, runtime}`: a digest of the
+  compiler (the files of its recorded module closure, the kit art it painted with and the runtime versions; TS-D,
+  docs/TEST_SPEED_PLAN.md 6.3, R9) and one per region of what its pixels depend on (the region's ground
   cells, the objects anchored in it, and the map-wide painting keys). `--region r` repaints only r's chunks, so it
   refuses a base whose compiler or any other region's digest differs (`--region: stale base, run a full compile`).
 - **Chunk digests (pass NW 3.4, NW-4).** A source whose regions are owner-grid rasters (`regions: {r: {raster:
@@ -32,6 +33,8 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
+from .closure import (ASSETS_SRC, REPO, compiler_closure, guard_closure, loaded_closure,  # noqa: F401
+                      record_closure, runtime_versions, snapshot_closure)
 from .frame import CHUNK
 from .region_chunks import (OBJ_REACH, PAINT_KEYS, RING_PAD, RegionError, changed_chunks, chunk_digests,  # noqa: F401
                             chunked, painted)
@@ -40,7 +43,6 @@ TOOLS = Path(__file__).resolve().parent.parent
 LOCK_PATH = Path("/tmp/ff-game-world-compile.lock")
 LOCK_TIMEOUT = 30 * 60
 WORLD_IDS = ("overworld",)                     # compiled under the lock even before they have regions
-CODE = ["build_map.py", "kit.py", "terrain"]   # the compiler's code (terrain/*.py)
 
 Rect = tuple[int, int, int, int]
 
@@ -88,14 +90,12 @@ def _anchor(o: dict) -> tuple[int, int] | None:
 
 
 def compiler_digest(kit) -> str:
-    """The compiler's code plus the kit art it paints with (parts, materials, which are approved)."""
+    """The compiler's code (the files of `compiler_closure`), the runtime versions and the kit art it paints with
+    (parts, materials, which are approved)."""
     h = hashlib.sha256()
-    files = []
-    for name in CODE:
-        p = TOOLS / name
-        files += sorted(p.glob("*.py")) if p.is_dir() else [p]
-    for f in files:
-        h.update(f.relative_to(TOOLS).as_posix().encode() + b"\0" + f.read_bytes() + b"\0")
+    for rel in compiler_closure():
+        h.update(rel.encode() + b"\0" + (REPO / rel).read_bytes() + b"\0")
+    h.update(json.dumps(runtime_versions(), sort_keys=True).encode())
     for name in sorted(n for n in kit.parts if "@" not in n):
         im = kit.parts[name]
         h.update(f"part {name} {im.mode} {im.size}".encode() + im.tobytes())
@@ -107,10 +107,12 @@ def compiler_digest(kit) -> str:
 
 
 def digests(src: dict, kit, wid: int, hgt: int, footprint=None) -> dict:
-    """`build: {compiler, boxes: {region: digest}}` for a map with regions (recorded in the compiled map); in
-    chunk-digest mode (`chunked`) `build: {compiler, chunks: {"col,row": digest}}` (`footprint`: build_map's)."""
+    """`build: {compiler, boxes: {region: digest}, runtime}` for a map with regions (recorded in the compiled map); in
+    chunk-digest mode (`chunked`) `build: {compiler, chunks: {"col,row": digest}, runtime}` (`footprint`:
+    build_map's)."""
     if chunked(src):
-        return {"compiler": compiler_digest(kit), "chunks": chunk_digests(src, wid, hgt, footprint)}
+        return {"compiler": compiler_digest(kit), "chunks": chunk_digests(src, wid, hgt, footprint),
+                "runtime": runtime_versions()}
     regions = regions_of(src, wid, hgt) or {}
     rows = src["ground"].rstrip("\n").split("\n")
     paint = json.dumps({k: src.get(k) for k in PAINT_KEYS}, sort_keys=True)
@@ -127,7 +129,7 @@ def digests(src: dict, kit, wid: int, hgt: int, footprint=None) -> dict:
                 h.update(rows[y][x0:x1 + 1].encode() + b"\n")
         h.update(json.dumps(objs.get(name, []) + objs.get(None, []), sort_keys=True).encode())
         boxes[name] = h.hexdigest()[:16]
-    return {"compiler": compiler_digest(kit), "boxes": boxes}
+    return {"compiler": compiler_digest(kit), "boxes": boxes, "runtime": runtime_versions()}
 
 
 def check_base(base: dict | None, new: dict, region: str, wid: int, hgt: int) -> set[tuple[int, int]]:

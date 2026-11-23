@@ -13,7 +13,7 @@ import type { MutationResult, ProofFailure } from './questTypes.js';
 import { createQuestContext, type QuestContext } from './questProofs.js';
 import { attachLate, lateOf } from './questLateData.js';
 import { ancestorsOf, globMatch, type QuestWorld } from './questData.js';
-import { Baseline, prefixStage, stageSkips, type CheckKey } from './questMutateCheck.js';
+import { Baseline, prefixStage, serialSource, stageSkips, type CheckKey, type RunSource } from './questMutateCheck.js';
 import { GATE_ROWS, type GateRow } from './questMutateRows.js';
 import type { MutElement } from './questMutateOps.js';
 import { genericElements, nonLoadBearingFor, pendingReason } from './questMutateGeneric.js';
@@ -61,6 +61,25 @@ function stageBlind(ctx: QuestContext, row: GateRow, stage: string): boolean {
   return otherSkips || (row.stages[0] !== stage && ancestorsOf(ctx.world.stages, stage).has(row.stages[0]));
 }
 
+/** An element's id in the base world's mutation list (Baseline.freshFor): a gate-table one, a generic one. */
+const rowId = (ri: number, row: GateRow, i: number, el: MutElement): string => `${ri} ${row.row}#${i} ${el.key} ${el.label}`;
+const genericId = (i: number, el: MutElement): string => `G#${i} ${el.key} ${el.label}`;
+
+/** Every element of the suite by id, as the runs above name them (the pool's workers look their jobs up here). */
+export function elementsById(ctx: QuestContext): Map<string, MutElement> {
+  const out = new Map<string, MutElement>();
+  const add = (id: string, el: MutElement): void => {
+    if (out.has(id)) throw new Error(`mutation suite: two elements with the id ${id}`);
+    out.set(id, el);
+  };
+  for (const [ri, row] of GATE_ROWS.entries()) {
+    if (row.probe || (ctx.stage && !row.stages.includes(ctx.stage))) continue;
+    row.find(ctx).forEach((el, i) => add(rowId(ri, row, i, el), el));
+  }
+  genericElements(ctx).forEach((el, i) => add(genericId(i, el), el));
+  return out;
+}
+
 /** `id`: the element's place in the base world's mutation list (Baseline.freshFor). */
 function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement, id: string): MutationResult {
   const stages = rowStages(row);
@@ -98,8 +117,8 @@ function runRow(ctx: QuestContext, base: Baseline, row: GateRow, el: MutElement,
 }
 
 /** The gate-table rows only (questMutate.test.ts asserts each by name). */
-export function runGateRows(ctx: QuestContext, only?: ReadonlySet<string>): MutationResult[] {
-  const base = new Baseline(ctx);
+export function runGateRows(ctx: QuestContext, only?: ReadonlySet<string>, source: RunSource = serialSource): MutationResult[] {
+  const base = new Baseline(ctx, source);
   const out: MutationResult[] = [];
   for (const [ri, row] of GATE_ROWS.entries()) {
     if (only && !only.has(row.row)) continue;
@@ -113,14 +132,14 @@ export function runGateRows(ctx: QuestContext, only?: ReadonlySet<string>): Muta
           : { failures: [{ proof: 'b', code: 'MISSING', message: `MISSING ${row.row} ${row.element}: not found` }] }) });
       continue;
     }
-    els.forEach((el, i) => out.push(runRow(ctx, base, row, el, `${ri} ${row.row}#${i} ${el.key} ${el.label}`)));
+    els.forEach((el, i) => out.push(runRow(ctx, base, row, el, rowId(ri, row, i, el))));
   }
   return out;
 }
 
 /** The generic elements (QUEST 5.4) the gate table does not name. */
-export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>): MutationResult[] {
-  const base = new Baseline(ctx);
+export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>, source: RunSource = serialSource): MutationResult[] {
+  const base = new Baseline(ctx, source);
   // (b) for the built stages and the stages right after one (a pending stage's grant waits for its `after` markers)
   const built = new Set(ctx.checked.filter((s) => s.status === 'built').map((s) => s.id));
   const scope = ctx.checked.filter((s) => built.has(s.id) || s.after.some((a) => built.has(a)));
@@ -132,7 +151,7 @@ export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>): Mutat
     || (el.map === ctx.world.worldMap && (el.reads ?? []).some((r) => [...own.grants.flags, ...own.grants.items].includes(r)));
   for (const [i, el] of genericElements(ctx).entries()) {
     if (named.has(spot(el)) || !mine(el)) continue;
-    const fresh: ProofFailure[] = base.freshFor(`G#${i} ${el.key} ${el.label}`, () => mutatedContext(ctx, el.apply(ctx.world)), keys);
+    const fresh: ProofFailure[] = base.freshFor(genericId(i, el), () => mutatedContext(ctx, el.apply(ctx.world)), keys);
     const r: MutationResult = { row: `G ${el.map}`, element: el.label, mutation: 'remove', caught: fresh.length > 0, failures: fresh };
     if (!r.caught) {
       const reason = nonLoadBearingFor(ctx, el) ?? pendingReason(ctx, el);
@@ -143,11 +162,12 @@ export function runGeneric(ctx: QuestContext, named: ReadonlySet<string>): Mutat
   return out;
 }
 
-export function runMutations(ctx: QuestContext): MutationResult[] {
-  const rows = runGateRows(ctx);
+/** The suite; `source` (docs/TEST_SPEED_PLAN.md 5.1) is where its raw runs come from (default: computed here). */
+export function runMutations(ctx: QuestContext, source: RunSource = serialSource): MutationResult[] {
+  const rows = runGateRows(ctx, undefined, source);
   const named = new Set<string>();
   for (const row of GATE_ROWS) if (!row.probe) for (const el of row.find(ctx)) named.add(spot(el));
-  const out = [...rows, ...runGeneric(ctx, named)];
+  const out = [...rows, ...runGeneric(ctx, named, source)];
   if (ctx.strict) {
     for (const m of out) {
       if (m.nonLoadBearing?.startsWith('pending')) { m.failures = [...m.failures]; delete m.nonLoadBearing; }

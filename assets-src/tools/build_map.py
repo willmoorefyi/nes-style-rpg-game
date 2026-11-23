@@ -6,6 +6,10 @@
   python3 -I assets-src/tools/build_map.py --check-determinism [ids]       # compile under two hash seeds, compare
   python3 -I assets-src/tools/build_map.py overworld --region <r> [ids]    # repaint one world region (GAP-19)
   python3 -I assets-src/tools/build_map.py --check-determinism --region <r> overworld [ids]
+  python3 -I assets-src/tools/build_map.py --check-determinism --changed [--base REV] [--full] [--serial] overworld
+      (TS-D, det_changed.py: only the chunks whose digest differs from REV's compiled map, both seeds at once; falls
+      back to the full check on a compiler, closure, runtime or size change, or 120+ painted chunks)
+  internal: --hash [ids] [--src FILE] [--rects FILE --per-chunk FILE] [--closure]   (the determinism children)
       options: --src-dir DIR (sources), --out DIR (compiled maps; scratch builds and probes)
   python3 -I assets-src/tools/build_map.py --preview <id> x0 y0 x1 y1 out.png [--grid] [--collision] [--scale f]
   python3 -I assets-src/tools/build_map.py --metrics [ids]                 # terrain metrics (terrain/)
@@ -1236,6 +1240,7 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT, kit: K.Kit | None = None,
         if k in src:
             doc[k] = src[k]
     HOOKS.passthrough(src, doc)
+    R.record_closure()                  # TS-D: what this compile loaded joins the compiler closure (and is checked)
     if kit is not None and R.regions_of(src, c.width, c.height):
         doc["build"] = R.digests(src, kit, c.width, c.height, footprint)
     path = out_dir / f"{c.id}.yaml"
@@ -1301,11 +1306,9 @@ def hashes(c: Compiled) -> dict[str, str]:
             "collision": hashlib.sha256(np.ascontiguousarray(c.collision, dtype=np.int16).tobytes()).hexdigest()}
 
 
-def hash_run(ids: list[str], src_file: str | None, placeholders: bool, seed: str,
-             region: str | None = None, src_dir: Path | None = None) -> dict[str, dict[str, str]]:
-    """Compile in a subprocess under PYTHONHASHSEED=seed and return {id: hashes}. Runs without -I (which would
-    ignore the variable) but with -s, and with an environment holding nothing but the seed (and
-    FFG_WORLD_LOCK_HELD=1: the parent holds the world-compile lock)."""
+def hash_cmd(ids: list[str], src_file: str | None, placeholders: bool, region: str | None = None,
+             src_dir: Path | None = None) -> list[str]:
+    """The `--hash` child's command line (run without -I, which would ignore PYTHONHASHSEED, but with -s)."""
     cmd = [sys.executable, "-s", str(Path(__file__).resolve()), "--hash", *ids]
     if src_file:
         cmd += ["--src", src_file]
@@ -1315,6 +1318,15 @@ def hash_run(ids: list[str], src_file: str | None, placeholders: bool, seed: str
         cmd += ["--region", region]
     if src_dir:
         cmd += ["--src-dir", str(src_dir)]
+    return cmd
+
+
+def hash_run(ids: list[str], src_file: str | None, placeholders: bool, seed: str,
+             region: str | None = None, src_dir: Path | None = None) -> dict[str, dict[str, str]]:
+    """Compile in a subprocess under PYTHONHASHSEED=seed and return {id: hashes}. Runs without -I (which would
+    ignore the variable) but with -s, and with an environment holding nothing but the seed (and
+    FFG_WORLD_LOCK_HELD=1: the parent holds the world-compile lock)."""
+    cmd = hash_cmd(ids, src_file, placeholders, region, src_dir)
     out = subprocess.run(cmd, env={"PYTHONHASHSEED": seed, "FFG_WORLD_LOCK_HELD": "1"}, cwd=ROOT,
                          capture_output=True, text=True)
     if out.returncode:
@@ -1447,6 +1459,9 @@ def build(ids: list[str] | None = None, region: str | None = None, src_dir: Path
                 c, kit = compile_source(src)
                 path = write(src, c, out_dir, kit=kit)
                 what = ""
+        if is_world(src):           # TS-D: write() checked it (guard_closure); the gate's record
+            print(f"{c.id}: compiler closure {len(R.loaded_closure())} files, all in the pre-compile closure "
+                  f"({len(R.compiler_closure())})")
         placeholder = sorted(set(K.PART_NAMES) - kit.approved)
         shown = path.relative_to(ROOT) if path.resolve().is_relative_to(ROOT) else path
         print(f"{c.id}: {what}{c.width}x{c.height} -> {shown} "
@@ -1567,6 +1582,8 @@ def selftest() -> None:
     from terrain import region_chunk_selftest, region_selftest  # noqa: PLC0415  (region yaml, multi-rect, ...)
     ok += region_selftest.selftest()
     ok += region_chunk_selftest.selftest()       # NW-4: the chunk-digest `--region` (digests, a neighbour, refusals)
+    import det_changed_selftest  # noqa: PLC0415  (TS-D: --check-determinism --changed, its fallbacks, the closure)
+    ok += det_changed_selftest.selftest()
     print(f"build_map selftest: {ok} checks passed")
 
 
@@ -1594,24 +1611,42 @@ def main(args: list[str]) -> None:
         selftest()
     elif args and args[0] == "--hash":                  # internal: used by the determinism checks
         rest = args[1:]
-        src_file = None
-        if "--src" in rest:
-            i = rest.index("--src")
-            src_file = rest[i + 1]
-            del rest[i:i + 2]
+        pre = R.snapshot_closure()
+        src_file, rects_file, chunks_file = _take(rest, "--src"), _take(rest, "--rects"), _take(rest, "--per-chunk")
         placeholders = "--placeholders" in rest
         ids = [a for a in rest if not a.startswith("--")]
         srcs = ({(s := json.loads(Path(src_file).read_text()))["id"]: s} if src_file else
                 {mid: yaml.safe_load(((src_dir or SRC) / f"{mid}.yaml").read_text()) for mid in ids or source_ids(src_dir)})
-        print(json.dumps({mid: hashes(compile_source(s, placeholders, region if region and R.regions_of(s) else None)[0])
-                          for mid, s in srcs.items()}))
+        out = {}
+        for mid, s in srcs.items():
+            if rects_file:                      # TS-D: explicit rects (each painted with its ring, as --region)
+                kit = load_map_kit(s, placeholders)
+                c = compile_map(s, kit, check_interiors=not placeholders,
+                                raster=[tuple(r) for r in json.loads(Path(rects_file).read_text())])
+            else:
+                c = compile_source(s, placeholders, region if region and R.regions_of(s) else None)[0]
+            out[mid] = hashes(c)
+            if chunks_file:
+                import det_changed as DC  # noqa: PLC0415
+                out[mid]["chunks"] = DC.chunk_hashes(c, json.loads(Path(chunks_file).read_text()), T, CHUNK)
+            del c
+        post = R.record_closure()
+        if "--closure" in rest:
+            out["_closure"] = {"pre": pre, "post": post}
+        print(json.dumps(out))
     elif args and args[0] == "--check-determinism":
-        ids = args[1:] or source_ids(src_dir)
+        changed, full, serial = "--changed" in args, "--full" in args, "--serial" in args
+        base = _take(args, "--base")
+        ids = [a for a in args[1:] if not a.startswith("--")] or source_ids(src_dir)
         world = any(is_world(yaml.safe_load(((src_dir or SRC) / f"{i}.yaml").read_text())) for i in ids)
         with R.world_lock() if world else contextlib.nullcontext():
-            ok = check_determinism(ids, region=region, src_dir=src_dir)
+            if changed:
+                import det_changed as DC  # noqa: PLC0415
+                ok = all([DC.check_changed(sys.modules[__name__], i, base, full, serial, src_dir).ok for i in ids])
+            else:
+                ok = check_determinism(ids, region=region, src_dir=src_dir)
         if not ok:
-            raise SystemExit("map error: compiled output depends on PYTHONHASHSEED")
+            raise SystemExit("map error: compiled output depends on PYTHONHASHSEED (or the chunk files are stale)")
     elif args and args[0] == "--preview":
         rest = list(args[1:])
         scale = 1.0
@@ -1630,6 +1665,7 @@ def main(args: list[str]) -> None:
     elif flags:
         raise SystemExit(f"unknown option(s) {sorted(flags)}; see the module docstring")
     else:
+        R.snapshot_closure()                            # TS-D: the pre-compile closure write() checks against
         build(args or None, region, src_dir, out_dir)
 
 
