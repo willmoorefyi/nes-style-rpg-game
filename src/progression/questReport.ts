@@ -50,10 +50,15 @@ export interface VerifyArgs {
   resetSamples?: number;
   /** TS-P `--jobs N`: the mutate pool's workers (1: in-process, the serial reference; default questMutatePool's). */
   jobs?: number;
+  /** TS-C `--cache use|refresh|off` (default QUEST_MUTATE_CACHE, else use). */
+  cache?: 'use' | 'refresh' | 'off';
+  /** TS-C `--audit N|all`: heavy jobs a cache hit re-runs live (default QUEST_MUTATE_AUDIT, else 1). */
+  audit?: number | 'all';
 }
 
 /** `[--strict] [--mutate] [--stage S11] [--json FILE] [--only abc] [--root DIR] [--maps DIR] [--anchors FILE]
- *  [--worst-canoe] [--from-reset] [--reset-samples N] [--jobs N]`. Throws on a bad argument. */
+ *  [--worst-canoe] [--from-reset] [--reset-samples N] [--jobs N] [--cache use|refresh|off] [--audit N|all]`.
+ *  Throws on a bad argument. */
 export function parseArgs(argv: readonly string[]): VerifyArgs {
   const out: VerifyArgs = { strict: false, mutate: false, worstCanoe: false, fromReset: false };
   for (let i = 0; i < argv.length; i++) {
@@ -74,6 +79,15 @@ export function parseArgs(argv: readonly string[]): VerifyArgs {
     else if (a === '--from-reset') out.fromReset = true;
     else if (a === '--reset-samples') out.resetSamples = Number(value());
     else if (a === '--jobs') out.jobs = Number(value());
+    else if (a === '--cache') {
+      const v = value();
+      if (v !== 'use' && v !== 'refresh' && v !== 'off') throw new Error(`--cache: expected use, refresh or off, got ${v}`);
+      out.cache = v;
+    } else if (a === '--audit') {
+      const v = value();
+      out.audit = v === 'all' ? 'all' : Number(v);
+      if (out.audit !== 'all' && !(Number.isInteger(out.audit) && out.audit >= 0)) throw new Error(`--audit: expected a count or all, got ${v}`);
+    }
     else if (a === '--only') {
       const letters = value();
       const bad = [...letters].filter((c) => !(ALL_PROOFS as readonly string[]).includes(c));

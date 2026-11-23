@@ -111,9 +111,9 @@ export function runtimeVersions(from: string = process.cwd()): Record<string, st
 }
 
 /** The verifier's entry points: the pool worker (the suite, the checks, the loaders), the pool and lock (through the
- *  suite), the report and the late and reset proofs. Their closure is the fingerprint's `code`. */
+ *  suite), the cache, the report and the late and reset proofs. Their closure is the fingerprint's `code`. */
 export const VERIFIER_ENTRIES: readonly string[] = [
-  'src/progression/questMutateWorker.ts', 'src/progression/questReport.ts',
+  'src/progression/questMutateWorker.ts', 'src/progression/questMutateCache.ts', 'src/progression/questReport.ts',
   'src/progression/questReset.ts', 'src/progression/questProofsLate.ts',
 ];
 

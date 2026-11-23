@@ -4,7 +4,8 @@
  *   npm run quest -- [--strict] [--mutate] [--stage S11] [--json /tmp/<agent>/quest.json] [--only abc] [--root DIR]
  *     [--maps DIR] [--anchors FILE] [--worst-canoe]   (NW-1: a scratch world compile, its anchors, proof (h)'s worst run)
  *     [--from-reset] [--reset-samples N]   (NW-5: proof (c) again from every stage's save-reset state, docs/NATURAL_WORLD_PLAN.md 5.3)
- *     [--jobs N]   (TS-P: the mutation suite's pool, docs/TEST_SPEED_PLAN.md 5; 1 = in-process, the serial reference)
+ *     [--jobs N] [--cache use|refresh|off] [--audit N|all]   (TS: the mutation suite's pool, 1 = in-process, the serial
+ *       reference; its cache in the git common dir, docs/TEST_SPEED_PLAN.md 4, 5)
  *
  * Proofs (a)-(c) are W1-H's (src/progression/questProofs.ts). Proofs (d)-(h) come from W1-I's questProofsLate.ts,
  * loaded from the root when present. `--mutate` runs the mutation suite (both variants, questMutateSuite.ts: planned,
@@ -22,7 +23,7 @@ import {
   buildReport, CORE_PROOFS, formatReport, isLateProofModule, LATE_PROOFS, missingProof, mutateLine, parseArgs,
   runCoreProofs,
 } from '../src/progression/questReport.js';
-import { runMutationSuite } from '../src/progression/questMutateSuite.js';
+import { mutationSuite } from '../src/progression/questMutateCache.js';
 import type { MutationResult, ProofId, ProofResult } from '../src/progression/questTypes.js';
 
 async function loadModule(root: string, name: string): Promise<unknown> {
@@ -50,12 +51,13 @@ async function main(): Promise<number> {
   let mutations: MutationResult[] | undefined;
   let poolLine: string | undefined;
   if (args.mutate) {
-    const suite = await runMutationSuite({
+    const suite = await mutationSuite({
       kind: 'repo', root, mapsDir: args.maps ? resolve(args.maps) : undefined,
       anchors: args.anchors ? resolve(args.anchors) : undefined, worstCanoe: args.worstCanoe, stage: args.stage,
-    }, { jobs: args.jobs });
+    }, { jobs: args.jobs, cache: args.cache, audit: args.audit, by: 'cli' });
     mutations = args.strict ? suite.strict : suite.plain;
-    poolLine = mutateLine(suite.jobs, suite.workers, suite.wallS);
+    const cache = suite.source === 'off' ? 'off' : `${suite.source === 'hit' ? 'hit' : suite.stored ? 'stored' : 'miss'} ${suite.fp12}`;
+    poolLine = mutateLine(suite.jobs, suite.workers, suite.wallS, cache);
     const jobLog = process.env.QUEST_MUTATE_JOB_LOG;      // G1: every job's wall time and peak heap
     if (jobLog) writeFileSync(jobLog, `${JSON.stringify(suite.jobLog, null, 2)}\n`);
   }

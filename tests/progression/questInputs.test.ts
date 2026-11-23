@@ -123,9 +123,9 @@ describe('code: the bundle closure', async () => {
       'src/core/schemaValidation.ts', 'src/entities/ExperienceTable.ts',
       // WR (docs/TEST_SPEED_PLAN.md 11): the wrapped world's step and the verifier's wrap
       'src/systems/worldWrap.ts', 'src/progression/questWrap.ts',
-      // TS-P: the pool, its lock and worker
+      // TS-P / TS-C: the pool, its lock and worker, the cache (the salt's file)
       'src/progression/questMutatePool.ts', 'src/progression/questMutateLock.ts', 'src/progression/questMutateWorker.ts',
-    ]) expect(paths).toContain(p);
+      'src/progression/questMutateCache.ts']) expect(paths).toContain(p);
     expect(paths.every((p) => p.startsWith('src/'))).toBe(true);
   });
 
