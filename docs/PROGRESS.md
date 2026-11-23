@@ -293,6 +293,22 @@ north to south and east to west". Plan and result `docs/WORLD_WRAP_PLAN.md`.
 - **Balance:** every stage from S14 on gains up to +0.38 levels (the wrapped witnesses' routes); by the user's ruling
   S21's band is [25, 29] (L29.2) and the plan's fallback seam zones are not used. `quest --strict` OK.
 
+
+## TS: test and gate speed-ups (2026-11-23)
+
+The user's request (2026-11-22): reuse the mutation result, run the mutation suite on several cores, check
+determinism only on what changed, leave the heavy proofs to the integrator once per merge batch. Plan and result
+`docs/TEST_SPEED_PLAN.md`.
+- **Mutation cache** (`questMutateCache.ts`): raw check outputs keyed by a fingerprint of every input the verifier
+  reads (`questInputs.ts`), its code closure, options and runtime, in the git common dir; a hit re-derives and audits
+  live. `test:full` on a hit: 224 s (was 72-79 min).
+- **Pool** (`questMutatePool.ts`, `questMutateSuite.ts`): `npm run quest -- --strict --mutate` 1,002-1,080 s at 6
+  workers (was 4,620 s), output identical to the serial run.
+- **Changed-chunk determinism** (`det_changed.py`): 65 s for a small world edit (the full check 400 s); the compiler
+  digest now covers the recorded module closure and the runtime versions.
+- **Process**: agents run build, test:fast, their tests and `quest --strict`; the integrator runs `--mutate`,
+  `--from-reset` and `test:full` once per batch on an integration branch (AGENTS.md "Who runs what").
+
 ---
 
 ## Current Metrics

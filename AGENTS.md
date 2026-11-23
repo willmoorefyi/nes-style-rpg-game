@@ -10,13 +10,13 @@ This document provides concrete instructions for AI agents working on this codeb
 npm install          # Install dependencies
 npm run dev          # Dev server at http://localhost:5173
 npm run build        # TypeScript check + production build (tsc && vite build)
-npm run test:fast    # Every test but the heavy tier: 403 files, 9680 tests, about 3 min (172 s at NW2-INT; 128 s at TST) with 2 workers (the agent's handoff check)
-npm run test:full    # Everything, both tiers: 369 files, 9197 tests, about 30 min (1772 s; before TST 58 min, 3507 s) with 2 workers (the integrator's check)
-npm run test:world   # The heavy tier alone (tests/tiers.ts): the real-world mutation suite, about 28 min (1673 s: the plain run 1637 s, the --strict run 36 s)
+npm run test:fast    # Every test but the heavy tier: 425 files, 10,201 tests, about 70 s at TS with the default workers (172 s at NW2-INT with 2) (the agent's handoff check)
+npm run test:full    # Everything, both tiers: with a mutation-cache hit about 4 min (224 s at TS, 2 workers); on a miss about 23 min (the suite runs live in its pool) (the integrator's check, once per merge batch)
+npm run test:world   # The heavy tier alone (tests/tiers.ts): the real-world mutation suite through its cache (hit: the live audit, about 3 min; miss: the pool, 4 workers) and questGraph
 npm test             # = test:full (unchanged meaning: all tests)
 ```
 
-**Always run `npm run build` and `npm run test:fast` after making changes**, plus the tests of what you touched; both must pass clean before any work is considered complete. Run `npm run quest -- --strict --mutate` (in the background) only when you change world or quest data (maps, layouts, `quest.yaml`, the progression code). The integrator runs `npm run test:full` once per merge batch. Times: measured at TST on this machine (14 cores) with `--maxWorkers=2`, see "Test tiers" under Testing.
+**Always run `npm run build` and `npm run test:fast` after making changes**, plus the tests of what you touched; both must pass clean before any work is considered complete. After a change to world or quest data (maps, layouts, `quest.yaml`), `src/progression/**` or the field rules, run `npm run quest -- --strict` (every proof, about 2 min). `--mutate`, `--from-reset`, `npm run test:full` and the full determinism check are the integrator's, once per merge batch (TS, `docs/TEST_SPEED_PLAN.md` 7.1); an agent may run `npm run quest -- --strict --mutate` (parallel, about 16 min) when it edits a gate-table row or `nonLoadBearing`, and its result lands in the shared mutation cache. Times: measured at TST on this machine (14 cores) with `--maxWorkers=2`, see "Test tiers" under Testing.
 
 ---
 
@@ -215,13 +215,13 @@ Two vitest projects (`vitest.workspace.ts`) built from one list, `tests/tiers.ts
 | Tier | Command | What | Time (2 workers, at TST) |
 |------|---------|------|------|
 | fast | `npm run test:fast` | every test file not listed in `HEAVY_TESTS` | 2 min (128 s) (368 files) |
-| world | `npm run test:world` | the files in `HEAVY_TESTS`: `tests/progression/questMutateWorld.test.ts` and, since NW-5 (the 256x256 world's 1.29 M-state graph, 170 s at collect), `questGraph.test.ts`; forks with an 8 GB heap | 28 min (1673 s: the plain run 1637 s, the --strict run 36 s) |
-| full | `npm run test:full` = `npm test` = `vitest run` | both | 30 min (1772 s; before TST 58 min, 3507 s) |
+| world | `npm run test:world` | the files in `HEAVY_TESTS`: `tests/progression/questMutateWorld.test.ts` (through the mutation cache since TS) and, since NW-5 (the 256x256 world's 1.29 M-state graph, 170 s at collect), `questGraph.test.ts`; forks with an 8 GB heap | TS: a cache hit about 4 min (questMutateWorld's audit 118-134 s, questGraph about 100 s); a miss about 23 min (the live suite 1272-1317 s on 4 workers) |
+| full | `npm run test:full` = `npm test` = `vitest run` | both | TS: a hit 224 s, a miss about 23 min (before TS 72-79 min) |
 
-- **Who runs what.** An agent runs `npm run build`, `npm run test:fast` and the tests of what it touched (`npx vitest run <paths>`) before a handoff, and `npm run quest -- --strict --mutate` only when it changes world or quest data. The integrator runs `npm run test:full` once per merge batch. Pass `-- --maxWorkers=2 --minWorkers=1` when other heavy processes share the machine.
+- **Who runs what (TS, `docs/TEST_SPEED_PLAN.md` 7.1).** An agent runs `npm run build`, `npm run test:fast` and the tests of what it touched (`npx vitest run <paths>`) before a handoff; after a change to world or quest data, `src/progression/**` or the field rules also `npm run quest -- --strict` (and for `--stage` work the stage gate); after a world change `world.py`, the compile, `build_map.py --check-determinism --changed overworld` and `mode7_atlas.py --check-determinism overworld`. Not `--mutate`, `--from-reset`, `test:full` or the full determinism check (an agent may run `--mutate` when it edits a gate-table row or `nonLoadBearing`). **The integrator, once per merge batch** (every merge into `mainline` is a batch, a single branch or a hotfix too), on an integration branch `int-<batch>` cut from `mainline`: (1) merge the branches, re-run `world.py` and the layouts, full-compile the world if it changed; (2) `build_map.py --check-determinism --changed --base <batch base> overworld` (it falls back to the full check by itself) and `mode7_atlas.py --check-determinism overworld`, `git diff --exit-code assets assets-src/maps`; (3) `npm run build`, `npm run test:fast`; (4) `npm run quest -- --strict --mutate --jobs 6` (fills the mutation cache) and `npm run quest -- --strict --only c --from-reset`, one after the other (both at once only on an idle machine); (5) `npm run test:full` (never skipped: a hit on step 4's entry, about 10 min; on a miss it runs the suite live); (6) fast-forward `mainline` to `int-<batch>` and record the figures. When a step fails, find the branch from the failure's row, element, map and stage, drop it from the batch (recreate `int-<batch>` without it), send it back and re-run; `mainline` never holds a failing batch. Pass `-- --maxWorkers=2 --minWorkers=1` when other heavy processes share the machine.
 - **Why one file is heavy.** Before TST, a full run took 58 min (3507 s with 2 workers), and one file was 57 of them: `questMutate.test.ts` ran the real-world mutation suite (`quest --mutate`) twice, plain at collect time and `--strict` in a test, about 28 min each (69 s of gate-table rows, the rest the generic elements, each re-proving (a), (b) for every stage, (c) and (e) on the 192x192 world). Every other file is small: the next slowest are `questGraph.test.ts` 35 s (the real world's (a)-(c)), `questLate.test.ts` 10 s, `questCurve.test.ts` 8 s, then nothing over 6 s; the region walks (`tests/quest/**`) take 1-4 s each and the balance suites (`chaos.test.ts`, 400 seeds per policy, included) under 1 s each. So the whole-world proofs, the region walks and the balance bounds all stay in the fast tier.
-- **What changed.** The mini-world half of the mutation tests stays in `questMutate.test.ts` (fast); the real-world half moved to `questMutateWorld.test.ts` (world). There the `--strict` run reuses the plain run's mutated checks: `Baseline.freshFor` (`questMutateCheck.ts`) caches each element's mutated proof results by base world, late data, stage, state cap, element and check (exact: a mutated context is never strict and is built only from those), while each run's own baseline still decides what is fresh. No assertion, bound or seed count changed.
-- **The guard.** `tests/timingReporter.ts` (a reporter in `vite.config.ts`) counts each file's collect + setup + run time (vitest's JSON reporter leaves out collect, where top-level `describe` work runs) and fails the run when a `fast` file is over `FAST_FILE_BUDGET_S` (90 s; `TEST_FILE_BUDGET_S=<s>` overrides, `0` turns it off). A new heavy file must be listed in `HEAVY_TESTS` with its reason; `tests/tiers.test.ts` checks the listed files exist. `TEST_TIMINGS=/tmp/<agent>/t.json` writes every file's timings, slowest first.
+- **What changed.** The mini-world half of the mutation tests stays in `questMutate.test.ts` (fast); the real-world half moved to `questMutateWorld.test.ts` (world). The `--strict` variant reuses the plain variant's mutated checks inside one run (a mutated context is never strict and is built only from the base world, late data, stage and state cap), and since TS also across runs: the **mutation cache** (`questMutateCache.ts`, `<git common dir>/ff-cache/quest-mutate/<fp>.json`, shared by every worktree) keys the raw check outputs by a fingerprint of every file the verifier reads (recorded where read, `questInputs.ts`), its esbuild code closure, the options, Node / yaml / esbuild and a salt. A hit re-derives both variants from the cached raw runs with the current code, checks them against the stored results, and re-runs every light job plus one heavy job picked by the fingerprint live (`QUEST_MUTATE_AUDIT=<n>|all`); a miss runs the suite live and stores it. The raw runs are computed by a pool of `worker_threads` (`questMutatePool.ts`; 4 workers inside vitest, `QUEST_MUTATE_JOBS`), the derivation stays serial (`questMutateSuite.ts`: plan, compute, derive). `QUEST_MUTATE_CACHE=refresh` forces a live run that overwrites, `off` neither reads nor writes. No assertion, bound or seed count changed.
+- **The guard.** `tests/timingReporter.ts` (a reporter in `vite.config.ts`) counts each file's collect + setup + run time (vitest's JSON reporter leaves out collect, where top-level `describe` work runs) and fails the run when a `fast` file is over `FAST_FILE_BUDGET_S` (90 s; `TEST_FILE_BUDGET_S=<s>` overrides, `0` turns it off). A new heavy file must be listed in `HEAVY_TESTS` with its reason; `tests/tiers.test.ts` checks the listed files exist. `TEST_TIMINGS=/tmp/<agent>/t.json` writes every file's timings, slowest first, with the tasks' `meta`. The 90 s budget is the fast tier's only (a world-tier budget would fail every honest cache miss); a run that includes `questMutateWorld.test.ts` prints `questMutateWorld: cache hit <fp12> (audit S s)` or `questMutateWorld: cache MISS <fp12> (live run S s on W workers)`, so a miss is visible, never a failure.
 - **Pools.** The default `threads` pool with isolation is kept, and no script forces a worker count. `--no-isolate` was measured on the fast tier: 98 s instead of 128 s, but 15 tests in 6 files fail on state shared between files, so it is not used.
 
 ### Running Tests
@@ -296,7 +296,7 @@ python3 -I assets-src/tools/build_map.py overworld        # compile (validates; 
 python3 -I assets-src/tools/build_map.py --preview overworld 20 30 40 45 /tmp/crop.png --grid --collision
 ```
 
-Re-running every layout script must leave `git diff --exit-code assets-src/maps` clean (the scripts are deterministic), and `build_map.py --check-determinism` must pass.
+Re-running every layout script must leave `git diff --exit-code assets-src/maps` clean (the scripts are deterministic), and `build_map.py --check-determinism --changed overworld` must pass (TS-D, `det_changed.py`: only the chunks whose digest differs from the base commit's, `git merge-base HEAD mainline` or `--base REV`, under both seeds at once, plus the working-tree files of those chunks and every other chunk file byte-equal to the base's; it falls back to the full check by itself on a compiler-closure, kit-art, runtime or size change or 120+ painted chunks, and `--full` forces it; `--serial` runs the two seeds in turn). A map without chunk digests takes the plain `--check-determinism <id>`.
 
 ### The world (pass NW)
 
@@ -401,10 +401,15 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   (palette-indexed PNGs, `build_map.save_chunk`: 38.8 MB at AR-T2, 43.9 MB of RGB before), the patch overlays and
   the Mode 7 atlas (`mode7.png` 3072x3072 at 12 px per cell, `mode7_low.png` 2048x2048 at 8 since WR, a power of two; the runtime and the dev pilot read `cellPx` from `mode7.json`).
   A map over 192x192 cells is painted in bands of 64 rows (`build_map.BAND_*`, byte-equal by chunk locality). Gates:
-  `build_map.py --check-determinism overworld`, `mode7_atlas.py --check-determinism overworld`, and re-running
+  `build_map.py --check-determinism --changed overworld` (TS-D; the full `--check-determinism overworld`, about 7 min
+  and 13 GB, is the fallback and the integrator's `--full`), `mode7_atlas.py --check-determinism overworld`, and re-running
   `world.py` leaves `git diff --exit-code assets-src/maps` clean. A source with rasters compiles in **chunk-digest
   mode** (`terrain/region_chunks.py`): `build.chunks` per chunk; `--region r` repaints r's raster plus every chunk
-  whose digest differs from the base's (at most `PAINT_LIMIT` 160 painted chunks, ring included).
+  whose digest differs from the base's (at most `PAINT_LIMIT` 160 painted chunks, ring included). The compiled map's
+  `build` also holds `runtime` (Python, Pillow, numpy) and `compiler`, the digest of the **compiler closure**
+  (`terrain/closure.py`: every module under `assets-src/` a compile loads, with the lazily imported ones of
+  `LAZY_IMPORTS`; a compile that loads a module outside the pre-compile closure fails, so add it there), the runtime
+  and the kit art.
 - **Terrain painting (AR-T2).** `tools/terrain/` paints the organic ground from the AR sheet (`kit.AR_SHEET`;
   `ecotone.tex_name` prefers `ar_<m>`, then the kit's own, then a fallback such as `beach` -> sand, so placeholder
   kits still compile). The partition is unchanged except the clamped cell core, now a disc of `CORE_R` 9 px
@@ -463,7 +468,11 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `tests/balance/questCurve.test.ts` replays its `segments` with seeded battles (each boss in its band, Chaos's door
   in [38, 41], wipes per stage).
 - **Commands.** `npm run quest` (assume mode), `npm run quest -- --strict` (every proof), `--mutate` (the mutation
-  suite: run it in the background, and only when world or quest data changed; its test,
+  suite: the integrator's, once per batch; parallel, `--jobs N` (default min(6, cores - 2); `--jobs 1` is the serial
+  in-process reference), about 16 min at 6 workers and 11.6 GB; it reads and writes the mutation cache, `--cache
+  use|refresh|off`, `--audit N|all`, and prints `mutate: N jobs on W workers, wall S s, cache <hit|stored|miss>
+  <fp12>`; one pool per machine (`/tmp/ff-game-quest-mutate.lock`); `QUEST_MUTATE_JOB_LOG=FILE` writes each job's
+  wall time and peak heap; agents may run it when they edit a gate row or `nonLoadBearing`; its test,
   `tests/progression/questMutateWorld.test.ts`, is the heavy tier), `--from-reset`, `--stage S11` (from the stage's
   `entry`, with its ancestors' grants), `--only abc`, `--json FILE`, `--maps DIR` (a scratch compile's maps first),
   `--anchors FILE`, `--worst-canoe` (rows T0-T4 again with the canoe). The search stops at `MAX_STATES` = 3,000,000
