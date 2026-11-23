@@ -79,7 +79,8 @@ describe('DebugScenarioLoader field mode', () => {
 
   it('every field scenario in debug-scenarios.yaml spawns on a walkable tile', () => {
     const scenarios = parse(readFileSync(resolve(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as DebugScenario[];
-    const fields = scenarios.filter((s) => s.mode === 'field');
+    // WR: the wr_* seam scenarios start on the ship or in flight over open sea (docs/WORLD_WRAP_PLAN.md 6.3)
+    const fields = scenarios.filter((s) => s.mode === 'field' && !(s.id.startsWith('wr_') && s.fieldMode && s.fieldMode !== 'walking'));
     const compiled = parse(readFileSync(resolve(root, 'assets/maps/ai/index.yaml'), 'utf-8')) as string[];
     expect(fields.length).toBeGreaterThan(0);
     for (const s of fields) {
@@ -149,7 +150,7 @@ describe('DebugScenarioLoader field mode', () => {
       // pass W's w_* stage starts (and pass CD's cd_* Cardia starts, AV's av_* airship previews) hold later story flags
       // (WORLD 6.5): any known flag
       for (const f of s.flags ?? []) {
-        if (s.id.startsWith('w_') || s.id.startsWith('m7_') || s.id.startsWith('cd_') || s.id.startsWith('av_')) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
+        if (['w_', 'm7_', 'cd_', 'av_', 'wr_'].some((p) => s.id.startsWith(p))) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
         else expect(known, `${s.id} flag ${f}`).toContain(f);
       }
       // pass F's f_* scenarios also start members stoned and afraid

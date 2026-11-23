@@ -19,7 +19,8 @@ import { TILE_SIZE } from '../../../core/LayoutConstants.js';
 import { getSettings } from '../../../core/Settings.js';
 import { canLand } from '../../../systems/fieldRules.js';
 import { AIRSHIP_LIFT, TAKEOFF_MS, nativeScale } from '../vehicleLayout.js';
-import { cellToScreen, screenToCell, type ViewParams } from './mode7Math.js';
+import { cellMarker, cellToScreen, screenToCell, type ViewParams } from './mode7Math.js';
+import { canonCell } from '../../../systems/worldWrap.js';
 import { FLIGHT_VIEW, SHIP_FOOT_Y, TILT_HOLDOFF_FRAMES, TILT_MS, TiltMachine, tiltParams,
   type TiltStart } from './mode7Tilt.js';
 import { capsOf, flightMayCome, mode7Enabled, slowThisSession, type Mode7Caps, type Mode7Profile } from './mode7Toggle.js';
@@ -203,7 +204,7 @@ export class FlightView {
     // the drawn shadow starts on the cell's bottom edge, as the top-down one; the check reads P itself
     const shadow = tilt ? cellToScreen(view, view.px, view.py + tilt.shadowSouth) ?? atP : atP;
     const seen = screenToCell(view, atP.x, atP.y);
-    const cell = seen ? { x: Math.floor(seen.x), y: Math.floor(seen.y) } : null;
+    const cell = seen ? canonCell(map, Math.floor(seen.x), Math.floor(seen.y)) : null;   // WR: canonical
     const idle = !player.isMoving;
     if (idle && cell && (cell.x !== player.gridX || cell.y !== player.gridY) && !this.mismatchLogged) {
       this.mismatchLogged = true;
@@ -212,9 +213,7 @@ export class FlightView {
     const here = { x: player.gridX, y: player.gridY };
     const landable = idle && !m.busy && canLand(map, here, this.deps.vehicles.fieldState('airship'))
       && !map.npcs.some((n) => n.x === here.x && n.y === here.y);
-    const corner = (x: number, y: number) => { const p = cellToScreen(view, x, y); return { x: p?.x ?? 0, y: p?.y ?? 0 }; };
-    const marker = landable ? [corner(here.x, here.y), corner(here.x + 1, here.y), corner(here.x + 1, here.y + 1),
-      corner(here.x, here.y + 1)] : null;
+    const marker = landable ? cellMarker(view, here) : null;
     Object.assign(this.report, { shadowCell: cell, marker: !!marker, t: m.t });
     const now = performance.now();
     const chunks = chunkHost(this.deps.tilemap());

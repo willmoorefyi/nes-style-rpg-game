@@ -220,3 +220,42 @@ describe('fieldRules: gates, transitions and encounters on synthetic maps', () =
     expect(fieldStep(map, { x: 1, y: 0 }, { x: 0, y: 0 }, state([], [], 'airship'))).toEqual({ ok: true, mode: 'airship', setFlags: [] });
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 4, 10): a wrapped map steps across both seams; a flat one refuses them
+describe('fieldRules: the wrap', () => {
+  const W = TerrainType.Water;
+  const G = TerrainType.Grass;
+  // 4x3: a water ring with grass at (1, 1) and (2, 1)
+  const cells = [W, W, W, W, W, G, G, W, W, W, W, W];
+  const torus = createMapData({ width: 4, height: 3, collision: cells, wrap: true });
+  const flat = createMapData({ width: 4, height: 3, collision: cells });
+  const ship = state([], [], 'ship');
+
+  it('fieldStep (3, y) to (0, y) and (x, 0) to (x, 2) is OK wrapped and refused flat', () => {
+    expect(fieldStep(torus, { x: 3, y: 0 }, { x: 0, y: 0 }, ship).ok).toBe(true);
+    expect(fieldStep(torus, { x: 1, y: 0 }, { x: 1, y: 2 }, ship).ok).toBe(true);
+    expect(fieldStep(flat, { x: 3, y: 0 }, { x: 0, y: 0 }, ship).ok).toBe(false);
+    expect(fieldStep(flat, { x: 1, y: 0 }, { x: 1, y: 2 }, ship).ok).toBe(false);
+  });
+
+  it('fieldStep with a non-canonical target is accepted wrapped, refused flat', () => {
+    expect(fieldStep(torus, { x: 3, y: 0 }, { x: 4, y: 0 }, ship)).toEqual({ ok: true, mode: 'ship', setFlags: [] });
+    expect(fieldStep(torus, { x: 0, y: 0 }, { x: 0, y: -1 }, ship).ok).toBe(true);
+    expect(fieldStep(flat, { x: 3, y: 0 }, { x: 4, y: 0 }, ship).ok).toBe(false);
+    expect(fieldStep(torus, { x: 3, y: 0 }, { x: 5, y: 0 }, ship).ok).toBe(false);
+  });
+
+  it('canEnter on (-1, y) reads (W - 1, y) wrapped; the strict lookups stay strict', () => {
+    expect(canEnter(torus, { x: -1, y: 1 }, 'ship', ship)).toBe(true);
+    expect(canEnter(flat, { x: -1, y: 1 }, 'ship', ship)).toBe(false);
+    expect(patchedTerrain(torus, -1, 1, new Set())).toBe(TerrainType.Wall);
+  });
+
+  it('a walker never crosses: the grass stays its own component; a ship mode change across the seam is read canonically', () => {
+    const map = createMapData({ width: 4, height: 1, collision: [G, W, W, W], wrap: true,
+      docks: [{ id: 'd', x: 3, y: 0, basin: 'b' }] });
+    // the ship at (3, 0) disembarks onto the grass at (0, 0) across the seam (a dock on the canonical cell)
+    expect(fieldStep(map, { x: 3, y: 0 }, { x: 4, y: 0 }, ship)).toMatchObject({ ok: true, mode: 'walking' });
+    expect(fieldStep(map, { x: 0, y: 0 }, { x: -1, y: 0 }, state()).ok).toBe(false);
+  });
+});

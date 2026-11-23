@@ -11,7 +11,8 @@ import mode7_atlas as M7
 def run(B) -> int:
     kit = K.load_kit("town", placeholders_only=True)
     ok = 0
-    assert M7.cell_px(192) == (16, 8) and M7.cell_px(256) == (12, 6), "3072 // width and half that"
+    assert M7.cell_px(192) == (16, 8) and M7.cell_px(256) == (12, 8), \
+        "3072 // width, and 2048 // width for the POT low atlas"
     for bad in (200, 1000):
         try:
             M7.cell_px(bad)

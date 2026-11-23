@@ -107,7 +107,7 @@ describe('travelMatrix: the plan\'s rows (WORLD 6.2) and the repository', () => 
     const ctx = createQuestContext(loadQuestWorld());
     const r = proofTravel(ctx);
     expect(r.failures).toEqual([]);
-    expect(r.line).toMatch(/^\(h\) travel matrix: OK {2}\(12 rows, 2 basin rows; \d+ checked, \d+ pending\)$/);
+    expect(r.line).toMatch(/^\(h\) travel matrix: OK {2}\(12 rows, 2 basin rows; \d+ checked, \d+ pending(; WRAP OK)?\)$/);
     // INT-W2a: after the six region-overworld merges T0-T5, B1 and B2 are checked (not pending) and pass
     for (const id of ['T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'B1', 'B2']) {
       expect(travelRow(ctx, DEFAULT_TRAVEL_ROWS, DEFAULT_TRAVEL_ROWS.find((x) => x.id === id)!), id)

@@ -174,8 +174,9 @@ export function collapseRows(positions: Float32Array, from: number, to: number, 
   }
 }
 
-/** The map's size in cells: a near square's side on the map's edge is open (`rowFits`). */
-export interface MapCells { w: number; h: number }
+/** The map's size in cells: a near square's side on the map's edge is open (`rowFits`). A wrapped map (WR) has no
+ *  edge: no side is open and no row is off the map. */
+export interface MapCells { w: number; h: number; wrap?: boolean }
 
 /**
  * Whether row r hits the ground and its whole span lies inside the cell square [x0, x0 + cells) x [y0, y0 + cells).
@@ -193,6 +194,7 @@ export function rowFits(p: ViewParams, table: RowTable, r: number, x0: number, y
   const right = p.px + ((width - p.cx) * s) / p.f;
   const far = p.py + p.back - Math.max(table.d[r], table.d[r + 1]);
   const near = p.py + p.back - Math.min(table.d[r], table.d[r + 1]);
+  if (map?.wrap) return left >= x0 && right <= x0 + cells && far >= y0 && near <= y0 + cells;
   return (left >= x0 || (!!map && x0 <= 0)) && (right <= x0 + cells || (!!map && x0 + cells >= map.w))
     && (far >= y0 || (!!map && y0 <= 0)) && (near <= y0 + cells || (!!map && y0 + cells >= map.h));
 }
@@ -203,7 +205,7 @@ export function rowFits(p: ViewParams, table: RowTable, r: number, x0: number, y
 export function rowOffMap(p: ViewParams, table: RowTable, r: number, map: MapCells, width = SCREEN_W): boolean {
   const sTop = table.s[r];
   const sBot = table.s[r + 1];
-  if (Number.isNaN(sTop) || Number.isNaN(sBot)) return false;
+  if (map.wrap || Number.isNaN(sTop) || Number.isNaN(sBot)) return false;
   const s = Math.max(sTop, sBot);
   const north = p.py + p.back - Math.max(table.d[r], table.d[r + 1]);
   const south = p.py + p.back - Math.min(table.d[r], table.d[r + 1]);
@@ -223,4 +225,12 @@ export function nearSplit(p: ViewParams, table: RowTable, dist: number, x0: numb
     if (!rowFits(p, table, r, x0, y0, cells, width, map) && !(map && rowOffMap(p, table, r, map, width))) return r + 1;
   }
   return from;
+}
+
+/** The landing marker's four screen corners round cell `here` (top-left, top-right, bottom-right, bottom-left). */
+export function cellMarker(p: ViewParams, here: { x: number; y: number }): Array<{ x: number; y: number }> {
+  return [[0, 0], [1, 0], [1, 1], [0, 1]].map(([dx, dy]) => {
+    const c = cellToScreen(p, here.x + dx, here.y + dy);
+    return { x: c?.x ?? 0, y: c?.y ?? 0 };
+  });
 }

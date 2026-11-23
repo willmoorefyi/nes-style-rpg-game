@@ -10,6 +10,7 @@
  * flags, read items); they assume a walking step does not depend on where the vehicles are parked.
  */
 import { fieldStep } from '../systems/fieldRules.js';
+import { stepTo } from '../systems/worldWrap.js';
 import type { FieldMode, MapData, MapTransition, VehicleState, VehicleType } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
 import type { QuestWorld } from './questData.js';
@@ -117,8 +118,8 @@ export class PlaceIndex {
       comp.cells.push(c);
       comp.cellSet.add(c);
       for (const [dx, dy] of DIRS) {
-        const to = { x: from.x + dx, y: from.y + dy };
-        if (to.x < 0 || to.y < 0 || to.x >= w || to.y >= map.height) continue;
+        const to = stepTo(map, from, dx, dy); // WR: across the seam on a wrapped map
+        if (!to) continue;
         const r = fieldStep(map, from, to, fs);
         if (!r.ok) continue;
         const n = to.y * w + to.x;
@@ -170,11 +171,11 @@ export class PlaceIndex {
       if (inComp.has(n.y * w + n.x)) from = { x: n.x, y: n.y };
       for (const [dx, dy] of DIRS) {
         if (from) break;
-        const a = { x: n.x + dx, y: n.y + dy };
-        if (a.x < 0 || a.y < 0 || a.x >= w || a.y >= map.height) continue;
+        const a = stepTo(map, n, dx, dy);
+        if (!a) continue;
         if (inComp.has(a.y * w + a.x)) { from = a; break; }
-        const b = { x: n.x + 2 * dx, y: n.y + 2 * dy };
-        if (map.collision[a.y * w + a.x] === COUNTER && b.x >= 0 && b.y >= 0 && b.x < w && b.y < map.height
+        const b = stepTo(map, a, dx, dy);
+        if (map.collision[a.y * w + a.x] === COUNTER && b
           && inComp.has(b.y * w + b.x)) from = b;
       }
       if (from) comp.triggers.set(ev.id, from);

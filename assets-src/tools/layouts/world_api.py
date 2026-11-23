@@ -41,6 +41,16 @@ EXEMPT_CAP = 600                             # 0.1.1: the exemption list may hol
 LAND_TARGET = (26_000, 31_800)               # D-NW12: preset B's 28,874 land cells +- 10 %
 SPOT_KINDS = ("land", "dock", "landing")     # 5.2: a spot's kind (walkable, Water, a landing cell)
 
+# WR (docs/WORLD_WRAP_PLAN.md 2, D-WR-2): the world wraps (a torus, as FF1's); its seam stays open ocean. No non-Water
+# cell lies within SEAM_MARGIN cells of an edge (the `wrap` check; mirrored in src/systems/worldWrap.ts). SEA_CLASS
+# sorts the ship zones into the early and the late seas for the report-only `seam_zones` line (Q4 (b): no re-zone).
+SEAM_MARGIN = 4
+SEA_CLASS: dict[str, str] = {
+    **{z: "early" for z in ("a1_aldi", "a1_north_sea", "elf_aldi", "elf_sea", "ert_aldi", "ert_sea", "fir_aldi",
+                            "fir_sea")},
+    **{z: "late" for z in ("ord_sea", "wat_sea", "wnd_sea")},
+}
+
 # 3.8 `basins`: the two seas and their seeds (aldi: the cell below Cornelia's jetty, today (92, 121) + A1_DELTA)
 BASIN_SEEDS: dict[str, Cell] = {"aldi": (146, 165), "ocean": (2, 2)}
 CANAL_PATCH = "canal"                        # EARTH's patch (flag CANAL_OPEN), the only link between the basins

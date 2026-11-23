@@ -11,6 +11,10 @@
 import type { Container, Sprite } from 'pixi.js';
 import { TILE_SIZE } from '../../../core/LayoutConstants.js';
 import { SCREEN_H, SCREEN_W, cellToScreen, type ViewParams } from './mode7Math.js';
+import { wrapDelta } from '../../../systems/worldWrap.js';
+
+/** A wrapped map's size in cells (WR): a billboard's ground point goes to its image nearest P. */
+export interface PropWrap { w: number; h: number }
 
 /** Billboards farther than this from the ship's position P (cells, on the ground) are culled (5). */
 export const PROP_RANGE = 40;
@@ -93,10 +97,13 @@ export function fogAt(y: number, horizon: number, fog: Fog): number {
  * hazes like the ground it stands on.
  */
 export function placeProp(view: ViewParams, src: PropSource, horizon = -Infinity,
-  fog: Fog = { rows: 1, alpha: 0 }): PropPlacement | null {
-  const dist = Math.hypot(src.gx - view.px, src.gy - view.py);
+  fog: Fog = { rows: 1, alpha: 0 }, wrap: PropWrap | null = null): PropPlacement | null {
+  // WR: the image nearest P (PROP_RANGE < W / 2); the sprite keeps its offset from its own ground point
+  const gx = wrap ? view.px + wrapDelta(view.px, src.gx, wrap.w) : src.gx;
+  const gy = wrap ? view.py + wrapDelta(view.py, src.gy, wrap.h) : src.gy;
+  const dist = Math.hypot(gx - view.px, gy - view.py);
   if (dist > PROP_RANGE) return null;
-  const p = cellToScreen(view, src.gx, src.gy);
+  const p = cellToScreen(view, gx, gy);
   if (!p) return null;
   const m = p.scale / TILE_SIZE;
   const s = src.sprite;
@@ -112,10 +119,10 @@ export function placeProp(view: ViewParams, src: PropSource, horizon = -Infinity
 
 /** Every billboard placed this frame, far to near (the draw order; the container also sorts by `depth`). */
 export function placeProps(view: ViewParams, sources: readonly PropSource[], horizon = -Infinity,
-  fog?: Fog): Array<{ src: PropSource; at: PropPlacement }> {
+  fog?: Fog, wrap: PropWrap | null = null): Array<{ src: PropSource; at: PropPlacement }> {
   const out: Array<{ src: PropSource; at: PropPlacement }> = [];
   for (const src of sources) {
-    const at = placeProp(view, src, horizon, fog);
+    const at = placeProp(view, src, horizon, fog, wrap);
     if (at) out.push({ src, at });
   }
   return out.sort((a, b) => a.at.depth - b.at.depth);

@@ -269,6 +269,7 @@ ground: |
 camp: true
 terrain: organic
 sealed_edges: true
+wrap: true
 no_unreachable_walkable:
   reach_roots:
   - cornelia
@@ -1337,6 +1338,9 @@ spots:
   elf_s_port_ship:
     at: [134, 188]
     kind: dock
+  elf_s_seam_s:
+    at: [100, 253]
+    kind: dock
   ert_s_dwarf:
     at: [100, 121]
     kind: land
@@ -1382,6 +1386,9 @@ spots:
   fir_s_ice_shore:
     at: [206, 119]
     kind: land
+  fir_s_seam_e:
+    at: [253, 200]
+    kind: dock
   ord_s_citadel:
     at: [125, 59]
     kind: land
@@ -1415,6 +1422,9 @@ spots:
   wat_s_waterfall_airship:
     at: [85, 55]
     kind: landing
+  wat_s_seam_nw:
+    at: [3, 3]
+    kind: dock
   wnd_s_gaia:
     at: [210, 41]
     kind: land
@@ -1433,6 +1443,9 @@ spots:
   wnd_s_ship:
     at: [238, 92]
     kind: dock
+  wnd_s_seam_landing:
+    at: [249, 31]
+    kind: landing
 world:
   basins:
     aldi: [146, 165]

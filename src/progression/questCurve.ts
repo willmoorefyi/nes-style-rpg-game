@@ -25,6 +25,7 @@ import { route } from './questRoute.js';
 import type { QuestContext } from './questProofs.js';
 import { lateOf } from './questLateData.js';
 import { encounterAt, explorationTables, tableRewards } from './questExplore.js';
+import { noteSeam, type SeamNote } from './questWrap.js';
 
 export { encounterAt, tableRewards };
 
@@ -62,6 +63,8 @@ export interface CurveResult {
   xp: number;
   /** The walk event by event (questCurve.test.ts replays it with seeded battles). */
   segments: CurveSegment[];
+  /** WR (report only): per stage, the witness's seam crossings and late-sea cells on a wrapped world. */
+  seam: Map<string, SeamNote>;
 }
 
 /** Fractional level for a member's xp (L2.9 = level 2, 90 % of the way to 3). */
@@ -102,7 +105,7 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
   const { world } = ctx;
   const out: CurveResult = {
     points: new Map(), stageStartGold: new Map(), townFirstGold: new Map(), assumedGold: new Set(),
-    assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0, segments: [],
+    assumedTowns: new Set(), takeGold: [], fights: 0, gold: data.startGold, xp: 0, segments: [], seam: new Map(),
   };
   // `--stage` (assume mode): the party arrives at the stage's band low, as its `w_s<n>_start` scenario does
   const own = ctx.stage ? world.stages.get(ctx.stage)?.band : null;
@@ -162,8 +165,11 @@ export function curveOf(ctx: QuestContext, opts: { rush?: boolean } = {}): Curve
       const grind = opts.rush ? 1 : stage?.grind ?? 1;
       const tables = new Map<readonly EncounterEntry[], number>();
       const add = (t: readonly EncounterEntry[], n: number): void => { tables.set(t, (tables.get(t) ?? 0) + n); };
+      let prev: (typeof path)[number] | null = null;
       for (const c of path) {
         const map = world.maps.get(c.map);
+        if (map) noteSeam(out.seam, stage?.id ?? '-', map, prev, c);
+        prev = c;
         if (map && !opts.rush && !explored.has(c.map)) {
           explored.add(c.map);
           for (const [t, n] of explorationTables(map)) add(t, n);

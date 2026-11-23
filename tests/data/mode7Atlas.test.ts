@@ -33,8 +33,8 @@ describe('M7-1: the Mode 7 world atlas', () => {
     expect(meta.inputs).toBe(h.digest('hex'));
   });
 
-  it('mode7.json gives 12 px per cell on the 256-cell world and 6 px on the low atlas (NW-5, NATURAL_WORLD 6.1)', () => {
-    expect(meta).toEqual({ version: 1, cellPx: 12, size: world.width * 12, lowCellPx: 6, lowSize: world.width * 6,
+  it('mode7.json gives 12 px per cell on the 256-cell world and 8 px on the POT low atlas (NW-5; WR, WORLD_WRAP 7.1)', () => {
+    expect(meta).toEqual({ version: 1, cellPx: 12, size: world.width * 12, lowCellPx: 8, lowSize: world.width * 8,
       inputs: meta.inputs });
     expect(meta.size).toBe(world.width * meta.cellPx);
     expect(meta.lowSize).toBe(world.width * meta.lowCellPx);

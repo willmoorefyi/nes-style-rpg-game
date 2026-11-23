@@ -38,6 +38,8 @@ const FILES = [
   // pass NW (docs/NATURAL_WORLD_PLAN.md 3.2): the generator and the continent specs
   ...walk('assets-src/tools/worldgen', (n) => n.endsWith('.py')),
   ...walk(join(LAYOUTS, 'world_specs'), (n) => n.endsWith('.py')),
+  // WR (docs/WORLD_WRAP_PLAN.md 6.2): the compile check of the wrapped world's seam
+  'assets-src/tools/map_checks_wrap.py',
 ];
 
 describe('pass W file-size ceilings', () => {

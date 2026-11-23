@@ -106,6 +106,7 @@ def run(src: dict, c, seen: set[Cell]) -> list[str]:
         if lost:
             errors.append(f"edge_exits: walkable edge cells can't be reached from the first entrance: {_cells(lost)}")
 
+    errors += __import__("map_checks_wrap").source_errors(src)      # WR: `wrap` needs `sealed_edges`
     if src.get("sealed_edges"):
         open_edge = [p for p in edge_cells(c.width, c.height) if walkable(coll, *p)]
         if open_edge:

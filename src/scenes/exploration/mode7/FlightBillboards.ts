@@ -64,11 +64,14 @@ export class FlightBillboards {
   private ship: VehicleView | null = null;
   private art: VehicleArt | null = null;
   private readonly k = nativeScale(TILE_SIZE);
-  readonly props = new FlightProps(this.container);
+  readonly props: FlightProps;
   lastPick: ShipPick | null = null;
   private shadowKey = '';
 
-  constructor(private readonly loadSheet: () => Promise<[unknown, Texture]> = defaultLoad) {
+  /** `map`: the world's size and wrap (WR: a wrapped map's billboards draw at their image nearest P). */
+  constructor(private readonly loadSheet: () => Promise<[unknown, Texture]> = defaultLoad,
+    map: { w: number; h: number; wrap?: boolean } | null = null) {
+    this.props = new FlightProps(this.container, map?.wrap ? { w: map.w, h: map.h } : null);
     this.container.label = 'mode7:billboards';
     this.container.sortableChildren = true;
     this.container.addChild(this.marker, this.shadow);

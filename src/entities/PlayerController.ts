@@ -98,8 +98,10 @@ export class PlayerController {
       if (this.moveProgress >= 1) {
         // the time past the tile's end is carried into the next step, so a held direction loses no frame per tile
         this.carry = Math.min(0.5, this.moveProgress - 1);
-        this.tileX = this.targetX;
-        this.tileY = this.targetY;
+        // WR: the drawn target may be unwrapped (-1 or W); the tile normalises here, the sprite jumps by the period
+        const end = this.collisionMap.wrapCell(this.targetX, this.targetY) ?? { x: this.targetX, y: this.targetY };
+        this.tileX = this.targetX = end.x;
+        this.tileY = this.targetY = end.y;
         this.moveProgress = 0;
         this.state = 'idle';
         this.stepsTaken++;                       // the next tile steps with the other foot
@@ -134,11 +136,10 @@ export class PlayerController {
     if (dir) {
       this.animation.setDirection(dir);
       const { dx, dy } = DIRECTION_VECTORS[dir];
-      const newX = this.tileX + dx;
-      const newY = this.tileY + dy;
-      if (this.canMoveTo(newX, newY)) {
-        this.targetX = newX;
-        this.targetY = newY;
+      const next = this.collisionMap.wrapCell(this.tileX + dx, this.tileY + dy); // WR: canonical (null off a flat map)
+      if (next && this.canMoveTo(next.x, next.y)) {
+        this.targetX = this.tileX + dx;
+        this.targetY = this.tileY + dy;
         this.state = 'moving';
         // the step starts moving on this frame (plus the last tile's carry), never finishing here: the scene sees
         // every arrival on its own frame (fieldStep, encounters)
@@ -186,10 +187,12 @@ export class PlayerController {
   face(dir: Direction): void { this.animation.setDirection(dir); }
   get isMoving(): boolean { return this.state === 'moving'; }
   /** The tile being stepped onto (the current tile when idle). */
-  get targetTile(): { x: number; y: number } { return { x: this.targetX, y: this.targetY }; }
+  get targetTile(): { x: number; y: number } {
+    return this.collisionMap.wrapCell(this.targetX, this.targetY) ?? { x: this.targetX, y: this.targetY };
+  }
   get facingTile(): { x: number; y: number } {
     const { dx, dy } = DIRECTION_VECTORS[this.animation.direction];
-    return { x: this.tileX + dx, y: this.tileY + dy };
+    return this.collisionMap.wrapCell(this.tileX + dx, this.tileY + dy) ?? { x: this.tileX + dx, y: this.tileY + dy };
   }
 
   get currentMode(): MovementMode { return this._currentMode; }

@@ -5,6 +5,7 @@
  * ship's water and its docks. Plus the dock rule of 2.6: every world-map dock is an allowed one, in its basin.
  * A row whose targets or vehicle places are not built yet is pending (a failure with --strict).
  */
+import { stepIndex } from '../systems/worldWrap.js';
 import { canEnter, canLand, type FieldState } from '../systems/fieldRules.js';
 import type { MapData, VehicleState } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestPlace, QuestState } from './questTypes.js';
@@ -13,6 +14,7 @@ import { Saturator } from './questSaturate.js';
 import { fail, result, type QuestContext } from './questProofs.js';
 import { lateOf } from './questLateData.js';
 import { AIRSHIP_ONLY, type TravelRow } from './questTravelRows.js';
+import { wrapFailures } from './questWrap.js';
 
 interface RowState {
   flags: Set<string>;
@@ -164,9 +166,9 @@ export function landingNear(map: MapData, anchor: string, mode: 'walking' | 'can
     for (const c of frontier) {
       if (canLand(map, c, fly)) return true;
       for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
-        const n = { x: c.x + dx, y: c.y + dy };
-        const k = n.y * map.width + n.x;
-        if (n.x < 0 || n.y < 0 || n.x >= map.width || n.y >= map.height || seen.has(k) || !open(n)) continue;
+        const k = stepIndex(map, c.x, c.y, dx, dy); // WR: across the seam on a wrapped map
+        const n = { x: k % map.width, y: Math.floor(k / map.width) };
+        if (k < 0 || seen.has(k) || !open(n)) continue;
         seen.add(k);
         next.push(n);
       }
@@ -212,11 +214,12 @@ export function proofTravel(ctx: QuestContext): ProofResult {
   const late = lateOf(ctx);
   const rows = late.worstCanoe ? [...late.travelRows, ...worstCanoeRows(late.travelRows)] : late.travelRows;
   const outs = rows.map((r) => travelRow(ctx, rows, r));
-  const failures = [...dockFailures(ctx), ...outs.flatMap((o) => o.failures)];
+  const world = ctx.world.maps.get(ctx.world.worldMap);
+  const failures = [...dockFailures(ctx), ...wrapFailures(world), ...outs.flatMap((o) => o.failures)];
   const pending = outs.filter((o) => o.status === 'pending');
   if (ctx.strict) for (const o of pending) failures.push(fail('h', 'TRAVEL', `TRAVEL ${o.row} pending: ${o.missing.join(' ')} not built`));
   const basin = rows.filter((r) => r.docks || r.basins).length;
   const ok = outs.filter((o) => o.status === 'ok').length;
   return result('h', 'travel matrix', failures,
-    `(${rows.length - basin} rows, ${basin} basin rows; ${ok} checked, ${pending.length} pending)`);
+    `(${rows.length - basin} rows, ${basin} basin rows; ${ok} checked, ${pending.length} pending${world?.wrap ? '; WRAP OK' : ''})`);
 }

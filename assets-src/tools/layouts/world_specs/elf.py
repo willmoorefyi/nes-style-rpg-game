@@ -56,7 +56,8 @@ def spec() -> RegionSpec:
         dock_links=("elf_port",),
         spots=[SpotDef("elf_s_keep", "elf_keep", (0, 0), "land"),
                SpotDef("elf_s_elfheim", "elf_elfheim", (0, 0), "land"),
-               SpotDef("elf_s_port_ship", "dock:elf_port", (0, 0), "dock")],
+               SpotDef("elf_s_port_ship", "dock:elf_port", (0, 0), "dock"),
+               SpotDef("elf_s_seam_s", "elf_elfheim", (-32, 57), "dock")],     # WR: at sea by the south seam
     )
 
 

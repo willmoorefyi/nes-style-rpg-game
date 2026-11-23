@@ -4,6 +4,7 @@
  * the fixtures and on the real world. Each returns the elements found; none found means the element is not built.
  */
 import { canEnter, terrainAllows } from '../systems/fieldRules.js';
+import { stepIndex, stepTo } from '../systems/worldWrap.js';
 import { TerrainType } from '../types/index.js';
 import type { KeyItemGate, MapData, MapWorld } from '../types/index.js';
 import type { QuestContext } from './questProofs.js';
@@ -149,8 +150,8 @@ function place(map: MapData, name: string): { x: number; y: number } | undefined
   const d = name.startsWith('dock:') ? map.docks?.find((k) => k.id === name.slice(5)) : undefined;
   const e = map.entrances?.[name];
   if (!d) return e ? { x: e[0], y: e[1] } : undefined;
-  return [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => ({ x: d.x + dx, y: d.y + dy }))
-    .find((c) => terrainAllows('walking', map.collision[c.y * map.width + c.x]));
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => stepTo(map, d, dx, dy))
+    .find((c): c is { x: number; y: number } => c !== null && terrainAllows('walking', map.collision[c.y * map.width + c.x]));
 }
 
 function minimalCut(ctx: QuestContext, map: MapData, a: { x: number; y: number }, b: { x: number; y: number }): XY[] {
@@ -173,12 +174,11 @@ function minimalCut(ctx: QuestContext, map: MapData, a: { x: number; y: number }
     const cy = Math.floor(c / w);
     if (cx === b.x && cy === b.y) break;
     for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
-      const x = cx + dx;
-      const y = cy + dy;
-      if (x < 0 || y < 0 || x >= w || y >= map.height) continue;
+      const n = stepIndex(map, cx, cy, dx, dy); // WR: across the seam on a wrapped map
+      const x = n % w, y = Math.floor(n / w);
+      if (n < 0) continue;
       const k = cost(x, y);
       if (!Number.isFinite(k)) continue;
-      const n = y * w + x;
       const d = dist.get(c)! + k;
       if (d >= (dist.get(n) ?? Infinity)) continue;
       dist.set(n, d);

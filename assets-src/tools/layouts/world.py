@@ -32,15 +32,15 @@ import world_source as SRC  # noqa: E402
 from a1 import world_a1_checks as A1C  # noqa: E402
 from a1 import world_a1_pins as P  # noqa: E402
 from world_api import (BARRIERS, CANOE_BARRIERS, DOCKS_ALLOWED, EXEMPT_CAP, G2_MIN, LAND_TARGET,  # noqa: E402
-                          NORTH_REGIONS, REGIONS, TAIGA_MIN)
-from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, hikes, metrics,  # noqa: E402
-                      owners, prewalk, spots)
+                          NORTH_REGIONS, REGIONS, SEA_CLASS, SEAM_MARGIN, TAIGA_MIN)
+from worldgen import (bundle, compose, gates, gates_canoe, gates_hike, gates_reach, gates_wrap, hikes,  # noqa: E402
+                      metrics, owners, prewalk, spots)
 from world_specs.common import hike  # noqa: E402
 from worldgen import spec as S  # noqa: E402
 
 CHECKS = ("world", "basins", "docks", "walls", "barriers", "routes", "north", "landings", "straits", "prewalk", "act1",
           "walks", "detours", "pins", "coverage", "canoe_gates", "gorges", "relations", "duergar_south", "hikes",
-          "dock_towns", "taiga_share")  # dock_towns and the five before it: NW2 (docs/NW2_EDITS_PLAN.md 8), over
+          "dock_towns", "taiga_share", "wrap")  # dock_towns and the five before it: NW2 (docs/NW2_EDITS_PLAN.md 8), over
                                          # declared records only; taiga_share: NW2-T (D-NW2-8)
 
 
@@ -100,7 +100,8 @@ def run_checks(g, meta, b, doc, ent_map, sp, sp_err, blocked) -> dict:
             "duergar_south": gates_canoe.duergar_south(g, meta, b.apart),
             "hikes": gates_hike.hikes(g, meta, b.hikes, hike(), sp, doc, taken),
             "dock_towns": prewalk.dock_towns(g, meta, ent_map),
-            "taiga_share": metrics.taiga_share(g, meta["region"], REGIONS, NORTH_REGIONS, TAIGA_MIN)}
+            "taiga_share": metrics.taiga_share(g, meta["region"], REGIONS, NORTH_REGIONS, TAIGA_MIN),
+            "wrap": gates_wrap.wrap_check(g, meta, SEAM_MARGIN)}   # WR: the torus (docs/WORLD_WRAP_PLAN.md 6.1)
 
 
 def figures(g, meta, ch) -> dict:
@@ -208,7 +209,8 @@ def main(argv: list[str]) -> int:
         return 0
     g, meta, _b, doc, ch = build()
     fig = figures(g, meta, ch)
-    lines = check_lines(ch, meta) + gate_lines(fig)
+    seam = gates_wrap.seam_report(g, doc.get("encounterZones") or [], SEA_CLASS)   # WR: report-only (Q4 (b))
+    lines = check_lines(ch, meta) + [f"seam_zones: REPORT ({seam['note']})"] + gate_lines(fig)
     print("\n".join(lines))
     if "--metrics" in argv:
         print(json.dumps({k: v for k, v in fig.items() if k != "checks"}, indent=1, default=_plain))

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createMapData } from '../../helpers/testUtils.js';
-import { deferred, flightField, flush, rendererModule, resetStub, stub } from './flightHarness.js';
+import { deferred, flightField, flightMap, flush, rendererModule, resetStub, stub } from './flightHarness.js';
+import { atlasSize } from '../../../src/scenes/exploration/mode7/WorldAtlas.js';
 
 vi.mock('../../../src/scenes/exploration/mode7/FlightRenderer.js', async () => (await import('./flightHarness.js')).rendererModule);
 
@@ -108,6 +109,23 @@ describe('M7-2: activation', () => {
     expect(world(f).visible).toBe(true);
     expect(error).toHaveBeenCalledTimes(1);
     expect(String(error.mock.calls[0][0])).toContain('Mode 7');
+  });
+
+  it('WR: a wrapped world with an NPOT atlas under WebGL1 rejects in atlasSize: failed, top-down, as a missing atlas', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const map = flightMap({ width: 256, height: 256, wrap: true });
+    const meta = { version: 1, cellPx: 12, size: 3072, lowCellPx: 6, lowSize: 1536, inputs: 'x' };
+    stub.fail = (() => { try { atlasSize(meta, map, 'low', false); return true; } catch (e) { return e as Error; } })();
+    expect(String(stub.fail)).toContain('a wrapped map needs a power-of-two atlas under WebGL1 (1536)');
+    const f = await flightField({ mode7: 'on', map, start: { x: 6, y: 20 } });
+    await f.confirm();
+    await f.steps('up', 3);
+    expect(f.game.fieldMode).toBe('airship');
+    expect(f.report().failed).toBe(true);
+    expect(f.report().state).toBe('off');
+    expect(world(f).visible).toBe(true);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][1])).toContain('power-of-two');
   });
 
   it('the renderer loads only once an airship is raised, parked or ridden on the world map', async () => {

@@ -231,3 +231,39 @@ describe('baked map streaming (QUEST 4.3, W1-E)', () => {
     expect(steps[steps.length - 1]).toBe(true);
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 5, D-WR-10): patch images and the layer sentinels on a wrapped map
+describe('WR: a wrapped streamed map', () => {
+  const torus = (): MapData => {
+    const m = world();
+    m.patches = [{ id: 'canal', flag: 'CANAL_OPEN', cells: [[2, 90], [3, 90]], terrain: TerrainType.Water }];
+    return { ...m, wrap: true };
+  };
+
+  it('draws a patch at its image nearest the camera, and shows it across the seam', () => {
+    const map = torus();
+    const r = new BakedMapRenderer(map, { below: [], above: [], patches: { canal: Texture.WHITE } },
+      { source: new FakeSource(() => 1), hasFlag: () => true });
+    const cam = new Camera(new Container());
+    cam.setMapBounds(map.width, map.height, true);
+    const target = { x: 190 * TILE, y: 90 * TILE };
+    cam.follow(target);
+    r.setCamera(cam);
+    cam.update();
+    r.render();
+    const patch = (r.container.children as Sprite[]).find((s) => s.zIndex === 1)!;
+    expect(patch.position.x).toBe((192 + 2) * TILE);
+    expect(patch.visible).toBe(true);
+    target.x = 10 * TILE;
+    cam.update();
+    r.render();
+    expect(patch.position.x).toBe(2 * TILE);
+  });
+
+  it('takes the sentinel z on a wrapped map and keeps -1 and (H + 2) x TILE on a flat one', () => {
+    const wrapped = new BakedMapRenderer(torus(), { below: [], above: [] }, { source: new FakeSource(() => 1) });
+    expect([wrapped.container.zIndex, wrapped.aboveContainer.zIndex]).toEqual([-1_000_000, 1_000_000]);
+    const flat = new BakedMapRenderer(world(), { below: [], above: [] }, { source: new FakeSource(() => 1) });
+    expect([flat.container.zIndex, flat.aboveContainer.zIndex]).toEqual([-1, (192 + 2) * TILE]);
+  });
+});
