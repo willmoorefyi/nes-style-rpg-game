@@ -4,13 +4,12 @@
  * index, else the legacy `assets/maps/<id>.yaml`), `cutscenes.yaml` and the key items of `items.yaml`.
  * `buildQuestWorld` is pure (the fixtures use it); `loadQuestWorld` reads the repository from disk.
  */
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
 import { validateQuestData } from '../core/schemaValidationQuest.js';
 import type { MapData, QuestData, QuestStage } from '../types/index.js';
 import type { QuestPlace } from './questTypes.js';
 import { loadMaps } from './questMaps.js';
+import { InputLog, type InputRecord } from './questInputs.js';
 import { resolveQuestPlaces } from './questSpots.js';
 
 /** The cutscene step fields the model reads (CutsceneManager's step, as plain data). */
@@ -74,6 +73,8 @@ export interface QuestWorld {
   optional: ReadonlyMap<string, OptionalReason>;
   /** Map ids a transition, exit or warp names that are not loaded (stubs not compiled yet). */
   missingMaps: string[];
+  /** The files `loadQuestWorld` read or probed (docs/TEST_SPEED_PLAN.md 3); absent for a world built in memory. */
+  inputs?: readonly InputRecord[];
 }
 
 /**
@@ -202,20 +203,24 @@ export interface LoadOptions {
   legacy?: boolean;
   /** NW-1 `--maps DIR`: a folder of compiled maps (a scratch world compile) read before `assets/maps/ai`. */
   mapsDir?: string;
-}
-
-function readYaml(path: string): unknown {
-  return parse(readFileSync(path, 'utf-8'));
+  /** Test only (the repository-layout fixture, tests/helpers/questRepoFixture.ts): the new game's start. */
+  start?: QuestStart;
+  /** Test only: the world map's id. */
+  worldMap?: string;
 }
 
 /** The repository's world: quest.yaml, the playable maps, cutscenes.yaml and items.yaml. */
 export function loadQuestWorld(opts: LoadOptions = {}): QuestWorld {
   const root = opts.root ?? process.cwd();
   const data = join(root, 'assets/data');
-  return buildQuestWorld({
-    quest: readYaml(join(data, 'quest.yaml')),
-    maps: loadMaps(root, opts.legacy ?? false, opts.mapsDir),
-    cutscenes: (readYaml(join(data, 'cutscenes.yaml')) as Array<{ id: string; steps: QuestCutStep[] }>) ?? [],
-    items: (readYaml(join(data, 'items.yaml')) as QuestItemRecord[]) ?? [],
+  const log = new InputLog(root);
+  const world = buildQuestWorld({
+    quest: log.read(join(data, 'quest.yaml')),
+    maps: loadMaps(root, opts.legacy ?? false, opts.mapsDir, log),
+    cutscenes: (log.read(join(data, 'cutscenes.yaml')) as Array<{ id: string; steps: QuestCutStep[] }>) ?? [],
+    items: (log.read(join(data, 'items.yaml')) as QuestItemRecord[]) ?? [],
+    start: opts.start,
+    worldMap: opts.worldMap,
   });
+  return { ...world, inputs: log.records() };
 }

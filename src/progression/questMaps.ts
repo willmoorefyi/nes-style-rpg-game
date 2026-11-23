@@ -4,32 +4,28 @@
  * (docs/NATURAL_WORLD_PLAN.md 5.2) puts a folder of compiled maps first: a map there (a scratch compile of the new
  * world) replaces the repository's map of the same id, and the ids of its own `index.yaml` are added.
  */
-import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
 import { validateMapData } from '../core/schemaValidation.js';
 import type { MapData } from '../types/index.js';
+import { InputLog, pathExists } from './questInputs.js';
 
-function readYaml(path: string): unknown {
-  return parse(readFileSync(path, 'utf-8'));
-}
-
-function indexOf(dir: string): string[] {
+function indexOf(log: InputLog, dir: string): string[] {
   const p = join(dir, 'index.yaml');
-  return existsSync(p) ? (readYaml(p) as string[]) : [];
+  return log.probe(p) ? (log.read(p) as string[]) : [];
 }
 
-/** Every map id the game can load: the compiled index (`mapsDir`'s maps first), then the legacy files. */
-export function loadMaps(root: string, legacy: boolean, mapsDir?: string): MapData[] {
+/** Every map id the game can load: the compiled index (`mapsDir`'s maps first), then the legacy files. Every file
+ *  read or probed is recorded in `log` (docs/TEST_SPEED_PLAN.md 3). */
+export function loadMaps(root: string, legacy: boolean, mapsDir?: string, log: InputLog = new InputLog(root)): MapData[] {
   const out = new Map<string, MapData>();
   const aiDir = join(root, 'assets/maps/ai');
-  if (mapsDir && !existsSync(mapsDir)) throw new Error(`--maps ${mapsDir}: no such folder`);
+  if (mapsDir && !pathExists(mapsDir)) throw new Error(`--maps ${mapsDir}: no such folder`);
   if (!legacy) {
-    const ids = [...new Set([...indexOf(aiDir), ...(mapsDir ? indexOf(mapsDir) : [])])];
+    const ids = [...new Set([...indexOf(log, aiDir), ...(mapsDir ? indexOf(log, mapsDir) : [])])];
     for (const id of ids) {
       const scratch = mapsDir ? join(mapsDir, `${id}.yaml`) : '';
-      const path = scratch && existsSync(scratch) ? scratch : join(aiDir, `${id}.yaml`);
-      out.set(id, validateMapData(readYaml(path)));
+      const path = scratch && log.probe(scratch) ? scratch : join(aiDir, `${id}.yaml`);
+      out.set(id, validateMapData(log.read(path)));
     }
   }
   const want = new Set<string>();
@@ -44,8 +40,8 @@ export function loadMaps(root: string, legacy: boolean, mapsDir?: string): MapDa
     const id = pending.pop()!;
     if (out.has(id)) continue;
     const p = join(root, 'assets/maps', `${id}.yaml`);
-    if (!existsSync(p)) continue;
-    const m = validateMapData(readYaml(p));
+    if (!log.probe(p)) continue;
+    const m = validateMapData(log.read(p));
     out.set(id, m);
     for (const t of m.transitions) pending.push(t.targetMap);
   }

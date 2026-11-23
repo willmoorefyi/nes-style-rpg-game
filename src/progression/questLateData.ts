@@ -4,9 +4,8 @@
  * docks. `buildLateData` is pure (the fixtures use it); `loadLateData` reads the repository. The data is attached
  * to a proof context with `attachLate`; `lateOf` loads it from the repository when nothing is attached.
  */
-import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from 'yaml';
+import { InputLog, pathExists, type InputRecord } from './questInputs.js';
 import type { QuestContext } from './questProofs.js';
 import { DEFAULT_TRAVEL_ROWS, type TravelRow } from './questTravelRows.js';
 
@@ -81,6 +80,8 @@ export interface LateData {
   worldOffset?: [number, number];
   /** NW-1 `--worst-canoe` (docs/NATURAL_WORLD_PLAN.md 4.3): proof (h) runs rows T0-T4 again with the canoe. */
   worstCanoe?: boolean;
+  /** The files `loadLateData` read or probed (docs/TEST_SPEED_PLAN.md 3); absent for data built in memory. */
+  inputs?: readonly InputRecord[];
 }
 
 export interface LateInput {
@@ -150,22 +151,24 @@ export function buildLateData(input: LateInput): LateData {
   };
 }
 
-function readYaml(path: string): unknown {
-  return existsSync(path) ? parse(readFileSync(path, 'utf-8')) : undefined;
+function readYaml(log: InputLog, path: string): unknown {
+  return log.probe(path) ? log.read(path) : undefined;
 }
 
 /** The repository's late data (assets/data); `anchors` replaces `world-anchors.yaml` (NW-1 `--anchors FILE`). */
 export function loadLateData(root: string = process.cwd(), opts: { anchors?: string; worstCanoe?: boolean } = {}): LateData {
   const d = join(root, 'assets/data');
-  if (opts.anchors && !existsSync(opts.anchors)) throw new Error(`--anchors ${opts.anchors}: no such file`);
+  if (opts.anchors && !pathExists(opts.anchors)) throw new Error(`--anchors ${opts.anchors}: no such file`);
+  const log = new InputLog(root);
   const late = buildLateData({
-    enemies: readYaml(join(d, 'enemies.yaml')) as LateInput['enemies'],
-    items: readYaml(join(d, 'items.yaml')) as LateInput['items'],
-    spells: readYaml(join(d, 'spells.yaml')) as LateInput['spells'],
-    kits: readYaml(join(d, 'kits.yaml')) as LateInput['kits'],
-    geo: readYaml(opts.anchors ?? join(d, 'world-anchors.yaml')),
+    enemies: readYaml(log, join(d, 'enemies.yaml')) as LateInput['enemies'],
+    items: readYaml(log, join(d, 'items.yaml')) as LateInput['items'],
+    spells: readYaml(log, join(d, 'spells.yaml')) as LateInput['spells'],
+    kits: readYaml(log, join(d, 'kits.yaml')) as LateInput['kits'],
+    geo: readYaml(log, opts.anchors ?? join(d, 'world-anchors.yaml')),
   });
-  return opts.worstCanoe ? { ...late, worstCanoe: true } : late;
+  const out = { ...late, inputs: log.records() };
+  return opts.worstCanoe ? { ...out, worstCanoe: true } : out;
 }
 
 const LATE = new WeakMap<QuestContext, LateData>();
