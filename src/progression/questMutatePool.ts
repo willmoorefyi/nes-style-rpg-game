@@ -20,6 +20,18 @@ export const FIRST_CAP_MB = 3584;
 export const SERIAL_HEAP_MB = 8192;
 export const DEFAULT_TIMEOUT_S = 1200;
 
+/**
+ * The process heap flag (`--max-old-space-size`, which `npm run quest` and the test:full / test:world scripts set to
+ * 8,192 through NODE_OPTIONS) is a V8 process flag: it overrides a worker's `resourceLimits`, so every worker is
+ * capped at that heap (the serial run's) from the start and the first-try cap and its retry do not apply. Null when
+ * no flag is set.
+ */
+export function processHeapFlagMb(): number | null {
+  const all = [...process.execArgv, ...(process.env.NODE_OPTIONS ?? '').split(/\s+/)];
+  const f = all.find((a) => a.startsWith('--max-old-space-size='));
+  return f ? Number(f.split('=')[1]) : null;
+}
+
 /** R3: CLI min(6, cores - 2), inside vitest 4; `QUEST_MUTATE_JOBS` overrides both. */
 export function defaultWorkers(): number {
   const env = Number(process.env.QUEST_MUTATE_JOBS);
@@ -93,6 +105,8 @@ export async function runPool(recipe: ContextRecipe, jobs: AnyJob[], opts: PoolO
   const bigCap = opts.retryCapMb ?? SERIAL_HEAP_MB;
   const timeoutS = opts.timeoutS ?? (Number(process.env.QUEST_MUTATE_JOB_TIMEOUT_S) || DEFAULT_TIMEOUT_S);
   const log = opts.log ?? ((l: string) => console.error(l));
+  const flag = processHeapFlagMb();
+  if (flag !== null) log(`mutate pool: the process heap flag caps every worker at ${flag} MB (the first-try cap does not apply)`);
   const heavy = (j: AnyJob): boolean => j.keys.includes('c:') || (j.kind === 'stub' && j.act === 'alloc');
   const queue: Queued[] = (opts.shuffleSeed === undefined ? jobs : shuffled(jobs, opts.shuffleSeed))
     .map((job) => ({ job, attempt: 0, big: false }));

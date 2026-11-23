@@ -30,7 +30,8 @@ afterAll(() => {
 const fx = writeRepoFixture(temp('qcache-'), 'clean');
 const recipe: ContextRecipe = { kind: 'repo', root: fx.root, start: fx.start, worldMap: fx.worldMap };
 const lines: string[] = [];
-const opts = (o: CacheOptions = {}): CacheOptions => ({ jobs: 2, log: (l) => lines.push(l), by: 'test', ...o });
+// lock: false: a fixture pool never waits behind a real-world pool (test:full runs questMutateWorld beside this file)
+const opts = (o: CacheOptions = {}): CacheOptions => ({ jobs: 2, lock: false, log: (l) => lines.push(l), by: 'test', ...o });
 const entryPath = (fp: string): string => join(store, `${fp}.json`);
 const readEntry = (fp: string): CacheEntry => JSON.parse(readFileSync(entryPath(fp), 'utf-8')) as CacheEntry;
 const writeEntry = (fp: string, e: CacheEntry): void => writeFileSync(entryPath(fp), JSON.stringify(e));

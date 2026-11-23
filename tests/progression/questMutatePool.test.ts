@@ -14,7 +14,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { runMutationSuite, type ContextRecipe, type SuiteResult } from '../../src/progression/questMutateSuite.js';
-import { runPool, type JobLogEntry } from '../../src/progression/questMutatePool.js';
+import { processHeapFlagMb, runPool, type JobLogEntry } from '../../src/progression/questMutatePool.js';
 import { acquirePoolLock } from '../../src/progression/questMutateLock.js';
 import { PrefilledSource } from '../../src/progression/questMutateCheck.js';
 import { mutationLine } from '../../src/progression/questReport.js';
@@ -24,7 +24,8 @@ import { miniContext } from './miniWorld.js';
 const here = (f: string): string => new URL(f, import.meta.url).pathname;
 const MINI: ContextRecipe = { kind: 'module', path: here('./miniWorld.ts'), export: 'miniContext' };
 const CLEAN: ContextRecipe = { kind: 'module', path: here('./miniWorld.ts'), export: 'cleanContext' };
-const quiet = { log: (): void => undefined };
+// lock: false: a fixture pool never waits behind a real-world pool (test:full runs questMutateWorld beside this file)
+const quiet = { log: (): void => undefined, lock: false };
 
 function same(a: SuiteResult, b: SuiteResult): void {
   expect(b.plain).toEqual(a.plain);
@@ -59,7 +60,7 @@ describe('the clean fixture: shuffles and a killed worker', async () => {
   const b = await runMutationSuite(CLEAN, { jobs: 3, shuffleSeed: 2, ...quiet });
   const lines: string[] = [];
   const log: JobLogEntry[] = [];
-  const killed = await runMutationSuite(CLEAN, { jobs: 2, killOnce: 'plain c:', jobLog: log, log: (l) => lines.push(l) });
+  const killed = await runMutationSuite(CLEAN, { jobs: 2, lock: false, killOnce: 'plain c:', jobLog: log, log: (l) => lines.push(l) });
   it('jobs 2 in order and two shuffles at 3 deep-equal jobs 1', () => { same(serial, inOrder); same(serial, a); same(serial, b); });
   it('a worker killed mid-job: its job is retried once and the result is equal', () => {
     same(serial, killed);
@@ -71,7 +72,9 @@ describe('the clean fixture: shuffles and a killed worker', async () => {
 describe('failures (stub jobs)', () => {
   const stub = (id: string, act: StubJob['act'], mb?: number): StubJob => ({ kind: 'stub', id, keys: ['ok:'], act, mb });
 
-  it('an out of memory on the first cap is retried at the big cap and succeeds', async () => {
+  // a process heap flag (test:full's NODE_OPTIONS) overrides the workers' caps: the cap cases need a run without it
+  const capped = processHeapFlagMb() === null;
+  it.runIf(capped)('an out of memory on the first cap is retried at the big cap and succeeds', async () => {
     const log: JobLogEntry[] = [];
     const lines: string[] = [];
     const out = await runPool(CLEAN, [stub('big', 'alloc', 160), stub('small', 'ok')],
@@ -80,7 +83,7 @@ describe('failures (stub jobs)', () => {
     expect(lines.some((l) => l.includes('big: out of memory at 48 MB, retrying at 1024 MB'))).toBe(true);
     expect(log.find((e) => e.id === 'big')?.retried).toBe(true);
   }, 60_000);
-  it('out of memory at the big cap fails the run', async () => {
+  it.runIf(capped)('out of memory at the big cap fails the run', async () => {
     await expect(runPool(CLEAN, [stub('huge', 'alloc', 400)], { workers: 1, capMb: 48, retryCapMb: 96, ...quiet }))
       .rejects.toThrow('job huge out of memory at 96 MB (the serial heap)');
   }, 60_000);

@@ -155,6 +155,9 @@ export interface SuiteOptions extends Partial<PoolOptions> {
   jobs?: number;
   /** The recipe's world, already loaded (the cache loads it for the fingerprint). */
   base?: LoadedBase;
+  /** false: no machine pool lock (the fast tier's fixture pools, a few MB each, must not wait behind a real-world
+   *  pool in the same `test:full`). */
+  lock?: boolean;
 }
 
 /** Computes jobs: in-process for `jobs: 1`, else in the pool under the machine's pool lock. */
@@ -165,7 +168,7 @@ export async function computeJobs(recipe: ContextRecipe, base: LoadedBase, jobs:
     const els = elementsById(factory);
     return new Map(jobs.map((j) => [j.id, runJob(base, factory, els, j)]));
   }
-  const release = await acquirePoolLock({ onWait: opts.log });
+  const release = opts.lock === false ? (): void => undefined : await acquirePoolLock({ onWait: opts.log });
   try {
     return await runPool(recipe, jobs, { ...opts, workers, data: dataPrint(base) });
   } finally {
