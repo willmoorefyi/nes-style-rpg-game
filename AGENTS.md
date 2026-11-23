@@ -320,10 +320,10 @@ gates, the verifier proofs) and `docs/QUEST_PLAN.md`.
   `gateAt`, ...) stay strict. The seam is open ocean (D-WR-2): `world.py`'s gated `wrap` line (`worldgen/gates_wrap.py`:
   every edge cell Water, no land within `SEAM_MARGIN` 4 of an edge, the components on foot, by canoe and by ship equal
   with and without the seam, patches off and on) and `seam_zones` (the ship zones on both sides of each seam of one
-  `SEA_CLASS`, gated since F-WR); the compile's `check_seam` (`map_checks_wrap.py`: `wrap` needs `sealed_edges`; the
-  seam's 1-px colour step against the interior chunk lines, `seam: x 5.7 (interior max 6.7), y 7.3 (7.7)`). F-WR (plan
-  8.4): the late seas' bands along the seams are early-table zones `wat_seam_w`, `wat_seam_n`, `ord_seam_n`,
-  `wnd_seam_n` (`layouts/sea_tables.py`). Relocation (`worldRevalidate`, `worldReset`, `MapTransition.safeSpawn`) and
+  `SEA_CLASS`, report-only: a sea cell keeps its zone, Q4 (b)); the compile's `check_seam` (`map_checks_wrap.py`: `wrap`
+  needs `sealed_edges`; the seam's 1-px colour step against the interior chunk lines, `seam: x 5.7 (interior max 6.7),
+  y 7.3 (7.7)`). The user's ruling (2026-11-22): S21's band is [25, 29] (the wrapped witnesses reach L29.2) and the
+  plan's fallback seam zones (F-WR) are not used. Relocation (`worldRevalidate`, `worldReset`, `MapTransition.safeSpawn`) and
   proof (g) stay planar. `build_map.py --preview` reads a wrapped map mod W (`--preview overworld 240 90 272 120 ...`)
   and `--grid` marks the seam in magenta. Seam spots `fir_s_seam_e`, `elf_s_seam_s`, `wat_s_seam_nw` (docks at sea) and
   `wnd_s_seam_landing`; previews `?mute=1&scenario=wr_ship_east | wr_ship_south | wr_air_corner | wr_air_land |

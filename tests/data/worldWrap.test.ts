@@ -53,21 +53,3 @@ describe('WR: the wrapped world map', () => {
   });
 });
 
-// WR F-WR (docs/WORLD_WRAP_PLAN.md 8.4): every seam pair's ship zones are of one class (early | early, late | late)
-describe('WR F-WR: the seam zones', () => {
-  const LATE = new Set(['ord_sea', 'wat_sea', 'wnd_sea']);
-  const shipZone = (x: number, y: number): string | null => world.encounterZones?.find((z) => (z.modes ?? []).includes('ship')
-    && z.rects.some(([x0, y0, x1, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1))?.id ?? null;
-
-  it("every seam pair's zones are of one class", () => {
-    const { width: w, height: h } = world;
-    const bad: string[] = [];
-    const pairs = [...Array(h).keys()].map((y) => [[0, y], [w - 1, y]]).concat([...Array(w).keys()].map((x) => [[x, 0], [x, h - 1]]));
-    for (const [[ax, ay], [bx, by]] of pairs) {
-      const a = shipZone(ax, ay);
-      const b = shipZone(bx, by);
-      if (a && b && LATE.has(a) !== LATE.has(b)) bad.push(`(${ax},${ay}) ${a} | (${bx},${by}) ${b}`);
-    }
-    expect(bad).toEqual([]);
-  });
-});

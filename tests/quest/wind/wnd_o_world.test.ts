@@ -150,10 +150,9 @@ describe('NW-R WIND: region WIND on the NW world source', () => {
     const zs = src.encounterZones.filter((z) => z.id.startsWith('wnd_'));
     expect(zs.map((z) => [z.id, z.name, z.modes])).toEqual([['wnd_highlands', 'Gaia Highlands', undefined],
       ['wnd_mirage_sands', 'Mirage Sands', undefined], ['wnd_lufen_moor', 'Lufenian Mesa', undefined],
-      ['wnd_tarns', 'Highland Tarns', ['canoe']], ['wnd_sea', 'North Seas', ['ship']],
-      ['wnd_seam_n', 'North Seas, far rim', ['ship']]]);   // WR F-WR (WORLD_WRAP_PLAN 8.4)
+      ['wnd_tarns', 'Highland Tarns', ['canoe']], ['wnd_sea', 'North Seas', ['ship']]]);
     const own = new Map<number, string>();
-    for (const z of zs.filter((x) => x.id !== 'wnd_sea' && x.id !== 'wnd_seam_n')) {
+    for (const z of zs.filter((x) => x.id !== 'wnd_sea')) {
       for (const k of cells(z)) { expect(own.get(k), `${z.id} ${at(k)}`).toBeUndefined(); own.set(k, z.id); }
     }
     for (const [z, e] of PARTS) for (const k of flood(E[e], walk).keys()) expect(own.get(k), `${z} ${at(k)}`).toBe(z);
@@ -165,12 +164,12 @@ describe('NW-R WIND: region WIND on the NW world source', () => {
         if (walk(x + dx, y + dy) || wet(x + dx, y + dy)) expect(own.has(key(x + dx, y + dy)), `${z} ${x + dx},${y + dy}`).toBe(true);
       }
     }
-    for (const k of [...cells(zone('wnd_sea')), ...cells(zone('wnd_seam_n'))]) expect(g[at(k)[1]][at(k)[0]]).toBe('o');
+    for (const k of cells(zone('wnd_sea'))) expect(g[at(k)[1]][at(k)[0]]).toBe('o');
   });
 
   it('every WIND zone has a staged backdrop; the walking zones map snow and taiga (D-NW9, NW2)', () => {
     const bg = src.battleBackgrounds.zones;
-    for (const z of ['wnd_highlands', 'wnd_mirage_sands', 'wnd_lufen_moor', 'wnd_tarns', 'wnd_sea', 'wnd_seam_n']) {
+    for (const z of ['wnd_highlands', 'wnd_mirage_sands', 'wnd_lufen_moor', 'wnd_tarns', 'wnd_sea']) {
       const ids = [bg[z].default, ...Object.values(bg[z].terrain ?? {})];
       for (const id of ids) expect(existsSync(`assets/backgrounds/${id}.webp`), `${z} ${id}`).toBe(true);
     }

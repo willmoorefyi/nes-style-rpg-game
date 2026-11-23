@@ -527,7 +527,7 @@ stages:
     requires: {flags: [], items: [canoe], vehicles: [airship]}
     grants: {flags: [CUBE_GIVEN], items: [cube], vehicles: []}
     boss: []
-    band: [25, 28]
+    band: [25, 29]   # WR: the user's ruling 2026-11-22 (the wrapped world's witness: S21 L29.2; docs/WORLD_WRAP_PLAN.md)
     kit: w_s21
     maps: [waterfall-cave]
     zones: [overworld:wat_streams]
@@ -571,8 +571,7 @@ stages:
     band: [25, 28]
     kit: w_s20
     maps: [onrac, onrac-*]
-    zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea, overworld:wat_seam_w,
-      overworld:wat_seam_n, overworld:ord_seam_n, overworld:wnd_seam_n]   # WR F-WR (WORLD_WRAP_PLAN 8.4)
+    zones: [overworld:wat_isles, overworld:wat_sea, overworld:ord_sea, overworld:wnd_sea]
     grind: 7.0
     # WAT-T: on foot at Cornelia's south gate, the airship landed beside it (as S21 and S22: WATER is airship-only,
     # 2.8); the walk flies to Onrac's meadow and enters the town by its icon's door

@@ -18,7 +18,6 @@ from __future__ import annotations
 import numpy as np
 
 import world_water_zones as WZ  # noqa: E402  (today's tables, backdrops and row_rects)
-import sea_tables as ST  # noqa: E402  (WR F-WR: the early seas' tables)
 from worldgen import gates
 from worldgen.geom import components
 
@@ -60,26 +59,16 @@ def zones(g: np.ndarray, p) -> list[dict]:
     streams = (np.isin(g, ["r", "≈"]) & mine) | ledge
     isles = walk & mine & ~dunes
     sea = (g == "o") & mine
-    # WR F-WR (docs/WORLD_WRAP_PLAN.md 8.4): the seam bands meet FIRE's sea (west, y 98-119) and ELF's (north)
-    seam_w = sea & ST.band(g.shape, 0, 98, ST.SEAM_BAND - 1, 119)
-    seam_n = sea & ST.north(g.shape, 0, 106) & ~seam_w
-    sea &= ~(seam_w | seam_n)
     return [
         {"id": "wat_streams", "name": "Waterfall River", "modes": ["canoe"], "rects": _rects(streams),
          "encounters": WZ.STREAMS},
         {"id": "wat_dunes", "name": "Caravan Dunes", "rects": _rects(dunes), "encounters": WZ.DUNE_TABLE},
         {"id": "wat_isles", "name": "Onrac Coast", "rects": _rects(isles), "encounters": WZ.COAST_TABLE},
         {"id": "wat_sea", "name": "Onrac Seas", "modes": ["ship"], "rects": _rects(sea), "encounters": WZ.SEA_TABLE},
-        {"id": "wat_seam_w", "name": "Onrac Seas, far rim", "modes": ["ship"], "rects": _rects(seam_w),
-         "encounters": ST.EARLY_EAST},
-        {"id": "wat_seam_n", "name": "Onrac Seas, far rim", "modes": ["ship"], "rects": _rects(seam_n),
-         "encounters": ST.EARLY_SOUTH},
     ]
 
 
 def backdrops() -> dict:
     out = {k: {kk: dict(vv) if isinstance(vv, dict) else vv for kk, vv in v.items()} for k, v in WZ.BACKDROPS.items()}
     out["wat_isles"]["terrain"].update(COLD)
-    out["wat_seam_w"] = {"default": "ocean"}   # WR F-WR
-    out["wat_seam_n"] = {"default": "ocean"}
     return out

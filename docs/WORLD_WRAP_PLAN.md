@@ -713,62 +713,63 @@ No question is open.
 
 ## Result (WR-0 to WR-INT, 2026-11-22)
 
+**The user's ruling on S21 (2026-11-22):** S21's band is widened to [25, 29] (`assets/data/quest.yaml`), and F-WR is
+dropped. The wrapped world keeps every sea zone as it is (Q4 (b)); `seam_zones` stays a report-only line.
+
 Branch `wr`: WR-0 `3e8d4e88`, WR-1 `13fde331`, WR-2 `e1069997`, the merge of mainline after QW2 `71d2fd03`, WR-3
-`f456ccb0`, WR-INT (this document, AGENTS.md, PROGRESS, MODE7_PLAN notes).
+`f456ccb0` (with F-WR), WR-INT `85b95403` (docs), then the ruling's commit (F-WR reverted, S21's band, these figures).
 
 **Built as planned.** Every mode wraps on `overworld`; every other map is flat. Momus's last amendment was taken:
 `FieldVehicleSprites`' module exports `vehicleParts` (a WeakSet of the parts it owns) and `setVehicleWrapOffset`;
 `ExplorationScene` imports them and `FieldVehicles.ts` is untouched (243 lines). Line counts: `FlightView.ts` 247,
 `ExplorationScene.ts` 581 / 590, `PlayerController.ts` 205, `src/types/index.ts` 435 / 442, `questMutateFind.ts` 248.
 
-**Gates.**
+**Gates (after the ruling).**
 
 | Gate | Figure |
 |---|---|
 | WR-0 `quest --strict --json` | byte-identical to the base (flat world) |
 | WR-0 verifier time, median of 3 | base 122.11 s (120.83 / 122.11 / 124.13), WR-0 122.51 s (124.39 / 122.51 / 122.05): +0.3 % |
 | (c) state count | 847,265 base (before and after QW2), 847,265 wrapped: unchanged |
-| `test:fast` | WR-0 416 files / 10,069 tests; WR-1 420 / 10,097; WR-2 421 / 10,115; WR-3: 7 failures fixed in the tests (scenario spawns at sea, the spot count, the (h) line), then only `questLate` (d) fails, as `quest --strict` |
-| `world.py` | every gated line OK; `wrap: OK (edges Water, least land margin 5 >= 4, no component joined ...)`; `seam_zones` before F-WR: E-W 98-119 (22) wat_sea / fir_sea, N-S 0-106 (107) wat_sea / elf_sea, 107-166 (60) ord_sea / elf_sea, 167-169 (3) ord_sea / fir_sea, 170-255 (86) wnd_sea / fir_sea (1.4 exactly); after F-WR: OK |
-| compile | 340 s, peak 15.5 GB; `seam: x 5.7 (interior max 6.7), y 7.3 (7.7)`; every chunk byte-identical to the flat compile (the wrap, the spots and the low atlas only) |
-| determinism | `build_map.py --check-determinism overworld` OK (600 s); `mode7_atlas.py --check-determinism overworld` OK; re-running `world.py` leaves the source unchanged |
-| selftests | `build_map.py --selftest` 149 checks (146 before WR-3's 3); `selftest_wrap.py` 6 cases OK; `nw1_selftest` `cell_px(256) == (12, 8)` |
-| `quest --strict` | (a), (b), (c), (e), (f), (g) s* 0.852, (h) `WRAP OK` all OK; **(d) FAIL: S21 L29.2 outside [25, 28]** |
-| `--from-reset` | (c) from reset OK (195 reset states, 5,206,351 states searched); the run's exit is 1 only for (d) |
-| `--strict --mutate` | `mutations: OK (68 gate rows; 109 elements, each removal reported)`, as QW2's; 80 min; exit 1 only for (d) |
+| `test:fast` | WR-0 416 files / 10,069 tests; WR-1 420 / 10,097; WR-2 421 / 10,115; after the ruling: 422 files / 10,133 tests, all passing (195 s); `npm run build` OK |
+| `world.py` | every gated line OK; `wrap: OK (edges Water, least land margin 5 >= 4, no component joined ...)`; `seam_zones: REPORT (E-W 98-119 (22): wat_sea \| fir_sea; N-S 0-106 (107): wat_sea \| elf_sea; N-S 107-166 (60): ord_sea \| elf_sea; N-S 167-169 (3): ord_sea \| fir_sea; N-S 170-255 (86): wnd_sea \| fir_sea)`, plan 1.4 exactly |
+| compile | 353 s, peak 14.4 GB; `seam: x 5.7 (interior max 6.7), y 7.3 (7.7)`; every chunk byte-identical to the flat compile (the wrap, the spots and the low atlas only) |
+| determinism | `build_map.py --check-determinism overworld` OK; `mode7_atlas.py --check-determinism overworld` OK; re-running `world.py` leaves the source unchanged |
+| selftests | `build_map.py --selftest` 149 checks; `selftest_wrap.py` 6 cases OK; `nw1_selftest` `cell_px(256) == (12, 8)` |
+| `quest --strict` | OK: (a)-(h) all OK, (g) s* 0.852, (h) `WRAP OK`, (d) `S21 L29.2 [25,29]` and `seam: S14 x1 late 65, S22 x2 late 0, S24 x1 late 0, S26 x1 late 0, S21 x1 late 0, S27 x1 late 0` |
+| `--from-reset` | OK: (c) from reset over 195 reset states (32 stage entries, 3 NW2 v4 saves, 160 mid-stage samples), 5,206,351 states searched |
+| `--strict --mutate` | run once with F-WR: `mutations: OK (68 gate rows; 109 elements, each removal reported)`, 80 min. Not re-run after the revert: no mutation element is a zone (the seam zones had no flag, gate, NPC or patch), so the suite's elements are the same |
+| `questCurve.test.ts` | bosses: garland L2.7, pirate L3.6, piscodemon L8.6, astos L10.6, vampire L14.4, lich L17.1, ashen_queen L22.0, evil_eye L24.6 [21,24] (tightest), dragon_zombie L26.4, drowned_sovereign L28.9, hollow_seraph L34.2, lich_2 L35.6; Chaos's door 40.7; wipes S31 0.33 (optional), required at most 0.05 (S14) |
 
-**The curve gate (8.3): failed, F-WR applied, still failing.** Levels against the post-QW2 base (the curve model on the
-committed maps; the no-F-WR world is the F-WR compile with the four bands folded back into their parents):
+**The curve gate (8.3).** Levels against the post-QW2 base:
 
-| Stage | base | wrapped | wrapped + F-WR |
+| Stage | base | wrapped | (with F-WR, dropped) |
 |---|---|---|---|
-| S14 | 18.09 | 18.41 (+0.32) | 18.34 (+0.26) |
+| S14 | 18.09 | 18.41 (+0.32) | 18.34 |
 | S15 ashen_queen | 21.81 | 22.04 | 22.00 |
 | S24 drowned_sovereign | 28.64 | 28.90 | 28.87 |
 | S25 / S26 | 28.74 / 28.79 | 29.03 / 29.09 | 29.00 / 29.06 |
-| **S21** [25, 28] | 28.88 | **29.23** | **29.20** |
-| S30 lich_2 | 35.31 | 35.69 (+0.38) | 35.67 (+0.36) |
+| **S21** | 28.88 | **29.23**, in [25, 29] by the ruling | 29.20 |
+| S30 lich_2 | 35.31 | 35.69 (+0.38) | 35.67 |
 
-- Condition 1 (bands) fails at S21 only; condition 2 (`questCurve.test.ts` wipes, the Chaos door) passes; condition 3
-  (within ±0.5) passes: the largest delta is +0.38 without F-WR, +0.36 with it. Stages S0-S13 are unchanged.
-- **Why.** S14's witness crosses the west seam at y 101 into 65 `wat_sea` cells (57 with F-WR's 8-cell band: the
-  brief's "57 of the 65"). But the larger share is not the ocean: the witnesses of S21, S22, S24, S25 and S27 fly
-  across a seam and land elsewhere, and walk more `wat_isles` (S21 4.6 -> 8.8 fights, S24 2.4 -> 7.3). The plan's 8.3
-  expected only the ocean voyages. S21 is measured at its end, after S24-S26, so it carries all of it.
-- **Q5's factor re-fit cannot fix it within the method's rules** (probes on the compiled map): `wat_sea` 3.0 / 4.0 gives
-  S21 29.13 / 29.09; `wat_isles` (CAP 2.0, the hikes' floor) at 2.6 / 3.0 gives 29.10 / 29.07; every S14 sea at 3.0
-  gives 29.12, plus the northern ones 29.05; even S21's `grind` 2.0 -> 1.0 (lever 2, not ruled) gives 29.13.
-- **A ruling is needed:** for example S21's band (its top 28 was reached at 28.85-28.88 before WR), the curve
-  model's witness costing (prefer fewer fights among equal routes), or accepting S21 at L29.2.
+- Condition 1 (bands) holds after the ruling; condition 2 (wipes, the Chaos door) holds; condition 3 (within +-0.5)
+  holds: the largest delta is +0.38 (S27-S30). Stages S0-S13 are unchanged.
+- **Why S21 rose.** S14's witness crosses the west seam at y 101 into 65 `wat_sea` cells (57 with F-WR's band). The
+  larger share is not the ocean: the witnesses of S21, S22, S24, S25 and S27 fly across a seam and land elsewhere, and
+  walk more `wat_isles` (S21 4.6 -> 8.8 fights, S24 2.4 -> 7.3). S21 is measured at its end, after S24-S26.
+- **Why F-WR was dropped.** It moved S21 by only -0.03, and no factor re-fit within the method's caps fixed the band
+  (`wat_sea` 3.0 / 4.0: S21 29.13 / 29.09; `wat_isles` at 2.6 / 3.0, over its CAP 2.0: 29.10 / 29.07; every sea at
+  3.0: 29.05; S21's `grind` 1.0: 29.13).
 
-**Browser checks** (`~/temp/ff-game/world_wrap/int/`, dev server on 127.0.0.1:5191, `mute=1`):
+**Browser checks** (`~/temp/ff-game/world_wrap/int/`, dev server on 127.0.0.1:5191, `mute=1`; run on the wrapped
+compile, before the ruling; the ruling changes no runtime code):
 - B1 `wr_ship_east`: x 253, 255, 0, 2 ...; zone `fir_sea` then `ert_sea`; centred camera, no placeholder.
 - B2 `wr_air_corner` top-down: (0, 3) -> (255, 3) -> (255, 0) -> (254, 255).
-- B3 `wr_ship_south`: y 254, 255, 0, 1; `elf_sea` then `wat_sea` (after F-WR `wat_seam_n`).
+- B3 `wr_ship_south`: y 254, 255, 0, 1; `elf_sea` then `wat_sea`.
 - B4 Mode 7: every seam and the corner; the far side's land on the horizon past the north seam; recentres only at
   chunk lines; steady frame p95 10 ms, update p95 0.2-0.5 ms; no console error (one start-up chunk-placeholder warning
   once, not reproduced).
-- B5 `wr_air_land`: west across x 0 and south to (249, 31), landed on foot. The t ≈ 0.07 tilt-out frame lines up with
+- B5 `wr_air_land`: west across x 0 and south to (249, 31), landed on foot. The t ~ 0.07 tilt-out frame lines up with
   the top-down frame by eye; pixel identity is 49 % (the near texture is 48 px per cell under the 96 px field, and
   the capture is a few frames early). The exact t = 0 match is the unit test (`mode7Tilt.test.ts`, the 4 seam points).
 - B6 `wr_parked`: the parked ship 4 cells west across the seam, top-down sprite and Mode 7 billboard (`props` 1).
@@ -785,5 +786,4 @@ committed maps; the no-F-WR world is the F-WR compile with the four bands folded
 - The scenario loader has no facing key: the `wr_*` scenarios start facing down. Flying starts over a dock spot load
   as written (no fallback needed).
 - Tests adapted for the wrap: `worldSource` (52 spots), `travelMatrix` (the `; WRAP OK` suffix), `worldSpots`,
-  `DebugScenarioField`, `scenarioSpawns` (spawns at sea on the ship or in flight), and the F-WR region tests (ORDEAL's
-  pass-W comparison leaves the new id out).
+  `DebugScenarioField`, `scenarioSpawns` (spawns at sea on the ship or in flight); `questCurve` (the WR figures).

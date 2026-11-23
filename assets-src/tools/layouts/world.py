@@ -209,9 +209,8 @@ def main(argv: list[str]) -> int:
         return 0
     g, meta, _b, doc, ch = build()
     fig = figures(g, meta, ch)
-    seam = gates_wrap.seam_report(g, doc.get("encounterZones") or [], SEA_CLASS)   # WR: gated under F-WR (8.4)
-    ok = not seam["stretches"] and not seam["unclassed"]
-    lines = check_lines(ch, meta) + [f"seam_zones: {'OK' if ok else 'FAIL'} ({seam['note']})"] + gate_lines(fig)
+    seam = gates_wrap.seam_report(g, doc.get("encounterZones") or [], SEA_CLASS)   # WR: report-only (Q4 (b))
+    lines = check_lines(ch, meta) + [f"seam_zones: REPORT ({seam['note']})"] + gate_lines(fig)
     print("\n".join(lines))
     if "--metrics" in argv:
         print(json.dumps({k: v for k, v in fig.items() if k != "checks"}, indent=1, default=_plain))

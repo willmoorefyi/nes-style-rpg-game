@@ -45,12 +45,10 @@ SPOT_KINDS = ("land", "dock", "landing")     # 5.2: a spot's kind (walkable, Wat
 # cell lies within SEAM_MARGIN cells of an edge (the `wrap` check; mirrored in src/systems/worldWrap.ts). SEA_CLASS
 # sorts the ship zones into the early and the late seas for the report-only `seam_zones` line (Q4 (b): no re-zone).
 SEAM_MARGIN = 4
-SEAM_BAND = 8                                # F-WR (8.4): the late seas' seam bands, all Water (land starts at 8)
 SEA_CLASS: dict[str, str] = {
     **{z: "early" for z in ("a1_aldi", "a1_north_sea", "elf_aldi", "elf_sea", "ert_aldi", "ert_sea", "fir_aldi",
                             "fir_sea")},
     **{z: "late" for z in ("ord_sea", "wat_sea", "wnd_sea")},
-    **{z: "early" for z in ("wat_seam_w", "wat_seam_n", "ord_seam_n", "wnd_seam_n")},     # F-WR (8.4)
 }
 
 # 3.8 `basins`: the two seas and their seeds (aldi: the cell below Cornelia's jetty, today (92, 121) + A1_DELTA)

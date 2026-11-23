@@ -287,11 +287,11 @@ north to south and east to west". Plan and result `docs/WORLD_WRAP_PLAN.md`.
 - **Runtime:** every mode crosses x 255 | 0 and y 255 | 0 on the world map (`MapData.wrap`, `src/systems/worldWrap.ts`);
   the camera never clamps there; chunks, patches, NPCs, smoke and parked vehicles draw at their image nearest the
   camera (`WrapImages`, the layer sentinels, `vehicleParts`). Mode 7's far atlas repeats; the low atlas is 2048² (POT).
-- **World:** the seam stays open ocean (`wrap` and `check_seam` gates); four seam spots and the `wr_*` previews; F-WR's
-  four seam-band zones copy the early seas' tables. Chunks unchanged.
+- **World:** the seam stays open ocean (`wrap` and `check_seam` gates); four seam spots and the `wr_*` previews; sea
+  zones unchanged (report-only `seam_zones`). Chunks unchanged.
 - **Verifier:** routes cross the seam; (c) unchanged at 847,265 states; `WRAP` in (h); (g) planar.
-- **Open:** the curve gate fails at S21 (L29.2 against [25, 28]; +0.32 from the wrapped witnesses) even with F-WR; no
-  factor re-fit within the method's caps fixes it. A ruling is needed (plan, result section).
+- **Balance:** every stage from S14 on gains up to +0.38 levels (the wrapped witnesses' routes); by the user's ruling
+  S21's band is [25, 29] (L29.2) and the plan's fallback seam zones are not used. `quest --strict` OK.
 
 ---
 
