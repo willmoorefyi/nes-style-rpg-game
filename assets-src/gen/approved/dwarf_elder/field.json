@@ -100,7 +100,24 @@
     ]
   ],
   "shifts": {},
-  "edits": [],
+  "edits": [
+    {
+      "op": "patch",
+      "cell": [
+        2,
+        0
+      ],
+      "pixels": 7
+    },
+    {
+      "op": "patch",
+      "cell": [
+        2,
+        2
+      ],
+      "pixels": 7
+    }
+  ],
   "figure_px": [
     70,
     70,

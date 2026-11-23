@@ -79,6 +79,11 @@ DW_SPEC = {
                   [['s', 5, False], ['s', 5, False], ['s', 5, True]],
                   [['d', 0, False], ['d', 2, False], ['d', 0, False]]],
         "cut": {'s': {'holes': 20}, 'd': {'holes': 20}},
+        # user review 2026-11-23: the side strip's cut left a notch between the hood and the white hair at the top
+        # of the head (cells [2, 0] and [2, 2], both side cell 0); closed with the hood's own outline and greys
+        "edits": [{'op': 'patch', 'cell': [2, c],
+                   'pixels': [[21, 28, '#292129'], [22, 28, '#292129'], [23, 28, '#292129'], [24, 28, '#292129'],
+                              [24, 29, '#a5a5ad'], [25, 29, '#73737b'], [24, 31, '#73737b']]} for c in (0, 2)],
         "approved": "2026-11-22",
         "note": ("DW dwarf_elder: front s50_1 row 0 (dw_elder guide: old_man squashed, 0.5, seed 1; white beard, "
                  "royal-blue robe); back = the same render's true back cell 5 (stand, stand, mirrored: the elder does "
