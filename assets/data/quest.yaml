@@ -527,7 +527,7 @@ stages:
     requires: {flags: [], items: [canoe], vehicles: [airship]}
     grants: {flags: [CUBE_GIVEN], items: [cube], vehicles: []}
     boss: []
-    band: [25, 28]
+    band: [25, 29]   # WR: the user's ruling 2026-11-22 (the wrapped world's witness: S21 L29.2; docs/WORLD_WRAP_PLAN.md)
     kit: w_s21
     maps: [waterfall-cave]
     zones: [overworld:wat_streams]

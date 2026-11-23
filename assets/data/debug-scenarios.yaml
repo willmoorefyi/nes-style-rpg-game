@@ -3041,3 +3041,66 @@
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
+# === WR === (docs/WORLD_WRAP_PLAN.md 6.3, 10): the world wraps; the seam spots of WR-3 (the loader has no facing key:
+# the hero faces down at the start; press the direction first). B1-B9 browser checks; add &mode7=0 for top-down.
+- id: wr_ship_east
+  name: WR - on the ship at sea by the east seam (sail east across x 255 | 0)
+  mode: field
+  map: overworld
+  spot: fir_s_seam_e  # (253, 200), open sea
+  fieldMode: ship
+  flags: *w_s18_flags
+  party: &wr_party
+    - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+    - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
+- id: wr_ship_south
+  name: WR - on the ship at sea by the south seam (sail south across y 255 | 0)
+  mode: field
+  map: overworld
+  spot: elf_s_seam_s  # (100, 253), open sea
+  fieldMode: ship
+  flags: *w_s18_flags
+  party: *wr_party
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
+- id: wr_air_corner
+  name: WR - in flight at sea by the north-west corner (fly across every seam and the corner)
+  mode: field
+  map: overworld
+  spot: wat_s_seam_nw  # (3, 3), open sea
+  fieldMode: airship
+  flags: *w_s18_flags
+  party: *wr_party
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
+- id: wr_air_land
+  name: WR - in flight by the corner; fly west across x 0 and south to land on the grass by the east seam
+  mode: field
+  map: overworld
+  spot: wat_s_seam_nw  # (3, 3); the landing wnd_s_seam_landing is (249, 31), 10 cells west and 28 south across x 0
+  fieldMode: airship
+  flags: *w_s18_flags
+  party: *wr_party
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []
+- id: wr_parked
+  name: WR - the ship parked at sea by the east seam, the party in flight by the seam (fly to it across y 0 or along x 249)
+  mode: field
+  map: overworld
+  spot: wnd_s_seam_landing  # (249, 31); the ship at fir_s_seam_e (253, 200): fly south and look across the seam
+  fieldMode: airship
+  vehicles:
+    - { type: ship, map: overworld, at: fir_s_seam_e }
+  flags: *w_s18_flags
+  party: *wr_party
+  items: { potion: 8, canoe: 1, lute: 1 }
+  gold: 6000
+  enemies: []

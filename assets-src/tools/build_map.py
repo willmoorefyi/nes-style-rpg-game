@@ -99,7 +99,7 @@ FACE_PLAIN, FACE_BASE = (56, 84), (84, 96)
 BANK_R = 34              # px: blur radius that rounds the canal outline
 SHADOW = 2               # px of shadow below an overlay edge (stays well under the 4 px budget)
 PASSTHROUGH = ("name", "music", "encounterRate", "encounters", "battleBackgrounds", "canSave", "scriptedEncounters",
-               "vehicles", "keyItemGates", "noWander", "inspect", "encounterZones", "camp")
+               "vehicles", "keyItemGates", "noWander", "inspect", "encounterZones", "camp", "wrap")
 ALPHA_MIN = 0.25         # collide: alpha: a footprint cell blocks when this share of its pixels is opaque art
 SIDES = ("north", "south", "west", "east")
 
@@ -1226,6 +1226,7 @@ def write(src: dict, c: Compiled, out_dir: Path = OUT, kit: K.Kit | None = None,
     if kit is not None:
         HOOKS.bake_patches(c.id, src, c.grid, kit, out_dir)
         HOOKS.bake_mode7(c.id, src, out_dir, is_world)
+        HOOKS.check_seam(c.id, src, out_dir)          # WR: a wrapped map's seam looks like an interior chunk line
     doc = {"id": c.id, "width": c.width, "height": c.height, "layers": [], "tilesets": [],
            "art": {"tile": T, "chunk": CHUNK, "below": below, "above": above},
            "entrances": c.entrances,
@@ -1352,11 +1353,14 @@ def stitch(map_id: str, out_dir: Path = OUT) -> tuple[Image.Image, dict]:
 def preview(map_id: str, x0: int, y0: int, x1: int, y1: int, out: Path, grid: bool = False,
             collision: bool = False, scale: float = 1.0, out_dir: Path = OUT) -> Path:
     """Crop cells x0..x1, y0..y1 (inclusive) of a compiled map to a PNG; --collision tints blocked cells red and
-    transitions cyan, --grid draws cell lines (labelled every 5 cells), --scale resizes (nearest)."""
+    transitions cyan, --grid draws cell lines (labelled every 5 cells), --scale resizes (nearest). On a wrapped map
+    (WR) cells outside [0, W) read the map mod W and H, and --grid marks the seam in magenta."""
     from PIL import ImageDraw
     img, doc = stitch(map_id, out_dir)
     wid, hgt = doc["width"], doc["height"]
-    x0, y0, x1, y1 = max(0, x0), max(0, y0), min(wid - 1, x1), min(hgt - 1, y1)
+    wrap = bool(doc.get("wrap"))
+    if not wrap:
+        x0, y0, x1, y1 = max(0, x0), max(0, y0), min(wid - 1, x1), min(hgt - 1, y1)
     if x1 < x0 or y1 < y0:
         raise MapError(f"preview: empty crop for a {wid}x{hgt} map")
     if collision:
@@ -1370,7 +1374,7 @@ def preview(map_id: str, x0: int, y0: int, x1: int, y1: int, out: Path, grid: bo
         for t in doc.get("transitions") or []:
             d.rectangle([t["x"] * T, t["y"] * T, (t["x"] + 1) * T - 1, (t["y"] + 1) * T - 1], fill=(0, 255, 255, 110))
         img.alpha_composite(over)
-    img = img.crop((x0 * T, y0 * T, (x1 + 1) * T, (y1 + 1) * T))
+    img = _wrapped_crop(img, x0, y0, x1, y1, wid, hgt) if wrap else img.crop((x0 * T, y0 * T, (x1 + 1) * T, (y1 + 1) * T))
     if scale != 1.0:
         img = img.resize((max(1, round(img.width * scale)), max(1, round(img.height * scale))), Image.Resampling.NEAREST)
     if grid:
@@ -1380,12 +1384,36 @@ def preview(map_id: str, x0: int, y0: int, x1: int, y1: int, out: Path, grid: bo
             d.line([(round(i * step), 0), (round(i * step), img.height)], fill=(255, 255, 255, 140))
         for j in range(y1 - y0 + 2):
             d.line([(0, round(j * step)), (img.width, round(j * step))], fill=(255, 255, 255, 140))
+        for i in range(x1 - x0 + 2):          # WR: the seam in magenta
+            if wrap and (x0 + i) % wid == 0:
+                d.line([(round(i * step), 0), (round(i * step), img.height)], fill=(255, 0, 255, 255), width=3)
+        for j in range(y1 - y0 + 2):
+            if wrap and (y0 + j) % hgt == 0:
+                d.line([(0, round(j * step)), (img.width, round(j * step))], fill=(255, 0, 255, 255), width=3)
         for i in range(x1 - x0 + 1):
             for j in range(y1 - y0 + 1):
-                if (x0 + i) % 5 == 0 and (y0 + j) % 5 == 0:
-                    d.text((round(i * step) + 2, round(j * step) + 1), f"{x0 + i},{y0 + j}", fill=(255, 255, 0, 255))
+                cx, cy = ((x0 + i) % wid, (y0 + j) % hgt) if wrap else (x0 + i, y0 + j)
+                if cx % 5 == 0 and cy % 5 == 0:
+                    d.text((round(i * step) + 2, round(j * step) + 1), f"{cx},{cy}", fill=(255, 255, 0, 255))
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out)
+    return out
+
+
+def _wrapped_crop(img: Image.Image, x0: int, y0: int, x1: int, y1: int, wid: int, hgt: int) -> Image.Image:
+    """WR: cells x0..x1, y0..y1 of a wrapped map, each read mod (wid, hgt), pasted piece by piece."""
+    out = Image.new(img.mode, ((x1 - x0 + 1) * T, (y1 - y0 + 1) * T))
+
+    def spans(a: int, b: int, n: int):
+        while a <= b:
+            k = a // n
+            e = min(b, (k + 1) * n - 1)
+            yield a - k * n, e - k * n, a
+            a = e + 1
+    for sy0, sy1, ay in spans(y0, y1, hgt):
+        for sx0, sx1, ax in spans(x0, x1, wid):
+            piece = img.crop((sx0 * T, sy0 * T, (sx1 + 1) * T, (sy1 + 1) * T))
+            out.paste(piece, ((ax - x0) * T, (ay - y0) * T))
     return out
 
 

@@ -5,6 +5,7 @@
  * come from fieldRules.ts (`canEnter`, `canLand`, `dockFor`).
  */
 import { canEnter, canLand, dockFor } from '../systems/fieldRules.js';
+import { stepTo } from '../systems/worldWrap.js';
 import type { FieldMode, MapData } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
 import type { QuestWorld } from './questData.js';
@@ -20,7 +21,7 @@ export function modeExits(world: QuestWorld, map: MapData, comp: PlaceComponent,
   const w = map.width;
   const walk = { ...fieldStateOf(state), mode: 'walking' as FieldMode };
   const landSide = (c: { x: number; y: number }): Array<{ x: number; y: number }> => DIRS
-    .map(([dx, dy]) => ({ x: c.x + dx, y: c.y + dy }))
+    .map(([dx, dy]) => stepTo(map, c, dx, dy)).filter((a): a is { x: number; y: number } => a !== null)
     .filter((a) => canEnter(map, a, 'walking', walk));
   if (comp.mode === 'ship') {
     for (const d of map.docks ?? []) {
@@ -79,8 +80,8 @@ export function stateExits(world: QuestWorld, comp: PlaceComponent, state: Pick<
   const out = [...comp.exits];
   for (const v of state.vehicles) {
     if (v.map !== comp.map) continue;
-    const cells = [{ x: v.x, y: v.y }, ...DIRS.map(([dx, dy]) => ({ x: v.x + dx, y: v.y + dy }))];
-    const from = cells.find((c) => c.x >= 0 && c.y >= 0 && c.x < w && c.y < map.height && comp.cellSet.has(c.y * w + c.x));
+    const cells = [{ x: v.x, y: v.y }, ...DIRS.map(([dx, dy]) => stepTo(map, v, dx, dy))];
+    const from = cells.find((c): c is { x: number; y: number } => c !== null && comp.cellSet.has(c.y * w + c.x));
     if (!from) continue;
     out.push({ kind: 'board', id: `${comp.map}:board:${v.type}`, aliases: [`${comp.map}:vehicle:${v.type}`], from,
       to: { map: v.map, x: v.x, y: v.y, mode: v.type }, unpark: v.type });

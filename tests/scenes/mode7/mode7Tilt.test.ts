@@ -310,3 +310,43 @@ describe('M7-4: the near detail through a tilt by the clamped edges', () => {
     });
   }
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 7.5): on a wrapped map the camera never clamps, so the tilt starts centred, and t = 0
+// matches the top-down camera across each seam and at the corner (the cells past a seam at their unwrapped images)
+describe('WR: the t = 0 match at the seams of a wrapped world', () => {
+  const W = 256;
+  const ts = 96;
+  for (const [name, px, py] of [['the east seam', 255.5, 100.5], ['the west seam', 0.5, 100.5],
+    ['the south seam', 100.5, 255.5], ['the corner', 0.5, 0.5]] as Array<[string, number, number]>) {
+    it(`${name}: centred, every cell corner in view exact, and the near mesh holds no row back`, () => {
+      const world = new Container();
+      const cam = new Camera(world);
+      cam.setMapBounds((W * ts) / TILE_SIZE, (W * ts) / TILE_SIZE, true);
+      cam.setViewInsets({ bottom: HUD_BOTTOM_BAND });
+      const hero = { x: px * ts, y: py * ts };
+      cam.follow(hero);
+      cam.update();
+      const anchor = cam.worldToScreen(hero.x, hero.y);
+      expect(anchor).toEqual({ x: 960, y: (1080 - HUD_BOTTOM_BAND) / 2 });
+      const view = { ...tiltParams(0, { anchor, ship: { x: anchor.x, y: anchor.y + ts / 2 } }, ts).view, px, py };
+      let corners = 0;
+      for (let j = Math.floor(py) - 8; j <= Math.floor(py) + 8; j++) {
+        for (let i = Math.floor(px) - 12; i <= Math.floor(px) + 12; i++) {
+          const top = cam.worldToScreen(i * ts, j * ts);
+          if (top.x < 0 || top.x > 1920 || top.y < 0 || top.y > 1080) continue;
+          const m7 = cellToScreen(view, i, j)!;
+          expect(Math.abs(m7.x - top.x) + Math.abs(m7.y - top.y)).toBeLessThan(1e-6);
+          corners++;
+        }
+      }
+      expect(corners).toBeGreaterThan(150);
+      const map = { width: W, height: W, wrap: true, art: { tile: 48, chunk: 16, below: [], above: [] } };
+      for (let i = 0; i <= 42; i += 6) {
+        const v = { ...tiltParams(i / 42, { anchor, ship: anchor }, ts).view, px, py };
+        const w = nearWindow(map, NEAR_FULL, px, py);
+        expect(nearSplit(v, rowTable(v), D_SPLIT, w.ix0, w.iy0, w.cells, 1080, 1920, { w: W, h: W, wrap: true }))
+          .toBe(splitRow(v, D_SPLIT));
+      }
+    });
+  }
+});

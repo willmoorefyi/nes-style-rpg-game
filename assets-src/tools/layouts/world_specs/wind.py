@@ -117,7 +117,8 @@ def spec() -> RegionSpec:
                SpotDef("wnd_s_sky_airship", "wnd_mirage", MIRAGE_LANDING, "landing"),
                SpotDef("wnd_s_mirage_airship", "wnd_mirage", MIRAGE_LANDING, "landing"),
                SpotDef("wnd_s_lufenia_airship", "wnd_lufenia", LUFENIA_LANDING, "landing"),
-               SpotDef("wnd_s_ship", "wnd_lufenia", (20, 16), "dock")],
+               SpotDef("wnd_s_ship", "wnd_lufenia", (20, 16), "dock"),
+               SpotDef("wnd_s_seam_landing", "wnd_gaia", (39, -10), "landing")],     # WR: grass by the east seam
         north=("wnd_gaia", "wnd_mirage", "wnd_lufenia"),
         hikes=[Hike("wnd_mirage", "wnd_s_mirage_airship"), Hike("wnd_lufenia", "wnd_s_lufenia_airship")],
     )

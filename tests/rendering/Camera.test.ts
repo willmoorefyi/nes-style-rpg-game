@@ -190,3 +190,33 @@ describe('M12: setViewInsets keeps rooms above the bottom HUD band', () => {
     expect(top).toBeCloseTo((VIEWPORT_HEIGHT - 5 * TILE_SIZE) / 2);
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 4): a wrapped map never clamps; the smooth camera rebases by whole periods
+describe('Camera on a wrapped map', () => {
+  it('never clamps and reports the period; flat clamps are unchanged', () => {
+    const camera = new Camera(new Container());
+    camera.setMapBounds(50, 30, true);
+    camera.setPosition(-500, -400);
+    expect([camera.x, camera.y]).toEqual([-500, -400]);
+    expect(camera.period).toEqual({ x: 50 * TILE_SIZE, y: 30 * TILE_SIZE });
+    camera.setMapBounds(50, 30);
+    camera.setPosition(-500, -400);
+    expect([camera.x, camera.y]).toEqual([0, 0]);
+    expect(camera.period).toEqual({ x: 0, y: 0 });
+  });
+
+  it('a target that jumps by a period moves the smooth camera by the period, not across the map', () => {
+    const camera = new Camera(new Container());
+    camera.setMapBounds(50, 30, true);
+    camera.smooth = true;
+    const target = { x: 49.5 * TILE_SIZE, y: 10 * TILE_SIZE };
+    camera.follow(target);
+    for (let i = 0; i < 200; i++) camera.update();
+    const before = camera.x;
+    target.x += TILE_SIZE - 50 * TILE_SIZE;   // a step east across the seam, normalised
+    camera.update();
+    expect(camera.x - (before - 50 * TILE_SIZE)).toBeGreaterThan(0);
+    expect(camera.x - (before - 50 * TILE_SIZE)).toBeLessThan(TILE_SIZE);
+    expect(camera.x + VIEWPORT_WIDTH / 2).toBeLessThan(target.x);
+  });
+});

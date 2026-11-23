@@ -15,6 +15,7 @@ import type {
 } from '../types/index.js';
 import { stepMode, vehicleCanLand, vehicleTerrainAllows, type CellReader } from './fieldRulesVehicles.js';
 import { conditionMet, dueEncounterWhere, flagsMet } from './fieldRulesNpc.js';
+import { canonOf, isStep } from './worldWrap.js';
 
 export type { FieldMode } from '../types/index.js';
 export {
@@ -121,8 +122,9 @@ function standable(map: MapData, cell: Cell, mode: FieldMode, state: FieldState)
 
 /** Terrain after patches; gates (requiredFlag(s), requiredItem); static (non-wander) NPC cells block; while flying,
  *  everything on the map is open. (The canoe ability on River and Lake is a vehicle rule, W1-A's.) */
-export function canEnter(map: MapData, cell: Cell, mode: FieldMode, state: FieldState): boolean {
-  if (!standable(map, cell, mode, state)) return false;
+export function canEnter(map: MapData, at: Cell, mode: FieldMode, state: FieldState): boolean {
+  const cell = canonOf(map, at); // WR: a wrapped map's unwrapped cell; off a flat map: refused
+  if (!cell || !standable(map, cell, mode, state)) return false;
   if (mode === 'airship') return true;
   const gate = gateAt(map, cell);
   return gate === null || gateCheck(gate, state).open;
@@ -130,18 +132,20 @@ export function canEnter(map: MapData, cell: Cell, mode: FieldMode, state: Field
 
 /** The cell reads the vehicle rules need (fieldRulesVehicles.ts, W1-A). */
 export function cellReader(map: MapData, state: FieldState): CellReader {
+  const k = (c: Cell): Cell => canonOf(map, c) ?? c; // WR: each read on the canonical cell
   return {
-    mapId: map.id, inBounds: (c) => inBounds(map, c.x, c.y), terrain: (c) => patchedTerrain(map, c.x, c.y, state.flags),
-    walkable: (t) => terrainAllows('walking', t), staticNpc: (c) => staticNpcAt(map, c, state) !== null,
-    dock: (c) => dockFor(map, c) !== null, gate: (c) => gateAt(map, c) !== null,
-    transition: (c) => map.transitions.some((t) => t.x === c.x && t.y === c.y),
+    mapId: map.id, inBounds: (c) => { const q = k(c); return inBounds(map, q.x, q.y); },
+    terrain: (c) => { const q = k(c); return patchedTerrain(map, q.x, q.y, state.flags); },
+    walkable: (t) => terrainAllows('walking', t), staticNpc: (c) => staticNpcAt(map, k(c), state) !== null,
+    dock: (c) => dockFor(map, k(c)) !== null, gate: (c) => gateAt(map, k(c)) !== null,
+    transition: (c) => { const q = k(c); return map.transitions.some((t) => t.x === q.x && t.y === q.y); },
   };
 }
 
 /** The party's mode after a step to the 4-neighbour `to`, or null when its terrain refuses it (gates not looked at):
  *  boarding a parked ship, the canoe on and off, the ship's dock disembark (fieldRulesVehicles.stepMode). */
 export function modeAfterStep(map: MapData, from: Cell, to: Cell, state: FieldState): FieldMode | null {
-  return stepMode(cellReader(map, state), state, from, to);
+  return stepMode(cellReader(map, state), state, from, canonOf(map, to) ?? to); // WR: `to` canonical (parkedAt)
 }
 
 /** Whether the airship may land on the cell: grass, not a transition, gate or NPC cell (fieldRulesVehicles.ts). */
@@ -180,9 +184,10 @@ export interface StepResult {
  * the encounter due, the hazard damage of a walking step. The single entry point the game and the verifier share.
  * The mode a step leads to (boarding, the canoe, a dock disembark) is fieldRulesVehicles.ts's (W1-A).
  */
-export function fieldStep(map: MapData, from: Cell, to: Cell, state: FieldState): StepResult {
+export function fieldStep(map: MapData, from: Cell, at: Cell, state: FieldState): StepResult {
   const refused: StepResult = { ok: false, mode: state.mode, setFlags: [] };
-  if (Math.abs(to.x - from.x) + Math.abs(to.y - from.y) !== 1) return refused;
+  const to = canonOf(map, at); // WR: canonical once here; the lookups below stay strict
+  if (!to || !isStep(map, from, to)) return refused;
   // terrain and mode changes (fieldRulesVehicles.stepMode, W1-A): on foot, boarding, the canoe, the ship's docks
   const mode = modeAfterStep(map, from, to, state);
   if (mode === null) return refused;

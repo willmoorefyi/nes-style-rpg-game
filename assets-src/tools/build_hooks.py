@@ -171,6 +171,13 @@ def region_checks(src: dict, grid: "Grid", region: str | None) -> list[str]:
     return MR.check(src, src["ground"], region)
 
 
+def check_seam(map_id: str, src: dict, out_dir: Path) -> dict | None:
+    """WR (docs/WORLD_WRAP_PLAN.md 6.2): a `wrap: true` map's seam figures; a seam that shows a line fails the compile
+    (map_checks_wrap.SeamError)."""
+    import map_checks_wrap as MW  # noqa: PLC0415
+    return MW.check_seam(map_id, src, Path(out_dir))
+
+
 MODE7_MAPS = ("overworld",)                  # D-M7: Mode 7 flies only on the world map (not the selftest worlds)
 
 

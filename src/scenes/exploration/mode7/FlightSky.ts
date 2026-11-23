@@ -9,6 +9,7 @@
 import { BufferImageSource, Container, Graphics, Sprite, Texture } from 'pixi.js';
 import { SCREEN_W } from './mode7Math.js';
 import { CLOUDS, cloudPlace, cloudTexels } from './cloudMath.js';
+import { wrapDelta } from '../../../systems/worldWrap.js';
 
 type C15 = readonly [number, number, number];
 
@@ -56,8 +57,12 @@ export class FlightSky {
   readonly view = new Graphics();
   readonly fog: Sprite;
   readonly clouds = new Container();
+  /** WR: the clouds' odometer (cells), so a seam step (P from 255.9 to 0.0) never jumps them by 256 x parallax. */
+  private cloudPx = 0;
+  private lastPx: number | null = null;
 
-  constructor() {
+  /** `mapW`: a wrapped map's width in cells (0: flat, the clouds read P itself). */
+  constructor(private readonly mapW = 0) {
     const source = new BufferImageSource({ resource: fogTexels(), width: 1, height: FOG_TEXELS,
       alphaMode: 'premultiplied-alpha', scaleMode: 'linear', addressMode: 'clamp-to-edge' });
     this.fog = new Sprite(new Texture({ source }));
@@ -75,9 +80,12 @@ export class FlightSky {
 
   /** Place the clouds: their drift at `tMs`, their slide with the ship at `px` cells, their height over `horizon`. */
   drift(tMs: number, px: number, horizon: number): void {
+    this.cloudPx = this.lastPx === null ? px : this.cloudPx + wrapDelta(this.lastPx, px, this.mapW);
+    this.lastPx = px;
+    const x = this.mapW > 0 ? this.cloudPx : px;
     CLOUDS.forEach((c, i) => {
       const s = this.clouds.children[i];
-      const at = cloudPlace(c, tMs, px, horizon);
+      const at = cloudPlace(c, tMs, x, horizon);
       s.visible = at.visible;
       if (at.visible) s.position.set(at.x, at.y);
     });

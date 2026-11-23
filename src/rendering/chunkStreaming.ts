@@ -123,9 +123,14 @@ export class ChunkStreamer {
 /** An inclusive chunk rectangle. */
 export interface ChunkRect { c0: number; r0: number; c1: number; r1: number }
 
-/** Chunks covering tiles [x0, x1) x [y0, y1), clipped to the map's `cols` x `rows` chunks. */
+/** Chunks covering tiles [x0, x1) x [y0, y1), clipped to the map's `cols` x `rows` chunks; on a wrapped map (WR) not
+ *  clipped: the rect may run past either end (read it through `rectChunks`). */
 export function chunkRect(x0: number, y0: number, x1: number, y1: number, chunk: number, cols: number,
-  rows: number): ChunkRect {
+  rows: number, wrap = false): ChunkRect {
+  if (wrap) {
+    return { c0: Math.floor(x0 / chunk), r0: Math.floor(y0 / chunk), c1: Math.floor((x1 - 1) / chunk),
+      r1: Math.floor((y1 - 1) / chunk) };
+  }
   return {
     c0: Math.max(0, Math.floor(x0 / chunk)), r0: Math.max(0, Math.floor(y0 / chunk)),
     c1: Math.min(cols - 1, Math.floor((x1 - 1) / chunk)), r1: Math.min(rows - 1, Math.floor((y1 - 1) / chunk)),
@@ -136,8 +141,14 @@ export function chunkRect(x0: number, y0: number, x1: number, y1: number, chunk:
  * The Mode 7 near window (3.2): `n` x `n` chunks, moved in whole chunks so that cell (x, y) lies in its middle 16
  * cells (so at least `(n - 1) x chunk / 2` cells on each side: 24 for 4x4, 16 for 3x3), clamped to the map.
  */
-export function flightWindow(x: number, y: number, n: number, chunk: number, cols: number, rows: number): ChunkRect {
+export function flightWindow(x: number, y: number, n: number, chunk: number, cols: number, rows: number,
+  wrap = false): ChunkRect {
   const margin = ((n - 1) * chunk) / 2;
+  if (wrap) { // WR: a canonical origin, the far side may pass the last chunk
+    const c0 = modInt(Math.floor((x - margin) / chunk), cols);
+    const r0 = modInt(Math.floor((y - margin) / chunk), rows);
+    return { c0, r0, c1: c0 + n - 1, r1: r0 + n - 1 };
+  }
   const at = (v: number, count: number): number =>
     Math.max(0, Math.min(Math.max(0, count - n), Math.floor((v - margin) / chunk)));
   const c0 = at(x, cols);
@@ -146,10 +157,40 @@ export function flightWindow(x: number, y: number, n: number, chunk: number, col
 }
 
 /** The tiles a view of `view` tiles shows on an axis of `size` tiles when it centres on tile `at`, plus 1 tile. */
-export function viewSpan(at: number, view: number, size: number): [number, number] {
+export function viewSpan(at: number, view: number, size: number, wrap = false): [number, number] {
+  if (wrap) { // WR: never clamped
+    const s = at + 0.5 - view / 2;
+    return [Math.floor(s) - 1, Math.ceil(s + view) + 1];
+  }
   if (size <= view) return [0, size];
   const start = Math.max(0, Math.min(at + 0.5 - view / 2, size - view));
   return [Math.max(0, Math.floor(start) - 1), Math.min(size, Math.ceil(start + view) + 1)];
+}
+
+function modInt(v: number, n: number): number {
+  return ((v % n) + n) % n;
+}
+
+/** One chunk of a rect: its canonical index `i` and the (maybe unwrapped) column and row of its image. */
+export interface RectChunk { i: number; col: number; row: number }
+
+/** The chunks of `rect` row by row, each canonical index once (its first image wins); a flat rect is read as is. */
+export function rectChunks(rect: ChunkRect, cols: number, rows: number): RectChunk[] {
+  const out: RectChunk[] = [];
+  const seen = new Set<number>();
+  for (let row = rect.r0; row <= rect.r1; row++) {
+    for (let col = rect.c0; col <= rect.c1; col++) {
+      const i = modInt(row, rows) * cols + modInt(col, cols);
+      if (seen.has(i)) continue;
+      seen.add(i);
+      out.push({ i, col, row });
+    }
+  }
+  return out;
+}
+
+export function inRect(r: ChunkRect, col: number, row: number): boolean {
+  return col >= r.c0 && col <= r.c1 && row >= r.r0 && row <= r.r1;
 }
 
 /** Placeholder colours by terrain (ocean blue for water). */

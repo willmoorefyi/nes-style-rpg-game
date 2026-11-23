@@ -32,24 +32,39 @@ export function atlasUrls(map: Pick<MapData, 'art'>): { meta: string; full: stri
   return { meta: `${dir}mode7.json`, full: `${dir}mode7.png`, low: `${dir}mode7_low.png` };
 }
 
-/** The meta's size and cell size for a profile, after checking it fits the map; throws on a mismatch. */
-export function atlasSize(meta: AtlasMeta, map: Pick<MapData, 'width' | 'height'>, profile: AtlasProfile): { size: number; cellPx: number } {
+export function isPowerOfTwo(n: number): boolean {
+  return n > 0 && (n & (n - 1)) === 0;
+}
+
+/** WR (docs/WORLD_WRAP_PLAN.md 7.1): one rule for mips. WebGL2 mips any size; WebGL1 only a power of two (a mip filter
+ *  on an NPOT texture samples black there). */
+export function atlasMips(size: number, webgl2: boolean): boolean {
+  return webgl2 || isPowerOfTwo(size);
+}
+
+/** The meta's size and cell size for a profile, after checking it fits the map; throws on a mismatch, and (WR) on a
+ *  wrapped map whose atlas cannot repeat under WebGL1 (NPOT), so the load rejects into the view's `failed` path. */
+export function atlasSize(meta: AtlasMeta, map: Pick<MapData, 'width' | 'height' | 'wrap'>, profile: AtlasProfile,
+  webgl2 = true): { size: number; cellPx: number } {
   if (meta.version !== ATLAS_VERSION) throw new Error(`mode7.json: version ${meta.version}, expected ${ATLAS_VERSION}`);
   const size = profile === 'full' ? meta.size : meta.lowSize;
   const cellPx = profile === 'full' ? meta.cellPx : meta.lowCellPx;
   if (map.width !== map.height || size !== map.width * cellPx) {
     throw new Error(`mode7.json: ${profile} atlas ${size} px at ${cellPx} px per cell does not fit a ${map.width}x${map.height} map`);
   }
+  if (map.wrap && !webgl2 && !isPowerOfTwo(size)) {
+    throw new Error(`mode7.json: a wrapped map needs a power-of-two atlas under WebGL1 (${size})`);
+  }
   return { size, cellPx };
 }
 
-/** The render texture's options. Magnification is nearest (pixel art), minification linear, clamped to the sea at
- *  the edges. With WebGL2 the mips are on (linear, with anisotropy); without it the NPOT atlas gets no mips, because
- *  a mip filter on an NPOT texture samples black under WebGL1 (3.1). */
-export function atlasTextureOptions(size: number, webgl2: boolean): TextureSourceOptions {
-  const base: TextureSourceOptions = { width: size, height: size, resolution: 1, addressMode: 'clamp-to-edge',
-    magFilter: 'nearest', minFilter: 'linear' };
-  return webgl2 ? { ...base, autoGenerateMipmaps: true, mipmapFilter: 'linear', maxAnisotropy: ATLAS_ANISOTROPY }
+/** The render texture's options. Magnification is nearest (pixel art), minification linear; a flat map clamps to the
+ *  sea at the edges, a wrapped one repeats (WR). Mips (linear, with anisotropy) when `atlasMips`: with WebGL2, or a
+ *  power of two under WebGL1; otherwise none (3.1). */
+export function atlasTextureOptions(size: number, webgl2: boolean, wrap = false): TextureSourceOptions {
+  const base: TextureSourceOptions = { width: size, height: size, resolution: 1,
+    addressMode: wrap ? 'repeat' : 'clamp-to-edge', magFilter: 'nearest', minFilter: 'linear' };
+  return atlasMips(size, webgl2) ? { ...base, autoGenerateMipmaps: true, mipmapFilter: 'linear', maxAnisotropy: ATLAS_ANISOTROPY }
     : { ...base, autoGenerateMipmaps: false };
 }
 
@@ -117,14 +132,15 @@ export class WorldAtlas {
   async load(): Promise<void> {
     const urls = atlasUrls(this.opts.map);
     if (!urls) throw new Error(`map ${this.opts.map.id} has no baked art for a Mode 7 atlas`);
-    const { size, cellPx } = atlasSize(await this.loader.meta(urls.meta), this.opts.map, this.opts.profile);
+    const { size, cellPx } = atlasSize(await this.loader.meta(urls.meta), this.opts.map, this.opts.profile,
+      this.opts.webgl2);
     this.cellPx = cellPx;
     this.placements = patchPlacements(this.opts.map, cellPx);
     const art = this.opts.map.art?.patches ?? {};
     await Promise.all(this.placements.map((p) => this.loader.texture(art[p.id]).then((t) => { this.patchTex[p.id] = t; },
       (err: unknown) => console.error(`Mode 7: could not load the patch overlay ${art[p.id]}`, err))));
     if (this.destroyed) return;
-    this.rt = RenderTexture.create(atlasTextureOptions(size, this.opts.webgl2));
+    this.rt = RenderTexture.create(atlasTextureOptions(size, this.opts.webgl2, this.opts.map.wrap === true));
     this.rt.source.style.magFilter = 'nearest';   // Pixi's maxAnisotropy > 1 sets every filter linear: keep nearest up
     await this.compose();
   }
@@ -174,7 +190,7 @@ export class WorldAtlas {
         stage.addChild(s);
       }
       this.opts.renderer.render({ container: stage, target: this.rt, clear: true });
-      if (this.opts.webgl2) this.rt.source.updateMipmaps();
+      if (atlasMips(this.rt.width, this.opts.webgl2)) this.rt.source.updateMipmaps();
       stage.destroy({ children: true });
       this.signature = patchSignature(this.placements, this.opts.hasFlag);
     } finally {

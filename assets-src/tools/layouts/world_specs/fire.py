@@ -92,7 +92,8 @@ def spec() -> RegionSpec:
                SpotDef("fir_s_crescent_ship", "dock:fir_crescent", (0, 0), "dock"),
                SpotDef("fir_s_airship", "fir_desert", (6, 2), "landing"),
                SpotDef("fir_s_ice_ship", "dock:fir_ice", (0, 0), "dock"),
-               SpotDef("fir_s_ice_shore", "dock:fir_ice", (1, 0), "land")],
+               SpotDef("fir_s_ice_shore", "dock:fir_ice", (1, 0), "land"),
+               SpotDef("fir_s_seam_e", "fir_desert", (59, -7), "dock")],     # WR: at sea by the east seam
     )
 
 

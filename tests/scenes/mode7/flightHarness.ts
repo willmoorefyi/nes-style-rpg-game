@@ -29,8 +29,8 @@ export function deferred(): Deferred {
 export const stub = {
   created: 0, destroyed: 0, draws: 0, visible: false,
   last: null as FlightFrame | null, opts: null as FlightRendererOptions | null,
-  /** When set, `load` waits on it; `fail` makes it reject. */
-  gate: null as Deferred | null, fail: false,
+  /** When set, `load` waits on it; `fail` makes it reject (an Error: with that error, WR's atlas guard). */
+  gate: null as Deferred | null, fail: false as boolean | Error,
 };
 
 export function resetStub(): void {
@@ -43,7 +43,8 @@ export const rendererModule = {
     stub.created++;
     stub.opts = opts;
     return {
-      load: () => (stub.fail ? Promise.reject(new Error('mode7.json: 404')) : stub.gate?.promise ?? Promise.resolve()),
+      load: () => (stub.fail ? Promise.reject(stub.fail instanceof Error ? stub.fail : new Error('mode7.json: 404'))
+        : stub.gate?.promise ?? Promise.resolve()),
       setVisible: (v: boolean) => { stub.visible = v; },
       draw: (f: FlightFrame) => { stub.draws++; stub.last = f; },
       destroy: () => { stub.destroyed++; },

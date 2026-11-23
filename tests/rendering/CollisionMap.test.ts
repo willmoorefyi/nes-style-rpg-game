@@ -125,3 +125,28 @@ describe('CollisionMap', () => {
     });
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 4): the runtime reader canonicalises on a wrapped map; flat maps are unchanged
+describe('CollisionMap: the wrap', () => {
+  const base = (): MapData => ({ id: 'w', width: 4, height: 4, layers: [[]], tilesets: [], npcs: [], transitions: [],
+    collision: [2, 2, 2, 2, 2, 0, 0, 2, 2, 0, 0, 2, 2, 2, 2, 10] });
+
+  it('getTerrainType, isWalkable, isCounter and wrapCell fold an unwrapped cell', () => {
+    const map = new CollisionMap({ ...base(), wrap: true });
+    expect(map.getTerrainType(5, 5)).toBe(TerrainType.Grass);
+    expect(map.isWalkable(-4, 1, new ShipMode())).toBe(true);
+    expect(map.isWalkable(-4, 1, new WalkingMode())).toBe(false);
+    expect(map.isCounter(-1, -1)).toBe(true);
+    expect(map.wrapCell(4, -1)).toEqual({ x: 0, y: 3 });
+    expect(map.period.x).toBeGreaterThan(0);
+  });
+
+  it('a flat map keeps its bounds and has no period', () => {
+    const map = new CollisionMap(base());
+    expect(map.getTerrainType(5, 5)).toBe(TerrainType.Wall);
+    expect(map.isWalkable(-3, 1, new ShipMode())).toBe(false);
+    expect(map.isCounter(-1, -1)).toBe(false);
+    expect(map.wrapCell(4, 0)).toBeNull();
+    expect(map.period).toEqual({ x: 0, y: 0 });
+  });
+});

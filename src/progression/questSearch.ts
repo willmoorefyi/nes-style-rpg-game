@@ -7,6 +7,7 @@
  * The auto events (pending stages' synthetic grants, vehicle spawns) fire as soon as they can, in stage order: they
  * need no place, and firing them at once removes their interleavings from the state space.
  */
+import { stepIndex } from '../systems/worldWrap.js';
 import { fieldStep } from '../systems/fieldRules.js';
 import type { VehicleState } from '../types/index.js';
 import type { QuestPlace, QuestState } from './questTypes.js';
@@ -233,9 +234,9 @@ export function cellPath(world: QuestWorld, from: QuestPlace, goals: Array<{ x: 
     }
     const at = { x: c % w, y: Math.floor(c / w) };
     for (const [dx, dy] of DIRS) {
-      const to = { x: at.x + dx, y: at.y + dy };
-      const n = to.y * w + to.x;
-      if (to.x < 0 || to.y < 0 || to.x >= w || to.y >= map.height || prev.has(n)) continue;
+      const n = stepIndex(map, at.x, at.y, dx, dy); // WR: across the seam on a wrapped map
+      const to = { x: n % w, y: Math.floor(n / w) };
+      if (n < 0 || prev.has(n)) continue;
       const r = fieldStep(map, at, to, fs);
       if (!r.ok || (r.mode !== from.mode && !want.has(n))) continue;
       prev.set(n, c);

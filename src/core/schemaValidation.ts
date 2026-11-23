@@ -270,6 +270,7 @@ export function validateMapData(data: unknown): MapData {
   if (data.battleBackgrounds !== undefined) validateBattleBackgrounds(data.battleBackgrounds);
   if (data.inspect !== undefined) validateInspect(data.inspect, data.width as number, data.height as number);
   if (data.art !== undefined) validateBakedArt(data.art, data.width as number, data.height as number);
+  if (data.wrap !== undefined) validateWrap(data);
   if (data.keyItemGates !== undefined) validateKeyItemGates(data.keyItemGates);
   if (data.scriptedEncounters !== undefined) {
     validateScriptedEncounters(data.scriptedEncounters, (data.npcs as Record<string, unknown>[]).map((n) => String(n.id)));
@@ -380,5 +381,16 @@ function validateBakedArt(art: unknown, width: number, height: number): void {
       if (key === 'above' && v === null) return;
       assertString(`MapData.art.${key}[${i}]`, v);
     });
+  }
+}
+
+/** WR: `wrap: true` only on a streamed baked map (more than 64 chunks, chunkStreaming.streams) whose sides are whole
+ *  chunks; the legacy maps stay flat. */
+function validateWrap(data: Record<string, unknown>): void {
+  assertType('MapData.wrap', data.wrap, 'boolean');
+  if (data.wrap !== true) return;
+  const art = data.art as { chunk: number; below: unknown[] } | undefined;
+  if (!art || art.below.length <= 64 || (data.width as number) % art.chunk || (data.height as number) % art.chunk) {
+    throw new ValidationError('MapData.wrap: a wrapped map must be a streamed baked map of whole chunks');
   }
 }

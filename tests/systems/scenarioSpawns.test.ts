@@ -13,7 +13,8 @@ import { validateMapData } from '../../src/core/schemaValidation.js';
 import { entrance, spot } from '../helpers/worldSpots.js';
 
 const scenarios = parse(readFileSync('assets/data/debug-scenarios.yaml', 'utf-8')) as DebugScenario[];
-const onOverworld = scenarios.filter((s) => s.mode === 'field' && s.map === 'overworld');
+// WR: the wr_* seam scenarios start on the ship or in flight over open sea (docs/WORLD_WRAP_PLAN.md 6.3)
+const onOverworld = scenarios.filter((s) => s.mode === 'field' && s.map === 'overworld' && !s.id.startsWith('wr_'));
 const map = validateMapData(parse(readFileSync('assets/maps/ai/overworld.yaml', 'utf-8')));
 
 describe('scenarioSpawns: overworld field scenarios', () => {

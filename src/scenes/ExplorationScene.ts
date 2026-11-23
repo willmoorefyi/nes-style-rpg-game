@@ -37,6 +37,11 @@ import { npcPresenceChanges } from './exploration/NpcPresence.js';
 import { noWanderTiles, updateWanderers } from './exploration/NpcWander.js';
 import { encounterStepFilter } from './exploration/FieldTiles.js';
 import { FlightView } from './exploration/mode7/FlightView.js';
+import { WrapImages } from '../rendering/wrapImages.js';
+import { setVehicleWrapOffset, vehicleParts } from './exploration/FieldVehicleSprites.js';
+import { nearestImage } from '../systems/worldWrap.js';
+import { publishFieldProbe } from './exploration/fieldProbe.js';
+import { VIEWPORT_HEIGHT, VIEWPORT_WIDTH } from '../rendering/Camera.js';
 
 export class ExplorationScene implements Scene {
   readonly container = new Container();
@@ -71,6 +76,7 @@ export class ExplorationScene implements Scene {
   private npcActions: FieldNpcActions;
   private flight: FlightView; // the Mode 7 airship view (docs/MODE7_PLAN.md)
   private walkingMode: MovementMode = new WalkingMode();
+  private wrapImages = new WrapImages(); // WR: world objects at their image nearest the camera (docs/WORLD_WRAP_PLAN.md 5)
   /** NPC in conversation (faces the heroes until the dialog closes). */
   private talkingNpc: NPC | null = null;
   private fieldHUD: FieldHUD;
@@ -304,7 +310,10 @@ export class ExplorationScene implements Scene {
     this.worldContainer.sortableChildren = true;
     this.worldContainer.addChild(tilemap.container);
     if (tilemap.aboveContainer) this.worldContainer.addChild(tilemap.aboveContainer);
-    this.camera.setMapBounds(mapData.width, mapData.height);
+    this.camera.setMapBounds(mapData.width, mapData.height, mapData.wrap === true);
+    const cam = this.camera;
+    setVehicleWrapOffset(mapData.wrap ? (x, y) => ({ dx: nearestImage(x, cam.x + VIEWPORT_WIDTH / 2, cam.period.x) - x,
+      dy: nearestImage(y, cam.y + VIEWPORT_HEIGHT / 2, cam.period.y) - y }) : null);
     tilemap.setCamera(this.camera);
     this.tilemap = tilemap;
     for (const npc of npcs) this.worldContainer.addChild(npc.sprite);
@@ -313,6 +322,7 @@ export class ExplorationScene implements Scene {
     this.npcInteraction.setCounterCheck((x, y) => collisionMap.isCounter(x, y));
     this.npcInteraction.setInspectCheck((x, y) => inspectAt(mapData, x, y, (f) => this.game.gameFlags.has(f)));
     this.npcInteraction.setInput(this.game.input);
+    this.npcInteraction.setMap(mapData);
     this.mapTransition.setTransitions(mapData.transitions);
     this.vehicles.setMap(mapData);
     this.flight.setMap(mapData);
@@ -355,7 +365,22 @@ export class ExplorationScene implements Scene {
     return this.loading || this.fieldTransition.active || this.cutsceneRunning || this.flight.busy;
   }
 
+  /** WR: the shifted images are undone before the frame's logic and put back after it, just before Pixi renders. */
   update(dt: number): void {
+    this.wrapImages.restore();
+    try { this.step(dt); } finally { this.applyWrap(); }
+  }
+
+  private applyWrap(): void {
+    const tm = this.tilemap;
+    this.wrapImages.apply(this.worldContainer, { x: this.camera.x, y: this.camera.y, width: VIEWPORT_WIDTH,
+      height: VIEWPORT_HEIGHT }, this.camera.period, (c) => c === tm?.container || c === tm?.aboveContainer || vehicleParts.has(c));
+    const p = this.player;
+    publishFieldProbe(() => p && { cell: { x: p.gridX, y: p.gridY }, mode: fieldModeOf(p.currentMode),
+      zone: this.encounterSystem.zoneAt(p.gridX, p.gridY)?.id ?? null });
+  }
+
+  private step(dt: number): void {
     if (this.paused || this.loading) return;
     this.ambient.update(dt); // loops under dialogs and the battle flash too
     // C5: Battle flash animation

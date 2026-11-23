@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Texture, type Renderer } from 'pixi.js';
+import { Texture, TextureSource, type Renderer } from 'pixi.js';
 import {
   WorldAtlas, atlasSize, atlasTextureOptions, atlasUrls, patchPlacements, patchSignature, type AtlasLoader, type AtlasMeta,
 } from '../../../src/scenes/exploration/mode7/WorldAtlas.js';
@@ -20,12 +20,18 @@ function world(): MapData {
   } as unknown as MapData;
 }
 
-function stubLoader(): AtlasLoader & { loaded: string[]; unloaded: string[] } {
+/** WR: the wrapped 256-cell world, its meta with the POT low atlas (2048, 8 px per cell). */
+const META_256: AtlasMeta = { version: 1, cellPx: 12, size: 3072, lowCellPx: 8, lowSize: 2048, inputs: 'x' };
+function torus(): MapData {
+  return { ...world(), width: 256, height: 256, wrap: true };
+}
+
+function stubLoader(meta: AtlasMeta = META): AtlasLoader & { loaded: string[]; unloaded: string[] } {
   const loaded: string[] = [];
   const unloaded: string[] = [];
   return {
     loaded, unloaded,
-    meta: async () => META,
+    meta: async () => meta,
     texture: async (url) => { loaded.push(url); return Texture.EMPTY; },
     unload: async (url) => { unloaded.push(url); },
   };
@@ -52,6 +58,14 @@ describe('M7-1: WorldAtlas', () => {
     expect(gl1).toMatchObject({ autoGenerateMipmaps: false, magFilter: 'nearest', minFilter: 'linear' });
     expect(gl1.mipmapFilter).toBeUndefined();
     expect(gl1.maxAnisotropy).toBeUndefined();
+    // WR (7.1): a flat map clamps, a wrapped one repeats; a power of two mips under WebGL1 too
+    for (const wrap of [false, true]) {
+      expect(atlasTextureOptions(3072, true, wrap).addressMode).toBe(wrap ? 'repeat' : 'clamp-to-edge');
+      expect(atlasTextureOptions(1536, false, wrap)).toMatchObject({ autoGenerateMipmaps: false,
+        addressMode: wrap ? 'repeat' : 'clamp-to-edge' });
+    }
+    expect(atlasTextureOptions(2048, false, true)).toMatchObject({ autoGenerateMipmaps: true, mipmapFilter: 'linear',
+      addressMode: 'repeat' });
   });
 
   it('places each patch at its top-left cell, scaled 16/48 (or 8/48 on the low atlas)', () => {
@@ -95,7 +109,29 @@ describe('M7-1: WorldAtlas', () => {
     expect(atlas.texture).toBeNull();
   });
 
-  it('the low profile without WebGL2 loads mode7_low.png and builds no mips', async () => {
+  it('WR: the low profile without WebGL2 on the wrapped world (2048, a power of two) repeats and builds its mips', async () => {
+    const loader = stubLoader(META_256);
+    const mips = vi.spyOn(TextureSource.prototype, 'updateMipmaps');
+    const atlas = new WorldAtlas({ map: torus(), profile: 'low', webgl2: false,
+      renderer: { render: vi.fn() } as unknown as Renderer, hasFlag: () => false, loader });
+    await atlas.load();
+    expect(atlas.texture?.width).toBe(2048);
+    expect(atlas.texture?.source.autoGenerateMipmaps).toBe(true);
+    expect(atlas.texture?.source.style.addressMode).toBe('repeat');
+    expect(mips).toHaveBeenCalled();
+    mips.mockRestore();
+    atlas.destroy();
+  });
+
+  it('WR: a wrapped world whose low atlas is NPOT rejects under WebGL1 (the view then flies top-down)', async () => {
+    const atlas = new WorldAtlas({ map: torus(), profile: 'low', webgl2: false,
+      renderer: { render: vi.fn() } as unknown as Renderer, hasFlag: () => false,
+      loader: stubLoader({ ...META_256, lowCellPx: 6, lowSize: 1536 }) });
+    await expect(atlas.load()).rejects.toThrow('mode7.json: a wrapped map needs a power-of-two atlas under WebGL1 (1536)');
+    expect(atlasSize({ ...META_256, lowCellPx: 6, lowSize: 1536 }, torus(), 'low', true)).toEqual({ size: 1536, cellPx: 6 });
+  });
+
+  it('the low profile without WebGL2 on a flat world (1536) loads mode7_low.png and builds no mips', async () => {
     const loader = stubLoader();
     const atlas = new WorldAtlas({ map: world(), profile: 'low', webgl2: false,
       renderer: { render: vi.fn() } as unknown as Renderer, hasFlag: () => false, loader });

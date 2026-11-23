@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Texture, type Container, type Renderer, type Sprite } from 'pixi.js';
-import { NearDetail, clipBox, nearTextureOptions } from '../../../src/scenes/exploration/mode7/NearDetail.js';
+import { NearDetail, clipBox, nearTextureOptions, wrapBoxes } from '../../../src/scenes/exploration/mode7/NearDetail.js';
 import { GroundStrips, SEAM_ROWS } from '../../../src/scenes/exploration/mode7/GroundStrips.js';
 import { NEAR_FULL, NEAR_LOW, nearWindow, type ChunkHost } from '../../../src/scenes/exploration/mode7/FlightStream.js';
 import { FOG_ALPHA, FOG_ROWS, fogTexels, rgb15, SKY_HAZE } from '../../../src/scenes/exploration/mode7/FlightSky.js';
@@ -177,3 +177,74 @@ describe('M7-3: the fog (2.5)', () => {
     expect(FOG_ROWS).toBe(120);
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 7.3): the near window across the seam
+describe('WR: NearDetail on a wrapped world', () => {
+  const torus = (): MapData => ({ ...world(), wrap: true, patches: [{ id: 'canal', flag: 'CANAL_OPEN',
+    cells: [[1, 1], [2, 1]], terrain: 2 }] });
+
+  it('wrapBoxes splits a box at the corner into 4 canonical pieces at their unwrapped places', () => {
+    const parts = wrapBoxes({ x0: 176, y0: 176, x1: 240, y1: 240 }, 192, 192);
+    expect(parts).toEqual([
+      { src: { x0: 176, y0: 176, x1: 192, y1: 192 }, at: { x: 176, y: 176 } },
+      { src: { x0: 0, y0: 176, x1: 48, y1: 192 }, at: { x: 192, y: 176 } },
+      { src: { x0: 176, y0: 0, x1: 192, y1: 48 }, at: { x: 176, y: 192 } },
+      { src: { x0: 0, y0: 0, x1: 48, y1: 48 }, at: { x: 192, y: 192 } },
+    ]);
+    expect(wrapBoxes({ x0: 16, y0: 32, x1: 80, y1: 96 }, 192, 192)).toEqual([
+      { src: { x0: 16, y0: 32, x1: 80, y1: 96 }, at: { x: 16, y: 32 } }]);
+  });
+
+  it('a window at the corner draws 4 underlay pieces, the wrapped chunks and the patch at its image', () => {
+    const map = torus();
+    const win = nearWindow(map, NEAR_FULL, 0.5, 0.5);   // c0 = r0 = 10 (canonical), c1 = r1 = 13
+    expect(win.rect).toEqual({ c0: 10, r0: 10, c1: 13, r1: 13 });
+    expect([win.x0, win.ix0]).toEqual([160, -32]);
+    const { draws, host, flags } = rig(new Set([0, 11 * 12 + 11]));
+    const near = new NearDetail({ renderer: (rigRenderer(draws)), map, atlas: rigAtlas(), prof: NEAR_FULL,
+      hasFlag: (f) => flags.has(f) });
+    flags.add('CANAL_OPEN');
+    near.update(win, host);
+    const d = draws[draws.length - 1];
+    // underlay pieces: [160, 192) x2 then [0, 32) x2, at the square's local px (cell - 160) x 48
+    expect(d.sprites.slice(0, 4).map((s) => [s.x, s.y, s.w, s.h])).toEqual([
+      [0, 0, 32 * 16, 32 * 16], [32 * 48, 0, 32 * 16, 32 * 16], [0, 32 * 48, 32 * 16, 32 * 16], [32 * 48, 32 * 48, 32 * 16, 32 * 16]]);
+    // chunk (11, 11) at its own square; chunk 0 at unwrapped col 12, row 12 (past the seam)
+    expect(d.sprites.slice(4, 6).map((s) => [s.x, s.y])).toEqual([[768, 768], [1536, 1536]]);
+    // the patch at (1, 1) draws at its image (193, 193)
+    expect(d.sprites[6]).toMatchObject({ x: (193 - 160) * 48, y: (193 - 160) * 48 });
+  });
+
+  it('a late chunk 11 draws into its square of a window at c0 11 that passes the seam', () => {
+    const map = torus();
+    const win = nearWindow(map, NEAR_FULL, 190.5, 100.5);   // cols 10..13: chunk cols 10, 11, 0, 1
+    const loaded = new Set<number>();
+    const { draws, host, arrive } = rig(loaded);
+    const near = new NearDetail({ renderer: rigRenderer(draws), map, atlas: rigAtlas(), prof: NEAR_FULL, hasFlag: () => false });
+    near.update(win, host);
+    const before = draws.length;
+    const late = win.rect.r0 * 12 + 0;   // chunk col 0 of the first window row: unwrapped col 12
+    loaded.add(late);
+    arrive(late);
+    near.update(win, host);
+    expect(draws.length).toBe(before + 1);
+    expect(draws[draws.length - 1].sprites[0]).toMatchObject({ x: (12 * 16 - win.x0) * 48, y: 0 });
+  });
+});
+
+function rigRenderer(draws: Drawn[]): Renderer {
+  return {
+    render: ({ container, clear }: { container: Container; clear: boolean }) => {
+      draws.push({ clear, sprites: (container.children as Sprite[]).map((s) => ({ x: s.x, y: s.y, scale: s.scale.x,
+        w: s.texture.frame.width, h: s.texture.frame.height, fx: s.texture.frame.x })) });
+    },
+  } as unknown as Renderer;
+}
+
+function rigAtlas(): WorldAtlas {
+  const patch = new Texture({ source: Texture.WHITE.source });
+  Object.defineProperty(patch, 'width', { value: 2 * 48 });
+  Object.defineProperty(patch, 'height', { value: 48 });
+  const far = new Texture({ source: Texture.WHITE.source });
+  return { texture: far, cellPx: 16, patchTexture: (id: string) => (id === 'canal' ? patch : null) } as unknown as WorldAtlas;
+}

@@ -141,3 +141,20 @@ describe('NPCInteractionSystem inspect cells (T3e)', () => {
     expect(sys.interact()).toEqual({ kind: 'inspect', lines: ['Here lies Erdrick.'] });
   });
 });
+
+// WR (docs/WORLD_WRAP_PLAN.md 4): across a counter on the seam of a wrapped map, the far cell wraps too
+describe('NPCInteractionSystem across a counter on a wrapped map', () => {
+  it('reaches the NPC two cells away across x W - 1 | 0', async () => {
+    const { NPCInteractionSystem } = await import('../../src/systems/NPCInteraction.js');
+    const sys = new NPCInteractionSystem();
+    const keeper = { tileX: 0, tileY: 3 } as unknown as import('../../src/entities/NPC.js').NPC;
+    sys.setNPCs([keeper]);
+    sys.setPlayer({ isMoving: false, gridX: 6, gridY: 3, facingTile: { x: 7, y: 3 } } as unknown as import('../../src/entities/PlayerController.js').PlayerController);
+    sys.setInput({ isJustPressed: () => true } as unknown as import('../../src/core/InputManager.js').InputManager);
+    sys.setCounterCheck((x, y) => x === 7 && y === 3);
+    sys.setMap({ width: 8, height: 8, wrap: true });
+    expect(sys.checkInteraction()).toBe(keeper);
+    sys.setMap({ width: 8, height: 8 });
+    expect(sys.checkInteraction()).toBeNull();
+  });
+});

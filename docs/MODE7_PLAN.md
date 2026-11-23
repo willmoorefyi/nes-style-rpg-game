@@ -260,12 +260,18 @@ The ship's cell shows at 95 px per cell (96 top-down), so the ship keeps its siz
 - **The seam.** The far mesh draws every ground row farther than `D_SPLIT − 1` cells. The near mesh draws the rows
   nearer than `D_SPLIT − 1`. Between them are 8 one-row `Mesh`es with the near texture, at `alpha` 1/9 to 8/9, drawn
   over the far mesh (8 extra draw calls). No per-vertex alpha is needed.
+- **Superseded by WR (`docs/WORLD_WRAP_PLAN.md` 7.1, 2026-11-22):** the world map wraps; on it both atlases repeat
+  (`REPEAT`), the low atlas is 2048² at 8 px per cell (a power of two, so it repeats and mips under WebGL1), and the
+  near window has no open sides. The clamp below holds for a flat map only.
 - **Off the world.** Both atlases use clamp-to-edge. All four world edges are sea (1), so the ground beyond the map
   repeats sea texels, and the camera never clamps in flight. M7-0 screenshots `m7_edge` to judge the repeat.
 
 ## 3. Data: the world's textures
 
 ### 3.1 Far atlas (D-M5)
+
+> WR (2026-11-22): `mode7_low.png` is now 2048² at 8 px per cell (`mode7_atlas.cell_px`, `POT_LOW`), not half the
+> full cell; the atlas repeats on the wrapped world (`docs/WORLD_WRAP_PLAN.md` 7.1).
 
 - **The bake.** `build_hooks.py` gains
   `bake_mode7(map_id: str, src: dict, out_dir: Path, is_world: Callable[[dict], bool]) -> Path | None`. It calls the new

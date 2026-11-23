@@ -4,6 +4,7 @@
  * is in its band, each pair's distance ratio and bearing error are in theirs, and the listed hops have no long
  * detour. An anchor whose entrance does not exist yet uses its target and is `assumed` (a failure with --strict).
  */
+import { torusHypot } from '../systems/worldWrap.js';
 import type { FieldMode } from '../types/index.js';
 import type { ProofFailure, ProofResult, QuestPlace, QuestState } from './questTypes.js';
 import { fail, result, type QuestContext } from './questProofs.js';
@@ -128,7 +129,7 @@ export function worldPathLength(ctx: QuestContext): (from: XY, to: XY, mode: str
     const st = openState(ctx, a);
     const modes = new Set<FieldMode>(MODES[mode] ?? ['walking']);
     if (modes.has('ship')) {
-      const near = [...(map.docks ?? [])].sort((d, e) => Math.hypot(d.x - a.x, d.y - a.y) - Math.hypot(e.x - a.x, e.y - a.y))[0];
+      const near = [...(map.docks ?? [])].sort((d, e) => torusHypot(map, d, a) - torusHypot(map, e, a))[0];
       if (near) st.vehicles = [{ type: 'ship', map: map.id, x: near.x, y: near.y }];
     }
     const path = route(ctx, a, (p) => p.map === map.id && p.x === to[0] && p.y === to[1] && p.mode === 'walking',

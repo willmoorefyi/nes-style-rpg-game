@@ -8,8 +8,8 @@ vi.mock('../../src/core/LayoutConstants.js', async (importOriginal) => ({
 
 import { BakedMapRenderer } from '../../src/rendering/BakedMapRenderer.js';
 import { Camera } from '../../src/rendering/Camera.js';
-import { ChunkStreamer, FLIGHT_TEXTURE_CAP, FLIGHT_TEXTURE_CAP_LOW, MISS_HOLD_FRAMES, STREAM_TEXTURE_CAP, flightWindow,
-  type ChunkSource } from '../../src/rendering/chunkStreaming.js';
+import { ChunkStreamer, FLIGHT_TEXTURE_CAP, FLIGHT_TEXTURE_CAP_LOW, MISS_HOLD_FRAMES, STREAM_TEXTURE_CAP, chunkRect,
+  flightWindow, rectChunks, viewSpan, type ChunkSource } from '../../src/rendering/chunkStreaming.js';
 import { FlightStream, NEAR_FULL, NEAR_LOW, chunkHost, nearWindow, type NearProfile } from '../../src/scenes/exploration/mode7/FlightStream.js';
 import { TerrainType, type MapData } from '../../src/types/index.js';
 
@@ -105,7 +105,7 @@ describe('M7-3: flightWindow', () => {
     for (let x = 40; x < 152; x++) starts.add(flightWindow(x, 100, 4, 16, 12, 12).c0);
     expect(starts.size).toBe(Math.ceil(112 / 16));
     expect(nearWindow(world(), NEAR_FULL, 100.5, 120.5)).toEqual({
-      rect: { c0: 4, r0: 6, c1: 7, r1: 9 }, x0: 64, y0: 96, cells: 64, dSplit: 25 });
+      rect: { c0: 4, r0: 6, c1: 7, r1: 9 }, x0: 64, y0: 96, ix0: 64, iy0: 96, cells: 64, dSplit: 25 });
     expect(nearWindow(world(), NEAR_LOW, 100.5, 120.5).cells).toBe(48);
   });
 });
@@ -215,5 +215,69 @@ describe('M7-3: onChunkLoaded and the flight stepHeld', () => {
     for (let f = 0; f < 10; f++) { holds.push(r.stepHeld(100, 119)); frame(); await src.tick(); }
     expect(holds.filter(Boolean)).toHaveLength(MISS_HOLD_FRAMES);
     expect(holds.slice(0, MISS_HOLD_FRAMES).every(Boolean)).toBe(true);
+  });
+});
+
+// WR (docs/WORLD_WRAP_PLAN.md 5, 10): the chunk rects of a wrapped 256x256 world (16x16 chunks)
+describe('WR: wrapped chunk rects and streaming', () => {
+  function torus(): MapData {
+    const at = (i: number): string => `assets/maps/ai/overworld/${Math.floor(i / 16)}_${i % 16}_below.png`;
+    return { id: 'overworld', width: 256, height: 256, layers: [], tilesets: [], wrap: true,
+      collision: new Array(256 * 256).fill(TerrainType.Water), npcs: [], transitions: [],
+      art: { tile: 48, chunk: 16, below: Array.from({ length: 256 }, (_, i) => at(i)), above: Array(256).fill(null) } };
+  }
+
+  it('chunkRect, viewSpan and flightWindow are not clipped with wrap; flat ones are', () => {
+    expect(chunkRect(-20, 0, 10, 16, 16, 16, 16, true)).toEqual({ c0: -2, r0: 0, c1: 0, r1: 0 });
+    expect(chunkRect(-20, 0, 10, 16, 16, 16, 16)).toEqual({ c0: 0, r0: 0, c1: 0, r1: 0 });
+    expect(viewSpan(0, 20, 256, true)).toEqual([-11, 12]);
+    expect(viewSpan(0, 20, 256)).toEqual([0, 21]);
+    expect(flightWindow(2, 100, 3, 16, 16, 16, true).c0).toBe(15);   // the low window: 16 cells of margin
+    expect(flightWindow(2, 100, 4, 16, 16, 16, true).c0).toBe(14);   // the full one: 24
+    const w = flightWindow(250, 100, 4, 16, 16, 16, true);
+    expect([w.c0, w.c1]).toEqual([14, 17]);
+    expect(rectChunks({ ...w, r0: 0, r1: 0 }, 16, 16).map((c) => c.i)).toEqual([14, 15, 0, 1]);
+    expect(flightWindow(250, 100, 4, 16, 16, 16).c1).toBe(15);
+  });
+
+  it('rectChunks gives each canonical chunk once, at its first image', () => {
+    const all = rectChunks({ c0: -1, r0: -1, c1: 16, r1: 1 }, 16, 16);
+    expect(new Set(all.map((c) => c.i)).size).toBe(all.length);
+    expect(all[0]).toEqual({ i: 15 * 16 + 15, col: -1, row: -1 });
+    expect(all.find((c) => c.i === 0)).toEqual({ i: 0, col: 0, row: 0 });
+  });
+
+  it('with the camera at x 0 chunk 15 draws at -1 chunk; the period jump keeps the look-ahead', async () => {
+    const src = new FakeSource(() => 0);
+    const map = torus();
+    const r = new BakedMapRenderer(map, { below: [], above: [] }, { source: src });
+    const host = new Container();
+    host.addChild(r.container);
+    const cam = new Camera(new Container());
+    cam.setMapBounds(256, 256, true);
+    const hero = { x: 0.5 * TILE, y: 100.5 * TILE };
+    cam.follow(hero);
+    r.setCamera(cam);
+    const frame = async (): Promise<void> => { cam.update(); r.render(); await src.tick(); r.render(); };
+    await frame();
+    const px = 16 * TILE;
+    const at = (i: number): number[] => r.container.children.filter((c) => c.visible
+      && c.y === Math.floor(i / 16) * px).map((c) => c.x).sort((a, b) => a - b);
+    expect(at(6 * 16 + 15)).toContain(-px);
+    expect(at(6 * 16)).toContain(0);
+    // moving west across the seam: the hero's step-end jump moves the camera by a period, the look-ahead stays west
+    const wants: string[][] = [];
+    vi.spyOn(ChunkStreamer.prototype, 'want').mockImplementation(function (this: ChunkStreamer, urls, f) {
+      wants.push([...urls]);
+      original.call(this, urls, f);
+    });
+    hero.x -= TILE;           // the drawn step to x -1
+    await frame();
+    hero.x += 256 * TILE;     // normalised to x 255
+    await frame();
+    const last = wants[wants.length - 1];
+    // west of the view (cols 13, 14 for the view at x 255 with the ring and 1 ahead) are wanted
+    expect(last.some((u) => u.endsWith('/6_13_below.png'))).toBe(true);
+    expect(r.stepHeld(254, 100)).toBe(false);
   });
 });
