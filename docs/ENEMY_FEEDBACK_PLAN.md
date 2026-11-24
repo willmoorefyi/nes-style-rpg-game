@@ -270,54 +270,82 @@ real battle; bestiary page renders. Ledger rows match the calls.
 4. Integrator: one batch per AGENTS.md (build, test:fast, `check --all`, selftest, atlas determinism, test:full),
    then a summary for the user with every screenshot path, the fire-lizard limit and any debrief.
 
-## EF-G. Puppet-then-repaint for the four humanoids (rev 1, 2026-11-24)
+## EF-G. Puppet-then-repaint for the four humanoids (rev 2, 2026-11-24; Momus rev-1: 14 findings addressed)
 
 EF, EF2 and EF3 gave no shippable pose set: renders keep identity only at low strength, where they barely move the
-pose. The user's route: pose the chosen idle with ordinary image editing, then let SD 3.5 Large re-render each posed
-image at low strength. User picks (2026-11-24, `~/temp/ff-game/ef/bedrock3/idle_candidates.png`): pirate **v3** with
-**v4's human face** grafted on (v4's two bent swords rule v4 out); vampire **v2** with the blood pool removed; vampire_lord
-**v4**; dark_wizard **v4**. Raws: `assets-src/gen/cache/<key>.png` (keys in `monster_br2.yaml`, EF3 rows).
+pose. The user's route: pose the chosen idle with ordinary image editing, then let SD 3.5 Large re-render each image at
+low strength. User picks (2026-11-24, `~/temp/ff-game/ef/bedrock3/idle_candidates.png`): pirate **v3** with **v4's
+human face** grafted on (v4's two bent swords rule v4 out); vampire **v2** with the blood pool removed; vampire_lord
+**v4**; dark_wizard **v4**. Raw keys: the EF3 rows of `assets-src/gen/monster_br3.yaml` (its `pick.idle` stays as
+recorded; the EF4 picks live in the new `monster_hr.yaml`). EF3 stays closed.
 
-**G1. Idle masters (no AI).** New `gen/monster_hr_prep.py` (< 250 lines): from each raw, a full-resolution RGBA master
-`gen/out/hr/<id>/idle_master.png` (not tracked; reproducible from the cache by a recorded recipe in
-`gen/monster_hr.yaml`):
-- background removal by key / flood from the border (per-sprite tolerance), small holes kept, one figure;
-- pirate: v4's face (polygon in v4's raw) scaled, rotated and moved onto v3's skull face (affine fit from 3-4
-  landmark points: eyes, nose tip, chin), colour-matched (per-channel mean/std in the face region toward v3's skin
-  neighbours or v4's own if v3 has none), feathered 4-8 px seam hidden under the hat brim and collar where possible;
-- vampire v2: the blood pool removed (pixels of the pool's red outside the figure mask, plus the area below the boot
-  soles), boots and cape hem completed by extending their own edge rows/colours downward (no AI), flat ground line;
-- lord v4, wizard v4: background removal only.
-Acceptance: an image-only reviewer says the master reads as one figure (pirate: the face fits, no visible seam at
-display size); else iterate (<= 3), then report.
+**G0. Setup.** Merge `mainline` into `ef-br` first (EF-A's `monster_hires.py`, the smoothing rule). Update the four
+`monsters.yaml` briefs and `attack` / `hurt` texts to the picked designs (e.g. dark_wizard: a horned hood, no hat) before
+posing; poses follow those texts and the kneel convention (dazed, on one or both knees, head low).
 
-**G2. Puppet poses (no AI).** New `gen/monster_hr_puppet.py` (< 250 lines; helpers in a second module if needed):
-per-sprite `parts` (polygons on the master: head, torso, near/far upper arm, forearm+hand (+weapon), thighs, shins,
-cape pieces) with pivots, and per-pose transforms (rotate about pivot, translate) for `attack`, `hurt`, `kneel`; parts
-drawn in a per-pose z-order; exposed gaps filled with the nearest part's colours (a rough fill is fine: G3 repaints).
-Deterministic; outputs `gen/out/hr/<id>/<pose>_posed.png` and an overlay showing parts and pivots. Poses follow the
-monsters.yaml `attack` / `hurt` texts and the kneel convention (dazed, on one or both knees, head low). The feet of a
-standing pose stay on the master's ground row.
+**G1. Idle masters (no AI).** New `gen/monster_hr_prep.py` (< 250 lines), recipe in `gen/monster_hr.yaml` (per sprite:
+source keys, flip, key settings, polygons, landmarks), output `gen/out/hr/<id>/idle_master.png` (untracked; its
+sha256 recorded in the yaml, so drift fails clearly):
+- **Canvas:** 1024x1024 RGBA, figure scaled (Lanczos) to 880 px tall, feet on row 960, centred, the lunge room kept to
+  the right; **facing right** (`flip: true` for dark_wizard v4, which faces left; vampire v2 stays frontal / three-
+  quarter in idle, and its poses turn toward the right).
+- **Background:** border-sampled key (per-sprite tolerance and hue, as EF3's `key_thresh` / `hue`), the largest figure
+  component kept plus pieces touching it; pirate v3's teal gradient page uses a per-row border sample.
+- **Pirate:** v4's face (a polygon on v4's raw) affine-fitted by 4 landmarks (eyes, nose tip, chin) onto v3's face,
+  colour-matched (per-channel mean/std toward v4's own face statistics re-lit to v3's skin-neighbour luminance), seam
+  feathered 6 px and placed under the hat brim and collar where possible.
+- **Vampire v2:** the blood pool removed by a **hand-drawn polygon** recorded in the yaml (its red equals the cape
+  lining's, so no colour rule); boots and hem completed by extending their own edge rows downward to the ground row.
+- **Wizard v4:** the staff-head glow outside the figure is cut back to <= 12 px from the staff head (the brief keeps
+  the aura inside the figure).
+- **Gate:** one image-only reviewer on the four masters at full size and at 128 px (pirate: does the face fit, does it
+  read with v3's bony hands and neck, is the seam visible; vampire: no blood, believable feet and hem). <= 3 iterations;
+  else a debrief (`~/temp/ff-game/ef/bedrock4/<id>/DEBRIEF.md`) and the sprite stops.
 
-**G3. Repaint (Bedrock).** SD 3.5 Large image-to-image via `bedrock.invoke` (new purpose, main checkout only) on each
-posed image over a flat mid-grey page, with the idle's prompt plus a pose sentence, fixed seed, strengths swept
-{0.30, 0.38, 0.45} (lowest first; stop at the first result the agent's own checklist accepts), then <= 2 more variations
-(seed or strength) if none passes: **<= 5 calls per pose**. The pirate idle may get one harmonising pass at 0.25-0.35 if
-the reviewer saw the seam (counts against the same per-pose 5). Background removal of the repainted result as in G1;
-`remove_bg` only if that fails.
-Budget: new pass `pass EF4` in budget.json (user approval 2026-11-24): `cap` 80, `per_purpose_caps` `ef4_pose` 72
-(4 sprites x (3 poses + idle) x <= 5, capped), `ef4_nobg` 8, `reserve` 0. No Gemini.
+**G2. Puppet poses (no AI).** New `gen/monster_hr_puppet.py` (+ `monster_hr_warp.py` if needed; each < 250 lines):
+- **Rigid parts** (polygon + pivot on the master): head, torso, near / far upper arm, forearm + hand, and **separate
+  props** (the pirate's cutlass, the wizard's staff); legs only where drawn (pirate).
+- **Cloth by warp**, not rigid parts: robes, long coats, capes and the lord's **wings** are piecewise-affine warped on a
+  triangle mesh (`scipy.spatial.Delaunay` over control points on the cloth outline and its attachment line, so cloth
+  bends with the body instead of tearing). The wings are their own warped parts (folded in hurt and kneel, spread in
+  attack).
+- Per pose (`attack`, `hurt`, `kneel`): part transforms, control-point moves and z-order in the yaml; exposed gaps
+  filled from the nearest part's own pixels (dilation fill). Deterministic; sha256 of every posed PNG in the yaml.
+  Output `gen/out/hr/<id>/<pose>_posed.png` plus an overlay (parts, pivots, mesh).
+- **Gate before any Bedrock call:** the agent's checks (figure inside the canvas with >= 16 px margin, standing feet
+  on row 960 +-4, no transparent tear inside the silhouette > 50 px, pose differs from idle by IoU <= 0.8) and one
+  image-only reviewer on the posed images + overlays ("does the pose read; anything torn, doubled or floating?").
+  <= 3 iterations per pose; else that sprite gets a debrief and no G3 spend.
 
-**G4. Cut and review.** Cut each set at the **large** size (128 px cell, figure 96-120 px, feet row 122) with one
-shared palette per sprite (quantized from the four repainted poses together, <= 16 colours, shared outline), plus the
-standing smoothing rule's entry prepared (`smooth: [despur]` + hi-res texture; memory `smooth-new-monster-sprites`).
-Review: own checklist (`NEW_MONSTER_GUIDE.md` 1.4), then one fresh image-only reviewer per sprite on idle, attack, hurt,
-kneel + raws: same character in all four, the pose reads, clean render (no extra limbs or weapons, no seams), menacing
-not cartoon. **Hold before approval:** the user will decide the display size first; record the approve command
-(`monster_br2.py approve <id> --pass EF4`, extended to take the EF4 rows). A sprite with no SHIP gets a debrief.
-Review sheets to `~/temp/ff-game/ef/bedrock4/<id>/`.
+**G3. Repaint (Bedrock).** New `gen/monster_hr_br.py` (< 250 lines; `monster_br2.py` is full): its own variation rows in
+`monster_hr.yaml` (`pass: EF4`, purpose, model `sd35`, seed, strength, prompt, the posed or master PNG's sha256 and
+the cache key), building an SD 3.5 Large **image-to-image body from a given PNG** (the master or a posed image,
+composited on flat mid-grey), through `bedrock.invoke` (main checkout only).
+- **Every idle is repainted too** (same strengths), so all four poses share one rendering; the approved idle is the
+  repainted render.
+- Strengths {0.30, 0.38, 0.45}, lowest first, then <= 2 more (seed or strength): **<= 5 calls per image**. Stop at the
+  first result passing the checklist: same costume, colours and face as the master; the posed silhouette kept (IoU
+  with the posed mask >= 0.85); no extra or missing limbs, weapons, wings; the background keyable by G1's key; no
+  text or frame.
+- **Budget:** pass `pass EF4` becomes the live `budget["bedrock"]` block (`bedrock.py:130-136` reads only it):
+  `cap` 80, `per_purpose_caps` `ef4_pose` 80 (4 sprites x 4 images x 5), `reserve` 0; no `remove_bg` purpose (no
+  caller). No Gemini. Closed into `bedrock_history` at the end.
 
-**G5. Code and tests.** `monster_hr_prep.py`, `monster_hr_puppet.py` and the EF4 rows in `monster_br2` get a selftest
-(`selftest_monster_hr.py`: determinism of prep and puppet on a synthetic figure, the recipe yaml schema, the budget
-block, every EF4 cache key reproducible from `monster_hr.yaml`); full `selftest.py` passes in the main checkout. Work on
-branch `ef-br` (main checkout; the Bedrock gate), merged later with the rigs.
+**G4. Cut, review, hold.** `monster_hr_br.py cut` takes the keyed RGBA repaints (no magenta re-key), cuts the **large**
+size (128 px cell, figure 96-120 px, feet row 122) with one palette per sprite quantized from all four together (<= 16
+colours, shared outline), and writes review sheets to `~/temp/ff-game/ef/bedrock4/<id>/` (large, small 80-cell
+preview, screen x2), plus the prepared `monster_scale.yaml` entry of the smoothing rule (`smooth: [despur]` + hi-res
+texture; despur dropped for wispy edges such as the wizard's ragged robe if the before/after shows it eats them).
+Review: one fresh image-only reviewer per sprite on idle, attack, hurt, kneel + raws: same character in all four, the
+pose reads, clean render (no extra limbs or weapons, no seams), menacing not cartoon -> SHIP / ITERATE (an ITERATE
+may spend the image's remaining calls). **Hold before approval** for the user's size decision; record the approve
+command: `monster_hr_br.py approve <id>` writes `approved/<id>/monster_large.{png,json}` (backend bedrock, `cache_key`
+= the repainted renders, `sources` = the EF3 raw keys + the posed sha256s, `recipe: monster_hr.yaml#<id>`) and
+`kneel.{png,json}` in the existing Bedrock kneel shape, **removes `approved/<id>/monster_small.*`** (archived in
+`_retired/<id>_vN`), sets `size: large` in `monsters.yaml`; `selftest_roster.bedrock_ok` must accept every key.
+After the size decision: F4's rig (`retire.py --move-rig`), kneel bridge, review, lock, the smoothing entry, atlas.
+
+**G5. Code and tests.** `selftest_monster_hr.py`, registered in `selftest.py`: prep and puppet byte-deterministic on
+a synthetic figure and on the recorded recipes (sha256 match), the yaml schema, the EF4 budget block, every EF4 cache
+key reproducible from `monster_hr.yaml`, the approve json shape. Full `selftest.py` passes in the main checkout. Work on
+branch `ef-br` (main checkout; the Bedrock gate).
