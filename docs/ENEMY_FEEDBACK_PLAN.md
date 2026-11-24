@@ -374,7 +374,10 @@ Trial on **dark_wizard only**, as pass **EF5**.
 **A0. Tool changes (named; each module stays < 250 lines; RED-first cases in `selftest_monster_hr.py`).**
 - `monster_hr_br.py`: pass and purpose come from each variation row's `pass` tag (`EF4` -> `ef4_pose`, `EF5` ->
   `ef5_pose`; a row without a tag is EF4), not from the module constants (`:30`); the 5-row cap (`:53`) and the
-  selftest's row cap (`selftest_monster_hr.py:63`) count **per pass per pose** (the user's "up to 5 variations" applies
+  selftest's row cap (`selftest_monster_hr.py:63`) count **rows per pass per pose** (not `max(n)`); **EF5 rows continue
+  the numbering** (dark_wizard attack and hurt n 3-7, kneel n 2-6), so `n` stays unique per pose and `variation()`,
+  `record_row`, `pick` and `--var` need no pass key; if `monster_hr_br.py` would pass 250 lines, the approve json moves
+  to `monster_hr_review.py` (the user's "up to 5 variations" applies
   to this trial's images; EF4 rows untouched); EF5 rows may carry a `prompt_pose` override (used instead of
   `poses[pose]`, so EF4's keys stay byte-identical); `approve()` writes each `sources[]` entry's own `pass` /
   `purpose` / `arm` (the EF4 idle with EF5 poses); the review directory is per pass (`bedrock4/` for EF4,
