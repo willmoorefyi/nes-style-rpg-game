@@ -96,6 +96,8 @@ EF_B1 = ("gr_imp", "werewolf", "ghast", "shadow", "gargoyle", "bloodbones", "pis
 EF_B2 = ("black_widow", "gr_wolf", "ogre_chief", "tarantula", "shark", "ghast", "shadow", "anaconda", "hyenadon",
          "crocodile", "hydra", "fire_hydra", "lava_worm", "hellhound", "white_dragon")
 EF_B3 = ("blue_dragon", "green_dragon", "fire_lizard")
+# EF-F: the Bedrock-regenerated sheets, smoothed under the standing rule (user, 2026-11-24; NEW_MONSTER_GUIDE.md 1.4)
+EF_F = ("crazy_horse",)
 # int-ef2 (user ruling 2026-11-24): blue_dragon / green_dragon take tex 3 after all, the other four stay at the fallback
 EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon")
 # int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5, each the smallest multiple of
@@ -129,7 +131,7 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     b3 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"]) for s in EF_B3) and all(
         real[s]["smooth"] == ["despur", "edges"] for s in ("blue_dragon", "green_dragon"))   # int-ef2 B4 round 2
     hires = sorted(s for s, v in real.items() if v["tex"] != 1)
-    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3) and b1 and b2 and b3 and len(hires) == 42,
+    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3 + EF_F) and b1 and b2 and b3 and len(hires) == 43,
           f"EF-B: the dict entries are B1 (29 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the four fallback "
           f"scale-3 ones at tex 1 "
           f"({len(dicts)} entries, {len(hires)} hi-res)")

@@ -89,23 +89,6 @@ def entry(sprite: str, value) -> dict:
     return {"scale": num(s), "tex": num(t), "smooth": list(smooth), **({"crop": True} if crop else {})}
 
 
-EF_START = "2026-11-24"            # the standing rule (user, 2026-11-24): every sheet approved from pass EF on is smoothed
-
-
-def ef_rule_failures(approved: dict[str, dict[str, dict]], table: dict) -> list[str]:
-    """The EF smoothing rule (NEW_MONSTER_GUIDE.md 1.4): {sprite: {sheet json name: json}} of approved/ -> one line per
-    sprite with a monster_* / boss_* sheet approved on/after EF_START (or by Bedrock) whose monster_scale.yaml entry
-    has neither `smooth: [despur]` nor a hi-res `tex` > 1 (tests/data/efSmoothRule.test.ts runs the same rule)."""
-    out = []
-    for sid, files in sorted(approved.items()):
-        ruled = sorted(f for f, j in files.items() if f.split("_")[0] in ("monster", "boss")
-                       and (j.get("backend") == "bedrock" or str(j.get("approved", "")) >= EF_START))
-        v = table.get(sid)
-        if ruled and not (isinstance(v, dict) and ("despur" in (v.get("smooth") or []) or (v.get("tex") or 1) > 1)):
-            out.append(f"{sid} ({', '.join(ruled)}): approved on/after pass EF without a smooth / hi-res entry")
-    return out
-
-
 def unit(t: float) -> int:
     """The smallest texture px step u with u / t a whole number of art px (2 -> 2, 2.5 -> 5, 3 -> 3, 2.8 -> 14): the
     numerator of t in lowest terms."""

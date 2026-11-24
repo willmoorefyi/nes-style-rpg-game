@@ -8,6 +8,11 @@ breath: true
 # forelegs with the head driven low and the hind legs kicking up, hurt a level flinch with the head thrown up and the
 # body thrown back. The keys are far apart, so every in-between is a translation-only copy of its source key
 # (moves: []), every leg joint pinned; the key switches carry the pose change (the v3 rig's recipe).
+# Legs off the ground in a frame's source key ride the body tweak (the idle's raised far foreleg, the attack's hind
+# legs, the hurt's three lifted legs), so no shin tears from its thigh. Paint closes the 1-px seams and the head-slump
+# holes (mostly outline ink; re-derive after any tweak change). Image review (ef-horse): SHIP WITH NITS; the recorded nit
+# is the attack's mane / tail switching to the attack key's shape at atk_mid, one frame before the key (the key switch
+# of this translation-only recipe).
 keyframes:
   idle:
     hip: [55, 72]

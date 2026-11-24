@@ -15,6 +15,7 @@ import numpy as np
 from PIL import Image
 
 from gen import monster_hires as MH
+from gen import monster_smooth_rule as MSR
 from gen import monster_hires_crop as MHC
 from gen import monster_hires_pages as MHP
 
@@ -215,10 +216,10 @@ def _ef_rule(check: Callable[[bool, str], None]) -> None:
     approved = {d.name: {f.name: json.loads(f.read_text()) for f in d.glob("*.json")}
                 for d in (root / "approved").iterdir() if d.is_dir() and not d.name.startswith("_")}
     table = yaml.safe_load((root / "monster_scale.yaml").read_text()) or {}
-    fails = MH.ef_rule_failures(approved, table)
+    fails = MSR.ef_rule_failures(approved, table)
     check(not fails and "crazy_horse" in approved, f"EF rule: every sheet approved from pass EF on is smoothed ({fails})")
     fx = {"a": {"monster_small.json": {"approved": "2026-11-25"}}, "b": {"monster_large.json": {"backend": "bedrock"}},
           "c": {"monster_small.json": {"approved": "2026-11-15"}}}
-    check(len(MH.ef_rule_failures(fx, {"a": 3, "b": {"scale": 2, "tex": 1}})) == 2
-          and not MH.ef_rule_failures(fx, {"a": {"scale": 2, "tex": 2}, "b": {"scale": 3, "tex": 1, "smooth": ["despur"]}}),
+    check(len(MSR.ef_rule_failures(fx, {"a": 3, "b": {"scale": 2, "tex": 1}})) == 2
+          and not MSR.ef_rule_failures(fx, {"a": {"scale": 2, "tex": 2}, "b": {"scale": 3, "tex": 1, "smooth": ["despur"]}}),
           "EF rule: a plain or unsmoothed entry of a ruled sheet fails, despur or tex > 1 passes, older sheets are free")

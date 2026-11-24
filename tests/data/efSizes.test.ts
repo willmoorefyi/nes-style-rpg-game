@@ -59,10 +59,11 @@ function formations(): string[][] {
 }
 
 describe('EF-A hi-res sheets in the atlas', () => {
-  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (42 hi-res sheets)', () => {
+  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (43 hi-res sheets)', () => {
     // the scale-3 B2 sheets (shark, hydra, fire_hydra, white_dragon) are at tex 1 with despur only (A4's budget
-    // fallback); int-ef2 (user ruling 2026-11-24): blue_dragon and green_dragon at tex 3
-    expect(hires.length).toBe(42);
+    // fallback); int-ef2 (user ruling 2026-11-24): blue_dragon and green_dragon at tex 3; ef-horse: crazy_horse at
+    // tex 2 (the EF smoothing rule)
+    expect(hires.length).toBe(43);
     expect(['blue_dragon', 'green_dragon'].map((s) => texOf(table[s]))).toEqual([3, 3]);
     for (const [s, e] of Object.entries(table)) {
       expect([atlas.sheets[s].scale, atlas.sheets[s].texScale ?? 1], s).toEqual([scaleOf(e), texOf(e)]);
@@ -105,7 +106,7 @@ describe('EF-A hi-res sheets in the atlas', () => {
     const extra = pages.length - 12;                               // the 12 pages before EF (3ba8aa91)
     console.log(`EF-A4 budget: ${pages.length} pages (${extra} extra, ${hires} hi-res), preload ${preload.join(',')}, `
       + `worst preload + formation ${(worst / 2 ** 20).toFixed(1)} MB`);
-    expect(extra).toBeLessThanOrEqual(MAX_EXTRA_PAGES);            // EF-A/B's 14 + EF-D's chaos page + int-ef2's dragons
+    expect(extra).toBeLessThanOrEqual(MAX_EXTRA_PAGES);            // EF-A/B's 14 + EF-D's chaos page + int-ef2's dragons + crazy_horse's hi-res page (ef-horse)
     expect(worst).toBeLessThanOrEqual(8 * 2048 * 2048 * 4);
     const act1 = ['goblin', 'gr_imp', 'gr_wolf', 'mummy', 'troll', 'ogre', 'dragon'].map((s) => atlas.sheets[s].page ?? 0);
     expect(act1.every((p) => preload.includes(p))).toBe(true);     // D-K13: every act-1 sheet stays preloaded
