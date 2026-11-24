@@ -42,126 +42,132 @@
     },
     {
       "file": "monsters-ai-7.png",
-      "w": 2044,
-      "h": 1280
+      "w": 2048,
+      "h": 1152
     },
     {
       "file": "monsters-ai-8.png",
-      "w": 2035,
-      "h": 1956,
+      "w": 1956,
+      "h": 1748,
       "filter": "linear"
     },
     {
       "file": "monsters-ai-9.png",
-      "w": 2000,
-      "h": 1554,
+      "w": 2020,
+      "h": 1964,
       "filter": "linear"
     },
     {
       "file": "monsters-ai-10.png",
+      "w": 1890,
+      "h": 734,
+      "filter": "linear"
+    },
+    {
+      "file": "monsters-ai-11.png",
       "w": 2048,
       "h": 1824
     },
     {
-      "file": "monsters-ai-11.png",
+      "file": "monsters-ai-12.png",
       "w": 2040,
       "h": 384
     },
     {
-      "file": "monsters-ai-12.png",
+      "file": "monsters-ai-13.png",
       "w": 1950,
       "h": 1950,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-13.png",
+      "file": "monsters-ai-14.png",
       "w": 2030,
       "h": 2024,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-14.png",
+      "file": "monsters-ai-15.png",
       "w": 1974,
       "h": 1806,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-15.png",
+      "file": "monsters-ai-16.png",
       "w": 1806,
       "h": 774,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-16.png",
+      "file": "monsters-ai-17.png",
       "w": 2048,
       "h": 2048
     },
     {
-      "file": "monsters-ai-17.png",
+      "file": "monsters-ai-18.png",
       "w": 2048,
       "h": 1104
     },
     {
-      "file": "monsters-ai-18.png",
+      "file": "monsters-ai-19.png",
       "w": 1950,
       "h": 1835,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-19.png",
+      "file": "monsters-ai-20.png",
       "w": 1950,
       "h": 1950,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-20.png",
+      "file": "monsters-ai-21.png",
       "w": 1845,
       "h": 1640,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-21.png",
+      "file": "monsters-ai-22.png",
       "w": 1940,
       "h": 1025,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-22.png",
+      "file": "monsters-ai-23.png",
       "w": 2048,
       "h": 976
     },
     {
-      "file": "monsters-ai-23.png",
+      "file": "monsters-ai-24.png",
       "w": 2000,
       "h": 1955,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-24.png",
+      "file": "monsters-ai-25.png",
       "w": 1740,
       "h": 1935,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-25.png",
+      "file": "monsters-ai-26.png",
       "w": 1965,
       "h": 1875,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-26.png",
+      "file": "monsters-ai-27.png",
       "w": 1955,
       "h": 1750,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-27.png",
+      "file": "monsters-ai-28.png",
       "w": 1700,
       "h": 1300,
       "filter": "linear"
     },
     {
-      "file": "monsters-ai-28.png",
+      "file": "monsters-ai-29.png",
       "w": 1950,
       "h": 1950,
       "filter": "linear"
@@ -267,7 +273,7 @@
         108
       ],
       "sequence_version": 1,
-      "page": 22,
+      "page": 23,
       "scale": 3,
       "kneelSink": 10
     },
@@ -370,7 +376,7 @@
         132
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "anaconda": {
       "cell": [
@@ -471,7 +477,7 @@
         116
       ],
       "sequence_version": 1,
-      "page": 13,
+      "page": 14,
       "scale": 2,
       "texScale": 2
     },
@@ -574,7 +580,7 @@
         140
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "ashen_queen": {
       "cell": [
@@ -909,7 +915,7 @@
         144
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "basilisk": {
       "cell": [
@@ -1010,7 +1016,7 @@
         96
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "bigeyes": {
       "cell": [
@@ -1021,72 +1027,72 @@
       "floating": true,
       "frames": {
         "idle": [
-          1024,
-          832
+          640,
+          704
         ],
         "idle_b": [
-          1114,
-          832
+          730,
+          704
         ],
         "atk_wind1": [
-          1204,
-          832
+          820,
+          704
         ],
         "atk_wind2": [
-          1294,
-          832
+          910,
+          704
         ],
         "atk_mid": [
-          1384,
-          832
+          1000,
+          704
         ],
         "attack": [
-          1474,
-          832
+          1090,
+          704
         ],
         "atk_follow": [
-          1564,
-          832
+          1180,
+          704
         ],
         "atk_recover": [
-          1654,
-          832
+          1270,
+          704
         ],
         "hurt_in1": [
-          1744,
-          832
+          1360,
+          704
         ],
         "hurt_in2": [
-          1834,
-          832
+          1450,
+          704
         ],
         "hurt": [
-          1924,
-          832
+          1540,
+          704
         ],
         "daze": [
-          0,
-          960
+          1630,
+          704
         ],
         "daze_b": [
-          90,
-          960
+          1720,
+          704
         ],
         "kneel_in1": [
-          180,
-          960
+          1810,
+          704
         ],
         "kneel_in2": [
-          270,
-          960
+          1900,
+          704
         ],
         "kneel": [
-          360,
-          960
+          0,
+          832
         ],
         "kneel_b": [
-          450,
-          960
+          90,
+          832
         ]
       },
       "anim": true,
@@ -1214,7 +1220,7 @@
         83
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "black_knight": {
       "cell": [
@@ -1315,7 +1321,7 @@
         64
       ],
       "sequence_version": 1,
-      "page": 23,
+      "page": 24,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -1328,72 +1334,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          513,
-          796
+          751,
+          718
         ],
         "idle_b": [
-          614,
-          796
+          852,
+          718
         ],
         "atk_wind1": [
-          715,
-          796
+          1,
+          821
         ],
         "atk_wind2": [
-          816,
-          796
+          102,
+          821
         ],
         "atk_mid": [
-          917,
-          796
+          203,
+          821
         ],
         "attack": [
-          1,
-          898
+          304,
+          821
         ],
         "atk_follow": [
-          102,
-          898
+          405,
+          821
         ],
         "atk_recover": [
-          203,
-          898
+          506,
+          821
         ],
         "hurt_in1": [
-          513,
-          796
+          751,
+          718
         ],
         "hurt_in2": [
-          304,
-          898
+          607,
+          821
         ],
         "hurt": [
-          304,
-          898
+          607,
+          821
         ],
         "daze": [
-          405,
-          898
+          708,
+          821
         ],
         "daze_b": [
-          506,
-          898
+          809,
+          821
         ],
         "kneel_in1": [
-          607,
-          898
+          910,
+          821
         ],
         "kneel_in2": [
-          708,
-          898
+          1,
+          902
         ],
         "kneel": [
-          809,
-          898
+          102,
+          902
         ],
         "kneel_b": [
-          910,
-          898
+          203,
+          902
         ]
       },
       "anim": true,
@@ -1418,7 +1424,7 @@
         89
       ],
       "sequence_version": 1,
-      "page": 8,
+      "page": 9,
       "scale": 2,
       "texScale": 2
     },
@@ -1431,72 +1437,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          652,
-          262
+          2,
+          2
         ],
         "idle_b": [
-          734,
-          262
+          84,
+          2
         ],
         "atk_wind1": [
-          2,
-          392
+          166,
+          2
         ],
         "atk_wind2": [
-          84,
-          392
+          248,
+          2
         ],
         "atk_mid": [
-          166,
-          392
+          330,
+          2
         ],
         "attack": [
-          248,
-          392
+          412,
+          2
         ],
         "atk_follow": [
-          330,
-          392
+          494,
+          2
         ],
         "atk_recover": [
-          412,
-          392
+          576,
+          2
         ],
         "hurt_in1": [
-          494,
-          392
+          658,
+          2
         ],
         "hurt_in2": [
-          576,
-          392
+          2,
+          84
         ],
         "hurt": [
-          658,
-          392
+          84,
+          84
         ],
         "daze": [
-          2,
-          474
+          166,
+          84
         ],
         "daze_b": [
-          84,
-          474
+          248,
+          84
         ],
         "kneel_in1": [
-          166,
-          474
+          330,
+          84
         ],
         "kneel_in2": [
-          248,
-          474
+          412,
+          84
         ],
         "kneel": [
-          330,
-          474
+          494,
+          84
         ],
         "kneel_b": [
-          412,
-          474
+          576,
+          84
         ]
       },
       "anim": true,
@@ -1521,7 +1527,7 @@
         68
       ],
       "sequence_version": 1,
-      "page": 8,
+      "page": 9,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -1624,7 +1630,7 @@
         122
       ],
       "sequence_version": 1,
-      "page": 23,
+      "page": 24,
       "scale": 3,
       "texScale": 3
     },
@@ -1637,72 +1643,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          1554,
-          624
+          1066,
+          496
         ],
         "idle_b": [
-          1634,
-          624
+          1146,
+          496
         ],
         "atk_wind1": [
-          1714,
-          624
+          1226,
+          496
         ],
         "atk_wind2": [
-          1794,
-          624
+          1306,
+          496
         ],
         "atk_mid": [
-          1874,
-          624
+          1386,
+          496
         ],
         "attack": [
-          1954,
-          624
+          1466,
+          496
         ],
         "atk_follow": [
-          0,
-          704
+          1546,
+          496
         ],
         "atk_recover": [
-          80,
-          704
+          1626,
+          496
         ],
         "hurt_in1": [
-          160,
-          704
+          1706,
+          496
         ],
         "hurt_in2": [
-          240,
-          704
+          1786,
+          496
         ],
         "hurt": [
-          320,
-          704
+          1866,
+          496
         ],
         "daze": [
-          400,
-          704
+          1946,
+          496
         ],
         "daze_b": [
-          480,
-          704
+          0,
+          576
         ],
         "kneel_in1": [
-          560,
-          704
+          80,
+          576
         ],
         "kneel_in2": [
-          640,
-          704
+          160,
+          576
         ],
         "kneel": [
-          720,
-          704
+          240,
+          576
         ],
         "kneel_b": [
-          800,
-          704
+          320,
+          576
         ]
       },
       "anim": true,
@@ -2079,7 +2085,7 @@
         148
       ],
       "sequence_version": 1,
-      "page": 27,
+      "page": 28,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -2182,7 +2188,7 @@
         111
       ],
       "sequence_version": 1,
-      "page": 19,
+      "page": 20,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -2195,72 +2201,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          1440,
-          384
+          990,
+          256
         ],
         "idle_b": [
-          1520,
-          384
+          1070,
+          256
         ],
         "atk_wind1": [
-          1600,
-          384
+          1150,
+          256
         ],
         "atk_wind2": [
-          1680,
-          384
+          1230,
+          256
         ],
         "atk_mid": [
-          1760,
-          384
+          1310,
+          256
         ],
         "attack": [
-          1840,
-          384
+          1390,
+          256
         ],
         "atk_follow": [
-          1920,
-          384
+          1470,
+          256
         ],
         "atk_recover": [
-          0,
-          464
+          1550,
+          256
         ],
         "hurt_in1": [
-          80,
-          464
+          1630,
+          256
         ],
         "hurt_in2": [
-          160,
-          464
+          1710,
+          256
         ],
         "hurt": [
-          240,
-          464
+          1790,
+          256
         ],
         "daze": [
-          320,
-          464
+          1870,
+          256
         ],
         "daze_b": [
-          400,
-          464
+          1950,
+          256
         ],
         "kneel_in1": [
-          480,
-          464
+          0,
+          336
         ],
         "kneel_in2": [
-          560,
-          464
+          80,
+          336
         ],
         "kneel": [
-          640,
-          464
+          160,
+          336
         ],
         "kneel_b": [
-          720,
-          464
+          240,
+          336
         ]
       },
       "anim": true,
@@ -2397,72 +2403,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          1120
+          1650,
+          912
         ],
         "idle_b": [
-          108,
-          1120
+          1758,
+          912
         ],
         "atk_wind1": [
-          0,
-          1120
+          1650,
+          912
         ],
         "atk_wind2": [
-          0,
-          1120
+          1650,
+          912
         ],
         "atk_mid": [
-          216,
-          1120
+          1866,
+          912
         ],
         "attack": [
-          216,
-          1120
+          1866,
+          912
         ],
         "atk_follow": [
-          216,
-          1120
+          1866,
+          912
         ],
         "atk_recover": [
-          0,
-          1120
+          1650,
+          912
         ],
         "hurt_in1": [
-          324,
-          1120
+          0,
+          992
         ],
         "hurt_in2": [
-          432,
-          1120
+          108,
+          992
         ],
         "hurt": [
-          432,
-          1120
+          108,
+          992
         ],
         "daze": [
-          540,
-          1120
+          216,
+          992
         ],
         "daze_b": [
-          648,
-          1120
+          324,
+          992
         ],
         "kneel_in1": [
-          756,
-          1120
+          432,
+          992
         ],
         "kneel_in2": [
-          864,
-          1120
+          540,
+          992
         ],
         "kneel": [
-          972,
-          1120
+          648,
+          992
         ],
         "kneel_b": [
-          1080,
-          1120
+          756,
+          992
         ]
       },
       "anim": true,
@@ -2493,104 +2499,106 @@
     },
     "crazy_horse": {
       "cell": [
-        132,
+        162,
         128
       ],
       "footRow": 122,
       "floating": false,
       "frames": {
         "idle": [
-          0,
-          0
+          813,
+          326
         ],
         "idle_b": [
-          132,
-          0
+          1,
+          488
         ],
         "atk_wind1": [
-          264,
-          0
+          164,
+          488
         ],
         "atk_wind2": [
-          396,
-          0
+          327,
+          488
         ],
         "atk_mid": [
-          528,
-          0
+          490,
+          488
         ],
         "attack": [
-          660,
-          0
+          653,
+          488
         ],
         "atk_follow": [
-          792,
-          0
+          816,
+          488
         ],
         "atk_recover": [
-          924,
-          0
+          1,
+          617
         ],
         "hurt_in1": [
-          1056,
-          0
+          164,
+          617
         ],
         "hurt_in2": [
-          1188,
-          0
+          327,
+          617
         ],
         "hurt": [
-          1320,
-          0
+          490,
+          617
         ],
         "daze": [
-          1452,
-          0
+          653,
+          617
         ],
         "daze_b": [
-          1584,
-          0
+          816,
+          617
         ],
         "kneel_in1": [
-          1716,
-          0
+          1,
+          746
         ],
         "kneel_in2": [
-          1848,
-          0
+          164,
+          746
         ],
         "kneel": [
-          0,
-          128
+          327,
+          746
         ],
         "kneel_b": [
-          132,
-          128
+          490,
+          746
         ]
       },
       "anim": true,
       "holds": [],
-      "lungePx": 31,
+      "lungePx": 34,
       "hasRaise": false,
-      "opaqueRight": 125,
+      "opaqueRight": 148,
       "head": [
-        94,
-        26
+        118,
+        27
       ],
       "idleBox": [
-        17,
-        26,
-        125,
+        11,
+        27,
+        148,
         122
       ],
-      "travelTop": 26,
-      "lungeRight": 130,
+      "travelTop": 19,
+      "lungeRight": 159,
       "homeX": [
-        2,
-        127
+        3,
+        150
       ],
       "sequence_version": 1,
-      "page": 7
+      "page": 8,
+      "scale": 2,
+      "texScale": 2
     },
     "crocodile": {
       "cell": [
@@ -2691,7 +2699,7 @@
         142
       ],
       "sequence_version": 1,
-      "page": 13,
+      "page": 14,
       "scale": 2,
       "texScale": 2
     },
@@ -2794,7 +2802,7 @@
         62
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "dark_wizard": {
       "cell": [
@@ -2895,7 +2903,7 @@
         65
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "death_eye": {
       "cell": [
@@ -3114,7 +3122,7 @@
         61
       ],
       "sequence_version": 1,
-      "page": 25,
+      "page": 26,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -3217,7 +3225,7 @@
         94
       ],
       "sequence_version": 1,
-      "page": 17,
+      "page": 18,
       "scale": 3,
       "kneelSink": 10
     },
@@ -3320,7 +3328,7 @@
         117
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "dragon": {
       "cell": [
@@ -3768,7 +3776,7 @@
         111
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "earth_medusa": {
@@ -3870,7 +3878,7 @@
         66
       ],
       "sequence_version": 1,
-      "page": 26,
+      "page": 27,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -4076,7 +4084,7 @@
         109
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3,
       "kneelSink": 10
     },
@@ -4179,7 +4187,7 @@
         105
       ],
       "sequence_version": 1,
-      "page": 11,
+      "page": 12,
       "scale": 3
     },
     "fire_hydra": {
@@ -4281,7 +4289,7 @@
         132
       ],
       "sequence_version": 1,
-      "page": 11,
+      "page": 12,
       "scale": 3
     },
     "fire_lizard": {
@@ -4383,7 +4391,7 @@
         212
       ],
       "sequence_version": 1,
-      "page": 14,
+      "page": 15,
       "scale": 2,
       "texScale": 2
     },
@@ -4396,72 +4404,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          494,
-          474
+          658,
+          84
         ],
         "idle_b": [
-          576,
-          474
+          2,
+          166
         ],
         "atk_wind1": [
-          658,
-          474
+          84,
+          166
         ],
         "atk_wind2": [
-          2,
-          556
+          166,
+          166
         ],
         "atk_mid": [
-          84,
-          556
+          248,
+          166
         ],
         "attack": [
-          166,
-          556
+          330,
+          166
         ],
         "atk_follow": [
-          248,
-          556
+          412,
+          166
         ],
         "atk_recover": [
-          330,
-          556
+          494,
+          166
         ],
         "hurt_in1": [
-          412,
-          556
+          576,
+          166
         ],
         "hurt_in2": [
-          494,
-          556
+          658,
+          166
         ],
         "hurt": [
-          576,
-          556
+          2,
+          248
         ],
         "daze": [
-          658,
-          556
+          84,
+          248
         ],
         "daze_b": [
-          2,
-          638
+          166,
+          248
         ],
         "kneel_in1": [
-          84,
-          638
+          248,
+          248
         ],
         "kneel_in2": [
-          166,
-          638
+          330,
+          248
         ],
         "kneel": [
-          248,
-          638
+          412,
+          248
         ],
         "kneel_b": [
-          330,
-          638
+          494,
+          248
         ]
       },
       "anim": true,
@@ -4486,7 +4494,7 @@
         71
       ],
       "sequence_version": 1,
-      "page": 8,
+      "page": 9,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -4642,72 +4650,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          2,
-          2
+          576,
+          248
         ],
         "idle_b": [
-          84,
-          2
+          658,
+          248
         ],
         "atk_wind1": [
-          166,
-          2
+          2,
+          330
         ],
         "atk_wind2": [
-          248,
-          2
+          84,
+          330
         ],
         "atk_mid": [
-          330,
-          2
+          166,
+          330
         ],
         "attack": [
-          412,
-          2
+          248,
+          330
         ],
         "atk_follow": [
-          494,
-          2
+          330,
+          330
         ],
         "atk_recover": [
-          576,
-          2
+          412,
+          330
         ],
         "hurt_in1": [
-          658,
-          2
+          494,
+          330
         ],
         "hurt_in2": [
-          2,
-          84
+          576,
+          330
         ],
         "hurt": [
-          84,
-          84
+          658,
+          330
         ],
         "daze": [
-          166,
-          84
+          2,
+          412
         ],
         "daze_b": [
-          248,
-          84
+          84,
+          412
         ],
         "kneel_in1": [
-          330,
-          84
+          166,
+          412
         ],
         "kneel_in2": [
-          412,
-          84
+          248,
+          412
         ],
         "kneel": [
-          494,
-          84
+          330,
+          412
         ],
         "kneel_b": [
-          576,
-          84
+          412,
+          412
         ]
       },
       "anim": true,
@@ -4835,7 +4843,7 @@
         84
       ],
       "sequence_version": 1,
-      "page": 17,
+      "page": 18,
       "kneelSink": 6
     },
     "ghoul": {
@@ -4847,72 +4855,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          1872,
-          256
+          1488,
+          128
         ],
         "idle_b": [
-          0,
-          384
+          1578,
+          128
         ],
         "atk_wind1": [
-          90,
-          384
+          1668,
+          128
         ],
         "atk_wind2": [
-          180,
-          384
+          1758,
+          128
         ],
         "atk_mid": [
-          270,
-          384
+          1848,
+          128
         ],
         "attack": [
-          360,
-          384
+          1938,
+          128
         ],
         "atk_follow": [
-          450,
-          384
+          0,
+          256
         ],
         "atk_recover": [
-          540,
-          384
+          90,
+          256
         ],
         "hurt_in1": [
-          630,
-          384
+          180,
+          256
         ],
         "hurt_in2": [
-          720,
-          384
+          270,
+          256
         ],
         "hurt": [
-          810,
-          384
+          360,
+          256
         ],
         "daze": [
-          900,
-          384
+          450,
+          256
         ],
         "daze_b": [
-          990,
-          384
+          540,
+          256
         ],
         "kneel_in1": [
-          1080,
-          384
+          630,
+          256
         ],
         "kneel_in2": [
-          1170,
-          384
+          720,
+          256
         ],
         "kneel": [
-          1260,
-          384
+          810,
+          256
         ],
         "kneel_b": [
-          1350,
-          384
+          900,
+          256
         ]
       },
       "anim": true,
@@ -4948,72 +4956,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          264,
-          128
+          0,
+          0
         ],
         "idle_b": [
-          392,
-          128
+          128,
+          0
         ],
         "atk_wind1": [
-          520,
-          128
+          256,
+          0
         ],
         "atk_wind2": [
-          648,
-          128
+          384,
+          0
         ],
         "atk_mid": [
-          776,
-          128
+          512,
+          0
         ],
         "attack": [
-          904,
-          128
+          640,
+          0
         ],
         "atk_follow": [
-          1032,
-          128
+          768,
+          0
         ],
         "atk_recover": [
-          1160,
-          128
+          896,
+          0
         ],
         "hurt_in1": [
-          1288,
-          128
+          1024,
+          0
         ],
         "hurt_in2": [
-          1416,
-          128
+          1152,
+          0
         ],
         "hurt": [
-          1544,
-          128
+          1280,
+          0
         ],
         "daze": [
-          1672,
-          128
+          1408,
+          0
         ],
         "daze_b": [
-          1800,
-          128
+          1536,
+          0
         ],
         "kneel_in1": [
-          0,
-          256
+          1664,
+          0
         ],
         "kneel_in2": [
-          128,
-          256
+          1792,
+          0
         ],
         "kneel": [
-          256,
-          256
+          1920,
+          0
         ],
         "kneel_b": [
-          384,
-          256
+          0,
+          128
         ]
       },
       "anim": true,
@@ -5356,72 +5364,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          1188,
-          1120
+          864,
+          992
         ],
         "idle_b": [
-          1298,
-          1120
+          974,
+          992
         ],
         "atk_wind1": [
-          1408,
-          1120
+          1084,
+          992
         ],
         "atk_wind2": [
-          1518,
-          1120
+          1194,
+          992
         ],
         "atk_mid": [
-          1628,
-          1120
+          1304,
+          992
         ],
         "attack": [
-          1738,
-          1120
+          1414,
+          992
         ],
         "atk_follow": [
-          1848,
-          1120
+          1524,
+          992
         ],
         "atk_recover": [
-          0,
-          1200
+          1634,
+          992
         ],
         "hurt_in1": [
-          110,
-          1200
+          1744,
+          992
         ],
         "hurt_in2": [
-          220,
-          1200
+          1854,
+          992
         ],
         "hurt": [
-          330,
-          1200
+          0,
+          1072
         ],
         "daze": [
-          440,
-          1200
+          110,
+          1072
         ],
         "daze_b": [
-          550,
-          1200
+          220,
+          1072
         ],
         "kneel_in1": [
-          660,
-          1200
+          330,
+          1072
         ],
         "kneel_in2": [
-          770,
-          1200
+          440,
+          1072
         ],
         "kneel": [
-          880,
-          1200
+          550,
+          1072
         ],
         "kneel_b": [
-          990,
-          1200
+          660,
+          1072
         ]
       },
       "anim": true,
@@ -5547,7 +5555,7 @@
         136
       ],
       "sequence_version": 1,
-      "page": 24,
+      "page": 25,
       "scale": 3,
       "texScale": 3
     },
@@ -5560,72 +5568,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          94,
-          1040
+          1778,
+          832
         ],
         "idle_b": [
-          204,
-          1040
+          1888,
+          832
         ],
         "atk_wind1": [
-          314,
-          1040
+          0,
+          912
         ],
         "atk_wind2": [
-          424,
-          1040
+          110,
+          912
         ],
         "atk_mid": [
-          534,
-          1040
+          220,
+          912
         ],
         "attack": [
-          644,
-          1040
+          330,
+          912
         ],
         "atk_follow": [
-          754,
-          1040
+          440,
+          912
         ],
         "atk_recover": [
-          864,
-          1040
+          550,
+          912
         ],
         "hurt_in1": [
-          974,
-          1040
+          660,
+          912
         ],
         "hurt_in2": [
-          1084,
-          1040
+          770,
+          912
         ],
         "hurt": [
-          1194,
-          1040
+          880,
+          912
         ],
         "daze": [
-          1304,
-          1040
+          990,
+          912
         ],
         "daze_b": [
-          1414,
-          1040
+          1100,
+          912
         ],
         "kneel_in1": [
-          1524,
-          1040
+          1210,
+          912
         ],
         "kneel_in2": [
-          1634,
-          1040
+          1320,
+          912
         ],
         "kneel": [
-          1744,
-          1040
+          1430,
+          912
         ],
         "kneel_b": [
-          1854,
-          1040
+          1540,
+          912
         ]
       },
       "anim": true,
@@ -5751,7 +5759,7 @@
         120
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "hellhound": {
       "cell": [
@@ -5852,7 +5860,7 @@
         130
       ],
       "sequence_version": 1,
-      "page": 14,
+      "page": 15,
       "scale": 2,
       "texScale": 2
     },
@@ -5955,7 +5963,7 @@
         104
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "hollow_seraph": {
@@ -6180,7 +6188,7 @@
         81
       ],
       "sequence_version": 1,
-      "page": 13,
+      "page": 14,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -6283,7 +6291,7 @@
         109
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "hyenadon": {
@@ -6385,7 +6393,7 @@
         104
       ],
       "sequence_version": 1,
-      "page": 13,
+      "page": 14,
       "scale": 2,
       "texScale": 2
     },
@@ -6488,7 +6496,7 @@
         106
       ],
       "sequence_version": 1,
-      "page": 16,
+      "page": 17,
       "scale": 3
     },
     "iron_golem": {
@@ -6590,7 +6598,7 @@
         98
       ],
       "sequence_version": 1,
-      "page": 26,
+      "page": 27,
       "scale": 3.3,
       "texScale": 3.3
     },
@@ -6693,7 +6701,7 @@
         60
       ],
       "sequence_version": 1,
-      "page": 18,
+      "page": 19,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -6796,7 +6804,7 @@
         109
       ],
       "sequence_version": 1,
-      "page": 15,
+      "page": 16,
       "scale": 2,
       "texScale": 2
     },
@@ -6899,7 +6907,7 @@
         109
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "lich": {
       "cell": [
@@ -7053,72 +7061,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          800,
-          464
+          320,
+          336
         ],
         "idle_b": [
-          916,
-          464
+          436,
+          336
         ],
         "atk_wind1": [
-          1032,
-          464
+          552,
+          336
         ],
         "atk_wind2": [
-          1148,
-          464
+          668,
+          336
         ],
         "atk_mid": [
-          1264,
-          464
+          784,
+          336
         ],
         "attack": [
-          1380,
-          464
+          900,
+          336
         ],
         "atk_follow": [
-          1496,
-          464
+          1016,
+          336
         ],
         "atk_recover": [
-          1612,
-          464
+          1132,
+          336
         ],
         "hurt_in1": [
-          1728,
-          464
+          1248,
+          336
         ],
         "hurt_in2": [
-          1844,
-          464
+          1364,
+          336
         ],
         "hurt": [
-          0,
-          544
+          1480,
+          336
         ],
         "daze": [
-          116,
-          544
+          1596,
+          336
         ],
         "daze_b": [
-          232,
-          544
+          1712,
+          336
         ],
         "kneel_in1": [
-          348,
-          544
+          1828,
+          336
         ],
         "kneel_in2": [
-          464,
-          544
+          0,
+          416
         ],
         "kneel": [
-          580,
-          544
+          116,
+          416
         ],
         "kneel_b": [
-          696,
-          544
+          232,
+          416
         ]
       },
       "anim": true,
@@ -7244,7 +7252,7 @@
         121
       ],
       "sequence_version": 1,
-      "page": 19,
+      "page": 20,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -7347,7 +7355,7 @@
         68
       ],
       "sequence_version": 1,
-      "page": 20,
+      "page": 21,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -7450,7 +7458,7 @@
         57
       ],
       "sequence_version": 1,
-      "page": 20,
+      "page": 21,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -7553,7 +7561,7 @@
         103
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "minotaur_zombie": {
@@ -7655,7 +7663,7 @@
         108
       ],
       "sequence_version": 1,
-      "page": 16,
+      "page": 17,
       "scale": 3
     },
     "mummy": {
@@ -7860,7 +7868,7 @@
         100
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "nightmare": {
@@ -7962,7 +7970,7 @@
         123
       ],
       "sequence_version": 1,
-      "page": 17
+      "page": 18
     },
     "ochre_jelly": {
       "cell": [
@@ -8063,7 +8071,7 @@
         74
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "ochu": {
       "cell": [
@@ -8164,7 +8172,7 @@
         111
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "scale": 3
     },
     "ogre": {
@@ -8470,7 +8478,7 @@
         110
       ],
       "sequence_version": 1,
-      "page": 12,
+      "page": 13,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -8777,7 +8785,7 @@
         103
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "pyrolisk": {
       "cell": [
@@ -8878,7 +8886,7 @@
         91
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "rakshasa": {
       "cell": [
@@ -8979,7 +8987,7 @@
         62
       ],
       "sequence_version": 1,
-      "page": 20,
+      "page": 21,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -9082,7 +9090,7 @@
         86
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "kneelSink": 6
     },
     "remorazz": {
@@ -9184,7 +9192,7 @@
         166
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "rhyos": {
       "cell": [
@@ -9285,7 +9293,7 @@
         118
       ],
       "sequence_version": 1,
-      "page": 28,
+      "page": 29,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -9388,7 +9396,7 @@
         175
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "sahagin": {
       "cell": [
@@ -9399,72 +9407,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          812,
-          544
+          348,
+          416
         ],
         "idle_b": [
-          892,
-          544
+          428,
+          416
         ],
         "atk_wind1": [
-          972,
-          544
+          508,
+          416
         ],
         "atk_wind2": [
-          1052,
-          544
+          588,
+          416
         ],
         "atk_mid": [
-          1132,
-          544
+          668,
+          416
         ],
         "attack": [
-          1212,
-          544
+          748,
+          416
         ],
         "atk_follow": [
-          1292,
-          544
+          828,
+          416
         ],
         "atk_recover": [
-          1372,
-          544
+          908,
+          416
         ],
         "hurt_in1": [
-          1452,
-          544
+          988,
+          416
         ],
         "hurt_in2": [
-          1532,
-          544
+          1068,
+          416
         ],
         "hurt": [
-          1612,
-          544
+          1148,
+          416
         ],
         "daze": [
-          1692,
-          544
+          1228,
+          416
         ],
         "daze_b": [
-          1772,
-          544
+          1308,
+          416
         ],
         "kneel_in1": [
-          1852,
-          544
+          1388,
+          416
         ],
         "kneel_in2": [
-          1932,
-          544
+          1468,
+          416
         ],
         "kneel": [
-          0,
-          624
+          1548,
+          416
         ],
         "kneel_b": [
-          80,
-          624
+          1628,
+          416
         ]
       },
       "anim": true,
@@ -9500,72 +9508,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          160,
-          624
+          1708,
+          416
         ],
         "idle_b": [
-          242,
-          624
+          1790,
+          416
         ],
         "atk_wind1": [
-          324,
-          624
+          1872,
+          416
         ],
         "atk_wind2": [
-          406,
-          624
+          1954,
+          416
         ],
         "atk_mid": [
-          488,
-          624
+          0,
+          496
         ],
         "attack": [
-          570,
-          624
+          82,
+          496
         ],
         "atk_follow": [
-          652,
-          624
+          164,
+          496
         ],
         "atk_recover": [
-          734,
-          624
+          246,
+          496
         ],
         "hurt_in1": [
-          816,
-          624
+          328,
+          496
         ],
         "hurt_in2": [
-          898,
-          624
+          410,
+          496
         ],
         "hurt": [
-          980,
-          624
+          492,
+          496
         ],
         "daze": [
-          1062,
-          624
+          574,
+          496
         ],
         "daze_b": [
-          1144,
-          624
+          656,
+          496
         ],
         "kneel_in1": [
-          1226,
-          624
+          738,
+          496
         ],
         "kneel_in2": [
-          1308,
-          624
+          820,
+          496
         ],
         "kneel": [
-          1390,
-          624
+          902,
+          496
         ],
         "kneel_b": [
-          1472,
-          624
+          984,
+          496
         ]
       },
       "anim": true,
@@ -9691,7 +9699,7 @@
         66
       ],
       "sequence_version": 1,
-      "page": 20,
+      "page": 21,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -9794,7 +9802,7 @@
         105
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "scorpion": {
       "cell": [
@@ -9805,72 +9813,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          540,
-          960
+          180,
+          832
         ],
         "idle_b": [
-          634,
-          960
+          274,
+          832
         ],
         "atk_wind1": [
-          728,
-          960
+          368,
+          832
         ],
         "atk_wind2": [
-          822,
-          960
+          462,
+          832
         ],
         "atk_mid": [
-          916,
-          960
+          556,
+          832
         ],
         "attack": [
-          1010,
-          960
+          650,
+          832
         ],
         "atk_follow": [
-          1104,
-          960
+          744,
+          832
         ],
         "atk_recover": [
-          1198,
-          960
+          838,
+          832
         ],
         "hurt_in1": [
-          1292,
-          960
+          932,
+          832
         ],
         "hurt_in2": [
-          1386,
-          960
+          1026,
+          832
         ],
         "hurt": [
-          1480,
-          960
+          1120,
+          832
         ],
         "daze": [
-          1574,
-          960
+          1214,
+          832
         ],
         "daze_b": [
-          1668,
-          960
+          1308,
+          832
         ],
         "kneel_in1": [
-          1762,
-          960
+          1402,
+          832
         ],
         "kneel_in2": [
-          1856,
-          960
+          1496,
+          832
         ],
         "kneel": [
-          1950,
-          960
+          1590,
+          832
         ],
         "kneel_b": [
-          0,
-          1040
+          1684,
+          832
         ]
       },
       "anim": true,
@@ -9996,7 +10004,7 @@
         94
       ],
       "sequence_version": 1,
-      "page": 17
+      "page": 18
     },
     "sea_snake": {
       "cell": [
@@ -10097,7 +10105,7 @@
         100
       ],
       "sequence_version": 1,
-      "page": 17
+      "page": 18
     },
     "sea_troll": {
       "cell": [
@@ -10198,7 +10206,7 @@
         110
       ],
       "sequence_version": 1,
-      "page": 18,
+      "page": 19,
       "scale": 2.7,
       "texScale": 2.7
     },
@@ -10211,72 +10219,72 @@
       "floating": true,
       "frames": {
         "idle": [
-          658,
-          84
+          494,
+          412
         ],
         "idle_b": [
-          2,
-          166
+          594,
+          412
         ],
         "atk_wind1": [
-          102,
-          166
+          694,
+          412
         ],
         "atk_wind2": [
-          202,
-          166
+          2,
+          494
         ],
         "atk_mid": [
-          302,
-          166
+          102,
+          494
         ],
         "attack": [
-          402,
-          166
+          202,
+          494
         ],
         "atk_follow": [
-          502,
-          166
+          302,
+          494
         ],
         "atk_recover": [
-          602,
-          166
+          402,
+          494
         ],
         "hurt_in1": [
-          702,
-          166
+          502,
+          494
         ],
         "hurt_in2": [
-          2,
-          248
+          602,
+          494
         ],
         "hurt": [
-          102,
-          248
+          702,
+          494
         ],
         "daze": [
-          202,
-          248
+          2,
+          576
         ],
         "daze_b": [
-          302,
-          248
+          102,
+          576
         ],
         "kneel_in1": [
-          402,
-          248
+          202,
+          576
         ],
         "kneel_in2": [
-          502,
-          248
+          302,
+          576
         ],
         "kneel": [
-          602,
-          248
+          402,
+          576
         ],
         "kneel_b": [
-          702,
-          248
+          502,
+          576
         ]
       },
       "anim": true,
@@ -10315,72 +10323,72 @@
       "floating": true,
       "frames": {
         "idle": [
-          880,
-          704
+          400,
+          576
         ],
         "idle_b": [
-          1008,
-          704
+          528,
+          576
         ],
         "atk_wind1": [
-          1136,
-          704
+          656,
+          576
         ],
         "atk_wind2": [
-          1264,
-          704
+          784,
+          576
         ],
         "atk_mid": [
-          1392,
-          704
+          912,
+          576
         ],
         "attack": [
-          1520,
-          704
+          1040,
+          576
         ],
         "atk_follow": [
-          1648,
-          704
+          1168,
+          576
         ],
         "atk_recover": [
-          1776,
-          704
+          1296,
+          576
         ],
         "hurt_in1": [
-          1904,
-          704
+          1424,
+          576
         ],
         "hurt_in2": [
-          0,
-          832
+          1552,
+          576
         ],
         "hurt": [
-          128,
-          832
+          1680,
+          576
         ],
         "daze": [
-          256,
-          832
+          1808,
+          576
         ],
         "daze_b": [
-          384,
-          832
+          0,
+          704
         ],
         "kneel_in1": [
-          512,
-          832
+          128,
+          704
         ],
         "kneel_in2": [
-          640,
-          832
+          256,
+          704
         ],
         "kneel": [
-          768,
-          832
+          384,
+          704
         ],
         "kneel_b": [
-          896,
-          832
+          512,
+          704
         ]
       },
       "anim": true,
@@ -10609,7 +10617,7 @@
         112
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "specter": {
       "cell": [
@@ -10710,7 +10718,7 @@
         68
       ],
       "sequence_version": 1,
-      "page": 16,
+      "page": 17,
       "kneelSink": 6
     },
     "sphinx": {
@@ -10812,7 +10820,7 @@
         108
       ],
       "sequence_version": 1,
-      "page": 12,
+      "page": 13,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -10915,7 +10923,7 @@
         103
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "stone_golem": {
       "cell": [
@@ -11016,7 +11024,7 @@
         116
       ],
       "sequence_version": 1,
-      "page": 25,
+      "page": 26,
       "scale": 2.8,
       "texScale": 2.8
     },
@@ -11030,71 +11038,71 @@
       "frames": {
         "idle": [
           821,
-          513
+          103
         ],
         "idle_b": [
           1,
-          616
+          206
         ],
         "atk_wind1": [
           106,
-          616
+          206
         ],
         "atk_wind2": [
           211,
-          616
+          206
         ],
         "atk_mid": [
           316,
-          616
+          206
         ],
         "attack": [
           421,
-          616
+          206
         ],
         "atk_follow": [
           526,
-          616
+          206
         ],
         "atk_recover": [
           631,
-          616
+          206
         ],
         "hurt_in1": [
           736,
-          616
+          206
         ],
         "hurt_in2": [
           841,
-          616
+          206
         ],
         "hurt": [
           1,
-          697
+          287
         ],
         "daze": [
           106,
-          697
+          287
         ],
         "daze_b": [
           211,
-          697
+          287
         ],
         "kneel_in1": [
           316,
-          697
+          287
         ],
         "kneel_in2": [
           421,
-          697
+          287
         ],
         "kneel": [
           526,
-          697
+          287
         ],
         "kneel_b": [
           631,
-          697
+          287
         ]
       },
       "anim": true,
@@ -11119,7 +11127,7 @@
         99
       ],
       "sequence_version": 1,
-      "page": 9,
+      "page": 10,
       "scale": 2,
       "texScale": 2
     },
@@ -11325,7 +11333,7 @@
         121
       ],
       "sequence_version": 1,
-      "page": 28,
+      "page": 29,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -11529,7 +11537,7 @@
         61
       ],
       "sequence_version": 1,
-      "page": 22
+      "page": 23
     },
     "warmech": {
       "cell": [
@@ -11747,7 +11755,7 @@
         103
       ],
       "sequence_version": 1,
-      "page": 17,
+      "page": 18,
       "scale": 3,
       "kneelSink": 10
     },
@@ -11850,7 +11858,7 @@
         99
       ],
       "sequence_version": 1,
-      "page": 17
+      "page": 18
     },
     "weretiger": {
       "cell": [
@@ -11951,7 +11959,7 @@
         70
       ],
       "sequence_version": 1,
-      "page": 21,
+      "page": 22,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -11965,71 +11973,71 @@
       "frames": {
         "idle": [
           2,
-          330
+          2
         ],
         "idle_b": [
           84,
-          330
+          2
         ],
         "atk_wind1": [
           166,
-          330
+          2
         ],
         "atk_wind2": [
           248,
-          330
+          2
         ],
         "atk_mid": [
           330,
-          330
+          2
         ],
         "attack": [
           412,
-          330
+          2
         ],
         "atk_follow": [
           494,
-          330
+          2
         ],
         "atk_recover": [
           576,
-          330
+          2
         ],
         "hurt_in1": [
           658,
-          330
+          2
         ],
         "hurt_in2": [
           2,
-          412
+          84
         ],
         "hurt": [
           84,
-          412
+          84
         ],
         "daze": [
           166,
-          412
+          84
         ],
         "daze_b": [
           248,
-          412
+          84
         ],
         "kneel_in1": [
           330,
-          412
+          84
         ],
         "kneel_in2": [
           412,
-          412
+          84
         ],
         "kneel": [
           494,
-          412
+          84
         ],
         "kneel_b": [
           576,
-          412
+          84
         ]
       },
       "anim": true,
@@ -12054,7 +12062,7 @@
         65
       ],
       "sequence_version": 1,
-      "page": 9,
+      "page": 10,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -12157,7 +12165,7 @@
         172
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "white_dragon": {
       "cell": [
@@ -12258,7 +12266,7 @@
         119
       ],
       "sequence_version": 1,
-      "page": 16,
+      "page": 17,
       "scale": 3
     },
     "white_shark": {
@@ -12360,7 +12368,7 @@
         118
       ],
       "sequence_version": 1,
-      "page": 17,
+      "page": 18,
       "scale": 3,
       "kneelSink": 10
     },
@@ -12463,7 +12471,7 @@
         77
       ],
       "sequence_version": 1,
-      "page": 10
+      "page": 11
     },
     "winter_wolf": {
       "cell": [
@@ -12564,7 +12572,7 @@
         103
       ],
       "sequence_version": 1,
-      "page": 21,
+      "page": 22,
       "scale": 2.5,
       "texScale": 2.5
     },
@@ -12768,7 +12776,7 @@
         65
       ],
       "sequence_version": 1,
-      "page": 10,
+      "page": 11,
       "kneelSink": 6
     },
     "wyrm": {
@@ -12870,7 +12878,7 @@
         110
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "wyvern": {
       "cell": [
@@ -12971,7 +12979,7 @@
         109
       ],
       "sequence_version": 1,
-      "page": 16
+      "page": 17
     },
     "zombie": {
       "cell": [
@@ -12982,72 +12990,72 @@
       "floating": false,
       "frames": {
         "idle": [
-          512,
-          256
+          128,
+          128
         ],
         "idle_b": [
-          592,
-          256
+          208,
+          128
         ],
         "atk_wind1": [
-          672,
-          256
+          288,
+          128
         ],
         "atk_wind2": [
-          752,
-          256
+          368,
+          128
         ],
         "atk_mid": [
-          832,
-          256
+          448,
+          128
         ],
         "attack": [
-          912,
-          256
+          528,
+          128
         ],
         "atk_follow": [
-          992,
-          256
+          608,
+          128
         ],
         "atk_recover": [
-          1072,
-          256
+          688,
+          128
         ],
         "hurt_in1": [
-          1152,
-          256
+          768,
+          128
         ],
         "hurt_in2": [
-          1232,
-          256
+          848,
+          128
         ],
         "hurt": [
-          1312,
-          256
+          928,
+          128
         ],
         "daze": [
-          1392,
-          256
+          1008,
+          128
         ],
         "daze_b": [
-          1472,
-          256
+          1088,
+          128
         ],
         "kneel_in1": [
-          1552,
-          256
+          1168,
+          128
         ],
         "kneel_in2": [
-          1632,
-          256
+          1248,
+          128
         ],
         "kneel": [
-          1712,
-          256
+          1328,
+          128
         ],
         "kneel_b": [
-          1792,
-          256
+          1408,
+          128
         ]
       },
       "anim": true,
