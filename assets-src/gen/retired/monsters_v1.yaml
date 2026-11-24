@@ -241,3 +241,63 @@
   hurt: rearing back in pain, neck twisted away, wings half folded and flinching
   seeds: [1234]
   retired_as: dragon_v1
+- id: pirate
+  size: small
+  prompt_rev: 2     # approved with the legacy sprite as design reference; keeps its cache key
+  prompt: >-
+    stocky pirate with a black tricorn hat, an eyepatch, a short dark beard, a blue coat with a red sash, brown boots,
+    holding a curved cutlass
+  attack: lunging forward with a wide cutlass slash, coat tails flying, free arm thrown back for balance
+  hurt: reeling backward off balance, hat knocked askew, one arm flailing, grimacing
+  seeds: [1234]
+  retired_as: pirate_v1
+- id: dark_wizard
+  # "Dark Wizard" (074): a hunched caster in a star-patterned robe
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
+    the heroes and thrust the staff and free hand with the elbows bent, so every reaching part stays well inside its
+    own cell. Draw only the parts and clothing named in the description, the same in every cell: no cape, cloak or
+    extra cloth, and no spell effects, smear or motion lines.
+  prompt: >-
+    a hunched old wizard in a long black robe patterned with small silver stars, a wide-brimmed tall pointed black hat,
+    a long grey beard, a hooked nose and two bright glowing yellow eyes clearly visible under the brim, clearly
+    visible silver stars on the robe, holding one gnarled wooden staff in the
+    hand on the right side of the image in every cell; centred in its own cell with empty space on both sides, the hat
+    tip well below the top of the grey box
+  attack: >-
+    leaning his body far forward toward the heroes and raising the staff upright in front of his chest with both
+    hands, the staff vertical (not pointed forward), its top level with the hat brim and glowing faintly, the whole
+    staff well inside the middle cell, the glowing yellow eyes wide under the brim
+  hurt: knocked back, the hat tipped askew, the free hand thrown up, the staff upright in the same hand
+  face: his bearded face with glowing yellow eyes under the hat brim is readable
+  extra_negative: a sword, armour, a crown, an orb, spell effects, a cape, a second staff
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R196): the attack hand thrust back; 1235 (R197): the forward staff sliced at the raw cell line
+  retired_as: dark_wizard_v1
+- id: vampire_lord
+  # "Vampire Lord" (116): a tall elder vampire, white hair, a bat-wing cape joined to the arms (not a recolour)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so every reaching part stays well inside its own cell. The bat-wing cape is
+    joined to the arms and moves with them, kept within the cell. Draw only the parts named in the description: no
+    second cape, and no smear or motion lines.
+  prompt: >-
+    a tall gaunt elder vampire with long straight white hair, a pale grey face with sunken red eyes and small fangs, a
+    tall stiff black collar rising behind the head like a crown with sharp points, a long black coat with dark red
+    trim, a black cape shaped like bat wings joined from the shoulders along both arms to the wrists, long clawed
+    fingers; centred in its own cell with empty space on both sides, the collar points well below the top of the grey
+    box
+  attack: >-
+    leaning forward toward the heroes, one clawed hand reaching out with the elbow bent and its bat-wing cape spread
+    under that arm, the other arm and its half of the cape kept close to the body (not flung out behind), the hand
+    and the whole cape well inside the middle cell
+  hurt: >-
+    knocked back, the white hair flying, both arms raised in front of the face with the bat-wing cape folded across
+    the body
+  face: his gaunt pale face with red eyes under long white hair is readable
+  extra_negative: slicked black hair, a red vest, a separate cape, a crown on the head, a weapon, real bat wings on the back, a young face
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R267): the attack's trailing cape sliced at the raw cell line
+  retired_as: vampire_lord_v1

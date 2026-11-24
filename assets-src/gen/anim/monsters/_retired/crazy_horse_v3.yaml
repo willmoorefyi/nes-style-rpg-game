@@ -1,0 +1,158 @@
+sprite: crazy_horse
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Pass V8 redesign (R321): an ash-grey otherworldly steed with a bare horse-skull head (a glowing yellow-green eye), the
+# ribs showing, a tall ridge of bone spines, blazing yellow-green cracks and smoke legs (no hooves). The attack is a
+# low lunge with the skull thrust down and the jaw open; the hurt is a sit-back onto the haunches, the head up. Every
+# in-between is a translation-only copy of its source key (moves: []), every leg (the lowest points of the smoke
+# columns as feet and toes) pinned; the key switches carry the pose change.
+keyframes:
+  idle:
+    hip: [52, 76]
+    back: [68, 68]
+    chest: [88, 70]
+    neck: [97, 52]
+    head: [106, 42]
+    snout: [122, 58]
+    tail0: [47, 68]
+    tail1: [38, 62]
+    tail2: [27, 72]
+    tail_tip: [22, 86]
+    hip_n: [50, 84]
+    knee_n: [45, 100]
+    foot_n: [44, 115]
+    toe_n: [45, 121]
+    hip_f: [60, 86]
+    knee_f: [60, 100]
+    foot_f: [61, 110]
+    toe_f: [64, 115]
+    sh_n: [84, 84]
+    el_n: [83, 100]
+    paw_n: [84, 115]
+    ftoe_n: [85, 121]
+    sh_f: [95, 84]
+    el_f: [96, 100]
+    paw_f: [96, 112]
+    ftoe_f: [97, 118]
+  attack:
+    hip: [42, 85]
+    back: [62, 75]
+    chest: [85, 80]
+    neck: [100, 80]
+    head: [112, 88]
+    snout: [124, 108]
+    tail0: [38, 78]
+    tail1: [28, 82]
+    tail2: [18, 88]
+    tail_tip: [6, 98]
+    hip_n: [42, 92]
+    knee_n: [35, 104]
+    foot_n: [29, 115]
+    toe_n: [30, 121]
+    hip_f: [52, 95]
+    knee_f: [48, 104]
+    foot_f: [44, 110]
+    toe_f: [45, 114]
+    sh_n: [80, 92]
+    el_n: [82, 102]
+    paw_n: [76, 112]
+    ftoe_n: [72, 119]
+    sh_f: [92, 90]
+    el_f: [97, 98]
+    paw_f: [97, 104]
+    ftoe_f: [98, 107]
+  hurt:
+    hip: [45, 95]
+    back: [58, 82]
+    chest: [78, 75]
+    neck: [85, 58]
+    head: [95, 48]
+    snout: [118, 54]
+    tail0: [40, 92]
+    tail1: [30, 92]
+    tail2: [20, 95]
+    tail_tip: [10, 95]
+    hip_n: [48, 100]
+    knee_n: [45, 108]
+    foot_n: [46, 116]
+    toe_n: [48, 121]
+    hip_f: [58, 100]
+    knee_f: [60, 108]
+    foot_f: [66, 112]
+    toe_f: [70, 116]
+    sh_n: [80, 92]
+    el_n: [86, 100]
+    paw_n: [80, 112]
+    ftoe_n: [80, 118]
+    sh_f: [90, 92]
+    el_f: [98, 100]
+    paw_f: [105, 110]
+    ftoe_f: [110, 118]
+frames:
+  atk_wind1:   # anticipation: the body 1 px back and down, the skull dipped and drawn back; legs planted
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [-1, 1], back: [-1, 1], chest: [-1, 1], neck: [-2, 1], head: [-2, 2], snout: [-2, 2], tail0: [-1, 1], tail1: [-1, 1], tail2: [-1, 1], tail_tip: [-1, 1], sh_n: [-1, 1], sh_f: [-1, 1], hip_n: [-1, 1], hip_f: [-1, 1]}
+  atk_wind2:   # coil: the body 3 px back and 2 down, the skull low and drawn well back
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [-2, 4], back: [-2, 4], chest: [-2, 4], neck: [-3, 4], head: [-3, 5], snout: [-3, 5], tail0: [-2, 4], tail1: [-2, 4], tail2: [-2, 4], tail_tip: [-2, 4], sh_n: [-2, 4], sh_f: [-2, 4], hip_n: [-2, 4], hip_f: [-2, 4]}
+  atk_mid:   # the lunge arriving: the attack key 2 px back and 1 up
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [1, -3], back: [1, -3], chest: [1, -3], neck: [1, -3], head: [1, -3], snout: [1, -3], tail0: [1, -3], tail1: [1, -3], tail2: [1, -3], tail_tip: [1, -3], sh_n: [1, -3], sh_f: [1, -3], hip_n: [1, -3], hip_f: [1, -3], knee_f: [0, -2], foot_f: [0, -2], toe_f: [0, -2]}
+  atk_follow:   # the lunge settles: the attack key lifted 1 px
+    moves: []
+    dy: 0
+    t: 1.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [0, -1], back: [0, -1], chest: [0, -1], neck: [0, -1], head: [0, -1], snout: [0, -1], tail0: [0, -1], tail1: [0, -1], tail2: [0, -1], tail_tip: [0, -1], sh_n: [0, -1], sh_f: [0, -1], hip_n: [0, -1], hip_f: [0, -1], el_f: [0, -1], paw_f: [0, -1], ftoe_f: [0, -1]}
+  atk_recover:   # back toward idle: the idle key 2 px low and back
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [-1, 4], back: [-1, 4], chest: [-1, 4], neck: [-1, 4], head: [-1, 4], snout: [-1, 4], tail0: [-1, 4], tail1: [-1, 4], tail2: [-1, 4], tail_tip: [-1, 4], sh_n: [-1, 4], sh_f: [-1, 4], hip_n: [-1, 4], hip_f: [-1, 4]}
+  hurt_in1:   # the flinch: body back and down, the skull tossed up; legs planted
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [-2, 2], back: [-2, 2], chest: [-2, 2], neck: [-2, 1], head: [-2, 0], snout: [-2, 0], tail0: [-2, 2], tail1: [-2, 2], tail2: [-2, 2], tail_tip: [-2, 2], sh_n: [-2, 2], sh_f: [-2, 2], hip_n: [-2, 2], hip_f: [-2, 2]}
+  hurt_in2:   # rising from the sit-back: the hurt key 2 px forward and 1 up, legs planted
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [2, -1], back: [2, -1], chest: [2, -1], neck: [2, -1], head: [2, -1], snout: [2, -1], tail0: [2, -1], tail1: [2, -1], tail2: [2, -1], tail_tip: [2, -1], sh_n: [2, -1], sh_f: [2, -1], hip_n: [2, -1], hip_f: [2, -1]}
+  daze:   # the skull hangs (the recipe adds its head slump)
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [0, 1], back: [0, 1], chest: [0, 1], neck: [0, 1], head: [0, 1], snout: [0, 1], tail0: [0, 1], tail1: [0, 1], tail2: [0, 1], tail_tip: [0, 1], sh_n: [0, 1], sh_f: [0, 1], hip_n: [0, 1], hip_f: [0, 1]}
+  daze_b:   # the skull 1 px lower
+    moves: []
+    dy: 0
+    t: 0.0
+    pins: [el_n, paw_n, ftoe_n, el_f, paw_f, ftoe_f, knee_n, foot_n, toe_n, knee_f, foot_f, toe_f]
+    tweaks: {hip: [0, 2], back: [0, 2], chest: [0, 2], neck: [0, 2], head: [0, 2], snout: [0, 2], tail0: [0, 2], tail1: [0, 2], tail2: [0, 2], tail_tip: [0, 2], sh_n: [0, 2], sh_f: [0, 2], hip_n: [0, 2], hip_f: [0, 2]}
+masks:
+  neck:   # the smoke mane rides the neck chain (the body chain took its crest)
+    idle: [[74, 54], [72, 44], [76, 36], [84, 28], [92, 27], [100, 29], [104, 34], [100, 48], [102, 58], [98, 68], [90, 74], [82, 62]]
+  head:   # the bare skull only, not the mane behind it
+    idle: [[100, 34], [106, 32], [112, 37], [120, 45], [127, 53], [127, 67], [118, 69], [108, 63], [102, 56], [98, 46]]
+holds: []
+paint: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

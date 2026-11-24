@@ -124,6 +124,19 @@
       }
     }
   ],
+  "bedrock": {
+    "pass": "EF",
+    "cap": 145,
+    "per_purpose_caps": {
+      "ef_sheet": 50,
+      "ef_structure": 75,
+      "ef_nobg": 20,
+      "reserve": 0
+    },
+    "gemini_before": 553,
+    "reserve_max_usd": 0.08,
+    "note": "User 2026-11-24 (docs/ENEMY_FEEDBACK_PLAN.md EF-F, F0): Bedrock regenerations of crazy_horse, pirate, vampire, dark_wizard, vampire_lord; no Gemini. Stable Image Ultra v1.1 (ef_sheet: one 4-pose render per variation, or the fallback's idle), the fallback's Control Structure poses (ef_structure), remove_bg only when the magenta key cut fails (ef_nobg). At most 5 variations per sprite. One row per logical request in cache/bedrock_ledger.jsonl."
+  },
   "bedrock_history": [
     {
       "note": "Pass C (docs/CHAOS_FORMS_PLAN.md 5.1, 5.6, 6; user D-U5, D-U6, 2026-11-16): Stability-on-Bedrock calls, read only by bedrock.invoke (the BR ledger cache/bedrock_ledger.jsonl, one row per logical request) and colossus.py budget --check. cap 80 = the sum of per_purpose_caps; any purpose not listed is refused under pass C (A6), reserve needs reserve:<reason>. rim_upscale (2, colossus.py upscale of the rim backdrop source, docs/CHAOS_FORMS_PLAN.md 7.3) was taken from the reserve's 18 by the orchestrator (2026-11-16), so the cap stays 80. gemini_before = N_C0, the main-checkout Gemini attempts at C1: pass C makes no Gemini call (gem[N_C0:] == 0, no fallback). The Gemini guard (generate.check_budget) never reads this block. Rev 4 (docs/CHAOS_FORMS_PLAN.md 18.9, B7; 2026-11-16, at 17 of 80 used): caps re-tabled with the total kept at 80: v0 closed at 9, f3_gen 12, f3_upscale 6 and f2_upscale 2 (new: Conservative Upscale), f3_nobg 4, f2_gen 2, f2_nobg 4, f4_variant closed at 2, f4_inpaint 8 (new: open + crack), rim_upscale 2 (kept, 7.3), reserve 29 (18.9's 31 less the 2 rim_upscale already moved out of it). reserve_max_usd 0.08: bedrock.invoke refuses a reserve call whose model costs more (bedrock.COST_USD estimates), so no upscale comes from the reserve; budget --check flags any such row.",
