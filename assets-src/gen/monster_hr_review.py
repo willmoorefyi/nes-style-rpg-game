@@ -67,6 +67,36 @@ def write_monsters_yaml(sid: str, sm: dict, path: Path | None = None) -> None:
     path.write_text(text[:m.start()] + new + text[m.end():])
 
 
+def approve_json(sid: str, sm: dict, pk: list[tuple], info: dict, size: tuple[int, int], model: str) -> tuple:
+    """The held approve's monster_large.json and kneel.json (Bedrock shapes) from the picks `pk` = [(pose, n, key,
+    row)]; each `sources[]` entry carries its own row's pass / purpose / arm (the EF4 idle with EF5 poses)."""
+    import time
+    from gen.monster_hr_br import row_pass
+    today, (w, h) = time.strftime("%Y-%m-%d"), size
+    srcs = [{"pose": p, "cache_key": k, "variation": n, "seed": int(v["seed"]), "strength": float(v["strength"]),
+             "pass": row_pass(v)[0], "purpose": row_pass(v)[1], "arm": f"{row_pass(v)[0].lower()}_sd35"}
+            for p, n, k, v in pk]
+    inputs = {"idle": {"master_sha256": sm["master_sha256"], "raw_keys": [sm["prep"]["source"]] + (
+        [sm["prep"]["graft"]["source"]] if sm["prep"].get("graft") else [])}}
+    inputs.update({p: {"posed_sha256": sm[f"{v.get('input', p)}_sha256"], "master_sha256": sm["master_sha256"]}
+                   for p, n, _, v in pk[1:]})
+    meta = {"character": sid, "sheet": "monster_large", "backend": "bedrock", "model": model,
+            "seed": srcs[0]["seed"], "cache_key": srcs[0]["cache_key"], "purpose": srcs[0]["purpose"],
+            "pass": srcs[0]["pass"], "approved": today, "grid": [w, h], "bottom_row": 122, "layout": [3, 1],
+            "poses": ["idle", "attack", "hurt"], "size": "large", "floating": False, "flip_frames": [],
+            "sources": srcs[:3], "inputs": inputs, "recipe": f"monster_hr.yaml#{sid}",
+            "route": "EF4: puppet-then-repaint (monster_hr_prep.py, monster_hr_puppet.py, SD 3.5 Large image-to-image "
+            "monster_hr_br.py)", "cut": {k: info.get(k) for k in ("mode", "scale", "fit", "native_heights", "cell_px")}}
+    kv = pk[3][3]
+    kneel = {"character": sid, "sheet": "kneel", "arm": srcs[3]["arm"], "seed": srcs[3]["seed"],
+             "try": srcs[3]["variation"], "grid": [w, h], "bottom_row": 122, "foot_row": 122, "models": [model],
+             "br_cache_keys": [srcs[3]["cache_key"]], "approved": today,
+             "settings": {"route": "EF4 kneel: puppet pose repainted by SD 3.5 (monster_hr_br.py)",
+                          "pass": srcs[3]["pass"], "strength": srcs[3]["strength"],
+                          "posed_sha256": sm[f"{kv.get('input', 'kneel')}_sha256"]}}
+    return meta, kneel, srcs
+
+
 def _wrap(s: str, width: int = 112) -> list[str]:
     out, cur = [], ""
     for word in s.split():

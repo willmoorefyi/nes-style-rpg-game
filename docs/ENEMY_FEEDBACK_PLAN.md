@@ -408,6 +408,21 @@ Trial on **dark_wizard only**, as pass **EF5**.
 - Gate: G2's checks + the above + one image-only reviewer ("does each pose read clearly at 128 px?"), <= 3
   iterations; on failure a debrief at `~/temp/ff-game/ef/bedrock5/dark_wizard/DEBRIEF.md` and no EF5 spend.
 
+**A0 / A1 result (2026-11-24).** A0: `monster_hr_br.py` takes pass / purpose from each row (`row_pass`), caps rows
+per pass per pose, reads a row's `prompt_pose`, and writes per-pass review dirs (`review_dir`); the approve json moved
+to `monster_hr_review.approve_json` (each `sources[]` entry with its own pass / purpose / arm). `monster_hr_puppet.py`:
+`--pass EF5` (`bedrock5/<id>/posed/`), a pose's `pass` tag, part option `minus` (a hand on the staff leaves the
+staff), pose `prefill` (a part's vacated px filled on the master before it moves; the claw's place in the robe, the
+hand's on the shaft) and part option `joint: false`. `monster_hr_check.py`: per-pass IoU bars, the staff / chest world
+angles and the body height without props, the EF5 targets. Selftests RED-first (`_check_ef5_tools`). EF4's recipes are
+`attack_ef4` / `hurt_ef4` / `kneel_ef4` (sha256 unchanged), its rows `input: <pose>_ef4`; a new `hand` part (no px in
+EF4 recipes) leaves every EF4 sha256 byte-identical. A1 (no AI): attack staff +77.0 deg from its idle -0.2 (world
+76.8), chest +26, IoU 0.51; hurt chest -24, staff -24.2 (-24 from idle), IoU 0.44; kneel body height 537 / 880 =
+0.61, hem on row 960, IoU 0.45 (measured values in the puppet's output). Reviewer (image-only, full and 128 px):
+iteration 1 ITERATE x3, iteration 2 ITERATE x3, iteration 3 PASS (nits: claw-tip fragments on the shaft in attack, the
+kneel's right horn crossing the staff). Sheet: `~/temp/ff-game/ef/bedrock5/dark_wizard/posed/poses_sheet.png`. Held at
+A2: no Bedrock call, no EF5 budget block.
+
 **A2. User gate.** The posed inputs (`~/temp/ff-game/ef/bedrock5/dark_wizard/posed/`) are shown to the user; **no
 Bedrock call until the user approves them.**
 

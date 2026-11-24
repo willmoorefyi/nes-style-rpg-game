@@ -8,14 +8,17 @@ gen/monster_hr.yaml `puppet` (master coordinates):
   `pins: {part: {i: [dx, dy]}}` (cloth pin moves on top of the base transform), `z` (draw order, back first),
   `close` (joint gap closing radius), `fill` (destination polygons whose enclosed holes are filled) and
   `backfill` (polygons whose vacated master px are filled); `part_opts: {part: {option: value | null}}` overrides
-  a part's options for that pose only. Exposed gaps
+  a part's options for that pose only; `minus: [part]` takes another part's px out of a part; `prefill: [{part, poly,
+  clone}]` fills a part's vacated px on the master before it moves. Exposed gaps
   near the moved pivots are filled from the nearest part's own px (dilation fill).
 
 Output gen/out/hr/<id>/<pose>_posed.png and <pose>_overlay.png; the sha256 of every posed PNG is recorded in the
 yaml (`<pose>_sha256`). Checks (`checks`): the figure inside the canvas with >= 16 px margin, the feet on row
-960 +- 4, no enclosed transparent gap > 50 px within 60 px of a moved joint (a tear), IoU with the idle <= 0.8.
+960 +- 4, no enclosed transparent gap > 50 px within 60 px of a moved joint (a tear), IoU with the idle under the
+pose's pass bar (a pose's `pass` tag, default EF4: 0.80; EF5: attack / hurt 0.70, kneel 0.65), plus amendment A's
+measures (`measure: {prop, chest}` names; staff and chest world angles, the body height without props) and targets.
 
-  python3 -I assets-src/gen/monster_hr_puppet.py <id> [poses...] [--record] [--review]
+  python3 -I assets-src/gen/monster_hr_puppet.py <id> [poses...] [--record] [--review] [--pass EF5]
 """
 from __future__ import annotations
 
@@ -31,10 +34,16 @@ from PIL import Image
 
 from gen import monster_hr_prep as P
 from gen import monster_hr_warp as W
+from gen import monster_hr_check as C
 from gen.monster_hr_check import checks, overlay
 
 POSES = ("attack", "hurt", "kneel")
 REVIEW = Path.home() / "temp" / "ff-game" / "ef" / "bedrock4"
+
+
+def review_dir(pass_: str, sid: str) -> Path:
+    """EF4: bedrock4/<id>/g2/ (G2); EF5: bedrock5/<id>/posed/ (amendment A1); EF4's G2 files are left alone."""
+    return REVIEW / sid / "g2" if pass_ == "EF4" else REVIEW.parent / f"bedrock{pass_[2:]}" / sid / "posed"
 
 
 def load_master(sid: str, sp: dict) -> Image.Image:
@@ -63,7 +72,26 @@ def part_masks(alpha: np.ndarray, parts: list[dict], rgb: np.ndarray | None = No
     for p in parts:
         if p.get("rest"):
             masks[p["name"]] = alpha & ~cut
+    for p in parts:                                    # `minus`: a part drawn over another (a hand on the staff)
+        for q in p.get("minus") or []:                 # leaves that part's px
+            masks[p["name"]] = masks[p["name"]] & ~masks[q]
     return masks
+
+
+def prefill(rgba: np.ndarray, src: np.ndarray, mask: np.ndarray, alpha: np.ndarray, poly: list, clone=None,
+            rest: bool = True) -> None:
+    """A part's px vacated by the parts cut out of it (the claw's place in the robe, the hand's on the staff), inside
+    `poly`, filled on the master before the part moves: cloned from the part's own px `clone` [dx, dy] away, then the
+    nearest fill unless `rest` is false (the hole travels with the cloth instead of opening in the posed image)."""
+    gap = P.poly_mask(alpha.shape, [poly]) & alpha & ~mask
+    if clone:
+        dx, dy = clone
+        sh, ms = W.shift(rgba, -dy, -dx), W.shift(mask, -dy, -dx)
+        ok = gap & ms
+        src[ok] = sh[ok]
+        gap &= ~ok
+    if rest:
+        src[:] = W.nearest_fill(src, gap)
 
 
 def worlds(parts: list[dict], xf: dict) -> dict[str, np.ndarray]:
@@ -99,6 +127,9 @@ def pose(sid: str, name: str, sp: dict | None = None,
         n = p["name"]
         src = rgba.copy()
         src[~masks[n]] = 0
+        for f in ps.get("prefill") or []:              # [{part, poly, clone}] (amendment A1 recipes)
+            if f["part"] == n:
+                prefill(rgba, src, masks[n], alpha, f["poly"], f.get("clone"), f.get("rest", True))
         if p.get("warp"):
             pins = np.asarray(p["pins"], float)
             dst = W.apply(wl[n], pins)
@@ -113,15 +144,15 @@ def pose(sid: str, name: str, sp: dict | None = None,
         else:
             back = W.backward(wl[n])
         layers[n] = W.warp(Image.fromarray(src), back, P.SIDE)
-        if p.get("pivot") and not np.allclose(wl[n], np.eye(3)):
+        if p.get("pivot") and p.get("joint", True) and not np.allclose(wl[n], np.eye(3)):   # joint: false, no fill
             pivots.append(W.apply(wl[n], np.asarray([p["pivot"]], float))[0])
     for n in order:
         canvas.alpha_composite(layers[n])
-    out = np.asarray(canvas).copy()
+    out, roll = np.asarray(canvas).copy(), 0
     if ps.get("ground", True):                         # the lowest opaque row back on the feet row (a kneel's hem);
         dy = P.FEET - int(np.where(out[..., 3].any(1))[0].max())   # fills and checks are in these coordinates
         if abs(dy) <= 240:
-            out = np.roll(out, dy, 0)
+            out, roll = np.roll(out, dy, 0), dy
             pivots = [(x, y + dy) for x, y in pivots]
     comp = out[..., 3] > 0
     r = int(ps.get("close", 6))
@@ -154,13 +185,22 @@ def pose(sid: str, name: str, sp: dict | None = None,
     sizes = np.bincount(lab.ravel())
     out[np.isin(lab, [i for i in range(1, n + 1) if sizes[i] < ps.get("speck", 400)])] = 0
     if ps.get("ground", True):                         # once more after the specks left
-        out = np.roll(out, P.FEET - int(np.where(out[..., 3].any(1))[0].max()), 0)
+        dy = P.FEET - int(np.where(out[..., 3].any(1))[0].max())
+        out, roll = np.roll(out, dy, 0), roll + dy
     img = Image.fromarray(out)
-    info = checks(img, master, [tuple(map(float, q)) for q in pivots], ps.get("open"))
+    pass_ = ps.get("pass", "EF4")
+    info = checks(img, master, [tuple(map(float, q)) for q in pivots], ps.get("open"), C.iou_bar(pass_, name))
+    names = {"prop": "staff", "chest": "chest", **(pp.get("measure") or {})}   # amendment A0's measures
+    pm = masks.get(names["prop"], np.zeros_like(alpha))
+    prop = np.roll(np.asarray(layers[names["prop"]])[..., 3] > 0, roll, 0) if names["prop"] in layers else pm
+    m = C.measures(wl, parts, out[..., 3] > 0, prop & (out[..., 3] > 0), pm, names)
+    idle_h = C.measures(wl, parts, alpha, pm, pm, names)["body_h"]
+    info.update(m, body_h_ratio=round(m["body_h"] / max(1, idle_h), 3))
+    info["ok"].update(C.targets(pass_, name, m, idle_h, names["prop"]))
     return img, overlay(img, layers, order, meshes, pivots), info
 
 
-def build(sid: str, poses: list[str], record: bool = False, review: bool = False) -> dict:
+def build(sid: str, poses: list[str], record: bool = False, review: bool = False, pass_: str = "EF4") -> dict:
     sp, res = P.spec(), {}
     for name in poses:
         img, ov, info = pose(sid, name, sp)
@@ -173,7 +213,7 @@ def build(sid: str, poses: list[str], record: bool = False, review: bool = False
             from gen.monster_hr_yaml import record as rec
             rec(sid, f"{name}_sha256", h)
         if review:
-            r = REVIEW / sid / "g2"
+            r = review_dir(pass_, sid)
             r.mkdir(parents=True, exist_ok=True)
             img.save(r / f"{name}_posed.png")
             ov.save(r / f"{name}_overlay.png")
@@ -186,9 +226,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("id")
     ap.add_argument("poses", nargs="*", help="poses of the recipe (default attack hurt kneel)")
     ap.add_argument("--record", action="store_true")
-    ap.add_argument("--review", action="store_true", help="copy into ~/temp/ff-game/ef/bedrock4/<id>/g2/")
+    ap.add_argument("--review", action="store_true", help="copy into the pass's review dir (review_dir)")
+    ap.add_argument("--pass", dest="pass_", default="EF4", help="EF4: bedrock4/<id>/g2/; EF5: bedrock5/<id>/posed/")
     a = ap.parse_args(argv)
-    for name, info in build(a.id, a.poses or list(POSES), a.record, a.review).items():
+    for name, info in build(a.id, a.poses or list(POSES), a.record, a.review, a.pass_).items():
         want = P.spec()["sprites"][a.id].get(f"{name}_sha256")
         drift = "" if a.record or not want else " OK" if want == info["sha256"] else " DRIFT"
         print(f"{a.id} {name}: {info}{drift}")

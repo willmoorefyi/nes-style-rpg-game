@@ -1,7 +1,9 @@
 """EF-G G3 / G4 (docs/ENEMY_FEEDBACK_PLAN.md EF-G): the SD 3.5 Large repaint of the idle masters and the puppet poses,
 the large cut and the held approval. Variation rows: gen/monster_hr.yaml `<id>.variations.<pose>` ({n, seed, strength,
 key}); one image-to-image request per row, the input being the master (idle) or the posed PNG (its sha256 checked
-against the yaml) composited on flat mid-grey, through bedrock.invoke (main checkout only, pass EF4, purpose ef4_pose).
+against the yaml) composited on flat mid-grey, through bedrock.invoke (main checkout only; pass and purpose from the row's `pass` tag, EF4 -> ef4_pose, EF5 ->
+ef5_pose, untagged EF4; <= 5 rows per pass per pose, EF5 rows continuing `n`; an EF5 row's `prompt_pose` replaces
+the pose text).
 
   python3 -I assets-src/gen/monster_hr_br.py gen <id> <pose> --var N [--paid]   # one repaint (ledgered, cached)
   python3 -I assets-src/gen/monster_hr_br.py cut <id>                           # the picks -> large cut + review sheets
@@ -14,7 +16,6 @@ import argparse
 import json
 import shutil
 import sys
-import time
 from pathlib import Path
 
 if str(Path(__file__).resolve().parent.parent) not in sys.path:
@@ -27,8 +28,19 @@ from gen import bedrock as B
 from gen import monster_hr_prep as P
 
 POSES = ("idle", "attack", "hurt", "kneel")
-PURPOSE, PASS, MODEL = "ef4_pose", "EF4", "sd35"
+PURPOSE, PASS, MODEL = "ef4_pose", "EF4", "sd35"     # the defaults: a variation row without a `pass` tag is EF4
 REVIEW = Path.home() / "temp" / "ff-game" / "ef" / "bedrock4"
+
+
+def row_pass(v: dict) -> tuple[str, str]:
+    """(pass, purpose) of a variation row: its `pass` tag (EF4 -> ef4_pose, EF5 -> ef5_pose), else EF4."""
+    p = v.get("pass", PASS)
+    return p, f"{p.lower()}_pose"
+
+
+def review_dir(pass_: str) -> Path:
+    """The review directory of a pass (bedrock4/ for EF4, bedrock5/ for EF5): EF4's held sheets never overwritten."""
+    return REVIEW.parent / f"bedrock{pass_[2:]}"
 PITCH = {"large": P.HEIGHT / 115.0, "small": P.HEIGHT / 68.0}   # render px per art px: the figure ~115 / ~68 art px
 
 
@@ -49,21 +61,24 @@ def on_grey(img: Image.Image, sp: dict) -> Image.Image:
 
 
 def variation(sm: dict, pose: str, n: int) -> dict:
-    rows = [v for v in ((sm.get("variations") or {}).get(pose) or []) if v["n"] == n]
-    if not rows or n > 5:
-        raise SystemExit(f"no {pose} variation {n} (at most 5 calls per image, EF-G G3)")
+    allr = (sm.get("variations") or {}).get(pose) or []
+    rows = [v for v in allr if v["n"] == n]
+    same = [v for v in allr if rows and row_pass(v)[0] == row_pass(rows[0])[0]]
+    if not rows or len(same) > 5:
+        raise SystemExit(f"no {pose} variation {n} (at most 5 calls per image per pass, EF-G G3 / amendment A3)")
     return rows[0]
 
 
-def text(sp: dict, sm: dict, pose: str) -> tuple[str, str]:
-    pos = f"{sm['subject']} Pose: {sm['poses'][pose]}. {sp['style']}"
+def text(sp: dict, sm: dict, pose: str, v: dict | None = None) -> tuple[str, str]:
+    """The prompt; an EF5 row's `prompt_pose` replaces `poses[pose]` (EF4's keys stay byte-identical)."""
+    pos = f"{sm['subject']} Pose: {(v or {}).get('prompt_pose') or sm['poses'][pose]}. {sp['style']}"
     return " ".join(pos.split()), " ".join(sp["negative"].split())
 
 
 def request(sid: str, pose: str, n: int, sp: dict, img: Image.Image | None = None) -> tuple[dict, str]:
     sm = sp["sprites"][sid]
     v = variation(sm, pose, n)
-    pos, neg = text(sp, sm, pose)
+    pos, neg = text(sp, sm, pose, v)
     src = on_grey(img or source(sid, v.get("input", pose), sp), sp)   # `input`: a superseded pose of the recipe
     body = {"prompt": pos, "negative_prompt": neg, "seed": int(v["seed"]), "output_format": "png",
             "mode": "image-to-image", "image": B.png_b64(src), "strength": float(v["strength"])}
@@ -84,11 +99,12 @@ def iou(a: Image.Image, b: Image.Image) -> float:
 
 
 def gen(sid: str, pose: str, n: int, paid: bool, sp: dict) -> dict:
-    src = source(sid, variation(sp["sprites"][sid], pose, n).get("input", pose), sp)
+    v = variation(sp["sprites"][sid], pose, n)
+    src = source(sid, v.get("input", pose), sp)
     body, key = request(sid, pose, n, sp, src)
-    raw = B.invoke(MODEL, body, paid=paid, purpose=PURPOSE)
+    raw = B.invoke(MODEL, body, paid=paid, purpose=row_pass(v)[1])
     k = keyed(raw, sp["sprites"][sid])
-    d = REVIEW / sid / "g3" / f"{pose}_v{n}"
+    d = review_dir(row_pass(v)[0]) / sid / "g3" / f"{pose}_v{n}"
     d.mkdir(parents=True, exist_ok=True)
     on_grey(src, sp).save(d / "input.png")
     raw.save(d / "raw.png")
@@ -139,7 +155,8 @@ def review(sid: str, sp: dict) -> list[Path]:
     from gen import monster_br as MB
     from gen.monster_br_review import review as page
     from gen.monster_hr_review import despur_page, screen
-    out = REVIEW / sid
+    sm = sp["sprites"][sid]                            # the newest pass among the picks: EF4's sheets stay put
+    out = review_dir(max(row_pass(variation(sm, p, n))[0] for p, n, _ in picks(sid, sp))) / sid
     big, info, raws = cut(sid, sp)
     small, sinfo, _ = cut(sid, sp, "small")
     paths = [page(raws, big, info, out / "set", MB.sheet), page(raws, small, sinfo, out / "set_small", MB.sheet)]
@@ -154,7 +171,7 @@ def approve(sid: str, sp: dict, root: Path | None = None) -> list[Path]:
     from gen import approve as AP
     from gen import monster_br as MB
     from gen import retire as RT
-    from gen.monster_hr_review import write_monsters_yaml
+    from gen.monster_hr_review import approve_json, write_monsters_yaml
     root = root or AP.APPROVED
     frames, info, _ = cut(sid, sp)
     tmp = Path("/tmp/efG/approve") / sid
@@ -170,25 +187,9 @@ def approve(sid: str, sp: dict, root: Path | None = None) -> list[Path]:
     dst.mkdir(parents=True, exist_ok=True)
     shutil.copy2(tmp / "monster_large.png", dst / "monster_large.png")
     shutil.copy2(tmp / "kneel.png", dst / "kneel.png")
-    sm, pk, today, (w, h) = sp["sprites"][sid], picks(sid, sp), time.strftime("%Y-%m-%d"), frames[0].size
-    srcs = [{"pose": p, "cache_key": k, "variation": n, "seed": int(variation(sm, p, n)["seed"]),
-             "strength": float(variation(sm, p, n)["strength"])} for p, n, k in pk]
-    inputs = {"idle": {"master_sha256": sm["master_sha256"], "raw_keys": [sm["prep"]["source"]] + (
-        [sm["prep"]["graft"]["source"]] if sm["prep"].get("graft") else [])}}
-    inputs.update({p: {"posed_sha256": sm[f"{variation(sm, p, n).get('input', p)}_sha256"],
-                       "master_sha256": sm["master_sha256"]} for p, n, _ in pk[1:]})
-    meta = {"character": sid, "sheet": "monster_large", "backend": "bedrock", "model": B.MODELS[MODEL],
-            "seed": srcs[0]["seed"], "cache_key": srcs[0]["cache_key"], "purpose": PURPOSE, "pass": PASS,
-            "approved": today, "grid": [w, h], "bottom_row": 122, "layout": [3, 1], "poses": ["idle", "attack", "hurt"],
-            "size": "large", "floating": False, "flip_frames": [], "sources": srcs[:3], "inputs": inputs,
-            "recipe": f"monster_hr.yaml#{sid}", "route": "EF4: puppet-then-repaint (monster_hr_prep.py, "
-            "monster_hr_puppet.py, SD 3.5 Large image-to-image monster_hr_br.py)",
-            "cut": {k: info.get(k) for k in ("mode", "scale", "fit", "native_heights", "cell_px")}}
-    kneel = {"character": sid, "sheet": "kneel", "arm": "ef4_sd35", "seed": srcs[3]["seed"], "try": srcs[3]["variation"],
-             "grid": [w, h], "bottom_row": 122, "foot_row": 122, "models": [B.MODELS[MODEL]],
-             "br_cache_keys": [srcs[3]["cache_key"]], "approved": today,
-             "settings": {"route": "EF4 kneel: puppet pose repainted by SD 3.5 (monster_hr_br.py)", "pass": PASS,
-                          "strength": srcs[3]["strength"], "posed_sha256": sm["kneel_sha256"]}}
+    sm, pk = sp["sprites"][sid], picks(sid, sp)
+    meta, kneel, srcs = approve_json(sid, sm, [(p, n, k, variation(sm, p, n)) for p, n, k in pk], info, frames[0].size,
+                                     B.MODELS[MODEL])
     (dst / "monster_large.json").write_text(json.dumps(meta, indent=2) + "\n")
     (dst / "kneel.json").write_text(json.dumps(kneel, indent=2) + "\n")
     for ext in ("png", "json"):
@@ -209,8 +210,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--paid", action="store_true")
     a = ap.parse_args(argv)
     if a.cmd == "status":
-        rows = [r for r in B.read_br_ledger() if r.get("event") == "request" and r.get("pass") == PASS]
-        return print(f"pass {PASS}: {len(rows)} requests") or 0
+        for ps in ("EF4", "EF5"):
+            rows = [r for r in B.read_br_ledger() if r.get("event") == "request" and r.get("pass") == ps]
+            print(f"pass {ps}: {len(rows)} requests")
+        return 0
     sp = P.spec()
     if a.cmd == "gen":
         info = gen(a.id, a.pose, a.var, a.paid, sp)

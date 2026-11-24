@@ -248,9 +248,12 @@ sprites:
     scale_entry: "{scale: 2, tex: 2, smooth: [despur]}"   # prepared for monster_scale.yaml (G4), not applied
     pick: {idle: 1, attack: 4, hurt: 4, kneel: 3}   # G4 round 2: attack / hurt on the G2-iteration-3 poses, kneel at 0.45
   dark_wizard:
-    kneel_sha256: 07411d7541faa5dc13f17047c2d8a6acf35b859aa57a4dd9a38b22c820b56a0a
-    hurt_sha256: 0d930d5385ce5fd9352f2fd3817cd819e764bad409de47f4cc930191f157c494
-    attack_sha256: 5bcc8de1cdb64c0ba0169d0b78b263d0a206f4f4179ab0443fea9606a5bd6ab2
+    kneel_sha256: 178f1f87c8151fe3c586fa09f435aa48185a8e204b33a2d6c08497880d6ece23
+    hurt_sha256: 0286d56036ab297e19914a19e10b5d44fdc4889e118ccf70ce5392a007dce05f
+    attack_sha256: da6a3c7ed9f564db99fa45ce4969fb20aae777c3365f49687d48b12c6f98abab
+    kneel_ef4_sha256: 07411d7541faa5dc13f17047c2d8a6acf35b859aa57a4dd9a38b22c820b56a0a
+    hurt_ef4_sha256: 0d930d5385ce5fd9352f2fd3817cd819e764bad409de47f4cc930191f157c494
+    attack_ef4_sha256: 5bcc8de1cdb64c0ba0169d0b78b263d0a206f4f4179ab0443fea9606a5bd6ab2
     master_sha256: 135e9f20336729cb1a029faa1ac07951dda533b00a6b1ce61baa2714d5192408
     brief: >-
       A sinister dark sorcerer (EF4: EF3 idle v4, flipped to face right): a horned midnight-blue hood, a gaunt
@@ -289,36 +292,72 @@ sprites:
         - {name: arm_f_up, poly: [[555, 400], [688, 420], [688, 470], [640, 500], [600, 570], [555, 560]], pivot: [570, 430], parent: chest}
         - {name: staff, poly: [[620, 80], [805, 80], [805, 270], [760, 280], [760, 965], [680, 965], [680, 280], [620, 270]], pivot: [715, 440], parent: arm_f_up}
         - {name: claw, poly: [[345, 615], [375, 595], [410, 600], [425, 640], [420, 700], [410, 735], [380, 735], [350, 690], [340, 650]], pivot: [390, 600], parent: chest}
+        - {name: hand, poly: null, pivot: [715, 440], parent: arm_f_up, joint: false}   # EF5: the staff hand (no px in EF4 recipes)
       poses:
-        attack:
+        attack_ef4:                     # EF4 G2 iteration 2 (superseded by attack, amendment A1)
           xf: {chest: [10, 25, 0], head: [-4], arm_f_up: [-50], staff: [70], claw: [-60, 230, -80]}
           pins: {body: {3: [20, 0], 4: [20, 0], 5: [-30, 0], 9: [-20, 0], 10: [10, 0]}}
           open: [[570, 450, 670, 580]]          # the window between the raised sleeve, the staff and the robe
           z: [body, claw, head, arm_f_up, staff]
           backfill: [[[320, 560], [460, 560], [460, 770], [320, 770]]]   # the claw's old place (the tatters keep their holes)
           clone: [-75, 0]                       # filled with the robe beside it
-        hurt:
+        hurt_ef4:                     # EF4 G2 iteration 2 (superseded by hurt, amendment A1)
           xf: {chest: [-12, -30, 0], head: [-12], arm_f_up: [20], staff: [-22], claw: [160, 30, -300]}
           pins: {body: {3: [-20, 0], 4: [-20, 0], 8: [30, 0], 10: [-10, 0]}}
           z: [body, head, claw, arm_f_up, staff]
           fill: [[[300, 480], [480, 480], [480, 680], [300, 680]]]   # seams by the raised claw
           backfill: [[[320, 560], [460, 560], [460, 770], [320, 770]]]   # the claw's old place (the tatters keep their holes)
           clone: [-75, 0]                       # filled with the robe beside it
-        kneel:
+        kneel_ef4:                     # EF4 G2 iteration 2 (superseded by kneel, amendment A1)
           xf: {chest: [12, 30, 190], head: [28], arm_f_up: [10], staff: [-22, -80, -170], claw: [-10, 0, 0]}
           pins: {body: {3: [30, 160], 4: [40, 170], 5: [-30, 0], 8: [40, 0], 9: [-10, 0], 10: [60, 100]}}
           z: [body, claw, head, arm_f_up, staff]
           fill: [[[330, 655], [490, 655], [490, 760], [330, 760]]]   # the seam above the claw
+        hurt:                           # EF5: thrown back, the head back, the staff tilting away, the free claw up
+          pass: EF5                     # A3 (after the user's A2 approval): its EF5 rows (n 3-7) carry prompt_pose "knocked
+                                        # backward, recoiling, head thrown back, the staff tilting away, the free claw flung up"
+          part_opts: &ef5_opts
+            hand: {poly: [[684, 398], [756, 398], [756, 494], [684, 494]], light: 100}   # the bony staff hand
+            staff: {minus: [hand]}
+            claw: {light: 100}                         # the bones only (the robe behind stays)
+          prefill: &ef5_prefill
+            - {part: staff, poly: [[684, 398], [756, 398], [756, 494], [684, 494]], clone: [0, -100], rest: false}
+            - {part: body, poly: [[335, 590], [430, 590], [430, 740], [335, 740]], clone: [0, 130]}   # the claw's place
+          xf: {chest: [-24, -40, 0], head: [-30], arm_f_up: [15], staff: [-15], claw: [190, 98, -253]}
+          open: [[290, 290, 330, 320]]                  # between the raised claw's fingers and the face
+          pins: {body: {3: [-40, 0], 4: [-40, 0], 8: [40, 0], 10: [-20, 0]}}
+          z: [body, head, claw, arm_f_up, staff, hand]   # the free claw flung up before the face
+        attack:                         # EF5 (amendment A1): the staff swung near horizontal, the arm out, a lunge
+          pass: EF5
+          part_opts:
+            <<: *ef5_opts
+            arm_f_up: {poly: [[555, 400], [688, 420], [688, 470], [650, 485], [600, 510], [555, 510]]}   # no tatters
+          prefill: *ef5_prefill
+          xf: {body: [0, -50, 0], chest: [26, -20, 0], head: [-6], arm_f_up: [-55], staff: [106, -118, -21], claw: [-30, 120, -216]}
+          pins: {body: {3: [30, 0], 4: [40, 0], 5: [-50, -25], 6: [40, 0], 7: [60, 0], 8: [70, 0], 9: [-40, -20], 10: [30, 0]}}   # the hem sheared forward
+          open: [[660, 440, 695, 475], [595, 512, 625, 538]]   # the gripping claw's fingers and the shaft; under the shaft
+          z: [body, head, arm_f_up, staff, hand, claw]     # the free claw on the shaft behind the staff hand
+        kneel:                          # EF5: the robe collapsed low, the head hanging over the planted staff
+          pass: EF5
+          part_opts:
+            <<: *ef5_opts
+            staff: {minus: [hand], parent: null}         # planted where it stands; the hand slides down it
+            hand: {poly: [[684, 398], [756, 398], [756, 494], [684, 494]]}   # with the shaft behind it (kept upright)
+            body: {pivot: [420, 960]}                    # the squash about the ground
+          prefill: *ef5_prefill
+          xf: {body: [0, 0, 0, 1.12, 0.62], chest: [22, 0, 260], head: [18, 50, 60], arm_f_up: [-25, -85, -17], hand: [3], claw: [-10, 0, 0]}   # the arm reaches across to the staff
+          open: [[575, 580, 720, 745], [580, 740, 690, 795]]   # under the arm, between the robe, the sleeve, the staff
+          z: [body, claw, head, arm_f_up, staff, hand]
     variations:                           # EF4 repaints (SD 3.5 Large image-to-image; <= 5 per image)
       idle:
         - {n: 1, seed: 44001, strength: 0.3, key: 26f7a17bbb0c23e4ec0c266c, iou: 0.958}
       attack:
-        - {n: 1, seed: 44011, strength: 0.3, key: 39fc075f9dac5d544a823f27, iou: 0.962}
-        - {n: 2, seed: 44012, strength: 0.38, key: 8fb3d653f63c16bb9d1b4117, iou: 0.946}
+        - {n: 1, seed: 44011, strength: 0.3, input: attack_ef4, key: 39fc075f9dac5d544a823f27, iou: 0.962}
+        - {n: 2, seed: 44012, strength: 0.38, input: attack_ef4, key: 8fb3d653f63c16bb9d1b4117, iou: 0.946}
       hurt:
-        - {n: 1, seed: 44021, strength: 0.3, key: 479aeb3a4c26554936919fe6, iou: 0.959}
-        - {n: 2, seed: 44022, strength: 0.45, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: a7f39f2c873de2a797522de4, iou: 0.938}
+        - {n: 1, seed: 44021, strength: 0.3, input: hurt_ef4, key: 479aeb3a4c26554936919fe6, iou: 0.959}
+        - {n: 2, seed: 44022, strength: 0.45, input: hurt_ef4, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: a7f39f2c873de2a797522de4, iou: 0.938}
       kneel:
-        - {n: 1, seed: 44031, strength: 0.3, key: 35d6f46ddc56c736e4227f11, iou: 0.948}
+        - {n: 1, seed: 44031, strength: 0.3, input: kneel_ef4, key: 35d6f46ddc56c736e4227f11, iou: 0.948}
     scale_entry: "{scale: 2, tex: 2}"   # prepared, not applied; no despur: it breaks the thin staff shaft
     pick: {idle: 1, attack: 2, hurt: 1, kneel: 1}   # G4 round 2: attack v2 (0.38) draws the reaching claw
