@@ -1,0 +1,324 @@
+# EF4 (pass EF4, docs/ENEMY_FEEDBACK_PLAN.md EF-G, user picks 2026-11-24): puppet-then-repaint for the four humanoids.
+# G1: an idle master per sprite from one picked EF3 raw (no AI; gen/monster_hr_prep.py, `prep`); G2: attack, hurt and
+# kneel posed from the master by rigid parts and cloth warps (no AI; gen/monster_hr_puppet.py, `puppet`); G3: every
+# image (the idle master too) repainted by SD 3.5 Large image-to-image at low strength (gen/monster_hr_br.py,
+# `variations`, pass EF4, purpose ef4_pose); G4: the large cut, held for the user's size decision (`pick`).
+# Coordinates: `prep` polygons and landmarks are on the source raw (896x1088, before any flip); `puppet` coordinates
+# are on the 1024x1024 master. The EF3 rows of monster_br3.yaml stay as recorded (its `pick.idle` unchanged).
+pass: EF4
+purpose: ef4_pose
+model: sd35
+grey: [128, 128, 128]
+style: >-
+  16-bit JRPG battle enemy, painted pixel-art style, crisp dark outline, cel shading lit from the top left, one single
+  full-body figure in side view facing right on a plain flat mid-grey background.
+negative: >-
+  text, watermark, frame, border, several figures, extra limbs, extra arms, extra weapons, cropped, scenery, floor,
+  cast shadow, blurry, photo
+sprites:
+  pirate:
+    brief: >-
+      A menacing pirate cutthroat (EF4: EF3 idle v3's body with v4's human face): a tanned, weathered, grinning human
+      face with a black beard, a red bandana under a black tricorn hat with gold trim, gold earrings, a long crimson
+      coat with gold buttons, black gloves, dark trousers, black boots, a huge curved steel cutlass; a wide, low
+      fighting stance.
+    subject: >-
+      A pirate cutthroat with a tanned grinning bearded human face, a black tricorn hat with gold trim over a red
+      bandana, gold earrings, a long crimson coat with gold buttons, black gloves and boots, a huge curved steel cutlass.
+    poses:
+      idle: a wide low fighting stance, the cutlass held across the body
+      attack: lunging forward to the right with a wide slash of the cutlass, the front knee bent
+      hurt: staggering backward, flinching, the head thrown back, the free arm thrown up
+      kneel: beaten down on one knee, slumped, head hanging, the cutlass lowered to the ground
+    prep:
+      source: 795adfe0af7aef21dad2e6a8      # EF3 pirate idle v3 (sd35)
+      flip: false
+      key: {mode: rows, tol: 34, hue: 16, sat: 0.5, val: 0.38, holes: 400}
+      cx: 470
+      keep_tol: 10
+      close: 2
+      keep_max: 110                         # dark px only (the lighter page between the legs stays page)
+      keep:                                 # the hat crown, both gloves and the trousers, lit in the page's own teal
+        - [[262, 438], [335, 440], [375, 462], [400, 478], [402, 548], [340, 552], [300, 535], [260, 540], [240, 560], [205, 560], [200, 515], [225, 500], [262, 500], [262, 470]]
+        - [[640, 415], [700, 418], [735, 425], [745, 445], [745, 495], [700, 480], [660, 500], [625, 495], [620, 450]]
+        - [[280, 600], [560, 560], [640, 620], [660, 800], [650, 860], [560, 860], [540, 820], [400, 850], [300, 900], [240, 900], [230, 800]]
+        - [[228, 172], [270, 112], [320, 76], [380, 58], [420, 50], [452, 54], [482, 68], [522, 100], [556, 140], [580, 178], [588, 197], [540, 190], [490, 178], [470, 168], [380, 160], [330, 165], [260, 175]]
+      keep_light: [[[640, 88], [700, 110], [790, 200], [806, 300], [775, 420], [730, 425], [745, 300], [700, 160], [640, 100]], [[400, 450], [660, 405], [690, 450], [640, 500], [560, 505], [450, 530], [400, 535]]]   # the cutlass's lower edge
+      # G1 iteration 4 (user approval 2026-11-24, after the 3rd reviewer ITERATE): hand polygons on the canvas
+      erase_out:                            # the floor shadows between and beside the boots (floor only)
+        - [[355, 895], [558, 895], [558, 922], [355, 922]]
+        - [[248, 942], [295, 942], [295, 958], [248, 958]]
+      erase_hue:                            # the page blob by the calf, the fringe under the right boot (teal px only)
+        - [[340, 765], [385, 765], [385, 803], [340, 803]]
+        - [[552, 908], [702, 908], [702, 932], [552, 932]]
+        - [[505, 212], [538, 222], [552, 255], [556, 300], [505, 300]]       # the restored head side's page px
+      restore_out:                          # the raw px back where the key ate costume
+        - [[465, 430], [665, 422], [665, 458], [560, 468], [470, 480]]       # the blade's lower edge by the guard
+        - [[498, 128], [540, 122], [586, 192], [588, 200], [520, 202], [498, 196]]   # the right hat crown
+        - [[505, 212], [538, 222], [552, 255], [556, 300], [505, 300]]       # the head's right side (ear, collar)
+      graft:
+        source: c2b502030ddf241687d4ba26    # EF3 pirate idle v4: its human face only
+        poly: [[396, 140], [500, 140], [508, 176], [532, 196], [536, 240], [512, 256], [480, 266], [442, 272], [404, 262], [380, 236], [372, 196], [386, 172]]
+        key: {mode: flat, tol: 30}          # v4's own page: its teal never comes along
+        src_marks: [[429, 165], [474, 164], [452, 186], [442, 254]]   # v4: eyes, nose tip, chin
+        dst_marks: [[391, 189], [450, 189], [432, 211], [432, 278]]   # v3: eye sockets, nose, chin (face 10 % up)
+        feather: 10
+        over: []
+  vampire:
+    kneel_sha256: d6fb22d34eace1052dbfd1beb679892f5a2d33416a7e5b27c696a24e1ec9a0f2
+    hurt_sha256: 3cb2c08ddf969709c26484df2758c6e92b686d5056663fa20f1ae15f44699992
+    attack_sha256: 6265708773a22586a03530109f5e724a9eeb1b9515e1e6323fa3eab77d136b51
+    master_sha256: e5139d9981625ad0c25d927e94a13b8147ef59b4f4c823bd7b8baceb43bbc8ce
+    brief: >-
+      A menacing young vampire noble (EF4: EF3 idle v2, the blood pool removed): a pale white face with glowing red
+      eyes, black slicked-back hair, a red scarf cowl at the throat, dark brown-black plate armour with copper trim and
+      a red gem, gauntleted fists, a black cape with a bright red lining.
+    subject: >-
+      A young vampire noble with a pale white face, glowing red eyes and black slicked-back hair, a red scarf cowl,
+      dark brown-black plate armour with copper trim, gauntleted fists, a black cape with a bright red lining.
+    poses:
+      idle: standing tall and still, three-quarter view, the fists low, the cape hanging open
+      attack: lunging forward to the right, one clawed gauntlet slashing out, the cape flaring behind
+      hurt: recoiling backward, flinching, an arm thrown up before the face
+      kneel: beaten down on one knee, head bowed, one gauntlet on the ground, the cape pooled round him
+    prep:
+      source: 4eaeb5057fa98e09b2440f89      # EF3 vampire idle v2 (sd35)
+      flip: false
+      key: {mode: flat, tol: 24, holes: 400}
+      cx: 470
+      erase:                                # the blood pool (its red equals the cape lining's: hand-drawn, no colour rule)
+        - [[100, 972], [170, 972], [178, 994], [250, 962], [300, 955], [300, 1088], [100, 1088]]
+        - [[300, 1060], [440, 1060], [440, 1088], [300, 1088]]
+        - [[600, 958], [896, 958], [896, 1088], [600, 1088]]
+      pool:                                 # round the boots: the pool's purple shadow, red and white px only
+        poly: [[300, 950], [600, 950], [600, 1060], [300, 1060]]
+        purple: [72, 55]                    # r >= 72 and b >= 55
+        red: [110, 80]                      # r >= 110 and g < 80
+        light: 190                          # min channel >= 190
+      paint_out: [[534, 709, 547, 722]]       # a stray magenta px cross on the tabard (G1 review)
+      extend:
+        - {x: [432, 525], from: 1000, to: 1012}
+    puppet:
+      sigma: 150
+      parts:
+        - {name: hips, poly: null, pivot: [480, 640]}
+        - {name: chest, poly: null, pivot: [480, 640], parent: hips}
+        - {name: body, rest: true, warp: true, pins: [[330, 290], [485, 205], [630, 310], [300, 500], [660, 500], [420, 650], [560, 650], [285, 890], [370, 880], [640, 850], [600, 800], [330, 700], [430, 780], [560, 790], [440, 955], [570, 920]], follow: {0: chest, 1: chest, 2: chest, 3: chest, 4: chest, 5: hips, 6: hips}}
+        - {name: head, poly: [[440, 80], [525, 80], [530, 150], [515, 195], [485, 205], [455, 195], [440, 150]], pivot: [485, 205], parent: chest}
+        - {name: arm_b_up, poly: [[262, 335], [385, 335], [385, 470], [330, 470], [300, 430], [265, 420]], pivot: [335, 345], parent: chest}
+        - {name: arm_b_lo, poly: [[335, 465], [400, 465], [405, 600], [330, 600]], pivot: [362, 470], parent: arm_b_up}
+        - {name: arm_f_up, poly: [[605, 330], [640, 322], [675, 350], [678, 425], [640, 440], [608, 430]], pivot: [635, 350], parent: chest}
+        - {name: arm_f_lo, poly: [[605, 425], [665, 425], [668, 500], [665, 585], [608, 585], [604, 500]], pivot: [632, 430], parent: arm_f_up}
+        - {name: leg_b_up, poly: [[378, 635], [478, 635], [478, 785], [382, 785]], pivot: [430, 645], parent: hips}
+        - {name: leg_b_lo, poly: [[380, 780], [485, 780], [485, 965], [380, 965]], pivot: [432, 785], parent: leg_b_up}
+        - {name: leg_f_up, poly: null, pivot: [520, 650], parent: hips}   # the front thigh is hidden by the tabard
+        - {name: leg_f_lo, poly: [[490, 785], [570, 785], [645, 840], [648, 930], [490, 930]], pivot: [525, 790], parent: leg_f_up}
+      poses:
+        attack:
+          xf: {chest: [18, 30, 10], head: [-4], arm_f_up: [-100], arm_f_lo: [5], arm_b_up: [30], arm_b_lo: [20]}
+          pins: {body: {5: [15, 5], 6: [15, 5], 7: [-70, -30], 8: [-40, -10], 9: [-10, 0], 10: [-10, 0], 11: [-30, 0], 12: [5, 0], 13: [20, 0]}}
+          z: [arm_b_lo, arm_b_up, leg_b_lo, leg_b_up, body, leg_f_up, leg_f_lo, head, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        hurt:
+          xf: {chest: [-18, -30, 0], head: [-15], arm_f_up: [165], arm_f_lo: [-30], arm_b_up: [-40], arm_b_lo: [-20]}
+          pins: {body: {5: [-12, 0], 6: [-12, 0], 7: [-10, 0], 9: [40, 0], 10: [30, 0]}}
+          z: [arm_b_lo, arm_b_up, leg_b_lo, leg_b_up, body, leg_f_up, leg_f_lo, head, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        kneel:
+          xf: {hips: [0, 20, 190], chest: [14], head: [8, 15, 30, 1, 0.85], arm_f_up: [-35], arm_f_lo: [-20], arm_b_up: [10], leg_f_up: [-80], leg_f_lo: [80], leg_b_up: [0], leg_b_lo: [95]}
+          pins: {body: {7: [-50, 50], 8: [-20, 60], 9: [50, 80], 10: [40, 100], 11: [-30, 110], 12: [-10, 140], 13: [90, 150], 14: [-20, 0], 15: [40, 0]}}
+          z: [arm_b_lo, arm_b_up, leg_b_lo, leg_b_up, body, leg_f_up, leg_f_lo, head, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+    variations:                           # EF4 repaints (SD 3.5 Large image-to-image; <= 5 per image)
+      idle:
+        - {n: 1, seed: 42001, strength: 0.3}
+      attack:
+        - {n: 1, seed: 42011, strength: 0.3}
+      hurt:
+        - {n: 1, seed: 42021, strength: 0.3}
+      kneel:
+        - {n: 1, seed: 42031, strength: 0.3}
+  vampire_lord:
+    hurt_r2_sha256: c675b7831806a7eb3c9163aed779ccb573611a929ed8e7dd7b2fc42416129f67
+    attack_r2_sha256: 7a46b5352ce68978edd0a15d38b73772f04f729d7ddf19160117a652fe866000
+    kneel_sha256: 63433990f8b66627ff80b87ec108cddbc182298c74bd2b0e1e6bc5fc66d6eed0
+    hurt_sha256: 39ac85c7d754a13372b4fdfb26909d34dd47292519090cd4ef4dde0961cf0aa4
+    attack_sha256: 0543e8aba6d2281af669e79b01092b2e136b54b70a7b0b2b92547becbb737994
+    master_sha256: f9fcf34d0339ca97acfb3cac7a229bf0e418a1ee6826b8b1f19781df7d23968c
+    brief: >-
+      An ancient vampire lord (EF4: EF3 idle v4): long straight white hair, a gaunt pale skull-like face with red eyes
+      and fangs, a tall gold-trimmed black collar, a crimson gold-trimmed coat over a black waistcoat and a red cravat,
+      long white claws, black bat wings and a black cape with a scarlet lining.
+    subject: >-
+      An ancient vampire lord with long straight white hair, a gaunt pale face with red eyes and fangs, a tall black
+      collar with gold trim, a crimson gold-trimmed coat, long white claws, black bat wings, a black cape lined scarlet.
+    poses:
+      idle: standing tall and imperious, three-quarter view, the claws low, the wings half raised behind him
+      attack: sweeping forward to the right, one clawed hand reaching out to grasp, the wings spread wide
+      hurt: reeling backward, both arms raised before the face, the wings folded in
+      kneel: sunk on one knee, head bowed, the white hair hanging, the wings folded, the cape draped on the ground
+    prep:
+      source: f5ea1b92b05a15146e230881      # EF3 vampire_lord idle v4 (sd35)
+      flip: false
+      key: {mode: flat, tol: 20, holes: 400}
+      cx: 480
+      erase_out: [[[636, 890], [694, 890], [694, 920], [636, 920]]]   # a grey page wedge at the right hem tip
+    puppet:
+      sigma: 150
+      fill_rgb: [14, 10, 16]               # enclosed gaps behind the wings and cape: the cape's black
+      parts:
+        - {name: chest, poly: null, pivot: [470, 600]}
+        - {name: wing_b, poly: [[170, 95], [356, 95], [352, 215], [340, 240], [332, 560], [300, 580], [255, 700], [215, 800], [170, 800]], pivot: [350, 215], parent: chest, warp: true, pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790], [300, 575], [250, 700]], follow: {0: chest, 1: chest}, anchor: [5, 6, 7], cut_poly: [[170, 95], [356, 95], [352, 215], [340, 240], [336, 440], [170, 440]]}
+        - {name: wing_f, poly: [[518, 100], [645, 100], [645, 660], [600, 650], [606, 470], [600, 250], [560, 232], [522, 205]], pivot: [545, 215], parent: chest, warp: true, pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], follow: {0: chest, 1: chest}}
+        - {name: body, rest: true, warp: true, pins: [[370, 225], [472, 205], [548, 228], [360, 450], [470, 450], [580, 450], [330, 650], [600, 650], [415, 955], [530, 905], [120, 955], [830, 915], [300, 950], [690, 900], [200, 955], [600, 915], [750, 910], [425, 780], [525, 780]], follow: {0: chest, 1: chest, 2: chest}, sigma: 600}   # a smoother field (no mesh folds)
+        - {name: head, poly: [[420, 75], [525, 75], [525, 200], [420, 200]], pivot: [472, 200], parent: chest}
+        - {name: arm_b_up, poly: [[345, 232], [405, 232], [402, 300], [395, 360], [343, 360], [340, 300]], pivot: [372, 245], parent: chest, light: 36}
+        - {name: arm_b_lo, poly: [[340, 355], [398, 355], [400, 470], [398, 575], [335, 575], [338, 470]], pivot: [368, 358], parent: arm_b_up, light: 36}
+        - {name: arm_f_up, poly: [[545, 232], [600, 240], [600, 300], [598, 355], [548, 355], [545, 300]], pivot: [570, 248], parent: chest, light: 36}
+        - {name: arm_f_lo, poly: [[545, 350], [600, 350], [605, 460], [610, 550], [555, 550], [548, 460]], pivot: [575, 352], parent: arm_f_up, light: 36}
+      poses:
+        attack:
+          xf: {chest: [8, 25, 0], head: [-4], arm_f_up: [-80], arm_f_lo: [-15], arm_b_up: [15], wing_b: [12], wing_f: [-25]}
+          pins: {body: {3: [20, 0], 4: [20, 0], 5: [20, 0], 6: [8, 0], 7: [8, 0], 10: [-40, 0]}}
+          z: [wing_b, arm_b_lo, arm_b_up, body, wing_f, head, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        hurt:
+          xf: {chest: [-8, -25, 0], head: [-12], arm_f_up: [140], arm_f_lo: [-100], arm_b_up: [-130], arm_b_lo: [95], wing_b: [-8, 15, 0, 0.9, 0.9], wing_f: [8, -15, 0, 0.9, 0.9]}
+          pins: {body: {3: [-20, 0], 4: [-20, 0], 5: [-20, 0], 6: [-8, 0], 7: [-8, 0], 11: [30, 0]}}
+          z: [wing_b, wing_f, body, head, arm_b_up, arm_b_lo, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        kneel:
+          part_opts:                            # the G2-iteration-2 kneel (PASS; repainted as kneel v1-v3), kept as it was
+            wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
+            wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
+            body: {sigma: null}
+            arm_b_up: {light: null}
+            arm_b_lo: {light: null}
+            arm_f_up: {light: null}
+            arm_f_lo: {light: null}
+          xf: {chest: [15, 30, 250], head: [32], arm_f_up: [-25], arm_f_lo: [-35], arm_b_up: [10], wing_b: [-10, 0, 0, 0.9, 0.8], wing_f: [8, 0, 0, 0.9, 0.8]}
+          pins: {body: {3: [30, 225], 4: [30, 225], 5: [30, 225], 6: [20, 190], 7: [70, 170], 9: [40, 0], 13: [40, 0], 10: [-40, 0], 11: [40, 0], 15: [30, 0]}}
+          z: [wing_b, wing_f, body, head, arm_b_up, arm_b_lo, arm_f_up, arm_f_lo]
+          fill: [[[150, 150], [590, 150], [590, 980], [150, 980]]]   # not the wedge behind the right arm
+          open: [[588, 400, 710, 730]]          # the window between the hanging right arm and the cape
+        attack_r2:                            # attack v1-v3 input (G2 iteration 2; superseded by attack)
+          part_opts:                            # the G2-iteration-2 recipe (kept: the kneel, and the inputs of attack / hurt v1-v3)
+            wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
+            wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
+            body: {sigma: null}
+            arm_b_up: {light: null}
+            arm_b_lo: {light: null}
+            arm_f_up: {light: null}
+            arm_f_lo: {light: null}
+          xf: {chest: [8, 25, 0], head: [-4], arm_f_up: [-80], arm_f_lo: [-15], arm_b_up: [15], wing_b: [12], wing_f: [-25]}
+          pins: {body: {3: [20, 0], 4: [20, 0], 5: [20, 0], 6: [8, 0], 7: [8, 0], 10: [-40, 0]}}
+          z: [wing_b, arm_b_lo, arm_b_up, body, wing_f, head, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        hurt_r2:                              # hurt v1-v3 input (G2 iteration 2; superseded by hurt)
+          part_opts:                            # the G2-iteration-2 recipe (kept: the kneel, and the inputs of attack / hurt v1-v3)
+            wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
+            wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
+            body: {sigma: null}
+            arm_b_up: {light: null}
+            arm_b_lo: {light: null}
+            arm_f_up: {light: null}
+            arm_f_lo: {light: null}
+          xf: {chest: [-8, -25, 0], head: [-12], arm_f_up: [140], arm_f_lo: [-100], arm_b_up: [-130], arm_b_lo: [95], wing_b: [-8, 15, 0, 0.9, 0.9], wing_f: [8, -15, 0, 0.9, 0.9]}
+          pins: {body: {3: [-20, 0], 4: [-20, 0], 5: [-20, 0], 6: [-8, 0], 7: [-8, 0], 11: [30, 0]}}
+          z: [wing_b, wing_f, body, head, arm_b_up, arm_b_lo, arm_f_up, arm_f_lo]
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+    variations:                           # EF4 repaints (SD 3.5 Large image-to-image; <= 5 per image)
+      idle:
+        - {n: 1, seed: 43001, strength: 0.3, key: 74cb05ef3d5f193416cf99c6, iou: 0.984}
+      attack:
+        - {n: 1, seed: 43011, strength: 0.3, input: attack_r2, key: 4fbf0a400025770d352609cd, iou: 0.975}
+        - {n: 2, seed: 43012, strength: 0.38, input: attack_r2, key: 67ece4b60af23f48e990db89, iou: 0.97}
+        - {n: 3, seed: 43013, strength: 0.45, input: attack_r2, key: acfcae5c3b2912494aca06e9, iou: 0.959}
+        - {n: 4, seed: 43014, strength: 0.38, note: "the G2-iteration-3 pose (no arm boxes, no cape steps)", key: 058627c0df817fec745721d3, iou: 0.964}
+      hurt:
+        - {n: 1, seed: 43021, strength: 0.3, input: hurt_r2, key: 05faf9aacf03da7e55e7b2da, iou: 0.984}
+        - {n: 2, seed: 43022, strength: 0.38, input: hurt_r2, key: d4d007a03a2ef3d22a18c3ed, iou: 0.979}
+        - {n: 3, seed: 43023, strength: 0.45, input: hurt_r2, key: f67659af2a3137c6f05f9ef8, iou: 0.968}
+        - {n: 4, seed: 43024, strength: 0.38, note: "the G2-iteration-3 pose", key: 0c0bab155670a4cf271e09ae, iou: 0.973}
+        - {n: 5, seed: 43025, strength: 0.45, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: 603effd84a930eaa7ae8e003, iou: 0.966}
+      kneel:
+        - {n: 1, seed: 43031, strength: 0.3, key: 38f9249b211c2cbd6e021009, iou: 0.977}
+        - {n: 2, seed: 43032, strength: 0.38, key: 479ae73707bc6f8f17fe82a9, iou: 0.969}
+        - {n: 3, seed: 43033, strength: 0.45, key: 9323b28c99083db27cd866dc, iou: 0.954}
+    scale_entry: "{scale: 2, tex: 2, smooth: [despur]}"   # prepared for monster_scale.yaml (G4), not applied
+    pick: {idle: 1, attack: 4, hurt: 4, kneel: 3}   # G4 round 2: attack / hurt on the G2-iteration-3 poses, kneel at 0.45
+  dark_wizard:
+    kneel_sha256: 07411d7541faa5dc13f17047c2d8a6acf35b859aa57a4dd9a38b22c820b56a0a
+    hurt_sha256: 0d930d5385ce5fd9352f2fd3817cd819e764bad409de47f4cc930191f157c494
+    attack_sha256: 5bcc8de1cdb64c0ba0169d0b78b263d0a206f4f4179ab0443fea9606a5bd6ab2
+    master_sha256: 135e9f20336729cb1a029faa1ac07951dda533b00a6b1ce61baa2714d5192408
+    brief: >-
+      A sinister dark sorcerer (EF4: EF3 idle v4, flipped to face right): a horned midnight-blue hood, a gaunt
+      skull-like grey face with glowing green eyes, a ragged midnight-blue robe with a brown sash and an amulet,
+      skeletal claws, a tall blackened staff topped with a glowing green horned skull; his aura kept inside the figure.
+    subject: >-
+      A dark sorcerer in a horned midnight-blue hood and a ragged midnight-blue robe, a gaunt skull-like grey face with
+      glowing green eyes, skeletal claws, a tall blackened staff topped with a glowing green horned skull.
+    poses:
+      idle: standing hunched, holding the tall staff upright, the free claw low
+      attack: thrusting the glowing skull staff forward to the right, the free claw reaching out
+      hurt: knocked backward, recoiling, one arm up, the staff held upright
+      kneel: collapsed on one knee, slumped over the planted staff, the head hanging
+    prep:
+      source: db4c3cc59bd5e10ed65f592c      # EF3 dark_wizard idle v4 (sd35), faces left
+      flip: true
+      key: {mode: flat, tol: 30, holes: 20}
+      despeck:                              # page-grey specks left in the tattered hem and robe edges
+        tol: 60
+        sat: 20
+        polys: [[[200, 780], [322, 780], [322, 962], [200, 962]], [[322, 780], [400, 780], [400, 884], [322, 884]], [[318, 860], [348, 860], [348, 945], [318, 945]], [[560, 460], [670, 460], [670, 580], [560, 580]], [[250, 560], [320, 560], [320, 720], [250, 720]], [[440, 860], [540, 860], [540, 962], [440, 962]]]
+      protect: [[[80, 15], [270, 15], [270, 210], [80, 210]]]   # the staff skull's grey dome is not a page pocket
+      erode: 1
+      cx: 470
+      glow: {box: [40, 0, 320, 280], keep: 10, green: 6}
+      floor: 1052                           # the painted ground line under the hem
+      erase:
+        - [[0, 1026], [142, 1026], [142, 1088], [0, 1088]]
+        - [[198, 1030], [384, 1030], [384, 1088], [198, 1088]]
+    puppet:
+      sigma: 150
+      parts:
+        - {name: chest, poly: null, pivot: [430, 650]}
+        - {name: body, rest: true, warp: true, pins: [[360, 330], [550, 350], [465, 310], [300, 550], [560, 560], [150, 955], [300, 955], [450, 955], [530, 950], [240, 900], [520, 780]], follow: {0: chest, 1: chest, 2: chest}}
+        - {name: head, poly: [[330, 75], [580, 75], [580, 200], [530, 240], [520, 310], [400, 310], [390, 240], [330, 200]], pivot: [460, 310], parent: chest}
+        - {name: arm_f_up, poly: [[555, 400], [688, 420], [688, 470], [640, 500], [600, 570], [555, 560]], pivot: [570, 430], parent: chest}
+        - {name: staff, poly: [[620, 80], [805, 80], [805, 270], [760, 280], [760, 965], [680, 965], [680, 280], [620, 270]], pivot: [715, 440], parent: arm_f_up}
+        - {name: claw, poly: [[345, 615], [375, 595], [410, 600], [425, 640], [420, 700], [410, 735], [380, 735], [350, 690], [340, 650]], pivot: [390, 600], parent: chest}
+      poses:
+        attack:
+          xf: {chest: [10, 25, 0], head: [-4], arm_f_up: [-50], staff: [70], claw: [-60, 230, -80]}
+          pins: {body: {3: [20, 0], 4: [20, 0], 5: [-30, 0], 9: [-20, 0], 10: [10, 0]}}
+          open: [[570, 450, 670, 580]]          # the window between the raised sleeve, the staff and the robe
+          z: [body, claw, head, arm_f_up, staff]
+          backfill: [[[320, 560], [460, 560], [460, 770], [320, 770]]]   # the claw's old place (the tatters keep their holes)
+          clone: [-75, 0]                       # filled with the robe beside it
+        hurt:
+          xf: {chest: [-12, -30, 0], head: [-12], arm_f_up: [20], staff: [-22], claw: [160, 30, -300]}
+          pins: {body: {3: [-20, 0], 4: [-20, 0], 8: [30, 0], 10: [-10, 0]}}
+          z: [body, head, claw, arm_f_up, staff]
+          fill: [[[300, 480], [480, 480], [480, 680], [300, 680]]]   # seams by the raised claw
+          backfill: [[[320, 560], [460, 560], [460, 770], [320, 770]]]   # the claw's old place (the tatters keep their holes)
+          clone: [-75, 0]                       # filled with the robe beside it
+        kneel:
+          xf: {chest: [12, 30, 190], head: [28], arm_f_up: [10], staff: [-22, -80, -170], claw: [-10, 0, 0]}
+          pins: {body: {3: [30, 160], 4: [40, 170], 5: [-30, 0], 8: [40, 0], 9: [-10, 0], 10: [60, 100]}}
+          z: [body, claw, head, arm_f_up, staff]
+          fill: [[[330, 655], [490, 655], [490, 760], [330, 760]]]   # the seam above the claw
+    variations:                           # EF4 repaints (SD 3.5 Large image-to-image; <= 5 per image)
+      idle:
+        - {n: 1, seed: 44001, strength: 0.3, key: 26f7a17bbb0c23e4ec0c266c, iou: 0.958}
+      attack:
+        - {n: 1, seed: 44011, strength: 0.3, key: 39fc075f9dac5d544a823f27, iou: 0.962}
+        - {n: 2, seed: 44012, strength: 0.38, key: 8fb3d653f63c16bb9d1b4117, iou: 0.946}
+      hurt:
+        - {n: 1, seed: 44021, strength: 0.3, key: 479aeb3a4c26554936919fe6, iou: 0.959}
+        - {n: 2, seed: 44022, strength: 0.45, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: a7f39f2c873de2a797522de4, iou: 0.938}
+      kneel:
+        - {n: 1, seed: 44031, strength: 0.3, key: 35d6f46ddc56c736e4227f11, iou: 0.948}
+    scale_entry: "{scale: 2, tex: 2}"   # prepared, not applied; no despur: it breaks the thin staff shaft
+    pick: {idle: 1, attack: 2, hurt: 1, kneel: 1}   # G4 round 2: attack v2 (0.38) draws the reaching claw

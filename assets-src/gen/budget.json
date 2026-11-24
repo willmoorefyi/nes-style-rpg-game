@@ -305,6 +305,19 @@
       "note": "User approval 2026-11-24, after the EF2 debrief: pass EF3 retries pirate, vampire, dark_wizard, vampire_lord at the LARGE size (128 px cell) with stocky, broad, heroic-proportion designs in bright readable colours (monster_br2.py --pass EF3, monster_br3.yaml): SD 3.5 Large primary, the idle by text-to-image, attack / hurt / kneel by image-to-image from the new idle. ef3_pose 80 = 4 sprites x 4 poses x 5 variations; ef3_nobg 10 (remove_bg only when the offline key fails); no Gemini. Sets are prepared, not approved (the user decides the size first). One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 28,
       "closed": "2026-11-24, 28 of 90 (EF3: pirate 8, vampire 5, vampire_lord 7, dark_wizard 8; SD 3.5 Large 27, Stable Outpaint 1; no remove_bg, no Gemini). No SHIP; pose renders stopped early on the user's guidance (part-posing route next). 62 calls left (ef3_pose 52, ef3_nobg 10): reopen this block for the part-posing route with the user's approval. Debriefs in ~/temp/ff-game/ef/bedrock3/<id>/DEBRIEF.md."
+    },
+    {
+      "pass": "EF4",
+      "cap": 80,
+      "per_purpose_caps": {
+        "ef4_pose": 80,
+        "reserve": 0
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User approval 2026-11-24 (docs/ENEMY_FEEDBACK_PLAN.md EF-G G3): pass EF4 repaints the four humanoids' puppet poses and idle masters (pirate v3 + v4 face, vampire v2, vampire_lord v4, dark_wizard v4) by SD 3.5 Large image-to-image at low strength (monster_hr_br.py, monster_hr.yaml). ef4_pose 80 = 4 sprites x 4 images x 5 calls; no remove_bg purpose; no Gemini. One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 19,
+      "closed": "2026-11-24, 19 of 80 (EF4, SD 3.5 Large image-to-image only: vampire_lord 13, dark_wizard 6; pirate 0, stopped at G1 after 4 iterations; vampire 0, stopped at G2; no remove_bg, no Gemini). Sets for vampire_lord and dark_wizard are cut and held for the user's size decision (G4 reviewers: ITERATE on the hurt poses). Debriefs in ~/temp/ff-game/ef/bedrock4/<id>/DEBRIEF.md. Reopen with the user's approval."
     }
   ]
 }
