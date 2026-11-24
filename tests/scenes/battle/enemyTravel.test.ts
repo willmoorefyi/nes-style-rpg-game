@@ -28,7 +28,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const meta = JSON.parse(readFileSync(join(root, 'assets/sprites/monsters-ai.json'), 'utf-8')) as {
   scale: number; texScale?: number;
   sheets: Record<string, MonsterAnchors & { cell: [number, number]; footRow: number; floating: boolean; lungePx?: number;
-    scale?: number; frames: Record<string, [number, number]> }>;
+    scale?: number; texScale?: number; frames: Record<string, [number, number]> }>;
 };
 const enemyData = parse(readFileSync(join(root, 'assets/data/enemies.yaml'), 'utf-8')) as EnemyData[];
 const scenarios = parse(readFileSync(join(root, 'assets/data/debug-scenarios.yaml'), 'utf-8')) as { id: string; enemies?: string[] }[];
@@ -37,10 +37,10 @@ const byId = (id: string): EnemyData => enemyData.find((e) => e.id === id)!;
 /** The idle keyframe's opaque box in art px [l, t, r, b) (what BattleArt measures at load). */
 const opaque = (sprite: string): [number, number, number, number] => {
   const s = meta.sheets[sprite];
-  const ts = meta.texScale ?? meta.scale;
+  const ts = s.texScale ?? meta.texScale ?? meta.scale;      // EF-A4: a hi-res sheet's own texScale
   const [x, y] = s.frames.idle;
-  const b = opaqueBounds(monsterSheetPng(sprite), x * ts, y * ts, s.cell[0] * ts, s.cell[1] * ts)!;
-  return b.map((v) => v / ts) as [number, number, number, number];
+  const b = opaqueBounds(monsterSheetPng(sprite), x * ts, y * ts, Math.ceil(s.cell[0] * ts), Math.ceil(s.cell[1] * ts))!;
+  return [Math.floor(b[0] / ts), Math.floor(b[1] / ts), Math.floor((b[2] - 1) / ts) + 1, Math.floor((b[3] - 1) / ts) + 1];
 };
 
 const art: MonsterArtSource = {
@@ -50,7 +50,7 @@ const art: MonsterArtSource = {
     const textures = Object.fromEntries(BOSS_FRAMES.map((n) => [n, new Texture()])) as Record<MonsterFrame, Texture>;
     const sc = s.scale ?? meta.scale; // FW-S per-sheet scale, lunge scaled once (as BattleArt.getMonsterFrames)
     return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: sc,
-      artScale: sc / (meta.texScale ?? meta.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
+      artScale: sc / (s.texScale ?? meta.texScale ?? meta.scale), cell: s.cell, footRow: s.footRow, floating: s.floating,
       hasCast: !!s.frames.cast, hasRaise: !!s.frames.attack_raise, lungePx: ((s.lungePx ?? 24) * sc) / meta.scale, anim: true,
       opaqueRight: opaque(sprite)[2], ...monsterAnchors(s) };
   },
@@ -106,7 +106,8 @@ describe('enemy travel reaches the target (item 3)', () => {
     expect(b.sprites.map((s) => [s.x, s.y])).toEqual(fresh.sprites.map((s) => [s.x, s.y]));
   });
 
-  it.each([['troll', 1], ['white_crocodile', 0.5]] as const)('nine %ss at scale factor %s land on every hero row', (id, factor) => {
+  // EF-B1: the troll is a 2.5 sheet laid out as `huge`, so nine take pass 3 (screen scale 2, factor 0.8)
+  it.each([['troll', 0.8], ['white_crocodile', 0.5]] as const)('nine %ss at scale factor %s land on every hero row', (id, factor) => {
     const b = battle(Array(9).fill(id));
     const f = art.getMonsterFrames(id)!;
     expect(b.sprites.map((s) => s.scale.x)).toEqual(Array(9).fill(f.artScale * factor));

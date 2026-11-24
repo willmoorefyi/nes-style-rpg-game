@@ -22,6 +22,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
 export interface AtlasSheet extends MonsterAnchors {
   page?: number; cell: [number, number]; footRow: number; floating: boolean; lungePx?: number; opaqueRight?: number;
+  /** EF-A4: a hi-res sheet's PNG px per art px. */
+  texScale?: number;
   /** FW-S per-sheet screen scale (gen/monster_scale.yaml; absent: the atlas scale). */
   scale?: number;
   frames: Record<string, [number, number]>;
@@ -42,7 +44,8 @@ export const enemyById = (id: string): EnemyData => {
   return e;
 };
 
-const ts = atlas.texScale ?? atlas.scale;
+/** PNG px per art px of a sheet: its own `texScale` (EF-A4 hi-res sheets), else the atlas's (1 = native). */
+export const texScaleOf = (sheet: string): number => atlas.sheets[sheet].texScale ?? atlas.texScale ?? atlas.scale;
 
 /** The atlas key a frame name shows (BattleArt's resolution: the fallback chain, then `attack`). */
 export function shownFrame(sheet: string, name: MonsterFrame): string {
@@ -58,9 +61,11 @@ export function frameBox(sheet: string, name: MonsterFrame): [number, number, nu
   if (!b) {
     const s = atlas.sheets[sheet];
     const [x, y] = s.frames[shownFrame(sheet, name)];
-    const px = opaqueBounds(monsterSheetPng(sheet), x * ts, y * ts, s.cell[0] * ts, s.cell[1] * ts);
+    const ts = texScaleOf(sheet);
+    const px = opaqueBounds(monsterSheetPng(sheet), x * ts, y * ts, Math.ceil(s.cell[0] * ts), Math.ceil(s.cell[1] * ts));
     if (!px) throw new Error(`${key} is empty`);
-    b = px.map((v) => v / ts) as [number, number, number, number];
+    // a hi-res texture's box back in art px (EF-A4: Scale2x never draws outside the native px it came from)
+    b = [Math.floor(px[0] / ts), Math.floor(px[1] / ts), Math.floor((px[2] - 1) / ts) + 1, Math.floor((px[3] - 1) / ts) + 1];
     boxes.set(key, b);
   }
   return b;
@@ -88,7 +93,7 @@ export function atlasFrames(sheet: string): MonsterFrames | null {
   // as BattleArt.getMonsterFrames: the sheet's own screen scale (FW-S), its lunge scaled once by scale / atlas scale
   const sc = sheetScale(sheet);
   return { textures, idle: textures.idle, attack: textures.attack, cast: textures.cast, hurt: textures.hurt, scale: sc,
-    artScale: sc / ts, cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
+    artScale: sc / texScaleOf(sheet), cell: s.cell, footRow: s.footRow, floating: s.floating, hasCast: !!s.frames.cast,
     hasRaise: !!s.frames.attack_raise, lungePx: ((s.lungePx ?? 24) * sc) / atlas.scale, anim: true,
     opaqueRight: s.opaqueRight ?? idleRight(sheet),
     ...monsterAnchors(s), idleBox: idleBoxOf(sheet) };
@@ -104,7 +109,7 @@ export function layoutInput(id: string): EnemyBoxInput {
   // as AiEnemyView (boxInputOf): a boss sheet at scale 3 is the titan class unless its art fits ENEMY_AREA (chaos is a
   // titan, hollow_seraph a boss, V8 N-1); a scale-3 boss box carries its art top `oy0`
   const f = { ...monsterAnchors(s), cell: s.cell, scale: sc };
-  return enemyBoxInput(layoutSizeOfArt(e.size, f), f);
+  return enemyBoxInput(layoutSizeOfArt(e.size, f), f, e.size ?? 'small');
 }
 
 /** atlasFrames with one cell-sized texture for every frame (so a sprite's bounds are its cell at its scale); `head`
@@ -112,12 +117,13 @@ export function layoutInput(id: string): EnemyBoxInput {
 export function sizedAtlasFrames(sheet: string, head = false): MonsterFrames | null {
   const f = atlasFrames(sheet);
   if (!f) return null;
-  const [w, h] = [f.cell[0] * ts, f.cell[1] * ts];
+  const ts = texScaleOf(sheet);
+  const [w, h] = [Math.ceil(f.cell[0] * ts), Math.ceil(f.cell[1] * ts)];
   const tex = new Texture({ source: new TextureSource({ width: w, height: h }) });
   if (head) {
     const [l, t, r] = idleBoxOf(sheet);
     const data = new Uint8ClampedArray(w * h * 4);
-    for (let x = l * ts; x <= r * ts; x++) data[(t * ts * w + x) * 4 + 3] = 255;
+    for (let x = Math.floor(l * ts); x <= Math.floor(r * ts); x++) data[(Math.floor(t * ts) * w + x) * 4 + 3] = 255;
     headOf(tex, () => ({ data, w, h }));
   }
   const textures = Object.fromEntries(Object.keys(f.textures).map((k) => [k, tex])) as Record<MonsterFrame, Texture>;

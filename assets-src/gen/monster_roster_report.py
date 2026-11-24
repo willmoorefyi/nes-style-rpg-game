@@ -60,7 +60,13 @@ def load_idles(atlas: Path) -> tuple[dict[str, np.ndarray], dict]:
     out = {}
     for s, v in sorted(m["sheets"].items()):
         (x, y), (w, h) = v["frames"]["idle"], v["cell"]
-        out[s] = pages[v.get("page", 0)][y:y + h, x:x + w].copy()
+        t = v.get("texScale", m.get("texScale", 1))     # EF-A4: a hi-res sheet's texture px per art px
+        if t == 1:
+            out[s] = pages[v.get("page", 0)][y:y + h, x:x + w].copy()
+        else:                                           # back to native art px: the texel at each art px's centre
+            ys = np.floor(y * t + (np.arange(h) + 0.5) * t).astype(int)
+            xs = np.floor(x * t + (np.arange(w) + 0.5) * t).astype(int)
+            out[s] = pages[v.get("page", 0)][ys][:, xs].copy()
     return out, m
 
 

@@ -499,12 +499,15 @@ mkdir -p /tmp/head && git show HEAD:assets/sprites/monsters-ai.json > /tmp/head/
 for f in $(python3 -I -c "import json; m = json.load(open('/tmp/head/monsters-ai.json')); print(*[p['file'] for p in m.get('pages', [{'file': 'monsters-ai.png'}])])"); do
   git show "HEAD:assets/sprites/$f" > "/tmp/head/$f"; done
 python3 -I - <<'EOF'
-import json, os
+import json, math, os
 from PIL import Image
 def cells(d):
     m = json.load(open(os.path.join(d, "monsters-ai.json")))
     pages = [Image.open(os.path.join(d, p["file"])).convert("RGBA") for p in m.get("pages", [{"file": "monsters-ai.png"}])]
-    return {(s, f): pages[v.get("page", 0)].crop((x, y, x + v["cell"][0], y + v["cell"][1])).tobytes()
+    def rect(v, x, y):                 # EF-A4: a hi-res sheet's rect is its art px x texScale (1 = native)
+        t = v.get("texScale", m.get("texScale", 1))
+        return (round(x * t), round(y * t), round(x * t) + math.ceil(v["cell"][0] * t), round(y * t) + math.ceil(v["cell"][1] * t))
+    return {(s, f): pages[v.get("page", 0)].crop(rect(v, x, y)).tobytes()
             for s, v in m["sheets"].items() for f, (x, y) in v["frames"].items()}
 a, b = cells("/tmp/head"), cells("assets/sprites")
 for s in sorted({s for s, _ in a}):

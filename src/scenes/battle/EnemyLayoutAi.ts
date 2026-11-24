@@ -2,15 +2,19 @@
  * Enemy placement for the 2x preview art (docs/ART_MONSTERS_PLAN.md). Pure function, screen pixels.
  *
  * Enemies are packed into columns inside ENEMY_AREA (a titan: TITAN_AREA), left to right: titan, boss, huge, large,
- * then small columns. A column holds one size class (1 titan, boss or huge, 2 large or 3 small) stacked with equal gaps.
+ * medium, then small columns. A column holds one size class (1 titan, boss or huge, 2 large or medium, 3 small)
+ * stacked with equal gaps. EF-A5 (docs/ENEMY_FEEDBACK_PLAN.md): a data-`small` sheet at 2 < scale < 3 lays out as
+ * `medium`, a data-`large` one as `huge`; from pass 3 on every box is in its data class (`dataSize`).
  * Odd columns are shifted down by half a step (the classic staggered look) when there is room.
- * Every box keeps a whole screen scale (the sheet's `scale` x the layout factor, docs/REDESIGN_PLAN.md 2.5), over four
- * passes: (1) cells at full size; (2) packed by the home art's opaque extent (`ox0` / `ox1`, docs/ROSTER_FIX_PLAN.md
- * defect 2: the cells carry 10-24 art px of empty margin); (3) as 2, with the scale-3 sheets at screen scale 2 (a no-op
- * without one); (4) every box at screen scale 1 (half size for the scale-2 sheets, as before). A formation with a
- * scale-3 sheet that reaches pass 4 is not supported (`formationFits` refuses it).
+ * Every box keeps its sheet's screen scale (the sheet's `scale` x the layout factor, docs/REDESIGN_PLAN.md 2.5; a
+ * 2.5 sheet is drawn from a texScale-2.5 texture, so 2.5 is whole texture px), over four passes: (1) cells at full
+ * size; (2) packed by the home art's opaque extent (`ox0` / `ox1`, docs/ROSTER_FIX_PLAN.md defect 2: the cells carry
+ * 10-24 art px of empty margin); (3) as 2, with every sheet over scale 2 at screen scale 2, laid out in its data class
+ * (exactly today's pass 3: a no-op without such a sheet); (4) every box at screen scale 1 (half size for the scale-2
+ * sheets, as before; a 2.5 sheet may take it too, through its mipmapped linear page). A formation with a scale-3 sheet
+ * that reaches pass 4 is not supported (`formationFits` refuses it).
  */
-export type EnemySizeClass = 'small' | 'large' | 'huge' | 'boss' | 'titan';
+export type EnemySizeClass = 'small' | 'medium' | 'large' | 'huge' | 'boss' | 'titan';
 
 export interface EnemyBoxInput {
   size: EnemySizeClass;
@@ -23,8 +27,11 @@ export interface EnemyBoxInput {
   /** A boss box only: its art's highest row (the travel frames' top) in box px from the box's top. The opaque passes
    *  fit and place a boss by its art, not its cell (the scale-3 hollow_seraph: a 600 px cell, 471 px of art). */
   oy0?: number;
-  /** The sheet's screen px per art px (FW-S: 3 for the rescaled sheets; default 2): the passes keep it whole. */
+  /** The sheet's screen px per art px (FW-S: 3 for the rescaled sheets; EF-A: 2.5; default 2). */
   scale?: number;
+  /** EF-A5: the data class of a box laid out in a tier class at full size (a 2.5 `small` as `medium`, a 2.5 `large`
+   *  as `huge`); passes 3 and 4 lay it out in this class. Missing: `size`. */
+  dataSize?: EnemySizeClass;
 }
 
 export interface EnemyBox {
@@ -49,8 +56,8 @@ const COLUMN_GAP = 24;
 /** The gap between the opaque extents of opaque-packed columns. */
 const OPAQUE_GAP = 16;
 const ROW_GAP = 16;
-const CAPACITY: Record<EnemySizeClass, number> = { titan: 1, boss: 1, huge: 1, large: 2, small: 3 };
-const ORDER: EnemySizeClass[] = ['titan', 'boss', 'huge', 'large', 'small'];
+const CAPACITY: Record<EnemySizeClass, number> = { titan: 1, boss: 1, huge: 1, large: 2, medium: 2, small: 3 };
+const ORDER: EnemySizeClass[] = ['titan', 'boss', 'huge', 'large', 'medium', 'small'];
 /** The atlas screen scale of a sheet without its own (`monsters-ai.json` `scale`). */
 export const DEFAULT_SHEET_SCALE = 2;
 
@@ -60,14 +67,17 @@ export const DEFAULT_SHEET_SCALE = 2;
  *  582 px of art). A scale-3 boss whose art fits (hollow_seraph, V8 N-1: 471 px) stays a boss in ENEMY_AREA. */
 export function layoutSizeOf(size: EnemySizeClass | undefined, sheetScale: number | undefined, artH?: number): EnemySizeClass {
   const s = size ?? 'small';
+  // EF-A5: the 2.5 tier (2 < scale < 3) lays a data-small sheet out as `medium` and a data-large one as `huge`
+  if (sheetScale !== undefined && sheetScale > 2 && sheetScale < 3) return s === 'small' ? 'medium' : s === 'large' ? 'huge' : s;
   if (s !== 'boss' || sheetScale !== 3) return s;
   return artH !== undefined && artH <= ENEMY_AREA.y1 - ENEMY_AREA.y0 ? 'boss' : 'titan';
 }
 
 interface Column { size: EnemySizeClass; items: number[]; w: number; h: number }
-/** How a layout attempt packs its columns: by the cells (gap 24) or by the opaque extents (gap 16), and the whole
- *  screen scale each box is shown at (`target`; the layout factor is target / the sheet's scale). */
-interface Packing { target: (scale: number) => number; opaque: boolean }
+/** How a layout attempt packs its columns: by the cells (gap 24) or by the opaque extents (gap 16), the screen scale
+ *  each box is shown at (`target`; the layout factor is target / the sheet's scale), and whether the boxes take their
+ *  data class (`dataSize`, passes 3-4) instead of their tier class. */
+interface Packing { target: (scale: number) => number; opaque: boolean; data: boolean }
 
 const sheetScale = (b: EnemyBoxInput): number => b.scale ?? DEFAULT_SHEET_SCALE;
 /** A box length at the pass's screen scale (multiplied first, so 384 at 2/3 is exactly 256). */
@@ -83,16 +93,18 @@ const extent = (b: EnemyBoxInput, f: number): [number, number] => [(b.ox0 ?? 0) 
 
 /** The four passes (see the header). */
 const PASSES: Packing[] = [
-  { target: (s) => s, opaque: false },
-  { target: (s) => s, opaque: true },
-  { target: (s) => (s === 3 ? 2 : s), opaque: true },
-  { target: () => 1, opaque: false },
+  { target: (s) => s, opaque: false, data: false },
+  { target: (s) => s, opaque: true, data: false },
+  { target: (s) => (s > 2 ? 2 : s), opaque: true, data: true },
+  { target: () => 1, opaque: false, data: true },
 ];
+/** A box's class in a pass. */
+const classOf = (b: EnemyBoxInput, p: Packing): EnemySizeClass => (p.data ? b.dataSize ?? b.size : b.size);
 
 function columns(boxes: EnemyBoxInput[], p: Packing): Column[] {
   const cols: Column[] = [];
   for (const size of ORDER) {
-    const idx = boxes.map((b, i) => (b.size === size ? i : -1)).filter((i) => i >= 0);
+    const idx = boxes.map((b, i) => (classOf(b, p) === size ? i : -1)).filter((i) => i >= 0);
     for (let c = 0; c < idx.length; c += CAPACITY[size]) {
       const items = idx.slice(c, c + CAPACITY[size]);
       const w = Math.max(...items.map((i) => {
@@ -151,6 +163,11 @@ function layout(boxes: EnemyBoxInput[]): { out: EnemyBox[]; pass: number } {
 
 export function computeEnemyLayoutAi(boxes: EnemyBoxInput[]): EnemyBox[] {
   return layout(boxes).out;
+}
+
+/** The pass (1-4) a formation's layout takes (EF-A5's per-sheet pass report). */
+export function layoutPass(boxes: EnemyBoxInput[]): number {
+  return layout(boxes).pass;
 }
 
 /** Most enemies in one battle; equal to EncounterTable's MAX_FORMATION (a test checks). */

@@ -30,7 +30,8 @@ const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.j
   texScale?: number;
   pages: { file: string; w: number; h: number }[];
   sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>; page: number;
-    anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number] }>;
+    anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number];
+    texScale?: number }>;
 };
 /** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
 // FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens
@@ -222,9 +223,10 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n))
           .filter((n) => kneel || !isKneelFrame(n));
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
+        const t = e.texScale ?? ts;                                // EF-A4: a hi-res sheet's own texScale
         for (const [x, y] of Object.values(e.frames)) {
-          expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);
-          expect((y + e.cell[1]) * ts, id).toBeLessThanOrEqual(h);
+          expect(x * t + Math.ceil(e.cell[0] * t), id).toBeLessThanOrEqual(w);
+          expect(y * t + Math.ceil(e.cell[1] * t), id).toBeLessThanOrEqual(h);
         }
         expect(e.footRow, id).toBeLessThan(e.cell[1]);
       }

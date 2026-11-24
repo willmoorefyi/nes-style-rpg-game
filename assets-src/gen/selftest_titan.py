@@ -181,15 +181,22 @@ def _caps(check) -> None:
 
 
 def _real_groups(titans: set[str]) -> tuple[list, dict]:
-    """Pack the committed atlas's sheets (unique frame cells, in page order) with the given titan set."""
+    """Pack the committed atlas's sheets (unique frame cells, in page order) with the given titan set: per group the
+    native pages, then (EF-A4) its hi-res pages at each sheet's texScale; positions back in art px."""
+    import math
+    from gen import monster_hires_pages as MHP
     from gen import monster_pages as MP
     sheets = json.loads(ATLAS_JSON.read_text())["sheets"]
     groups = MP.group_order(sorted(sheets), titans)
+    hi = {s: v["texScale"] for s, v in sheets.items() if v.get("texScale", 1) != 1}
 
     def cells(s: str) -> list[tuple[int, int]]:
         pos = sorted({tuple(p) for p in sheets[s]["frames"].values()}, key=lambda p: (p[1], p[0]))
-        return [tuple(sheets[s]["cell"])] * len(pos)
-    return groups, MP.pack_pages([[(s, cells(s)) for s in ids] for _, ids in groups])[1]
+        t = hi.get(s, 1)
+        return [(math.ceil(sheets[s]["cell"][0] * t), math.ceil(sheets[s]["cell"][1] * t))] * len(pos)
+    placed = MHP.pack_all(groups, {s: cells(s) for _, ids in groups for s in ids}, hi)[1]
+    return groups, {s: (pg, [(round(x / hi.get(s, 1)), round(y / hi.get(s, 1))) for x, y in pos])
+                    for s, (pg, pos) in placed.items()}
 
 
 def _pages(check) -> None:

@@ -8,7 +8,8 @@ frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAM
 or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
 hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
 opaque row), idleBox ([l, t, r, b]: the idle key's opaque box, inclusive; FW-A2), scale (only for a sheet listed in
-gen/monster_scale.yaml: its integer display scale, FW-S), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
+gen/monster_scale.yaml: its display scale, FW-S; EF-A: 2, 2.5 or 3), texScale (EF-A4: a hi-res sheet's texture px per art px;
+its frames sit on `filter: linear` pages, rects at frame * texScale), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
 attack_raise only, or atk_wind2's for a rig with `raise: false`, FW-R), travelTop / lungeRight / homeX (FW-A, below),
 sequence_version, page (index into pages), kneelSink (floaters with a kneel key, docs/KNEEL_PLAN.md D-K9)}},
 preload: [the pages holding an act-1 sheet] (D-K13; BattleArt loads and pins them)}. Kneel frames are packed like any
@@ -30,6 +31,8 @@ from PIL import Image
 
 from gen import anim_checks as C
 from gen import monster_anim as MA
+from gen import monster_hires as MH
+from gen import monster_hires_pages as MHP
 from gen import monster_pages as MP
 
 SCALE = 2
@@ -42,7 +45,9 @@ HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b
 RANGED_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover")
 ENEMIES = MA.HERE.parent.parent / "assets" / "data" / "enemies.yaml"
 SCALE_TABLE = MA.HERE / "monster_scale.yaml"
-DISPLAY_SCALES = (2, 3)            # FW-S: integer screen px per art px only (no stair-steps)
+# FW-S had integer screen px per art px only (D-V1 S1); EF-A1 (docs/ENEMY_FEEDBACK_PLAN.md, the user's 2026-11-24
+# request overrides D-V1 S1) adds 2.5, drawn from a hi-res texture at texScale 2.5 (gen/monster_hires.py)
+DISPLAY_SCALES = MH.DISPLAY_SCALES
 
 
 def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict[str, Image.Image], list[str], bool]:
@@ -76,20 +81,18 @@ def anchors(idle: Image.Image) -> dict:
             "idleBox": [int(xs.min()), top, int(xs.max()), int(ys.max())]}
 
 
-def load_scale(sprites: list[str] | set[str], path: Path | None = None) -> dict[str, int]:
-    """FW-S (docs/REDESIGN_PLAN.md 2.2, D-V1 S1): the per-sheet integer display scale table gen/monster_scale.yaml,
-    {sprite: 3}. Allowed values: 2 and 3; a sprite that is not an atlas sheet is refused. Empty = every sheet at the
-    atlas SCALE (no JSON change)."""
+def load_scale(sprites: list[str] | set[str], path: Path | None = None) -> dict[str, dict]:
+    """FW-S / EF-A1: the per-sheet table gen/monster_scale.yaml -> {sprite: {scale, tex, smooth}} (monster_hires.entry:
+    a plain 2 or 3 keeps today's meaning, tex 1; a dict {scale, tex, smooth} is a hi-res or smoothed entry). A sprite
+    that is not an atlas sheet is refused. Empty = every sheet at the atlas SCALE (no JSON change)."""
     path = path or SCALE_TABLE
     table = (yaml.safe_load(path.read_text()) if path.exists() else None) or {}
     if not isinstance(table, dict):
         raise SystemExit(f"monsters_ai: {path.name} must map sprite ids to a scale ({table!r})")
-    bad = {k: v for k, v in table.items() if v not in DISPLAY_SCALES or isinstance(v, bool)}
     unknown = sorted(set(table) - set(sprites))
-    if bad or unknown:
-        raise SystemExit(f"monsters_ai: {path.name}: scales must be one of {DISPLAY_SCALES} ({bad}); unknown sprites "
-                         f"{unknown}")
-    return dict(table)
+    if unknown:
+        raise SystemExit(f"monsters_ai: {path.name}: unknown sprites {unknown}")
+    return {k: MH.entry(k, v) for k, v in table.items()}
 
 
 def tip(raise_key: Image.Image) -> dict:
@@ -160,12 +163,19 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
                 raise SystemExit("monsters_ai: variant checks failed\n  " + "\n  ".join(bad))
             sprites[v["id"]] = (meta, vf, holds, anim, L)
     scales = load_scale(set(sprites), scale_table)
+    smooth = {}
+    for sid in sorted(s for s, e in scales.items() if e["smooth"]):   # EF-A3: native clean-up after checks and locks
+        meta, frames, holds, anim, L = sprites[sid]
+        frames, smooth[sid] = MH.despur_sheet(sid, frames)
+        sprites[sid] = (meta, frames, holds, anim, L)
+    hi = {s: e["tex"] for s, e in scales.items() if e["tex"] != 1}
     groups = MP.group_order(sorted(sprites), {s for s, v in sprites.items() if v[0].get("size") == "titan"})
     order = [sid for _, ids in groups for sid in ids]
     names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
     items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}
-    sizes, placed = MP.pack_pages([[(sid, [sprites[sid][1][n].size for n in items[sid]]) for sid in ids]
-                                   for _, ids in groups])
+    tex = {sid: MH.hires_sheet(sid, {n: sprites[sid][1][n] for n in items[sid]}, hi[sid]) for sid in hi}
+    img = (lambda sid, n: tex[sid][n] if sid in tex else sprites[sid][1][n])
+    sizes, placed, linear, act1 = MHP.pack_all(groups, {s: [img(s, n).size for n in items[s]] for s in order}, hi)
     for w, h in sizes:
         page = C.page_size(w, h)
         if page:
@@ -174,25 +184,31 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
     rects: dict[str, dict[str, list[int]]] = {s: {} for s in order}
     for sid in order:
         pg, pos = placed[sid]
+        t = hi.get(sid, 1)
         for n, (x, y) in zip(items[sid], pos):
-            atlases[pg].paste(sprites[sid][1][n], (x, y))
-            rects[sid][n] = [x, y]
+            atlases[pg].paste(img(sid, n), (x, y))
+            rects[sid][n] = [int(round(x / t)), int(round(y / t))]   # art px (x, y are whole multiples of t)
     arrs = [np.asarray(a) for a in atlases]
     sheets, ranged = {}, ranged_sheets()
     for sid in sorted(order):                        # JSON key order stays sorted by id (as at R0)
         meta, frames, holds, anim, L = sprites[sid]
         names = names_of[sid]
         pg = placed[sid][0]
+        t = hi.get(sid, 1)
         fr = {n: rects[sid][MA.resolve(n, rects[sid])] for n in names}
-        cw, ch = frames["idle"].size
+        tw, th = img(sid, "idle").size
         for n in names:
-            img = frames[MA.resolve(n, frames)]
-            bad = C.atlas_exact(arrs[pg], (fr[n][0], fr[n][1], cw, ch), np.asarray(img))
+            want = np.asarray(img(sid, MA.resolve(n, frames)))
+            rx, ry = round(fr[n][0] * t), round(fr[n][1] * t)
+            bad = C.atlas_exact(arrs[pg], (rx, ry, tw, th), want) or ([] if t == 1 or MHP.gutter_ok(
+                arrs[pg], (rx, ry, tw, th)) else ["no 1-px transparent gutter round the rect"])
             if bad:
                 raise SystemExit(f"monsters_ai: {sid} {n}: {bad[0]}")
         sheets[sid] = sheet_meta(meta, frames, names, fr, holds, anim, L, pg, sid in ranged)
         if sid in scales:                            # FW-S: the sheet's own display scale (BattleArt: entry.scale ?? scale)
-            sheets[sid]["scale"] = scales[sid]
+            sheets[sid]["scale"] = scales[sid]["scale"]
+        if t != 1:                                   # EF-A4: the hi-res texture's px per art px
+            sheets[sid]["texScale"] = t
         sheets[sid].update(kneel_sink(sid, meta, frames))   # D-K9: floaters with a kneel key only
     out.mkdir(parents=True, exist_ok=True)
     files = [page_file(i) for i in range(len(atlases))]
@@ -201,13 +217,15 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
             stale.unlink()
     for a, f in zip(atlases, files):
         a.save(out / f)
-    meta_json = {"scale": SCALE, "texScale": TEX_SCALE,
-                 "pages": [{"file": f, "w": w, "h": h} for f, (w, h) in zip(files, sizes)], "sheets": sheets,
-                 "preload": sorted({placed[s][0] for g, ids in groups if g == "act1" for s in ids})}   # D-K13
+    pages = [{"file": f, "w": w, "h": h, **({"filter": "linear"} if i in linear else {})}
+             for i, (f, (w, h)) in enumerate(zip(files, sizes))]
+    meta_json = {"scale": SCALE, "texScale": TEX_SCALE, "pages": pages, "sheets": sheets,
+                 "preload": sorted(act1 & {placed[s][0] for s in order})}   # D-K13 (EF-A4: act-1 hi-res pages too)
     (out / "monsters-ai.json").write_text(json.dumps(meta_json, indent=2) + "\n")
     print(f"monsters_ai: {len(sheets)} sheets on {len(files)} page(s) "
-          f"{', '.join(f'{w}x{h}' for w, h in sizes)} native (texScale {TEX_SCALE}, max {C.MAX_PAGE}); "
+          f"{', '.join(f'{w}x{h}' for w, h in sizes)} (texScale {TEX_SCALE}, max {C.MAX_PAGE}); "
           f"animated {[s for s in sorted(order) if sheets[s]['anim']]}")
+    MHP.report(meta_json, smooth, hi)
     return meta_json
 
 

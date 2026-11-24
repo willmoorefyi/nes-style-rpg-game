@@ -902,6 +902,53 @@
   gold: 100
   enemies: [wolf, gr_wolf, cockatrice]
   background: assets/backgrounds/forest.webp
+# EF-A8 (docs/ENEMY_FEEDBACK_PLAN.md): one formation per new tier, with today's sizes beside them for comparison
+# (use &enemyAnim=loop): ef_sizes the medium tier (2.5 smalls beside goblin and wolf at 2), ef_sizes_huge the 2.5
+# larges laid out as huge (beside the ogre at 2), ef_smooth the smoothed scale-2 sheets, ef_smooth_big scale 3.
+- id: ef_sizes
+  name: EF - medium tier (2.5 smalls) beside goblin and wolf
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [goblin, gr_imp, werewolf, wolf, gr_wolf, mummy]
+  background: assets/backgrounds/grassland.webp
+- id: ef_sizes_huge
+  name: EF - 2.5 larges (laid out as huge) beside the ogre
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [ogre, ogre_chief, troll]
+  background: assets/backgrounds/grassland.webp
+- id: ef_smooth
+  name: EF - smoothed scale-2 sheets (despur + Scale2x)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [black_widow, tarantula, hyenadon, fire_lizard]
+  background: assets/backgrounds/grassland.webp
+- id: ef_smooth_big
+  name: EF - smoothed scale-3 sheets
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [blue_dragon, green_dragon]
+  background: assets/backgrounds/grassland.webp
 - id: anim_boss_garland
   name: Anim - Garland, fight and magic 1:1
   party:
