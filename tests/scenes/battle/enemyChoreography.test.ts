@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   ATTACK_CONTACT, ATTACK_FRAMES, BOSS_FRAMES, CAST_FRAMES, DYING_DX, DYING_IN, FRAME_SOURCE, HURT_FRAMES, HURT_HOLD_START,
-  HURT_REHIT_AT, MONSTER_FRAMES,
+  HURT_REHIT_AT, MONSTER_FRAMES, ORBIT_FRAMES, ORBIT_MAX, ORBIT_STEP_FRAMES, resolveFrame,
   PLAIN_CAST_FRAMES, attackAt, castAt, castOut, dyingAt, hurtAt, idleFrame, lungePx, trembleDx, type FrameAt, type MonsterFrame,
 } from '../../../src/scenes/battle/enemyChoreography.js';
 import { EnemyPoseController } from '../../../src/scenes/battle/EnemyPoseController.js';
@@ -104,9 +104,43 @@ describe('enemyChoreography (ENEMY_ANIM_PLAN 3.2)', () => {
     for (const n of used) expect(MONSTER_FRAMES, n).toContain(n);
     for (const n of names(frames((t) => castAt(t, true), 35))) expect(BOSS_FRAMES, n).toContain(n);
     for (const n of BOSS_FRAMES) expect(['idle', 'attack', 'hurt', 'cast']).toContain(FRAME_SOURCE[n]);
-    // F0 (pass F): + daze, daze_b for every sheet; + attack_raise and its four in-betweens for bosses; pass K: + 4 kneel
-    expect(MONSTER_FRAMES).toHaveLength(17);
-    expect(BOSS_FRAMES).toHaveLength(26);
+    // F0 (pass F): + daze, daze_b for every sheet; + attack_raise and its four in-betweens for bosses; pass K: + 4 kneel;
+    // EF-D: + the 2 x ORBIT_MAX orbit frames (own rects on an orbit sheet only)
+    expect(MONSTER_FRAMES).toHaveLength(17 + 2 * ORBIT_MAX);
+    expect(BOSS_FRAMES).toHaveLength(26 + 2 * ORBIT_MAX);
+    for (const n of ORBIT_FRAMES) expect(MONSTER_FRAMES).toContain(n);
+  });
+
+  it('EF-D orbit: idle_o<k> / idle_b_o<k>, k one step every 6 frames over N steps, the breath unchanged', () => {
+    expect(ORBIT_STEP_FRAMES).toBe(6);
+    expect(ORBIT_FRAMES).toHaveLength(32);
+    expect([0, 5, 6, 12, 90, 95, 96].map((c) => idleFrame(c, 0, true, 'none', 16)))
+      .toEqual(['idle_o0', 'idle_o0', 'idle_o1', 'idle_o2', 'idle_o15', 'idle_o15', 'idle_o0']);
+    expect(idleFrame(36, 0, true, 'none', 16)).toBe('idle_b_o6');
+    expect(idleFrame(48, 0, true, 'none', 8)).toBe('idle_b_o0');
+    expect(idleFrame(40, 0, false, 'none', 16)).toBe('idle_o6');           // no breath: the orbit still turns
+    expect(idleFrame(40, 0, true, 'tremble', 16)).toBe('idle_b_o6');
+    for (const p of ['stone', 'still'] as const) expect(idleFrame(40, 0, true, p, 16)).toBe('idle');
+    expect(idleFrame(40, 0, true, 'none', 0)).toBe('idle_b');            // no orbit: unchanged
+    // every orbit frame is cut from the idle; an atlas without them falls back to idle / idle_b
+    for (const n of ORBIT_FRAMES) expect(FRAME_SOURCE[n]).toBe('idle');
+    const has = (f: MonsterFrame): boolean => f === 'idle' || f === 'idle_b';
+    expect(resolveFrame('idle_o3', has)).toBe('idle');
+    expect(resolveFrame('idle_b_o3', has)).toBe('idle_b');
+    expect(resolveFrame('idle_b_o3', (f) => f === 'idle')).toBe('idle');
+  });
+
+  it('EF-D orbit: the pose controller plays the orbit in idle (configured from the atlas), not in an attack', () => {
+    const c = new EnemyPoseController(1);
+    c.configure(0, { orbit: 16 });
+    const seen: string[] = [];
+    for (let t = 0; t < 96; t++) { seen.push(c.state(0).pose); c.update(1); }
+    expect(new Set(seen).size).toBe(16);            // idle_o0-5, idle_b_o6-11 (frames 36-71), idle_o12-15
+    expect(seen.every((p) => /^idle(_b)?_o\d+$/.test(p))).toBe(true);
+    c.playAttack(0);
+    expect(c.state(0).pose).toBe('atk_wind1');
+    const plain = new EnemyPoseController(1);
+    expect(plain.state(0).pose).toBe('idle');
   });
 
   it('lungePx: the D2 formula at w = 55, 93, 185 and beyond the clamps; 24 when the atlas has none', () => {

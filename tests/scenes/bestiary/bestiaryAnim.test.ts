@@ -104,4 +104,16 @@ describe('bestiary loop', () => {
     const r = rig(GOBLIN);
     for (let i = 0; i < 500; i++) expect(r.frame(0)).toBe('break');
   });
+
+  it('EF-D: an orbit sheet (chaos) turns its orbs in every idle break, and its attack plays the key frames', () => {
+    const r = rig(GARLAND, { heavy: false });
+    r.poses.configure(0, { orbit: 16 });
+    const poses = new Set<string>();
+    while (r.loop.current === 'break') { poses.add(r.poses.state(0).pose); r.frame(); }
+    expect([...poses].every((p) => /^idle(_b)?_o\d+$/.test(p))).toBe(true);
+    expect(poses.size).toBeGreaterThanOrEqual(4);                // the 30-frame first break: 5 steps
+    expect(r.loop.current).toBe('attack');
+    r.frame();
+    expect(r.poses.state(0).pose).not.toMatch(/_o\d+$/);
+  });
 });

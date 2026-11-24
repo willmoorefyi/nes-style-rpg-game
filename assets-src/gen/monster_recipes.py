@@ -12,16 +12,26 @@ MONSTER_FRAMES = ["idle", "idle_b", "atk_wind1", "atk_wind2", "atk_mid", "attack
 KNEEL_FRAMES = ("kneel_in1", "kneel_in2", "kneel", "kneel_b")
 BOSS_FRAMES = MONSTER_FRAMES + ["cast_gather", "cast_rise", "cast", "cast_release"]
 RAISE_FRAMES = ["attack_raise", "atk_raise_in", "atk_raise_b", "atk_swing", "atk_swing2"]
+# EF-D (docs/ENEMY_FEEDBACK_PLAN.md, monster_orbit.py): a rig's `orbit` adds idle_o<k> / idle_b_o<k>, k < N <= ORBIT_MAX
+ORBIT_MAX = 16
+
+
+def orbit_names(n: int) -> list[str]:
+    """The orbit frames of an n-step orbit (idle first, then idle_b); [] for 0."""
+    return [f"idle_o{k}" for k in range(n)] + [f"idle_b_o{k}" for k in range(n)]
+
+
 FRAME_SOURCE = {"idle_b": "idle", "atk_wind1": "idle", "atk_wind2": "idle", "atk_mid": "attack", "atk_follow": "attack",
                 "atk_recover": "idle", "hurt_in1": "idle", "hurt_in2": "hurt", "cast_gather": "idle", "cast_rise": "cast",
                 "cast_release": "cast", "daze": "idle", "daze_b": "idle", "atk_raise_in": "idle",
                 "atk_raise_b": "attack_raise", "atk_swing": "attack_raise", "atk_swing2": "attack",
-                **{n: "idle" for n in KNEEL_FRAMES}}
+                **{n: "idle" for n in KNEEL_FRAMES}, **{n: "idle" for n in orbit_names(ORBIT_MAX)}}
 # what a held (or missing) frame shows instead, followed until a frame exists (src/scenes/battle/enemyChoreography.ts
 # FRAME_FALLBACK): a held daze shows the hurt_in1 flinch, daze_b then shows daze
 FALLBACK = {**FRAME_SOURCE, "daze": "hurt_in1", "daze_b": "daze", "atk_raise_in": "atk_wind1", "atk_swing": "atk_mid",
             "atk_swing2": "atk_mid",               # a held heavy frame shows the plain attack's (as the TS chain)
-            "kneel": "daze", "kneel_b": "daze_b", "kneel_in2": "daze", "kneel_in1": "idle"}   # D-K7: unopted sheets
+            "kneel": "daze", "kneel_b": "daze_b", "kneel_in2": "daze", "kneel_in1": "idle",   # D-K7: unopted sheets
+            **{f"idle_b_o{k}": "idle_b" for k in range(ORBIT_MAX)}}   # EF-D: without its orbit frame, the breath
 # runtime orders checked for continuity (monster_check.check_sprite); a pair's span is the keyframes around it
 SEQUENCES = {"attack": ["idle", "atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover", "idle"],
              "hurt": ["idle", "hurt_in1", "hurt_in2", "hurt"],
@@ -77,8 +87,8 @@ RECIPES = {
 IDLE_B = {"src": "idle", "toward": "idle", "t": 0.0, "moves": "wind", "pins": "feet"}
 
 
-def frames_for(has_cast: bool, has_raise: bool = False) -> list[str]:
-    return (BOSS_FRAMES if has_cast else MONSTER_FRAMES) + (RAISE_FRAMES if has_raise else [])
+def frames_for(has_cast: bool, has_raise: bool = False, orbit: int = 0) -> list[str]:
+    return (BOSS_FRAMES if has_cast else MONSTER_FRAMES) + (RAISE_FRAMES if has_raise else []) + orbit_names(orbit)
 
 
 def generated_names(has_cast: bool, has_raise: bool = False) -> list[str]:

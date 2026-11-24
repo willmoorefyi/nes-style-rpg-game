@@ -38,7 +38,8 @@ SEQUENCE_VERSION = 1
 TRAVEL_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover", "atk_raise_in",
                  "attack_raise", "atk_raise_b", "atk_swing", "atk_swing2", "idle", "hurt_in1", "hurt_in2", "hurt")
 LUNGE_FRAMES = TRAVEL_FRAMES[:11]
-HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b")
+HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b",
+               *MA.orbit_names(MA.ORBIT_MAX))     # EF-D: the orbit frames a sheet has (monster_orbit, idleOrbit)
 RANGED_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover")
 ENEMIES = MA.HERE.parent.parent / "assets" / "data" / "enemies.yaml"
 SCALE_TABLE = MA.HERE / "monster_scale.yaml"
@@ -136,7 +137,13 @@ def sheet_meta(meta: dict, frames: dict[str, Image.Image], names: list[str], fr:
     return {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
             "frames": fr, "anim": anim, "holds": holds, "lungePx": lunge, "hasRaise": "attack_raise" in frames,
             **anchors(frames["idle"]), **(tip(frames[tip_key]) if tip_key else {}),
-            **travel_anchors(frames, names, ranged), "sequence_version": SEQUENCE_VERSION, "page": page}
+            **travel_anchors(frames, names, ranged), "sequence_version": SEQUENCE_VERSION, "page": page,
+            **({"idleOrbit": orbit_of(frames)} if orbit_of(frames) else {})}
+
+
+def orbit_of(frames) -> int:
+    """EF-D: N of a sheet's idle_o<k> frames (monster_orbit; the runtime's `idleOrbit`), 0 without an orbit."""
+    return sum(1 for n in frames if n.startswith("idle_o"))
 
 
 def build(out: Path, scale_table: Path | None = None) -> dict:
@@ -162,7 +169,8 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
     scales = load_scale(set(sprites), scale_table)
     groups = MP.group_order(sorted(sprites), {s for s, v in sprites.items() if v[0].get("size") == "titan"})
     order = [sid for _, ids in groups for sid in ids]
-    names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
+    names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1], orbit_of(sprites[s][1]))
+                for s in order}
     items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}
     sizes, placed = MP.pack_pages([[(sid, [sprites[sid][1][n].size for n in items[sid]]) for sid in ids]
                                    for _, ids in groups])

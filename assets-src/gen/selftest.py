@@ -512,6 +512,7 @@ def test_monster_anim() -> None:
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501
     print("pass KA-G Gemini kneel (batch tool on a fake client, arm g, guard, KG1-KG8)"); __import__("gen.selftest_gemini_batch", fromlist=["x"]).run_gemini_batch(check)  # noqa: E702,E501
+    print("EF-D idle orbit (rig `orbit`: chaos only, orbit frames and checks, mutations RED, idleOrbit, anchors)"); __import__("gen.selftest_orbit", fromlist=["x"]).run_orbit(check)  # noqa: E702,E501
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

@@ -16,6 +16,8 @@ export interface EnemyAnimConfig {
   heavy: boolean;
   /** Travel hop in px at scale factor 1 (10 small, 6 large, 3 boss). */
   hopPx: number;
+  /** EF-D: the atlas `idleOrbit` steps (0: no orbit frames, the plain idle). */
+  orbit: number;
 }
 
 /** Where an attack goes: the travel (absolute screen px, toward the party) and the rise to the target's feet. */
@@ -63,5 +65,5 @@ export interface PoseState {
 }
 
 export const DEFAULTS: EnemyAnimConfig = { hasCast: false, hasRaise: false, lungePx: DEFAULT_LUNGE_PX, scaleFactor: 1,
-  breath: true, heavy: false, hopPx: 10 };
+  breath: true, heavy: false, hopPx: 10, orbit: 0 };
 export const ZERO = { dx: 0, dy: 0 };
