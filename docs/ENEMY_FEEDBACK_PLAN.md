@@ -365,3 +365,20 @@ After the size decision: F4's rig (`retire.py --move-rig`), kneel bridge, review
 a synthetic figure and on the recorded recipes (sha256 match), the yaml schema, the EF4 budget block, every EF4 cache
 key reproducible from `monster_hr.yaml`, the approve json shape. Full `selftest.py` passes in the main checkout. Work on
 branch `ef-br` (main checkout; the Bedrock gate).
+
+### EF-G amendment A (2026-11-24): dark_wizard re-pose with large moves (user-approved trial)
+
+EF4's repaints held identity and rendered cleanly, but the G2 poses moved too little (attack and hurt read as leans).
+Trial on **dark_wizard only**:
+- **A1 Re-pose (no AI).** New poses on the EF4 `idle_master` with `monster_hr_puppet.py` (code changes, if any, stay in
+  the puppet / warp modules, each < 250 lines, with a selftest case): **attack** staff swung forward to near horizontal
+  (>= 50 deg from its idle angle), staff arm fully extended, torso and hood lunging forward >= 15 deg, robe hem trailing;
+  **hurt** torso and head thrown back >= 20 deg, staff tilting away, free arm flung up; **kneel** robe collapsed (height
+  <= 70 % of idle), one knee down, head hanging over the planted staff. Gate: G2's checks, plus the silhouette IoU with
+  the idle <= 0.70 (attack, hurt) / <= 0.65 (kneel), plus one image-only reviewer ("does each pose read clearly at
+  128 px?"), <= 3 iterations.
+- **A2 User gate.** The posed inputs (`~/temp/ff-game/ef/bedrock5/dark_wizard/posed/`) are shown to the user; **no
+  Bedrock call until the user approves them**.
+- **A3 Repaint.** As G3 (SD 3.5 Large image-to-image, strengths 0.30 / 0.38 / 0.45, <= 5 calls per pose; the EF4 idle
+  repaint is reused). Budget: new pass `pass EF5` (cap 15, `ef5_pose` 15, reserve 0), recorded in `monster_hr.yaml`
+  variations with the pass tag; closed after. Then G4 (cut, review, hold for approval).
