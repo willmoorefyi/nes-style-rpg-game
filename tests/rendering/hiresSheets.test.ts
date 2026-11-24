@@ -12,7 +12,7 @@ import { characterAtlas } from '../../src/rendering/CharacterAtlas.js';
 import { applyPageFilter, type PageIo } from '../../src/rendering/MonsterPages.js';
 import { enemyBoxInput, layoutSizeOfArt } from '../../src/rendering/monsterAnchors.js';
 import { AiEnemyView } from '../../src/scenes/battle/AiEnemyView.js';
-import { computeEnemyLayoutAi, formationFits, layoutPass, layoutSizeOf, type EnemyBoxInput } from '../../src/scenes/battle/EnemyLayoutAi.js';
+import { computeEnemyLayoutAi, formationFits, isTierScale, layoutPass, layoutSizeOf, type EnemyBoxInput } from '../../src/scenes/battle/EnemyLayoutAi.js';
 import { TRAVEL_HOP } from '../../src/scenes/battle/enemyReach.js';
 import { PLACEHOLDER } from '../../src/scenes/battle/formationCheck.js';
 import type { EnemyData } from '../../src/types/index.js';
@@ -126,5 +126,26 @@ describe('the medium tier and the 2.5 passes (EF-A5)', () => {
     const threes: EnemyBoxInput[] = Array.from({ length: 9 }, () => ({ size: 'huge', w: 384, h: 384, scale: 3 }));
     expect(layoutPass(threes)).toBe(4);
     expect(formationFits(threes)).toBe(false);
+  });
+});
+
+describe('int-ef2: scales on the 0.05 grid (2.7, 2.8, 3.3) are tier scales', () => {
+  it('isTierScale: over 2 and not the V4 integer 3; a 3.3 large is huge, a 3.3 small medium; 3 keeps its classes', () => {
+    expect([2, 2.05, 2.5, 2.7, 2.8, 3, 3.3, 3.5].map(isTierScale)).toEqual([false, true, true, true, true, false, true, true]);
+    expect([layoutSizeOf('large', 3.3), layoutSizeOf('small', 3.3), layoutSizeOf('large', 2.8), layoutSizeOf('large', 3)])
+      .toEqual(['huge', 'medium', 'huge', 'large']);
+    expect([layoutSizeOf('boss', 3.3), layoutSizeOf('boss', 3)]).toEqual(['boss', 'titan']);   // the boss rule stays at 3
+  });
+
+  it('pass 3 takes a 3.3 sheet to screen scale 2; pass 4 is allowed for it (mipmapped linear page)', () => {
+    const iron = (): EnemyBoxInput => ({ size: 'huge', dataSize: 'large', w: 330, h: 321, scale: 3.3 });
+    const four = Array.from({ length: 4 }, iron);
+    expect(layoutPass(four)).toBe(3);
+    expect(computeEnemyLayoutAi(four).every((b) => Math.abs(b.w - 200) < 1e-9)).toBe(true);   // 330 x 2 / 3.3
+    const cell = (): EnemyBoxInput => ({ size: 'huge', dataSize: 'large', w: 422.4, h: 422.4, scale: 3.3 });   // uncut 128 px
+    const nine = Array.from({ length: 9 }, cell);
+    expect([layoutPass(nine), formationFits(nine)]).toEqual([4, true]);
+    expect(formationFits(Array.from({ length: 9 }, () => ({ ...cell(), size: 'large' as const, dataSize: undefined, scale: 3 }))))
+      .toBe(false);                                                         // the same at the V4 integer 3: refused
   });
 });

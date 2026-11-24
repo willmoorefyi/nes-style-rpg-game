@@ -22,6 +22,7 @@ import { monsterSheetPng } from '../../helpers/monsterAtlas.js';
 import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import { monsterAnchors, type MonsterAnchors } from '../../../src/rendering/monsterAnchors.js';
 import { frameBox } from '../../helpers/atlasFrames.js';
+import { artFloor, artFloorEnd, texLen, texPos } from '../../../src/rendering/texPx.js';
 import type { EnemyData } from '../../../src/types/index.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -39,8 +40,8 @@ const opaque = (sprite: string): [number, number, number, number] => {
   const s = meta.sheets[sprite];
   const ts = s.texScale ?? meta.texScale ?? meta.scale;      // EF-A4: a hi-res sheet's own texScale
   const [x, y] = s.frames.idle;
-  const b = opaqueBounds(monsterSheetPng(sprite), x * ts, y * ts, Math.ceil(s.cell[0] * ts), Math.ceil(s.cell[1] * ts))!;
-  return [Math.floor(b[0] / ts), Math.floor(b[1] / ts), Math.floor((b[2] - 1) / ts) + 1, Math.floor((b[3] - 1) / ts) + 1];
+  const b = opaqueBounds(monsterSheetPng(sprite), texPos(x, ts), texPos(y, ts), texLen(s.cell[0], ts), texLen(s.cell[1], ts))!;
+  return [artFloor(b[0], ts), artFloor(b[1], ts), artFloorEnd(b[2] - 1, ts) + 1, artFloorEnd(b[3] - 1, ts) + 1];
 };
 
 const art: MonsterArtSource = {

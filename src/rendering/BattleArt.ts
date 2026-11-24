@@ -3,10 +3,10 @@ import { characterAtlas, fetchJson } from './CharacterAtlas.js';
 import { MonsterPages, type MonsterAtlasPage, type PageIo } from './MonsterPages.js';
 import { monsterAnchors, type MonsterAnchors } from './monsterAnchors.js';
 import { measureOpaqueBox } from './measureOpaque.js';
+import { texLen, texPos } from './texPx.js';
 import { BOSS_FRAMES, lungePx, resolveFrame, type MonsterFrame, type MonsterKeyframe } from '../scenes/battle/enemyChoreography.js';
 
-const MONSTER_DIR = 'assets/sprites/';
-const MONSTER_ATLAS = `${MONSTER_DIR}monsters-ai`;
+const MONSTER_DIR = 'assets/sprites/', MONSTER_ATLAS = `${MONSTER_DIR}monsters-ai`;
 
 /** Pixi's asset cache as the page loader. */
 const PIXI_PAGES: PageIo = {
@@ -174,7 +174,7 @@ export class BattleArt {
       const key = `${x},${y}`;
       let t = cache.get(key);
       if (!t) {
-        t = new Texture({ source, frame: new Rectangle(x * ts, y * ts, Math.ceil(w * ts), Math.ceil(h * ts)) });
+        t = new Texture({ source, frame: new Rectangle(texPos(x, ts), texPos(y, ts), texLen(w, ts), texLen(h, ts)) });
         cache.set(key, t);
       }
       return t;

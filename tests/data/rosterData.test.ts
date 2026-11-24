@@ -32,6 +32,8 @@ const EF_B1 = ['gr_imp', 'werewolf', 'ghast', 'shadow', 'gargoyle', 'bloodbones'
   'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'black_knight', 'earth_medusa', 'gr_wolf',
   'ogre_chief', 'troll', 'sphinx', 'manticore', 'clay_golem', 'tyrannosaur', 'rhyos', 'iron_golem',
   'death_knight', 'stone_golem', 'chimera', 'sea_troll', 'winter_wolf', 'ogre_mage'];
+/** int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5 (efSizes.test.ts pins the heights). */
+const EF_GROW: Record<string, number> = { stone_golem: 2.8, iron_golem: 3.3, sea_troll: 2.7 };
 
 describe('roster data: coverage and numbering', () => {
   it('every atlas sheet has an enemy, and every enemy a sheet', () => {
@@ -73,10 +75,11 @@ describe('roster data: coverage and numbering', () => {
     // V6 (D-V6 = C2): chaos keeps `size: boss` (the 200 px boss band) and is shown at scale 3; V8 N-1: so is
     // hollow_seraph (hollow_seraph_2 shares the sprite)
     // EF-B1 (docs/ENEMY_FEEDBACK_PLAN.md; the user's 2026-11-24 request overrides D-V1 S1's integer scales): the
-    // user's 26 sheets plus six greater siblings at 2.5, excepted by list
+    // user's 26 sheets plus six greater siblings at 2.5, excepted by list; int-ef2: stone_golem, iron_golem and
+    // sea_troll grown past 2.5 (EF_GROW)
     const scaleOf = (e: EnemyData): number => atlas.sheets[e.sprite ?? e.id].scale ?? atlas.scale;
     for (const e of enemies) {
-      const want = EF_B1.includes(e.sprite ?? e.id) ? 2.5
+      const want = EF_B1.includes(e.sprite ?? e.id) ? EF_GROW[e.sprite ?? e.id] ?? 2.5
         : e.size === 'huge' || ['bigeyes', 'chaos', 'hollow_seraph'].includes(e.sprite ?? e.id) ? 3 : 2;
       expect(scaleOf(e), `${e.id} (${e.size ?? 'small'})`).toBe(want);
     }

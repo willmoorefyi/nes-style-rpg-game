@@ -24,7 +24,7 @@ import { BestiaryPreview, CachedArt, PREVIEW_INNER } from '../../../src/scenes/b
 import { BESTIARY_PLAIN, fitShift, panelCentre } from '../../../src/scenes/bestiary/bestiaryFit.js';
 import { validateBestiary } from '../../../src/core/bestiaryValidation.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, atlasArt, atlasFrames, enemyById, enemyData, frameBox, idleBoxOf } from '../../helpers/atlasFrames.js';
+import { atlas, atlasArt, atlasFrames, enemyById, enemyData, frameBox, idleBoxOf, texScaleOf } from '../../helpers/atlasFrames.js';
 import type { MonsterArtSource } from '../../../src/scenes/battle/AiEnemyView.js';
 import type { MonsterFrames } from '../../../src/rendering/BattleArt.js';
 import type { EnemyData } from '../../../src/types/index.js';
@@ -134,7 +134,7 @@ describe('tier H and the titan in the bestiary', () => {
     preview.show({ enemy: e, seen: true, hasSpells: false }, null);
     preview.update(0);
     const s = preview.enemySprite!;
-    expect(s.scale.x).toBe(3);
+    expect(s.scale.x * texScaleOf(sheet)).toBe(3);                 // int-ef2: blue / green_dragon drawn 1:1 from tex 3
     const [l, t, r, b] = idleBoxOf(sheet);
     const g = s.getGlobalPosition();
     expect(Math.abs(g.x + ((l + r + 1) / 2) * 3 - CX)).toBeLessThanOrEqual(1);

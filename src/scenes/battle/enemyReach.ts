@@ -41,5 +41,7 @@ export function enemyReach(r: ReachInput): { travel: number; rise: number } {
   const travel = clamp(r.targetLeft + ENEMY_REACH_OVERLAP - r.opaqueRight - CONTACT_LUNGE * r.lunge, 0, MAX_ENEMY_TRAVEL);
   if (travel <= 0) return { travel, rise: 0 };
   const rise = clamp(r.targetFeetY - r.feetY, -MAX_ENEMY_RISE, MAX_ENEMY_RISE);
-  return { travel, rise: r.topY === undefined ? rise : Math.min(MAX_ENEMY_RISE, Math.max(rise, TRAVEL_CLEAR_Y - r.topY)) };
+  // the clearance bound in whole px (int-ef2: at 2.7 a travel top lands on x.9; Math.round(-94.1) would leave 0.1 px
+  // above the line; at scale 2, 3 and 2.5 the result is unchanged, as Math.round(-94.5) is -94 too)
+  return { travel, rise: r.topY === undefined ? rise : Math.min(MAX_ENEMY_RISE, Math.max(rise, Math.ceil(TRAVEL_CLEAR_Y - r.topY))) };
 }

@@ -45,6 +45,8 @@ const NEW_FILES = [
   // EF-A: the hi-res monster textures (docs/ENEMY_FEEDBACK_PLAN.md A2-A4) and the atlas stage they extend
   'assets-src/gen/monster_hires.py', 'assets-src/gen/monster_hires_pages.py', 'assets-src/gen/selftest_hires.py',
   'assets-src/gen/monster_atlas.py',
+  // int-ef2: the fine scales' crop and the exact texture px
+  'assets-src/gen/monster_hires_crop.py', 'src/rendering/texPx.ts',
 ];
 
 describe('file-size ceilings', () => {

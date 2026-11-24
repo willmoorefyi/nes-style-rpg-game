@@ -17,6 +17,7 @@ import type { MonsterArtSource } from '../../src/scenes/battle/AiEnemyView.js';
 import type { EnemyData } from '../../src/types/index.js';
 import { opaqueBounds } from './pngAlpha.js';
 import { monsterSheetPng, readMonsterAtlas } from './monsterAtlas.js';
+import { artFloor, artFloorEnd, texLen, texPos } from '../../src/rendering/texPx.js';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -62,10 +63,10 @@ export function frameBox(sheet: string, name: MonsterFrame): [number, number, nu
     const s = atlas.sheets[sheet];
     const [x, y] = s.frames[shownFrame(sheet, name)];
     const ts = texScaleOf(sheet);
-    const px = opaqueBounds(monsterSheetPng(sheet), x * ts, y * ts, Math.ceil(s.cell[0] * ts), Math.ceil(s.cell[1] * ts));
+    const px = opaqueBounds(monsterSheetPng(sheet), texPos(x, ts), texPos(y, ts), texLen(s.cell[0], ts), texLen(s.cell[1], ts));
     if (!px) throw new Error(`${key} is empty`);
     // a hi-res texture's box back in art px (EF-A4: Scale2x never draws outside the native px it came from)
-    b = [Math.floor(px[0] / ts), Math.floor(px[1] / ts), Math.floor((px[2] - 1) / ts) + 1, Math.floor((px[3] - 1) / ts) + 1];
+    b = [artFloor(px[0], ts), artFloor(px[1], ts), artFloorEnd(px[2] - 1, ts) + 1, artFloorEnd(px[3] - 1, ts) + 1];
     boxes.set(key, b);
   }
   return b;
@@ -118,7 +119,7 @@ export function sizedAtlasFrames(sheet: string, head = false): MonsterFrames | n
   const f = atlasFrames(sheet);
   if (!f) return null;
   const ts = texScaleOf(sheet);
-  const [w, h] = [Math.ceil(f.cell[0] * ts), Math.ceil(f.cell[1] * ts)];
+  const [w, h] = [texLen(f.cell[0], ts), texLen(f.cell[1], ts)];
   const tex = new Texture({ source: new TextureSource({ width: w, height: h }) });
   if (head) {
     const [l, t, r] = idleBoxOf(sheet);

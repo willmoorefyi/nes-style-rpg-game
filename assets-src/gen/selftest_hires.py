@@ -15,6 +15,7 @@ import numpy as np
 from PIL import Image
 
 from gen import monster_hires as MH
+from gen import monster_hires_crop as MHC
 from gen import monster_hires_pages as MHP
 
 R, G, K, O = (200, 40, 40, 255), (40, 200, 40, 255), (6, 4, 10, 255), (0, 0, 0, 0)
@@ -53,16 +54,25 @@ def run_hires(check: Callable[[bool, str], None]) -> None:
     check((MH.epx(c)[2, 2] == R).all() and (MH.epx(c)[3, 3] == O).all(), "EF-A2: Scale2x fills a corner where B = D")
     fig = _figure()
     cols = {tuple(int(v) for v in px) for px in fig[fig[..., 3] > 0][:, :3]}
-    for t in (2, 2.5, 3):
+    for t in (2, 2.5, 2.7, 2.8, 3, 3.25, 3.3, 3.5):     # int-ef2: the 0.05 grid's scales too
         up = MH.upscale(fig, t)
         got = {tuple(int(v) for v in px) for px in up[up[..., 3] > 0][:, :3]}
-        check(up.shape[:2] == (math.ceil(40 * t), math.ceil(32 * t)), f"EF-A2: T {t}: size ceil(cell * T) {up.shape[:2]}")
+        check(up.shape[:2] == (MH.ceil_mul(40, t), MH.ceil_mul(32, t)), f"EF-A2: T {t}: size ceil(cell * T) {up.shape[:2]}")
         check(got <= cols and set(np.unique(up[..., 3]).tolist()) <= {0, 255}, f"EF-A2: T {t}: no new colour, binary alpha")
-        check(not MH.feet_row(fig, up, t) and MH.lowest_row(up) == math.ceil((MH.lowest_row(fig) + 1) * t) - 1,
+        check(not MH.feet_row(fig, up, t) and MH.lowest_row(up) == MH.ceil_mul(MH.lowest_row(fig) + 1, t) - 1,
               f"EF-A2: T {t}: lowest texture row ceil((footRow + 1) T) - 1 = {MH.lowest_row(up)}")
         check(np.array_equal(up, MH.upscale(fig.copy(), t)), f"EF-A2: T {t}: deterministic")
         check(not (up[:math.ceil(t)].any() or up[:, :math.ceil(t)].any()), f"EF-A2: T {t}: the cell border stays clear")
     check(np.array_equal(MH.upscale(fig, 1), fig), "EF-A2: T 1 returns the frame")
+    full, edge, near = MH.upscale(fig, 3), MH.upscale(fig, 3, edges=True), np.repeat(np.repeat(MH._clean(fig), 3, 0), 3, 1)
+    inside = np.zeros(fig.shape[:2], bool)
+    inside[1:-1, 1:-1] = (fig[..., 3] > 0)[1:-1, 1:-1] & (fig[:-2, 1:-1, 3] > 0) & (fig[2:, 1:-1, 3] > 0) & \
+        (fig[1:-1, :-2, 3] > 0) & (fig[1:-1, 2:, 3] > 0) & (fig[:-2, :-2, 3] > 0) & (fig[2:, 2:, 3] > 0) & \
+        (fig[:-2, 2:, 3] > 0) & (fig[2:, :-2, 3] > 0)
+    deep = np.repeat(np.repeat(inside, 3, 0), 3, 1)
+    check(np.array_equal(edge[deep], near[deep]) and not np.array_equal(full[deep], near[deep])
+          and np.array_equal(edge[..., 3] > 0, full[..., 3] > 0) and not MH.feet_row(fig, edge, 3),
+          "int-ef2: `edges` Scale2x keeps the inside nearest and the full Scale2x silhouette, feet row kept")
     tip = np.zeros((8, 8, 4), np.uint8)                 # a foot px whose 8x sub-rows Scale2x rounds away at 2.5
     for y, x in ((3, 2), (3, 4), (3, 5), (4, 5)):
         tip[y, x] = R
@@ -110,18 +120,41 @@ def _table(check: Callable[[bool, str], None]) -> None:
           ({"scale": 3, "tex": 1, "smooth": ["despur"]}, {"scale": 3, "tex": 1, "smooth": ["despur"]}),
           ({"scale": 2, "tex": 2, "smooth": ["despur"]}, {"scale": 2, "tex": 2, "smooth": ["despur"]})]
     check(all(MH.entry("x", v) == want for v, want in ok), "EF-A1: plain and dict entries parse to {scale, tex, smooth}")
+    ok2 = [({"scale": 2.8, "tex": 2.8}, 2.8), ({"scale": 3.3, "tex": 3.3}, 3.3), ({"scale": 3.5, "tex": 3.5}, 3.5),
+           ({"scale": 2.05, "tex": 2.05}, 2.05)]
+    check(all(MH.entry("x", v)["scale"] == want == MH.entry("x", v)["tex"] for v, want in ok2),
+          "int-ef2: any multiple of 0.05 in [2, 3.5] with tex = scale parses")
     bad = [4, 2.5, True, {"scale": 2.5}, {"scale": 2.5, "tex": 1}, {"scale": 2.5, "tex": 3}, {"scale": 3, "tex": 2},
-           {"scale": 1.5, "tex": 1.5}, {"scale": 2, "tex": 2, "smooth": ["blur"]}, {"tex": 2}, {"scale": 2, "x": 1}]
+           {"scale": 1.5, "tex": 1.5}, {"scale": 2, "tex": 2, "smooth": ["blur"]}, {"tex": 2}, {"scale": 2, "x": 1},
+           {"scale": 2.73, "tex": 2.73}, {"scale": 3.55, "tex": 3.55}, {"scale": 1.95, "tex": 1.95}, 2.8,
+           {"scale": 2.8, "tex": 1}, {"scale": 2.8, "tex": 2.85}, {"scale": float("nan"), "tex": 2}]
     msgs = [_raises(lambda v=v: MH.entry("bat", v)) for v in bad]
     check(all("bat" in m for m in msgs), f"EF-A1: {len(bad)} bad entries refused, each naming the sprite")
-    check([MH.unit(t) for t in (1, 2, 2.5, 3)] == [1, 2, 5, 3], "EF-A4: texture units 1, 2, 5, 3")
+    check(MH.entry("x", {"scale": 3.3, "tex": 3.3, "crop": True}) == {"scale": 3.3, "tex": 3.3, "smooth": [], "crop": True}
+          and all(_raises(lambda v=v: MH.entry("bat", v)) for v in ({"scale": 3, "tex": 1, "crop": True},
+                                                                    {"scale": 2.8, "tex": 2.8, "crop": "yes"})),
+          "int-ef2: crop: true parses on a hi-res entry; on a tex-1 entry or as a non-bool it is refused")
+    fig = np.pad(_figure(), ((10, 0), (6, 9), (0, 0)))              # 50 x 47, art x 6.., y 10.., feet row 46
+    ys, xs = np.nonzero(fig[..., 3] > 0)
+    hurt = np.roll(fig, 2, axis=1)                                   # the union reaches 2 px further right
+    cut, (dx, dy) = MHC.crop_sheet("fix", {"idle": Image.fromarray(fig, "RGBA"), "hurt": Image.fromarray(hurt, "RGBA")})
+    c = np.asarray(cut["idle"])
+    check((dx, dy) == (int(xs.min()) - 1, int(ys.min()) - 1) and c.shape[0] == 50 - dy
+          and c.shape[1] == int(xs.max()) + 2 + 2 - dx and np.array_equal(c, fig[dy:, dx:dx + c.shape[1]])
+          and not (c[0].any() or c[:, 0].any() or c[:, -1].any()) and MH.lowest_row(c) == MH.lowest_row(fig) - dy,
+          f"int-ef2: crop_sheet cuts to the union box + 1 px, keeps the bottom rows and every px (cut {dx}, {dy})")
+    check([MH.unit(t) for t in (1, 2, 2.5, 3, 2.7, 2.8, 3.3)] == [1, 2, 5, 3, 27, 14, 33],
+          "EF-A4: texture units 1, 2, 5, 3 (int-ef2: 2.7 -> 27, 2.8 -> 14, 3.3 -> 33)")
+    check(MH.ceil_mul(10, 2.7) == 27 and MH.ceil_mul(90, 2.7) == 243 and MH.ceil_mul(128, 3.3) == 423,
+          "int-ef2: products with a scale are exact (10 x 2.7 = 27, not 28)")
 
 
 def _pack(check: Callable[[bool, str], None]) -> None:
-    items = [("a", [(200, 200)] * 17, 2.5), ("b", [(384, 384)] * 17, 3), ("c", [(256, 160)] * 15, 2)]
+    items = [("a", [(200, 200)] * 17, 2.5), ("b", [(384, 384)] * 17, 3), ("c", [(256, 160)] * 15, 2),
+             ("d", [(359, 359)] * 9, 2.8), ("e", [(423, 423)] * 9, 3.3)]      # int-ef2: units 14, 33 in one group
     sizes, placed = MHP.pack_group(items)
     rects = [(x, y, w, h, t) for sid, sz, t in items for (w, h), (x, y) in zip(sz, placed[sid][1])]
-    whole = all((x / t) == int(x / t) and (y / t) == int(y / t) for x, y, _, _, t in rects)
+    whole = all((x / MH.frac(t)).denominator == 1 and (y / MH.frac(t)).denominator == 1 for x, y, _, _, t in rects)
     gap = all(not (x0 - 1 < x1 + w1 and x1 - 1 < x0 + w0 and y0 - 1 < y1 + h1 and y1 - 1 < y0 + h0)
               for i, (x0, y0, w0, h0, _) in enumerate(rects) for (x1, y1, w1, h1, _) in rects[i + 1:]
               if placed_page(placed, items, x0, y0) == placed_page(placed, items, x1, y1))

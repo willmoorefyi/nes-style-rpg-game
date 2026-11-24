@@ -129,6 +129,18 @@ real extra detail needs a new render.
 lost features (eyes, teeth, fangs, claws), no new specks or holes, feet on the line). ITERATE on a sheet: tune
 `smooth` for it or drop it, max 2 rounds.
 
+**int-ef2 (user rulings 2026-11-24).** (1) blue_dragon and green_dragon take `tex: 3` with despur after all (the
+other four fallback sheets unchanged); B4 round 1 (image review) ITERATE: full Scale2x rounded the horn / crest points
+and blotched the dithered scales, so round 2 adds `smooth: [despur, edges]` (Scale2x on the silhouette only); the page cap rises to 17 extra (29 pages, 19 hi-res; GPU preload + largest real
+formation 74.8 MB of 128, clay_golem + king_mummy). (2) "Grow the tougher enemies": A1's S may be any multiple of 0.05
+in [2, 3.5] (T = S); stone_golem 2.8 (idle 105 art px -> 294 screen px), iron_golem 3.3 (90 -> 297), sea_troll 2.7
+(106 -> 286.2), each the smallest step at least as tall as its lesser sibling (clay_golem 292.5, troll 282.5; iron also
+>= stone). The packer aligns each sheet's y to its own unit (a group's lcm would be 20790 px); iron_golem's 423-px cells
+fit only 16 a page, so its entry has `crop: true` (cell cut to the frames' union box + 1 px, 128x128 -> 100x97, anchors
+measured on the cut frames). Layout: a tier scale is any scale over 2 but the V4 integer 3 (`isTierScale`), so a 3.3
+large lays out as `huge` and may take pass 4; whole-px feet never round a box's top out of the area; the travel
+clearance bound is rounded up to whole px. Every real formation still fits at pass 1.
+
 ## EF-C. Ogre club and shark daze
 
 **C1. Ogre idle club.** The idle club ends in a straight edge at x 106 (rows 86-107; columns 107-127 empty): it was

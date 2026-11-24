@@ -5,8 +5,11 @@ Runs in the monsters_ai build (monster_atlas.build) **after** the frames are gen
 approved PNG, rig or lock changes: only the atlas pages do.
 
 - `entry(sprite, value)`: one table entry -> {scale, tex, smooth}. A plain number is today's integer display scale at
-  the native texture (tex 1, no smoothing); a dict is {scale: S, tex: T, smooth: [despur]} with S in DISPLAY_SCALES and
-  T = S (the texture drawn 1:1 at full size) or T = 1 with an integer S (a smooth-only entry at today's texture).
+  the native texture (tex 1, no smoothing); a dict is {scale: S, tex: T, smooth: [despur]} with S a multiple of
+  SCALE_STEP (0.05) in [SCALE_MIN, SCALE_MAX] = [2, 3.5] (`valid_scale`; int-ef2, the user's 2026-11-24 ruling: the
+  golems and the sea troll need sizes between and beyond {2, 2.5, 3}) and T = S (the texture drawn 1:1 at full size)
+  or T = 1 with an integer S (a smooth-only entry at today's texture). Every product with T is exact (`frac`,
+  `ceil_mul`): a float 2.7 x 10 is 27.000000000000004. `crop: true` (int-ef2): gen/monster_hires_crop.py.
 - `despur(frame, outline, rounds)`: up to 2 rounds of: drop an opaque px with <= 1 opaque 4-neighbour that is not on
   the frame's lowest opaque row (its foot row); fill a transparent px with >= 3 opaque 4-neighbours with the sheet's
   outline colour (`outline_colour`: the darkest colour of the idle key's 1-px edge ring).
@@ -24,19 +27,40 @@ approved PNG, rig or lock changes: only the atlas pages do.
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 
 import numpy as np
 from PIL import Image
 
 from gen import anim_checks as C
 
-DISPLAY_SCALES = (2, 2.5, 3)       # EF-A1 (user request 2026-11-24, overrides D-V1 S1's integer scales)
-TEX_SCALES = (1, 2, 2.5, 3)
-SMOOTH_OPS = ("despur",)
+# EF-A1 (user request 2026-11-24, overrides D-V1 S1's integer scales): {2, 2.5, 3}; int-ef2 (user ruling 2026-11-24,
+# "grow the tougher enemies"): any multiple of SCALE_STEP in [SCALE_MIN, SCALE_MAX], T = S
+SCALE_MIN, SCALE_MAX = Fraction(2), Fraction(7, 2)
+SCALE_STEP = Fraction(1, 20)
+SMOOTH_OPS = ("despur", "edges")   # int-ef2 B4 round 2: `edges` = Scale2x on the silhouette only (epx)
 SUPER = 8                          # Scale2x until the image is >= SUPER x
 SAMPLE_OFFSET = 0.4                # < 0.5: keeps the feet row invariant at T = 2.5 (see the header)
 DESPUR_ROUNDS = 2
 MAX_AREA_CHANGE = 0.03
+
+
+def frac(t: float) -> Fraction:
+    """A scale as an exact fraction (2.7 -> 27/10; through its shortest repr, so YAML's floats map exactly)."""
+    return Fraction(t) if isinstance(t, int) else Fraction(repr(float(t)))
+
+
+def ceil_mul(n: int, t: float) -> int:
+    """ceil(n * t), exact."""
+    return math.ceil(n * frac(t))
+
+
+def valid_scale(s) -> bool:
+    """A display scale: a number, a multiple of SCALE_STEP in [SCALE_MIN, SCALE_MAX] (int-ef2)."""
+    if isinstance(s, bool) or not isinstance(s, (int, float)) or not math.isfinite(s):
+        return False
+    f = frac(s)
+    return SCALE_MIN <= f <= SCALE_MAX and (f / SCALE_STEP).denominator == 1
 
 
 def entry(sprite: str, value) -> dict:
@@ -49,17 +73,20 @@ def entry(sprite: str, value) -> dict:
         if value not in (2, 3) or value != int(value):
             bad("a plain entry must be the integer 2 or 3 (a fractional scale needs {scale, tex})")
         return {"scale": int(value), "tex": 1, "smooth": []}
-    if not isinstance(value, dict) or set(value) - {"scale", "tex", "smooth"} or "scale" not in value:
-        bad("an entry is a number or {scale: S, tex: T, smooth: [despur]}")
+    if not isinstance(value, dict) or set(value) - {"scale", "tex", "smooth", "crop"} or "scale" not in value:
+        bad("an entry is a number or {scale: S, tex: T, smooth: [despur], crop: true}")
     s, t, smooth = value["scale"], value.get("tex", 1), value.get("smooth") or []
-    if isinstance(s, bool) or s not in DISPLAY_SCALES:
-        bad(f"scale must be one of {DISPLAY_SCALES}")
-    if isinstance(t, bool) or t not in TEX_SCALES or not (t == s or (t == 1 and s == int(s))):
+    if not valid_scale(s):
+        bad(f"scale must be a multiple of {float(SCALE_STEP)} in [{float(SCALE_MIN)}, {float(SCALE_MAX)}]")
+    if isinstance(t, bool) or not isinstance(t, (int, float)) or not (t == s or (t == 1 and s == int(s))):
         bad("tex must equal scale, or be 1 with an integer scale")
     if not isinstance(smooth, list) or any(op not in SMOOTH_OPS for op in smooth):
         bad(f"smooth must be a list of {SMOOTH_OPS}")
+    crop = value.get("crop", False)
+    if not isinstance(crop, bool) or (crop and t == 1):
+        bad("crop must be true or false, and only on a hi-res entry (tex > 1)")
     num = (lambda v: int(v) if v == int(v) else float(v))
-    return {"scale": num(s), "tex": num(t), "smooth": list(smooth)}
+    return {"scale": num(s), "tex": num(t), "smooth": list(smooth), **({"crop": True} if crop else {})}
 
 
 EF_START = "2026-11-24"            # the standing rule (user, 2026-11-24): every sheet approved from pass EF on is smoothed
@@ -80,16 +107,14 @@ def ef_rule_failures(approved: dict[str, dict[str, dict]], table: dict) -> list[
 
 
 def unit(t: float) -> int:
-    """The smallest texture px step u with u / t a whole number of art px (2 -> 2, 2.5 -> 5, 3 -> 3)."""
-    for u in range(1, 64):
-        if (u / t) == int(u / t):
-            return u
-    raise SystemExit(f"monsters_ai: no texture unit for texScale {t}")
+    """The smallest texture px step u with u / t a whole number of art px (2 -> 2, 2.5 -> 5, 3 -> 3, 2.8 -> 14): the
+    numerator of t in lowest terms."""
+    return frac(t).numerator
 
 
 def tex_cell(cell: tuple[int, int], t: float) -> tuple[int, int]:
     """The texture size of a cell: ceil(cell * t) (padded right / bottom when cell * t is not whole)."""
-    return math.ceil(cell[0] * t), math.ceil(cell[1] * t)
+    return ceil_mul(cell[0], t), ceil_mul(cell[1], t)
 
 
 def _clean(a: np.ndarray) -> np.ndarray:
@@ -99,9 +124,10 @@ def _clean(a: np.ndarray) -> np.ndarray:
     return a
 
 
-def epx(a: np.ndarray) -> np.ndarray:
+def epx(a: np.ndarray, edges: bool = False) -> np.ndarray:
     """Scale2x (EPX) on an H x W x 4 uint8 array with exact RGBA equality: each px becomes 2x2, a corner takes a
-    neighbour's colour where the two neighbours on that corner agree and the other two differ."""
+    neighbour's colour where the two neighbours on that corner agree and the other two differ. `edges` (int-ef2, the
+    dragons' B4 round 2): only where that changes the alpha (the silhouette), the inside stays nearest."""
     h, w, _ = a.shape
     p = np.pad(a, ((1, 1), (1, 1), (0, 0)), mode="edge")
     e, b, hh, d, f = p[1:-1, 1:-1], p[:-2, 1:-1], p[2:, 1:-1], p[1:-1, :-2], p[1:-1, 2:]
@@ -110,30 +136,35 @@ def epx(a: np.ndarray) -> np.ndarray:
     out = np.empty((h * 2, w * 2, 4), np.uint8)
     for (dy, dx), c, src in (((0, 0), db & ~bf & ~dh, d), ((0, 1), bf & ~db & ~hf, f),
                              ((1, 0), dh & ~db & ~hf, d), ((1, 1), hf & ~dh & ~bf, f)):
+        c = c & ((e[..., 3] > 0) != (src[..., 3] > 0)) if edges else c
         out[dy::2, dx::2] = np.where(c[..., None], src, e)
     return out
 
 
 def _samples(n_out: int, n_big: int, t: float, k: int) -> np.ndarray:
-    idx = np.floor((np.arange(n_out) + SAMPLE_OFFSET) * k / t).astype(np.int64)
+    """floor((i + SAMPLE_OFFSET) * k / t) for each texture px i, in exact integers (t = p / q, SAMPLE_OFFSET 2 / 5;
+    the same values as the float form at T 2, 2.5 and 3, where no product lands on a whole number)."""
+    f, o = frac(t), Fraction(repr(SAMPLE_OFFSET))
+    i = np.arange(n_out, dtype=np.int64)
+    idx = ((i * o.denominator + o.numerator) * k * f.denominator) // (o.denominator * f.numerator)
     return np.clip(idx, 0, n_big - 1)
 
 
-def upscale(a: np.ndarray, t: float) -> np.ndarray:
-    """The frame at t texture px per art px (EF-A2); t = 1 returns it unchanged."""
+def upscale(a: np.ndarray, t: float, edges: bool = False) -> np.ndarray:
+    """The frame at t texture px per art px (EF-A2; `edges`: silhouette-only Scale2x); t = 1 returns it unchanged."""
     a = _clean(a)
     if t == 1:
         return a
     h, w, _ = a.shape
     big, k = a, 1
     while k < SUPER:
-        big, k = epx(big), k * 2
-    th, tw = math.ceil(h * t), math.ceil(w * t)
+        big, k = epx(big, edges), k * 2
+    th, tw = ceil_mul(h, t), ceil_mul(w, t)
     ys, xs = _samples(th, big.shape[0], t, k), _samples(tw, big.shape[1], t, k)
     out = np.ascontiguousarray(big[ys][:, xs])
     r = lowest_row(a)
     if r is not None:                    # the feet guard: Scale2x can round the native foot row's edge sub-rows away
-        want = math.ceil((r + 1) * t) - 1
+        want = ceil_mul(r + 1, t) - 1
         for row in (big[r * k + k // 2][xs], a[r][np.clip(xs // k, 0, w - 1)]):
             if out[want, :, 3].any():
                 break
@@ -145,11 +176,10 @@ def lowest_row(a: np.ndarray) -> int | None:
     rows = np.nonzero((a[..., 3] > 0).any(axis=1))[0]
     return int(rows.max()) if len(rows) else None
 
-
 def feet_row(native: np.ndarray, tex: np.ndarray, t: float) -> list[str]:
     """EF-A2 feet invariant: the lowest opaque texture row is ceil((r + 1) * t) - 1 for the native lowest row r."""
     r, got = lowest_row(native), lowest_row(tex)
-    want = None if r is None else math.ceil((r + 1) * t) - 1
+    want = None if r is None else ceil_mul(r + 1, t) - 1
     return [] if got == want else [f"lowest texture row {got} != {want} (native row {r}, texScale {t})"]
 
 
@@ -222,12 +252,12 @@ def despur_sheet(sid: str, frames: dict[str, Image.Image]) -> tuple[dict[str, Im
     return out, {"dropped": dropped, "filled": filled, "frames": len(frames), "outline": list(outline)}
 
 
-def hires_sheet(sid: str, frames: dict[str, Image.Image], t: float) -> dict[str, Image.Image]:
+def hires_sheet(sid: str, frames: dict[str, Image.Image], t: float, edges: bool = False) -> dict[str, Image.Image]:
     """{name: texture} at t texture px per art px; SystemExit naming the sprite and frame when the feet row moves."""
     out, fails = {}, []
     for name in sorted(frames):
         a = np.asarray(frames[name].convert("RGBA"))
-        tex = upscale(a, t)
+        tex = upscale(a, t, edges)
         fails += [f"{sid} {name}: {e}" for e in feet_row(a, tex, t) + C.binary_alpha(tex)]
         out[name] = Image.fromarray(tex, "RGBA")
     if fails:

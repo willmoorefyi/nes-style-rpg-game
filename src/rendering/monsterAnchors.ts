@@ -11,7 +11,7 @@
  * - `idleBox`: the idle frame's opaque box [left, top, right, bottom] (FW-A2, docs/REDESIGN_PLAN.md 1); the bestiary
  *   centres it in the preview panel. Missing: measured from the atlas image in a browser, else no centring.
  */
-import { layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from '../scenes/battle/EnemyLayoutAi.js';
+import { isTierScale, layoutSizeOf, type EnemyBoxInput, type EnemySizeClass } from '../scenes/battle/EnemyLayoutAi.js';
 
 /** The anchor fields of an atlas sheet entry (monster_atlas.py) and of MonsterFrames (optional, so hand-built test
  *  frames may leave them out). */
@@ -51,10 +51,10 @@ export function lungeOvershoot(f: AnchoredFrames): number {
 
 /** The layout box of a sprite with art: its cell at the art's screen scale, with the home art's opaque extent (`ox0`
  *  inclusive, `ox1` exclusive, box px) when the atlas has it. `dataSize` (EF-A5): the enemy's data class when `size`
- *  is its 2.5 tier class (`medium` / `huge`), laid out from pass 3 on. */
+ *  is its tier class (`medium` / `huge`; a tier scale, `isTierScale`), laid out from pass 3 on. */
 export function enemyBoxInput(size: EnemySizeClass, f: AnchoredFrames, dataSize?: EnemySizeClass): EnemyBoxInput {
   const box: EnemyBoxInput = { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale, scale: f.scale };
-  if (dataSize && dataSize !== size && f.scale > 2 && f.scale < 3) box.dataSize = dataSize;
+  if (dataSize && dataSize !== size && isTierScale(f.scale)) box.dataSize = dataSize;
   if (f.homeX) { box.ox0 = f.homeX[0] * f.scale; box.ox1 = (f.homeX[1] + 1) * f.scale; }
   // a scale-3 boss is fitted by its art, not its cell (EnemyBoxInput.oy0; hollow_seraph, V8 N-1)
   if (size === 'boss' && f.scale === 3 && f.travelTop !== undefined) box.oy0 = f.travelTop * f.scale;
