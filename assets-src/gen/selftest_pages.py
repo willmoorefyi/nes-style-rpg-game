@@ -226,8 +226,10 @@ def _raises_value(fn: Callable[[], object], *words: str) -> bool:
 # key; F3b pulled the recover back toward idle, recover->idle 3.6 px), so its lunge frames now reach 110.
 # Re-measured at fix pass 2 G6: warmech travelTop 5 -> 2, because the sheet is rigged since T-K (its in-betweens are
 # translations of the keys, and the attack's d (-23, -4/-5) lifts the travel frames 3 px above the keyframe-only top).
+# Re-measured at int-ef1: ogre homeX [10, 113] -> [10, 120] and lungeRight 110 -> 117, EF-C's idle club tip (FW-P
+# idle paint, docs/ENEMY_FEEDBACK_PLAN.md EF-C) reaching 7 px further right in every idle-drawn frame.
 ANCHORS = {"garland": {"travelTop": 2}, "lich": {"travelTop": 9}, "death_eye": {"travelTop": 42, "lungeRight": 179},
-           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 2}, "ogre": {"homeX": [10, 113], "lungeRight": 110},
+           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 2}, "ogre": {"homeX": [10, 120], "lungeRight": 117},
            "troll": {"homeX": [24, 122]}, "dragon": {"homeX": [4, 118]},
            "earth_elemental": {"lungeRight": 109, "opaqueRight": 110}}
 
