@@ -559,7 +559,7 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
         seed: int = 0, n_cells: int = 3, cell: int | None = None,
         foot_row: int | None = None, haze: bool = False, split: str = "gaps",
         keep_pieces: str | None = None, top_margin: int | None = None,
-        match: tuple[int, float] | None = None) -> tuple[list[Image.Image], dict]:
+        match: tuple[int, float] | None = None, guide_width: int | None = None) -> tuple[list[Image.Image], dict]:
     """`cell` / `foot_row` override the band's output cell (per-pose bosses use a larger cell). `split` picks the cell
     splitter (`split_cells`): "gaps" (default, future cuts) or "thirds" (the cutter every approved sheet was cut with;
     approved sheets are never re-cut). A floating cell drawn so low that the shared offset would put it below the cell's
@@ -578,8 +578,10 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
     columns, stair-stepping diagonals, more visibly when upscaling) to the nearer band edge, capped by the headroom
     rows, feet on the feet row, the target moved a row at a time (at most MATCH_TRIES) until the cut lands in the band;
     info["match"] records ref, tolerance, band, the target and the cut height. A figure inside the band is cut exactly
-    as without the option."""
-    native, info = native_art(raw, guide_width=S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
+    as without the option. `guide_width` (EF-F, monster_br.py) overrides the guide width that sets the area-average
+    pitch when the render has no detectable grid; None keeps the default."""
+    gw = guide_width or (S.MONSTER_GUIDE_CELL[0] * n_cells if n_cells == 3 else S.MONSTER_POSE_GUIDE[0])
+    native, info = native_art(raw, guide_width=gw)
     a = np.asarray(native.convert("RGB"))
     h, w, _ = a.shape
     cells, offs, lines = split_cells(a, n_cells, haze, split)
@@ -727,7 +729,7 @@ def cut(raw: Image.Image, band: S.MonsterBand, floating: bool = False, colors: i
             hh = min(fig.shape[0] - sy0, c - ty0)
             out[ty0:ty0 + hh, tx0:tx0 + ww] = fig[sy0:sy0 + hh, sx0:sx0 + ww]
             if (x0 + dx < 0 or x1 + dx >= cw or y0 + dy < 0 or y1 + dy >= c):
-                clipped.append(S.MONSTER_POSES[k])
+                clipped.append(S.MONSTER_POSES[k] if k < len(S.MONSTER_POSES) else f"cell {k}")
             frames.append(Image.fromarray(out, "RGBA"))
         return frames, clipped, lifted
 

@@ -1314,3 +1314,65 @@
 {"event": "result", "key": "58e9f860cde1d0016a61bfd9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
 {"event": "request", "ts": "2026-11-22T14:09:34", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "c52cd8952b52a0ca6ea52e90", "pass": "AR"}
 {"event": "result", "key": "c52cd8952b52a0ca6ea52e90", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:31:11", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7101, "key": "5e59748a03e3e0e345491214", "pass": "EF"}
+{"event": "result", "key": "5e59748a03e3e0e345491214", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:31:28", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7101, "key": "cc5fce9cdc59b317f27cf681", "pass": "EF"}
+{"event": "result", "key": "cc5fce9cdc59b317f27cf681", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:32:16", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7101, "key": "9d7e9cc0077a0ee54be09fd8", "pass": "EF"}
+{"event": "result", "key": "9d7e9cc0077a0ee54be09fd8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:32:28", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7101, "key": "4d7e6229062698daf19bde5b", "pass": "EF"}
+{"event": "result", "key": "4d7e6229062698daf19bde5b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:37:55", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7105, "key": "972b61e866029c067d18cd5b", "pass": "EF"}
+{"event": "result", "key": "972b61e866029c067d18cd5b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:38:08", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "47798554e12ef543000434a8", "pass": "EF"}
+{"event": "result", "key": "47798554e12ef543000434a8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:38:20", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "2abc3e54cf81b7995efc334f", "pass": "EF"}
+{"event": "result", "key": "2abc3e54cf81b7995efc334f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:38:30", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "c2863b34c5a7ddfc7a9f99f3", "pass": "EF"}
+{"event": "result", "key": "c2863b34c5a7ddfc7a9f99f3", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:39:57", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7201, "key": "89ad908e6c15b32d19e8e0e5", "pass": "EF"}
+{"event": "result", "key": "89ad908e6c15b32d19e8e0e5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:40:48", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7202, "key": "0959fc7f6fe9fe70a8b06a62", "pass": "EF"}
+{"event": "result", "key": "0959fc7f6fe9fe70a8b06a62", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:41:23", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7203, "key": "2cdf46e80285e1e90211188c", "pass": "EF"}
+{"event": "result", "key": "2cdf46e80285e1e90211188c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:42:09", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7204, "key": "17d6597e723422488f228a5c", "pass": "EF"}
+{"event": "result", "key": "17d6597e723422488f228a5c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:42:34", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7205, "key": "8404f91bd700a82ca65aa8d0", "pass": "EF"}
+{"event": "result", "key": "8404f91bd700a82ca65aa8d0", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:43:19", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7301, "key": "c74d0a0a8a6e7dbb709b806d", "pass": "EF"}
+{"event": "result", "key": "c74d0a0a8a6e7dbb709b806d", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:43:46", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7302, "key": "00edc85c45f06e2a58d095dd", "pass": "EF"}
+{"event": "result", "key": "00edc85c45f06e2a58d095dd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:44:18", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7303, "key": "63abac0ad475fa7d96501e61", "pass": "EF"}
+{"event": "result", "key": "63abac0ad475fa7d96501e61", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:44:29", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "f791388bd6ec071da1a9f65a", "pass": "EF"}
+{"event": "result", "key": "f791388bd6ec071da1a9f65a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:44:48", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "731694d023dc9715ef2e8e8b", "pass": "EF"}
+{"event": "result", "key": "731694d023dc9715ef2e8e8b", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:45:05", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "2d9edcc41f074aea96007fdc", "pass": "EF"}
+{"event": "result", "key": "2d9edcc41f074aea96007fdc", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:46:24", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7304, "key": "2c23cb9422cbe7db8b9eddef", "pass": "EF"}
+{"event": "result", "key": "2c23cb9422cbe7db8b9eddef", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:47:02", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7304, "key": "8d3680bd8eb76c8b30d646e5", "pass": "EF"}
+{"event": "result", "key": "8d3680bd8eb76c8b30d646e5", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:48:23", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7401, "key": "1b850caab665a429639f14d1", "pass": "EF"}
+{"event": "result", "key": "1b850caab665a429639f14d1", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:49:13", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7401, "key": "d3cd5a8e1dc26f21f42bf68a", "pass": "EF"}
+{"event": "result", "key": "d3cd5a8e1dc26f21f42bf68a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:49:52", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7403, "key": "bd9cb835ee8c380ccb9827e7", "pass": "EF"}
+{"event": "result", "key": "bd9cb835ee8c380ccb9827e7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:51:10", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7404, "key": "e68e446beb2fd5540855cd65", "pass": "EF"}
+{"event": "result", "key": "e68e446beb2fd5540855cd65", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:51:40", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7405, "key": "86fae64893e44aa0706b7dbd", "pass": "EF"}
+{"event": "result", "key": "86fae64893e44aa0706b7dbd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:52:31", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "9d268d8dddfc4a6ac3c99d3d", "pass": "EF"}
+{"event": "result", "key": "9d268d8dddfc4a6ac3c99d3d", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:53:06", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7502, "key": "cbf086bbd0b794720026aa8e", "pass": "EF"}
+{"event": "result", "key": "cbf086bbd0b794720026aa8e", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:53:42", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "16e2002af046e65a76f73135", "pass": "EF"}
+{"event": "result", "key": "16e2002af046e65a76f73135", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:55:19", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "70c6e4f3437dbd2bfcfe2044", "pass": "EF"}
+{"event": "result", "key": "70c6e4f3437dbd2bfcfe2044", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:56:02", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7505, "key": "e04f96d7c4a5ead38a1051e9", "pass": "EF"}
+{"event": "result", "key": "e04f96d7c4a5ead38a1051e9", "ok": true, "served": "stability.sd3-5-large-v1:0"}

@@ -124,19 +124,6 @@
       }
     }
   ],
-  "bedrock": {
-    "pass": "EF",
-    "cap": 145,
-    "per_purpose_caps": {
-      "ef_sheet": 50,
-      "ef_structure": 75,
-      "ef_nobg": 20,
-      "reserve": 0
-    },
-    "gemini_before": 553,
-    "reserve_max_usd": 0.08,
-    "note": "User 2026-11-24 (docs/ENEMY_FEEDBACK_PLAN.md EF-F, F0): Bedrock regenerations of crazy_horse, pirate, vampire, dark_wizard, vampire_lord; no Gemini. Stable Image Ultra v1.1 (ef_sheet: one 4-pose render per variation, or the fallback's idle), the fallback's Control Structure poses (ef_structure), remove_bg only when the magenta key cut fails (ef_nobg). At most 5 variations per sprite. One row per logical request in cache/bedrock_ledger.jsonl."
-  },
   "bedrock_history": [
     {
       "note": "Pass C (docs/CHAOS_FORMS_PLAN.md 5.1, 5.6, 6; user D-U5, D-U6, 2026-11-16): Stability-on-Bedrock calls, read only by bedrock.invoke (the BR ledger cache/bedrock_ledger.jsonl, one row per logical request) and colossus.py budget --check. cap 80 = the sum of per_purpose_caps; any purpose not listed is refused under pass C (A6), reserve needs reserve:<reason>. rim_upscale (2, colossus.py upscale of the rim backdrop source, docs/CHAOS_FORMS_PLAN.md 7.3) was taken from the reserve's 18 by the orchestrator (2026-11-16), so the cap stays 80. gemini_before = N_C0, the main-checkout Gemini attempts at C1: pass C makes no Gemini call (gem[N_C0:] == 0, no fallback). The Gemini guard (generate.check_budget) never reads this block. Rev 4 (docs/CHAOS_FORMS_PLAN.md 18.9, B7; 2026-11-16, at 17 of 80 used): caps re-tabled with the total kept at 80: v0 closed at 9, f3_gen 12, f3_upscale 6 and f2_upscale 2 (new: Conservative Upscale), f3_nobg 4, f2_gen 2, f2_nobg 4, f4_variant closed at 2, f4_inpaint 8 (new: open + crack), rim_upscale 2 (kept, 7.3), reserve 29 (18.9's 31 less the 2 rim_upscale already moved out of it). reserve_max_usd 0.08: bedrock.invoke refuses a reserve call whose model costs more (bedrock.COST_USD estimates), so no upscale comes from the reserve; budget --check flags any such row.",
@@ -275,6 +262,21 @@
       "note": "User 2026-11-21: art pass AR on free Bedrock, no Gemini: terrain tiles and boundaries (ar_tiles), new NPC field sheets by the fairy/mermaid method (ar_npc), dungeon props (ar_props), per-town themes (ar_towns). Shared by the concurrent AR agents; one row per logical request in cache/bedrock_ledger.jsonl. Extended 2026-11-22 by user permission (\"feel free to extend the bedrock budget if you must\"): ar_towns 80->110, ar_tiles 70->90, cap 340->390. Extended 2026-11-22: ar_dragon 60 (the Cardia dragon great village: brief concept boards and its kit), cap 390->450. Extended 2026-11-22 (playtest feedback): ar_dwarf 40 (dwarf NPC sheets), ar_airship 30 (airship toward/away views, TODO T-2), cap 450->520.",
       "used": 348,
       "closed": "2026-11-23, 348 of 520 (AR done: terrain, props, town themes, AR/dwarf/dragon NPCs, Cardia Deep kit, airship views; per purpose {'ar_npc': 69, 'ar_props': 47, 'ar_tiles': 58, 'ar_towns': 82, 'ar_dragon': 41, 'ar_dwarf': 33, 'ar_airship': 18}; no Gemini)"
+    },
+    {
+      "pass": "EF",
+      "cap": 145,
+      "per_purpose_caps": {
+        "ef_sheet": 50,
+        "ef_structure": 75,
+        "ef_nobg": 20,
+        "reserve": 0
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User 2026-11-24 (docs/ENEMY_FEEDBACK_PLAN.md EF-F, F0): Bedrock regenerations of crazy_horse, pirate, vampire, dark_wizard, vampire_lord; no Gemini. Stable Image Ultra v1.1 (ef_sheet: one 4-pose render per variation, or the fallback's idle), the fallback's Control Structure poses (ef_structure), remove_bg only when the magenta key cut fails (ef_nobg). At most 5 variations per sprite. One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 31,
+      "closed": "2026-11-24, 31 of 145 (EF-F: 5 variations per sprite spent, no SHIP for any of the five; debriefs in ~/temp/ff-game/ef/bedrock/<id>/DEBRIEF.md; per purpose {'ef_sheet': 24 (Ultra 6, SD 3.5 18), 'ef_structure': 7, 'ef_nobg': 0}; no Gemini, no remove_bg, no reserve). Reopen with the user's approval for more variations."
     }
   ]
 }

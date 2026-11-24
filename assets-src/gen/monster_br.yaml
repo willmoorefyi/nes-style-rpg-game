@@ -1,0 +1,200 @@
+# EF-F (docs/ENEMY_FEEDBACK_PLAN.md F2, F3): the prompts and every variation of the five Bedrock regenerations, read by
+# monster_br.py. One Stable Image Ultra image-to-image render per variation (the 2x2 magenta guide, monster_br.guide):
+# idle top left, attack top right, hurt bottom left, kneel (the dazed key) bottom right. At most 5 variations per
+# sprite. A variation's `flip` mirrors cells drawn facing left (0-3, idle attack hurt kneel); `add` / `negative`
+# extend the sprite's prompt. The user's reference images (~/temp/ff-game/ef/refs/) are mood only and never sent.
+style: >-
+  A 16-bit era Japanese RPG enemy battle sprite sheet in detailed pixel art: a crisp dark outline round the figure,
+  a limited palette, clean shading lit from the top left, the full body in side view, a serious, dark and menacing
+  tone, realistic proportions, not cartoonish, not cute, not chibi.
+style2: >-
+  Detailed 16-bit era Japanese RPG pixel art of one enemy character for a battle screen: a crisp dark outline round
+  the figure, a limited palette, clean shading lit from the top left, side view, a serious, dark and menacing tone,
+  realistic proportions, not cartoonish, not cute, not chibi.
+grid2: >-
+  The same one character drawn four times, once in each quarter of the picture, each copy whole and alone, drawn
+  over the dark grey shape in its quarter and filling it, always facing right with the face and chest turned to the
+  right side of the picture:
+grid3: >-
+  The same one character drawn four times, once in each quarter of the picture, each copy whole and alone, redrawn
+  over the figure in its quarter with its pose and size, always facing right with the face and chest turned to the
+  right side of the picture:
+style4: >-
+  Pixel art, 16-bit JRPG enemy battle sprites, dark fantasy, crisp black outline, cel shading lit from the top left,
+  side view, full body.
+background4: Flat solid magenta background.
+negative4: >-
+  chibi, cute, cartoon, comic, smiling, big head, text, watermark, frame, grid lines, floor, shadow, scenery, blurry,
+  3d render, photo, extra characters
+background: >-
+  The background is one flat solid magenta (#FF00FF) colour everywhere, with no floor, no cast shadow, no scenery,
+  no text and no frame lines between the poses; each figure stands alone with empty magenta round it.
+negative: >-
+  text, letters, watermark, signature, grid lines, panel borders, frames, floor, ground shadow, scenery, gradient
+  background, photo, 3d render, blurry, cartoon, chibi, cute, comic, smiling, extra characters, duplicate figures in
+  one pose, cropped figure, cut off feet, pink clothing, magenta clothing
+sprites:
+  pirate:
+    retired: pirate_v1
+    size: small
+    body: biped
+    canvas: square
+    subject: >-
+      a menacing, battle-hardened sea cutthroat: a lean weathered man with a scarred face, cruel narrowed eyes and a
+      cruel grin of crooked teeth, a dark stubbled jaw, a faded dark red bandana under a battered black tricorn hat,
+      a gold hoop earring, a long tattered dark brown leather coat over a stained off-white shirt, a wide black belt
+      with a brass buckle and a pistol tucked in it, dark breeches and tall worn black boots, a heavy curved steel
+      cutlass in his hand.
+    poses:
+      idle: standing in a low guarded fighting stance, knees bent, the cutlass held forward and low, ready to strike
+      attack: >-
+        lunging forward to the right with a wide slashing cut of the cutlass, the front knee deeply bent, the coat
+        tails swinging behind
+      hurt: staggering backward, flinching with the head thrown back and the free arm up, the cutlass still in hand
+      kneel: >-
+        dazed and beaten, down on one knee and slumped forward, one hand on the ground, the cutlass lowered, the head
+        hanging
+    negative: parrot, peg leg, hook hand, eyepatch, blue coat, cartoon pirate
+    variations:
+      - {n: 1, seed: 7101, strength: 0.85, guide: 1, note: "Ultra image-to-image confirmed (image + strength, served stability.stable-image-ultra-v1:1); failed: the grey guide boxes kept as panels, one figure only (top right)"}
+      - {n: 2, seed: 7101, strength: 0.85, guide: 1, model: sd35, note: "model bake-off round 1 on SD 3.5 Large: failed as v1 (grey panels, one noisy figure)"}
+      - {n: 3, seed: 7101, strength: 0.93, note: "bake-off round 2 (Ultra): guide rev 2 (key-magenta boxes), strength 0.93; failed: a flat magenta image, no figure"}
+      - {n: 4, seed: 7101, strength: 0.93, model: sd35, note: "bake-off round 2 (SD 3.5 Large): failed as v3 (a flat magenta image: a flat init keeps flat at 0.93)"}
+      - {n: 5, seed: 7105, route: fallback, control: 0.7, note: "F3 fallback (the 2x2 layout failed twice): Ultra text-to-image idle, Control Structure attack / hurt / kneel on the pirate_v1 silhouettes; failed: the idle drew a fleet of pirate ships, the three structure poses whole sheets of dozens of small blue soldiers ('sprite sheet' in the style text), the silhouettes ignored"}
+  vampire:
+    retired: vampire_v2
+    size: small
+    body: biped
+    canvas: square
+    subject: >-
+      a menacing young vampire noble, a lean predator: deathly pale grey-white skin, a sharp gaunt face with feral
+      glowing red eyes and long white fangs bared in a snarl, black hair slicked back to a widow's peak, pointed ears,
+      long clawed fingers, a tall stiff black collar, a fitted black and deep crimson aristocratic coat with silver
+      buttons, a long black cape with a blood-red lining.
+    poses:
+      idle: standing tall and still, leaning slightly forward, one clawed hand raised, the cape wrapped close
+      attack: lunging forward to the right with both clawed hands slashing, fangs bared, the cape flaring behind
+      hurt: recoiling backward, shielding the face with the cape, hissing
+      kneel: >-
+        dazed and weakened, down on one knee with the head bowed, one clawed hand on the ground, the cape pooled
+        round him
+    negative: white hair, bat wings, crown, old man, beard, cartoon fangs, bats
+    variations:
+      - {n: 1, seed: 7201, strength: 0.85, guide: 3, text: 2, note: "main route rev 3: Ultra over the vampire_v2 silhouettes, no 'sheet' wording; layout, magenta and facing work, but the grey silhouettes leak (a grey armoured boy, a grey ghoul, no vampire), 0.85 too low for the prompt"}
+      - {n: 2, seed: 7202, strength: 0.88, guide: 4, text: 3, note: "guide rev 4: the vampire_v2 poses in their own colours (the same young noble design concept), strength 0.88; failed: Ultra drew flat black silhouettes with orange runes (a horned knight, no vampire)"}
+      - {n: 3, seed: 7203, strength: 0.6, model: structure, guide: 4, text: 3, note: "F3 fallback (the 2x2 Ultra layout failed twice): Control Structure on the old poses, all four in one call (one identity), control 0.6; failed: the layout ignored (one large armoured boy with a staff and a ghoul behind him on a grey ground; TOWN_THEMES: control-structure ignores layouts)"}
+      - {n: 4, seed: 7204, strength: 0.75, model: sd35, guide: 4, text: 3, note: "SD 3.5 image-to-image on the old colour poses (TOWN_THEMES method: SD3.5 keeps a flat colour guide's layout and background at 0.76), strength 0.75; best so far: the layout, the magenta key and the facing hold and idle / attack / hurt are one figure (black hair, red eyes, long coat), but no pale skin or fangs, armour plates, and the kneel became a black cat"}
+      - {n: 5, seed: 7205, strength: 0.72, model: sd35, guide: 4, text: 3, add: "In all four quarters he is the same man with a deathly pale white face and two visible white fangs; in the bottom right quarter he is a man kneeling, not an animal.", negative: "cat, animal, armour plates, metal armor, sword", note: "v4 at 0.72 with the face, fangs and the kneeling man named"}
+  vampire_lord:
+    retired: vampire_lord_v1
+    size: small
+    body: biped
+    canvas: square
+    subject: >-
+      an ancient towering vampire lord, far older and grander than a common vampire: tall and gaunt, a long lined
+      grey-white face with hollow cheeks, burning red eyes under heavy brows and long fangs, long straight white hair
+      falling past the shoulders, a tall black collar with sharp points rising behind the head like a crown, a long
+      regal black coat with dark crimson and gold trim and a gold chain clasp at the chest, a vast black cape with a
+      crimson lining shaped like bat wings, joined along both arms to the wrists, long bony clawed fingers.
+    poses:
+      idle: standing tall and imperious, the arms half spread so the bat-wing cape opens
+      attack: >-
+        sweeping forward to the right, one clawed hand reaching out to grasp, the bat-wing cape spread wide under
+        that arm
+      hurt: reeling backward, both arms raised before the face with the bat-wing cape folded across the body
+      kneel: dazed, sunk on one knee with the head bowed, the white hair hanging, the cape draped over the ground
+    short: >-
+      ancient vampire lord with a gaunt pale grey face, red eyes, fangs, long straight white hair, a tall pointed
+      black collar, a black coat with crimson trim, a black bat-wing cape on his arms and long claws
+    poses4:
+      idle: standing tall, arms half spread, cape open
+      attack: lunging forward, one clawed hand reaching out
+      hurt: reeling back, arms raised before his face
+      kneel: kneeling on one knee, head bowed, exhausted
+    negative: young face, black hair, crown on the head, bats, real wings on the back
+    variations:
+      - {n: 1, seed: 7301, strength: 0.72, model: sd35, guide: 4, text: 3, add: "In all four quarters he is the same tall old man with a gaunt pale face, long white hair and fangs; in the bottom right quarter he kneels on one knee, a man, not an animal.", negative: "cat, animal, sword, weapon, armour plates, purple, violet", note: "the vampire's best route (SD 3.5 image-to-image on the vampire_lord_v1 colour poses), the kneeling man named; failed: a hooded bearded wraith with a skull face in the kneel, no collar or bat-wing cape, the four not one identity: 0.72 redesigns too far"}
+      - {n: 2, seed: 7302, strength: 0.62, model: sd35, guide: 4, text: 3, add: "In all four quarters he is the same tall old vampire lord with a gaunt pale face, long straight white hair, no beard, red eyes and fangs, the tall pointed black collar behind his head and the black bat-wing cape on his arms; in the bottom right quarter he kneels on one knee.", negative: "beard, hood, skull, cat, animal, sword, weapon, armour plates, purple, violet", note: "closer to the old poses (0.62) with the lord's marks named; failed: black blobs with unreadable faces, the hurt's flying hair turned into a beast skull, the attack a horned hood: no vampire lord, no single identity"}
+      - {n: 3, seed: 7303, route: fallback, text: 2, control: 0.7, add: "He is a man, no beard.", negative: "beard, hood, skull, cat, animal, sword, weapon, armour plates, purple, violet, several figures, sprite sheet", note: "F3 fallback with text 2 (no 'sheet' wording): Ultra text-to-image idle, Control Structure attack / hurt / kneel, each one large silhouette of the vampire_lord_v1 pose; failed: the Ultra idle a hooded wraith on a white page, the three structure renders green-clad chibi swordsmen on grey that follow neither the silhouettes nor the prompt (the style text's 'not cute, not chibi' negations pull toward them)"}
+      - {n: 4, seed: 7304, strength: 0.7, model: sd35, guide: 4, text: 4, negative: "beard, hood, skull, cat, animal, sword, weapon, purple, violet", note: "text 4 (short, positive only) on the vampire's best route: SD 3.5 over the vampire_lord_v1 colour poses at 0.7; best yet: one identity (white hair, red eyes, black coat with red trim), the cut clean (71/71/67/55 px, 14 colours, edges ok), but a wide hat in idle and attack and none in the hurt, no collar or bat-wing cape, the kneel a faceless black hump"}
+      - {n: 5, seed: 7304, strength: 0.7, model: sd35, guide: 4, text: 4, add: "bareheaded", kneel: "kneeling on one knee, his white hair hanging round his pale face", negative: "hat, tricorn, wide brim, beard, hood, skull, cat, animal, sword, weapon, purple, violet", note: "v4 with the same seed, bareheaded, the kneel's face named"}
+  dark_wizard:
+    retired: dark_wizard_v1
+    recolor: {light: [40, 38, 46], warm: [104, 128, 92]}
+    size: small
+    body: biped
+    canvas: square
+    subject: >-
+      a sinister, evil dark sorcerer of a corrupted elf-orc kind: gaunt and hunched, sickly grey-green skin tight over
+      a skull-like face, long pointed ears, a hooked nose, a lipless mouth of small sharp teeth, two burning
+      yellow-green eyes glowing from the deep shadow of a ragged black hood, a long tattered black robe hanging in
+      rags with dark green trim, bony clawed hands, a tall staff of blackened twisted wood topped with a horned animal
+      skull; a faint dark green aura clings close round his body.
+    poses:
+      idle: standing hunched, leaning on the skull staff, the free clawed hand raised with the fingers curled
+      attack: >-
+        leaning in and thrusting the skull staff forward to the right, its eye sockets glowing green, the free hand
+        clawing forward
+      hurt: knocked back, recoiling with the hood half thrown back and one arm up, the staff held upright
+      kneel: >-
+        dazed, collapsed down on one knee, slumped over the staff planted beside him, the head hanging
+    short: >-
+      evil dark sorcerer, a gaunt hunched elf-orc with sickly grey-green skin, a skull-like face, long pointed ears,
+      burning yellow-green eyes in the shadow of a ragged black hood, a tattered black robe with dark green trim, bony
+      clawed hands and a tall blackened staff topped with a horned skull
+    poses4:
+      idle: standing hunched, leaning on his staff, free claw raised
+      attack: thrusting the skull staff forward, free claw reaching out
+      hurt: knocked back, one arm up, the staff upright
+      kneel: kneeling on one knee, slumped over his planted staff, head hanging
+    negative: pointed hat, wizard hat, star pattern, white beard, long beard, crown, sword, bright spell effects, flames
+    variations:
+      - {n: 1, seed: 7401, strength: 0.72, model: sd35, guide: 4, text: 4, negative: "beard, brim, cat, animal, purple, violet", note: "the lord's route: SD 3.5 over the dark_wizard_v1 poses, the guide recoloured (beard and face to robe black and grey-green skin); good start: one green-skinned hooded sorcerer in idle / attack / hurt, but a pointed hat in idle, the staff head changes (knob, skull), the kneel holds a torch, small (the render's own 10 px grid, 50 native rows)"}
+      - {n: 2, seed: 7401, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, kneel: "kneeling on one knee, slumped over his planted skull-topped staff, head hanging", negative: "wizard hat, pointed hat, brim, torch, fire, flame, beard, cat, animal, purple, violet", note: "v1's seed: hood only, no torch, the skull staff named in the kneel; regrid for a 71 px cut; the render is v1's again (mean abs difference 1.0 of 255): with SD 3.5 image-to-image a fixed seed outweighs prompt edits, so the seed is the lever"}
+      - {n: 3, seed: 7403, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, kneel: "kneeling on one knee, slumped over his planted skull-topped staff, head hanging", negative: "wizard hat, pointed hat, brim, torch, fire, flame, beard, cat, animal, purple, violet", note: "v2's prompt on a new seed; a pointed hat in idle and attack (the old silhouette's hat) but a hood in hurt and kneel, the kneel without the staff, the green faces without clear eyes; cut with regrid at 71 px"}
+      - {n: 4, seed: 7404, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, add: "wearing a tall crooked pointed black hat with a ragged brim in all four quarters, two glowing yellow eyes under the brim", kneel: "kneeling on one knee, the hat still on, both hands gripping his planted skull-topped staff", negative: "hood, bare head, torch, lantern, fire, flame, beard, cat, animal, purple, violet", note: "keep the old hat silhouette in every pose instead of fighting it; eyes and the kneel's staff named; new seed; the hat now in idle, attack and kneel, the idle good; but the attack turns the face away, the hurt throws the hat into a flame-like shape with a yellow flash, the kneel holds two staffs"}
+      - {n: 5, seed: 7405, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, add: "wearing a tall crooked pointed black hat with a ragged brim in all four quarters, two glowing yellow eyes under the brim", kneel: "kneeling on one knee, the hat still on, both hands gripping his planted skull-topped staff", negative: "hood, bare head, torch, lantern, fire, flame, beard, cat, animal, purple, violet, second staff, two staffs, spell effects", note: "v4 on a new seed, no second staff or spell effects"}
+  crazy_horse:
+    retired: crazy_horse_v3
+    recolor: {light: [112, 62, 36], glow: [112, 62, 36], warm: [112, 62, 36]}
+    recolor_v4: {light: [104, 58, 34], glow: [104, 58, 34], warm: [104, 58, 34], bright: [104, 58, 34], flat: true}
+    size: large
+    body: quadruped
+    canvas: wide
+    subject: >-
+      a huge living war horse gone mad on a violent rampage, terrifying and dangerous: a heavily muscled dark bay
+      hide covered in old scars and fresh cuts, veins standing out, foam at the mouth, flared red nostrils, wild
+      rolling bloodshot eyes showing the whites, ears pinned flat back, bared teeth in an open screaming mouth, a long
+      wild tangled black mane and tail whipping, a broken leather bridle with a snapped rein trailing from the jaw,
+      heavy iron-shod hooves; a living flesh-and-blood animal, not undead.
+    poses:
+      idle: standing side-on, the head low and tossing, one forehoof pawing the ground, snorting
+      attack: >-
+        lunging forward to the right with the head thrust out to bite and the forelegs striking forward, lifted only
+        a little, the mouth wide open screaming
+      hurt: flinching back, the head thrown up and back, stumbling with the hind legs buckling
+      kneel: >-
+        dazed and exhausted, collapsed onto its knees with the forelegs folded under it, the head drooping low, the
+        sides heaving
+    negative: >-
+      skeleton, skull, bones, ribs showing, undead, zombie, smoke, glowing cracks, rider, saddle, horn, wings,
+      unicorn, pony, rearing straight up
+    short: >-
+      huge mad war horse on a rampage, a living animal with a muscular dark bay hide covered in scars and cuts, black
+      legs, a wild tangled black mane and tail, wild bloodshot eyes, flared nostrils, bared teeth, foam at the mouth,
+      a broken leather bridle with a snapped rein
+    short_wild: >-
+      huge mad wild stallion on a rampage, a living animal with a muscular dark bay hide covered in scars and cuts,
+      black legs, a wild tangled black mane and tail, wild bloodshot eyes, flared nostrils, bared teeth, foam at the
+      mouth, a broken leather bridle with a snapped rein
+    poses4:
+      idle: standing side-on, head low and tossing, one forehoof pawing
+      attack: lunging forward, head thrust out, mouth open screaming, forelegs striking
+      hurt: flinching back, head thrown up, hind legs buckling
+      kneel: collapsed on its knees, forelegs folded under it, head drooping
+    variations:
+      - {n: 1, seed: 7501, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, negative: "skull, bones, ribs, smoke, glowing cracks, rider, saddle, horn, cat, purple, violet", note: "the dark_wizard route: SD 3.5 over the crazy_horse_v3 poses with the guide recoloured to a bay hide (ash, bone and glow to brown), 16:9 2x2; one consistent bay horse in all four (cut 116/86/109/84 px, edges ok) but a plain riding horse: a saddle with saddlebags, a white blaze, calm face, green grass specks at the hooves; not mad or frightening"}
+      - {n: 2, seed: 7502, strength: 0.72, model: sd35, guide: 4, text: 4, regrid: 1.5, add: "in a killing frenzy, ears pinned flat, glaring red bloodshot eyes, foam flying from the open mouth, no saddle", negative: "saddle, saddlebags, saddle blanket, white blaze, calm, grass, ground, skull, bones, ribs, smoke, glowing cracks, rider, horn, cat, purple, violet", note: "the rage named, the saddle and grass negated; new seed; worse: an olive-grey horse, the saddle again (the old bone spine ridge reads as a saddle; negations do not move SD 3.5 here), a lance in the attack's raw, calm faces"}
+      - {n: 3, seed: 7501, strength: 0.8, model: sd35, guide: 4, text: 4, regrid: 1.5, add: "in a killing frenzy, ears pinned flat, glaring red bloodshot eyes, foam flying from the open mouth, no saddle", negative: "saddle, saddlebags, saddle blanket, white blaze, calm, grass, ground, skull, bones, ribs, smoke, glowing cracks, rider, horn, cat, purple, violet", note: "strength 0.8 so the bone spine ridge of the old silhouette (read as a saddle) can be redrawn; v1's seed; the saddle again (and rocks, a lance and a blade in the raw): the guide's bone ridge and rib texture keep coming back as tack"}
+      - {n: 4, seed: 7501, strength: 0.75, open_guide: true, recolor_key: recolor_v4, model: sd35, guide: 4, text: 4, regrid: 1.5, add: "in a killing frenzy, ears pinned flat, glaring red bloodshot eyes, foam flying from the open mouth, no saddle", negative: "saddle, saddlebags, saddle blanket, white blaze, calm, grass, ground, skull, bones, ribs, smoke, glowing cracks, rider, horn, cat, purple, violet", note: "guide without the old bone ridge and texture: a 3x3 opening drops the spine spikes, every bright pixel flat bay brown; the ridge is gone but the saddle stays, with a lance and debris in the raw: the words 'war horse' (and the seed) carry tack and weapons"}
+      - {n: 5, seed: 7505, strength: 0.75, model: sd35, guide: 4, text: 4, regrid: 1.5, open_guide: true, recolor_key: recolor_v4, short4: wild, add: "in a killing frenzy, ears pinned flat, glaring red bloodshot eyes, foam flying from the open mouth, a bare back", negative: "saddle, saddlebags, saddle blanket, lance, spear, weapon, rider, rocks, debris, white blaze, calm, grass, ground, skull, bones, ribs, smoke, glowing cracks, horn, cat, purple, violet", note: "'wild stallion' instead of 'war horse' (short4: wild), a bare back, a new seed"}
