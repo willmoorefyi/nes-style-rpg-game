@@ -109,3 +109,83 @@ def run_kneel_bridge(check: Callable[[bool, str], None]) -> None:
     check(not plain, f"bridge_frame passes the bridge's kneel_in1 ({plain})")
     check(bool(KC.bridge_frame("kneel_in1", key, idle, key, 0.35, 80, allowed)),
           "bridge_frame fails a frame at the key's size for u 0.35 (height / area off the lerp)")
+    run_kneel_cap(check)
+
+
+SHARK_KNEEL_CAP = 744      # EF-C2 (docs/ENEMY_FEEDBACK_PLAN.md): the measured grey slab of the shark's dazed key
+
+
+def run_kneel_cap(check: Callable[[bool, str], None]) -> None:
+    """EF-C2: a separate kneel paint cap. `kneel_paint` takes the rig's `kf_paint_cap.kneel` (checked against
+    KNEEL_PAINT_ALLOW, not KF_PAINT_ALLOW); the shark's idle cap and every other sprite's kneel cap stay 160."""
+    from gen import monster_anim as MA
+    from gen import monster_keys as MK
+
+    def refused(fn, *words) -> bool:
+        try:
+            fn()
+        except ValueError as e:
+            return all(w in str(e) for w in words)
+        return False
+    check(getattr(MK, "KNEEL_PAINT_ALLOW", None) == {"shark": SHARK_KNEEL_CAP} and MK.KF_PAINT_CAP == 160
+          and ("shark", "kneel") not in MK.KF_PAINT_ALLOW and ("shark", "idle") not in MK.KF_PAINT_ALLOW,
+          f"EF-C2: KNEEL_PAINT_ALLOW is exactly shark <= {SHARK_KNEEL_CAP} (not in KF_PAINT_ALLOW), the key cap 160")
+    cap = getattr(MK, "kneel_cap", lambda *a: None)
+    check(cap("shark", {"kf_paint_cap": {"kneel": SHARK_KNEEL_CAP}}) == SHARK_KNEEL_CAP and cap("shark", {}) == 160
+          and cap("goblin", {}) == 160, "EF-C2: kneel_cap reads kf_paint_cap.kneel (default 160)")
+    check(refused(lambda: cap("shark", {"kf_paint_cap": {"kneel": SHARK_KNEEL_CAP + 1}}), "shark", "kneel")
+          and refused(lambda: cap("goblin", {"kf_paint_cap": {"kneel": 200}}), "goblin", "kneel"),
+          "EF-C2: a kneel cap over the shark's allowance, or on another sprite, is refused")
+    entries = {e[0]: e for e in MA.load_entries(paint=False)}
+    _, _, sk = entries["shark"]
+    _, _, gk = entries["goblin"]
+    s_idle, g_idle = (np.asarray(k["idle"].convert("RGBA")) for k in (sk, gk))
+    s_pal, g_pal = sorted(MK.approved_palette(sk)), sorted(MK.approved_palette(gk))
+    s_px = [[int(x), int(y)] for y, x in zip(*np.nonzero(s_idle[..., 3] > 0))]
+    g_px = [[int(x), int(y)] for y, x in zip(*np.nonzero(g_idle[..., 3] > 0))]
+    shark_cfg = {"kf_paint_cap": {"kneel": SHARK_KNEEL_CAP}}
+    check(refused(lambda: MK.paint_keys("shark", {**shark_cfg, "paint": [{"frame": "idle", "xy": s_px[:161],
+                                                                           "rgb": list(s_pal[1])}]}, sk), "161 px", "160")
+          and refused(lambda: MK.paint_keys("shark", {"kf_paint_cap": {"idle": SHARK_KNEEL_CAP}}, sk),
+                      "not an approved exception"),
+          "EF-C2: the shark's idle key cap stays 160 with the kneel cap set (and idle is no exception)")
+    try:
+        ok_cfg = MK.paint_keys("shark", shark_cfg, sk)[1] == []
+    except ValueError as e:
+        ok_cfg = repr(e)
+    check(ok_cfg is True, f"EF-C2: paint_keys accepts the shark's kneel cap entry ({ok_cfg})")
+    try:
+        big = [{"xy": s_px[:SHARK_KNEEL_CAP], "rgb": None}]
+        n_ok = int((MK.kneel_paint("shark", big, s_idle.copy(), sk, SHARK_KNEEL_CAP)[..., 3] == 0).sum())
+    except (TypeError, ValueError) as e:
+        n_ok = repr(e)
+    check(n_ok == int((s_idle[..., 3] == 0).sum()) + SHARK_KNEEL_CAP,
+          f"EF-C2: a {SHARK_KNEEL_CAP} px shark kneel patch is allowed at its cap ({n_ok})")
+    over = [{"xy": s_px[:SHARK_KNEEL_CAP + 1], "rgb": None}]
+    check(refused(lambda: MK.kneel_paint("shark", over, s_idle.copy(), sk, SHARK_KNEEL_CAP), str(SHARK_KNEEL_CAP)),
+          "EF-C2: a shark kneel patch over its cap is refused")
+    g161 = [{"xy": g_px[:161], "rgb": list(g_pal[1])}]
+    check(refused(lambda: MK.kneel_paint("goblin", g161, g_idle.copy(), gk, cap("goblin", {})), "161 px", "160")
+          and refused(lambda: MK.kneel_paint("goblin", g161, g_idle.copy(), gk), "161 px", "160"),
+          "EF-C2: another sprite's kneel paint cap stays 160")
+    rig = MA.load_rig("shark")
+    kn = (rig.get("kneel") or {}).get("paint") or []
+    n = len({(int(x), int(y)) for p in kn for x, y in p["xy"]})
+    check(rig.get("kf_paint_cap") == {"kneel": SHARK_KNEEL_CAP} and n == SHARK_KNEEL_CAP,
+          f"EF-C2: the shark rig paints its kneel key with {n} px under kf_paint_cap.kneel {SHARK_KNEEL_CAP}")
+    _, smeta, skf = {e[0]: e for e in MA.load_entries()}["shark"]
+    gen = MA.generate("shark", rig, skf, smeta)
+    # the slab was two flat (107, 123, 140) pieces of 554 and 64 px; the shark's own shading pieces of that colour are
+    # at most 47 px, so no piece of 60 px or more may be left in the key or the frames drawn from it
+    from PIL import Image
+    from gen import pixelize as PX
+    raw_key = np.asarray(Image.open(MA.APPROVED / "shark" / "kneel.png").convert("RGBA"))
+    imgs = {"approved": raw_key, "kneel": np.asarray(skf["kneel"].convert("RGBA")),
+            **{f: gen[f]["img"] for f in ("kneel_in2", "kneel_b") if f in gen}}
+
+    def biggest(a: np.ndarray) -> int:
+        lab, n = PX.components((a[..., 3] > 0) & (a[..., :3] == (107, 123, 140)).all(2))
+        return max((int((lab == i).sum()) for i in range(1, n + 1)), default=0)
+    big = {f: biggest(a) for f, a in imgs.items()}
+    check(len(big) == 4 and big["approved"] >= 554 and max(big[f] for f in ("kneel", "kneel_in2", "kneel_b")) < 60,
+          f"EF-C2: no slab piece left in kneel, kneel_in2, kneel_b (largest slab-colour piece {big})")

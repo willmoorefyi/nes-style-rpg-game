@@ -146,7 +146,8 @@ def derive(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict) -> dict
     # the lowest lift standing on the feet row, else the lowest one above it (K-ground then reports it), else the last
     low, (img, labels, J, rots, lift) = next((t for t in tried if t[0] == bottom), None) or \
         next((t for t in tried if t[0] < bottom), tried[-1])
-    img = MK.kneel_paint(sid, b.get("paint"), glow_apply(b.get("glow"), "kneel", img, sid), kfs)   # K2-0b glow
+    img = MK.kneel_paint(sid, b.get("paint"), glow_apply(b.get("glow"), "kneel", img, sid), kfs,   # K2-0b glow
+                         MK.kneel_cap(sid, cfg))                                                # EF-C2
     return {"img": img, "labels": labels, "joints": J, "rots": rots, "lift": lift}
 
 

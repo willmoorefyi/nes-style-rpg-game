@@ -37,6 +37,10 @@ KF_PAINT_ALLOW = {("crocodile", "hurt"): 220, ("drowned_sovereign", "cast"): 300
                   ("chimera", "hurt"): 720}  # hurt raised 600 -> 720 (orchestrator, round 2: measured erase >= 689 px)
 # rev 15: drowned_sovereign/cast is a colour remap only: every patched pixel is opaque and stays opaque
 KF_REMAP_ONLY = {("drowned_sovereign", "cast")}
+# EF-C2 (docs/ENEMY_FEEDBACK_PLAN.md, user request 2026-11-24; overrides KT3's "no key fixes" for this key only): the
+# kneel key's own paint cap, `kf_paint_cap: {kneel: n}`, read by kneel_cap and checked here, never in KF_PAINT_ALLOW
+# (kneel_paint relabels its patches as `idle`, so the key caps stay 160): the shark's dazed key's grey slab (measured)
+KNEEL_PAINT_ALLOW = {"shark": 744}
 OUTLINE = (6, 4, 10)
 KEY_OFFSET_MAX = 12
 # FW-H: the sprites whose rig may build the hurt key from the idle (orchestrator ruling, V8 F4); a new entry needs approval
@@ -148,13 +152,20 @@ def paint_keys(sid: str, cfg: dict | None, kfs: dict[str, Image.Image]) -> tuple
     ValueError naming the rig: a cap not in KF_PAINT_ALLOW (or above it), more distinct px than the cap, a colour
     outside the approved palette, a pixel outside the cell, a missing key, and in a remap-only key a null colour or a
     transparent pixel."""
-    caps = (cfg or {}).get("kf_paint_cap") or {}
+    caps = {k: v for k, v in ((cfg or {}).get("kf_paint_cap") or {}).items() if k != "kneel"}
+    if "kneel" in ((cfg or {}).get("kf_paint_cap") or {}):
+        kneel_cap(sid, cfg)                               # EF-C2: the kneel cap is checked on its own path
     for k, v in caps.items():
         top = KF_PAINT_ALLOW.get((sid, k))
         if top is None or not isinstance(v, int) or v > top:
             raise ValueError(f"rig {sid}: kf_paint_cap {k}: {v} is not an approved exception "
                              f"(allowed: {', '.join(f'{s}/{f} <= {n}' for (s, f), n in sorted(KF_PAINT_ALLOW.items()))})")
-    patches = kf_patches(cfg)
+    return _paint_keys(sid, kf_patches(cfg), kfs, caps)
+
+
+def _paint_keys(sid: str, patches: list[dict], kfs: dict[str, Image.Image],
+                caps: dict) -> tuple[dict[str, Image.Image], list[str]]:
+    """paint_keys' painting with the caps already checked ({key: n}; KF_PAINT_CAP for a key without one)."""
     if not patches:
         return kfs, []
     pal = approved_palette(kfs)
@@ -188,13 +199,29 @@ def paint_keys(sid: str, cfg: dict | None, kfs: dict[str, Image.Image]) -> tuple
     return out, painted
 
 
-def kneel_paint(sid: str, patches: list | None, img: np.ndarray, kfs: dict[str, Image.Image]) -> np.ndarray:
-    """docs/KNEEL_PLAN.md D-K4: the derived `kneel` key's `kneel.paint` under the FW-P rules (KF_PAINT_CAP px, the
-    approved palette or null, inside the cell); it is locked as `kf:kneel` (meta kf_derived, monster_check)."""
+def kneel_cap(sid: str, cfg: dict | None) -> int:
+    """EF-C2: the kneel key's paint cap, the rig's `kf_paint_cap.kneel` (KF_PAINT_CAP when absent); a ValueError naming
+    the rig for a sprite not in KNEEL_PAINT_ALLOW or a cap above its allowance."""
+    v = ((cfg or {}).get("kf_paint_cap") or {}).get("kneel")
+    if v is None:
+        return KF_PAINT_CAP
+    top = KNEEL_PAINT_ALLOW.get(sid)
+    if top is None or not isinstance(v, int) or isinstance(v, bool) or v > top:
+        raise ValueError(f"rig {sid}: kf_paint_cap kneel: {v} is not an approved exception "
+                         f"(allowed: {', '.join(f'{s}/kneel <= {n}' for s, n in sorted(KNEEL_PAINT_ALLOW.items()))})")
+    return v
+
+
+def kneel_paint(sid: str, patches: list | None, img: np.ndarray, kfs: dict[str, Image.Image],
+                cap: int = KF_PAINT_CAP) -> np.ndarray:
+    """docs/KNEEL_PLAN.md D-K4: the kneel key's `kneel.paint` under the FW-P rules (`cap` px: KF_PAINT_CAP unless
+    kneel_cap allows more (EF-C2), the approved palette or null, inside the cell); a derived key is locked as
+    `kf:kneel` (meta kf_derived, monster_check). The patches are painted as an `idle` key with the cap passed straight
+    in, so neither KF_PAINT_ALLOW nor the idle key's own cap is involved."""
     if not patches:
         return img
     key = Image.fromarray(img, "RGBA")
-    out, _ = paint_keys(sid, {"paint": [{**p, "frame": "idle"} for p in patches]}, {**kfs, "idle": key})
+    out, _ = _paint_keys(sid, [{**p, "frame": "idle"} for p in patches], {**kfs, "idle": key}, {"idle": int(cap)})
     return np.asarray(out["idle"]).copy()
 
 

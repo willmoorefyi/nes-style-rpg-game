@@ -96,14 +96,15 @@ frames:                        # tweaks from /tmp/t3/pose.py: rigid rotations ab
     moves: []
     tweaks: {el_n: [2, -1], hand_n: [3, -2], tip: [3, -2]}
   hurt_in1:                    # recoil 3 back, lean back 13, head back 28, club arm lifts
-    moves: []
-    tweaks: {crown: [-25, 2], neck: [-11, -1], chest: [-9, 1], hip: [-1, 0], sh_n: [-10, -3], el_n: [-5, -5], hand_n: [0, -7], tip: [2, -13], sh_f: [-10, 6], el_f: [-4, 9], hand_f: [2, 7]}
+    moves: []                  # EF-C1: the whole club (painted tip) lifts a little less (tip [2, -13] -> [-2, -8]) and the
+    dx: -1                     # frame recoils 1 px further, so hurt_in1 -> hurt_in2 keeps its IoU (0.547 -> 0.5506 >= 0.55)
+    tweaks: {crown: [-25, 2], neck: [-11, -1], chest: [-9, 1], hip: [-1, 0], sh_n: [-10, -3], el_n: [-5, -5], hand_n: [0, -7], tip: [-2, -8], sh_f: [-10, 6], el_f: [-4, 9], hand_f: [2, 7]}
   hurt_in2:                    # 2 forward, lean in 13, head 13 forward (crown 1 px up since the crack-fill fix: IoU), thrown arm 27 down; club dropped behind the near leg (club_h)
     moves: []
     tweaks: {crown: [19, -12], neck: [9, -1], chest: [6, -1], hip: [1, 0], sh_n: [8, 1], el_n: [10, 8], hand_n: [12, 15]}
 masks:
   club:
-    idle: [[87, 86], [108, 84], [108, 112], [94, 112], [87, 100]]
+    idle: [[87, 86], [108, 84], [117, 84], [117, 110], [108, 112], [94, 112], [87, 100]]   # EF-C1: over the painted tip (x 107-114)
     attack: [[14, 24], [50, 24], [50, 40], [38, 44], [30, 50], [14, 50]]
   ft_n:
     idle: [[64, 114], [92, 114], [92, 123], [64, 123]]
@@ -115,7 +116,7 @@ masks:
     hurt: [[26, 116], [54, 116], [54, 123], [26, 123]]
 holds: []
 paint:                         # hurt_in1: the far arm / belly slit (open in idle) closed with the arm's dark brown
-  - {frame: hurt_in1, xy: [[36, 81], [36, 82], [36, 83], [37, 84], [38, 84], [37, 85], [36, 86], [37, 86], [37, 87], [38, 87], [37, 88], [38, 88], [37, 89]], rgb: [66, 41, 41]}
+  - {frame: hurt_in1, xy: [[35, 81], [35, 82], [35, 83], [36, 84], [37, 84], [36, 85], [35, 86], [36, 86], [36, 87], [37, 87], [36, 88], [37, 88], [36, 89]], rgb: [66, 41, 41]}   # EF-C1: x - 1 with the frame's dx
   # hurt_in2 (E9): the leaned torso staircases the back edge where the shoulder fold meets it (y 62-65) and above the
   # belt (y 79-81); the edge is evened out, the fold kept inside, the 1 px holes closed
   - {frame: hurt_in2, xy: [[34, 62], [35, 62], [34, 63], [35, 63], [35, 64], [36, 64], [35, 65], [36, 65]], rgb: [181, 123, 90]}
@@ -130,7 +131,7 @@ paint:                         # hurt_in1: the far arm / belly slit (open in idl
   - {frame: hurt_in2, xy: [[33, 61]], rgb: [6, 4, 10]}
   # zero-nit pass: 1 px background holes enclosed by outline ink (hurt_in1 at the club hand / hip, hurt_in2 by the
   # tusk / brow and in the armpit), closed with the outline
-  - {frame: hurt_in1, xy: [[77, 83], [79, 86]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[76, 83], [78, 86]], rgb: [6, 4, 10]}   # EF-C1: x - 1 with the frame's dx
   - {frame: hurt_in2, xy: [[58, 39], [71, 70]], rgb: [6, 4, 10]}
   # pass F daze_b: the 5 px pocket between the far forearm and thigh the 2 px slump closes off, outline ink
   - {frame: daze_b, xy: [[42, 90], [41, 91], [42, 91], [41, 92], [42, 92]], rgb: [6, 4, 10]}
@@ -138,6 +139,26 @@ paint:                         # hurt_in1: the far arm / belly slit (open in idl
   # and, in daze_b, the pinholes the slump leaves in the ink above the far thigh; outline ink
   - {frame: daze, xy: [[40, 81], [40, 82], [41, 90], [41, 91]], rgb: [6, 4, 10]}
   - {frame: daze_b, xy: [[40, 83], [40, 84], [41, 89], [37, 101], [38, 101], [36, 102], [35, 103]], rgb: [6, 4, 10]}
+  # EF-C1 (docs/ENEMY_FEEDBACK_PLAN.md): the idle club ended in a straight edge at x 106, cut at the raw's 528 px
+  # cell line (monster.py split "thirds"). Registration: monster.py's own cutter on the raw (cache/5c00115d...),
+  # the idle cell widened over the club piece that crosses the line (split "gaps") and pixelized with the
+  # thirds palette, reproduces columns 0-106 of the approved idle exactly (0 px differ) at the measured offset
+  # (+8, +9) native -> cell px; the 139 tip px right of x 106 (x 107-114, y 86-107, its outline closed) are
+  # taken from that re-cut, approved-palette colours only. FW-P idle paint, under the 160 px cap.
+  - {frame: idle, rgb: [6, 4, 10], xy: [[107, 86], [108, 87], [108, 88], [108, 89], [109, 90], [110, 91], [111, 91], [112, 91], [113, 91], [114, 91], [114, 92], [113, 93], [113, 94], [113, 95], [114, 96], [114, 97], [114, 98], [114, 99], [114, 100], [114, 101], [113, 102], [113, 103], [114, 104], [114, 105], [107, 106], [114, 106], [108, 107], [109, 107], [110, 107], [111, 107], [112, 107], [113, 107]]}
+  - {frame: idle, rgb: [132, 82, 66], xy: [[107, 90], [108, 90], [107, 91], [108, 91], [107, 92], [108, 92], [109, 92], [110, 92], [111, 92], [107, 93], [110, 95], [111, 95], [112, 95], [107, 96], [109, 96], [110, 96], [111, 96], [112, 96], [113, 96], [107, 97], [109, 97], [112, 97], [113, 97], [107, 98], [108, 98], [113, 98], [107, 99], [108, 99], [113, 100]]}
+  - {frame: idle, rgb: [99, 57, 57], xy: [[109, 91], [107, 100], [108, 100], [108, 101], [109, 101], [110, 101], [112, 101], [108, 102], [109, 102], [110, 102], [111, 102], [112, 102], [107, 103], [108, 103], [109, 103], [110, 103], [108, 105], [109, 105], [110, 105]]}
+  - {frame: idle, rgb: [66, 41, 41], xy: [[107, 101], [113, 101], [107, 102], [111, 103], [112, 103], [107, 104], [108, 104], [109, 104], [110, 104], [111, 104], [112, 104], [113, 104], [107, 105], [113, 105], [108, 106], [109, 106], [110, 106], [111, 106], [113, 106]]}
+  - {frame: idle, rgb: [148, 140, 140], xy: [[107, 87], [107, 88], [109, 93], [112, 93], [110, 99], [111, 99], [112, 99], [110, 100], [111, 100], [112, 100], [112, 105], [112, 106]]}
+  - {frame: idle, rgb: [198, 189, 181], xy: [[112, 92], [113, 92], [110, 93], [111, 93], [109, 94], [110, 94], [110, 98], [111, 98], [112, 98]]}
+  - {frame: idle, rgb: [156, 99, 74], xy: [[108, 93], [107, 94], [107, 95], [109, 95], [108, 96], [108, 97], [111, 97]]}
+  - {frame: idle, rgb: [132, 115, 148], xy: [[107, 89], [111, 94], [112, 94], [111, 101], [111, 105]]}
+  - {frame: idle, rgb: [148, 123, 115], xy: [[109, 98], [109, 99], [113, 99], [109, 100]]}
+  - {frame: idle, rgb: [181, 123, 90], xy: [[108, 94], [108, 95]]}
+  - {frame: idle, rgb: [115, 74, 24], xy: [[110, 97]]}
+  # EF-C1: the longer idle club (painted tip) is carried behind the near leg in hurt_in2 and its head poked out
+  # past the shin again; those px are erased, so hurt_in2 is byte-identical to before (only the handle shows)
+  - {frame: hurt_in2, xy: [[88, 103], [89, 103], [89, 104], [89, 105], [88, 106], [88, 107], [89, 107], [87, 108], [88, 108], [89, 108], [87, 109], [88, 109], [89, 109], [86, 110], [87, 110], [88, 110], [89, 110], [90, 110], [91, 110], [86, 111], [87, 111], [88, 111], [89, 111], [90, 111], [91, 111], [92, 111], [93, 111], [85, 112], [86, 112], [87, 112], [88, 112], [89, 112], [90, 112], [91, 112], [92, 112], [84, 113], [85, 113], [86, 113], [87, 113], [88, 113], [89, 113], [90, 113], [84, 114], [85, 114], [86, 114], [87, 114], [88, 114], [89, 114], [90, 114], [83, 115], [84, 115], [85, 115], [86, 115], [87, 115], [88, 115], [89, 115], [90, 115], [82, 116], [83, 116], [84, 116], [85, 116], [86, 116], [87, 116], [88, 116], [89, 116], [90, 116], [84, 117], [85, 117], [86, 117], [87, 117], [88, 117], [89, 117], [85, 118], [86, 118], [87, 118], [88, 118], [89, 118], [80, 123], [81, 123], [82, 123], [83, 123], [84, 123], [85, 123], [86, 123], [82, 124], [83, 124], [84, 124], [85, 124], [86, 124], [84, 125], [85, 125]], rgb: null}
 # pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
 # frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
 kneel:

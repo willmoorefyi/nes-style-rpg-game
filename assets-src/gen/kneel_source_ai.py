@@ -22,7 +22,8 @@ def ai_key(sid: str, cfg: dict, kfs: dict[str, Image.Image]) -> np.ndarray:
     if key.shape[:2] != (kfs["idle"].size[1], kfs["idle"].size[0]):
         raise ValueError(f"rig {sid}: AI kneel key {key.shape[1]}x{key.shape[0]} != the idle cell {kfs['idle'].size}")
     b = KN.block(cfg)
-    return MK.kneel_paint(sid, b.get("paint"), KB.offset(key, b.get("offset")), kfs)
+    return MK.kneel_paint(sid, b.get("paint"), KB.offset(key, b.get("offset")), kfs,
+                          MK.kneel_cap(sid, cfg))                 # EF-C2: kf_paint_cap.kneel (KNEEL_PAINT_ALLOW)
 
 
 HERO_KEYS = ("source", "bridge", "offset")
