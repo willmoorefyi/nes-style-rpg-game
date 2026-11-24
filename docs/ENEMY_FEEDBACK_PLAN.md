@@ -366,19 +366,50 @@ a synthetic figure and on the recorded recipes (sha256 match), the yaml schema, 
 key reproducible from `monster_hr.yaml`, the approve json shape. Full `selftest.py` passes in the main checkout. Work on
 branch `ef-br` (main checkout; the Bedrock gate).
 
-### EF-G amendment A (2026-11-24): dark_wizard re-pose with large moves (user-approved trial)
+### EF-G amendment A (rev 2, 2026-11-24): dark_wizard re-pose with large moves (user-approved trial; Momus rev-1: 10 findings)
 
 EF4's repaints held identity and rendered cleanly, but the G2 poses moved too little (attack and hurt read as leans).
-Trial on **dark_wizard only**:
-- **A1 Re-pose (no AI).** New poses on the EF4 `idle_master` with `monster_hr_puppet.py` (code changes, if any, stay in
-  the puppet / warp modules, each < 250 lines, with a selftest case): **attack** staff swung forward to near horizontal
-  (>= 50 deg from its idle angle), staff arm fully extended, torso and hood lunging forward >= 15 deg, robe hem trailing;
-  **hurt** torso and head thrown back >= 20 deg, staff tilting away, free arm flung up; **kneel** robe collapsed (height
-  <= 70 % of idle), one knee down, head hanging over the planted staff. Gate: G2's checks, plus the silhouette IoU with
-  the idle <= 0.70 (attack, hurt) / <= 0.65 (kneel), plus one image-only reviewer ("does each pose read clearly at
-  128 px?"), <= 3 iterations.
-- **A2 User gate.** The posed inputs (`~/temp/ff-game/ef/bedrock5/dark_wizard/posed/`) are shown to the user; **no
-  Bedrock call until the user approves them**.
-- **A3 Repaint.** As G3 (SD 3.5 Large image-to-image, strengths 0.30 / 0.38 / 0.45, <= 5 calls per pose; the EF4 idle
-  repaint is reused). Budget: new pass `pass EF5` (cap 15, `ef5_pose` 15, reserve 0), recorded in `monster_hr.yaml`
-  variations with the pass tag; closed after. Then G4 (cut, review, hold for approval).
+Trial on **dark_wizard only**, as pass **EF5**.
+
+**A0. Tool changes (named; each module stays < 250 lines; RED-first cases in `selftest_monster_hr.py`).**
+- `monster_hr_br.py`: pass and purpose come from each variation row's `pass` tag (`EF4` -> `ef4_pose`, `EF5` ->
+  `ef5_pose`; a row without a tag is EF4), not from the module constants (`:30`); the 5-row cap (`:53`) and the
+  selftest's row cap (`selftest_monster_hr.py:63`) count **per pass per pose** (the user's "up to 5 variations" applies
+  to this trial's images; EF4 rows untouched); EF5 rows may carry a `prompt_pose` override (used instead of
+  `poses[pose]`, so EF4's keys stay byte-identical); `approve()` writes each `sources[]` entry's own `pass` /
+  `purpose` / `arm` (the EF4 idle with EF5 poses); the review directory is per pass (`bedrock4/` for EF4,
+  `bedrock5/` for EF5), so EF4's held sheets are never overwritten.
+- `monster_hr_puppet.py`: the review/output directory is per pass (`--pass EF5` -> `bedrock5/<id>/posed/`); EF4's G2
+  files are left alone.
+- `monster_hr_check.py`: per-pose IoU bars (attack, hurt <= 0.70; kneel <= 0.65 for EF5; EF4's 0.80 kept for EF4
+  rows) and three new measures reported: the staff's **world angle** from vertical and the chest's world angle
+  (composed through `worlds()`, `monster_hr_puppet.py:69-77`; + = forward / toward the right, as EF4's attack chest
+  +10 and hurt -12), and the **body height** = the alpha bbox height of the figure **without props** (the staff mask
+  excluded).
+- `selftest_monster_hr.py`: `_check_recorded` per pass (EF4 rows against `pass EF4` ledger rows, EF5 against EF5);
+  `_check_yaml` accepts the per-row pass tags (top-level `pass` stays EF4 as the default); `_check_budget` checks the
+  closed EF4 and the EF5 block.
+**Supersede, never overwrite (EF4 reproducible):** EF4's dark_wizard recipes become `attack_ef4`, `hurt_ef4`,
+`kneel_ef4` with their recorded sha256s; EF4's five pose rows get `input: <pose>_ef4` (the mechanism vampire_lord's
+`attack_r2` / `hurt_r2` already use). The new recipes take the plain names.
+
+**A1. Re-pose (no AI)** on the EF4 `idle_master`. Targets (measured by A0's checks, + = forward):
+- **attack:** staff world angle >= +50 deg from its idle angle (near horizontal toward the right); chest >= +15 deg;
+  IoU with idle <= 0.70.
+- **hurt:** chest <= -20 deg (thrown back), staff tilted away (world angle <= its idle angle - 15 deg); IoU <= 0.70;
+  `prompt_pose`: "knocked backward, recoiling, head thrown back, the staff tilting away, the free claw flung up".
+- **kneel:** body height (props excluded) <= 70 % of the idle's, hem on row 960 +- 4, the head hanging toward the
+  planted staff; IoU <= 0.65.
+- Reviewer-only (the rig has no forearm, leg or free-arm joints): "arm fully extended", "free arm flung up", "one
+  knee down", "hem trailing".
+- Gate: G2's checks + the above + one image-only reviewer ("does each pose read clearly at 128 px?"), <= 3
+  iterations; on failure a debrief at `~/temp/ff-game/ef/bedrock5/dark_wizard/DEBRIEF.md` and no EF5 spend.
+
+**A2. User gate.** The posed inputs (`~/temp/ff-game/ef/bedrock5/dark_wizard/posed/`) are shown to the user; **no
+Bedrock call until the user approves them.**
+
+**A3. Repaint.** As G3 (SD 3.5 Large image-to-image, strengths 0.30 / 0.38 / 0.45 then <= 2 more, **<= 5 EF5 calls
+per pose**; the EF4 idle repaint is reused). Budget: `pass EF5` becomes the single live `budget["bedrock"]` block
+(cap 15, `per_purpose_caps` `{ef5_pose: 15, reserve: 0}`, `gemini_before` = the current count, `reserve_max_usd`,
+`note`, as EF4's entry), closed into `bedrock_history` with `used` / `closed` at the end. Then G4 (cut into
+`bedrock5/`, review, hold for approval).
