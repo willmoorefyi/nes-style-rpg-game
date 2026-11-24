@@ -17,6 +17,7 @@ from gen import anim_efix as E
 from gen import anim_feet as AF
 from gen import kneel_checks as KC
 from gen import monster_anim as MA
+from gen import monster_orbit as MO
 from gen.monster_recipes import KNEEL_FRAMES
 
 
@@ -69,6 +70,8 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     T = gen[f["toward"]]["img"] if f["toward"] in gen else arrs[f["toward"]]
     cell_h = a.shape[0]
     a0 = AF.unshift(a, f.get("shift"))                    # rooted translate: holes and feet judged as if unmoved
+    if f.get("orbit"):                                    # EF-D: the idle with its orbs moved (monster_orbit)
+        return MO.frame_checks(name, f, S, allowed)
     if f.get("bridge"):                                   # pass KT D-KT4: a bridge frame lies between two drawings
         return KC.bridge_frame(name, a, S, T, f["u"], cell_h, allowed)
     out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, S) + \
@@ -131,6 +134,7 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
                 fails += [f"{a}->{b}: {e}" for e in C.continuity(imgs[MA.resolve(a, imgs)], imgs[MA.resolve(b, imgs)],
                                                                     span, cell_h, KC.continuity_share(seq, a, b, gen))]
         rep[f"sequence:{seq}"] = fails
+    rep.update(MO.sequence_checks(gen, cfg))              # EF-D: the orbit's steps (orb pixels exempt)
     rep["holds"] = C.holds_cap([h["frame"] for h in cfg.get("holds") or []])
     if with_lock:
         lp = MA.lock_path(sprite)

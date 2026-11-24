@@ -25,8 +25,8 @@ RIGS = HERE / "anim" / "monsters"
 if str(HERE.parent) not in sys.path:                      # run as a script: make the `gen` package importable
     sys.path.insert(0, str(HERE.parent))
 from gen.monster_recipes import (ARM, BOSS_FRAMES, FALLBACK, FRAME_SOURCE, HEAD, IDLE_B, KEYFRAMES,  # noqa: E402,F401
-                                 MONSTER_FRAMES, NEEDS, RAISE_FRAMES, RECIPES, SEQUENCES, SPAN, frames_for,
-                                 generated_names, head_joints, held, resolve, span_of)
+                                 MONSTER_FRAMES, NEEDS, ORBIT_MAX, RAISE_FRAMES, RECIPES, SEQUENCES, SPAN, frames_for,
+                                 generated_names, head_joints, held, orbit_names, resolve, span_of)
 
 
 def recipe_u(name: str, rig_cfg: dict | None = None) -> float:
@@ -315,7 +315,26 @@ def generate(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta: di
                      **({"rot_cap": rig.rot_cap} if rig.rot_cap else {}),          # FW-5 mechanical preset
                      **({"shift": shift} if rig.translate else {}),                # rooted whole-figure translate
                      **MR.check_info(rig, r["src"], carried)}
+    out.update(orbit_frames(sprite, cfg, rig, arrs["idle"], out.get("idle_b")))   # EF-D
     return {**out, **KN.bridge_frames(sprite, cfg, keyframes, meta, floating)}   # pass KT: the AI kneel bridge
+
+
+def orbit_frames(sprite: str, cfg: dict, rig, idle: np.ndarray, idle_b: dict | None) -> dict[str, dict]:
+    """EF-D (monster_orbit): a rig's `orbit` orbs circling in idle_o<k> / idle_b_o<k>; {} without the option."""
+    from gen import monster_orbit as MO
+    from gen import rig as R
+    if not cfg.get("orbit"):
+        return {}
+    parts = set(cfg["orbit"].get("behind") or [])
+    unknown = parts - set(rig.parts)
+    if unknown:
+        raise ValueError(f"rig {sprite}: orbit behind names unknown parts {sorted(unknown)}")
+
+    def behind_of(base: np.ndarray) -> np.ndarray:
+        lab, names = R.segment(rig, "idle", base)
+        return np.isin(lab, [names.index(p) for p in parts]) & (base[..., 3] > 0)
+    return MO.frames(sprite, cfg, rig, idle, idle_b["img"] if idle_b else None, int(idle_b["dy"]) if idle_b else 0,
+                     behind_of)
 
 
 def monster_frames(sprite: str, keyframes: dict[str, Image.Image] | None = None, meta: dict | None = None) -> dict[str, Image.Image]:

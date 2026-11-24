@@ -125,7 +125,8 @@ export class AiEnemyView {
     return this.enemies.map((e, i) => {
       const f = this.frames[i];
       this.poses.configure(i, { hasCast: f?.hasCast ?? false, hasRaise: f?.hasRaise ?? false, scaleFactor: boxes[i].scaleFactor,
-        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[layoutSizeOfArt(e.size, f)], ...(f ? { lungePx: f.lungePx } : {}) });
+        heavy: e.attackAnim === 'heavy', hopPx: TRAVEL_HOP[layoutSizeOfArt(e.size, f)], orbit: f?.idleOrbit ?? 0,
+        ...(f ? { lungePx: f.lungePx } : {}) });
       return this.buildOne(e, f, boxes[i]);
     });
   }

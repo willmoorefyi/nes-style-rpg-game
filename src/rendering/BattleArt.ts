@@ -29,10 +29,8 @@ export interface MonsterAtlasMeta {
   sheets: Record<string, MonsterAnchors & {
     /** Index into `pages` (0 when missing). */
     page?: number;
-    /** The sheet's own screen px per art px (FW-S: 3 for the rescaled sheets; EF-A: 2.5 too); missing: the atlas `scale`. */
-    scale?: number;
-    /** EF-A4: a hi-res sheet's PNG px per art px (its page is `filter: linear`); missing: the atlas `texScale`. */
-    texScale?: number;
+    scale?: number;      // the sheet's screen px per art px (FW-S: 3 for the rescaled sheets; EF-A: 2.5); missing: atlas `scale`
+    texScale?: number;   // EF-A4: a hi-res sheet's PNG px per art px (a `filter: linear` page); missing: atlas `texScale`
     cell: [number, number];
     footRow: number;
     floating: boolean;
@@ -49,6 +47,7 @@ export interface MonsterAtlasMeta {
     tip?: [number, number];
     /** D-K9: a floater's kneel drop in native px (floating / swimmer sheets only). */
     kneelSink?: number;
+    idleOrbit?: number;                 // EF-D: orbit steps (idle_o<k> / idle_b_o<k>, monster_orbit.py); missing: none
   }>;
 }
 
@@ -84,6 +83,7 @@ export interface MonsterFrames extends MonsterAnchors {
   tip?: [number, number];
   /** D-K9: the kneel drop in art px (a floater sinks as it kneels), when the atlas has it. */
   kneelSink?: number;
+  idleOrbit?: number;                   // EF-D: the idle's orbit steps, when the atlas has them (poses' `orbit`)
 }
 
 /** Art id for an enemy: its `sprite` (palette-swap variants share code but not art), without a file extension. */
@@ -194,7 +194,7 @@ export class BattleArt {
       opaqueRight: entry.opaqueRight ?? (measured ? measured[2] + 1 : w),
       ...(entry.head ? { head: entry.head } : {}), ...(entry.tip ? { tip: entry.tip } : {}), ...anchors,
       ...(typeof entry.kneelSink === 'number' && entry.kneelSink > 0 ? { kneelSink: entry.kneelSink } : {}),
-      ...(idleBox ? { idleBox } : {}) };
+      ...(idleBox ? { idleBox } : {}), ...(entry.idleOrbit && entry.idleOrbit > 0 ? { idleOrbit: entry.idleOrbit } : {}) };
   }
 
   /** The idle frame's opaque box (art px, inclusive), read once from the atlas image; null outside a browser. */

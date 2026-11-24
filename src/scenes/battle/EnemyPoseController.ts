@@ -207,7 +207,7 @@ export class EnemyPoseController {
       case 'cast': return risen({ ...castAt(s.t, s.hasCast), k: 0 });
       case 'hurt': return { ...hurtAt(s.t), k: 0 };
       case 'dying': { const d = dyingAt(s.t, s.from, s.start); return { ...d, frame: s.dyingFrame ?? d.frame, k: 0 }; }
-      default: return { frame: s.track.frame(this.clock) ?? idleFrame(this.clock, this.states.indexOf(s), s.breath, s.posture),
+      default: return { frame: s.track.frame(this.clock) ?? idleFrame(this.clock, this.states.indexOf(s), s.breath, s.posture, s.orbit),
         dx: 0, dy: 0, k: 0 };
     }
   }

@@ -10,10 +10,24 @@ import { riseEnd, riseTime, type KneelFrame } from './kneelChoreography.js';
 export type MonsterKeyframe = 'idle' | 'attack' | 'hurt' | 'cast' | 'attack_raise';
 export type MonsterFrame = MonsterKeyframe | 'idle_b' | 'atk_wind1' | 'atk_wind2' | 'atk_mid' | 'atk_follow'
   | 'atk_recover' | 'hurt_in1' | 'hurt_in2' | 'cast_gather' | 'cast_rise' | 'cast_release'
-  | 'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2' | KneelFrame;
+  | 'daze' | 'daze_b' | 'atk_raise_in' | 'atk_raise_b' | 'atk_swing' | 'atk_swing2' | KneelFrame | OrbitFrame;
+
+/** EF-D (docs/ENEMY_FEEDBACK_PLAN.md): an orbit sheet (atlas `idleOrbit: N`, N <= ORBIT_MAX; chaos's element orbs)
+ *  has `idle_o<k>` / `idle_b_o<k>`, the idle / idle_b with its orbs at step k; any other sheet resolves them to idle /
+ *  idle_b. Built by assets-src/gen/monster_orbit.py. */
+export const ORBIT_MAX = 16;
+type OrbitStep = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+export type OrbitFrame = `idle_o${OrbitStep}` | `idle_b_o${OrbitStep}`;
+const STEPS = Array.from({ length: ORBIT_MAX }, (_, k) => k as OrbitStep);
+export const ORBIT_FRAMES: readonly OrbitFrame[] = [...STEPS.map((k) => `idle_o${k}` as const),
+  ...STEPS.map((k) => `idle_b_o${k}` as const)];
+/** The orbit advances one step every 6 frames (a 16-step turn is 96 frames). */
+export const ORBIT_STEP_FRAMES = 6;
+export const isOrbitFrame = (f: string): f is OrbitFrame => (ORBIT_FRAMES as readonly string[]).includes(f);
 
 export const MONSTER_FRAMES: readonly MonsterFrame[] = ['idle', 'idle_b', 'atk_wind1', 'atk_wind2', 'atk_mid', 'attack',
-  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt', 'daze', 'daze_b', 'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b'];
+  'atk_follow', 'atk_recover', 'hurt_in1', 'hurt_in2', 'hurt', 'daze', 'daze_b', 'kneel_in1', 'kneel_in2', 'kneel', 'kneel_b',
+  ...ORBIT_FRAMES];
 export const BOSS_FRAMES: readonly MonsterFrame[] = [...MONSTER_FRAMES, 'cast_gather', 'cast_rise', 'cast', 'cast_release',
   'attack_raise', 'atk_raise_in', 'atk_raise_b', 'atk_swing', 'atk_swing2'];
 /** Frames a sheet may lack (the heavy raise without an `attack_raise` key; the pass K kneel until K4, docs/KNEEL_PLAN.md
@@ -27,7 +41,7 @@ export const FRAME_SOURCE: Record<MonsterFrame, MonsterKeyframe> = {
   atk_mid: 'attack', atk_follow: 'attack', atk_recover: 'idle', hurt_in1: 'idle', hurt_in2: 'hurt', cast_gather: 'idle',
   cast_rise: 'cast', cast_release: 'cast', daze: 'idle', daze_b: 'idle', attack_raise: 'idle', atk_raise_in: 'idle',
   atk_raise_b: 'idle', atk_swing: 'attack', atk_swing2: 'attack', kneel_in1: 'idle', kneel_in2: 'idle', kneel: 'idle',
-  kneel_b: 'idle',
+  kneel_b: 'idle', ...(Object.fromEntries(ORBIT_FRAMES.map((f) => [f, 'idle'])) as Record<OrbitFrame, MonsterKeyframe>),
 };
 
 /** What an atlas without a frame shows instead, resolved step by step until a key exists (a keyframe maps to itself,
@@ -37,6 +51,8 @@ export const FRAME_FALLBACK: Record<MonsterFrame, MonsterFrame> = {
   attack_raise: 'atk_wind2', atk_raise_b: 'atk_wind2', atk_swing: 'atk_mid', atk_swing2: 'atk_mid',
   // D-K7: an unopted sheet shows today's daze look on the kneel timing
   kneel: 'daze', kneel_b: 'daze_b', kneel_in2: 'daze', kneel_in1: 'idle',
+  // EF-D: a sheet without an orbit shows its plain breath
+  ...(Object.fromEntries(STEPS.map((k) => [`idle_b_o${k}`, 'idle_b'])) as Record<`idle_b_o${OrbitStep}`, MonsterFrame>),
 };
 
 /** The first frame along the fallback chain from `name` that `has` an atlas key; null when none does. */
@@ -175,10 +191,15 @@ export const trembleDx = (clock: number): number => TREMBLE_STEPS[Math.floor(clo
 export type Posture = StatusPosture;
 
 /** The standing idle frame: stone and still enemies (and sheets without breathing) hold idle; the rest breathe (idle /
- *  idle_b every half period, out of phase per enemy). A kneeler shows its KneelTrack frame instead. */
-export function idleFrame(clock: number, index: number, breath: boolean, posture: Posture = 'none'): MonsterFrame {
-  if (posture === 'stone' || posture === 'still' || !breath) return 'idle';
-  return Math.floor((clock + index * 17) / (IDLE_PERIOD / 2)) % 2 === 0 ? 'idle' : 'idle_b';
+ *  idle_b every half period, out of phase per enemy). A kneeler shows its KneelTrack frame instead. EF-D: an orbit
+ *  sheet (`orbit` N > 0 steps) shows that frame's `_o<k>`, k one step every ORBIT_STEP_FRAMES (the breath unchanged);
+ *  stone and still hold the plain idle (the key's orbs). */
+export function idleFrame(clock: number, index: number, breath: boolean, posture: Posture = 'none', orbit = 0): MonsterFrame {
+  if (posture === 'stone' || posture === 'still') return 'idle';
+  const base = !breath || Math.floor((clock + index * 17) / (IDLE_PERIOD / 2)) % 2 === 0 ? 'idle' : 'idle_b';
+  const n = Math.min(Math.floor(orbit), ORBIT_MAX);
+  if (n <= 0) return base;
+  return `${base}_o${(Math.floor(clock / ORBIT_STEP_FRAMES) % n) as OrbitStep}`;
 }
 
 /** D2: the per-sheet lunge from the atlas; 24 px for an old atlas without it. */

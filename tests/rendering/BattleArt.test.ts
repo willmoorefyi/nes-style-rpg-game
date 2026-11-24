@@ -77,6 +77,23 @@ describe('BattleArt monster frames', () => {
     expect(f.anim).toBe(false);
   });
 
+  it('EF-D: an orbit sheet (idleOrbit) slices its idle_o<k> / idle_b_o<k> rects; without one they show idle / idle_b', async () => {
+    const orbit = { ...aiMonsters.sheets.goblin, idleOrbit: 2, frames: { ...aiMonsters.sheets.goblin.frames,
+      idle_b: [0, 80], idle_o0: [80, 80], idle_o1: [160, 80], idle_b_o0: [240, 80], idle_b_o1: [320, 80] } };
+    atlasJson = () => respond(JSON.stringify({ ...aiMonsters, sheets: { ...aiMonsters.sheets, orb: orbit } }));
+    const art = new BattleArt();
+    await art.load();
+    const f = art.getMonsterFrames('orb')!;
+    expect(f.idleOrbit).toBe(2);
+    expect([f.textures.idle_o0, f.textures.idle_o1, f.textures.idle_b_o0, f.textures.idle_b_o1].map((t) => t.frame.x))
+      .toEqual([160, 320, 480, 640]);
+    expect(f.textures.idle_o5).toBe(f.idle);                       // past N: the plain idle
+    const plain = art.getMonsterFrames('goblin')!;
+    expect(plain.idleOrbit).toBeUndefined();
+    expect(plain.textures.idle_o3).toBe(plain.idle);
+    expect(plain.textures.idle_b_o3).toBe(plain.textures.idle_b);
+  });
+
   it('a native atlas (texScale 1) is sliced in art px and scaled at runtime (artScale = scale / texScale)', async () => {
     const native = {
       scale: 2, texScale: 1,

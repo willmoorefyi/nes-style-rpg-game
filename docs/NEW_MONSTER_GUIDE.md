@@ -271,6 +271,7 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `alias: [hurt]` or `[attack]` | FW-Q partial rig: that sequence's in-betweens are not generated and resolve to their source keys (as keyframe-only); daze and the rest stay generated; `check` prints `OK (aliased: <seq>; ...)`; only `FWQ_ALLOW` sheets (`monster_anim.py`, pinned in `selftest_efix.py`), one per rig |
 | `raise: false` | FW-R: drop the approved `attack_raise` key (cell kept): no raise frames, `hasRaise: false`, the heavy glint `tip` from `atk_wind2` (hollow_seraph, D-F1) |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
+| `orbit: {steps, centre, rx, ry, behind, parts}` | EF-D (`monster_orbit.py`, chaos only): small round parts (`parts.<orb>: {at, r, a0, colors?}` in the idle key) are cut out of idle / idle_b (cut px next to the figure sealed with outline) and orbit an ellipse in `idle_o<k>` / `idle_b_o<k>` (k < steps, 8-16), behind the `behind` parts on the far (upper) half; whole px, own pixels. Atlas `idleOrbit: N`; the runtime steps k every 6 frames. Checks: alpha, palette, clipping, pieces, body unchanged outside the orb masks, each orb >= 25 % visible, `sequence:orbit` step cap. Review: `<id>_orbit.png`, `_orbit.gif`, `_orbit_head.gif` |
 
 - **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`,
   hollow_seraph `halo`); a new `kind: fx` needs approval and an allowlist edit.

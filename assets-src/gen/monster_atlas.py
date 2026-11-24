@@ -34,6 +34,7 @@ from gen import monster_anim as MA
 from gen import monster_hires as MH
 from gen import monster_hires_pages as MHP
 from gen import monster_pages as MP
+from gen.monster_recipes import orbit_of   # EF-D (selftest_orbit reads it here)
 
 SCALE = 2
 TEX_SCALE = 1
@@ -41,7 +42,8 @@ SEQUENCE_VERSION = 1
 TRAVEL_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover", "atk_raise_in",
                  "attack_raise", "atk_raise_b", "atk_swing", "atk_swing2", "idle", "hurt_in1", "hurt_in2", "hurt")
 LUNGE_FRAMES = TRAVEL_FRAMES[:11]
-HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b")
+HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b",
+               *MA.orbit_names(MA.ORBIT_MAX))     # EF-D: the orbit frames a sheet has (monster_orbit, idleOrbit)
 RANGED_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover")
 ENEMIES = MA.HERE.parent.parent / "assets" / "data" / "enemies.yaml"
 SCALE_TABLE = MA.HERE / "monster_scale.yaml"
@@ -139,7 +141,8 @@ def sheet_meta(meta: dict, frames: dict[str, Image.Image], names: list[str], fr:
     return {"cell": [cw, ch], "footRow": meta["bottom_row"], "floating": meta.get("floating", False),
             "frames": fr, "anim": anim, "holds": holds, "lungePx": lunge, "hasRaise": "attack_raise" in frames,
             **anchors(frames["idle"]), **(tip(frames[tip_key]) if tip_key else {}),
-            **travel_anchors(frames, names, ranged), "sequence_version": SEQUENCE_VERSION, "page": page}
+            **travel_anchors(frames, names, ranged), "sequence_version": SEQUENCE_VERSION, "page": page,
+            **({"idleOrbit": orbit_of(frames)} if orbit_of(frames) else {})}
 
 
 def build(out: Path, scale_table: Path | None = None) -> dict:
@@ -171,7 +174,8 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
     hi = {s: e["tex"] for s, e in scales.items() if e["tex"] != 1}
     groups = MP.group_order(sorted(sprites), {s for s, v in sprites.items() if v[0].get("size") == "titan"})
     order = [sid for _, ids in groups for sid in ids]
-    names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1]) for s in order}
+    names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1], orbit_of(sprites[s][1]))
+                for s in order}
     items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}
     tex = {sid: MH.hires_sheet(sid, {n: sprites[sid][1][n] for n in items[sid]}, hi[sid]) for sid in hi}
     img = (lambda sid, n: tex[sid][n] if sid in tex else sprites[sid][1][n])

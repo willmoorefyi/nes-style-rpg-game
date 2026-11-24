@@ -257,7 +257,8 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
     check(r["homeX"] == [2, 28] and r["travelTop"] == 3, f"FW-A: a ranged sheet's homeX includes its attack frames {r}")
     check(MAT.ranged_sheets() == {"dragon"}, f"FW-A: the ranged sheets are the dragon's ({sorted(MAT.ranged_sheets())})")
     check(MAT.LUNGE_FRAMES == MAT.TRAVEL_FRAMES[:11] and len(MAT.TRAVEL_FRAMES) == 15 and MAT.HOME_FRAMES ==
-          ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b"), "FW-A: the plan's frame lists")
+          ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b", *MA.orbit_names(MA.ORBIT_MAX)),
+          "FW-A: the plan's frame lists (EF-D: + the orbit frames a sheet has)")
 
     meta = json.loads(ATLAS_JSON.read_text())
     sheets = meta["sheets"]
