@@ -6,7 +6,9 @@
  * - a layer is {name, kind, blend?: normal | add, alpha?, frames: {base, crack?, open?, ...}} (variants are frames);
  * - a frame is {at, size, texScale?, tiles: [{file, x, y, w, h}], pivot?}: tiles in texture px, relative to the frame,
  *   covering ceil(size / texScale) exactly; the glow is stored at half res (texScale 2);
- * - no `image`, `variants` or canvas-relative tile key.
+ * - no `image`, `variants` or canvas-relative tile key;
+ * - EF-E: `rings` {id: {centre, axes, tilt, dir}} and `orbits` {orb layer: {ring, phase0, periodMs}}; the orb, orb_glow
+ *   (additive) and ring_back layer kinds.
  */
 import { describe, it, expect } from 'vitest';
 import { formProblems, readColossusIndex, textureSize, type ColossusFormSpec } from '../../../src/scenes/battle/colossus/colossusIndex.js';
@@ -25,7 +27,7 @@ describe('colossus.json contract (18.5)', () => {
 
   it('the form keys are exactly the reader\'s; targetRect is [x, y, w, h] inside the canvas', () => {
     const f = form();
-    const allowed = ['canvas', 'scale', 'place', 'anchors', 'targetRect', 'coverBox', 'visibleBox', 'skyDim', 'layers'];
+    const allowed = ['canvas', 'scale', 'place', 'anchors', 'targetRect', 'coverBox', 'visibleBox', 'skyDim', 'rings', 'orbits', 'layers'];
     expect(Object.keys(f).filter((k) => !allowed.includes(k))).toEqual([]);
     expect(f).toMatchObject({ canvas: [2700, 1080], scale: 1, place: [-527, -60], skyDim: 0.6, targetRect: [1170, 345, 360, 495] });
     const [x, y, w, h] = f.targetRect;
@@ -40,7 +42,7 @@ describe('colossus.json contract (18.5)', () => {
         expect(Object.keys(fr).filter((k) => !['at', 'size', 'texScale', 'tiles', 'pivot'].includes(k)), l.name).toEqual([]);
       }
     }
-    expect(form().layers.map((l) => l.name)).toEqual(['glow', 'body', 'core', 'corona']);
+    expect(form().layers.map((l) => l.name)).toEqual(['glow', 'body', 'core', 'corona', 'ring_back', 'orb_a', 'orb_a_glow']);
     expect(Object.keys(form().layers.find((l) => l.name === 'core')!.frames)).toEqual(['base', 'crack', 'open']);
   });
 
@@ -51,6 +53,18 @@ describe('colossus.json contract (18.5)', () => {
     expect(glow.frames.base.tiles.map((t) => [t.x, t.y, t.w, t.h])).toEqual([[0, 0, 1350, 540]]);
     expect(form().layers.find((l) => l.name === 'corona')).toMatchObject({ blend: 'add', alpha: 1 });
     expect(form().layers.find((l) => l.name === 'body')!.blend).toBeUndefined();
+  });
+
+  it('EF-E: the orbit layers, their rings and orbits (orb_glow additive at half res, orb and ring_back normal)', () => {
+    const f = form();
+    expect(f.rings).toEqual({ R: { centre: [1350, 600], axes: [900, 200], tilt: 0.1, dir: -1 } });
+    expect(f.orbits).toEqual({ orb_a: { ring: 'R', phase0: 0.5, periodMs: 8000 } });
+    const by = (n: string): ColossusFormSpec['layers'][number] => f.layers.find((l) => l.name === n)!;
+    expect(by('orb_a')).toMatchObject({ kind: 'orb' });
+    expect(by('orb_a').blend).toBeUndefined();
+    expect(by('ring_back').blend).toBeUndefined();
+    expect(by('orb_a_glow')).toMatchObject({ kind: 'orb_glow', blend: 'add', alpha: 1 });
+    expect(by('orb_a_glow').frames.base).toMatchObject({ at: [1760, 560], size: [160, 160], texScale: 2 });
   });
 
   it('tiles are frame-relative texture px, <= 2048, abutting and covering the frame texture exactly', () => {
@@ -86,5 +100,12 @@ describe('colossus.json contract (18.5)', () => {
     bad((f) => { f.targetRect = [1170, 345, 0, 495]; }, /targetRect/);
     bad((f) => { f.scale = 0; }, /scale/);
     expect(formProblems('x', { ...form(), scale: 1.5 })).toEqual([]);   // no integer-scale assumption (18.1)
+    bad((f) => { f.orbits = {}; }, /orb_a: an orb layer needs an orbit/);
+    bad((f) => { f.orbits!.orb_a.ring = 'Q'; }, /orbit orb_a: needs a known ring/);
+    bad((f) => { f.orbits!.orb_a.periodMs = 0; }, /periodMs/);
+    bad((f) => { f.rings!.R.axes = [0, 200]; }, /ring R/);
+    bad((f) => { (f.rings!.R as { dir: number }).dir = 2; }, /ring R/);
+    bad((f) => { f.layers.find((l) => l.name === 'orb_a_glow')!.name = 'halo'; }, /orb_glow layer is named/);
+    bad((f) => { (f.layers[0] as { kind: string }).kind = 'planet'; }, /unknown kind/);
   });
 });

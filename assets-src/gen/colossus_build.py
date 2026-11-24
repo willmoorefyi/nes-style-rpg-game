@@ -11,13 +11,15 @@ Deterministic: sorted forms, the yaml's layer order, sorted json keys (R26: `--o
 
 The json is the shape the TS reader (src/scenes/battle/colossus/colossusIndex.ts) accepts, which is the contract:
   {version: 1, bytes, forms: {<form>: {canvas: [w, h], scale, place: [x, y], anchors, targetRect: [x, y, w, h],
-   visibleBox?, coverBox?, skyDim?, layers: [{name, kind, over?, blend?: add, alpha?, frames: {base: F, crack?: F}}]}}}
+   visibleBox?, coverBox?, skyDim?, rings?, orbits?, layers: [{name, kind, over?, blend?: add, alpha?, frames: {base: F,
+   crack?: F}}]}}} (rings {id: {centre, axes, tilt, dir}} and orbits {orb layer: {ring, phase0, periodMs}}, EF-E)
   (blend / alpha only when not the reader's defaults normal / 1, so an additive layer carries both; skyDim from the
   yaml's sky_dim or colossus.FORMS, written when < 1)
   F = {at: [x, y] (canvas art px), size: [w, h] (canvas art px), texScale? (default 1), tiles: [{file, x, y, w, h}]};
   the tiles are in texture px relative to the frame and cover exactly ceil(size / texScale); each side <= 2048.
 Layer yaml (written by the rigger): form, canvas, scale (1), place, anchors {target, core, head, hands: [l, r], melee,
-feet}, target_rect [x, y, w, h], cover_box?, visible_box?, sky_dim? (the preview's bg multiply; F3 / F4 0.6), layers:
+feet}, target_rect [x, y, w, h], cover_box?, visible_box?, sky_dim? (the preview's bg multiply; F3 / F4 0.6), rings?,
+orbits? {orb layer: {ring, phase0, period_ms}} (EF-E; colossus_spec._orbit_problems), layers:
 [{name, kind, over?, blend?, alpha?, tex_scale?, box? [x0, y0, x1, y1], frames: {base: <png> | null, <variant>: <png>}}];
 each png is canvas-sized RGBA in the form's approved dir; a frame is its alpha box (+1 px) inside `box`.
 An alias yaml (`art: <form>`, `variant: {layer: frame}`; F4 chaos_horizon_core) reads that form's approved files with the
@@ -42,7 +44,7 @@ import numpy as np  # noqa: E402
 import yaml  # noqa: E402
 from PIL import Image  # noqa: E402
 
-from gen.colossus_spec import preview, spec_problems  # noqa: E402
+from gen.colossus_spec import ADD_KINDS, orbits_json, preview, spec_problems  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
@@ -155,7 +157,7 @@ def export_form(form: str, approved: Path = APPROVED, specs: Path = SPECS, max_s
                 files[rel] = t
                 fr["tiles"].append({"file": rel, "x": tx, "y": ty, "w": t.width, "h": t.height})
             frames[fname] = fr
-        blend = L.get("blend", "add" if L["kind"] in ("glow", "corona") else "normal")
+        blend = L.get("blend", "add" if L["kind"] in ADD_KINDS else "normal")      # blend by kind (EF-E: orb_glow)
         e = {"name": name, "kind": L["kind"], "frames": frames}
         if blend == "add" or float(L.get("alpha", 1.0)) != 1.0:      # normal / 1 are the reader's defaults
             e.update(blend=blend, alpha=float(L.get("alpha", 1.0)))
@@ -168,6 +170,7 @@ def export_form(form: str, approved: Path = APPROVED, specs: Path = SPECS, max_s
     for key, yk in (("coverBox", "cover_box"), ("visibleBox", "visible_box")):    # missing: the reader's defaults
         if spec.get(yk):
             entry[key] = list(spec[yk])
+    entry.update(orbits_json(spec))                                    # EF-E: rings / orbits, when the form has orbs
     dim = float(spec.get("sky_dim", form_table(form).get("sky_dim", 1.0)))
     if dim != 1.0:
         entry["skyDim"] = dim

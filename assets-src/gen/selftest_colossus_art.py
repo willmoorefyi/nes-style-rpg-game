@@ -42,7 +42,8 @@ def run_art(check: Callable[[bool, str], None]) -> None:
     sections(check, _build, _contract, _stage_rim)
 
 
-FORM_KEYS = {"canvas", "scale", "place", "anchors", "targetRect", "skyDim", "layers"}   # visibleBox / coverBox: defaults
+FORM_KEYS = {"canvas", "scale", "place", "anchors", "targetRect", "skyDim", "rings", "orbits", "layers"}   # visibleBox /
+# coverBox: defaults; rings / orbits: EF-E, only on a form with orb layers
 LAYER_KEYS = {"name", "kind", "over", "blend", "alpha", "frames"}
 
 
@@ -94,6 +95,20 @@ def _build(check) -> None:
               and "texScale" not in L["body"]["frames"]["base"],
               "build: glow blend add, alpha 1.0, texScale 2 (half res); corona add; body at the reader's defaults "
               "(no blend / alpha key) and texScale 1")
+        check(form["rings"] == {"R": {"centre": [1350.0, 600.0], "axes": [900.0, 200.0], "tilt": 0.1, "dir": -1}}
+              and form["orbits"] == {"orb_a": {"ring": "R", "phase0": 0.5, "periodMs": 8000}}
+              and L["orb_a_glow"]["blend"] == "add" and L["orb_a_glow"]["alpha"] == 1.0 and "blend" not in L["orb_a"]
+              and "blend" not in L["ring_back"] and L["orb_a_glow"]["frames"]["base"].get("texScale") == 2,
+              "build (EF-E): rings / orbits in the json (period_ms -> periodMs); orb_glow additive by its kind (no blend "
+              "key in the yaml), orb and ring_back normal")
+        for label, over, word in (("an orb layer without an orbit", {"orbits": {}}, "needs an orbit"),
+                                  ("an orbit on an unknown ring", {"orbits": {"orb_a": {"ring": "Q", "phase0": 0.5,
+                                                                                         "period_ms": 8000}}}, "ring"),
+                                  ("a ring with a zero axis", {"rings": {"R": {"centre": [1, 2], "axes": [0, 3], "tilt": 0,
+                                                                               "dir": 1}}}, "axes")):
+            a3, s3 = FX.write(tmp / f"orb{len(word)}", over)
+            r = _raises(lambda: CB.build(tmp / "o4", approved=a3, specs=s3, bg=None), word)
+            check(bool(r), f"build (EF-E): {label} is refused ({r[:80]!r})")
         probs = [f"{x['name']}/{n}: {p}" for x in form["layers"] for n, fr in x["frames"].items() for p in frame_problems(fr)]
         bt = [(t["file"].rsplit("/", 1)[1], t["x"], t["w"]) for t in L["body"]["frames"]["base"]["tiles"]]
         check(not probs and bt == [("body_base_0.png", 0, 2048), ("body_base_1.png", 2048, 652)],

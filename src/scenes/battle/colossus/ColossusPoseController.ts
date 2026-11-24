@@ -1,7 +1,8 @@
 /**
  * The cursor of one colossus over its timelines (docs/CHAOS_FORMS_PLAN.md 4.3), with the calls EnemyPoseController
  * offers (attack, cast, hurt, die, update), so the battle drives either through EnemyActorPoses. Pure (no PixiJS).
- * Like an atlas enemy, a hurt never interrupts an attack or a cast; dying holds its last frame.
+ * Like an atlas enemy, a hurt never interrupts an attack or a cast; dying holds its last frame. The orbs (EF-E) run on
+ * their own orbit clock, which holds while an interlude poses the form (`pose`) until it is idle again.
  */
 import {
   BEAM_RELEASE, CAST_RELEASE, SLAM_CONTACT, SLAM_LIMITS, TIMELINE_FRAMES, cuesBetween, poseAt,
@@ -18,6 +19,9 @@ export class ColossusPoseController {
   private tl: ColossusTimeline = 'idle';
   private t = 0;
   private clock = 0;
+  /** The orbs' clock (frames): it stops while an interlude's pose plays (EF-E). */
+  private orbitClock = 0;
+  private posing = false;
   /** Raised from `update` on a timeline's cue frames (the slam's contact and shake, a spell's release). */
   onCue: ((cue: ColossusCue) => void) | null = null;
   /** The drawn form's slam dip and drop (`slamLimitsFor`, set by ColossusSlots at the swap and at a re-base). */
@@ -65,33 +69,41 @@ export class ColossusPoseController {
     this.t = 0;
   }
 
-  /** An interlude `pose` step. */
+  /** An interlude `pose` step (the orbs hold still until the pose ends). */
   pose(name: ColossusPoseName): void {
     if (name === 'attack') this.attack(); else if (name === 'cast') this.cast('cast'); else if (name === 'hurt') this.play('hurt');
     else this.roar();
+    this.posing = this.tl !== 'idle';
   }
+
+  /** The orbs' clock now (frames). */
+  get orbitFrames(): number { return this.orbitClock; }
 
   /** Back to idle at t = 0 (the dev step preview replays from here). */
   reset(): void {
     this.tl = 'idle';
     this.t = 0;
     this.clock = 0;
+    this.orbitClock = 0;
+    this.posing = false;
   }
 
   update(dt: number): void {
     if (dt <= 0) return;
     this.clock += dt;
-    if (this.tl === 'idle') { this.t = this.clock % TIMELINE_FRAMES.idle; return; }
+    if (!this.posing) this.orbitClock += dt;
+    if (this.tl === 'idle') { this.posing = false; this.t = this.clock % TIMELINE_FRAMES.idle; return; }
     const before = this.t;
     this.t += dt;
     for (const cue of cuesBetween(this.tl, Math.floor(before) + 1, Math.floor(this.t) + 1)) this.onCue?.(cue);
     if (this.tl === 'dying') { this.t = Math.min(this.t, TIMELINE_FRAMES.dying); return; }
-    if (this.t >= TIMELINE_FRAMES[this.tl]) { this.tl = 'idle'; this.t = this.clock % TIMELINE_FRAMES.idle; }
+    if (this.t >= TIMELINE_FRAMES[this.tl]) { this.tl = 'idle'; this.posing = false; this.t = this.clock % TIMELINE_FRAMES.idle; }
   }
 
   /** The pose of every layer now. */
   frame(): ColossusPoseFrame {
-    return poseAt(this.tl, this.tl === 'dying' ? Math.min(this.t, TIMELINE_FRAMES.dying - 1) : this.t, this.clock, this.layers, this.slamLimits);
+    return poseAt(this.tl, this.tl === 'dying' ? Math.min(this.t, TIMELINE_FRAMES.dying - 1) : this.t, this.clock, this.layers,
+      this.slamLimits, this.orbitClock);
   }
 
   /** The dev preview's `enemy: frame / t` text. */
