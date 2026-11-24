@@ -99,3 +99,4 @@ hellhound: {scale: 2, tex: 2, smooth: [despur]}
 # them, user ruling 2026-11-24); fire_lizard at tex 2 with despur (no block-mode reduction: only 46-61 % of its 2x2 blocks are uniform).
 # None adds detail the raw never had: real extra detail needs a new render.
 fire_lizard: {scale: 2, tex: 2, smooth: [despur]}
+crazy_horse: {scale: 2, tex: 2, smooth: [despur, edges]}   # EF-F (standing rule 2026-11-24, NEW_MONSTER_GUIDE 1.4); edges: the review kept the face crisp

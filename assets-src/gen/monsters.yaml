@@ -747,45 +747,23 @@
   extra_negative: two shields, a shield on the back, a dagger, a vest, a sword, a bow, a cape
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R80): two shields in the idle
 - id: crazy_horse
-  # "Crazy Horse" (004): pass V redesign (docs/REDESIGN_PLAN.md 3.1): a gaunt otherworldly horse from another plane,
-  # lesser than a nightmare (the piebald wild horse is archived as crazy_horse_v1, docs/RETIRED_SPRITES.md).
-  # V8 (docs/REDESIGN_FIX_PLAN.md F1): the R290 sheet read as an ordinary grey horse in idle and attack (dim olive
-  # cracks, a 2 px eye); archived as crazy_horse_v2. The glow is named at full strength in every pose and the body gets
-  # non-equine features (a bare skull head, smoke legs, a tall spine ridge, ribs).
+  # "Crazy Horse" (004). EF2 (docs/ENEMY_FEEDBACK_PLAN.md EF-F, revised after the EF debrief; user 2026-11-24 "awesome"):
+  # a living, enraged war horse on a rampage, not undead: a huge black stallion with a blood-red raw face and bared
+  # teeth, scarred hide with red cuts, a wild jet-black mane and tail, a broken bridle line. Bedrock pass EF2 (SD 3.5
+  # Large): the idle by text-to-image (mirrored to face right), attack / hurt / kneel by image-to-image from the new
+  # idle (monster_br2.py, monster_br2.yaml: seeds, strengths, warps); approved/crazy_horse/*.json record the cache
+  # keys. The pass-V / V8 looks are archived as crazy_horse_v1..v3 (docs/RETIRED_SPRITES.md). The Gemini fields below
+  # are no longer used for this sprite (its sheets are Bedrock records, not re-planned).
   size: large
   body: quadruped
-  motion: >-
-    Use a clear diagonal line of action through the whole body but keep the hind legs on the ground and the body low
-    (no leap, no rearing up): thrust the head toward the heroes with the neck bent so the head stays well inside its
-    own cell; the smoke mane and tail move with the motion, kept close to the body.
   prompt: >-
-    an otherworldly, unnatural horse-like beast from another plane, seen from the side: an ash-grey hide stretched
-    tight over a bony frame with the ribs showing through the hide, a tall ridge of long pale bone spines along the
-    neck and the whole back, wide jagged cracks across the neck, flanks and legs blazing bright yellow-green light from
-    inside, as bright as the eyes; the head a bare horse skull of pale bone with empty sockets holding two large
-    burning yellow-green eyes, each a clear bright spot; a mane and tail of thick curling black smoke with small bright
-    yellow-green embers inside the smoke (drawn as part of the body, with dark outlines, not floating free); the lower
-    legs dissolve into thick curling black smoke instead of hooves, the smoke touching the ground; the whole beast,
-    tail tip to muzzle, sits in the middle of its own cell with empty space on both sides and fills most of the grey
-    box height; palette of ash grey, charcoal, bone white and bright yellow-green glow
-  attack: >-
-    a lunging strike toward the heroes: the bare skull head thrust forward and down with the long bony jaw open, the
-    forelegs lifted only a little and striking forward, the smoke of the hind legs on the ground, the smoke mane
-    streaming back close to the neck; the wide jagged cracks blazing bright yellow-green, as bright in this pose as the
-    eyes; the tall bone spine ridge and the smoke legs as in the idle; no rearing up; the whole beast well inside the
-    middle cell
-  hurt: >-
-    knocked back, all four smoke legs on the ground, the bare skull head tossed up a little, the wide jagged cracks
-    blazing bright yellow-green, one foreleg buckling; the tall bone spine ridge as in the idle; no taller than its
-    idle height
-  face: >-
-    the bare horse skull head with two large burning yellow-green eyes in its empty sockets, each a clear bright spot,
-    is readable
-  extra_negative: >-
-    a rider, a saddle, a bridle, white or brown patches, a horn, wings, blue fire, a black hide, violet, purple, pink,
-    magenta, rearing up, dim cracks, faint cracks, a normal horse head, hooves, a plain horse, floating sparks
+    a frightening mad horse on a violent rampage, a living flesh-and-blood animal: a huge muscular black stallion
+    with a blood-red raw face and bared white teeth, scars and fresh red cuts on its hide, a wild tangled jet-black
+    mane and tail, ears pinned flat, a broken leather bridle; no saddle, no rider
+  attack: lunging forward low, the head thrust out to bite, the forelegs striking forward
+  hurt: flinching from a blow, the body level, the head jerked back and up, the hind legs bracing
+  face: the blood-red face with bared white teeth and a dark eye is readable
   seeds: [1234]
-  sheet_seeds: {monster_large: 1235}   # V8 attempt 1 (REDESIGN_FIX_PLAN F1 G-S); 1234 = R290 (crazy_horse_v2)
 - id: black_widow
   # "Black Widow" (006): a basic spider (no poison in NES)
   size: small

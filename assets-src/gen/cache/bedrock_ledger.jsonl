@@ -1314,3 +1314,209 @@
 {"event": "result", "key": "58e9f860cde1d0016a61bfd9", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
 {"event": "request", "ts": "2026-11-22T14:09:34", "tool": "dargen.py", "model": "structure", "purpose": "ar_dwarf", "seed": 1, "key": "c52cd8952b52a0ca6ea52e90", "pass": "AR"}
 {"event": "result", "key": "c52cd8952b52a0ca6ea52e90", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:31:11", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7101, "key": "5e59748a03e3e0e345491214", "pass": "EF"}
+{"event": "result", "key": "5e59748a03e3e0e345491214", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:31:28", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7101, "key": "cc5fce9cdc59b317f27cf681", "pass": "EF"}
+{"event": "result", "key": "cc5fce9cdc59b317f27cf681", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:32:16", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7101, "key": "9d7e9cc0077a0ee54be09fd8", "pass": "EF"}
+{"event": "result", "key": "9d7e9cc0077a0ee54be09fd8", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:32:28", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7101, "key": "4d7e6229062698daf19bde5b", "pass": "EF"}
+{"event": "result", "key": "4d7e6229062698daf19bde5b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:37:55", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7105, "key": "972b61e866029c067d18cd5b", "pass": "EF"}
+{"event": "result", "key": "972b61e866029c067d18cd5b", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:38:08", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "47798554e12ef543000434a8", "pass": "EF"}
+{"event": "result", "key": "47798554e12ef543000434a8", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:38:20", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "2abc3e54cf81b7995efc334f", "pass": "EF"}
+{"event": "result", "key": "2abc3e54cf81b7995efc334f", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:38:30", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7105, "key": "c2863b34c5a7ddfc7a9f99f3", "pass": "EF"}
+{"event": "result", "key": "c2863b34c5a7ddfc7a9f99f3", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:39:57", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7201, "key": "89ad908e6c15b32d19e8e0e5", "pass": "EF"}
+{"event": "result", "key": "89ad908e6c15b32d19e8e0e5", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:40:48", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7202, "key": "0959fc7f6fe9fe70a8b06a62", "pass": "EF"}
+{"event": "result", "key": "0959fc7f6fe9fe70a8b06a62", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:41:23", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7203, "key": "2cdf46e80285e1e90211188c", "pass": "EF"}
+{"event": "result", "key": "2cdf46e80285e1e90211188c", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:42:09", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7204, "key": "17d6597e723422488f228a5c", "pass": "EF"}
+{"event": "result", "key": "17d6597e723422488f228a5c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:42:34", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7205, "key": "8404f91bd700a82ca65aa8d0", "pass": "EF"}
+{"event": "result", "key": "8404f91bd700a82ca65aa8d0", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:43:19", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7301, "key": "c74d0a0a8a6e7dbb709b806d", "pass": "EF"}
+{"event": "result", "key": "c74d0a0a8a6e7dbb709b806d", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:43:46", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7302, "key": "00edc85c45f06e2a58d095dd", "pass": "EF"}
+{"event": "result", "key": "00edc85c45f06e2a58d095dd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:44:18", "tool": "monster_br.py", "model": "ultra", "purpose": "ef_sheet", "seed": 7303, "key": "63abac0ad475fa7d96501e61", "pass": "EF"}
+{"event": "result", "key": "63abac0ad475fa7d96501e61", "ok": true, "served": "stability.stable-image-ultra-v1:1"}
+{"event": "request", "ts": "2026-11-24T10:44:29", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "f791388bd6ec071da1a9f65a", "pass": "EF"}
+{"event": "result", "key": "f791388bd6ec071da1a9f65a", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:44:48", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "731694d023dc9715ef2e8e8b", "pass": "EF"}
+{"event": "result", "key": "731694d023dc9715ef2e8e8b", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:45:05", "tool": "monster_br.py", "model": "structure", "purpose": "ef_structure", "seed": 7303, "key": "2d9edcc41f074aea96007fdc", "pass": "EF"}
+{"event": "result", "key": "2d9edcc41f074aea96007fdc", "ok": true, "served": "us.stability.stable-image-control-structure-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:46:24", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7304, "key": "2c23cb9422cbe7db8b9eddef", "pass": "EF"}
+{"event": "result", "key": "2c23cb9422cbe7db8b9eddef", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:47:02", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7304, "key": "8d3680bd8eb76c8b30d646e5", "pass": "EF"}
+{"event": "result", "key": "8d3680bd8eb76c8b30d646e5", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:48:23", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7401, "key": "1b850caab665a429639f14d1", "pass": "EF"}
+{"event": "result", "key": "1b850caab665a429639f14d1", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:49:13", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7401, "key": "d3cd5a8e1dc26f21f42bf68a", "pass": "EF"}
+{"event": "result", "key": "d3cd5a8e1dc26f21f42bf68a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:49:52", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7403, "key": "bd9cb835ee8c380ccb9827e7", "pass": "EF"}
+{"event": "result", "key": "bd9cb835ee8c380ccb9827e7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:51:10", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7404, "key": "e68e446beb2fd5540855cd65", "pass": "EF"}
+{"event": "result", "key": "e68e446beb2fd5540855cd65", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:51:40", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7405, "key": "86fae64893e44aa0706b7dbd", "pass": "EF"}
+{"event": "result", "key": "86fae64893e44aa0706b7dbd", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:52:31", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "9d268d8dddfc4a6ac3c99d3d", "pass": "EF"}
+{"event": "result", "key": "9d268d8dddfc4a6ac3c99d3d", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:53:06", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7502, "key": "cbf086bbd0b794720026aa8e", "pass": "EF"}
+{"event": "result", "key": "cbf086bbd0b794720026aa8e", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:53:42", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "16e2002af046e65a76f73135", "pass": "EF"}
+{"event": "result", "key": "16e2002af046e65a76f73135", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:55:19", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7501, "key": "70c6e4f3437dbd2bfcfe2044", "pass": "EF"}
+{"event": "result", "key": "70c6e4f3437dbd2bfcfe2044", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T10:56:02", "tool": "monster_br.py", "model": "sd35", "purpose": "ef_sheet", "seed": 7505, "key": "e04f96d7c4a5ead38a1051e9", "pass": "EF"}
+{"event": "result", "key": "e04f96d7c4a5ead38a1051e9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:26:35", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8101, "key": "c319435285fc65e562baec56", "pass": "EF2"}
+{"event": "result", "key": "c319435285fc65e562baec56", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:27:28", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8101, "key": "ff70925b39fb5ee9105efea1", "pass": "EF2"}
+{"event": "result", "key": "ff70925b39fb5ee9105efea1", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:29:52", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8201, "key": "6504de2d077e98c9bacc71ab", "pass": "EF2"}
+{"event": "result", "key": "6504de2d077e98c9bacc71ab", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:30:04", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8301, "key": "f041a76bfa6064361927c86f", "pass": "EF2"}
+{"event": "result", "key": "f041a76bfa6064361927c86f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:30:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8401, "key": "dcee331ff544c646df47c573", "pass": "EF2"}
+{"event": "result", "key": "dcee331ff544c646df47c573", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:31:45", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8202, "key": "f61945945d1bfdfd21e8adb7", "pass": "EF2"}
+{"event": "result", "key": "f61945945d1bfdfd21e8adb7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:31:58", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8302, "key": "e3b01080b85469a9070d633c", "pass": "EF2"}
+{"event": "result", "key": "e3b01080b85469a9070d633c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:32:10", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8402, "key": "763bc752cc8ad2b5bebf3760", "pass": "EF2"}
+{"event": "result", "key": "763bc752cc8ad2b5bebf3760", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:33:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8203, "key": "78b7d59b93a7e911bef89458", "pass": "EF2"}
+{"event": "result", "key": "78b7d59b93a7e911bef89458", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:33:24", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8303, "key": "b44cc4ec6f4161f4c11b2bf1", "pass": "EF2"}
+{"event": "result", "key": "b44cc4ec6f4161f4c11b2bf1", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:33:36", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8403, "key": "36fc8a3c601c2ffaa54c58d9", "pass": "EF2"}
+{"event": "result", "key": "36fc8a3c601c2ffaa54c58d9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:34:14", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8304, "key": "99287b4c77f9c80be68db976", "pass": "EF2"}
+{"event": "result", "key": "99287b4c77f9c80be68db976", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:34:26", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8404, "key": "2e553aaec0852897f271c7f0", "pass": "EF2"}
+{"event": "result", "key": "2e553aaec0852897f271c7f0", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:41:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8305, "key": "ff26d0a4a47fafa475e1ee44", "pass": "EF2"}
+{"event": "result", "key": "ff26d0a4a47fafa475e1ee44", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:41:27", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 8405, "key": "2946e287ad7faef27c04d37f", "pass": "EF2"}
+{"event": "result", "key": "2946e287ad7faef27c04d37f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:43:01", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9101, "key": "969d4477764dd00e573a36e8", "pass": "EF2"}
+{"event": "result", "key": "969d4477764dd00e573a36e8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:43:41", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9102, "key": "e80cbf24324726502efbde93", "pass": "EF2"}
+{"event": "result", "key": "e80cbf24324726502efbde93", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:44:28", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9103, "key": "1efd6766167045c6cf001238", "pass": "EF2"}
+{"event": "result", "key": "1efd6766167045c6cf001238", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:45:03", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9104, "key": "5f407c8c47fb38ac3a3fb0a6", "pass": "EF2"}
+{"event": "result", "key": "5f407c8c47fb38ac3a3fb0a6", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:46:02", "tool": "monster_br2.py", "model": "outpaint", "purpose": "ef2_pose", "seed": 9105, "key": "c168bc008cdbffa510620083", "pass": "EF2"}
+{"event": "result", "key": "c168bc008cdbffa510620083", "ok": true, "served": "us.stability.stable-outpaint-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:48:06", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9201, "key": "ed9df606761aab7bf608d13b", "pass": "EF2"}
+{"event": "result", "key": "ed9df606761aab7bf608d13b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:48:17", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9301, "key": "2589dc127e70d066dc4e14c9", "pass": "EF2"}
+{"event": "result", "key": "2589dc127e70d066dc4e14c9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:48:27", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9401, "key": "dc822fd286140d4cb6455db0", "pass": "EF2"}
+{"event": "result", "key": "dc822fd286140d4cb6455db0", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:50:37", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9202, "key": "ffd798d799708ad4edbf4df5", "pass": "EF2"}
+{"event": "result", "key": "ffd798d799708ad4edbf4df5", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:50:48", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9302, "key": "d02e2849fe4674af0c8c1f5e", "pass": "EF2"}
+{"event": "result", "key": "d02e2849fe4674af0c8c1f5e", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:50:58", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9402, "key": "c4a3d6d2534c51c16f858589", "pass": "EF2"}
+{"event": "result", "key": "c4a3d6d2534c51c16f858589", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:51:48", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9501, "key": "3e345eb2a752923fb7774d02", "pass": "EF2"}
+{"event": "result", "key": "3e345eb2a752923fb7774d02", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:54:41", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9601, "key": "3332993b0b51ea596725d412", "pass": "EF2"}
+{"event": "result", "key": "3332993b0b51ea596725d412", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:54:52", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9701, "key": "00ca7fdc6fc2fb00cf013db7", "pass": "EF2"}
+{"event": "result", "key": "00ca7fdc6fc2fb00cf013db7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:55:03", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9801, "key": "4dd15588c44cf6bfd6f69716", "pass": "EF2"}
+{"event": "result", "key": "4dd15588c44cf6bfd6f69716", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:55:49", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9602, "key": "99c89d3f4d8f597f8ba19f42", "pass": "EF2"}
+{"event": "result", "key": "99c89d3f4d8f597f8ba19f42", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:56:00", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9802, "key": "220bc8feca3d4ff9eda18793", "pass": "EF2"}
+{"event": "result", "key": "220bc8feca3d4ff9eda18793", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:56:58", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9603, "key": "713d2a7a14558243b415600c", "pass": "EF2"}
+{"event": "result", "key": "713d2a7a14558243b415600c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:58:30", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9901, "key": "9a76021057dd25706569b1ec", "pass": "EF2"}
+{"event": "result", "key": "9a76021057dd25706569b1ec", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:59:22", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9604, "key": "a1c3ffea0edf2aec98b46cc9", "pass": "EF2"}
+{"event": "result", "key": "a1c3ffea0edf2aec98b46cc9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T11:59:33", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9702, "key": "facb73a4b7d511d114f658c2", "pass": "EF2"}
+{"event": "result", "key": "facb73a4b7d511d114f658c2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:03:07", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9902, "key": "f14ed824f563cd1204517850", "pass": "EF2"}
+{"event": "result", "key": "f14ed824f563cd1204517850", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:03:41", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9803, "key": "ab8385847548ed69f97222fc", "pass": "EF2"}
+{"event": "result", "key": "ab8385847548ed69f97222fc", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:06:00", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9703, "key": "37e4c804459d09d552f3d10b", "pass": "EF2"}
+{"event": "result", "key": "37e4c804459d09d552f3d10b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:06:11", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9804, "key": "45aaa0451649022c9708bc07", "pass": "EF2"}
+{"event": "result", "key": "45aaa0451649022c9708bc07", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:08:38", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9704, "key": "a4419f4e9702dd81c434bad9", "pass": "EF2"}
+{"event": "result", "key": "a4419f4e9702dd81c434bad9", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:11:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9911, "key": "04e37c1ce24cbdde6ee84b7f", "pass": "EF2"}
+{"event": "result", "key": "04e37c1ce24cbdde6ee84b7f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:11:19", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9921, "key": "184fab709c466d9cd082be69", "pass": "EF2"}
+{"event": "result", "key": "184fab709c466d9cd082be69", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T12:11:30", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9931, "key": "48549228cc11d8b04cf1f675", "pass": "EF2"}
+{"event": "result", "key": "48549228cc11d8b04cf1f675", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:24", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10101, "key": "768212b6ba0ee510676d0976", "pass": "EF3"}
+{"event": "result", "key": "768212b6ba0ee510676d0976", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:32", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10201, "key": "5661431cf8174819527eb871", "pass": "EF3"}
+{"event": "result", "key": "5661431cf8174819527eb871", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:39", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10301, "key": "17068603778ad05623fd0541", "pass": "EF3"}
+{"event": "result", "key": "17068603778ad05623fd0541", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:46", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10401, "key": "fb88b397401d92438a78d46f", "pass": "EF3"}
+{"event": "result", "key": "fb88b397401d92438a78d46f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10102, "key": "289bcc86fec04f69c7c5ec01", "pass": "EF3"}
+{"event": "result", "key": "289bcc86fec04f69c7c5ec01", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10202, "key": "4eaeb5057fa98e09b2440f89", "pass": "EF3"}
+{"event": "result", "key": "4eaeb5057fa98e09b2440f89", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:24", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10302, "key": "7b90249e4dd2f46ba2f6df61", "pass": "EF3"}
+{"event": "result", "key": "7b90249e4dd2f46ba2f6df61", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:31", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10402, "key": "3451fcb65639ce3b1f437998", "pass": "EF3"}
+{"event": "result", "key": "3451fcb65639ce3b1f437998", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:41:47", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10103, "key": "795adfe0af7aef21dad2e6a8", "pass": "EF3"}
+{"event": "result", "key": "795adfe0af7aef21dad2e6a8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:41:54", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10203, "key": "5b502aae27aa1577ba3e6484", "pass": "EF3"}
+{"event": "result", "key": "5b502aae27aa1577ba3e6484", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:42:02", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "d003cba682838081c415e983", "pass": "EF3"}
+{"event": "result", "key": "d003cba682838081c415e983", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:42:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "d3b2be42ffe2af6f98f3bd01", "pass": "EF3"}
+{"event": "result", "key": "d3b2be42ffe2af6f98f3bd01", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:13", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10103, "key": "c2b502030ddf241687d4ba26", "pass": "EF3"}
+{"event": "result", "key": "c2b502030ddf241687d4ba26", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:20", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10202, "key": "329f87f162139be389b485c8", "pass": "EF3"}
+{"event": "result", "key": "329f87f162139be389b485c8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:28", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "f5ea1b92b05a15146e230881", "pass": "EF3"}
+{"event": "result", "key": "f5ea1b92b05a15146e230881", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:35", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "db4c3cc59bd5e10ed65f592c", "pass": "EF3"}
+{"event": "result", "key": "db4c3cc59bd5e10ed65f592c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:51:27", "tool": "monster_br2.py", "model": "outpaint", "purpose": "ef3_pose", "seed": 10205, "key": "e1a9fbb7b1810636be730f99", "pass": "EF3"}
+{"event": "result", "key": "e1a9fbb7b1810636be730f99", "ok": true, "served": "us.stability.stable-outpaint-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:51:58", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10203, "key": "3693c03a6d59cef878984687", "pass": "EF3"}
+{"event": "result", "key": "3693c03a6d59cef878984687", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:10", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "a1a5b9f2ba18c0d20c2aa5b2", "pass": "EF3"}
+{"event": "result", "key": "a1a5b9f2ba18c0d20c2aa5b2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:21", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "f637dcd24b6b823730aff0cb", "pass": "EF3"}
+{"event": "result", "key": "f637dcd24b6b823730aff0cb", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:32", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "423a14b08684eac1c4fb6177", "pass": "EF3"}
+{"event": "result", "key": "423a14b08684eac1c4fb6177", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:42", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10503, "key": "2275280c66a2dc4e98060278", "pass": "EF3"}
+{"event": "result", "key": "2275280c66a2dc4e98060278", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:53", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10603, "key": "72b54f9dab1228f7aeef3538", "pass": "EF3"}
+{"event": "result", "key": "72b54f9dab1228f7aeef3538", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:05", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10503, "key": "ab06fc64a325f6464fb02b8b", "pass": "EF3"}
+{"event": "result", "key": "ab06fc64a325f6464fb02b8b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10603, "key": "b51e43a858445fc58dc0628a", "pass": "EF3"}
+{"event": "result", "key": "b51e43a858445fc58dc0628a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:27", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10703, "key": "6bce0839bbc6c80caaf3cb46", "pass": "EF3"}
+{"event": "result", "key": "6bce0839bbc6c80caaf3cb46", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:57:02", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10304, "key": "2c609e8bc1abc9dc07b4f76b", "pass": "EF3"}
+{"event": "result", "key": "2c609e8bc1abc9dc07b4f76b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:57:15", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10604, "key": "f7ac0c20f720fd0a1bbe765e", "pass": "EF3"}
+{"event": "result", "key": "f7ac0c20f720fd0a1bbe765e", "ok": true, "served": "stability.sd3-5-large-v1:0"}

@@ -135,3 +135,29 @@
   sheet_seeds: {boss_attack: 1238, boss_cast: 1237}   # boss_attack 1236 (ROSTER_LOG R314): crescent slash smears, 147 px; 1237 (R315): five blades; boss_cast 1236 (R317): thin skirt, 157 px
   seeds: [1236]   # 1234 (ROSTER_LOG R297): six blade wings, the cell widened to 240; 1235 (R298): four wings, cut lost the pieces, wing tips on row 0
   retired_as: hollow_seraph_v2
+- id: vampire
+  # act-1 sprite (page 0). Pass V redraw (docs/REDESIGN_PLAN.md 3.1): the same young noble vampire, drawn clean with
+  # large simple shapes (the noisy act-1 sheet is archived as vampire_v1, docs/RETIRED_SPRITES.md); distinct from the
+  # white-haired vampire_lord
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes with the elbows bent, so the clawed hand stays well inside its own cell; the cape stays close
+    around the body in every cell. Draw only the parts named in the description: no bats, wings, smear or motion lines.
+  prompt: >-
+    a young noble vampire drawn with large clean shapes and few small details, a clear dark outline and smooth shading
+    (no noise, no speckled texture): pale grey-blue skin, a clear pale face with two large bright red eyes, each a
+    clear bright spot, and two small fangs, slicked-back black hair clearly darker than the face, a tall stiff black
+    collar, a black cape with a deep red lining kept close around the body (not flung out), a dark red waistcoat with a
+    white cravat, one clawed hand raised in front of the chest; standing upright; centred in its own cell with empty
+    space on both sides; palette of black, deep red, pale grey-blue skin and white
+  attack: >-
+    swooping forward toward the heroes, the body leaning low, one clawed hand raking forward in front of the chest,
+    pulled in close (not stretched to the cell edge), the cape kept close to the body
+  hurt: recoiling, twisting away behind the cape held close in front of the body, the head turned back
+  face: a clear pale face with two large bright red eyes, each a clear bright spot, the black hair clearly darker than the face
+  extra_negative: >-
+    white hair, wings, bat wings, a crown, a staff, a coffin, violet, purple, pink, magenta, noise, dithering
+  seeds: [1234]
+  retired_as: vampire_v2

@@ -1,36 +1,25 @@
 {
   "character": "crazy_horse",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "0d458f8f9a764220",
-    "skel": "5e11c22e19f123f2",
-    "ref": "d35350a9db930f64"
-  },
+  "arm": "ef2_sd35",
+  "seed": 9804,
+  "try": 4,
   "grid": [
-    132,
+    162,
     128
   ],
   "bottom_row": 122,
   "foot_row": 122,
-  "j0": "FAIL A-hist, A-outline",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
   "models": [
-    "gemini-nano-banana-2.1"
+    "stability.sd3-5-large-v1:0"
   ],
-  "gemini_cache_keys": [
-    "51e2f81ad52cfc4d793ccc8c"
-  ],
-  "refs": [
-    "idle",
-    "pose"
+  "br_cache_keys": [
+    "45aaa0451649022c9708bc07"
   ],
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
+    "route": "EF2 kneel: SD 3.5 image-to-image from the new idle (monster_br2.py)",
+    "pass": "EF2",
+    "strength": 0.34
   },
-  "approved": "2026-11-17"
+  "approved": "2026-11-24"
 }

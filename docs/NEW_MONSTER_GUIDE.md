@@ -151,13 +151,23 @@ decision |`, plus "Images used: N of 100"). Self-approve only if the user author
   the ogre (204 screen px) and its lesser siblings; a low, wide pose cannot (the old red dragon, 165 px at scale 3, was
   redrawn upright). A boss sheet at scale 3 (chaos, D-V6 = C2) is laid out as the titan class: alone, in
   `TITAN_AREA`, attacking in place (`layoutSizeOf`, `EnemyLayoutAi.ts`).
+- **EF smoothing is mandatory for every new or regenerated sheet (the user's standing rule, 2026-11-24).** A
+  `monster_*` / `boss_*` sheet approved on or after 2026-11-24, or any Bedrock sheet, needs a dict entry in
+  `assets-src/gen/monster_scale.yaml` with `smooth: [despur]` and a Scale2x hi-res texture at its display scale
+  (`{scale: 2, tex: 2, smooth: [despur]}` for a scale-2 sheet; an enlarged one takes `tex` = its scale, e.g. 2.5; a
+  scale-3 sheet that does not fit the page budget falls back to `tex: 1` with despur; `edges` (silhouette-only Scale2x)
+  when full Scale2x rounds away fine detail). An image review may drop one of the two (the shadow kept its texture
+  without despur), never both. Enforced by `tests/data/efSmoothRule.test.ts` and `selftest_hires.py`
+  (`monster_smooth_rule.ef_rule_failures`); show a before/after contact sheet at screen size to the image reviewer, and pin
+  the sheet in `selftest_pages.py`'s EF lists (crazy_horse is `EF_F`).
 
 ### 1.5 Wire it into the game
 
 1. Add `assets/data/enemies.yaml` with `sprite: <id>` (or a variant id), stats and rewards.
 2. Encounters live in the map *source* (overworld: `assets-src/tools/layouts/overworld_zones.py`; hand-written
    `temple-of-fiends.yaml`); regenerate and compile per AGENTS.md "Editing a 2x Map".
-3. Build the atlas with `python3 -I assets-src/build_assets.py monsters_ai`. A sheet without a rig gets `anim: false`
+3. Add the sheet's EF smoothing entry to `assets-src/gen/monster_scale.yaml` (1.4, mandatory since 2026-11-24), then
+   build the atlas with `python3 -I assets-src/build_assets.py monsters_ai`. A sheet without a rig gets `anim: false`
    and aliased frames: it plays with today's look and the new timing.
 4. Run `npx vitest run tests/data/assetCoverage.test.ts tests/data/crossFileValidation.test.ts`. Every enemy needs
    an atlas sheet with every frame key, and variants must match their base's keys, `anim` flag and holds.
