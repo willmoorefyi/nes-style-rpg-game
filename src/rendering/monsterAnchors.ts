@@ -49,10 +49,12 @@ export function lungeOvershoot(f: AnchoredFrames): number {
   return f.lungeRight === undefined ? 0 : Math.max(0, f.lungeRight - (f.opaqueRight ?? f.cell[0]));
 }
 
-/** The layout box of a sprite with art: its cell at the art's screen scale (which the layout keeps whole), with the
- *  home art's opaque extent (`ox0` inclusive, `ox1` exclusive, box px) when the atlas has it. */
-export function enemyBoxInput(size: EnemySizeClass, f: AnchoredFrames): EnemyBoxInput {
+/** The layout box of a sprite with art: its cell at the art's screen scale, with the home art's opaque extent (`ox0`
+ *  inclusive, `ox1` exclusive, box px) when the atlas has it. `dataSize` (EF-A5): the enemy's data class when `size`
+ *  is its 2.5 tier class (`medium` / `huge`), laid out from pass 3 on. */
+export function enemyBoxInput(size: EnemySizeClass, f: AnchoredFrames, dataSize?: EnemySizeClass): EnemyBoxInput {
   const box: EnemyBoxInput = { size, w: f.cell[0] * f.scale, h: f.cell[1] * f.scale, scale: f.scale };
+  if (dataSize && dataSize !== size && f.scale > 2 && f.scale < 3) box.dataSize = dataSize;
   if (f.homeX) { box.ox0 = f.homeX[0] * f.scale; box.ox1 = (f.homeX[1] + 1) * f.scale; }
   // a scale-3 boss is fitted by its art, not its cell (EnemyBoxInput.oy0; hollow_seraph, V8 N-1)
   if (size === 'boss' && f.scale === 3 && f.travelTop !== undefined) box.oy0 = f.travelTop * f.scale;

@@ -14,12 +14,12 @@ import { colossusOf } from './colossus/colossusIndex.js';
 export { colossusOf };
 
 /** Placeholder box sizes when no art is loaded yet (screen px, matches the 2x art bands). */
-export const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
+export const PLACEHOLDER: Record<EnemySizeClass, number> = { small: 160, medium: 200, large: 256, huge: 384, boss: 400, titan: 600 };
 
 /** The layout input of one enemy: its frames' cell, scale and home extent, else its placeholder box. */
 export function boxInputOf(e: EnemyData, f: MonsterFrames | null | undefined): EnemyBoxInput {
   const size = layoutSizeOfArt(e.size, f);
-  return f ? enemyBoxInput(size, f) : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
+  return f ? enemyBoxInput(size, f, e.size ?? 'small') : { size, w: PLACEHOLDER[size], h: PLACEHOLDER[size] };
 }
 
 /** True when the formation fits (formationFits over the boxes AiEnemyView would lay out). */

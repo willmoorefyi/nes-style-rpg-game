@@ -508,6 +508,9 @@ def test_monster_anim() -> None:
           "FW-A2 idleBox; FW-S display scale)")
     from gen import selftest_pages as SP
     SP.run_pages(check)
+    print("EF-A hi-res monster textures (Scale2x upscale, despur, table, hi-res pages, round trip)")
+    from gen import selftest_hires as SHi
+    SHi.run_hires(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501

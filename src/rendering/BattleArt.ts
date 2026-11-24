@@ -29,8 +29,10 @@ export interface MonsterAtlasMeta {
   sheets: Record<string, MonsterAnchors & {
     /** Index into `pages` (0 when missing). */
     page?: number;
-    /** The sheet's own screen px per art px (FW-S: 3 for the rescaled sheets); missing: the atlas `scale`. */
+    /** The sheet's own screen px per art px (FW-S: 3 for the rescaled sheets; EF-A: 2.5 too); missing: the atlas `scale`. */
     scale?: number;
+    /** EF-A4: a hi-res sheet's PNG px per art px (its page is `filter: linear`); missing: the atlas `texScale`. */
+    texScale?: number;
     cell: [number, number];
     footRow: number;
     floating: boolean;
@@ -162,7 +164,7 @@ export class BattleArt {
       return null;
     }
     const source = tex.source;
-    const ts = this.meta.texScale ?? this.meta.scale;
+    const ts = entry.texScale ?? this.meta.texScale ?? this.meta.scale;   // EF-A5: a hi-res sheet's own texScale
     const [w, h] = entry.cell;
     const cache = new Map<string, Texture>();
     const slice = (name: MonsterFrame): Texture => {
@@ -172,7 +174,7 @@ export class BattleArt {
       const key = `${x},${y}`;
       let t = cache.get(key);
       if (!t) {
-        t = new Texture({ source, frame: new Rectangle(x * ts, y * ts, w * ts, h * ts) });
+        t = new Texture({ source, frame: new Rectangle(x * ts, y * ts, Math.ceil(w * ts), Math.ceil(h * ts)) });
         cache.set(key, t);
       }
       return t;
