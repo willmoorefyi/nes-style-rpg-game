@@ -15,6 +15,7 @@ import numpy as np
 from PIL import Image
 
 from gen import monster_hires as MH
+from gen import monster_smooth_rule as MSR
 from gen import monster_hires_crop as MHC
 from gen import monster_hires_pages as MHP
 
@@ -86,6 +87,7 @@ def run_hires(check: Callable[[bool, str], None]) -> None:
     _table(check)
     _pack(check)
     _round_trip(check)
+    _ef_rule(check)
 
 
 def _despur(check: Callable[[bool, str], None]) -> None:
@@ -204,3 +206,20 @@ def _round_trip(check: Callable[[bool, str], None]) -> None:
             v, pages = m["sheets"][sid], [Image.open(d / p["file"]).convert("RGBA") for p in m["pages"]]
             return [pages[v["page"]].crop((x, y, x + v["cell"][0], y + v["cell"][1])).tobytes() for x, y in v["frames"].values()]
         check(cells(base, mb, "ogre") == cells(hi, mh, "ogre"), "EF-A8: the sheet outside the table is byte-equal by rect")
+
+
+def _ef_rule(check: Callable[[bool, str], None]) -> None:
+    """The standing EF smoothing rule (user, 2026-11-24): the real approved/ tree against the real table, then mutations."""
+    import json
+    import yaml
+    root = Path(__file__).resolve().parent
+    approved = {d.name: {f.name: json.loads(f.read_text()) for f in d.glob("*.json")}
+                for d in (root / "approved").iterdir() if d.is_dir() and not d.name.startswith("_")}
+    table = yaml.safe_load((root / "monster_scale.yaml").read_text()) or {}
+    fails = MSR.ef_rule_failures(approved, table)
+    check(not fails and "crazy_horse" in approved, f"EF rule: every sheet approved from pass EF on is smoothed ({fails})")
+    fx = {"a": {"monster_small.json": {"approved": "2026-11-25"}}, "b": {"monster_large.json": {"backend": "bedrock"}},
+          "c": {"monster_small.json": {"approved": "2026-11-15"}}}
+    check(len(MSR.ef_rule_failures(fx, {"a": 3, "b": {"scale": 2, "tex": 1}})) == 2
+          and not MSR.ef_rule_failures(fx, {"a": {"scale": 2, "tex": 2}, "b": {"scale": 3, "tex": 1, "smooth": ["despur"]}}),
+          "EF rule: a plain or unsmoothed entry of a ruled sheet fails, despur or tex > 1 passes, older sheets are free")
