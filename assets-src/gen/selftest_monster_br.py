@@ -37,6 +37,26 @@ def synthetic() -> Image.Image:
     return img
 
 
+def _ef2(check) -> None:
+    """EF2 (monster_br2_key): the page keyed offline, the figure kept; the pose warp leans and squashes."""
+    from gen import monster_br2_key as K
+    img = Image.new("RGB", (1024, 1024), (140, 144, 142))
+    d = ImageDraw.Draw(img)
+    d.rectangle([450, 200, 570, 900], fill=(20, 18, 24))
+    d.rectangle([470, 220, 550, 300], fill=(120, 120, 122))         # a grey patch inside the figure: kept
+    a = np.asarray(K.key_bg(img))
+    check(tuple(a[10, 10]) == K.KEY and tuple(a[500, 500]) == (20, 18, 24) and tuple(a[250, 500]) == (120, 120, 122),
+          "EF2 key_bg: the grey page keyed, the figure and its inner grey kept")
+    _, m0 = K.figure(img, 2)
+    _, m1 = K.figure(K.warp(img, {"rot": 15, "key": 2}), 2)
+    _, m2 = K.figure(K.warp(img, {"hip": 0.5, "legs": 0.3, "key": 2}), 2)
+    top = lambda m: np.where(m[np.where(m.any(1))[0].min()])[0].mean()
+    h = lambda m: np.ptp(np.where(m.any(1))[0])
+    check(top(m1) > top(m0) + 20, "EF2 warp: + rot leans the top toward the heroes (right)")
+    check(h(m2) < 0.75 * h(m0) and np.where(m2.any(1))[0].max() == np.where(m0.any(1))[0].max(),
+          "EF2 warp: the hip squash lowers the figure, feet on the same row")
+
+
 def main() -> int:
     fails = []
 
@@ -89,6 +109,7 @@ def main() -> int:
               "approve: the sheet is 3 cells, the kneel key is the idle's cell")
         check(kn["arm"] != "g" and kn["br_cache_keys"] == ["k" * 24] and "backend" not in kn and kn["sheet"] == "kneel",
               "approve: kneel.json in the Bedrock kneel shape (arm, br_cache_keys, no backend)")
+    _ef2(check)
     print(f"monster_br selftest: {'ALL PASSED' if not fails else f'{len(fails)} FAILED'}")
     return 1 if fails else 0
 
