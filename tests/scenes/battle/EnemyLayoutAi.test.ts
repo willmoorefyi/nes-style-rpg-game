@@ -240,6 +240,8 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   });
 
   it('every box of every real formation (golden and rescaled) and of 1,000 seeded random formations has a whole screen scale', () => {
+    const TIER = new Set(Object.values(atlas.sheets).map((v) => v.scale ?? atlas.scale).filter((v) => !Number.isInteger(v)));
+    expect([...TIER].sort()).toEqual([2.5, 2.7, 2.8, 3.3]);
     const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '__golden__/layout_f1.json'), 'utf-8')) as
       { cases: { enemies: string[]; inputs: EnemyBoxInput[] }[] };
     const formations: EnemyBoxInput[][] = golden.cases.flatMap((c) => [c.inputs, c.enemies.map(rescaled)]);
@@ -252,8 +254,9 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
     }
     let boxes = 0;
     for (const f of formations) {
-      // EF-A1 (overrides D-V1 S1): 2.5 is allowed too, drawn 1:1 from its texScale-2.5 texture
-      for (const s of screenScales(f)) { expect(whole(s) || s === 2.5, `${s} in ${f.map((b) => b.size).join(',')}`).toBe(true); boxes++; }
+      // EF-A1 (overrides D-V1 S1): 2.5 is allowed too, drawn 1:1 from its texScale-2.5 texture; int-ef2: so is every
+      // tier scale of the table (2.7 sea_troll, 2.8 stone_golem, 3.3 iron_golem), each drawn 1:1 from its texture
+      for (const s of screenScales(f)) { expect(whole(s) || TIER.has(s), `${s} in ${f.map((b) => b.size).join(',')}`).toBe(true); boxes++; }
     }
     expect(boxes).toBeGreaterThan(4000);
   });

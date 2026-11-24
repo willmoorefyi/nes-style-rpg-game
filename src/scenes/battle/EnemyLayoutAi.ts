@@ -3,16 +3,18 @@
  *
  * Enemies are packed into columns inside ENEMY_AREA (a titan: TITAN_AREA), left to right: titan, boss, huge, large,
  * medium, then small columns. A column holds one size class (1 titan, boss or huge, 2 large or medium, 3 small)
- * stacked with equal gaps. EF-A5 (docs/ENEMY_FEEDBACK_PLAN.md): a data-`small` sheet at 2 < scale < 3 lays out as
- * `medium`, a data-`large` one as `huge`; from pass 3 on every box is in its data class (`dataSize`).
+ * stacked with equal gaps. EF-A5 (docs/ENEMY_FEEDBACK_PLAN.md): a data-`small` sheet at a fractional scale over 2
+ * (`isTierScale`: 2.5; int-ef2 any multiple of 0.05 in (2, 3.5] but the V4 integer 3, e.g. sea_troll 2.7, stone_golem
+ * 2.8, iron_golem 3.3) lays out as `medium`, a data-`large` one as `huge`; from pass 3 on every box is in its data
+ * class (`dataSize`). A sheet at exactly 3 keeps its V4 class (bigeyes `large`, the scale-3 bosses' boss / titan rule).
  * Odd columns are shifted down by half a step (the classic staggered look) when there is room.
  * Every box keeps its sheet's screen scale (the sheet's `scale` x the layout factor, docs/REDESIGN_PLAN.md 2.5; a
  * 2.5 sheet is drawn from a texScale-2.5 texture, so 2.5 is whole texture px), over four passes: (1) cells at full
  * size; (2) packed by the home art's opaque extent (`ox0` / `ox1`, docs/ROSTER_FIX_PLAN.md defect 2: the cells carry
  * 10-24 art px of empty margin); (3) as 2, with every sheet over scale 2 at screen scale 2, laid out in its data class
  * (exactly today's pass 3: a no-op without such a sheet); (4) every box at screen scale 1 (half size for the scale-2
- * sheets, as before; a 2.5 sheet may take it too, through its mipmapped linear page). A formation with a scale-3 sheet
- * that reaches pass 4 is not supported (`formationFits` refuses it).
+ * sheets, as before; a tier sheet may take it too, through its mipmapped linear page, 3.3 included). A formation with
+ * a V4 scale-3 sheet that reaches pass 4 is not supported (`formationFits` refuses it; its nearest page has no mips).
  */
 export type EnemySizeClass = 'small' | 'medium' | 'large' | 'huge' | 'boss' | 'titan';
 
@@ -61,14 +63,18 @@ const ORDER: EnemySizeClass[] = ['titan', 'boss', 'huge', 'large', 'medium', 'sm
 /** The atlas screen scale of a sheet without its own (`monsters-ai.json` `scale`). */
 export const DEFAULT_SHEET_SCALE = 2;
 
+/** int-ef2: a tier scale (EF-A5's tier classes `medium` / `huge`, and pass 4 allowed): over 2 and not the V4 integer 3. */
+export const isTierScale = (s: number | undefined): boolean => s !== undefined && s > 2 && s !== 3;
+
 /** The layout class of an enemy: its data `size`, except that a boss sheet shown at scale 3 whose art (`artH`: the
  *  highest frame row to the cell bottom, screen px) does not fit ENEMY_AREA's height, or is unknown, is laid out, hops
  *  and attacks in place as the titan class (TITAN_AREA, travel 0): chaos under D-V6 = C2 (docs/REDESIGN_PLAN.md 4.2,
  *  582 px of art). A scale-3 boss whose art fits (hollow_seraph, V8 N-1: 471 px) stays a boss in ENEMY_AREA. */
 export function layoutSizeOf(size: EnemySizeClass | undefined, sheetScale: number | undefined, artH?: number): EnemySizeClass {
   const s = size ?? 'small';
-  // EF-A5: the 2.5 tier (2 < scale < 3) lays a data-small sheet out as `medium` and a data-large one as `huge`
-  if (sheetScale !== undefined && sheetScale > 2 && sheetScale < 3) return s === 'small' ? 'medium' : s === 'large' ? 'huge' : s;
+  // EF-A5: the tier scales (2.5; int-ef2: any fractional scale over 2, 3.3 too) lay a data-small sheet out as
+  // `medium` and a data-large one as `huge`
+  if (isTierScale(sheetScale)) return s === 'small' ? 'medium' : s === 'large' ? 'huge' : s;
   if (s !== 'boss' || sheetScale !== 3) return s;
   return artH !== undefined && artH <= ENEMY_AREA.y1 - ENEMY_AREA.y0 ? 'boss' : 'titan';
 }
@@ -153,7 +159,12 @@ function layout(boxes: EnemyBoxInput[]): { out: EnemyBox[]; pass: number } {
       // opaque packing centres the opaque extent in the column (the cell centre moves by the art's off-centre)
       const [l, r] = extentAt(b, p);
       const cx = p.opaque ? x + col.w / 2 + w / 2 - (l + r) / 2 : x + col.w / 2;
-      out[i] = { x: Math.round(cx), feetY: Math.round(y + h), w, h, scaleFactor: factorOf(b, p) };
+      // whole-px feet, never rounded so far up that the opaque top leaves the area (int-ef2: a 358.4 px box at the
+      // area top; at scales 2, 2.5 and 3 a box height is whole or x.5, and Math.round takes x.5 down the screen, so
+      // nothing changes there)
+      const minFeet = area.y0 + h - (b.oy0 ?? 0) * factorOf(b, p);
+      const feetY = Math.max(Math.round(y + h), Math.ceil(minFeet - 1e-9));
+      out[i] = { x: Math.round(cx), feetY, w, h, scaleFactor: factorOf(b, p) };
       y += h + ROW_GAP;
     }
     x += col.w + (p.opaque ? OPAQUE_GAP : COLUMN_GAP);

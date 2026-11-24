@@ -96,7 +96,11 @@ EF_B1 = ("gr_imp", "werewolf", "ghast", "shadow", "gargoyle", "bloodbones", "pis
 EF_B2 = ("black_widow", "gr_wolf", "ogre_chief", "tarantula", "shark", "ghast", "shadow", "anaconda", "hyenadon",
          "crocodile", "hydra", "fire_hydra", "lava_worm", "hellhound", "white_dragon")
 EF_B3 = ("blue_dragon", "green_dragon", "fire_lizard")
-EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon", "blue_dragon", "green_dragon")
+# int-ef2 (user ruling 2026-11-24): blue_dragon / green_dragon take tex 3 after all, the other four stay at the fallback
+EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon")
+# int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5, each the smallest multiple of
+# 0.05 that keeps it at least as tall as its lesser sibling (stone, iron >= clay; iron >= stone; sea_troll >= troll)
+EF_GROW = {"stone_golem": 2.8, "iron_golem": 3.3, "sea_troll": 2.7}
 
 
 def run_scale(check: Callable[[bool, str], None]) -> None:
@@ -109,7 +113,7 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     from gen import monster_atlas as MAT
     from gen import retire as RT
     real = MAT.load_scale(set(json.loads(ATLAS_JSON.read_text())["sheets"]))
-    check(all(v["scale"] in MAT.DISPLAY_SCALES for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
+    check(all(MAT.valid_scale(v["scale"]) for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
                                                                         f"({len(real)} entries)")
     at3 = {s for s, v in real.items() if v["scale"] == 3}
     check(at3 == set(V4_RESCALED + V6_SCALED + V8_SCALED),
@@ -117,15 +121,17 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     import yaml
     raw = yaml.safe_load(MAT.SCALE_TABLE.read_text())
     dicts = {s for s, v in raw.items() if isinstance(v, dict)}
-    b1 = all(real[s]["scale"] == 2.5 == real[s]["tex"] for s in EF_B1)
+    b1 = all(real[s]["scale"] == EF_GROW.get(s, 2.5) == real[s]["tex"] for s in EF_B1)
     # A4's budget fallback: the scale-3 sheets of B2 and B3 at tex 1 with despur only (EF_FALLBACK)
     # B4 round 1: shadow's despur was dropped (its smoky tatters are the design), it keeps the Scale2x texture
     b2 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"])
              and real[s]["smooth"] == ([] if s == "shadow" else ["despur"]) for s in EF_B2)
-    b3 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"]) for s in EF_B3)
+    b3 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"]) for s in EF_B3) and all(
+        real[s]["smooth"] == ["despur", "edges"] for s in ("blue_dragon", "green_dragon"))   # int-ef2 B4 round 2
     hires = sorted(s for s, v in real.items() if v["tex"] != 1)
-    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3) and b1 and b2 and b3 and len(hires) == 40,
-          f"EF-B: the dict entries are B1 (32 at 2.5), B2 (despur) and B3, the scale-3 ones at tex 1 "
+    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3) and b1 and b2 and b3 and len(hires) == 42,
+          f"EF-B: the dict entries are B1 (29 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the four fallback "
+          f"scale-3 ones at tex 1 "
           f"({len(dicts)} entries, {len(hires)} hi-res)")
     with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):
         t = Path(tmp)
@@ -306,17 +312,22 @@ CHAOS_TIP = [116, 12]        # the chaos attack_raise tip at 9fe129c (docs/REDES
 
 
 def _native(page, x: int, y: int, w: int, h: int, t: float):
-    """A frame's cell in art px: the native crop, or (EF-A4) a hi-res rect's opaque px mapped forward to the art px
-    they came from (floor(x / t)); Scale2x never draws outside an art px's own span, so the extents are the native ones."""
-    import math
+    """A frame's cell in art px: the native crop, or (EF-A4) a hi-res rect's opaque px mapped back to the art px they
+    were sampled from, floor((x + 0.4) / t) (monster_hires.SAMPLE_OFFSET; = floor(x / t) at t 2, 2.5, 3), and the lowest
+    opaque row (the feet guard's, re-sampled from the foot row) to floor(y / t) (int-ef2: 2.7, 2.8, 3.3); Scale2x never
+    draws outside the silhouette's own span, so the extents are the native ones."""
     import numpy as np
     from PIL import Image
     if t == 1:
         return page.crop((x, y, x + w, y + h))
-    a = np.asarray(page.crop((round(x * t), round(y * t), round(x * t) + math.ceil(w * t), round(y * t) + math.ceil(h * t))))
+    from gen import monster_hires as MH
+    f, px, py = MH.frac(t), round(x * t), round(y * t)
+    a = np.asarray(page.crop((px, py, px + MH.ceil_mul(w, t), py + MH.ceil_mul(h, t))))
     ys, xs = np.nonzero(a[..., 3] > 0)
+    back = (lambda v: (v * 5 + 2) * f.denominator // (5 * f.numerator))     # floor((v + 0.4) / t), exact
+    ny = np.where(ys == ys.max(), ys * f.denominator // f.numerator, back(ys))
     out = np.zeros((h, w, 4), np.uint8)
-    out[(ys / t).astype(int), (xs / t).astype(int)] = a[ys, xs]
+    out[np.minimum(ny, h - 1), np.minimum(back(xs), w - 1)] = a[ys, xs]
     return Image.fromarray(out, "RGBA")
 
 

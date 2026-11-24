@@ -14,7 +14,6 @@
 """
 from __future__ import annotations
 
-import math
 from pathlib import Path
 
 import yaml
@@ -24,7 +23,7 @@ from gen.anim_rules import MAX_PAGE
 from gen.monster_hires import unit
 
 GUTTER = 1
-MAX_EXTRA_PAGES = 15               # EF-A/B's 14 + EF-D's bosses-group spill (chaos's orbit frames; plan EF-D; int-ef1)
+MAX_EXTRA_PAGES = 17               # EF-A/B 14 + EF-D chaos spill 1 + int-ef2 2 (blue / green_dragon at tex 3, user ruling 2026-11-24)
 BASE_PAGES = 12                    # the atlas pages before EF (3ba8aa91): `extra` = pages - BASE_PAGES
 PAGE_BYTES = 2048 * 2048 * 4
 MAX_GPU_BYTES = 8 * PAGE_BYTES
@@ -36,11 +35,12 @@ def _align(v: int, u: int) -> int:
 
 
 class HiresPage:
-    """A shelf packer whose positions are multiples of each sheet's unit, shelves on multiples of `row_unit`."""
+    """A shelf packer whose positions are multiples of each sheet's unit: x on the shelf, and y from the shelf's top
+    aligned up to the sheet's own unit (int-ef2: one unit per page, the lcm of a group's units, would be 20790 texture
+    px once 2.5, 2.7, 2.8 and 3.3 share a group)."""
 
-    def __init__(self, row_unit: int) -> None:
-        self.row_unit = row_unit
-        self.x, self.y, self.shelf_h, self.width = 0, _align(GUTTER, row_unit), 0, 0
+    def __init__(self) -> None:
+        self.x, self.y, self.shelf_h, self.width = 0, GUTTER, 0, 0
         self.empty = True
 
     def place(self, sizes: list[tuple[int, int]], u: int, cap: int) -> list[tuple[int, int]] | None:
@@ -49,13 +49,14 @@ class HiresPage:
         for w, h in sizes:
             px = _align(x + GUTTER, u)
             if px + w > cap:
-                y, shelf_h = _align(y + shelf_h + GUTTER, self.row_unit), 0
+                y, shelf_h = y + shelf_h + GUTTER, 0
                 px = _align(GUTTER, u)
             if px + w > cap:
                 return None
-            pos.append((px, y))
+            py = _align(y, u)
+            pos.append((px, py))
             x = px + w
-            shelf_h = max(shelf_h, h)
+            shelf_h = max(shelf_h, py - y + h)
             width = max(width, x)
         if y + shelf_h > cap:
             return None
@@ -74,7 +75,6 @@ def pack_group(items: list[tuple[str, list[tuple[int, int]], float]], cap: int =
     the tallest sheets first, pack_all, the short sheets fill the earlier pages' last shelves)."""
     if not items:
         return [], {}
-    row_unit = math.lcm(*(unit(t) for _, _, t in items))
     pages: list[HiresPage] = []
     out = {}
     for sid, sizes, t in items:
@@ -84,7 +84,7 @@ def pack_group(items: list[tuple[str, list[tuple[int, int]], float]], cap: int =
                 out[sid] = (i, pos)
                 break
         else:
-            pages.append(HiresPage(row_unit))
+            pages.append(HiresPage())
             pos = pages[-1].place(sizes, unit(t), cap)
             if pos is None:
                 raise SystemExit(f"monsters_ai: hi-res {sid} does not fit on an empty {cap}x{cap} page")

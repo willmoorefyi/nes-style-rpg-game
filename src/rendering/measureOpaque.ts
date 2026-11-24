@@ -1,4 +1,5 @@
 import type { Texture } from 'pixi.js';
+import { artFloor, artFloorEnd, texLen, texPos } from './texPx.js';
 
 /**
  * The opaque box [left, top, right, bottom] (art px in the cell, inclusive) of one atlas frame, read from the page
@@ -9,12 +10,12 @@ export function measureOpaqueBox(sprite: string, tex: Texture, [x, y]: [number, 
   ts: number): [number, number, number, number] | null {
   if (typeof document === 'undefined') return null;
   try {
-    const [pw, ph] = [Math.round(w * ts), Math.round(h * ts)];
+    const [pw, ph] = [texLen(w, ts), texLen(h, ts)];
     const canvas = document.createElement('canvas');
     canvas.width = pw;
     canvas.height = ph;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx?.drawImage(tex.source.resource as CanvasImageSource, x * ts, y * ts, pw, ph, 0, 0, pw, ph);
+    ctx?.drawImage(tex.source.resource as CanvasImageSource, texPos(x, ts), texPos(y, ts), pw, ph, 0, 0, pw, ph);
     const data = ctx?.getImageData(0, 0, pw, ph).data;
     if (!data) return null;
     let [l, t, r, b] = [pw, ph, -1, -1];
@@ -25,7 +26,7 @@ export function measureOpaqueBox(sprite: string, tex: Texture, [x, y]: [number, 
       }
     }
     if (r < 0) return null;
-    return [Math.floor(l / ts), Math.floor(t / ts), Math.floor(r / ts), Math.floor(b / ts)];
+    return [artFloor(l, ts), artFloor(t, ts), artFloorEnd(r, ts), artFloorEnd(b, ts)];
   } catch (err) {
     console.warn(`Monster art: could not measure the opaque box of "${sprite}"; using its cell`, err);
     return null;

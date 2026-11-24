@@ -949,6 +949,30 @@
   gold: 100
   enemies: [blue_dragon, green_dragon]
   background: assets/backgrounds/grassland.webp
+# int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): clay 2.5 <= stone 2.8 <= iron 3.3 (cropped cell), and
+# troll 2.5 <= sea_troll 2.7
+- id: ef_grow
+  name: EF - the golems by toughness (clay 2.5, stone 2.8, iron 3.3)
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [clay_golem, stone_golem, iron_golem]
+  background: assets/backgrounds/grassland.webp
+- id: ef_grow_trolls
+  name: EF - troll 2.5 beside sea_troll 2.7
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [troll, sea_troll]
+  background: assets/backgrounds/grassland.webp
 - id: anim_boss_garland
   name: Anim - Garland, fight and magic 1:1
   party:

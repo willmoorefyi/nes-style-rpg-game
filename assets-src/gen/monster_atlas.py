@@ -8,7 +8,7 @@ frames: {name: [x, y]} (every MONSTER_FRAMES / BOSS_FRAMES name, plus RAISE_FRAM
 or missing frames alias along monster_recipes.FALLBACK, e.g. a held daze shows hurt_in1), anim, holds, lungePx,
 hasRaise, opaqueRight (the idle key's rightmost opaque column), head ([x, y]: the centre of the idle key's topmost
 opaque row), idleBox ([l, t, r, b]: the idle key's opaque box, inclusive; FW-A2), scale (only for a sheet listed in
-gen/monster_scale.yaml: its display scale, FW-S; EF-A: 2, 2.5 or 3), texScale (EF-A4: a hi-res sheet's texture px per art px;
+gen/monster_scale.yaml: its display scale, FW-S; EF-A: 2, 2.5 or 3; int-ef2: a multiple of 0.05 in [2, 3.5]), texScale (EF-A4: a hi-res sheet's texture px per art px;
 its frames sit on `filter: linear` pages, rects at frame * texScale), tip ([x, y]: the centre of attack_raise's topmost opaque row, the heavy attack's weapon tip; sheets with
 attack_raise only, or atk_wind2's for a rig with `raise: false`, FW-R), travelTop / lungeRight / homeX (FW-A, below),
 sequence_version, page (index into pages), kneelSink (floaters with a kneel key, docs/KNEEL_PLAN.md D-K9)}},
@@ -32,6 +32,7 @@ from PIL import Image
 from gen import anim_checks as C
 from gen import monster_anim as MA
 from gen import monster_hires as MH
+from gen import monster_hires_crop as MHC
 from gen import monster_hires_pages as MHP
 from gen import monster_pages as MP
 from gen.monster_recipes import orbit_of   # EF-D (selftest_orbit reads it here)
@@ -47,9 +48,8 @@ HOME_FRAMES = ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b
 RANGED_FRAMES = ("atk_wind1", "atk_wind2", "atk_mid", "attack", "atk_follow", "atk_recover")
 ENEMIES = MA.HERE.parent.parent / "assets" / "data" / "enemies.yaml"
 SCALE_TABLE = MA.HERE / "monster_scale.yaml"
-# FW-S had integer screen px per art px only (D-V1 S1); EF-A1 (docs/ENEMY_FEEDBACK_PLAN.md, the user's 2026-11-24
-# request overrides D-V1 S1) adds 2.5, drawn from a hi-res texture at texScale 2.5 (gen/monster_hires.py)
-DISPLAY_SCALES = MH.DISPLAY_SCALES
+# FW-S integer scales (D-V1 S1); EF-A1 2.5, int-ef2 any multiple of 0.05 in [2, 3.5] (docs/ENEMY_FEEDBACK_PLAN.md)
+valid_scale = MH.valid_scale
 
 
 def sprite_frames(sid: str, meta: dict, kfs: dict[str, Image.Image]) -> tuple[dict[str, Image.Image], list[str], bool]:
@@ -167,17 +167,18 @@ def build(out: Path, scale_table: Path | None = None) -> dict:
             sprites[v["id"]] = (meta, vf, holds, anim, L)
     scales = load_scale(set(sprites), scale_table)
     smooth = {}
-    for sid in sorted(s for s, e in scales.items() if e["smooth"]):   # EF-A3: native clean-up after checks and locks
+    for sid in sorted(s for s, e in scales.items() if "despur" in e["smooth"]):   # EF-A3: native clean-up after checks and locks
         meta, frames, holds, anim, L = sprites[sid]
         frames, smooth[sid] = MH.despur_sheet(sid, frames)
         sprites[sid] = (meta, frames, holds, anim, L)
+    MHC.apply(scales, sprites)                       # int-ef2: a `crop: true` sheet's cell cut to its art
     hi = {s: e["tex"] for s, e in scales.items() if e["tex"] != 1}
     groups = MP.group_order(sorted(sprites), {s for s, v in sprites.items() if v[0].get("size") == "titan"})
     order = [sid for _, ids in groups for sid in ids]
     names_of = {s: MA.frames_for("cast" in sprites[s][1], "attack_raise" in sprites[s][1], orbit_of(sprites[s][1]))
                 for s in order}
     items = {sid: [n for n in names_of[sid] if n in sprites[sid][1]] for sid in order}
-    tex = {sid: MH.hires_sheet(sid, {n: sprites[sid][1][n] for n in items[sid]}, hi[sid]) for sid in hi}
+    tex = {s: MH.hires_sheet(s, {n: sprites[s][1][n] for n in items[s]}, hi[s], "edges" in scales[s]["smooth"]) for s in hi}
     img = (lambda sid, n: tex[sid][n] if sid in tex else sprites[sid][1][n])
     sizes, placed, linear, act1 = MHP.pack_all(groups, {s: [img(s, n).size for n in items[s]] for s in order}, hi)
     for w, h in sizes:
