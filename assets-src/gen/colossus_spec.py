@@ -9,7 +9,9 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-KINDS = ("body", "limb", "core", "glow", "moon", "eyes", "cloud", "corona", "overhang")   # colossusIndex.ts LAYER_KINDS
+KINDS = ("body", "limb", "core", "glow", "moon", "eyes", "cloud", "corona", "overhang",   # colossusIndex.ts LAYER_KINDS
+         "orb", "orb_glow", "ring_back")                                                     # EF-E: the orbits
+ADD_KINDS = ("glow", "corona", "orb_glow")   # drawn additively unless the yaml says otherwise
 ANCHORS = ("target", "core", "head", "melee", "feet")
 FIELD_Y1 = 780                      # the rest view's bottom (the strip)
 PREVIEW = (940, 720)                # 18.8: the bestiary still, Lanczos-fit and opaque
@@ -58,7 +60,65 @@ def spec_problems(spec: dict) -> list[str]:
             p.append(f"layer {n}: box must be 4 integers")
         if "base" not in (L.get("frames") or {}):
             p.append(f"layer {n}: no base frame")
+    p += _orbit_problems(spec, names)
     return [f"colossus {spec.get('form', '?')}: {m}" for m in p]
+
+
+def _num(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and np.isfinite(v)
+
+
+def _orbit_problems(spec: dict, names: list) -> list[str]:
+    """EF-E: `rings` {id: {centre [x, y], axes [a, b] (> 0), tilt (rad), dir 1 | -1}} and `orbits` {orb layer: {ring,
+    phase0 (rad), period_ms > 0}}: every `orb` layer has an orbit on a ring, every `orb_glow` layer is `<orb>_glow`."""
+    p: list[str] = []
+    rings, orbits = spec.get("rings") or {}, spec.get("orbits") or {}
+    for k, r in rings.items():
+        ok = isinstance(r, dict) and isinstance(r.get("centre"), list) and len(r["centre"]) == 2 \
+            and all(_num(v) for v in r["centre"]) and isinstance(r.get("axes"), list) and len(r["axes"]) == 2 \
+            and all(_num(v) and v > 0 for v in r["axes"]) and _num(r.get("tilt")) and r.get("dir") in (1, -1)
+        if not ok:
+            p.append(f"ring {k}: needs centre [x, y], axes [a, b] > 0, tilt and dir 1 | -1")
+    kinds = {L.get("name"): L.get("kind") for L in spec.get("layers") or []}
+    for name, o in orbits.items():
+        if kinds.get(name) != "orb":
+            p.append(f"orbit {name}: no orb layer of that name")
+        if not isinstance(o, dict) or o.get("ring") not in rings or not _num(o.get("phase0")) \
+                or not isinstance(o.get("period_ms"), int) or o["period_ms"] <= 0:
+            p.append(f"orbit {name}: needs a ring of `rings`, phase0 and an integer period_ms > 0")
+    for name, kind in kinds.items():
+        if kind == "orb" and name not in orbits:
+            p.append(f"layer {name}: an orb layer needs an orbit")
+        if kind == "orb_glow" and not (name.endswith("_glow") and kinds.get(name[:-5]) == "orb"):
+            p.append(f"layer {name}: an orb_glow layer is named <orb layer>_glow")
+    return p
+
+
+def orbits_json(spec: dict) -> dict:
+    """The json's `rings` / `orbits` (camelCase periodMs), {} for a form without orbits."""
+    if not spec.get("orbits"):
+        return {}
+    return {"rings": {k: {"centre": [float(v) for v in r["centre"]], "axes": [float(v) for v in r["axes"]],
+                          "tilt": float(r["tilt"]), "dir": int(r["dir"])} for k, r in spec["rings"].items()},
+            "orbits": {k: {"ring": o["ring"], "phase0": float(o["phase0"]), "periodMs": int(o["period_ms"])}
+                       for k, o in spec["orbits"].items()}}
+
+
+def orbit_of(spec: dict, name: str) -> dict | None:
+    """The orbit an orb or orb_glow layer moves on (a glow follows its orb)."""
+    orbits = spec.get("orbits") or {}
+    return orbits.get(name) or (orbits.get(name[:-5]) if name.endswith("_glow") else None)
+
+
+def draw_order(spec: dict) -> list[int]:
+    """The layers' indices in draw order at rest (colossusIndex.ts): ring_back first, then the orbs on the far half of
+    their ring (sin phase0 <= 0) with their halos, then the rest in yaml order (near orbs where the yaml puts them)."""
+    def group(L: dict) -> int:
+        if L["kind"] == "ring_back":
+            return 0
+        o = orbit_of(spec, L["name"]) if L["kind"] in ("orb", "orb_glow") else None
+        return 1 if o is not None and np.sin(o["phase0"]) <= 0 else 2
+    return sorted(range(len(spec["layers"])), key=lambda i: (group(spec["layers"][i]), i))
 
 
 def visible_box_of(entry: dict) -> list[int]:
@@ -78,7 +138,7 @@ def preview(entry: dict, spec: dict, approved: Path, form: str, bg_path: Path | 
     bg = np.asarray(Image.open(bg_path).convert("RGB").resize((1920, 1080), Image.Resampling.LANCZOS)).astype(float)
     out = bg * float(spec.get("sky_dim", 1.0))
     px, py = entry["place"]
-    for L, e in zip(spec["layers"], entry["layers"]):
+    for L, e in ((spec["layers"][i], entry["layers"][i]) for i in draw_order(spec)):
         src, box = L["frames"].get((spec.get("variant") or {}).get(L["name"], "base")), L.get("box")
         if src is None:
             continue

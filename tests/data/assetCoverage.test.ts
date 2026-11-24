@@ -1,5 +1,5 @@
 import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
-import { BOSS_FRAMES, FRAME_FALLBACK, FRAME_SOURCE, MONSTER_FRAMES, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
+import { BOSS_FRAMES, FRAME_FALLBACK, FRAME_SOURCE, MONSTER_FRAMES, isOrbitFrame, resolveFrame, type MonsterFrame } from '../../src/scenes/battle/enemyChoreography.js';
 import { KNEEL_FRAMES, isKneelFrame } from '../../src/scenes/battle/kneelChoreography.js';
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -30,7 +30,8 @@ const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.j
   texScale?: number;
   pages: { file: string; w: number; h: number }[];
   sheets: Record<string, { cell: [number, number]; footRow: number; frames: Record<string, [number, number]>; page: number;
-    anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number] }>;
+    anim?: boolean; holds?: string[]; lungePx?: number; hasRaise?: boolean; opaqueRight?: number; head?: [number, number];
+    texScale?: number; idleOrbit?: number }>;
 };
 /** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
 // FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens
@@ -219,12 +220,16 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
         // every sheet has daze / daze_b (pass F 5a); the heavy raise frames only with hasRaise (pass F 7)
         // pass K: the 4 kneel names come all together (own rects or aliased per D-K7) or not at all (an atlas before K1)
         const kneel = 'kneel' in e.frames;
+        // EF-D: an orbit sheet (idleOrbit N) has idle_o<k> / idle_b_o<k> for k < N; every other sheet none
+        const orbit = e.idleOrbit ?? 0;
         const want = ('cast' in e.frames ? BOSS_FRAMES : MONSTER_FRAMES).filter((n) => !!e.hasRaise || !RAISE_FRAMES.has(n))
-          .filter((n) => kneel || !isKneelFrame(n));
+          .filter((n) => kneel || !isKneelFrame(n))
+          .filter((n) => !isOrbitFrame(n) || Number(n.slice(n.lastIndexOf('o') + 1)) < orbit);
         expect(Object.keys(e.frames).sort(), id).toEqual([...want].sort());
+        const t = e.texScale ?? ts;                                // EF-A4: a hi-res sheet's own texScale
         for (const [x, y] of Object.values(e.frames)) {
-          expect((x + e.cell[0]) * ts, id).toBeLessThanOrEqual(w);
-          expect((y + e.cell[1]) * ts, id).toBeLessThanOrEqual(h);
+          expect(x * t + Math.ceil(e.cell[0] * t), id).toBeLessThanOrEqual(w);
+          expect(y * t + Math.ceil(e.cell[1] * t), id).toBeLessThanOrEqual(h);
         }
         expect(e.footRow, id).toBeLessThan(e.cell[1]);
       }

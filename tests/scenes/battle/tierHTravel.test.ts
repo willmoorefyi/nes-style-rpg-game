@@ -64,11 +64,13 @@ describe('tier H travels under the message window at a whole screen scale (real 
     const others = TIER_H.filter((x) => x !== id).slice(0, 2);
     for (const layout of [[huge(id)], [huge(id), ...others.map(huge)]]) {
       const b = battle(layout);
-      for (const s of b.sprites) {
+      // the screen scale (sprite scale x texScale; int-ef2: blue / green_dragon are drawn 1:1 from a tex-3 texture)
+      const screen = b.sprites.map((s, i) => { const g = atlasFrames(monsterSpriteKey(enemyById(layout[i].id)))!; return (s.scale.x * g.scale) / g.artScale; });
+      for (const [i, s] of b.sprites.entries()) {
         expect(Number.isInteger(s.x) && Number.isInteger(s.y), `${id} position ${s.x},${s.y}`).toBe(true);
-        expect([2, 3]).toContain(s.scale.x);
+        expect([2, 3]).toContain(Math.round(screen[i] * 1e9) / 1e9);
       }
-      expect(b.sprites[0].scale.x, `${id} at factor 1`).toBe(3);
+      expect(screen[0], `${id} at factor 1`).toBe(3);
       expect(highest(b, sheet, f), `${id} x${layout.length}`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
     }
   });

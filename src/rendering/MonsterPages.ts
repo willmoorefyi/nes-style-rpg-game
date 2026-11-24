@@ -1,7 +1,12 @@
 import type { Texture } from 'pixi.js';
 
 /** One page of the monster atlas (`monsters-ai.json` `pages`, docs/ROSTER_PLAN.md 8): a PNG next to the JSON. */
-export interface MonsterAtlasPage { file: string; w: number; h: number }
+export interface MonsterAtlasPage {
+  file: string; w: number; h: number;
+  /** EF-A4: `linear` for a page of hi-res sheets (drawn 1:1 it is byte-exact; shrunk it down-samples through mipmaps);
+   *  missing: nearest (the native pages). */
+  filter?: 'linear' | 'nearest';
+}
 
 /** How a page texture is fetched and freed (pixi `Assets` in the game; tests inject fakes). */
 export interface PageIo {
@@ -124,8 +129,9 @@ export class MonsterPages {
     let job = this.inFlight.get(p);
     if (!job) {
       const url = this.url(p);
+      const linear = this.pages[p].filter === 'linear';
       job = this.io.load(url).then((tex) => {
-        tex.source.scaleMode = 'nearest';
+        applyPageFilter(tex, linear);
         this.loaded.set(p, tex);
         this.failed.delete(p);
       }, (err: unknown) => {
@@ -150,4 +156,15 @@ export class MonsterPages {
       extra--;
     }
   }
+}
+
+/** EF-A5: a page's sampling. Native pages stay nearest (crisp art px at any whole scale); a hi-res page is linear with
+ *  mipmaps, so a shrink pass (0.8, 0.67, 0.4) averages texels instead of skipping them. Set before the first upload:
+ *  the GL texture system sizes the mip chain when it creates the texture (WebGL1 with an NPOT page: linear only). */
+export function applyPageFilter(tex: Texture, linear: boolean): void {
+  const src = tex.source;
+  src.scaleMode = linear ? 'linear' : 'nearest';
+  if (!linear) return;
+  src.mipmapFilter = 'linear';
+  src.autoGenerateMipmaps = true;
 }

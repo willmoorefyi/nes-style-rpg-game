@@ -8,7 +8,7 @@ import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
 import { atlas, enemyById, enemyData, formRecords, frameBox, layoutInput, sheetScale } from '../../helpers/atlasFrames.js';
 
-const BOX: Record<EnemySizeClass, number> = { small: 160, large: 256, huge: 384, boss: 400, titan: 600 };
+const BOX: Record<EnemySizeClass, number> = { small: 160, medium: 200, large: 256, huge: 384, boss: 400, titan: 600 };
 const box = (size: EnemySizeClass): EnemyBoxInput => ({ size, w: BOX[size], h: BOX[size] });
 
 function rect(b: EnemyBox) {
@@ -140,8 +140,9 @@ describe('large crowds pack by their home art (defect 2)', () => {
   // 6 tier-L members alone at factor 1 and 3 tier-H side by side are pinned in the TS-2 block below)
   it('the play-test crowd (3 tier-H since V4) lays out with whole screen scales and no overlap; the dragon\'s rect holds its breath', () => {
     // V8: the regenerated crazy_horse (home art 126 art px) no longer fits this crowd at a whole scale (the sandbox refuses
-    // it, F8); the crowd keeps its shape with nightmare in that slot
-    const crowd = ['ogre', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
+    // it, F8); the crowd keeps its shape with nightmare in that slot. int-ef1: EF-C's ogre club tip widens its home art
+    // 7 px and, beside EF-B's 2.5 troll / ogre_chief / anaconda, the nine no longer fit; wyvern takes the ogre's slot
+    const crowd = ['wyvern', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
     const out = packed(crowd);
     const shown = out.map((b, i) => sheetScale(crowd[i]) * b.scaleFactor);
     expect(shown, 'measured at V4').toEqual(CROWD_SHOWN);
@@ -157,13 +158,14 @@ describe('large crowds pack by their home art (defect 2)', () => {
 
   it('nine of every tier-L sheet whose home art is <= 236 screen px wide lay out at scale factor 1 (26 sheets, re-measured at V8 W4)', () => {
     const large = [...new Set(enemyData.filter((e) => e.size === 'large').map((e) => monsterSpriteKey(e)))];
-    const s = large.filter((k) => atlas.sheets[k] && homeWidth(k) * sheetScale(k) <= 236);
+    const s = large.filter((k) => atlas.sheets[k] && sheetScale(k) !== 2.5 && homeWidth(k) * sheetScale(k) <= 236);
     // 46 at fix pass 2 G4 (45 at F5 + white_shark; 118 art px at scale 2); V4 (REDESIGN_PLAN 2.6): the 20 of them now
     // `huge` (tier H) leave the large class: 26. bigeyes joins the large class at scale 3 but its home art is 87 x 3 =
     // 261 screen px, so it is not in this set (nine bigeyes: the next case). V6: the pass-V guardian (128 cell, home art
     // 118 art px = 236 screen px; the retired hound was 274) joins the set: 27. V8 W4 (REDESIGN_FIX_PLAN F1): the R321
     // crazy_horse (132 cell, home art 2-127 = 126 art px = 252 screen px, its hurt recoils to x 2; R290 was 98) leaves: 26
-    expect(s.length).toBe(26);
+    // EF-B1: the 2.5 larges lay out as `huge` (capacity 1), so they leave the set: 11 of the 26, 15 left
+    expect(s.length).toBe(15);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);
@@ -218,7 +220,8 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
       expect(enemyData.find((e) => e.id === id)!.size, id).toBe('boss');
       expect([layoutInput(id).size, layoutInput(id).scale, layoutInput(id).oy0], id).toEqual(['boss', 3, 129]);
     }
-    const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale !== undefined).sort();
+    // EF-B adds 2.5 sheets and explicit scale-2 entries (smoothed sheets); the scale-3 set is unchanged
+    const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale === 3).sort();
     expect(scaled).toEqual([...TIER_H, 'bigeyes', 'chaos', 'hollow_seraph'].sort());
   });
   const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
@@ -237,6 +240,8 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   });
 
   it('every box of every real formation (golden and rescaled) and of 1,000 seeded random formations has a whole screen scale', () => {
+    const TIER = new Set(Object.values(atlas.sheets).map((v) => v.scale ?? atlas.scale).filter((v) => !Number.isInteger(v)));
+    expect([...TIER].sort()).toEqual([2.5, 2.7, 2.8, 3.3]);
     const golden = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '__golden__/layout_f1.json'), 'utf-8')) as
       { cases: { enemies: string[]; inputs: EnemyBoxInput[] }[] };
     const formations: EnemyBoxInput[][] = golden.cases.flatMap((c) => [c.inputs, c.enemies.map(rescaled)]);
@@ -249,7 +254,9 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
     }
     let boxes = 0;
     for (const f of formations) {
-      for (const s of screenScales(f)) { expect(whole(s), `${s} in ${f.map((b) => b.size).join(',')}`).toBe(true); boxes++; }
+      // EF-A1 (overrides D-V1 S1): 2.5 is allowed too, drawn 1:1 from its texScale-2.5 texture; int-ef2: so is every
+      // tier scale of the table (2.7 sea_troll, 2.8 stone_golem, 3.3 iron_golem), each drawn 1:1 from its texture
+      for (const s of screenScales(f)) { expect(whole(s) || TIER.has(s), `${s} in ${f.map((b) => b.size).join(',')}`).toBe(true); boxes++; }
     }
     expect(boxes).toBeGreaterThan(4000);
   });
@@ -268,8 +275,9 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
 
   it('the play-test crowd with dragon, shark and minotaur rescaled: whole scales, no overlap; the 6 tier-L at factor 1 alone', () => {
     // V8: the regenerated crazy_horse (home art 126 art px) no longer fits this crowd at a whole scale (the sandbox refuses
-    // it, F8); the crowd keeps its shape with nightmare in that slot
-    const crowd = ['ogre', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
+    // it, F8); the crowd keeps its shape with nightmare in that slot. int-ef1: EF-C's ogre club tip widens its home art
+    // 7 px and, beside EF-B's 2.5 troll / ogre_chief / anaconda, the nine no longer fit; wyvern takes the ogre's slot
+    const crowd = ['wyvern', 'troll', 'dragon', 'nightmare', 'gigas_worm', 'ogre_chief', 'shark', 'anaconda', 'minotaur'];
     const inputs = crowd.map(rescaled);
     expect(screenScales(inputs).every(whole)).toBe(true);
     expect(formationFits(inputs)).toBe(true);

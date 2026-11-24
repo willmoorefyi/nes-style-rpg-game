@@ -2,16 +2,22 @@
 # atlas sheet's `scale` field (BattleArt uses entry.scale ?? meta.scale). Approved PNGs, rigs and locks are untouched:
 # frames are generated, checked and locked at native size; the GPU draws each art px as a scale x scale block.
 # Format: {<sprite id>: 3}. Allowed values 2 and 3; an id that is not an atlas sheet is refused (monster_atlas.load_scale).
+# EF-A1 (docs/ENEMY_FEEDBACK_PLAN.md; the user's 2026-11-24 request overrides D-V1 S1's integer-only rule): an entry may
+# also be {scale: S, tex: T, smooth: [despur]}: S in {2, 2.5, 3} screen px per native art px, T = S (a hi-res texture
+# from gen/monster_hires.py, drawn 1:1 from a `filter: linear` page) or T = 1 with an integer S (today's texture),
+# `smooth: [despur]` a native spur / notch clean-up first. The approved PNGs, rigs and locks stay untouched.
+# int-ef2 (user ruling 2026-11-24, "grow the tougher enemies vs. shrink the weaker ones"): S may be any multiple of 0.05
+# in [2, 3.5] (monster_hires.valid_scale), with T = S; a plain entry stays the integer 2 or 3.
 # Empty: every sheet at the atlas scale 2 (the JSON has no `scale` field per sheet). The integrator fills the entries (V4).
 # V4 (docs/REDESIGN_PLAN.md 2.3, 2.4; D-V1 S1, D-V2, D-V3): 23 sheets at 3 screen px per art px.
 # tier L, small -> large (FF1 large class):
 bigeyes: 3
 # tier H `huge`, the user's 17 (D-V2; "all dragons" = dragon (red), white, blue, green, dragon_zombie):
-shark: 3
+shark: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
 minotaur: 3
 ochu: 3
 neochu: 3
-hydra: 3
+hydra: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
 earth_elemental: 3
 fire_elemental: 3
 water_elemental: 3
@@ -20,14 +26,17 @@ hill_gigas: 3
 fire_gigas: 3
 ice_gigas: 3
 dragon: 3
-white_dragon: 3
-blue_dragon: 3
-green_dragon: 3
+white_dragon: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
+# EF-B3; int-ef2 (user ruling 2026-11-24): the tex-3 texture after all. B4 round 1 (image review, ITERATE): full
+# Scale2x rounded the horn and crest points and blotched the dithered scales; round 2: `edges`, Scale2x on the
+# silhouette only, the inside nearest
+blue_dragon: {scale: 3, tex: 3, smooth: [despur, edges]}
+green_dragon: {scale: 3, tex: 3, smooth: [despur, edges]}
 dragon_zombie: 3
 # tier H siblings (D-V3), so no lesser sibling outgrows its greater one:
 white_shark: 3
 minotaur_zombie: 3
-fire_hydra: 3
+fire_hydra: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
 deepeyes: 3
 evil_eye: 3
 # V6 (docs/REDESIGN_PLAN.md 4.2, ruling D-V6 = C2 after G-T0): the redesigned chaos, cut in the normal 200 px boss band
@@ -37,3 +46,56 @@ chaos: 3
 # art px) is shown at 3 screen px per art px (idle 504 x 414) so it is no longer smaller than lich / garland / warmech;
 # hollow_seraph_2 shares the sprite. `size: boss` kept; its art (471 px) fits ENEMY_AREA, so it lays out as a boss.
 hollow_seraph: 3
+
+# EF-B1 (docs/ENEMY_FEEDBACK_PLAN.md, the user's 26 plus six greater siblings): bigger at 2.5 screen px per art px,
+# drawn from a texScale-2.5 Scale2x texture. Data-`small` sheets (layout tier `medium`):
+gr_imp: {scale: 2.5, tex: 2.5}
+werewolf: {scale: 2.5, tex: 2.5}
+ghast: {scale: 2.5, tex: 2.5, smooth: [despur]}
+shadow: {scale: 2.5, tex: 2.5}   # B4 round 1: despur merged its smoky tatters into solid lobes, so Scale2x only
+gargoyle: {scale: 2.5, tex: 2.5}
+bloodbones: {scale: 2.5, tex: 2.5}
+piscodemon: {scale: 2.5, tex: 2.5}
+mummy: {scale: 2.5, tex: 2.5}
+horned_devil: {scale: 2.5, tex: 2.5}
+mindflayer: {scale: 2.5, tex: 2.5}
+weretiger: {scale: 2.5, tex: 2.5}
+king_mummy: {scale: 2.5, tex: 2.5}
+medusa: {scale: 2.5, tex: 2.5}
+rakshasa: {scale: 2.5, tex: 2.5}
+sahagin_prince: {scale: 2.5, tex: 2.5}
+black_knight: {scale: 2.5, tex: 2.5}
+earth_medusa: {scale: 2.5, tex: 2.5}
+gr_wolf: {scale: 2.5, tex: 2.5, smooth: [despur]}
+# data-`large` sheets (laid out as `huge`, capacity 1):
+ogre_chief: {scale: 2.5, tex: 2.5, smooth: [despur]}
+troll: {scale: 2.5, tex: 2.5}
+sphinx: {scale: 2.5, tex: 2.5}
+manticore: {scale: 2.5, tex: 2.5}
+clay_golem: {scale: 2.5, tex: 2.5}
+tyrannosaur: {scale: 2.5, tex: 2.5}
+rhyos: {scale: 2.5, tex: 2.5}
+# int-ef2 (user ruling 2026-11-24): the tougher golems at least as tall as clay_golem (idle 117 art px = 292.5 screen
+# px), in toughness order clay <= stone <= iron: iron at 3.3 (90 px -> 297), stone at 2.8 below (105 px -> 294); each
+# the smallest multiple of 0.05 that meets it (iron at 3.25 would be 292.5, under stone's 294)
+iron_golem: {scale: 3.3, tex: 3.3, crop: true}   # crop: its 423-px cells fit 16 a page, not its 17 frames (monster_hires.crop_sheet)
+# the greater siblings (NEW_MONSTER_GUIDE.md 1.4: no lesser sibling outgrows its greater one; beyond the user's list):
+death_knight: {scale: 2.5, tex: 2.5}   # > black_knight
+stone_golem: {scale: 2.8, tex: 2.8}   # > clay_golem < stone 200 < iron 304 HP; int-ef2: 105 px -> 294 >= clay's 292.5
+chimera: {scale: 2.5, tex: 2.5}   # > manticore
+sea_troll: {scale: 2.7, tex: 2.7}   # > troll; int-ef2 (user ruling 2026-11-24): 106 px -> 286.2 >= troll's 282.5 (113 px)
+winter_wolf: {scale: 2.5, tex: 2.5}   # > gr_wolf: 92 HP > 72
+ogre_mage: {scale: 2.5, tex: 2.5}   # > ogre_chief: 144 HP > 132
+# EF-B2: smoothed (`despur` and a Scale2x texture) at today's size; the scale-3 ones (shark, hydra, fire_hydra,
+# white_dragon) are above at tex 1 (the A4 budget fallback: despur only), the B1 ones in B1 (gr_wolf, ogre_chief, ghast, shadow):
+black_widow: {scale: 2, tex: 2, smooth: [despur]}
+tarantula: {scale: 2, tex: 2, smooth: [despur]}
+anaconda: {scale: 2, tex: 2, smooth: [despur]}
+hyenadon: {scale: 2, tex: 2, smooth: [despur]}
+crocodile: {scale: 2, tex: 2, smooth: [despur]}
+lava_worm: {scale: 2, tex: 2, smooth: [despur]}
+hellhound: {scale: 2, tex: 2, smooth: [despur]}
+# EF-B3: the low-res trio. blue_dragon / green_dragon above (tex 3 with despur; int-ef2 raised the page budget for
+# them, user ruling 2026-11-24); fire_lizard at tex 2 with despur (no block-mode reduction: only 46-61 % of its 2x2 blocks are uniform).
+# None adds detail the raw never had: real extra detail needs a new render.
+fire_lizard: {scale: 2, tex: 2, smooth: [despur]}

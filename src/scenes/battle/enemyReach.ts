@@ -17,7 +17,7 @@ export const MAX_ENEMY_RISE = 400;
 /** The lunge share of the contact frame (enemyAttackTables: the first `attack` frame). */
 export const CONTACT_LUNGE = 0.75;
 /** Travel hop per size class, px at scale factor 1 (a titan attacks in place, docs/REDESIGN_PLAN.md 4.2). */
-export const TRAVEL_HOP: Record<EnemySizeClass, number> = { small: 10, large: 6, huge: 4, boss: 3, titan: 0 };
+export const TRAVEL_HOP: Record<EnemySizeClass, number> = { small: 10, medium: 10, large: 6, huge: 4, boss: 3, titan: 0 };
 /** The highest a travelling enemy's art may reach: 4 px under the message window. */
 export const TRAVEL_CLEAR_Y = BATTLE_MESSAGE_HEIGHT + 4;
 
@@ -41,5 +41,7 @@ export function enemyReach(r: ReachInput): { travel: number; rise: number } {
   const travel = clamp(r.targetLeft + ENEMY_REACH_OVERLAP - r.opaqueRight - CONTACT_LUNGE * r.lunge, 0, MAX_ENEMY_TRAVEL);
   if (travel <= 0) return { travel, rise: 0 };
   const rise = clamp(r.targetFeetY - r.feetY, -MAX_ENEMY_RISE, MAX_ENEMY_RISE);
-  return { travel, rise: r.topY === undefined ? rise : Math.min(MAX_ENEMY_RISE, Math.max(rise, TRAVEL_CLEAR_Y - r.topY)) };
+  // the clearance bound in whole px (int-ef2: at 2.7 a travel top lands on x.9; Math.round(-94.1) would leave 0.1 px
+  // above the line; at scale 2, 3 and 2.5 the result is unchanged, as Math.round(-94.5) is -94 too)
+  return { travel, rise: r.topY === undefined ? rise : Math.min(MAX_ENEMY_RISE, Math.max(rise, Math.ceil(TRAVEL_CLEAR_Y - r.topY))) };
 }

@@ -182,7 +182,10 @@ def run_atlas(check: Callable[[bool, str], None]) -> None:
         return
     from gen import monster_pages as MP
     act1 = sorted({meta["sheets"][s]["page"] for s in dict(MP.PAGE_GROUPS)["act1"] if s in meta["sheets"]})
-    check(meta["preload"] == act1 and len(act1) <= 2, f"preload {meta['preload']} = the act-1 pages {act1}")
+    # EF-A4: the act-1 group's hi-res (`filter: linear`) pages are preloaded too; at most 2 native act-1 pages
+    native = [p for p in act1 if meta["pages"][p].get("filter") != "linear"]
+    check(meta["preload"] == act1 and len(native) <= 2, f"preload {meta['preload']} = the act-1 pages {act1} "
+                                                         f"({len(native)} native)")
 
 
 def run_kneel(check: Callable[[bool, str], None]) -> None:

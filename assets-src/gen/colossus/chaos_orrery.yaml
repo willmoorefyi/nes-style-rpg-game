@@ -5,7 +5,10 @@
 #   head = the eclipse disc's top (screen 705, 195): the status icon row sits above it, under the message window
 #   melee = the right forearm (screen 1010, 585): hero travel from the party (x 1380) about 370 px
 #   hands = the two forearms (screen 340 / 1070, 715); feet = the lower torso just above the strip (screen 765)
-# No orb / planet layers: the orbs sit on the rings and cutting them out would need the art behind them painted.
+# EF-E (docs/ENEMY_FEEDBACK_PLAN.md): the four orbs travel along the two gold rings. gen/colossus/chaos_orrery_orbs.py
+# (offline, no model) cut them off the v2 master (approved/_retired/chaos_orrery_v2), filled their spots (armour
+# mirror-cloned from the opposite side, the band redrawn along the fitted ellipse) and moved the far ring segments over
+# the sky to ring_back. Draw order (colossusIndex.ts): ring_back < far orbs < body < near orbs < glow.
 form: chaos_orrery
 canvas: [1320, 900]
 scale: 1
@@ -18,14 +21,39 @@ anchors:
   melee: [970, 560]
   feet: [660, 740]
 target_rect: [380, 130, 580, 610]
+# the rings' ellipses fitted to the gold pixels by chaos_orrery_orbs.py (art px; tilt in radians, screen y down): a point
+# is centre + R(tilt) (a cos t, b sin t); t increases with the clock for dir 1; the near half (in front of the body) is
+# sin t > 0. A (white, cyan, orange) rises to the right, B (teal) falls to the right; they turn opposite ways.
+rings:
+  A: {centre: [656.592, 469.638], axes: [591.872, 155.823], tilt: -0.214, dir: 1}
+  B: {centre: [660.447, 516.748], axes: [512.568, 127.666], tilt: 0.277, dir: -1}
+# each orb's ring, its phase at clock 0 (the painted spot) and its period (one turn; the orbs of a ring share it)
+orbits:
+  orb_white: {ring: A, phase0: -2.082, period_ms: 9000}
+  orb_cyan: {ring: A, phase0: 0.3143, period_ms: 9000}
+  orb_orange: {ring: A, phase0: 2.6169, period_ms: 9000}
+  orb_teal: {ring: B, phase0: 1.1858, period_ms: 7000}
 layers:
+  # ring_back: the far ring segments over the sky (and both rings' ends), under the far orbs
+  - name: ring_back
+    kind: ring_back
+    frames: {base: ring_back.png}
   # body: the frame drops only the invisible residue outside the alpha >= 5 box (252 px, alpha <= 4), so the cut
   # never reaches the canvas's left or right border
   - name: body
     kind: body
     box: [56, 0, 1272, 900]
     frames: {base: master.png}
-  # glow: the crown and planet halos (nothing over the body), additive, half res (texScale 2), rest alpha 1
+  # the orbs at their painted spots (disc + glassy rim) and their halos (additive, half res), moved along their rings
+  - {name: orb_white, kind: orb, frames: {base: orb_white.png}}
+  - {name: orb_white_glow, kind: orb_glow, blend: add, alpha: 1.0, tex_scale: 2, frames: {base: orb_white_glow.png}}
+  - {name: orb_cyan, kind: orb, frames: {base: orb_cyan.png}}
+  - {name: orb_cyan_glow, kind: orb_glow, blend: add, alpha: 1.0, tex_scale: 2, frames: {base: orb_cyan_glow.png}}
+  - {name: orb_orange, kind: orb, frames: {base: orb_orange.png}}
+  - {name: orb_orange_glow, kind: orb_glow, blend: add, alpha: 1.0, tex_scale: 2, frames: {base: orb_orange_glow.png}}
+  - {name: orb_teal, kind: orb, frames: {base: orb_teal.png}}
+  - {name: orb_teal_glow, kind: orb_glow, blend: add, alpha: 1.0, tex_scale: 2, frames: {base: orb_teal_glow.png}}
+  # glow: the crown halo (nothing over the body; the orb halos moved to orb_<c>_glow), additive, half res (texScale 2)
   - name: glow
     kind: glow
     blend: add

@@ -42,6 +42,11 @@ const NEW_FILES = [
   'assets-src/tools/layouts/town_theme.py',
   // WR: the world wrap (docs/WORLD_WRAP_PLAN.md 10)
   'src/systems/worldWrap.ts', 'src/rendering/wrapImages.ts', 'src/scenes/exploration/fieldProbe.ts',
+  // EF-A: the hi-res monster textures (docs/ENEMY_FEEDBACK_PLAN.md A2-A4) and the atlas stage they extend
+  'assets-src/gen/monster_hires.py', 'assets-src/gen/monster_hires_pages.py', 'assets-src/gen/selftest_hires.py',
+  'assets-src/gen/monster_atlas.py',
+  // int-ef2: the fine scales' crop and the exact texture px
+  'assets-src/gen/monster_hires_crop.py', 'src/rendering/texPx.ts',
 ];
 
 describe('file-size ceilings', () => {

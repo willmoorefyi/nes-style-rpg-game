@@ -1,0 +1,7 @@
+{
+  "form": "chaos_orrery",
+  "frames": {
+    "colossus/chaos_orrery/body_base.png": "aa75d9880411e0dcf9aefa9777a6d1eee03ed05b4dde8065ae0e9c2c77f4521c",
+    "colossus/chaos_orrery/glow_base.png": "d1f6ba496b28b0cf236be0e6146d096ec28518fa5ec81a55e7ac40cd6560170c"
+  }
+}

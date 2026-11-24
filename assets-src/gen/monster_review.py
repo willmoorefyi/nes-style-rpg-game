@@ -132,6 +132,8 @@ def review(sprite: str, out: Path = OUT) -> dict:
         onion.append((b, im))
     _strip(onion).save(out / f"{sprite}_onion.png")
     stage(sprite, [get(n) for n in order], meta["bottom_row"], out)
+    from gen import monster_orbit as MO
+    MO.review(sprite, gen, out)                           # EF-D: the orbit strip and GIFs (orbit rigs only)
     report = {"sprite": sprite, "anim": bool(gen), "checks": rep, "ok": not any(rep.values()) if cfg else True,
               "mask_overlap": MC.mask_report(cfg, kfs)[1] if cfg else {}, "roughness": roughness(gen, kfs)}
     (out / f"{sprite}_report.json").write_text(json.dumps(report, indent=2) + "\n")

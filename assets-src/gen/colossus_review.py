@@ -21,6 +21,7 @@ from PIL import Image, ImageDraw
 
 from gen import colossus_build as CB
 from gen import colossus_paint as P
+from gen.colossus_spec import draw_order
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
@@ -131,7 +132,7 @@ def rest_view(entry: dict, imgs: dict, spec: dict, dy: float = 0, glow: float = 
     bg = np.asarray(Image.open(bg_p).convert("RGB").resize((1920, 1080), Image.Resampling.LANCZOS)).astype(float)
     out = bg * float(entry.get("skyDim", 1.0))
     pick = {**(spec.get("variant") or {}), **(frames or {})}
-    for L in entry["layers"]:
+    for L in (entry["layers"][i] for i in draw_order(spec)):      # far orbs under the body (EF-E)
         fr = L["frames"].get(pick.get(L["name"], "base"))
         if not fr or not fr["tiles"]:
             continue

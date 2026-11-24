@@ -87,6 +87,20 @@ V4_RESCALED = ("bigeyes", "shark", "minotaur", "ochu", "neochu", "hydra", "earth
 V6_SCALED = ("chaos",)
 # V8 N-1 (orchestrator ruling): the regenerated hollow_seraph boss (and hollow_seraph_2, same sprite) at scale 3.
 V8_SCALED = ("hollow_seraph",)
+# EF-B (docs/ENEMY_FEEDBACK_PLAN.md; the user's 2026-11-24 request overrides D-V1 S1): the dict entries. B1: bigger at
+# 2.5 (the user's 26 plus six greater siblings); B2: smoothed at today's size; B3: the low-res trio.
+EF_B1 = ("gr_imp", "werewolf", "ghast", "shadow", "gargoyle", "bloodbones", "piscodemon", "mummy", "horned_devil",
+         "mindflayer", "weretiger", "king_mummy", "medusa", "rakshasa", "sahagin_prince", "black_knight", "earth_medusa",
+         "gr_wolf", "ogre_chief", "troll", "sphinx", "manticore", "clay_golem", "tyrannosaur", "rhyos", "iron_golem",
+         "death_knight", "stone_golem", "chimera", "sea_troll", "winter_wolf", "ogre_mage")
+EF_B2 = ("black_widow", "gr_wolf", "ogre_chief", "tarantula", "shark", "ghast", "shadow", "anaconda", "hyenadon",
+         "crocodile", "hydra", "fire_hydra", "lava_worm", "hellhound", "white_dragon")
+EF_B3 = ("blue_dragon", "green_dragon", "fire_lizard")
+# int-ef2 (user ruling 2026-11-24): blue_dragon / green_dragon take tex 3 after all, the other four stay at the fallback
+EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon")
+# int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5, each the smallest multiple of
+# 0.05 that keeps it at least as tall as its lesser sibling (stone, iron >= clay; iron >= stone; sea_troll >= troll)
+EF_GROW = {"stone_golem": 2.8, "iron_golem": 3.3, "sea_troll": 2.7}
 
 
 def run_scale(check: Callable[[bool, str], None]) -> None:
@@ -99,10 +113,26 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     from gen import monster_atlas as MAT
     from gen import retire as RT
     real = MAT.load_scale(set(json.loads(ATLAS_JSON.read_text())["sheets"]))
-    check(all(v in MAT.DISPLAY_SCALES for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
-                                                                 f"({len(real)} entries)")
-    check(real == {s: 3 for s in V4_RESCALED + V6_SCALED + V8_SCALED},
-          f"FW-S: the real table is the 23 V4 sheets + chaos (V6) + hollow_seraph (V8 N-1) at 3 ({sorted(real)})")
+    check(all(MAT.valid_scale(v["scale"]) for v in real.values()), f"FW-S: the real monster_scale.yaml is valid "
+                                                                        f"({len(real)} entries)")
+    at3 = {s for s, v in real.items() if v["scale"] == 3}
+    check(at3 == set(V4_RESCALED + V6_SCALED + V8_SCALED),
+          f"FW-S: the scale-3 sheets are the 23 V4 sheets + chaos (V6) + hollow_seraph (V8 N-1) ({sorted(at3)})")
+    import yaml
+    raw = yaml.safe_load(MAT.SCALE_TABLE.read_text())
+    dicts = {s for s, v in raw.items() if isinstance(v, dict)}
+    b1 = all(real[s]["scale"] == EF_GROW.get(s, 2.5) == real[s]["tex"] for s in EF_B1)
+    # A4's budget fallback: the scale-3 sheets of B2 and B3 at tex 1 with despur only (EF_FALLBACK)
+    # B4 round 1: shadow's despur was dropped (its smoky tatters are the design), it keeps the Scale2x texture
+    b2 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"])
+             and real[s]["smooth"] == ([] if s == "shadow" else ["despur"]) for s in EF_B2)
+    b3 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"]) for s in EF_B3) and all(
+        real[s]["smooth"] == ["despur", "edges"] for s in ("blue_dragon", "green_dragon"))   # int-ef2 B4 round 2
+    hires = sorted(s for s, v in real.items() if v["tex"] != 1)
+    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3) and b1 and b2 and b3 and len(hires) == 42,
+          f"EF-B: the dict entries are B1 (29 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the four fallback "
+          f"scale-3 ones at tex 1 "
+          f"({len(dicts)} entries, {len(hires)} hi-res)")
     with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):
         t = Path(tmp)
 
@@ -202,8 +232,10 @@ def _raises_value(fn: Callable[[], object], *words: str) -> bool:
 # key; F3b pulled the recover back toward idle, recover->idle 3.6 px), so its lunge frames now reach 110.
 # Re-measured at fix pass 2 G6: warmech travelTop 5 -> 2, because the sheet is rigged since T-K (its in-betweens are
 # translations of the keys, and the attack's d (-23, -4/-5) lifts the travel frames 3 px above the keyframe-only top).
+# Re-measured at int-ef1: ogre homeX [10, 113] -> [10, 120] and lungeRight 110 -> 117, EF-C's idle club tip (FW-P
+# idle paint, docs/ENEMY_FEEDBACK_PLAN.md EF-C) reaching 7 px further right in every idle-drawn frame.
 ANCHORS = {"garland": {"travelTop": 2}, "lich": {"travelTop": 9}, "death_eye": {"travelTop": 42, "lungeRight": 179},
-           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 2}, "ogre": {"homeX": [10, 113], "lungeRight": 110},
+           "chaos": {"travelTop": 12}, "warmech": {"travelTop": 2}, "ogre": {"homeX": [10, 120], "lungeRight": 117},
            "troll": {"homeX": [24, 122]}, "dragon": {"homeX": [4, 118]},
            "earth_elemental": {"lungeRight": 109, "opaqueRight": 110}}
 
@@ -233,7 +265,8 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
     check(r["homeX"] == [2, 28] and r["travelTop"] == 3, f"FW-A: a ranged sheet's homeX includes its attack frames {r}")
     check(MAT.ranged_sheets() == {"dragon"}, f"FW-A: the ranged sheets are the dragon's ({sorted(MAT.ranged_sheets())})")
     check(MAT.LUNGE_FRAMES == MAT.TRAVEL_FRAMES[:11] and len(MAT.TRAVEL_FRAMES) == 15 and MAT.HOME_FRAMES ==
-          ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b"), "FW-A: the plan's frame lists")
+          ("idle", "idle_b", "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b", *MA.orbit_names(MA.ORBIT_MAX)),
+          "FW-A: the plan's frame lists (EF-D: + the orbit frames a sheet has)")
 
     meta = json.loads(ATLAS_JSON.read_text())
     sheets = meta["sheets"]
@@ -263,7 +296,8 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
         if "travelTop" not in v:
             continue
         w, h = v["cell"]
-        crops = {n: pages[v["page"]].crop((x, y, x + w, y + h)) for n, (x, y) in v["frames"].items()}
+        t = v.get("texScale", 1)
+        crops = {n: _native(pages[v["page"]], x, y, w, h, t) for n, (x, y) in v["frames"].items()}
         got = MAT.travel_anchors(crops, list(v["frames"]), sid in ranged)
         if any(got[k] != v[k] for k in got):
             off.append(sid)
@@ -275,6 +309,26 @@ def run_anchors(check: Callable[[bool, str], None]) -> None:
 
 
 CHAOS_TIP = [116, 12]        # the chaos attack_raise tip at 9fe129c (docs/REDESIGN_PLAN.md 9.5: the chaos_v1 archive)
+
+
+def _native(page, x: int, y: int, w: int, h: int, t: float):
+    """A frame's cell in art px: the native crop, or (EF-A4) a hi-res rect's opaque px mapped back to the art px they
+    were sampled from, floor((x + 0.4) / t) (monster_hires.SAMPLE_OFFSET; = floor(x / t) at t 2, 2.5, 3), and the lowest
+    opaque row (the feet guard's, re-sampled from the foot row) to floor(y / t) (int-ef2: 2.7, 2.8, 3.3); Scale2x never
+    draws outside the silhouette's own span, so the extents are the native ones."""
+    import numpy as np
+    from PIL import Image
+    if t == 1:
+        return page.crop((x, y, x + w, y + h))
+    from gen import monster_hires as MH
+    f, px, py = MH.frac(t), round(x * t), round(y * t)
+    a = np.asarray(page.crop((px, py, px + MH.ceil_mul(w, t), py + MH.ceil_mul(h, t))))
+    ys, xs = np.nonzero(a[..., 3] > 0)
+    back = (lambda v: (v * 5 + 2) * f.denominator // (5 * f.numerator))     # floor((v + 0.4) / t), exact
+    ny = np.where(ys == ys.max(), ys * f.denominator // f.numerator, back(ys))
+    out = np.zeros((h, w, 4), np.uint8)
+    out[np.minimum(ny, h - 1), np.minimum(back(xs), w - 1)] = a[ys, xs]
+    return Image.fromarray(out, "RGBA")
 
 
 def run_raise_off(check: Callable[[bool, str], None]) -> None:

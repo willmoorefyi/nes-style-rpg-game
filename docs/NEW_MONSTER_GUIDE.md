@@ -265,12 +265,13 @@ One file per base sprite, plus `<sprite>.lock.json`. Variants never get a rig. T
 | `frames.<f>: {t, moves, pins, dy, tweaks, drop, scale, sampler}` | `moves: []` = no interpolation (tweaks only). `tweaks.<joint>: [dx, dy]`. `drop: [part]` hides a part. `scale: {fxpart: 0.25-1}` is fx only. `sampler` is per frame |
 | `holds: [{frame, reason}]` | alias a frame to its source; at most 1 per sequence |
 | `paint: [{frame, xy: [[x, y], ...], rgb: [r, g, b] \| null}]` | native pixels after compositing; `null` = transparent |
-| `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220, drowned_sovereign/cast <= 300 (a remap), chimera/attack <= 800 and chimera/hurt <= 600), approved-palette colours or `null`, locked as `kf:<key>` |
+| `paint` with `frame: idle \| attack \| hurt \| cast \| attack_raise` | FW-P keyframe paint: applied to the key in `load_entries` after `pad_keyframes` (padded-cell xy), so every frame cut from it follows; at most 160 px per key (`kf_paint_cap: {key: n}` only for the approved crocodile/hurt <= 220, drowned_sovereign/cast <= 300 (a remap), chimera/attack <= 800 and chimera/hurt <= 600), approved-palette colours or `null`, locked as `kf:<key>`. The kneel key's `kneel.paint` has its own cap path (EF-C2): `kf_paint_cap: {kneel: n}`, checked against `monster_keys.KNEEL_PAINT_ALLOW` (only shark <= 744, the dazed key's grey slab), never against the keyframe caps |
 | `key_offset: {key: [dx, dy]}` | FW-O: move an approved key by whole px (<= 12, nothing may leave the cell; before keyframe paint, also with `--raw`); its joints, `masks.*.<key>` and keyframe paint are written in the unmoved art and translated with it; in-between paint is not moved (re-derive it); locked as `kf:<key>` (ashen_queen coil, N-4) |
 | `hurt_from: idle` | FW-H: a per-pose boss with no approved `boss_hurt` gets its hurt key from the padded idle key (only `HURT_FROM_ALLOW` = hollow_seraph, orchestrator ruling after R329 / R330); give `keyframes.hurt` joints, make the recoil with `key_offset` / keyframe `paint` on `hurt`; the hurt in-betweens and daze are generated, the derived key is locked as `kf:hurt`; refused with an approved hurt (`selftest_hurtfrom.py`) |
 | `alias: [hurt]` or `[attack]` | FW-Q partial rig: that sequence's in-betweens are not generated and resolve to their source keys (as keyframe-only); daze and the rest stay generated; `check` prints `OK (aliased: <seq>; ...)`; only `FWQ_ALLOW` sheets (`monster_anim.py`, pinned in `selftest_efix.py`), one per rig |
 | `raise: false` | FW-R: drop the approved `attack_raise` key (cell kept): no raise frames, `hasRaise: false`, the heavy glint `tip` from `atk_wind2` (hollow_seraph, D-F1) |
 | `seam_tolerance: 2` | allow 2 seam px (an approved notch only) |
+| `orbit: {steps, centre, rx, ry, behind, parts}` | EF-D (`monster_orbit.py`, chaos only): small round parts (`parts.<orb>: {at, r, a0, colors?}` in the idle key) are cut out of idle / idle_b (cut px next to the figure sealed with outline) and orbit an ellipse in `idle_o<k>` / `idle_b_o<k>` (k < steps, 8-16), behind the `behind` parts on the far (upper) half; whole px, own pixels. Atlas `idleOrbit: N`; the runtime steps k every 6 frames. Checks: alpha, palette, clipping, pieces, body unchanged outside the orb masks, each orb >= 25 % visible, `sequence:orbit` step cap. Review: `<id>_orbit.png`, `_orbit.gif`, `_orbit_head.gif` |
 
 - **fx parts are an allowlist** (`selftest_efix.py`: garland `glow`, lich `trail`/`crystal`, vampire `slash`,
   hollow_seraph `halo`); a new `kind: fx` needs approval and an allowlist edit.
@@ -499,12 +500,15 @@ mkdir -p /tmp/head && git show HEAD:assets/sprites/monsters-ai.json > /tmp/head/
 for f in $(python3 -I -c "import json; m = json.load(open('/tmp/head/monsters-ai.json')); print(*[p['file'] for p in m.get('pages', [{'file': 'monsters-ai.png'}])])"); do
   git show "HEAD:assets/sprites/$f" > "/tmp/head/$f"; done
 python3 -I - <<'EOF'
-import json, os
+import json, math, os
 from PIL import Image
 def cells(d):
     m = json.load(open(os.path.join(d, "monsters-ai.json")))
     pages = [Image.open(os.path.join(d, p["file"])).convert("RGBA") for p in m.get("pages", [{"file": "monsters-ai.png"}])]
-    return {(s, f): pages[v.get("page", 0)].crop((x, y, x + v["cell"][0], y + v["cell"][1])).tobytes()
+    def rect(v, x, y):                 # EF-A4: a hi-res sheet's rect is its art px x texScale (1 = native)
+        t = v.get("texScale", m.get("texScale", 1))
+        return (round(x * t), round(y * t), round(x * t) + math.ceil(v["cell"][0] * t), round(y * t) + math.ceil(v["cell"][1] * t))
+    return {(s, f): pages[v.get("page", 0)].crop(rect(v, x, y)).tobytes()
             for s, v in m["sheets"].items() for f, (x, y) in v["frames"].items()}
 a, b = cells("/tmp/head"), cells("assets/sprites")
 for s in sorted({s for s, _ in a}):

@@ -14,14 +14,13 @@ import { FLOAT_FONT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { ICON_LIFT, ICON_PX } from '../../../src/scenes/battle/fx/statusIcons.js';
 import { TRAVEL_CLEAR_Y } from '../../../src/scenes/battle/enemyReach.js';
 import { monsterSpriteKey } from '../../../src/rendering/BattleArt.js';
-import { atlas, enemyById, idleBoxOf, sizedAtlasFrames } from '../../helpers/atlasFrames.js';
+import { enemyById, idleBoxOf, sizedAtlasFrames, texScaleOf } from '../../helpers/atlasFrames.js';
 import { loadStatusVisuals } from '../../helpers/statusVisuals.js';
 import type { BattleStateMachine, DamageEvent } from '../../../src/battle/BattleStateMachine.js';
 import type { BattleDisplayManager } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import type { StatusEffect } from '../../../src/battle/StatusEffects.js';
 
 const VISUALS = loadStatusVisuals();
-const ts = atlas.texScale ?? atlas.scale;
 
 const sizedArt: MonsterArtSource = { getMonsterFrames: (sheet) => sizedAtlasFrames(sheet, true) };
 
@@ -75,6 +74,7 @@ describe('damage numbers and the status icon row (V8 F6)', () => {
       const s = scene(id, ['poison']);
       const [l, t, r] = idleBoxOf(s.sheet);
       const scale = s.sprite.scale.x;
+      const ts = texScaleOf(s.sheet);   // EF-A4: PNG px per art px of the sheet
       const headY = s.sprite.y + t * ts * scale;
       const cx = s.sprite.x + ((l + r + 1) / 2) * ts * scale;
       const row: Rect = { x0: cx - ICON_PX / 2, y0: headY - ICON_LIFT - ICON_PX, x1: cx + ICON_PX / 2, y1: headY - ICON_LIFT };

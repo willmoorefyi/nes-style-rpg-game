@@ -28,6 +28,12 @@ KNEEL_LOCK = {"kf:kneel", *[n for n in KNEEL_FRAMES if n != "kneel"]}
 HERO_KNEEL_LOCK = set(KNEEL_FRAMES)  # hero locks (puppet_kneel.py) hash the four frames; no derived kf: key
 ANCHOR_KEYS = ("homeX", "idleBox", "travelTop", "lungeRight", "head", "lungePx", "opaqueRight")
 MAX_PAGES, MAX_PRELOAD = 12, 2
+# EF-A4 (docs/ENEMY_FEEDBACK_PLAN.md): at most 14 pages over the 12 before EF; the act-1 group's hi-res (`filter:
+# linear`) pages are preloaded too (D-K13 holds), so the two caps above count the native pages only. A sheet with
+# `smooth: [despur]` (EF-A3) has its anchors re-measured on the cleaned frames: its K-anchor moves are expected.
+# int-ef2: the cap is monster_hires_pages's (one number for the build gate, efSizes.test.ts and this check); a sheet with
+# `crop: true` has its cell cut to its art, so its anchors move by the px cut (expected too).
+from gen.monster_hires_pages import MAX_EXTRA_PAGES  # noqa: E402
 
 
 def git_show(rev: str, path: Path) -> bytes | None:
@@ -83,14 +89,22 @@ def _atlas(rev: str | None, d: Path, name: str):
 
 def pages(base: str, d: Path) -> int:
     new, old = _atlas(None, d, "monsters-ai.json"), _atlas(base, d, "monsters-ai.json")
-    fails = [f"{len(new['pages'])} pages > {MAX_PAGES}"] if len(new["pages"]) > MAX_PAGES else []
+    native = [p for p in new["pages"] if p.get("filter") != "linear"]
+    extra = len(new["pages"]) - MAX_PAGES
+    fails = [f"{len(native)} native pages > {MAX_PAGES}"] if len(native) > MAX_PAGES else []
+    fails += [f"{extra} pages over {MAX_PAGES} > {MAX_EXTRA_PAGES}"] if extra > MAX_EXTRA_PAGES else []
     fails += [f"page {p['file']} {p['w']}x{p['h']} > 2048" for p in new["pages"] if max(p["w"], p["h"]) > 2048]
     act1 = sorted({new["sheets"][s]["page"] for s in dict(MP.PAGE_GROUPS)["act1"] if s in new["sheets"]})
     pre = new.get("preload")
-    fails += [] if pre == act1 and len(pre) <= MAX_PRELOAD else [f"preload {pre} != act-1 pages {act1} (<= 2)"]
+    pre_native = [p for p in pre or [] if new["pages"][p].get("filter") != "linear"]
+    fails += [] if pre == act1 and len(pre_native) <= MAX_PRELOAD else [f"preload {pre} != act-1 pages {act1} (<= 2 native)"]
+    from gen import monster_atlas as MAT
+    smoothed = {s for s, e in MAT.load_scale(set(new["sheets"])).items() if e["smooth"] or e.get("crop")}
     moved = [f"{s} {k}: {old['sheets'][s].get(k)} -> {v.get(k)}" for s, v in sorted(new["sheets"].items())
              if s in old["sheets"] for k in ANCHOR_KEYS if v.get(k) != old["sheets"][s].get(k)]
-    fails += [f"K-anchor {m}" for m in moved]
+    fails += [f"K-anchor {m}" for m in moved if m.split()[0] not in smoothed]
+    print(f"EF-A3 despur sheets with re-measured K-anchors (expected): "
+          f"{' '.join(sorted({m.split()[0] for m in moved} & smoothed)) or '-'}")
     print(f"{len(new['pages'])} pages: " + ", ".join(f"{p['w']}x{p['h']}" for p in new["pages"])
           + f" (base {len(old['pages'])}); preload {pre}; K-anchor fields identical for "
             f"{sum(1 for s in new['sheets'] if s in old['sheets'])} sheets" + ("" if not moved else " EXCEPT below"))
