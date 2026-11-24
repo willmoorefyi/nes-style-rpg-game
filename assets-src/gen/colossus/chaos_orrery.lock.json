@@ -1,7 +1,16 @@
 {
   "form": "chaos_orrery",
   "frames": {
-    "colossus/chaos_orrery/body_base.png": "aa75d9880411e0dcf9aefa9777a6d1eee03ed05b4dde8065ae0e9c2c77f4521c",
-    "colossus/chaos_orrery/glow_base.png": "d1f6ba496b28b0cf236be0e6146d096ec28518fa5ec81a55e7ac40cd6560170c"
+    "colossus/chaos_orrery/body_base.png": "8d2992e0a134c6f8ff3907b6a37e3b432bb3f89d04138266d9cb6f090af656f7",
+    "colossus/chaos_orrery/glow_base.png": "fa417a8c1a481ecac3b3c750b2285af0aea295c2e60844929c61c727e9ec19a5",
+    "colossus/chaos_orrery/orb_cyan_base.png": "ba3233cf69d49477ef4c146417418163fda52087f0516013f234d3a1fc7fd29a",
+    "colossus/chaos_orrery/orb_cyan_glow_base.png": "b8ed44e4617326da8e9b8a831fd25802247e7e9104d3939d81a25dc78e90d0c7",
+    "colossus/chaos_orrery/orb_orange_base.png": "a961a6ab94ced8c91b6b52918b6aa4ea854e3ccaead69aa5e71e37f0afccb90d",
+    "colossus/chaos_orrery/orb_orange_glow_base.png": "9b21055c707e2f9c4580e624bfce3e8d27c3d749e7dca938e297fae5c43ec6a5",
+    "colossus/chaos_orrery/orb_teal_base.png": "23bd7ee70c998847041d58d4cb877e77eb5040bece965d5702a59e73a13521b6",
+    "colossus/chaos_orrery/orb_teal_glow_base.png": "5692f46315e2197a776d9018992d0fcc19ffd1894819ce34619c7c4c1d057fa0",
+    "colossus/chaos_orrery/orb_white_base.png": "ef02cf11e4f529f37a0c335f683b2d2870ac8f9688ce66b390335002b6fe2eff",
+    "colossus/chaos_orrery/orb_white_glow_base.png": "065a7a1dafe28c26a58b5ccdcf86ddf3ecaebf4ddf66e61b92bce70abb9b8bae",
+    "colossus/chaos_orrery/ring_back_base.png": "749d1210221b0a69c410b9d645bf771ea0269a631080527f53de7f75176e6889"
   }
 }

@@ -5,36 +5,23 @@
  * blend (`add` for the glow and corona) and rest alpha come from the json. The canvas moves sub-pixel (the breathing,
  * the slam, the pan, the rise, the sink; screen px); the hurt shake is whole screen px. The hurt flash is an additive
  * copy of each normal layer's own tiles (same texture, white tint, alpha 0.6): no filter, no composite render (R15).
- * The invisible proxy at the target rect stands in for "the enemy sprite" (colossusProxy.ts).
+ * The invisible proxy at the target rect stands in for "the enemy sprite" (colossusProxy.ts). Draw order (EF-E):
+ * ring_back < far orbs < the yaml's layers (body, near orbs in their slots, glow) < moons (colossusLayerNode.ts).
  */
-import { Container, Graphics, Sprite } from 'pixi.js';
-import type { Texture } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import type { ColossusPoseFrame, LayerInfo } from './colossusChoreography.js';
 import { artIdOf } from './colossusEntries.js';
 import { canvasRect, screenAnchors, targetRectOnScreen, type ColossusFormSpec, type ColossusLayerSpec, type Offset } from './colossusIndex.js';
-import { EFFECT_BOX, SLASH_BOX, registerProxy, unregisterProxy, type ColossusAnchorSource, type Rect } from './colossusProxy.js';
+import { isOrbLayer, orbitOf } from './colossusOrbits.js';
+import { buildLayerNode, type ColossusTextureSource, type LayerNode } from './colossusLayerNode.js';
 
-/** Where the view's textures come from (ColossusArt; tests a fixture). */
-export interface ColossusTextureSource {
-  texture(file: string): Texture | null;
-}
+export { FLASH_ALPHA, type ColossusTextureSource } from './colossusLayerNode.js';
 
-const PLACEHOLDER_COLOR = 0x553366;
 /** Frames the routed element flash keeps every layer lit. */
 const FLASH_FRAMES = 4;
-/** The hurt flash: an additive copy of the layer's tiles at this alpha (18.3). */
-export const FLASH_ALPHA = 0.6;
 /** The effect box's top row (the number band's top, NUMBER_Y). */
 const EFFECT_TOP = 140;
-
-interface LayerNode {
-  spec: ColossusLayerSpec;
-  node: Container;
-  frames: Map<string, Container>;
-  /** Each frame's additive flash copies (hidden unless the layer flashes). */
-  flashes: Map<string, Sprite[]>;
-  current: string;
-}
+import { EFFECT_BOX, SLASH_BOX, registerProxy, unregisterProxy, type ColossusAnchorSource, type Rect } from './colossusProxy.js';
 
 export class ColossusView implements ColossusAnchorSource {
   readonly root = new Container();
@@ -43,6 +30,8 @@ export class ColossusView implements ColossusAnchorSource {
   /** Never drawn; measured: its box is the target rect (R15). */
   readonly proxy = new Container();
   readonly layerInfo: LayerInfo[];
+  /** The far ring segments (ring_back), under everything. */
+  private readonly back = new Container();
   private readonly behind = new Container();
   private readonly main = new Container();
   private readonly front = new Container();
@@ -70,12 +59,13 @@ export class ColossusView implements ColossusAnchorSource {
     this.variants = { ...variant };
     this.root.label = `colossus.${formId}`;
     this.art.label = 'colossus.art';
-    this.art.addChild(this.behind, this.main, this.front);
+    this.art.addChild(this.back, this.behind, this.main, this.front);
     this.root.addChild(this.art);
     this.art.scale.set(form.scale);
     for (const spec of form.layers) this.addLayer(spec);
     this.layerInfo = form.layers.map((l) => ({ name: l.name, kind: l.kind, frames: Object.keys(l.frames),
-      ...(l.orbit ? { orbit: l.orbit } : {}), ...(l.alpha !== undefined ? { alpha: l.alpha } : {}) }));
+      ...(l.orbit ? { orbit: l.orbit } : {}), ...(l.alpha !== undefined ? { alpha: l.alpha } : {}),
+      ...(isOrbLayer(l) && orbitOf(form, l.name) ? { path: orbitOf(form, l.name)! } : {}) }));
     const r = targetRectOnScreen(form);
     const box = this.proxyBox = new Graphics().rect(0, 0, r.width, r.height).fill(0xffffff);
     box.renderable = false;
@@ -104,42 +94,9 @@ export class ColossusView implements ColossusAnchorSource {
     this.place();
   }
   private addLayer(spec: ColossusLayerSpec): void {
-    const node = new Container();
-    node.label = `colossus.layer.${spec.name}`;
-    const add = spec.blend === 'add';
-    node.blendMode = add ? 'add' : 'normal';
-    const entry: LayerNode = { spec, node, frames: new Map(), flashes: new Map(), current: '' };
-    for (const [name, fr] of Object.entries(spec.frames)) {
-      const c = new Container();
-      c.position.set(fr.at[0], fr.at[1]);
-      c.scale.set(fr.texScale ?? 1);
-      const flashes: Sprite[] = [];
-      for (const t of fr.tiles) {
-        const tex = this.src.texture(t.file);
-        if (!tex) { c.addChild(new Graphics().rect(t.x, t.y, t.w, t.h).fill(PLACEHOLDER_COLOR)); continue; }
-        const s = new Sprite(tex);
-        s.position.set(t.x, t.y);
-        s.blendMode = add ? 'add' : 'normal';
-        c.addChild(s);
-        if (add) continue;
-        const flash = new Sprite(tex);
-        flash.label = 'colossus.flash';
-        flash.position.set(t.x, t.y);
-        flash.blendMode = 'add';
-        flash.tint = 0xffffff;
-        flash.alpha = FLASH_ALPHA;
-        flash.visible = false;
-        c.addChild(flash);
-        flashes.push(flash);
-      }
-      // an empty body frame is missing art (the placeholder box); an empty variant base (the core) draws nothing
-      if (fr.tiles.length === 0 && spec.kind === 'body') c.addChild(new Graphics().rect(0, 0, fr.size[0], fr.size[1]).fill(PLACEHOLDER_COLOR));
-      c.visible = false;
-      node.addChild(c);
-      entry.frames.set(name, c);
-      entry.flashes.set(name, flashes);
-    }
-    (spec.kind === 'moon' ? this.front : this.main).addChild(node);
+    const entry = buildLayerNode(spec, this.src);
+    if (entry.slot) this.main.addChild(entry.slot);
+    else (spec.kind === 'moon' ? this.front : spec.kind === 'ring_back' ? this.back : this.main).addChild(entry.node);
     this.nodes.set(spec.name, entry);
     this.show(entry, this.variants[spec.name] ?? 'base');
   }
@@ -188,8 +145,8 @@ export class ColossusView implements ColossusAnchorSource {
       const white = (p.white || this.flashLeft > 0) && spec.blend !== 'add';
       this.whiteNow ||= white;
       for (const [name, list] of e.flashes) for (const s of list) s.visible = white && name === e.current;
-      if (spec.kind === 'moon') {
-        const want = p.behind ? this.behind : this.front;
+      if (spec.kind === 'moon' || e.slot) {
+        const want = p.behind ? this.behind : e.slot ?? this.front;
         if (e.node.parent !== want) want.addChild(e.node);
       }
     });
@@ -219,6 +176,8 @@ export class ColossusView implements ColossusAnchorSource {
 
   frameOf(layer: string): string | null { return this.nodes.get(layer)?.current ?? null; }
   layerNode(name: string): Container | null { return this.nodes.get(name)?.node ?? null; }
+  /** Whether a layer is drawn behind the body now (a far orb or moon). */
+  isBehind(name: string): boolean { return this.nodes.get(name)?.node.parent === this.behind; }
 
   anchors(): ReturnType<ColossusAnchorSource['anchors']> { return screenAnchors(this.form, this.restOffset()); }
   targetBox(): Rect { return targetRectOnScreen(this.form, this.restOffset()); }

@@ -7,14 +7,17 @@
  */
 import type { EnemyData } from '../../../types/index.js';
 import { resolveArtEntries } from './colossusEntries.js';
+import { orbitProblems, type ColossusOrbit, type ColossusRing } from './colossusOrbits.js';
+export type { ColossusOrbit, ColossusRing } from './colossusOrbits.js';
 import { COLOSSUS_ROW_PX, ICON_LIFT } from '../fx/statusIcons.js';
 
 export type XY = [number, number];
 /** [left, top, right, bottom], right / bottom exclusive. */
 export type Box = [number, number, number, number];
 
-export type ColossusLayerKind = 'body' | 'limb' | 'core' | 'glow' | 'moon' | 'eyes' | 'cloud' | 'corona';
-export const LAYER_KINDS: readonly ColossusLayerKind[] = ['body', 'limb', 'core', 'glow', 'moon', 'eyes', 'cloud', 'corona'];
+/** EF-E (colossusOrbits.ts): `orb` travels along a ring, `orb_glow` (`<orb>_glow`) with it, `ring_back` under far orbs. */
+export type ColossusLayerKind = 'body' | 'limb' | 'core' | 'glow' | 'moon' | 'eyes' | 'cloud' | 'corona' | 'orb' | 'orb_glow' | 'ring_back';
+export const LAYER_KINDS: readonly ColossusLayerKind[] = ['body', 'limb', 'core', 'glow', 'moon', 'eyes', 'cloud', 'corona', 'orb', 'orb_glow', 'ring_back'];
 export type ColossusBlend = 'normal' | 'add';
 
 /** One tile of a frame: a PNG next to the index, placed at (x, y) texture px inside its frame. */
@@ -55,6 +58,8 @@ export interface ColossusFormSpec {
   art?: string;
   /** The bestiary still (18.8), relative to the index; missing: the build's `colossus/<art>/preview.png`. */
   preview?: string;
+  /** EF-E: the rings the `orb` layers travel along, and each orb layer's orbit (keyed by layer name). */
+  rings?: Record<string, ColossusRing>; orbits?: Record<string, ColossusOrbit>;
   layers: ColossusLayerSpec[];
 }
 export interface ColossusIndex { forms: Record<string, ColossusFormSpec> }
@@ -124,6 +129,7 @@ export function formProblems(id: string, f: ColossusFormSpec): string[] {
       if ((fr.tiles ?? []).length > 0 && area !== tw * th) p(`layer ${l.name}/${name}: tiles do not cover the frame's texture exactly`);
     }
   }
+  out.push(...orbitProblems(f).map((m) => `colossus ${id}: ${m}`));
   return out;
 }
 

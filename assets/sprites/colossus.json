@@ -1,5 +1,5 @@
 {
-  "bytes": 16850728,
+  "bytes": 18637300,
   "forms": {
     "chaos_horizon": {
       "anchors": {
@@ -256,6 +256,31 @@
           "frames": {
             "base": {
               "at": [
+                55,
+                249
+              ],
+              "size": [
+                1214,
+                466
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/ring_back_base.png",
+                  "h": 466,
+                  "w": 1214,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "ring_back",
+          "name": "ring_back"
+        },
+        {
+          "frames": {
+            "base": {
+              "at": [
                 56,
                 0
               ],
@@ -278,24 +303,236 @@
           "name": "body"
         },
         {
+          "frames": {
+            "base": {
+              "at": [
+                293,
+                331
+              ],
+              "size": [
+                98,
+                97
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_white_base.png",
+                  "h": 97,
+                  "w": 98,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb",
+          "name": "orb_white"
+        },
+        {
           "alpha": 1.0,
           "blend": "add",
           "frames": {
             "base": {
               "at": [
-                92,
+                274,
+                316
+              ],
+              "size": [
+                132,
+                134
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_white_glow_base.png",
+                  "h": 67,
+                  "w": 66,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb_glow",
+          "name": "orb_white_glow"
+        },
+        {
+          "frames": {
+            "base": {
+              "at": [
+                1174,
+                353
+              ],
+              "size": [
+                99,
+                98
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_cyan_base.png",
+                  "h": 98,
+                  "w": 99,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb",
+          "name": "orb_cyan"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                1136,
+                316
+              ],
+              "size": [
+                176,
+                176
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_cyan_glow_base.png",
+                  "h": 88,
+                  "w": 88,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb_glow",
+          "name": "orb_cyan_glow"
+        },
+        {
+          "frames": {
+            "base": {
+              "at": [
+                125,
+                609
+              ],
+              "size": [
+                96,
+                93
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_orange_base.png",
+                  "h": 93,
+                  "w": 96,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb",
+          "name": "orb_orange"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                84,
+                568
+              ],
+              "size": [
+                176,
+                176
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_orange_glow_base.png",
+                  "h": 88,
+                  "w": 88,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb_glow",
+          "name": "orb_orange_glow"
+        },
+        {
+          "frames": {
+            "base": {
+              "at": [
+                763,
+                630
+              ],
+              "size": [
+                102,
+                103
+              ],
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_teal_base.png",
+                  "h": 103,
+                  "w": 102,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb",
+          "name": "orb_teal"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                730,
+                598
+              ],
+              "size": [
+                168,
+                168
+              ],
+              "texScale": 2,
+              "tiles": [
+                {
+                  "file": "colossus/chaos_orrery/orb_teal_glow_base.png",
+                  "h": 84,
+                  "w": 84,
+                  "x": 0,
+                  "y": 0
+                }
+              ]
+            }
+          },
+          "kind": "orb_glow",
+          "name": "orb_teal_glow"
+        },
+        {
+          "alpha": 1.0,
+          "blend": "add",
+          "frames": {
+            "base": {
+              "at": [
+                402,
                 16
               ],
               "size": [
-                1206,
-                744
+                518,
+                306
               ],
               "texScale": 2,
               "tiles": [
                 {
                   "file": "colossus/chaos_orrery/glow_base.png",
-                  "h": 372,
-                  "w": 603,
+                  "h": 153,
+                  "w": 259,
                   "x": 0,
                   "y": 0
                 }
@@ -306,10 +543,58 @@
           "name": "glow"
         }
       ],
+      "orbits": {
+        "orb_cyan": {
+          "periodMs": 9000,
+          "phase0": 0.3143,
+          "ring": "A"
+        },
+        "orb_orange": {
+          "periodMs": 9000,
+          "phase0": 2.6169,
+          "ring": "A"
+        },
+        "orb_teal": {
+          "periodMs": 7000,
+          "phase0": 1.1858,
+          "ring": "B"
+        },
+        "orb_white": {
+          "periodMs": 9000,
+          "phase0": -2.082,
+          "ring": "A"
+        }
+      },
       "place": [
         40,
         25
       ],
+      "rings": {
+        "A": {
+          "axes": [
+            591.872,
+            155.823
+          ],
+          "centre": [
+            656.592,
+            469.638
+          ],
+          "dir": 1,
+          "tilt": -0.214
+        },
+        "B": {
+          "axes": [
+            512.568,
+            127.666
+          ],
+          "centre": [
+            660.447,
+            516.748
+          ],
+          "dir": -1,
+          "tilt": 0.277
+        }
+      },
       "scale": 1,
       "targetRect": [
         380,

@@ -7,6 +7,7 @@
 // - fixture_wide: one 2600 px body (two tiles).
 // - chaos_orrery / chaos_horizon / chaos_horizon_core: the real ids on those tiles for `?colossus=fixture` (F4 an `art`
 //   entry at (-527, -285)).
+// - contract.json's contract_form: the F3 stand-in plus EF-E's ring_back, orb and orb_glow layers, rings and orbits.
 // Run: node tests/fixtures/colossus/makeFixture.mjs (deterministic; no dependencies).
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -152,7 +153,16 @@ const browser = { chaos_orrery: orrery, chaos_horizon: horizon, chaos_horizon_co
 const index = { version: 1, forms: { [H]: horizon, [O]: orrery, [W]: wide, ...browser } };
 const tiles = new Map(files);
 files.clear();
-const contract = { version: 1, forms: { contract_form: horizonForm('contract_form') } };   // its tiles are not written
+// EF-E: the contract form also carries the orbit layers and their rings / orbits (colossus_fixture.py paints them)
+const C = 'contract_form';
+const contractForm = { ...horizonForm(C),
+  rings: { R: { centre: [1350, 600], axes: [900, 200], tilt: 0.1, dir: -1 } },
+  orbits: { orb_a: { ring: 'R', phase0: 0.5, periodMs: 8000 } } };
+contractForm.layers.push(
+  layer(C, 'ring_back', 'ring_back', [['base', [400, 380], [1900, 40], 0]]),
+  layer(C, 'orb_a', 'orb', [['base', [1800, 600], [80, 80], 0]]),
+  layer(C, 'orb_a_glow', 'orb_glow', [['base', [1760, 560], [160, 160], 0, { texScale: 2 }]], { blend: 'add', alpha: 1 }));
+const contract = { version: 1, forms: { [C]: contractForm } };   // its tiles are not written
 for (const [file, data] of tiles) {
   mkdirSync(dirname(join(DIR, file)), { recursive: true });
   writeFileSync(join(DIR, file), data);

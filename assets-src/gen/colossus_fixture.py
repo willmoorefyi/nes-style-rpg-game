@@ -2,7 +2,9 @@
 colossus_build.py, give exactly `contract_form` of the committed tests/fixtures/colossus/contract.json (written by the
 TS side, makeFixture.mjs; the TS reader is the contract): glow at texScale 2 over the whole canvas, the body's rows
 360-1079 in two tiles (2048 + 652), core with an empty base and `crack` / `open` patches at (1047, 300) 600x600, the
-corona cut from the glow file to (997, 160) 700x700; skyDim 0.6. Not game art: soft alpha, full colour, numpy only,
+corona cut from the glow file to (997, 160) 700x700; skyDim 0.6; EF-E's orbit layers: ring_back at (400, 380)
+1900x40, orb_a at (1800, 600) 80x80 on ring R (orbits: phase0 0.5, 8000 ms) and its halo orb_a_glow (additive by its
+kind, no blend key in the yaml) at (1760, 560) 160x160, texScale 2. Not game art: soft alpha, full colour, numpy only,
 no RNG. Used by selftest_colossus_art.py.
 """
 from __future__ import annotations
@@ -44,6 +46,12 @@ def images() -> dict[str, Image.Image]:
     for name, col, k in (("core_crack.png", (255, 170, 60), 0.4), ("core_open.png", (255, 150, 50), 1.0)):
         e = np.clip(1 - np.hypot((xx - DISC[0]) / 300, (yy - 600) / 300), 0.02, 1) * k
         out[name] = np.dstack([np.full(xx.shape, c, np.float64) for c in col] + [np.where(inside, e * 255, 0)])
+    for name, (x0, y0, x1, y1), col in (("ring_back.png", (401, 381, 2298, 418), (200, 160, 90)),     # + the 1 px margin
+                                        ("orb_a.png", (1801, 601, 1878, 678), (60, 200, 230)),
+                                        ("orb_a_glow.png", (1761, 561, 1918, 718), (255, 120, 60))):
+        box = (xx >= x0) & (xx <= x1) & (yy >= y0) & (yy <= y1)
+        a = np.clip(1 - np.hypot((xx - (x0 + x1) / 2) / (x1 - x0), (yy - (y0 + y1) / 2) / (y1 - y0)), 0.1, 1)
+        out[name] = np.dstack([np.full(xx.shape, c, np.float64) for c in col] + [np.where(box, a * 255, 0)])
     return {k: Image.fromarray(np.clip(np.round(v), 0, 255).astype(np.uint8), "RGBA") for k, v in out.items()}
 
 
@@ -52,12 +60,17 @@ def spec() -> dict:
             "anchors": {"target": [1347, 510], "core": [1347, 510], "head": [1347, 410],
                         "hands": [[647, 680], [1787, 630]], "melee": [1747, 590], "feet": [1347, 950]},
             "target_rect": [1170, 345, 360, 495],
+            "rings": {"R": {"centre": [1350.0, 600.0], "axes": [900.0, 200.0], "tilt": 0.1, "dir": -1}},
+            "orbits": {"orb_a": {"ring": "R", "phase0": 0.5, "period_ms": 8000}},
             "layers": [{"name": "glow", "kind": "glow", "tex_scale": 2, "alpha": 1.0, "frames": {"base": "glow.png"}},
                        {"name": "body", "kind": "body", "frames": {"base": "master.png"}},
                        {"name": "core", "kind": "core",
                         "frames": {"base": None, "crack": "core_crack.png", "open": "core_open.png"}},
                        {"name": "corona", "kind": "corona", "box": [997, 160, 1697, 860],
-                        "frames": {"base": "glow.png"}}]}
+                        "frames": {"base": "glow.png"}},
+                       {"name": "ring_back", "kind": "ring_back", "frames": {"base": "ring_back.png"}},
+                       {"name": "orb_a", "kind": "orb", "frames": {"base": "orb_a.png"}},
+                       {"name": "orb_a_glow", "kind": "orb_glow", "tex_scale": 2, "frames": {"base": "orb_a_glow.png"}}]}
 
 
 def write(root: Path, spec_over: dict | None = None, imgs: dict[str, Image.Image] | None = None) -> tuple[Path, Path]:

@@ -192,8 +192,107 @@
        ]
       }
      }
+    },
+    {
+     "name": "ring_back",
+     "kind": "ring_back",
+     "frames": {
+      "base": {
+       "at": [
+        400,
+        380
+       ],
+       "size": [
+        1900,
+        40
+       ],
+       "tiles": [
+        {
+         "file": "contract_form/ring_back_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 1900,
+         "h": 40
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "orb_a",
+     "kind": "orb",
+     "frames": {
+      "base": {
+       "at": [
+        1800,
+        600
+       ],
+       "size": [
+        80,
+        80
+       ],
+       "tiles": [
+        {
+         "file": "contract_form/orb_a_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 80,
+         "h": 80
+        }
+       ]
+      }
+     }
+    },
+    {
+     "name": "orb_a_glow",
+     "kind": "orb_glow",
+     "blend": "add",
+     "alpha": 1,
+     "frames": {
+      "base": {
+       "at": [
+        1760,
+        560
+       ],
+       "size": [
+        160,
+        160
+       ],
+       "texScale": 2,
+       "tiles": [
+        {
+         "file": "contract_form/orb_a_glow_base.png",
+         "x": 0,
+         "y": 0,
+         "w": 80,
+         "h": 80
+        }
+       ]
+      }
+     }
     }
-   ]
+   ],
+   "rings": {
+    "R": {
+     "centre": [
+      1350,
+      600
+     ],
+     "axes": [
+      900,
+      200
+     ],
+     "tilt": 0.1,
+     "dir": -1
+    }
+   },
+   "orbits": {
+    "orb_a": {
+     "ring": "R",
+     "phase0": 0.5,
+     "periodMs": 8000
+    }
+   }
   }
  }
 }

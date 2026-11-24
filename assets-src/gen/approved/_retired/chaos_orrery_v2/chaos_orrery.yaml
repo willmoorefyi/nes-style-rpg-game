@@ -1,0 +1,35 @@
+# F2 "Chaos, the Orrery", painted (rev 4, D-U10; docs/CHAOS_FORMS_PLAN.md 18.3-18.5). Layer yaml for colossus_build.py.
+# Art px = screen px at scale 1; place = the canvas top-left at rest (C3' approval, (40, 25): plinths behind the strip).
+# Anchors measured on approved/chaos_forms/chaos_orrery/master.png (every point on opaque body, alpha 254):
+#   target / core = the chest flame (screen 700, 480): the number spot, below the status row
+#   head = the eclipse disc's top (screen 705, 195): the status icon row sits above it, under the message window
+#   melee = the right forearm (screen 1010, 585): hero travel from the party (x 1380) about 370 px
+#   hands = the two forearms (screen 340 / 1070, 715); feet = the lower torso just above the strip (screen 765)
+# No orb / planet layers: the orbs sit on the rings and cutting them out would need the art behind them painted.
+form: chaos_orrery
+canvas: [1320, 900]
+scale: 1
+place: [40, 25]
+anchors:
+  target: [660, 455]
+  core: [660, 455]
+  head: [665, 170]
+  hands: [[300, 690], [1030, 690]]
+  melee: [970, 560]
+  feet: [660, 740]
+target_rect: [380, 130, 580, 610]
+layers:
+  # body: the frame drops only the invisible residue outside the alpha >= 5 box (252 px, alpha <= 4), so the cut
+  # never reaches the canvas's left or right border
+  - name: body
+    kind: body
+    box: [56, 0, 1272, 900]
+    frames: {base: master.png}
+  # glow: the crown and planet halos (nothing over the body), additive, half res (texScale 2), rest alpha 1
+  - name: glow
+    kind: glow
+    blend: add
+    alpha: 1.0
+    tex_scale: 2
+    box: [92, 17, 1298, 760]
+    frames: {base: glow.png}

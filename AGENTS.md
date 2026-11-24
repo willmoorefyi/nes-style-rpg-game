@@ -833,6 +833,12 @@ one shared HP pool (**20000**, user ruling U-3, which overrides D-U3's 6000 and 
   (`formInterlude.ts`: message, flash, shake, tint, fade, dissolve, swap, rise, pose, variant, pan) play at each
   change; while F3 / F4 show, the `bg` is dimmed to 0.6 (reset on victory, defeat, retry and the next battle).
   Textures load at battle start (`ColossusArt`, F2 released after its swap) and are destroyed at battle end.
+- **Orrery orbits (EF-E):** F2's four orbs travel its two gold rings. Layer kinds `orb`, `orb_glow` (`<orb>_glow`,
+  additive by kind) and `ring_back`; the yaml's `rings` (fitted ellipses: centre, axes, tilt, dir) and `orbits` (ring,
+  phase0, period_ms; A 9 s, B 7 s, opposite ways) go into colossus.json (`colossusOrbits.ts`). Draw order: ring_back <
+  far orbs (sin t <= 0) < body < near orbs < glow; the orbit clock holds while an interlude poses the form. The art is
+  cut offline by `gen/colossus/chaos_orrery_orbs.py` (no model) from `_retired/chaos_orrery_v2`. Tests:
+  `tests/scenes/battle/colossusOrbits.test.ts`, `colossusContract.test.ts`.
 - **Arena:** `assets/backgrounds/rim.webp` (staged by `tools/stage_rim.py`; `rim_floor.webp` is committed but unused).
 - **Scenarios:** `chaos_forms` (F1 -> F4; the `&chaos_party` anchor is a **level-40** party, user ruling U-2:
   KNGT / NINJ / MSTR / WWIZ, max HP 666 / 420 / 586 / 303), `chaos_final` (F3 alone, poison + blind preset for the

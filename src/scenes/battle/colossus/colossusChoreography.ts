@@ -5,7 +5,9 @@
  * rest alpha (colossus.json, default 1) times its pulse.
  *
  *   idle  144 loop  breathing: the canvas dy 0 -> -4 -> 0 px (cosine); glow pulse 1 <-> 0.7 (288 frames), corona
- *                   1 <-> 0.8 (96 frames); moons orbit 1 art px / 4 frames; clouds drift 1 art px / 20 frames
+ *                   1 <-> 0.8 (96 frames); moons orbit 1 art px / 4 frames; clouds drift 1 art px / 20 frames;
+ *                   orbs travel their rings (EF-E, colossusOrbits.ts) on the controller's orbit clock, their halos
+ *                   with them, pulsing like the glow
  *   slam   44       the dip dy -48 px (12, the wind-up), hold (8), slam to +40 (4; contact at 24: the shake, the hit and
  *                   a glow flare; a second shake 6 frames on), back to rest (20); dip and drop clamped per form by the
  *                   border rule (`slamLimitsFor`, C6-5: F3 48 / 40, F4 5 / 40); limbs raise / slam / recoil
@@ -16,6 +18,7 @@
  *   dying 150       flare and the core's white (30), sink 2 px / frame while every layer fades (90), white fade (30)
  */
 import { BORDER_MARGIN, FIELD, canvasRect, touchedSides, type ColossusFormSpec, type ColossusLayerKind, type XY } from './colossusIndex.js';
+import { pathPose, type OrbitPath } from './colossusOrbits.js';
 
 export type ColossusTimeline = 'idle' | 'slam' | 'beam' | 'cast' | 'hurt' | 'roar' | 'dying';
 export const TIMELINE_FRAMES: Readonly<Record<ColossusTimeline, number>> = {
@@ -51,7 +54,11 @@ const CUES: Partial<Record<ColossusTimeline, [number, ColossusCue][]>> = {
 };
 
 /** What a timeline needs to know about a layer. */
-export interface LayerInfo { name: string; kind: ColossusLayerKind; frames: readonly string[]; orbit?: number; alpha?: number }
+export interface LayerInfo {
+  name: string; kind: ColossusLayerKind; frames: readonly string[]; orbit?: number; alpha?: number;
+  /** An orb's (or its halo's) ring and orbit (EF-E). */
+  path?: OrbitPath;
+}
 
 export interface LayerPose {
   /** The frame to show (a layer without it shows `base`). */
@@ -63,7 +70,7 @@ export interface LayerPose {
   alpha: number;
   /** Show the white flash (the hurt, the core at the dying). */
   white: boolean;
-  /** A moon in the back half of its orbit draws behind the body. */
+  /** A moon in the back half of its orbit, or an orb on the far half of its ring, draws behind the body. */
   behind: boolean;
 }
 
@@ -125,11 +132,15 @@ const tri = (k: number, a: number): number => {
   return s < 2 * a ? s - a : 3 * a - s;
 };
 
-/** The ambient pose of layer `info` (index k among the moons) at clock c. */
-function ambient(info: LayerInfo, c: number, k: number, moonSpeed: number): LayerPose {
+/** A light layer that pulses and flares like the glow (an orb's halo too, EF-E). */
+const glowLike = (k: ColossusLayerKind): boolean => k === 'glow' || k === 'orb_glow';
+
+/** The ambient pose of layer `info` (index k among the moons) at clock c (orbs at the orbit clock oc). */
+function ambient(info: LayerInfo, c: number, k: number, moonSpeed: number, oc: number): LayerPose {
   const rest = info.alpha ?? 1;
   const pose: LayerPose = { frame: 'base', dx: 0, dy: 0, alpha: rest, white: false, behind: false };
-  if (info.kind === 'glow') pose.alpha = rest * pulse(c, 2 * TIMELINE_FRAMES.idle, GLOW_PULSE_MIN);
+  if (glowLike(info.kind)) pose.alpha = rest * pulse(c, 2 * TIMELINE_FRAMES.idle, GLOW_PULSE_MIN);
+  if (info.path) Object.assign(pose, pathPose(info.path, oc));
   if (info.kind === 'corona') pose.alpha = rest * pulse(c, 96, CORONA_PULSE_MIN);
   if (info.kind === 'cloud') pose.dx = tri(Math.floor(c / 20), 4);
   if (info.kind === 'moon') {
@@ -156,7 +167,7 @@ function flare(t: number, up: number, down: number, total: number): number {
 
 /** The pose of every layer and the canvas at frame t of `timeline` (ambient clock `clock`). */
 export function poseAt(timeline: ColossusTimeline, t: number, clock: number, layers: readonly LayerInfo[],
-  slam: Readonly<SlamLimits> = SLAM_LIMITS): ColossusPoseFrame {
+  slam: Readonly<SlamLimits> = SLAM_LIMITS, orbitClock: number = clock): ColossusPoseFrame {
   const f = Math.max(0, Math.floor(t));
   const c = Math.floor(clock);
   const moonSpeed = timeline === 'cast' ? 2 : 1;
@@ -168,10 +179,10 @@ export function poseAt(timeline: ColossusTimeline, t: number, clock: number, lay
   let moon = 0;
   const out: ColossusPoseFrame = { dx: 0, dy: 0, bob: breathAt(c) + (timeline === 'slam' ? slamAt(f, slam) : 0), sink: 0, overlay: 0, layers: [] };
   for (const info of layers) {
-    const p = ambient(info, c, info.kind === 'moon' ? moon++ : 0, moonSpeed);
+    const p = ambient(info, c, info.kind === 'moon' ? moon++ : 0, moonSpeed, orbitClock);
     const rest = info.alpha ?? 1;
     if (timeline === 'slam' && slamming.includes(info)) p.frame = slamFrame(info, f);
-    if (info.kind === 'glow' || info.kind === 'corona') p.alpha += (rest - p.alpha) * lit;
+    if (glowLike(info.kind) || info.kind === 'corona') p.alpha += (rest - p.alpha) * lit;
     if (timeline === 'hurt') p.white = f < 8 && f % 4 < 2;
     if (timeline === 'roar') {
       p.dx += Math.floor(f / 2) % 2 === 0 ? 1 : -1;

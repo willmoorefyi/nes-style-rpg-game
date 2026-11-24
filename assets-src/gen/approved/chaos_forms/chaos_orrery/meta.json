@@ -1,5 +1,5 @@
 {
-  "approved": "2026-11-16 C3' (fresh image-only reviews vs the source: ITERATE, then SHIP WITH NITS; nits fixed: storm planet tinted + halo + on the ring, plinths cleared below the strip line)",
+  "approved": "2026-11-16 C3' (fresh image-only reviews vs the source: ITERATE, then SHIP WITH NITS; nits fixed: storm planet tinted + halo + on the ring, plinths cleared below the strip line); 2026-11-24 EF-E: the four orbs cut into their own layers (orb_<c>, orb_<c>_glow), their spots filled offline, the far ring segments split into ring_back (image-only reviews: feasibility READS AS ARMOUR; final review in docs/ENEMY_FEEDBACK_PLAN.md EF-E)",
   "body": "assets-src/gen/out/colossus/chaos_orrery/f2_paint/body.png",
   "cache_keys": [
     "29e22d7952891fa1359044d1",
@@ -15,10 +15,13 @@
     "chaos_orrery_compose.py: o1 head onto o2, planets recoloured, ribbon rings -> iron-gold (offline)",
     "remove_bg (f2_nobg)",
     "chaos_orrery_finish.py at full res (no CL.pix): dark eclipse disc + gradient, storm planet repainted glossy on the upper-left ring (old spot mirrored), slabs cleared below row 757",
-    "finish edits baked into the raw (o12_metal_edit_raw.png) so glow G1 sees them; glow masked to the crown and planet halos, nothing over the body or inside the disc; a storm-planet halo added"
+    "finish edits baked into the raw (o12_metal_edit_raw.png) so glow G1 sees them; glow masked to the crown and planet halos, nothing over the body or inside the disc; a storm-planet halo added",
+    "EF-E (0 model calls): gen/colossus/chaos_orrery_orbs.py on _retired/chaos_orrery_v2 (the master with the orbs baked in): rings fitted, orb spots mirror-filled from the opposite side, the band redrawn along the fitted ellipse, far bands over the sky -> ring_back, orb halos re-drawn whole from glow.png profiles"
   ],
   "extras": {
     "glow": "assets-src/gen/out/colossus/chaos_orrery/f2_paint/glow_masked.png",
+    "orbs": "gen/colossus/chaos_orrery_orbs.py (orb_white, orb_cyan, orb_orange, orb_teal and their _glow)",
+    "ring_back": "gen/colossus/chaos_orrery_orbs.py",
     "sky_base": "assets-src/gen/out/colossus/chaos_orrery/f2_paint/sky_base.png"
   },
   "form": "chaos_orrery",
@@ -30,6 +33,7 @@
     40,
     25
   ],
+  "previous": "approved/_retired/chaos_orrery_v2",
   "scale": 1,
   "title": "Chaos, the Orrery (F2), painted (rev 4, D-U10)"
 }
