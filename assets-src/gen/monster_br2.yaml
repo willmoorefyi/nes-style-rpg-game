@@ -1,0 +1,160 @@
+# EF2 (pass EF2, docs/ENEMY_FEEDBACK_PLAN.md EF-F as revised after the EF debriefs, user approval 2026-11-24): the
+# prompts, every variation and the picks of monster_br2.py. One render per pose: the idle by SD 3.5 text-to-image (no
+# old-sprite guide), then attack / hurt / kneel by SD 3.5 image-to-image from the new idle's figure warped about its
+# feet (`warp`: rot +leans toward the heroes, sx / sy, shear, dx / dy px). At most 5 variations per pose. `pick` names
+# the variation of each pose that the cut uses. The user's references are mood only and never sent. Prompts are short
+# and positive only (EF lesson: "sprite sheet" / "not chibi" in a prompt draw exactly that).
+style: >-
+  Pixel art enemy for a 16-bit JRPG battle screen, dark fantasy, crisp black outline, cel shading lit from the top
+  left, one single full-body figure in side view facing right, standing on the ground, centred.
+background: Flat solid magenta background.
+style2: >-
+  Pixel art enemy for a 16-bit JRPG battle screen, dark fantasy, crisp black outline, cel shading lit from the top
+  left, one single full-body figure in side view facing right, centred, the whole figure inside the picture.
+style3: >-
+  Pixel art enemy for a 16-bit JRPG battle screen, crisp black outline, cel shading lit from the top left, one single
+  full-body human figure in side view facing right, centred, the whole figure inside the picture.
+style4: >-
+  Pixel art enemy sprite for a 16-bit JRPG battle screen: a bold readable silhouette, sturdy heroic proportions about
+  six heads tall with big clear hands and face, strong light-dark contrast and a few large clear shapes in rich
+  colours, crisp black outline, cel shading lit from the top left; one single full-body figure in side view facing
+  right, filling the picture height.
+background2: The background is flat solid pure magenta (#FF00FF) everywhere, empty, nothing else.
+negative: >-
+  chibi, cute, cartoon, comic, big head, smiling, sprite sheet, several figures, text, watermark, frame, border,
+  floor, cast shadow, scenery, blurry, photo, 3d render, purple, violet, pink clothing
+negative2: >-
+  chibi, cute, cartoon, comic, big head, smiling, sprite sheet, several figures, text, watermark, frame, border,
+  floor, ground, cast shadow, scenery, gradient, blurry, photo, 3d render
+sprites:
+  pirate:
+    size: small
+    subject: >-
+      A menacing pirate cutthroat: a lean weathered man with a scarred face, a cruel grin, a dark stubbled jaw, a red
+      bandana under a battered black tricorn hat, a gold earring, a long tattered dark brown leather coat over a
+      stained white shirt, a black belt, tall black boots, a heavy curved cutlass in his hand.
+    poses:
+      idle: a low guarded fighting stance, knees bent, the cutlass held forward, ready to strike
+      attack: lunging forward with a wide slash of the cutlass, the front knee deeply bent
+      hurt: staggering backward, flinching, the free arm thrown up
+      kneel: beaten down on one knee, slumped, head hanging, the cutlass lowered
+    negative: parrot, eyepatch, blue coat, peg leg
+    variations:
+      idle:
+        - {n: 1, seed: 8101, note: "a strong skull-faced pirate in a tricorn and dark coat with a big cutlass, but undead (a skull face), on a flat grey-green page with a ground strip (purple / pink in the negative fought the magenta; 'standing on the ground' drew ground)"}
+        - {n: 2, seed: 8101, text: 2, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, ground, grass, dirt", note: "picked: a menacing human cutthroat (tricorn, red bandana, dark coat, cutlass), turned to the right; flat grey page keyed offline (key_bg)"}
+      attack:
+        - {n: 1, seed: 8201, text: 2, strength: 0.7, warp: {rot: 12, dx: 60, sy: 0.94}, negative: "skull, skeleton, undead, ground, grass, dirt", note: "the face turned into a skull (the human-face line was not in this request), the pose barely changed, no slash"}
+        - {n: 2, seed: 8202, text: 2, strength: 0.6, warp: {rot: 20, dx: 90, sy: 0.92}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "the face a skull again at 0.6 (SD 3.5 turns a dark-fantasy pirate into a skeleton); pose change small"}
+        - {n: 3, seed: 8203, text: 3, strength: 0.45, warp: {rot: 20, dx: 90, sy: 0.92}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "human face kept, a forward lean (the warp), the cutlass held low and forward"}
+      hurt:
+        - {n: 1, seed: 8301, text: 2, strength: 0.62, warp: {rot: -12, dx: -50}, negative: "skull, skeleton, undead, ground, grass, dirt", note: "a skull face; upright, barely recoiling"}
+        - {n: 2, seed: 8302, text: 2, strength: 0.6, warp: {rot: -18, dx: -70}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "the face a skull again at 0.6 (SD 3.5 turns a dark-fantasy pirate into a skeleton); pose change small"}
+        - {n: 3, seed: 8303, text: 3, strength: 0.45, warp: {rot: -18, dx: -70}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "skull face again at 0.45"}
+        - {n: 4, seed: 8304, text: 3, strength: 0.35, warp: {rot: -18, dx: -70}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "the human face kept, leaning back; but pushed to the left edge (the cutlass tip at the cell border)"}
+        - {n: 5, seed: 8305, text: 3, strength: 0.38, warp: {rot: -16, dx: -15, key: 2}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt"}
+      kneel:
+        - {n: 1, seed: 8401, text: 2, strength: 0.66, warp: {sy: 0.7, sx: 1.08, rot: 8}, negative: "skull, skeleton, undead, ground, grass, dirt", note: "a skull face; a squashed standing figure, not kneeling"}
+        - {n: 2, seed: 8402, text: 2, strength: 0.66, warp: {hip: 0.55, legs: 0.42, rot: 10, dx: 20}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "the face a skull again at 0.6 (SD 3.5 turns a dark-fantasy pirate into a skeleton); pose change small"}
+        - {n: 3, seed: 8403, text: 3, strength: 0.45, warp: {hip: 0.55, legs: 0.42, rot: 10, dx: 20}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "skull face again at 0.45; a short standing figure, not kneeling"}
+        - {n: 4, seed: 8404, text: 3, strength: 0.4, warp: {hip: 0.55, legs: 0.32, rot: 12, dx: 20}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt", note: "still a skull face at 0.4, a short standing figure"}
+        - {n: 5, seed: 8405, text: 3, strength: 0.3, warp: {hip: 0.55, legs: 0.32, rot: 12, dx: 30, key: 2}, add: "He is a living human man with a weathered human face.", negative: "skull, skeleton, undead, bones, ground, grass, dirt"}
+    pick: {idle: 2, attack: 3, hurt: 5, kneel: 5}
+  vampire:
+    size: small
+    lift: 0.6
+    subject: >-
+      A menacing young vampire noble: deathly pale white skin, a sharp gaunt face with glowing red eyes and bared
+      white fangs, black hair slicked back to a widow's peak, pointed ears, long clawed fingers, a tall stiff black
+      collar, a crimson waistcoat, a long black cape with a bright blood-red lining.
+    poses:
+      idle: standing tall, leaning slightly forward, one clawed hand raised, the cape wrapped round him
+      attack: lunging forward with both clawed hands slashing, fangs bared, the cape flaring behind
+      hurt: recoiling backward, flinching, an arm thrown up before his face
+      kneel: beaten down on one knee, head bowed, one clawed hand on the ground, the cape pooled round him
+    negative: white hair, wings, bats, crown, old man, beard, sword, weapon, skull
+    variations:
+      idle:
+        - {n: 1, seed: 9101, text: 4, note: "a black hooded wraith on a dark page, the face hidden: no vampire; text 4's long style made it darker, not more readable"}
+        - {n: 2, seed: 9102, text: 2, add: "His pale white face is clearly visible, bareheaded, no hood; bright red cape lining.", negative: "hood, hooded, mask", note: "a fine pale red-eyed vampire noble, but facing left and cut off below the knees (a square page)"}
+        - {n: 3, seed: 9103, text: 2, aspect: "2:3", add: "His pale white face is clearly visible, bareheaded, no hood; bright red cape lining. The full body from head to boots, both feet visible.", negative: "hood, hooded, mask, cropped, close-up, portrait", note: "a strong pale red-eyed vampire in a black coat and red cravat, but frontal and cut off at the shins again"}
+        - {n: 4, seed: 9104, text: 2, add: "His pale white face is clearly visible, bareheaded; bright red cape lining. Seen from the side, walking toward the right. A small full-body figure in the middle of a large empty background, with empty space above his head and below his boots.", negative: "hood, hooded, mask, cropped, close-up, portrait, front view", note: "the design to keep: a menacing pale vampire with red eyes, a red-lined high collar and cape, turned right; cut off at the knees (SD 3.5 frames every figure as a three-quarter portrait)"}
+        - {n: 5, seed: 9105, text: 2, outpaint: {from: 4, down: 640, left: 160, right: 160, creativity: 0.35}, add: "The full body down to his black boots standing on the ground, both feet visible.", note: "picked: v4 extended downward by Stable Outpaint (served us.stability.stable-outpaint-v1:0): the full body, a long red-lined cape"}
+      attack:
+        - {n: 1, seed: 9201, text: 2, strength: 0.55, warp: {rot: 15, dx: 80, key: 2}, note: "only a lean; the hair grew long and dark"}
+        - {n: 2, seed: 9202, text: 2, strength: 0.68, note: "a real lunge but white hair, an anime face: identity lost at 0.68", warp: {rot: 22, dx: 110, sy: 0.9, key: 2}, add: "Bald-templed slicked-back black hair, his pale face and red eyes as before; both clawed hands thrust far forward.", negative: "long hair"}
+      hurt:
+        - {n: 1, seed: 9301, text: 2, strength: 0.45, warp: {rot: -14, dx: -30, key: 2}, note: "almost the idle again"}
+        - {n: 2, seed: 9302, text: 2, strength: 0.58, note: "turned frontal, a different face; not a recoil", warp: {rot: -24, dx: -60, sy: 0.95, key: 2}, add: "Thrown backward off balance, his arm raised before his pale face."}
+      kneel:
+        - {n: 1, seed: 9401, text: 2, strength: 0.55, warp: {hip: 0.5, legs: 0.35, rot: 10, dx: 30, key: 2}, note: "a shorter standing figure, not kneeling"}
+        - {n: 2, seed: 9402, text: 2, strength: 0.66, note: "hunched low with the cape spread, but white hair and a grin: identity lost", warp: {hip: 0.45, legs: 0.25, rot: 18, dx: 40, key: 2}, add: "Collapsed down on one knee, hunched forward, his cape spread on the ground round him."}
+    pick: {idle: 5, attack: 1, hurt: 1, kneel: 1}
+  crazy_horse:
+    size: large
+    lift: 0.7
+    key_thresh: 45
+    drop_green: true
+    floor: 0.94
+    flip: [0]
+    subject: >-
+      A frightening mad horse on a violent rampage, a living flesh-and-blood animal: a huge muscular dark bay stallion
+      with scars and fresh cuts on its hide, a wild tangled black mane and tail, rolling bloodshot eyes showing the
+      whites, ears pinned flat, flared red nostrils, bared teeth in an open screaming mouth, foam at the mouth, a
+      broken leather bridle with a snapped rein trailing, heavy hooves; no saddle, no rider.
+    poses:
+      idle: standing side-on with the head low and tossing, one forehoof pawing the ground, the whole horse visible
+      attack: lunging forward with the head thrust out to bite, forelegs striking forward
+      hurt: flinching back, the head thrown up, the hind legs buckling
+      kneel: collapsed onto its knees with the forelegs folded under it, the head drooping, exhausted
+    negative: saddle, rider, horn, unicorn, wings, skeleton, skull, bones, undead, smoke, armour, cropped, close-up
+    variations:
+      idle:
+        - {n: 1, seed: 9501, text: 2, aspect: "3:2", add: "Seen from the side, facing right; a small full-body horse in the middle of a large empty background, with empty space round it and all four hooves visible.", note: "picked: a frightening black stallion with a blood-red raw face and bared teeth, trotting; drawn facing left (mirrored: flip 0), on a dithered green page with a grass strip (keyed offline: key_thresh 45, drop_green)"}
+      attack:
+        - {n: 1, seed: 9601, text: 2, strength: 0.55, warp: {rot: 8, dx: 60, sy: 0.95, key: 3}, note: "the same black horse, but its red raw face turned black with a red bridle"}
+        - {n: 2, seed: 9602, text: 2, strength: 0.45, warp: {rot: 10, dx: 70, sy: 0.95, key: 3}, add: "Its face raw and blood-red with bared white teeth, as before.", negative: "harness, straps, saddle", note: "the red face back, a head-down charge; but the muzzle runs into the render's right edge (sliced at x 181 of the cut)"}
+        - {n: 3, seed: 9603, text: 2, strength: 0.45, warp: {rot: 12, dx: -40, sy: 0.95, key: 3}, add: "Its face raw and blood-red with bared white teeth, as before; lunging, the open mouth biting forward.", negative: "harness, straps, saddle", note: "reviewer ITERATE (EF2 set 1): a red strap round the chest only here, a teal mane, only a lower-headed gallop"}
+        - {n: 4, seed: 9604, text: 2, strength: 0.4, warp: {rot: 14, dx: -30, sy: 0.93, key: 3}, add: "A jet-black mane and tail; its face blood-red with bared white teeth, as before; lunging low, the open mouth biting forward.", negative: "harness, straps, girth, strap, saddle, green mane, blue mane"}
+      hurt:
+        - {n: 1, seed: 9701, text: 2, strength: 0.5, warp: {rot: -12, dx: -40, key: 3}, note: "good: rearing back, the red raw face kept; reviewer: a confident prance, not a recoil"}
+        - {n: 2, seed: 9702, text: 2, strength: 0.45, warp: {rot: -6, dx: -30, sx: 0.96, key: 3}, pose: "flinching back from a blow, the head thrown up and back, the body twisting away, the hind legs buckling", add: "A jet-black mane and tail; its face blood-red with bared white teeth, as before.", negative: "harness, straps, saddle, green mane, blue mane, rearing, prancing", note: "reviewer (sets 2-3): still the idle's prance with the head raised, not a recoil"}
+        - {n: 3, seed: 9703, text: 2, strength: 0.5, warp: {rot: -20, dx: -90, sx: 0.9, key: 3}, pose: "recoiling from a heavy blow, reeling backward onto its haunches, the head twisted back and up in pain, the forelegs off the ground", add: "A jet-black mane and tail; its face blood-red with bared white teeth, as before.", negative: "harness, straps, saddle, green mane, blue mane, prancing, trotting", note: "a real recoil (reared back) but a grey face with red straps, a greener mane, and a 45-degree rear too far from the idle to animate"}
+        - {n: 4, seed: 9704, text: 2, strength: 0.36, warp: {rot: -8, dx: -50, sx: 0.92, key: 3}, pose: "flinching from a blow, the body kept level, the head jerked back and up, the hind legs bracing", add: "A jet-black mane and tail; its whole face blood-red with bared white teeth exactly as before; red scars on the hide.", negative: "harness, straps, strap, saddle, green mane, blue mane, rearing upright"}
+      kneel:
+        - {n: 1, seed: 9801, text: 2, strength: 0.6, warp: {hip: 0.55, legs: 0.35, rot: 4, key: 3}, note: "low on its folded legs, but the red face lost and red harness straps added"}
+        - {n: 2, seed: 9802, text: 2, strength: 0.5, warp: {hip: 0.55, legs: 0.3, rot: 6, key: 3}, add: "Its face raw and blood-red with bared white teeth, as before.", negative: "harness, straps, saddle", note: "reviewer (set 2): a glowing white eye and a white drool trail only here, red stripes instead of the red face"}
+        - {n: 3, seed: 9803, text: 2, strength: 0.42, warp: {hip: 0.55, legs: 0.3, rot: 6, key: 3}, add: "A jet-black mane; its whole face blood-red as before, a dark eye, the mouth closed.", negative: "harness, straps, saddle, glowing eyes, white eye, foam, drool, saliva", note: "reviewer (set 3): the head unreadable red clutter with a boxy strap"}
+        - {n: 4, seed: 9804, text: 2, strength: 0.34, warp: {hip: 0.55, legs: 0.3, rot: 6, key: 3}, add: "A jet-black mane; its face exactly as before, a dark eye, the mouth closed.", negative: "harness, straps, strap, saddle, glowing eyes, white eye, foam, drool, saliva"}
+    pick: {idle: 1, attack: 4, hurt: 4, kneel: 4}
+    min_piece: 40
+    over: 1.15
+  dark_wizard:
+    size: small
+    lift: 0.6
+    subject: >-
+      A sinister evil dark sorcerer of a corrupted elf-orc kind: gaunt and hunched, sickly grey-green skin, a cruel
+      bony face with long pointed ears, a hooked nose and small sharp teeth, two burning yellow-green eyes, a ragged
+      black hood, long tattered black robes with dark green trim, bony clawed hands, a tall staff of blackened twisted
+      wood topped with a horned skull glowing green.
+    poses:
+      idle: standing hunched, leaning on the skull staff, the free clawed hand raised
+      attack: thrusting the glowing skull staff forward, the free claw reaching out
+      hurt: knocked backward, recoiling, one arm up, the staff held upright
+      kneel: collapsed down on one knee, slumped over the planted staff, the head hanging
+    negative: pointed hat, wizard hat, star pattern, white beard, long beard, crown, sword, spell effects, flames, cropped, close-up, portrait
+    variations:
+      idle:
+        - {n: 1, seed: 9901, text: 2, aspect: "2:3", add: "Seen from the side, facing right; a small full-body figure in the middle of a large empty background, with empty space above the hood and below the feet.", note: "a hooded green skull-faced wraith with glowing eyes and a tall staff: sinister, but tall and thin (a sliver at 72 px), green robes, a bush and ground at the feet"}
+        - {n: 2, seed: 9902, text: 2, aspect: "4:5", add: "Bent low and hunched, broad ragged black robes spreading wide at the hem, the grey-green face and clawed hands clearly visible under the hood, the skull staff held at a slant in front of him. Seen from the side, facing right; a small full-body figure in the middle of a large empty background, with empty space round him.", negative: "green robes, bush, ground", note: "picked: a hunched hooded sorcerer in tattered black robes, a glowing green skull face, a blackened crooked staff; three-quarter view turned right, a dirt patch under the feet (floor 0.955)"}
+      attack:
+        - {n: 1, seed: 9911, text: 2, strength: 0.45, warp: {rot: 14, dx: 40, sy: 0.95, key: 4, floor: 0.955}, add: "The same hooded sorcerer with the glowing green skull face, black robes and crooked staff."}
+      hurt:
+        - {n: 1, seed: 9921, text: 2, strength: 0.45, warp: {rot: -12, dx: -30, key: 4, floor: 0.955}, add: "The same hooded sorcerer with the glowing green skull face, black robes and crooked staff."}
+      kneel:
+        - {n: 1, seed: 9931, text: 2, strength: 0.5, warp: {hip: 0.5, legs: 0.35, rot: 10, dx: 20, key: 4, floor: 0.955}, add: "The same hooded sorcerer with the glowing green skull face, black robes and crooked staff, sunk down low."}
+    pick: {idle: 2, attack: 1, hurt: 1, kneel: 1}
+    floor: 0.955
+    over: 1.15
+    min_piece: 30
+    holes: 400

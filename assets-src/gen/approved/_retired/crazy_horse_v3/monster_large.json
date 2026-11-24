@@ -1,0 +1,27 @@
+{
+  "character": "crazy_horse",
+  "sheet": "monster_large",
+  "backend": "gemini",
+  "model": "gemini-3.1-flash-lite-image",
+  "seed": 1235,
+  "cache_key": "c27aaedec151d608f5e3c33f",
+  "approved": "2026-11-16",
+  "grid": [
+    132,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "note": "V8 F1 attempt 1 (seed 1235): R321"
+}

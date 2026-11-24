@@ -1,13 +1,15 @@
 {
   "character": "crazy_horse",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1235,
-  "cache_key": "c27aaedec151d608f5e3c33f",
-  "approved": "2026-11-16",
+  "backend": "bedrock",
+  "model": "stability.sd3-5-large-v1:0",
+  "seed": 9501,
+  "cache_key": "3e345eb2a752923fb7774d02",
+  "purpose": "ef2_pose",
+  "pass": "EF2",
+  "approved": "2026-11-24",
   "grid": [
-    132,
+    162,
     128
   ],
   "bottom_row": 122,
@@ -23,5 +25,55 @@
   "size": "large",
   "floating": false,
   "flip_frames": [],
-  "note": "V8 F1 attempt 1 (seed 1235): R321"
+  "route": "EF2: SD 3.5 idle text-to-image, attack / hurt / kneel image-to-image from the new idle (monster_br2.py)",
+  "sources": [
+    {
+      "pose": "idle",
+      "model": "stability.sd3-5-large-v1:0",
+      "cache_key": "3e345eb2a752923fb7774d02",
+      "variation": 1,
+      "seed": 9501
+    },
+    {
+      "pose": "attack",
+      "model": "stability.sd3-5-large-v1:0",
+      "cache_key": "a1c3ffea0edf2aec98b46cc9",
+      "variation": 4,
+      "seed": 9604,
+      "strength": 0.4
+    },
+    {
+      "pose": "hurt",
+      "model": "stability.sd3-5-large-v1:0",
+      "cache_key": "a4419f4e9702dd81c434bad9",
+      "variation": 4,
+      "seed": 9704,
+      "strength": 0.36
+    }
+  ],
+  "flipped_cells": [
+    0
+  ],
+  "cut": {
+    "mode": "area-averaged at 5.94 px",
+    "scale": 1.0,
+    "fit": {
+      "top_margin": 6,
+      "need": 103,
+      "avail": 117,
+      "top_row": 19
+    },
+    "shrink": null,
+    "native_heights": [
+      94,
+      88,
+      103,
+      65
+    ],
+    "cell_px": [
+      162,
+      128
+    ]
+  },
+  "review": ""
 }

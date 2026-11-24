@@ -1,0 +1,153 @@
+# Vampire v2 (pass V R296, docs/REDESIGN_PLAN.md 3.1): a young noble vampire, pale grey-blue face with red eyes,
+# slicked black hair, a tall black collar, a black cape with a deep red lining kept close, one claw raised before the
+# chest. The keys are far apart (the attack is a low forward swoop with the claw raking across the chest, the hurt a
+# twist away behind the closed cape), so every in-between is a translation-only copy of its source key (moves: []):
+# the upper body, cape and hips move as one piece, the knees by about half and the feet by at most 1 px (2 in
+# atk_mid); the motion lives in the key switch. No fx part (the v1 `slash` is not re-declared).
+# fixmeasure.py switch (no rig): attack need 0.550 cap 6.0 d (0, 0), IoU 0.616; hurt d (4, 0), IoU 0.705.
+# Image review 2: SHIP WITH NITS (the boots shift 1 px in wind2 / follow / recover and 2 in atk_mid, the allowed
+# near-pin). Review 1 (ITERATE) found cape cracks: the torso mask now makes cape, arms and coat one piece.
+# Kept distinct from vampire_lord (crouch with the claw drawn up, rotated arm moves): here the whole figure rises
+# and leans back before the swoop and settles forward after it.
+sprite: vampire
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+keyframes:
+  idle:
+    crown: [43, 4]
+    neck: [43, 25]
+    chest: [42, 34]
+    hip: [42, 52]
+    sh_n: [49, 29]
+    el_n: [53, 36]
+    hand_n: [58, 28]
+    sh_f: [34, 30]
+    el_f: [28, 40]
+    hand_f: [27, 51]
+    hip_n: [48, 58]
+    knee_n: [49, 66]
+    foot_n: [49, 72]
+    toe_n: [54, 74]
+    hip_f: [32, 58]
+    knee_f: [28, 66]
+    foot_f: [26, 72]
+    toe_f: [30, 74]
+  attack:
+    crown: [53, 12]
+    neck: [53, 33]
+    chest: [46, 41]
+    hip: [40, 54]
+    sh_n: [50, 36]
+    el_n: [48, 42]
+    hand_n: [43, 39]
+    sh_f: [40, 34]
+    el_f: [34, 40]
+    hand_f: [30, 44]
+    hip_n: [46, 56]
+    knee_n: [47, 64]
+    foot_n: [47, 72]
+    toe_n: [53, 74]
+    hip_f: [33, 56]
+    knee_f: [24, 64]
+    foot_f: [16, 72]
+    toe_f: [19, 74]
+  hurt:
+    crown: [43, 7]
+    neck: [45, 27]
+    chest: [42, 36]
+    hip: [40, 52]
+    sh_n: [48, 30]
+    el_n: [50, 40]
+    hand_n: [46, 48]
+    sh_f: [34, 30]
+    el_f: [28, 40]
+    hand_f: [22, 50]
+    hip_n: [44, 58]
+    knee_n: [45, 66]
+    foot_n: [45, 72]
+    toe_n: [51, 74]
+    hip_f: [28, 58]
+    knee_f: [22, 64]
+    foot_f: [19, 72]
+    toe_f: [21, 75]
+parts:
+  weapon: {remove: true}
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                 # the whole upper body and cape 2 back and 1 down: the swoop gathers; knees 1 back
+    t: 0
+    moves: []
+    dy: 1
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], hip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-1, 0], knee_f: [-1, 0]}
+  atk_wind2:                 # the coil: the upper body and cape 3 back and 2 down; knees 2 and feet 1 back
+    t: 0
+    moves: []
+    dy: 2
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0], hip: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0], knee_n: [-2, 0], knee_f: [-2, 0], foot_n: [-1, 0], foot_f: [-1, 0], toe_n: [-1, 0], toe_f: [-1, 0]}
+  atk_mid:                   # the swoop key 2 px short (toward the idle) as one piece; knees and feet 2 back
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], hip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-2, 0], knee_f: [-2, 0], foot_n: [-2, 0], foot_f: [-2, 0], toe_n: [-2, 0], toe_f: [-2, 0]}
+  atk_follow:                # the swoop key 2 px further through and 1 lower (overshoot); knees and feet 1 on
+    t: 1.0
+    moves: []
+    dy: 1
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], hip: [2, 0], hip_n: [2, 0], hip_f: [2, 0], knee_n: [1, 0], knee_f: [1, 0], foot_n: [1, 0], foot_f: [1, 0], toe_n: [1, 0], toe_f: [1, 0]}
+  atk_recover:               # the idle 2 px forward and 1 down (settling after the swoop); knees and feet 1 forward
+    t: 0
+    moves: []
+    dy: 1
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], hip: [2, 0], hip_n: [2, 0], hip_f: [2, 0], knee_n: [1, 0], knee_f: [1, 0], foot_n: [1, 0], foot_f: [1, 0], toe_n: [1, 0], toe_f: [1, 0]}
+  hurt_in1:                  # flinch: the whole upper body and cape 3 back (translated, feet planted); knees 1
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-3, 0], sh_n: [-3, 0], el_n: [-3, 0], hand_n: [-3, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-3, 0], hip: [-3, 0], hip_n: [-3, 0], hip_f: [-3, 0], knee_n: [-1, 0], knee_f: [-1, 0]}
+  hurt_in2:                  # from the hurt: the upper body and cape 2 toward the idle
+    t: 0
+    moves: []
+    dy: 0
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], hip: [2, 0], hip_n: [2, 0], hip_f: [2, 0]}
+  daze:                      # slump: the head nods 1 down, translated
+    moves: []
+    dy: 0
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [0, 1], neck: [0, 1]}
+  daze_b:                    # the slump 1 px lower (breath)
+    moves: []
+    dy: 1
+    pins: [knee_n, knee_f, foot_n, foot_f, toe_n, toe_f]
+    tweaks: {crown: [0, 1], neck: [0, 1]}
+masks:
+  head:                        # the face, hair and the tall collar move as one piece (the collar is not split off the torso)
+    idle: [[24, 2], [54, 2], [54, 26], [24, 26]]
+  torso:                       # the whole cape, both arms and the coat down to the hem are one piece: every in-between
+    # moves them together, so no seam can open inside the cape (review 1: shoulder and hem cracks)
+    idle: [[12, 27], [68, 27], [68, 67], [36, 67], [36, 69], [12, 69]]
+    attack: [[2, 27], [42, 27], [42, 34], [68, 34], [68, 67], [2, 67]]
+    hurt: [[8, 28], [60, 28], [60, 67], [8, 67]]
+  ft_n:
+    idle: [[41, 70], [57, 70], [57, 77], [41, 77]]
+    attack: [[40, 69], [57, 69], [57, 77], [40, 77]]
+    hurt: [[37, 69], [55, 69], [55, 77], [37, 77]]
+  ft_f:
+    idle: [[18, 70], [34, 70], [34, 77], [18, 77]]
+    attack: [[8, 69], [23, 69], [23, 77], [8, 77]]
+    hurt: [[12, 68], [26, 68], [26, 77], [12, 77]]
+holds: []
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+kneel:
+  source: ai
