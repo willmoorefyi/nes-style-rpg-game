@@ -1464,3 +1464,59 @@
 {"event": "result", "key": "184fab709c466d9cd082be69", "ok": true, "served": "stability.sd3-5-large-v1:0"}
 {"event": "request", "ts": "2026-11-24T12:11:30", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef2_pose", "seed": 9931, "key": "48549228cc11d8b04cf1f675", "pass": "EF2"}
 {"event": "result", "key": "48549228cc11d8b04cf1f675", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:24", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10101, "key": "768212b6ba0ee510676d0976", "pass": "EF3"}
+{"event": "result", "key": "768212b6ba0ee510676d0976", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:32", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10201, "key": "5661431cf8174819527eb871", "pass": "EF3"}
+{"event": "result", "key": "5661431cf8174819527eb871", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:39", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10301, "key": "17068603778ad05623fd0541", "pass": "EF3"}
+{"event": "result", "key": "17068603778ad05623fd0541", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:35:46", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10401, "key": "fb88b397401d92438a78d46f", "pass": "EF3"}
+{"event": "result", "key": "fb88b397401d92438a78d46f", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10102, "key": "289bcc86fec04f69c7c5ec01", "pass": "EF3"}
+{"event": "result", "key": "289bcc86fec04f69c7c5ec01", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10202, "key": "4eaeb5057fa98e09b2440f89", "pass": "EF3"}
+{"event": "result", "key": "4eaeb5057fa98e09b2440f89", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:24", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10302, "key": "7b90249e4dd2f46ba2f6df61", "pass": "EF3"}
+{"event": "result", "key": "7b90249e4dd2f46ba2f6df61", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:37:31", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10402, "key": "3451fcb65639ce3b1f437998", "pass": "EF3"}
+{"event": "result", "key": "3451fcb65639ce3b1f437998", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:41:47", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10103, "key": "795adfe0af7aef21dad2e6a8", "pass": "EF3"}
+{"event": "result", "key": "795adfe0af7aef21dad2e6a8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:41:54", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10203, "key": "5b502aae27aa1577ba3e6484", "pass": "EF3"}
+{"event": "result", "key": "5b502aae27aa1577ba3e6484", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:42:02", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "d003cba682838081c415e983", "pass": "EF3"}
+{"event": "result", "key": "d003cba682838081c415e983", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:42:09", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "d3b2be42ffe2af6f98f3bd01", "pass": "EF3"}
+{"event": "result", "key": "d3b2be42ffe2af6f98f3bd01", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:13", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10103, "key": "c2b502030ddf241687d4ba26", "pass": "EF3"}
+{"event": "result", "key": "c2b502030ddf241687d4ba26", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:20", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10202, "key": "329f87f162139be389b485c8", "pass": "EF3"}
+{"event": "result", "key": "329f87f162139be389b485c8", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:28", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "f5ea1b92b05a15146e230881", "pass": "EF3"}
+{"event": "result", "key": "f5ea1b92b05a15146e230881", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:44:35", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "db4c3cc59bd5e10ed65f592c", "pass": "EF3"}
+{"event": "result", "key": "db4c3cc59bd5e10ed65f592c", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:51:27", "tool": "monster_br2.py", "model": "outpaint", "purpose": "ef3_pose", "seed": 10205, "key": "e1a9fbb7b1810636be730f99", "pass": "EF3"}
+{"event": "result", "key": "e1a9fbb7b1810636be730f99", "ok": true, "served": "us.stability.stable-outpaint-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:51:58", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10203, "key": "3693c03a6d59cef878984687", "pass": "EF3"}
+{"event": "result", "key": "3693c03a6d59cef878984687", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:10", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10303, "key": "a1a5b9f2ba18c0d20c2aa5b2", "pass": "EF3"}
+{"event": "result", "key": "a1a5b9f2ba18c0d20c2aa5b2", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:21", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "f637dcd24b6b823730aff0cb", "pass": "EF3"}
+{"event": "result", "key": "f637dcd24b6b823730aff0cb", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:32", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10403, "key": "423a14b08684eac1c4fb6177", "pass": "EF3"}
+{"event": "result", "key": "423a14b08684eac1c4fb6177", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:42", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10503, "key": "2275280c66a2dc4e98060278", "pass": "EF3"}
+{"event": "result", "key": "2275280c66a2dc4e98060278", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:52:53", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10603, "key": "72b54f9dab1228f7aeef3538", "pass": "EF3"}
+{"event": "result", "key": "72b54f9dab1228f7aeef3538", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:05", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10503, "key": "ab06fc64a325f6464fb02b8b", "pass": "EF3"}
+{"event": "result", "key": "ab06fc64a325f6464fb02b8b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:16", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10603, "key": "b51e43a858445fc58dc0628a", "pass": "EF3"}
+{"event": "result", "key": "b51e43a858445fc58dc0628a", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:53:27", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10703, "key": "6bce0839bbc6c80caaf3cb46", "pass": "EF3"}
+{"event": "result", "key": "6bce0839bbc6c80caaf3cb46", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:57:02", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10304, "key": "2c609e8bc1abc9dc07b4f76b", "pass": "EF3"}
+{"event": "result", "key": "2c609e8bc1abc9dc07b4f76b", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-24T13:57:15", "tool": "monster_br2.py", "model": "sd35", "purpose": "ef3_pose", "seed": 10604, "key": "f7ac0c20f720fd0a1bbe765e", "pass": "EF3"}
+{"event": "result", "key": "f7ac0c20f720fd0a1bbe765e", "ok": true, "served": "stability.sd3-5-large-v1:0"}

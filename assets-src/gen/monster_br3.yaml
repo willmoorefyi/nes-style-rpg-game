@@ -1,0 +1,136 @@
+# EF3 (pass EF3, user approval 2026-11-24 after the EF2 debrief): the four humanoids again with monster_br2.py --pass EF3,
+# at the LARGE size (128 px cell, figure 96-120 px) and with stocky, broad, heroic-proportion designs (big head and
+# hands, short legs) in bright readable colours with strong value contrast (deep saturated hues with bright trim, no
+# near-black costumes) and large clear face features; still menacing, not cartoon. Same route as EF2: the idle by
+# SD 3.5 text-to-image, attack / hurt / kneel by image-to-image from the new idle warped about its feet. At most 5
+# variations per pose. Sets are prepared, not approved (the user decides the size first).
+style: unused
+background: unused
+negative: unused
+background2: The background is flat solid pure magenta (#FF00FF) everywhere, empty, nothing else.
+negative2: >-
+  chibi, cute, cartoon, comic, smiling, sprite sheet, several figures, text, watermark, frame, border, floor, ground,
+  cast shadow, scenery, gradient, blurry, photo, 3d render, cropped, close-up, portrait
+style5: >-
+  Pixel art enemy for a 16-bit JRPG battle screen: a stocky, broad, heroic-proportion figure with a big head, big
+  hands and short sturdy legs, large clear face features, bright readable colours with strong light-dark contrast,
+  deep saturated colours with bright trim, crisp black outline, cel shading lit from the top left; one single
+  full-body figure in side view facing right, the whole figure inside the picture with empty space round it.
+style6: >-
+  Stocky heroic proportions with a big head and big hands, bright saturated colours with bright trim and strong
+  contrast, 16-bit JRPG pixel art enemy, crisp black outline, cel shading, side view facing right, full body.
+sprites:
+  pirate:
+    size: large
+    key_thresh: 22
+    hue: 20
+    over: 1.15
+    min_piece: 30
+    holes: 400
+    subject: >-
+      A menacing pirate cutthroat: a weathered scarred human face with a cruel grin, a big jaw and stubble, a bright
+      red bandana under a black tricorn hat with gold trim, gold earrings, a deep crimson long coat with gold buttons
+      and trim, a white shirt, a broad brown belt with a brass buckle, black boots, a heavy curved steel cutlass.
+    poses:
+      idle: a low guarded fighting stance, knees bent, the cutlass held forward, ready to strike
+      attack: lunging forward with a wide slash of the cutlass, the front knee deeply bent
+      hurt: staggering backward, flinching, the free arm thrown up
+      kneel: beaten down on one knee, slumped, head hanging, the cutlass lowered
+    negative: parrot, eyepatch, peg leg, skull, skeleton, undead
+    variations:
+      idle:
+        - {n: 1, seed: 10101, text: 5, aspect: "4:5", note: "a stocky readable brute in a red bandana and vest with bracers, menacing, but frontal and without the tricorn, coat or cutlass"}
+        - {n: 2, seed: 10102, text: 5, aspect: "4:5", add: "Three-quarter side view turned to the right. He wears the black tricorn hat and the long crimson coat and grips the big curved cutlass in his right hand.", negative: "muscle vest, bare chest, frontal view", note: "still a frontal bare-armed brute: the tricorn, coat and cutlass ignored (late in a long prompt)"}
+        - {n: 3, seed: 10103, text: 6, aspect: "4:5", subject: "A pirate cutthroat holding a big curved steel cutlass, wearing a black tricorn hat with gold trim and a long crimson coat with gold buttons, a scarred grinning human face, a red bandana, gold earrings, black boots.", negative: "bare chest, muscle vest, hulk, brute, skull, skeleton, demon, horns", note: "follows the costume (tricorn, crimson coat, big cutlass, a strong low stance) and cuts well at 128 px, but the face is a skull and the style an illustration, not pixel art"}
+        - {n: 4, seed: 10103, text: 6, aspect: "4:5", subject: "A pirate cutthroat holding a big curved steel cutlass, wearing a black tricorn hat with gold trim and a long crimson coat with gold buttons, a scarred grinning human face, a red bandana, gold earrings, black boots.", add: "He is a living human man: a tanned weathered human face with a black beard and a cruel grin, human eyes.", negative: "bare chest, muscle vest, hulk, brute, skull, skeleton, demon, horns, mask, undead", note: "picked: a menacing grinning bearded human cutthroat, black tricorn, crimson coat, a big cutlass and a second blade; a photographic render on a teal gradient page (key_thresh 40 + hue 20)"}
+      attack:
+        - {n: 1, seed: 10203, text: 6, strength: 0.5, warp: {rot: 14, dx: 40, sy: 0.95, key: 4, thresh: 22, hue: 20}, add: "He is the same living human pirate with the bearded grinning face, tricorn and crimson coat."}
+      hurt:
+        - {n: 1, seed: 10303, text: 6, strength: 0.5, warp: {rot: -14, dx: -40, key: 4, thresh: 22, hue: 20}, add: "He is the same living human pirate with the bearded grinning face, tricorn and crimson coat.", note: "the face drifted toward a skull; the cutlass blade sliced at the cell's left edge (x 6)"}
+        - {n: 2, seed: 10304, text: 6, strength: 0.42, warp: {rot: -14, dx: 40, key: 4, thresh: 22, hue: 20}, add: "He is the same living human pirate with the bearded grinning face, tricorn and crimson coat."}
+      kneel:
+        - {n: 1, seed: 10403, text: 6, strength: 0.55, warp: {hip: 0.5, legs: 0.35, rot: 10, dx: 20, key: 4, thresh: 22, hue: 20}, add: "He is the same living human pirate with the bearded grinning face, tricorn and crimson coat. Down on one knee."}
+    pick: {idle: 4, attack: 1, hurt: 2, kneel: 1}
+  vampire:
+    size: large
+    over: 1.15
+    min_piece: 30
+    holes: 400
+    subject: >-
+      A menacing young vampire noble: a pale white face with glowing red eyes and white fangs, black hair slicked
+      back to a widow's peak, pointed ears, big clawed hands, a tall stiff collar, a deep royal-blue coat with silver
+      trim, a crimson waistcoat, a black cape with a bright scarlet lining.
+    poses:
+      idle: standing tall, leaning slightly forward, one clawed hand raised, the cape open
+      attack: lunging forward with both clawed hands slashing, fangs bared, the cape flaring behind
+      hurt: recoiling backward, flinching, an arm thrown up before his face
+      kneel: beaten down on one knee, head bowed, one clawed hand on the ground, the cape pooled round him
+    negative: white hair, wings, bats, crown, old man, beard, sword, weapon, skull, hood
+    variations:
+      idle:
+        - {n: 1, seed: 10201, text: 5, aspect: "4:5", note: "a thin black-suited figure with a cyan cape on a black page: not stocky, not readable, the wrong colours"}
+        - {n: 2, seed: 10202, text: 5, aspect: "4:5", add: "A stocky, broad-shouldered vampire. Three-quarter side view turned to the right. His pale white face is clear; the cape is black outside and bright scarlet inside.", negative: "cyan, turquoise, blue cape, thin, lanky, black background", note: "a good pale red-eyed vampire with a red-lined cape and armoured coat, but frontal and standing in a red blood pool"}
+        - {n: 3, seed: 10203, text: 6, aspect: "4:5", add: "A stocky, broad-shouldered vampire; his pale white face is clear; the cape black outside and bright scarlet inside.", negative: "blood, puddle, pool, ground, cyan, thin, lanky, front view", note: "a photographic pale vampire, not pixel art, cut off below the knees"}
+        - {n: 4, seed: 10202, text: 6, aspect: "4:5", add: "A stocky, broad-shouldered vampire; his pale white face is clear; the cape black outside and bright scarlet inside.", add: "A stocky, broad-shouldered vampire; his pale white face is clear; the cape black outside and bright scarlet inside; standing on nothing.", negative: "blood, puddle, pool, ground, cyan, thin, lanky", note: "a strong anime-style vampire (slicked black hair, pale face, red waistcoat, red-lined cape, claws) on a blue gradient, cut off at the knees"}
+        - {n: 5, seed: 10205, text: 6, outpaint: {from: 4, down: 560, left: 120, right: 120, creativity: 0.35}, add: "The full body down to his black boots, both feet visible.", note: "v4 extended downward by Stable Outpaint"}
+  vampire_lord:
+    size: large
+    key_thresh: 20
+    clamp: true
+    over: 1.15
+    min_piece: 30
+    holes: 400
+    subject: >-
+      An ancient vampire lord, older and grander than any vampire: a gaunt pale grey face with burning red eyes, heavy
+      brows and long fangs, long straight white hair, a tall pointed black collar rising like a crown, a deep crimson
+      regal coat with gold trim and a gold chain clasp, a black bat-wing cape with a bright scarlet lining joined to
+      his arms, long claws.
+    poses:
+      idle: standing tall and imperious, the arms half spread so the bat-wing cape opens
+      attack: sweeping forward, one clawed hand reaching out to grasp, the cape spread under that arm
+      hurt: reeling backward, both arms raised before the face, the cape folded across the body
+      kneel: sunk on one knee, head bowed, the white hair hanging, the cape draped over the ground
+    negative: young face, black hair, crown on the head, bats, hood, hat, skull, beard
+    variations:
+      idle:
+        - {n: 1, seed: 10301, text: 5, aspect: "4:5", note: "a broad red-caped robed figure with a skull face: an undead lich, not a vampire"}
+        - {n: 2, seed: 10302, text: 5, aspect: "4:5", add: "A living man, not a skeleton: a pale grey skin face with a big nose and heavy brows, long white hair falling to the shoulders. Three-quarter side view turned to the right.", negative: "skull, skeleton, bones, undead, lich, hood", note: "a horned demon knight before a red sun: not the vampire lord"}
+        - {n: 3, seed: 10303, text: 6, aspect: "4:5", subject: "A vampire lord with long straight white hair and a gaunt pale grey human face, red eyes, long fangs, a tall pointed black collar, a regal crimson coat with gold trim, a black bat-wing cape with a scarlet lining on his arms, long claws.", negative: "bare chest, muscle vest, hulk, brute, skull, skeleton, demon, horns", note: "the right design (long white hair, crimson coat, bat-wing cape, claws) but a comic illustration on a white page whose black wings run off the edges (not keyable)"}
+        - {n: 4, seed: 10303, text: 6, aspect: "4:5", subject: "A vampire lord with long straight white hair and a gaunt pale grey human face, red eyes, long fangs, a tall pointed black collar, a regal crimson coat with gold trim, a black bat-wing cape with a scarlet lining on his arms, long claws.", add: "On a plain flat grey background with empty space all round him; the bat-wing cape folded close to his body.", negative: "bare chest, muscle vest, hulk, brute, skull, skeleton, demon, horns, white background, moon", note: "picked: the long white hair, gaunt pale face, crimson gold-trimmed coat and a full bat-wing cape, full body on a flat grey page (key_thresh 20, clamp keeps the white hair)"}
+      attack:
+        - {n: 1, seed: 10403, text: 6, strength: 0.5, warp: {rot: 14, dx: 40, sy: 0.95, key: 4, thresh: 20, clamp: true}, add: "The same vampire lord with long white hair, the crimson coat and the bat-wing cape."}
+      hurt:
+        - {n: 1, seed: 10503, text: 6, strength: 0.5, warp: {rot: -14, dx: -40, key: 4, thresh: 20, clamp: true}, add: "The same vampire lord with long white hair, the crimson coat and the bat-wing cape."}
+      kneel:
+        - {n: 1, seed: 10603, text: 6, strength: 0.55, warp: {hip: 0.5, legs: 0.35, rot: 10, dx: 20, key: 4, thresh: 20, clamp: true}, add: "The same vampire lord with long white hair, the crimson coat and the bat-wing cape. Down on one knee."}
+    pick: {idle: 4, attack: 1, hurt: 1, kneel: 1}
+  dark_wizard:
+    size: large
+    key_thresh: 30
+    over: 1.15
+    min_piece: 30
+    holes: 400
+    subject: >-
+      A sinister evil dark sorcerer of a corrupted elf-orc kind: grey-green skin, a cruel bony face with long pointed
+      ears, a hooked nose, glowing yellow eyes and sharp teeth, a ragged deep forest-green hood and robe with bright
+      bone-white trim and runes, big bony clawed hands, a blackened staff topped with a horned skull glowing green.
+    poses:
+      idle: standing hunched, leaning on the skull staff, the free clawed hand raised
+      attack: thrusting the glowing skull staff forward, the free claw reaching out
+      hurt: knocked backward, recoiling, one arm up, the staff held upright
+      kneel: collapsed down on one knee, slumped over the planted staff, the head hanging
+    negative: pointed hat, wizard hat, star pattern, white beard, crown, sword, spell effects, flames, skull face
+    variations:
+      idle:
+        - {n: 1, seed: 10401, text: 5, aspect: "4:5", note: "a green hulking orc on a green page: no hood, robe or staff, and a green figure on green cannot be keyed"}
+        - {n: 2, seed: 10402, text: 5, aspect: "4:5", add: "A gaunt hunched sorcerer, not a muscular brute. His robe and hood are deep midnight blue with bright bone-white trim; grey-green skin only on his face and hands. He holds the tall blackened staff topped with a glowing green horned skull. Three-quarter side view turned to the right.", negative: "muscular, hulk, brute, bare chest, green robe, green background", note: "a dark-blue hulk with a green face: no robe, hood or staff"}
+        - {n: 3, seed: 10403, text: 6, aspect: "4:5", subject: "A dark sorcerer holding a tall blackened staff topped with a glowing green horned skull, wearing a ragged midnight-blue hooded robe with bone-white trim, a grey-green bony face with long pointed ears and glowing yellow eyes, thin clawed hands, hunched.", negative: "bare chest, muscle vest, hulk, brute, skull, skeleton, demon, horns", note: "a hooded skull-faced lich with a glowing green horned-skull staff and midnight-blue rags: sinister and readable at 128 px, but a skull face instead of the grey-green elf-orc face"}
+        - {n: 4, seed: 10403, text: 6, aspect: "4:5", subject: "A dark sorcerer holding a tall blackened staff topped with a glowing green horned skull, wearing a ragged midnight-blue hooded robe with bone-white trim, a grey-green bony face with long pointed ears and glowing yellow eyes, thin clawed hands, hunched.", add: "A living grey-green fleshy face with a long hooked nose, long pointed elf ears and glowing yellow eyes, no skull.", negative: "bare chest, muscle vest, hulk, brute, skeleton, demon, horns, skull face, bare skull", note: "picked: a hooded skull-faced lich in midnight-blue rags with a glowing green horned-skull staff (the skull face kept: the 'living face' line was ignored twice)"}
+      attack:
+        - {n: 1, seed: 10503, text: 6, strength: 0.5, warp: {rot: 14, dx: 40, sy: 0.95, key: 4, thresh: 30}, add: "The same hooded skull-faced sorcerer in midnight-blue rags with the glowing green horned-skull staff."}
+      hurt:
+        - {n: 1, seed: 10603, text: 6, strength: 0.5, warp: {rot: -14, dx: -5, key: 4, thresh: 30}, add: "The same hooded skull-faced sorcerer in midnight-blue rags with the glowing green horned-skull staff.", note: "the staff's glow sliced at the cell's left edge (x 3)"}
+        - {n: 2, seed: 10604, text: 6, strength: 0.5, warp: {rot: -14, dx: 60, key: 4, thresh: 30}, add: "The same hooded skull-faced sorcerer in midnight-blue rags with the glowing green horned-skull staff."}
+      kneel:
+        - {n: 1, seed: 10703, text: 6, strength: 0.55, warp: {hip: 0.5, legs: 0.35, rot: 10, dx: 20, key: 4, thresh: 30}, add: "The same hooded skull-faced sorcerer in midnight-blue rags with the glowing green horned-skull staff. Down on one knee."}
+    pick: {idle: 4, attack: 1, hurt: 2, kneel: 1}

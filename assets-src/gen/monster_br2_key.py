@@ -40,7 +40,7 @@ def key_bg_v1(img: Image.Image, thresh: int = 30) -> Image.Image:
 
 
 def key_bg(img: Image.Image, thresh: int = 30, green: bool = False, floor: float | None = None,
-           holes: int = 0) -> Image.Image:
+           holes: int = 0, hue: float = 0, clamp: bool = False) -> Image.Image:
     """SD 3.5 ignores the magenta request on a text-to-image page (a flat grey page) and paints the key unevenly on
     image-to-image: every pixel near the border's median colour or magenta-ish (PX.magenta_bg), connected to the
     border, becomes the key; then the cast shadow (`deshadow`). Offline, no remove_bg call."""
@@ -56,6 +56,12 @@ def key_bg(img: Image.Image, thresh: int = 30, green: bool = False, floor: float
     border = np.concatenate([f[0], f[-1], f[:, 0], f[:, -1]])
     med = np.median(border, 0)
     cand = (np.abs(f - med).max(2) <= thresh) | PX.magenta_bg(a)
+    if hue:                                         # a gradient page: every saturated pixel of the page's hue (EF3 pirate)
+        import colorsys
+        hb = colorsys.rgb_to_hsv(*(med / 255))[0]
+        hsv = np.asarray(Image.fromarray(a).convert("HSV")).astype(float) / 255
+        dh = np.minimum(np.abs(hsv[..., 0] - hb), 1 - np.abs(hsv[..., 0] - hb)) * 360
+        cand |= (dh <= hue) & (hsv[..., 1] > 0.45)
     if green:                                       # a painted grass strip (no green in the design)
         cand |= (f[..., 1] > f[..., 0] + 25) & (f[..., 1] > f[..., 2] + 25)
     m = Image.fromarray(np.where(cand, 255, 0).astype(np.uint8)).copy()   # a numpy-backed image does not take the fill
@@ -69,6 +75,9 @@ def key_bg(img: Image.Image, thresh: int = 30, green: bool = False, floor: float
         sizes = np.bincount(lab.ravel())
         keyed |= np.isin(lab, [i for i in range(1, n + 1) if sizes[i] >= holes])
     a[keyed] = KEY
+    if clamp:                                       # near-white figure pixels (white hair) would read as page to the cutter
+        fig = ~keyed
+        a[fig] = np.minimum(a[fig], 222)
     return deshadow(Image.fromarray(a))
 
 
@@ -96,9 +105,11 @@ def deshadow(img: Image.Image) -> Image.Image:
     return Image.fromarray(a)
 
 
-def figure(img: Image.Image, key: int = 1, floor: float | None = None) -> tuple[np.ndarray, np.ndarray]:
-    rgb = np.asarray(key_bg(img, green=key == 3, floor=floor or (0.94 if key == 3 else None),
-                            holes=400 if key == 4 else 0) if key >= 2
+def figure(img: Image.Image, key: int = 1, floor: float | None = None, thresh: int = 30,
+           opts: dict | None = None) -> tuple[np.ndarray, np.ndarray]:
+    o = opts or {}
+    rgb = np.asarray(key_bg(img, thresh, green=key == 3, floor=floor or (0.94 if key == 3 else None),
+                            holes=400 if key == 4 else 0, hue=o.get("hue", 0), clamp=o.get("clamp", False)) if key >= 2
                      else key_bg_v1(img))
     return rgb, M._figure_mask(rgb)
 
@@ -106,7 +117,7 @@ def figure(img: Image.Image, key: int = 1, floor: float | None = None) -> tuple[
 def warp(img: Image.Image, w: dict) -> Image.Image:
     """The idle's figure warped about its feet (bottom centre): `rot` degrees (+ leans the top toward the heroes,
     right), `sx` / `sy` scales, `shear` (+ pushes the top right), `dx` / `dy` px; on the magenta key."""
-    rgb, mask = figure(img, w.get("key", 1), w.get("floor"))
+    rgb, mask = figure(img, w.get("key", 1), w.get("floor"), w.get("thresh", 30), w)
     ys, xs = np.where(mask)
     if "hip" in w:                        # kneel: the legs below the hip squashed to `legs` of their height
         hy = int(ys.min() + w["hip"] * (ys.max() - ys.min()))

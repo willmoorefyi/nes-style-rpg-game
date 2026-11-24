@@ -38,8 +38,8 @@ PURPOSE, PASS = "ef2_pose", "EF2"
 TOP_MARGIN = 6
 
 
-def spec(path: Path = SPEC) -> dict:
-    return yaml.safe_load(path.read_text())
+def spec(path: Path | None = None) -> dict:
+    return yaml.safe_load((path or SPEC).read_text())
 
 
 def sprite(sid: str, sp: dict) -> dict:
@@ -59,8 +59,10 @@ def text(sp: dict, sm: dict, pose: str, v: dict) -> tuple[str, str]:
     """Short, positive-only prompt (EF lesson: 'sprite sheet' / 'not chibi' draw exactly that)."""
     tx = v.get("text", 1)              # text 2: no purple / pink in the negative (they fight the key); 3: no "dark fantasy"
     t2 = tx >= 2
-    parts = [sp[{1: "style", 2: "style2", 3: "style3", 4: "style4"}[tx]], f"{sm['subject']} {v.get('add', '')}", f"Pose: {v.get('pose', sm['poses'][pose])}.",
-             sp["background2" if t2 else "background"]]
+    parts = [sp[f"style{tx}" if tx > 1 else "style"], f"{v.get('subject', sm['subject'])} {v.get('add', '')}",
+             f"Pose: {v.get('pose', sm['poses'][pose])}.", sp["background2" if t2 else "background"]]
+    if tx >= 6:                        # EF3 text 6: the identity first (SD 3.5 drops late details), a short style after
+        parts = [parts[1], parts[2], parts[0], parts[3]]
     neg = ", ".join(x for x in (sp["negative2" if t2 else "negative"], sm.get("negative", ""), v.get("negative", ""))
                     if x)
     return " ".join(" ".join(p.split()) for p in parts), " ".join(neg.split())
@@ -93,8 +95,7 @@ def request(sid: str, pose: str, n: int, sp: dict) -> tuple[str, str, dict, str]
     else:
         b.update(mode="image-to-image", image=B.png_b64(guide(sid, pose, v, sp)), strength=float(v["strength"]))
     model = v.get("model", "sd35")
-    if model == "ultra":                          # Ultra: no `mode`
-        b.pop("mode")
+    b.pop("mode") if model == "ultra" else None   # Ultra: no `mode`
     return model, PURPOSE, b, B.cache_key(model, b)
 
 
@@ -114,7 +115,7 @@ def cut(sid: str, sp: dict) -> tuple[list[Image.Image], dict, list[Image.Image]]
     st = Image.new("RGB", (SIDE * 4, SIDE), KEY)
     for k, r in enumerate(raws):
         c = key_bg(r, sm.get("key_thresh", 30), bool(sm.get("drop_green")), sm.get("floor") if k == 0 else None,
-                   sm.get("holes", 0))
+                   sm.get("holes", 0), sm.get("hue", 0) if k == 0 else 0, bool(sm.get("clamp")))
         if sm.get("drop_green"):                    # green tints left in the figure (mane tips): to their grey
             a = np.asarray(c).astype(int)
             gm = (a[..., 1] > a[..., 0] + 12) & (a[..., 1] > a[..., 2] + 12)
@@ -193,19 +194,30 @@ def approve(sid: str, sp: dict, root: Path | None = None, cutres: tuple | None =
     return [dst / f"{name}.png", dst / f"{name}.json", dst / "kneel.png", dst / "kneel.json"]
 
 
+PASSES = {"EF2": ("monster_br2.yaml", "bedrock2", "ef2_pose"), "EF3": ("monster_br3.yaml", "bedrock3", "ef3_pose")}
+
+
+def use_pass(name: str) -> None:
+    """EF3 (user 2026-11-24): the humanoids again, larger and stockier; own yaml, review folder, purpose, pass."""
+    global SPEC, REVIEW, PURPOSE, PASS
+    y, r, PURPOSE = PASSES[name]
+    SPEC, REVIEW, PASS = HERE / y, Path.home() / "temp" / "ff-game" / "ef" / r, name
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["gen", "look", "cut", "approve", "status"])
+    ap.add_argument("cmd", choices=["gen", "look", "cut", "preview", "approve", "status"])
     ap.add_argument("id", nargs="?")
     ap.add_argument("pose", nargs="?", choices=POSES)
     ap.add_argument("--var", type=int)
     ap.add_argument("--paid", action="store_true")
+    ap.add_argument("--pass", dest="pass_", choices=list(PASSES), default="EF2")
     a = ap.parse_args(argv)
+    use_pass(a.pass_)
     if a.cmd == "status":
         rows = [r["purpose"] for r in B.read_br_ledger() if r.get("event") == "request" and r.get("pass") == PASS]
         return print(f"pass {PASS}: {len(rows)} requests {({p: rows.count(p) for p in set(rows)})}") or 0
-    sp = spec()
-    out = REVIEW / a.id
+    sp, out = spec(), REVIEW / a.id
     out.mkdir(parents=True, exist_ok=True)
     if a.cmd in ("gen", "look"):
         m, p, b, k = request(a.id, a.pose, a.var, sp)
@@ -226,6 +238,9 @@ def main(argv: list[str] | None = None) -> int:
         frames, info, raws = cut(a.id, sp)
         print(review(raws, frames, info, out / "set", MB.sheet), json.dumps(info["report"], default=str)[:300])
         return 0
+    if a.cmd == "preview":
+        from gen.monster_br_review import preview
+        return print("\n".join(map(str, preview(a.id, sp, out, cut, sprite)))) or 0
     for path in approve(a.id, sp):
         print("approved:", path)
     return 0

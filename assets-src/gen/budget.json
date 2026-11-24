@@ -291,6 +291,20 @@
       "note": "User approval 2026-11-24, after the EF debrief (~/temp/ff-game/ef/bedrock/<id>/DEBRIEF.md): pass EF2 regenerates crazy_horse, pirate, vampire, dark_wizard, vampire_lord one pose per full-size render: the idle first by SD 3.5 Large text-to-image (no old-sprite guide), then attack, hurt and kneel each by SD 3.5 image-to-image from a guide drawn from the NEW idle (monster_br2.py); Ultra only where a pose clearly needs it, inside the same caps. ef2_pose 100 = 5 sprites x 4 poses x 5 variations; ef2_nobg 20 (remove_bg only when the magenta key cut fails); no Gemini. One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 44,
       "closed": "2026-11-24, 44 of 120 (EF2: pirate 15, vampire 11, crazy_horse 13, dark_wizard 5, vampire_lord 0; SD 3.5 Large 43, Stable Outpaint 1; no Ultra, no remove_bg, no Gemini). No SHIP: crazy_horse closest (5 reviewer ITERATEs, set ready for a user decision); the small dark humanoids do not read when cut to 72 px. Debriefs in ~/temp/ff-game/ef/bedrock2/<id>/DEBRIEF.md. Reopen with the user's approval."
+    },
+    {
+      "pass": "EF3",
+      "cap": 90,
+      "per_purpose_caps": {
+        "ef3_pose": 80,
+        "ef3_nobg": 10,
+        "reserve": 0
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User approval 2026-11-24, after the EF2 debrief: pass EF3 retries pirate, vampire, dark_wizard, vampire_lord at the LARGE size (128 px cell) with stocky, broad, heroic-proportion designs in bright readable colours (monster_br2.py --pass EF3, monster_br3.yaml): SD 3.5 Large primary, the idle by text-to-image, attack / hurt / kneel by image-to-image from the new idle. ef3_pose 80 = 4 sprites x 4 poses x 5 variations; ef3_nobg 10 (remove_bg only when the offline key fails); no Gemini. Sets are prepared, not approved (the user decides the size first). One row per logical request in cache/bedrock_ledger.jsonl.",
+      "used": 28,
+      "closed": "2026-11-24, 28 of 90 (EF3: pirate 8, vampire 5, vampire_lord 7, dark_wizard 8; SD 3.5 Large 27, Stable Outpaint 1; no remove_bg, no Gemini). No SHIP; pose renders stopped early on the user's guidance (part-posing route next). 62 calls left (ef3_pose 52, ef3_nobg 10): reopen this block for the part-posing route with the user's approval. Debriefs in ~/temp/ff-game/ef/bedrock3/<id>/DEBRIEF.md."
     }
   ]
 }
