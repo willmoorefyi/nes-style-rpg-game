@@ -93,7 +93,7 @@ describe('EF-A hi-res sheets in the atlas', () => {
     const extra = pages.length - 12;                               // the 12 pages before EF (3ba8aa91)
     console.log(`EF-A4 budget: ${pages.length} pages (${extra} extra, ${hires} hi-res), preload ${preload.join(',')}, `
       + `worst preload + formation ${(worst / 2 ** 20).toFixed(1)} MB`);
-    expect(extra).toBeLessThanOrEqual(14);
+    expect(extra).toBeLessThanOrEqual(15);                         // EF-A/B's 14 + EF-D's chaos page (int-ef1)
     expect(worst).toBeLessThanOrEqual(8 * 2048 * 2048 * 4);
     const act1 = ['goblin', 'gr_imp', 'gr_wolf', 'mummy', 'troll', 'ogre', 'dragon'].map((s) => atlas.sheets[s].page ?? 0);
     expect(act1.every((p) => preload.includes(p))).toBe(true);     // D-K13: every act-1 sheet stays preloaded

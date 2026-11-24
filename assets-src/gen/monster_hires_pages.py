@@ -24,7 +24,7 @@ from gen.anim_rules import MAX_PAGE
 from gen.monster_hires import unit
 
 GUTTER = 1
-MAX_EXTRA_PAGES = 14
+MAX_EXTRA_PAGES = 15               # EF-A/B's 14 + EF-D's bosses-group spill (chaos's orbit frames; plan EF-D; int-ef1)
 BASE_PAGES = 12                    # the atlas pages before EF (3ba8aa91): `extra` = pages - BASE_PAGES
 PAGE_BYTES = 2048 * 2048 * 4
 MAX_GPU_BYTES = 8 * PAGE_BYTES
