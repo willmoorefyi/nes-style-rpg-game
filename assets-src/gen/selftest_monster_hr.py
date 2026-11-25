@@ -64,7 +64,7 @@ def _check_yaml(check: Callable[[bool, str], None], sp: dict) -> None:
             for r in rows:
                 per[H.row_pass(r)[0]] = per.get(H.row_pass(r)[0], 0) + 1
             if (pose not in H.POSES or len(set(ns)) != len(ns) or max(per.values()) > 5
-                    or not set(per) <= {"EF4", "EF5"}):
+                    or not set(per) <= {"EF4", "EF5", "EF6"}):
                 bad.append(f"{sid} {pose}: rows {ns} {per} (at most 5 per image per pass)")
             bad += [f"{sid} {pose} v{r['n']}: strength {r['strength']}" for r in rows
                     if float(r["strength"]) not in STRENGTHS]
@@ -103,7 +103,8 @@ def _check_recorded(check: Callable[[bool, str], None], sp: dict) -> dict:
     for sid, sm in sp["sprites"].items():
         if not sm.get("master_sha256"):
             continue
-        srcs = [sm["prep"]["source"]] + ([sm["prep"]["graft"]["source"]] if sm["prep"].get("graft") else [])
+        srcs = [sm["prep"]["source"]] + [k for k in ((sm["prep"].get("graft") or {}).get("source"),
+                                                    sm["prep"].get("nobg_key")) if k]   # B0: the remove_bg render
         if not all(B.is_cached(k) for k in srcs):
             print(f"  skip {sid} (EF3 raws not in this checkout's cache)")
             continue
@@ -122,8 +123,9 @@ def _check_recorded(check: Callable[[bool, str], None], sp: dict) -> dict:
     check(not bad, f"EF4 prep / puppet: {n} recorded sha256 reproduced {bad}")
     led = B.read_br_ledger()
     ok = {r["key"] for r in led if r.get("event") == "result" and r.get("ok")}
-    for ps in ("EF4", "EF5"):                         # each pass's rows against that pass's ledger requests
-        rows = [r for r in led if r.get("pass") == ps and r.get("event") == "request"]
+    for ps in ("EF4", "EF5", "EF6"):                  # each pass's *_pose requests against its rows (ef6_nobg: EF6 file)
+        rows = [r for r in led if r.get("pass") == ps and r.get("event") == "request"
+                and str(r.get("purpose", "")).endswith("_pose")]
         asked = {r["key"] for r in rows}
         keyed, bad = 0, []
         for sid, sm in sp["sprites"].items():

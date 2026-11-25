@@ -41,3 +41,22 @@ def record_row(sid: str, pose: str, n: int, key: str, value: str, path: Path | N
             path.write_text("\n".join(lines))
             return
     raise SystemExit(f"{sid} {pose}: no variation row n: {n}")
+
+
+def record_prep(sid: str, key: str, value: str, path: Path | None = None) -> None:
+    """Set `key: value` right under the sprite's `prep:` line (replaced in place when present): `prep.nobg_key`."""
+    path = path or SPEC
+    lines = path.read_text().split("\n")
+    start = next(i for i, ln in enumerate(lines) if ln == f"  {sid}:")
+    prep = next(i for i in range(start + 1, len(lines)) if lines[i] == "    prep:")
+    row = f"      {key}: {value}"
+    for i in range(prep + 1, len(lines)):
+        if not lines[i].startswith("      "):
+            lines.insert(prep + 1, row)
+            break
+        if lines[i].startswith(f"      {key}:"):
+            lines[i] = row
+            break
+    else:
+        lines.insert(prep + 1, row)
+    path.write_text("\n".join(lines))

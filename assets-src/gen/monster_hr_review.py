@@ -48,10 +48,12 @@ def despur_page(sid: str, frames: list[Image.Image], out: Path) -> Path:
     return out
 
 
-def write_monsters_yaml(sid: str, sm: dict, path: Path | None = None) -> None:
+def write_monsters_yaml(sid: str, sm: dict, path: Path | None = None, rows: dict | None = None) -> None:
     """The held approve's monsters.yaml rewrite: the `- id: <sid>` entry becomes size large with the EF4 brief and
-    pose texts (its Gemini fields are no longer used: the sheets are Bedrock records); `body` is kept."""
+    pose texts (its Gemini fields are no longer used: the sheets are Bedrock records); `body` is kept. `rows`
+    {pose: picked variation row}: a picked row's `prompt_pose` is written instead of `poses[pose]` (amendment B0)."""
     path = path or HERE / "monsters.yaml"
+    txt = {p: ((rows or {}).get(p) or {}).get("prompt_pose") or sm["poses"][p] for p in ("attack", "hurt", "kneel")}
     text = path.read_text()
     m = re.search(rf"^- id: {sid}\n(.*?)(?=^- id: |\Z)", text, re.S | re.M)
     if not m:
@@ -62,7 +64,7 @@ def write_monsters_yaml(sid: str, sm: dict, path: Path | None = None) -> None:
            f"(monster_hr.yaml#{sid}); approved/{sid}/*.json\n  # record the cache keys. The older looks are archived "
            f"(docs/RETIRED_SPRITES.md); the fields below are the EF4 brief.\n  size: large\n"
            + (f"  body: {body.group(1)}\n" if body else "") + f"  prompt: >-\n{fold(sm['brief'])}\n"
-           f"  attack: {sm['poses']['attack']}\n  hurt: {sm['poses']['hurt']}\n  kneel: {sm['poses']['kneel']}\n"
+           f"  attack: {txt['attack']}\n  hurt: {txt['hurt']}\n  kneel: {txt['kneel']}\n"
            f"  seeds: [1234]\n")
     path.write_text(text[:m.start()] + new + text[m.end():])
 
@@ -77,7 +79,8 @@ def approve_json(sid: str, sm: dict, pk: list[tuple], info: dict, size: tuple[in
              "pass": row_pass(v)[0], "purpose": row_pass(v)[1], "arm": f"{row_pass(v)[0].lower()}_sd35"}
             for p, n, k, v in pk]
     inputs = {"idle": {"master_sha256": sm["master_sha256"], "raw_keys": [sm["prep"]["source"]] + (
-        [sm["prep"]["graft"]["source"]] if sm["prep"].get("graft") else [])}}
+        [sm["prep"]["graft"]["source"]] if sm["prep"].get("graft") else []) + (
+        [sm["prep"]["nobg_key"]] if sm["prep"].get("nobg_key") else [])}}   # B0: the remove_bg render too
     inputs.update({p: {"posed_sha256": sm[f"{v.get('input', p)}_sha256"], "master_sha256": sm["master_sha256"]}
                    for p, n, _, v in pk[1:]})
     meta = {"character": sid, "sheet": "monster_large", "backend": "bedrock", "model": model,

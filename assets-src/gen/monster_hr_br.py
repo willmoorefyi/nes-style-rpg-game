@@ -8,7 +8,8 @@ the pose text).
   python3 -I assets-src/gen/monster_hr_br.py gen <id> <pose> --var N [--paid]   # one repaint (ledgered, cached)
   python3 -I assets-src/gen/monster_hr_br.py cut <id>                           # the picks -> large cut + review sheets
   python3 -I assets-src/gen/monster_hr_br.py approve <id>                       # HELD: run only after the user's size decision
-  python3 -I assets-src/gen/monster_hr_br.py status
+  python3 -I assets-src/gen/monster_hr_br.py nobg <id> [--paid]                  # EF6: remove_bg on the prep raw (prep.nobg_key)
+  python3 -I assets-src/gen/monster_hr_br.py status                             # requests per pass of the ledger
 """
 from __future__ import annotations
 
@@ -195,26 +196,29 @@ def approve(sid: str, sp: dict, root: Path | None = None) -> list[Path]:
     for ext in ("png", "json"):
         (dst / f"monster_small.{ext}").unlink(missing_ok=True)
     if root == AP.APPROVED:
-        for s in srcs:
-            AP._unignore(s["cache_key"])
-        write_monsters_yaml(sid, sm)
+        for k in [s["cache_key"] for s in srcs] + ([sm["prep"]["nobg_key"]] if sm["prep"].get("nobg_key") else []):
+            AP._unignore(k)                            # the renders and the remove_bg output (amendment B0)
+        write_monsters_yaml(sid, sm, rows={p: variation(sm, p, n) for p, n, _ in pk})
     return [dst / "monster_large.png", dst / "monster_large.json", dst / "kneel.png", dst / "kneel.json"]
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("cmd", choices=["gen", "cut", "approve", "status"])
+    ap.add_argument("cmd", choices=["gen", "cut", "approve", "nobg", "status"])
     ap.add_argument("id", nargs="?")
     ap.add_argument("pose", nargs="?", choices=POSES)
     ap.add_argument("--var", type=int)
     ap.add_argument("--paid", action="store_true")
     a = ap.parse_args(argv)
     if a.cmd == "status":
-        for ps in ("EF4", "EF5"):
-            rows = [r for r in B.read_br_ledger() if r.get("event") == "request" and r.get("pass") == ps]
-            print(f"pass {ps}: {len(rows)} requests")
+        rows = [r for r in B.read_br_ledger() if r.get("event") == "request"]
+        for ps in sorted({str(r.get("pass")) for r in rows}):      # every pass found in the ledger
+            print(f"pass {ps}: {sum(str(r.get('pass')) == ps for r in rows)} requests")
         return 0
     sp = P.spec()
+    if a.cmd == "nobg":
+        from gen.monster_hr_br_nobg import nobg
+        return print(f"{a.id}: prep.nobg_key {nobg(a.id, sp, a.paid)}") or 0
     if a.cmd == "gen":
         info = gen(a.id, a.pose, a.var, a.paid, sp)
         from gen.monster_hr_yaml import record_row

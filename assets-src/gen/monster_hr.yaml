@@ -33,7 +33,10 @@ sprites:
     prep:
       source: 795adfe0af7aef21dad2e6a8      # EF3 pirate idle v3 (sd35)
       flip: false
-      key: {mode: rows, tol: 34, hue: 16, sat: 0.5, val: 0.38, holes: 400}
+      key: remove_bg                        # EF6 (amendment B0): the alpha of the cached remove_bg output (nobg_key,
+                                            # `monster_hr_br.py nobg pirate --paid`); keep / keep_light / erase_hue /
+                                            # erase_out below are ignored under it, restore_out is kept
+      key_ef4: {mode: rows, tol: 34, hue: 16, sat: 0.5, val: 0.38, holes: 400}   # EF4's colour key (record only)
       cx: 470
       keep_tol: 10
       close: 2
@@ -64,6 +67,10 @@ sprites:
         dst_marks: [[391, 189], [450, 189], [432, 211], [432, 278]]   # v3: eye sockets, nose, chin (face 10 % up)
         feather: 10
         over: []
+        erase:                              # EF6: the graft trimmed to v4's face and beard (v4 raw coordinates): v4's
+          - [[516, 180], [540, 180], [540, 280], [466, 280], [476, 260], [490, 243], [500, 231], [512, 228], [516, 215]]
+                                            # beige neck / collar beside the ear (EF4 debrief iteration 4) and its
+                                            # page-tinted hair right of the earring leave; v3's own body shows there
   vampire:
     kneel_sha256: d6fb22d34eace1052dbfd1beb679892f5a2d33416a7e5b27c696a24e1ec9a0f2
     hurt_sha256: 3cb2c08ddf969709c26484df2758c6e92b686d5056663fa20f1ae15f44699992
@@ -129,21 +136,12 @@ sprites:
           pins: {body: {7: [-50, 50], 8: [-20, 60], 9: [50, 80], 10: [40, 100], 11: [-30, 110], 12: [-10, 140], 13: [90, 150], 14: [-20, 0], 15: [40, 0]}}
           z: [arm_b_lo, arm_b_up, leg_b_lo, leg_b_up, body, leg_f_up, leg_f_lo, head, arm_f_up, arm_f_lo]
           fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
-    variations:                           # EF4 repaints (SD 3.5 Large image-to-image; <= 5 per image)
-      idle:
-        - {n: 1, seed: 42001, strength: 0.3}
-      attack:
-        - {n: 1, seed: 42011, strength: 0.3}
-      hurt:
-        - {n: 1, seed: 42021, strength: 0.3}
-      kneel:
-        - {n: 1, seed: 42031, strength: 0.3}
   vampire_lord:
-    hurt_r2_sha256: c675b7831806a7eb3c9163aed779ccb573611a929ed8e7dd7b2fc42416129f67
-    attack_r2_sha256: 7a46b5352ce68978edd0a15d38b73772f04f729d7ddf19160117a652fe866000
-    kneel_sha256: 63433990f8b66627ff80b87ec108cddbc182298c74bd2b0e1e6bc5fc66d6eed0
-    hurt_sha256: 39ac85c7d754a13372b4fdfb26909d34dd47292519090cd4ef4dde0961cf0aa4
-    attack_sha256: 0543e8aba6d2281af669e79b01092b2e136b54b70a7b0b2b92547becbb737994
+    hurt_r2_ef4_sha256: c675b7831806a7eb3c9163aed779ccb573611a929ed8e7dd7b2fc42416129f67
+    attack_r2_ef4_sha256: 7a46b5352ce68978edd0a15d38b73772f04f729d7ddf19160117a652fe866000
+    kneel_ef4_sha256: 63433990f8b66627ff80b87ec108cddbc182298c74bd2b0e1e6bc5fc66d6eed0
+    hurt_ef4_sha256: 39ac85c7d754a13372b4fdfb26909d34dd47292519090cd4ef4dde0961cf0aa4
+    attack_ef4_sha256: 0543e8aba6d2281af669e79b01092b2e136b54b70a7b0b2b92547becbb737994
     master_sha256: f9fcf34d0339ca97acfb3cac7a229bf0e418a1ee6826b8b1f19781df7d23968c
     brief: >-
       An ancient vampire lord (EF4: EF3 idle v4): long straight white hair, a gaunt pale skull-like face with red eyes
@@ -177,17 +175,17 @@ sprites:
         - {name: arm_f_up, poly: [[545, 232], [600, 240], [600, 300], [598, 355], [548, 355], [545, 300]], pivot: [570, 248], parent: chest, light: 36}
         - {name: arm_f_lo, poly: [[545, 350], [600, 350], [605, 460], [610, 550], [555, 550], [548, 460]], pivot: [575, 352], parent: arm_f_up, light: 36}
       poses:
-        attack:
+        attack_ef4:                           # EF4 G2 iteration 3 (superseded by attack, amendment B1)
           xf: {chest: [8, 25, 0], head: [-4], arm_f_up: [-80], arm_f_lo: [-15], arm_b_up: [15], wing_b: [12], wing_f: [-25]}
           pins: {body: {3: [20, 0], 4: [20, 0], 5: [20, 0], 6: [8, 0], 7: [8, 0], 10: [-40, 0]}}
           z: [wing_b, arm_b_lo, arm_b_up, body, wing_f, head, arm_f_up, arm_f_lo]
           fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
-        hurt:
+        hurt_ef4:                             # EF4 G2 iteration 3 (superseded by hurt, amendment B1)
           xf: {chest: [-8, -25, 0], head: [-12], arm_f_up: [140], arm_f_lo: [-100], arm_b_up: [-130], arm_b_lo: [95], wing_b: [-8, 15, 0, 0.9, 0.9], wing_f: [8, -15, 0, 0.9, 0.9]}
           pins: {body: {3: [-20, 0], 4: [-20, 0], 5: [-20, 0], 6: [-8, 0], 7: [-8, 0], 11: [30, 0]}}
           z: [wing_b, wing_f, body, head, arm_b_up, arm_b_lo, arm_f_up, arm_f_lo]
           fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
-        kneel:
+        kneel_ef4:                            # EF4 G2 iteration 2 (superseded by kneel, amendment B1)
           part_opts:                            # the G2-iteration-2 kneel (PASS; repainted as kneel v1-v3), kept as it was
             wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
             wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
@@ -201,7 +199,7 @@ sprites:
           z: [wing_b, wing_f, body, head, arm_b_up, arm_b_lo, arm_f_up, arm_f_lo]
           fill: [[[150, 150], [590, 150], [590, 980], [150, 980]]]   # not the wedge behind the right arm
           open: [[588, 400, 710, 730]]          # the window between the hanging right arm and the cape
-        attack_r2:                            # attack v1-v3 input (G2 iteration 2; superseded by attack)
+        attack_r2_ef4:                        # attack v1-v3 input (G2 iteration 2; superseded by attack_ef4)
           part_opts:                            # the G2-iteration-2 recipe (kept: the kneel, and the inputs of attack / hurt v1-v3)
             wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
             wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
@@ -214,7 +212,7 @@ sprites:
           pins: {body: {3: [20, 0], 4: [20, 0], 5: [20, 0], 6: [8, 0], 7: [8, 0], 10: [-40, 0]}}
           z: [wing_b, arm_b_lo, arm_b_up, body, wing_f, head, arm_f_up, arm_f_lo]
           fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
-        hurt_r2:                              # hurt v1-v3 input (G2 iteration 2; superseded by hurt)
+        hurt_r2_ef4:                          # hurt v1-v3 input (G2 iteration 2; superseded by hurt_ef4)
           part_opts:                            # the G2-iteration-2 recipe (kept: the kneel, and the inputs of attack / hurt v1-v3)
             wing_b: {pins: [[350, 215], [338, 330], [330, 100], [200, 300], [190, 560], [215, 790]], anchor: null, cut_poly: null}
             wing_f: {pins: [[545, 215], [600, 300], [540, 115], [625, 250], [615, 640]], anchor: null, cut_poly: null}
@@ -231,20 +229,20 @@ sprites:
       idle:
         - {n: 1, seed: 43001, strength: 0.3, key: 74cb05ef3d5f193416cf99c6, iou: 0.984}
       attack:
-        - {n: 1, seed: 43011, strength: 0.3, input: attack_r2, key: 4fbf0a400025770d352609cd, iou: 0.975}
-        - {n: 2, seed: 43012, strength: 0.38, input: attack_r2, key: 67ece4b60af23f48e990db89, iou: 0.97}
-        - {n: 3, seed: 43013, strength: 0.45, input: attack_r2, key: acfcae5c3b2912494aca06e9, iou: 0.959}
-        - {n: 4, seed: 43014, strength: 0.38, note: "the G2-iteration-3 pose (no arm boxes, no cape steps)", key: 058627c0df817fec745721d3, iou: 0.964}
+        - {n: 1, seed: 43011, strength: 0.3, input: attack_r2_ef4, key: 4fbf0a400025770d352609cd, iou: 0.975}
+        - {n: 2, seed: 43012, strength: 0.38, input: attack_r2_ef4, key: 67ece4b60af23f48e990db89, iou: 0.97}
+        - {n: 3, seed: 43013, strength: 0.45, input: attack_r2_ef4, key: acfcae5c3b2912494aca06e9, iou: 0.959}
+        - {n: 4, seed: 43014, strength: 0.38, input: attack_ef4, note: "the G2-iteration-3 pose (no arm boxes, no cape steps)", key: 058627c0df817fec745721d3, iou: 0.964}
       hurt:
-        - {n: 1, seed: 43021, strength: 0.3, input: hurt_r2, key: 05faf9aacf03da7e55e7b2da, iou: 0.984}
-        - {n: 2, seed: 43022, strength: 0.38, input: hurt_r2, key: d4d007a03a2ef3d22a18c3ed, iou: 0.979}
-        - {n: 3, seed: 43023, strength: 0.45, input: hurt_r2, key: f67659af2a3137c6f05f9ef8, iou: 0.968}
-        - {n: 4, seed: 43024, strength: 0.38, note: "the G2-iteration-3 pose", key: 0c0bab155670a4cf271e09ae, iou: 0.973}
-        - {n: 5, seed: 43025, strength: 0.45, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: 603effd84a930eaa7ae8e003, iou: 0.966}
+        - {n: 1, seed: 43021, strength: 0.3, input: hurt_r2_ef4, key: 05faf9aacf03da7e55e7b2da, iou: 0.984}
+        - {n: 2, seed: 43022, strength: 0.38, input: hurt_r2_ef4, key: d4d007a03a2ef3d22a18c3ed, iou: 0.979}
+        - {n: 3, seed: 43023, strength: 0.45, input: hurt_r2_ef4, key: f67659af2a3137c6f05f9ef8, iou: 0.968}
+        - {n: 4, seed: 43024, strength: 0.38, input: hurt_ef4, note: "the G2-iteration-3 pose", key: 0c0bab155670a4cf271e09ae, iou: 0.973}
+        - {n: 5, seed: 43025, strength: 0.45, input: hurt_ef4, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: 603effd84a930eaa7ae8e003, iou: 0.966}
       kneel:
-        - {n: 1, seed: 43031, strength: 0.3, key: 38f9249b211c2cbd6e021009, iou: 0.977}
-        - {n: 2, seed: 43032, strength: 0.38, key: 479ae73707bc6f8f17fe82a9, iou: 0.969}
-        - {n: 3, seed: 43033, strength: 0.45, key: 9323b28c99083db27cd866dc, iou: 0.954}
+        - {n: 1, seed: 43031, strength: 0.3, input: kneel_ef4, key: 38f9249b211c2cbd6e021009, iou: 0.977}
+        - {n: 2, seed: 43032, strength: 0.38, input: kneel_ef4, key: 479ae73707bc6f8f17fe82a9, iou: 0.969}
+        - {n: 3, seed: 43033, strength: 0.45, input: kneel_ef4, key: 9323b28c99083db27cd866dc, iou: 0.954}
     scale_entry: "{scale: 2, tex: 2, smooth: [despur]}"   # prepared for monster_scale.yaml (G4), not applied
     pick: {idle: 1, attack: 4, hurt: 4, kneel: 3}   # G4 round 2: attack / hurt on the G2-iteration-3 poses, kneel at 0.45
   dark_wizard:
@@ -293,6 +291,10 @@ sprites:
         - {name: staff, poly: [[620, 80], [805, 80], [805, 270], [760, 280], [760, 965], [680, 965], [680, 280], [620, 270]], pivot: [715, 440], parent: arm_f_up}
         - {name: claw, poly: [[345, 615], [375, 595], [410, 600], [425, 640], [420, 700], [410, 735], [380, 735], [350, 690], [340, 650]], pivot: [390, 600], parent: chest}
         - {name: hand, poly: null, pivot: [715, 440], parent: arm_f_up, joint: false}   # EF5: the staff hand (no px in EF4 recipes)
+      targets:                          # amendment A1's EF5 targets (amendment B0: read by monster_hr_check.targets)
+        attack: {prop_delta: [50, 180], chest: [15, 90]}
+        hurt: {chest: [-90, -20], prop_delta: [-180, -15]}
+        kneel: {height_max: 0.70}
       poses:
         attack_ef4:                     # EF4 G2 iteration 2 (superseded by attack, amendment A1)
           xf: {chest: [10, 25, 0], head: [-4], arm_f_up: [-50], staff: [70], claw: [-60, 230, -80]}

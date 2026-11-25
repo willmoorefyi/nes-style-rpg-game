@@ -1,6 +1,7 @@
 """EF-G G1 (docs/ENEMY_FEEDBACK_PLAN.md EF-G): the idle masters of the four humanoids, no AI. Each master is one EF3 raw
 render (assets-src/gen/cache/<key>.png) keyed off its page, cleaned by the recipe in gen/monster_hr.yaml (`prep`:
-source key, flip, key settings, polygons, landmarks), and placed on a 1024x1024 RGBA canvas: the figure scaled
+source key, flip, key settings, polygons, landmarks; `key: remove_bg` takes the alpha of the cached remove_bg output,
+gen/monster_hr_prep_nobg.py), and placed on a 1024x1024 RGBA canvas: the figure scaled
 (Lanczos, premultiplied) to 880 px tall, feet on row 960, facing right. Output gen/out/hr/<id>/idle_master.png
 (untracked); its sha256 is recorded in the yaml (`master_sha256`), so drift fails clearly.
 
@@ -79,12 +80,17 @@ def place(rgb: np.ndarray, m: np.ndarray, cx: float) -> Image.Image:
 
 def master(sid: str, sp: dict | None = None) -> Image.Image:
     from gen import bedrock as B
-    p = (sp or spec())["sprites"][sid]["prep"]
+    from gen import monster_hr_prep_nobg as Q
+    p = Q.effective((sp or spec())["sprites"][sid]["prep"])   # remove_bg: no colour-key hand polygons
     rgb = np.asarray(Image.open(B.CACHE / f"{p['source']}.png").convert("RGB")).copy()
-    if p.get("graft"):
-        rgb = graft(rgb, p["graft"])
-    prot = poly_mask(rgb.shape[:2], p.get("protect")) if p.get("protect") else None
-    m = key(rgb, p.get("key") or {}, prot) & ~poly_mask(rgb.shape[:2], p.get("erase"))
+    if p.get("key") == "remove_bg":                    # amendment B0: the body's alpha from remove_bg, the graft on top
+        rgb, m = Q.body(rgb, p)
+        m &= ~poly_mask(rgb.shape[:2], p.get("erase"))
+    else:
+        if p.get("graft"):
+            rgb = graft(rgb, p["graft"])
+        prot = poly_mask(rgb.shape[:2], p.get("protect")) if p.get("protect") else None
+        m = key(rgb, p.get("key") or {}, prot) & ~poly_mask(rgb.shape[:2], p.get("erase"))
     if p.get("keep"):                                  # figure px the key took (gloves lit in the page's teal): every
         f = rgb.astype(float)                          # px of the polygons but those within keep_tol of the page
         near = np.abs(f - page(f, (p.get("key") or {}).get("mode", "flat"))).max(2) <= p.get("keep_tol", 10)

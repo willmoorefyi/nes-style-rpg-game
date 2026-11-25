@@ -1,7 +1,7 @@
 """EF-G G2 helpers for gen/monster_hr_puppet.py: the agent's checks on a posed image (margin, feet row, joint tears,
 IoU with the idle under its pass's bar), amendment A's measures (the prop's and the chest's world angles from
 vertical, + = forward / toward the right, composed through the puppet's world transforms; the head's world tilt; the body height = the alpha
-bbox height without the props) with the EF5 targets, and the review overlay (part outlines, pivots, cloth pins, mesh)."""
+bbox height without the props) with the per-recipe targets of the yaml (amendment B0), and the review overlay (part outlines, pivots, cloth pins, mesh)."""
 from __future__ import annotations
 
 import math
@@ -15,7 +15,8 @@ from gen import monster_hr_warp as W
 COLOURS = [(255, 80, 80), (80, 220, 80), (90, 140, 255), (255, 210, 60), (230, 90, 230), (60, 220, 220),
            (255, 150, 60), (170, 120, 255), (200, 255, 120), (255, 255, 255)]
 
-IOU_BARS = {"EF4": {}, "EF5": {"attack": 0.70, "hurt": 0.70, "kneel": 0.65}}   # EF4: 0.80 for every pose
+IOU_BARS = {"EF4": {}, "EF5": {"attack": 0.70, "hurt": 0.70, "kneel": 0.65},   # EF4: 0.80 for every pose
+            "EF6": {"attack": 0.80, "hurt": 0.70, "kneel": 0.65}}   # amendment B0: an upright attack overlaps the idle
 
 
 def base_pose(name: str) -> str:
@@ -62,19 +63,19 @@ def measures(wl: dict, parts: list[dict], alpha: np.ndarray, prop: np.ndarray, p
     return out
 
 
-def targets(pass_: str, name: str, m: dict, idle_body_h: int, prop: str = "staff") -> dict:
-    """Amendment A1's EF5 targets (none for EF4 recipes)."""
-    if pass_ != "EF5":
-        return {}
-    d = m.get(f"{prop}_deg", 0) - m.get(f"{prop}_idle_deg", 0)
-    pose = base_pose(name)
-    if pose == "attack":
-        return {"staff_swing": d >= 50, "chest_fwd": m.get("chest_deg", 0) >= 15}
-    if pose == "hurt":
-        return {"chest_back": m.get("chest_deg", 0) <= -20, "staff_away": d <= -15}
-    if pose == "kneel":
-        return {"body_low": m["body_h"] <= 0.70 * idle_body_h}
-    return {}
+def targets(tg: dict | None, name: str, m: dict, idle_body_h: int, prop: str = "staff") -> dict:
+    """Amendment B0: a recipe's targets from monster_hr.yaml `<id>.puppet.targets.<recipe>` = {chest, head, prop,
+    prop_delta: [lo, hi] (inclusive, degrees, + = forward; `prop` the prop's world angle from vertical, `prop_delta`
+    its world angle minus its idle angle), height_max: f (body height / the idle's)}, any key optional."""
+    out = {}
+    val = {"chest": m.get("chest_deg", 0), "head": m.get("head_deg", 0), "prop": m.get(f"{prop}_deg", 0),
+           "prop_delta": m.get(f"{prop}_deg", 0) - m.get(f"{prop}_idle_deg", 0)}
+    for k, v in (tg or {}).items():
+        if k == "height_max":
+            out["t_height_max"] = m["body_h"] <= v * idle_body_h
+        else:
+            out[f"t_{k}"] = v[0] <= round(val[k], 1) <= v[1]
+    return out
 
 
 def checks(img: Image.Image, master: Image.Image, joints: list | None = None, open_: list | None = None,

@@ -9,7 +9,8 @@ gen/monster_hr.yaml `puppet` (master coordinates):
   `close` (joint gap closing radius), `fill` (destination polygons whose enclosed holes are filled) and
   `backfill` (polygons whose vacated master px are filled); `part_opts: {part: {option: value | null}}` overrides
   a part's options for that pose only; `minus: [part]` takes another part's px out of a part; `prefill: [{part, poly,
-  clone}]` fills a part's vacated px on the master before it moves. Exposed gaps
+  clone}]` fills a part's vacated px on the master before it moves; `mirror: {from, about}` paints a hidden limb from
+  a visible one's px mirrored about a vertical line (gen/monster_hr_puppet_fill.py). Exposed gaps
   near the moved pivots are filled from the nearest part's own px (dilation fill).
 
 Output gen/out/hr/<id>/<pose>_posed.png and <pose>_overlay.png; the sha256 of every posed PNG is recorded in the
@@ -35,6 +36,7 @@ from PIL import Image
 from gen import monster_hr_prep as P
 from gen import monster_hr_warp as W
 from gen import monster_hr_check as C
+from gen import monster_hr_puppet_fill as PF
 from gen.monster_hr_check import checks, overlay
 
 POSES = ("attack", "hurt", "kneel")
@@ -125,8 +127,7 @@ def pose(sid: str, name: str, sp: dict | None = None,
     layers, meshes, pivots = {}, [], []
     for p in parts:
         n = p["name"]
-        src = rgba.copy()
-        src[~masks[n]] = 0
+        src, masks[n] = PF.part_src(rgba, masks, p)    # `mirror`: a hidden limb from a visible one's px
         for f in ps.get("prefill") or []:              # [{part, poly, clone}] (amendment A1 recipes)
             if f["part"] == n:
                 prefill(rgba, src, masks[n], alpha, f["poly"], f.get("clone"), f.get("rest", True))
@@ -196,7 +197,7 @@ def pose(sid: str, name: str, sp: dict | None = None,
     m = C.measures(wl, parts, out[..., 3] > 0, prop & (out[..., 3] > 0), pm, names)
     idle_h = C.measures(wl, parts, alpha, pm, pm, names)["body_h"]
     info.update(m, body_h_ratio=round(m["body_h"] / max(1, idle_h), 3))
-    info["ok"].update(C.targets(pass_, name, m, idle_h, names["prop"]))
+    info["ok"].update(C.targets((pp.get("targets") or {}).get(name), name, m, idle_h, names["prop"]))
     return img, overlay(img, layers, order, meshes, pivots), info
 
 
