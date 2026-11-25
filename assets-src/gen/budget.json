@@ -318,17 +318,31 @@
       "note": "User approval 2026-11-24 (docs/ENEMY_FEEDBACK_PLAN.md EF-G G3): pass EF4 repaints the four humanoids' puppet poses and idle masters (pirate v3 + v4 face, vampire v2, vampire_lord v4, dark_wizard v4) by SD 3.5 Large image-to-image at low strength (monster_hr_br.py, monster_hr.yaml). ef4_pose 80 = 4 sprites x 4 images x 5 calls; no remove_bg purpose; no Gemini. One row per logical request in cache/bedrock_ledger.jsonl.",
       "used": 19,
       "closed": "2026-11-24, 19 of 80 (EF4, SD 3.5 Large image-to-image only: vampire_lord 13, dark_wizard 6; pirate 0, stopped at G1 after 4 iterations; vampire 0, stopped at G2; no remove_bg, no Gemini). Sets for vampire_lord and dark_wizard are cut and held for the user's size decision (G4 reviewers: ITERATE on the hurt poses). Debriefs in ~/temp/ff-game/ef/bedrock4/<id>/DEBRIEF.md. Reopen with the user's approval."
+    },
+    {
+      "pass": "EF5",
+      "cap": 15,
+      "per_purpose_caps": {
+        "ef5_pose": 15,
+        "reserve": 0
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment A3; the user approved the EF5 posed inputs directly in the session): pass EF5 repaints dark_wizard's re-posed attack, hurt and kneel by SD 3.5 Large image-to-image at low strength (monster_hr_br.py); <= 5 calls per pose; no remove_bg, no Gemini.",
+      "used": 4,
+      "closed": "2026-11-25, 4 of 15 (EF5: dark_wizard attack v3 0.30, hurt v3 0.30 + v4 0.38, kneel v2 0.30; SD 3.5 Large image-to-image only). Set cut in ~/temp/ff-game/ef/bedrock5/dark_wizard/ (final review SHIP WITH NITS), approval held for the user's size decision."
     }
   ],
   "bedrock": {
-    "pass": "EF5",
-    "cap": 15,
+    "pass": "EF6",
+    "cap": 57,
     "per_purpose_caps": {
-      "ef5_pose": 15,
+      "ef6_pose": 56,
+      "ef6_nobg": 1,
       "reserve": 0
     },
     "gemini_before": 553,
     "reserve_max_usd": 0.08,
-    "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment A3; the user approved the EF5 posed inputs directly in the session): pass EF5 repaints dark_wizard's re-posed attack, hurt and kneel by SD 3.5 Large image-to-image at low strength (monster_hr_br.py); <= 5 calls per pose; no remove_bg, no Gemini."
+    "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment B): pass EF6 repaints pirate, vampire and vampire_lord by the EF5 method (re-posed, user-approved poses, SD 3.5 Large image-to-image at low strength; upright attack), plus one Stability Remove Background call for the pirate's v3 page (ef6_nobg) and at most one dark_wizard hurt repaint if the user asks for it. ef6_pose 56 = (4 + 4 + 3 images) x 5 + 1. All EF6 calls made by the orchestrator session. No Gemini."
   }
 }
