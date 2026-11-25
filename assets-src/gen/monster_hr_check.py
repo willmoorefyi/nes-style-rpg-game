@@ -1,6 +1,6 @@
 """EF-G G2 helpers for gen/monster_hr_puppet.py: the agent's checks on a posed image (margin, feet row, joint tears,
 IoU with the idle under its pass's bar), amendment A's measures (the prop's and the chest's world angles from
-vertical, + = forward / toward the right, composed through the puppet's world transforms; the body height = the alpha
+vertical, + = forward / toward the right, composed through the puppet's world transforms; the head's world tilt; the body height = the alpha
 bbox height without the props) with the EF5 targets, and the review overlay (part outlines, pivots, cloth pins, mesh)."""
 from __future__ import annotations
 
@@ -46,11 +46,13 @@ def axis_deg(mask: np.ndarray) -> float:
 def measures(wl: dict, parts: list[dict], alpha: np.ndarray, prop: np.ndarray, prop_master: np.ndarray,
              names: dict | None = None) -> dict:
     """`alpha` / `prop`: the posed figure's and its prop's masks; `prop_master`: the prop on the master."""
-    names = {"prop": "staff", "chest": "chest", **(names or {})}
+    names = {"prop": "staff", "chest": "chest", "head": "head", **(names or {})}
     have = {p["name"] for p in parts}
     out = {}
     if names["chest"] in have:
         out["chest_deg"] = round(rot_deg(wl[names["chest"]]), 1) + 0.0
+    if names["head"] in have:                         # the head's world tilt (+ = the face pitched forward / down)
+        out["head_deg"] = round(rot_deg(wl[names["head"]]), 1) + 0.0
     if names["prop"] in have:
         idle = axis_deg(prop_master)
         out[f"{names['prop']}_idle_deg"] = idle

@@ -205,6 +205,9 @@ def _check_ef5_tools(check: Callable[[bool, str], None]) -> None:
     parts = [{"name": "chest", "pivot": [450, 600]}, {"name": "arm", "pivot": [600, 400], "parent": "chest"},
              {"name": "staff", "pivot": [610, 400], "parent": "arm"}]
     m = C.measures(U.worlds(parts, {"chest": [15], "arm": [-30], "staff": [70]}), parts, a | p, p, p)
+    parts2 = parts + [{"name": "head", "pivot": [450, 200], "parent": "chest"}]
+    m2 = C.measures(U.worlds(parts2, {"chest": [26], "head": [-18]}), parts2, a | p, p, p)
+    check(m2.get("head_deg") == 8.0, f"EF5 measures: the head's world tilt (8 = chest 26 + head -18) {m2.get('head_deg')}")
     check(m["chest_deg"] == 15.0 and m["staff_deg"] == 55.0 and m["staff_idle_deg"] == 0.0 and m["body_h"] == 760,
           f"EF5 measures: chest 15, staff world 55 from its idle 0 (composed through worlds()), body height 760 "
           f"without the prop {m}")

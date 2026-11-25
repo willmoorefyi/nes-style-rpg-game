@@ -250,7 +250,7 @@ sprites:
   dark_wizard:
     kneel_sha256: 178f1f87c8151fe3c586fa09f435aa48185a8e204b33a2d6c08497880d6ece23
     hurt_sha256: 0286d56036ab297e19914a19e10b5d44fdc4889e118ccf70ce5392a007dce05f
-    attack_sha256: da6a3c7ed9f564db99fa45ce4969fb20aae777c3365f49687d48b12c6f98abab
+    attack_sha256: 45794eaaf50260746fc108b330e62a93446883832a698be83da9cacbc34cd891
     kneel_ef4_sha256: 07411d7541faa5dc13f17047c2d8a6acf35b859aa57a4dd9a38b22c820b56a0a
     hurt_ef4_sha256: 0d930d5385ce5fd9352f2fd3817cd819e764bad409de47f4cc930191f157c494
     attack_ef4_sha256: 5bcc8de1cdb64c0ba0169d0b78b263d0a206f4f4179ab0443fea9606a5bd6ab2
@@ -333,10 +333,11 @@ sprites:
             <<: *ef5_opts
             arm_f_up: {poly: [[555, 400], [688, 420], [688, 470], [650, 485], [600, 510], [555, 510]]}   # no tatters
           prefill: *ef5_prefill
-          xf: {body: [0, -50, 0], chest: [26, -20, 0], head: [-6], arm_f_up: [-55], staff: [106, -118, -21], claw: [-30, 120, -216]}
+          xf: {body: [0, -50, 0], chest: [26, -20, 0], head: [-18], arm_f_up: [-55], staff: [106, -118, -21], claw: [-30, 120, -216]}
           pins: {body: {3: [30, 0], 4: [40, 0], 5: [-50, -25], 6: [40, 0], 7: [60, 0], 8: [70, 0], 9: [-40, -20], 10: [30, 0]}}   # the hem sheared forward
           open: [[660, 440, 695, 475], [595, 512, 625, 538]]   # the gripping claw's fingers and the shaft; under the shaft
-          z: [body, head, arm_f_up, staff, hand, claw]     # the free claw on the shaft behind the staff hand
+          z: [body, head, arm_f_up, staff, hand, claw]     # the free claw on the shaft behind the staff hand; the head
+                                                           # counter-rotated to +8 world (the eyes on the party, user 2026-11-24)
         kneel:                          # EF5: the robe collapsed low, the head hanging over the planted staff
           pass: EF5
           part_opts:

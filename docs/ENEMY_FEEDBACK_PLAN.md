@@ -420,7 +420,9 @@ EF4 recipes) leaves every EF4 sha256 byte-identical. A1 (no AI): attack staff +7
 76.8), chest +26, IoU 0.51; hurt chest -24, staff -24.2 (-24 from idle), IoU 0.44; kneel body height 537 / 880 =
 0.61, hem on row 960, IoU 0.45 (measured values in the puppet's output). Reviewer (image-only, full and 128 px):
 iteration 1 ITERATE x3, iteration 2 ITERATE x3, iteration 3 PASS (nits: claw-tip fragments on the shaft in attack, the
-kneel's right horn crossing the staff). Sheet: `~/temp/ff-game/ef/bedrock5/dark_wizard/posed/poses_sheet.png`. Held at
+kneel's right horn crossing the staff). Sheet: `~/temp/ff-game/ef/bedrock5/dark_wizard/posed/poses_sheet.png`. User follow-up
+(2026-11-24): the attack's head no longer pitches with the +26 chest lean; it is counter-rotated to +8 world (new
+measure `head_deg`), the eyes on the party; image reviewer PASS (head sits naturally, clean hood join). Held at
 A2: no Bedrock call, no EF5 budget block.
 
 **A2. User gate.** The posed inputs (`~/temp/ff-game/ef/bedrock5/dark_wizard/posed/`) are shown to the user; **no
