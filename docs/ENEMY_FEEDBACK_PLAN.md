@@ -934,3 +934,16 @@ back. No AI image call; numpy / Pillow only (no scipy: it is not importable here
   `~/temp/ff-game/ef/chaos_kneel/r1..r3/` (strip x4, before / after x2 and 1x, game-timing GIF, slow GIF).
 - **Locks:** `chaos.lock.json` only `kf:kneel`, `kneel_b`, `kneel_in1`, `kneel_in2` changed (the other 47 of 51 entries equal).
 - **Gates:** `selftest.py --anim` ALL PASSED (worktree, gen/refs, gen/cache and gen/out/hr cloned from the main checkout); `monster_anim.py check --all` 123 OK lines only; `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:fast` passed. Browser `?mute=1&scenario=chaos_forms&kneel=on&poseLabel=1` on a worktree atlas build (only `monsters-ai-5.png` changed, restored, not committed): Chaos in `kneel_b` with the four orbs on the ground, no console warnings.
+
+#### Integrator gates (int-ef4: ef-pv, ef-review-daze, ef-chaos-kneel; 2026-11-25)
+
+Merges: ef-pv fast-forward; ef-review-daze conflict in this file only (both kept); ef-chaos-kneel conflicts in this
+file and `monster_check.py` (kept both: EF-J's `kneel_orbs` argument to `bridge_frame` and EF-H's
+`MAGENTA_ART` per character). Atlas rebuilt and committed (30 pages, 47 hi-res sheets, preload + largest formation
+90.4 MB, max 128); PYTHONHASHSEED 0 / 1 byte-identical (31 files); by-rect vs mainline: chaos 4 kneel frames, pirate,
+vampire, vampire_lord 17 each, 119 sheets same; `monster_anim.py check --all` 123 OK lines only; `selftest.py` ALL
+PASSED (1909 ok); `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:fast` 430 files, 10266
+passed; `test:full` left for the combined batch (user instruction). `review` of vampire_lord, pirate, vampire into
+`~/temp/ff-game/ef/user/<id>/anim_v2/`: the daze GIF plays idle, kneel_in1, kneel_in2, kneel / kneel_b x2, out.
+Browser (`?mute=1`): `ef_user_pirate_vampire&enemyAnim=loop` one lunger at a time; `chaos_forms&kneel=on` the four
+orbs on the ground; no console warnings or errors (`~/temp/ff-game/ef/int4/`).
