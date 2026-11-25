@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { Container } from 'pixi.js';
-import { EnemyAnimPreview, LABEL_POS, PAUSE, STAGGER, parseEnemyAnim, schedule } from '../../../src/scenes/battle/enemyAnimPreview.js';
+import { EnemyAnimPreview, LABEL_POS, PAUSE, parseEnemyAnim, schedule, turnPlan } from '../../../src/scenes/battle/enemyAnimPreview.js';
 import { BATTLE_MESSAGE_HEIGHT } from '../../../src/scenes/battle/BattleSceneTypes.js';
 import { ATTACK_FRAMES, CAST_FRAMES, EnemyPoseController, HURT_FRAMES } from '../../../src/scenes/battle/EnemyPoseController.js';
 
@@ -25,7 +25,7 @@ describe('enemy animation preview (dev ?enemyAnim=)', () => {
     expect(parseEnemyAnim('')).toBeNull();
   });
 
-  it('loop schedules attack, hurt and (bosses only) cast per enemy, staggered 20 frames', () => {
+  it('loop schedules attack, hurt and (bosses only) cast per enemy, the enemies taking turns to attack', () => {
     expect(schedule(false).events.map((e) => e[0])).toEqual(['attack', 'hurt']);
     expect(schedule(true).events).toEqual([['attack', 0], ['hurt', ATTACK_FRAMES + PAUSE],
       ['cast', ATTACK_FRAMES + PAUSE + HURT_FRAMES + PAUSE]]);
@@ -36,13 +36,44 @@ describe('enemy animation preview (dev ?enemyAnim=)', () => {
     tick(1);
     expect(t.poses.isLunging(0)).toBe(true);
     expect(t.poses.isLunging(1)).toBe(false);
-    tick(STAGGER);
+    tick(ATTACK_FRAMES + PAUSE - 1);
+    expect(t.poses.isLunging(1)).toBe(false);           // enemy 1 waits for enemy 0's attack and the pause
+    tick(1);
+    expect(t.poses.state(0).pose).toBe('hurt_in1');     // enemy 0's hurt (in place) plays during enemy 1's turn
+    expect(t.poses.isLunging(0)).toBe(false);
     expect(t.poses.isLunging(1)).toBe(true);
-    tick(ATTACK_FRAMES + PAUSE - STAGGER);
-    expect(t.poses.state(0).pose).toBe('hurt_in1');   // the hurt started one frame ago
-    tick(HURT_FRAMES + PAUSE + STAGGER);
-    expect(t.poses.isAttacking(1)).toBe(true);         // the boss casts
+    tick(ATTACK_FRAMES + PAUSE + HURT_FRAMES + PAUSE);
+    expect(t.poses.isAttacking(1)).toBe(true);           // the boss casts
     expect(t.poses.state(1).pose).toMatch(/^cast_/);
+  });
+
+  it('EF-H follow-up: only one enemy lunges at a time, for mixed attack lengths, over two full cycles', () => {
+    const plan = turnPlan([{ cycle: 120, attack: 65 }, { cycle: 90, attack: 31 }, { cycle: 200, attack: 47 }]);
+    expect(plan.offsets).toEqual([0, 65 + PAUSE, 65 + 31 + 2 * PAUSE]);
+    expect(plan.cycle).toBe(Math.max(65 + 31 + 47 + 3 * PAUSE, 200));
+    const t = target(5);
+    const travel = [600, 0, 300, 0, 450];                // melee travellers and in-place attackers mixed
+    const play = (poses: EnemyPoseController, i: number) => (travel[i] ? poses.playAttack(i, { travel: travel[i], rise: 0 })
+      : poses.playAttack(i));
+    const lens = travel.map((_, i) => {                  // each attack's real length, as the view's attackLength reports
+      const q = new EnemyPoseController(5);
+      play(q, i);
+      let n = 0;
+      while (q.isAttacking(i)) { q.update(1); n++; }
+      return n;
+    });
+    expect(new Set(lens).size).toBeGreaterThan(1);
+    const p = new EnemyAnimPreview('loop', 1, { ...t, attack: (i: number) => play(t.poses, i), attackFrames: (i: number) => lens[i] });
+    let most = 0;
+    let seen = new Set<number>();
+    for (let f = 0; f < 2 * (lens.reduce((a, b) => a + b, 0) + 5 * PAUSE) + 400; f++) {
+      t.poses.update(p.frameDt(1));
+      const lunging = [0, 1, 2, 3, 4].filter((i) => t.poses.isLunging(i));
+      most = Math.max(most, lunging.length);
+      seen = new Set([...seen, ...lunging]);
+    }
+    expect(most).toBe(1);
+    expect([...seen].sort()).toEqual([0, 1, 2, 3, 4]);
   });
 
   it('pass F item 3: the loop starts the view\'s attack (the travel) and spaces the hurt after its longer length', () => {

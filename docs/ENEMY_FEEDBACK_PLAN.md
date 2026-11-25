@@ -699,3 +699,19 @@ the sha256s of the reference packs (`~/temp/ff-game/ef/user_packs/<id>/`: idle, 
   passed, 2 skipped (mutation cache MISS caaa3078077a, live 1299 s on 4 workers); browser
   `?mute=1&scenario=ef_user_pirate_vampire&enemyAnim=loop` (new: pirate, vampire and vampire_lord beside the goblin
   and the ogre), no console warnings or errors (`~/temp/ff-game/ef/user/smoke/`).
+
+#### EF-H follow-up plan: one attacker at a time in the `enemyAnim=loop` preview (2026-11-25, dev preview only)
+
+User concern on the ef-pv smoke shot: with `?enemyAnim=loop` every enemy lunges 20 frames after the last, so five
+attackers overlap over the party and the pirate (drawn later) covers the vampire's front leg. Plan: the loop takes
+turns (`enemyAnimPreview.turnPlan`): enemy i's whole schedule is offset by the attack slots before it (each slot = its
+attack length + PAUSE), and every enemy shares one super-cycle (the larger of the slots' sum and the longest own
+cycle), so no two attack windows overlap while hurt / cast still play in place. Step mode uses the same plan. No
+battle logic or real-battle drawing changes; a unit test pins disjoint attack windows for mixed lengths.
+
+Result (ef-pv): the scenario stepped frame by frame (`&enemyAnim=step`, 420 frames, every attack of the five
+enemies): at most one enemy lunges at a time and the lunging one is the top child of the actors layer in every frame
+(A4, read from the scene graph: 0 frames off top); the pirate's, vampire's and vampire_lord's strips show both legs in
+every frame and nothing clipped (`~/temp/ff-game/ef/user/smoke2/<id>_attack_frames.png`). The disappearing leg was
+the old 20-frame stagger only: two lungers overlapping, the later-drawn pirate over the vampire. No real-battle drawing
+changed; the loop now takes turns (`loop_staggered.png`; at most 1 lunger over 12 s, 111 fps).

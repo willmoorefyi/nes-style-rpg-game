@@ -1,7 +1,8 @@
 /**
  * Dev-only monster animation preview (docs/ENEMY_ANIM_PLAN.md 6.2), no battle logic:
- *   ?enemyAnim=loop   every enemy cycles attack, pause, hurt, pause, cast (if it has one), pause; staggered 20 frames;
- *                     melee enemies travel to the first living party sprite and back (pass F item 3)
+ *   ?enemyAnim=loop   every enemy cycles attack, pause, hurt, pause, cast (if it has one), pause; the enemies take
+ *                     turns (turnPlan: one attacker at a time, EF-H follow-up); melee enemies travel to the first
+ *                     living party sprite and back (pass F item 3)
  *   ?enemyAnim=step   time is frozen; `.` steps 1 frame forward, `,` 1 back (replayed from t = 0); a corner label shows
  *                     `enemy: frame / t`
  *   &slow=N           divides dt
@@ -19,7 +20,6 @@ import { EnemyActorPoses } from './colossus/enemyActorView.js';
 import { TIMELINE_FRAMES } from './colossus/colossusChoreography.js';
 
 export type PreviewMode = 'loop' | 'step';
-export const STAGGER = 20;
 export const PAUSE = 20;
 /** E18: the step label sits just below the battle message window (y 0 to BATTLE_MESSAGE_HEIGHT). */
 export const LABEL_POS = { x: 16, y: BATTLE_MESSAGE_HEIGHT + 8 } as const;
@@ -70,6 +70,16 @@ export function schedule(hasCast: boolean, attackFrames = ATTACK_FRAMES): { cycl
   return { cycle: t, events };
 }
 
+/** The turn plan (EF-H follow-up, docs/ENEMY_FEEDBACK_PLAN.md): each enemy's loop starts after the attack slots of the
+ *  enemies before it (a slot = its attack length + PAUSE), and all share one cycle, the larger of the slots' sum and
+ *  the longest own cycle, so no two attack windows overlap. Pure. */
+export function turnPlan(loops: readonly { cycle: number; attack: number }[]): { offsets: number[]; cycle: number } {
+  const offsets: number[] = [];
+  let t = 0;
+  for (const l of loops) { offsets.push(t); t += l.attack + PAUSE; }
+  return { offsets, cycle: Math.max(t, ...loops.map((l) => l.cycle)) };
+}
+
 /** A colossus's loop: slam, beam, cast and hurt, each followed by the pause. */
 export function colossusSchedule(): { cycle: number; events: [Action, number][] } {
   const events: [Action, number][] = [];
@@ -84,7 +94,7 @@ export class EnemyAnimPreview {
   private started = false;
   private label: BitmapText | null = null;
   /** Each enemy's loop, fixed when the preview starts. */
-  private readonly loops = new Map<number, ReturnType<typeof schedule>>();
+  private plan: { loops: ReturnType<typeof schedule>[]; offsets: number[]; cycle: number } | null = null;
   private readonly onKey = (e: { key: string }): void => {
     if (this.mode !== 'step') return;
     if (e.key === '.') this.stepTo(this.clock + 1);
@@ -98,17 +108,25 @@ export class EnemyAnimPreview {
 
   get time(): number { return this.clock; }
 
+  /** Each enemy's loop and its turn, fixed when the preview first fires (the views have measured their travel). */
+  private turns(): { loops: ReturnType<typeof schedule>[]; offsets: number[]; cycle: number } {
+    if (!this.plan) {
+      const loops = Array.from({ length: this.target.count }, (_, i) => this.target.colossus?.(i) ? colossusSchedule()
+        : schedule(this.target.hasCast(i), this.target.attackFrames?.(i) ?? ATTACK_FRAMES));
+      // the attack window: up to the next event less its pause (schedule / colossusSchedule put one after each action)
+      const attack = loops.map((l) => (l.events.find((e) => e[0] !== 'attack')?.[1] ?? l.cycle) - PAUSE);
+      this.plan = { loops, ...turnPlan(loops.map((l, i) => ({ cycle: l.cycle, attack: attack[i] }))) };
+    }
+    return this.plan;
+  }
+
   /** Actions due at integer frame f (global time) for every enemy. */
   private fire(f: number): void {
+    const { loops, offsets, cycle } = this.turns();
     for (let i = 0; i < this.target.count; i++) {
-      const local = f - i * STAGGER;
+      const local = f - offsets[i];
       if (local < 0) continue;
-      let loop = this.loops.get(i);
-      if (!loop) {
-        loop = this.target.colossus?.(i) ? colossusSchedule() : schedule(this.target.hasCast(i), this.target.attackFrames?.(i) ?? ATTACK_FRAMES);
-        this.loops.set(i, loop);
-      }
-      const { cycle, events } = loop;
+      const { events } = loops[i];
       for (const [action, at] of events) {
         if (local % cycle !== at) continue;
         const p = this.target.poses;
