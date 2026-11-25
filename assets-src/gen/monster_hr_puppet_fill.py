@@ -1,12 +1,14 @@
 """EF-G amendment B0 helpers for gen/monster_hr_puppet.py: a part's source px on the master, with the part option
 `mirror: {from: <part>, about: [x, y], poly: [...] (optional)}` that paints a hidden limb (the vampire's front thigh
 and knee behind the tabard) from the visible one's own px, mirrored about the vertical line through `about`; drawn
-where the pose's `z` puts it (under the covering parts). Pure numpy."""
+where the pose's `z` puts it (under the covering parts); and `prefill` (a part's vacated px filled on the master before
+it moves: cloned, an optional flat `rgb`, else the nearest fill). Pure numpy."""
 from __future__ import annotations
 
 import numpy as np
 
 from gen import monster_hr_geom as G
+from gen import monster_hr_warp as W
 
 
 def mirrored(rgba: np.ndarray, mask: np.ndarray, x0: float) -> tuple[np.ndarray, np.ndarray]:
@@ -33,3 +35,21 @@ def part_src(rgba: np.ndarray, masks: dict, p: dict) -> tuple[np.ndarray, np.nda
     if mi.get("poly"):
         m = m & G.poly_mask(m.shape, [mi["poly"]])
     return mirrored(rgba, m, float(mi["about"][0]))
+
+
+def prefill(rgba: np.ndarray, src: np.ndarray, mask: np.ndarray, alpha: np.ndarray, poly: list, clone=None,
+            rest: bool = True, rgb: list | None = None) -> None:
+    """A part's px vacated by the parts cut out of it (the claw's place in the robe, the hand's on the staff), inside
+    `poly`, filled on the master before the part moves: cloned from the part's own px `clone` [dx, dy] away, then the
+    nearest fill unless `rest` is false (or `rgb`: that flat colour) (the hole travels with the cloth instead of opening in the posed image)."""
+    gap = G.poly_mask(alpha.shape, [poly]) & alpha & ~mask
+    if clone:
+        dx, dy = clone
+        sh, ms = W.shift(rgba, -dy, -dx), W.shift(mask, -dy, -dx)
+        ok = gap & ms
+        src[ok] = sh[ok]
+        gap &= ~ok
+    if rgb:                                           # EF6: a flat colour (the lord's legs under the pooled coat)
+        src[gap] = (*rgb, 255)
+    elif rest:
+        src[:] = W.nearest_fill(src, gap)

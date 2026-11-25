@@ -80,22 +80,6 @@ def part_masks(alpha: np.ndarray, parts: list[dict], rgb: np.ndarray | None = No
     return masks
 
 
-def prefill(rgba: np.ndarray, src: np.ndarray, mask: np.ndarray, alpha: np.ndarray, poly: list, clone=None,
-            rest: bool = True) -> None:
-    """A part's px vacated by the parts cut out of it (the claw's place in the robe, the hand's on the staff), inside
-    `poly`, filled on the master before the part moves: cloned from the part's own px `clone` [dx, dy] away, then the
-    nearest fill unless `rest` is false (the hole travels with the cloth instead of opening in the posed image)."""
-    gap = P.poly_mask(alpha.shape, [poly]) & alpha & ~mask
-    if clone:
-        dx, dy = clone
-        sh, ms = W.shift(rgba, -dy, -dx), W.shift(mask, -dy, -dx)
-        ok = gap & ms
-        src[ok] = sh[ok]
-        gap &= ~ok
-    if rest:
-        src[:] = W.nearest_fill(src, gap)
-
-
 def worlds(parts: list[dict], xf: dict) -> dict[str, np.ndarray]:
     by, out = {p["name"]: p for p in parts}, {}
 
@@ -130,7 +114,7 @@ def pose(sid: str, name: str, sp: dict | None = None,
         src, masks[n] = PF.part_src(rgba, masks, p)    # `mirror`: a hidden limb from a visible one's px
         for f in ps.get("prefill") or []:              # [{part, poly, clone}] (amendment A1 recipes)
             if f["part"] == n:
-                prefill(rgba, src, masks[n], alpha, f["poly"], f.get("clone"), f.get("rest", True))
+                PF.prefill(rgba, src, masks[n], alpha, f["poly"], f.get("clone"), f.get("rest", True), f.get("rgb"))
         if p.get("warp"):
             pins = np.asarray(p["pins"], float)
             dst = W.apply(wl[n], pins)

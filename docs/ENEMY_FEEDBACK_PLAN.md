@@ -496,3 +496,47 @@ size and 128 px (<= 3 iterations; a debrief on failure).
 **B3. Repaint** (orchestrator) as A3: 0.30 first, <= 5 EF6 calls per image (pirate and vampire repaint their idle too;
 the lord's EF4 idle is reused). Then G4: cut into `bedrock6/`, an independent image-only review, approval held for the
 user's size decision. EF6 closed into `bedrock_history` at the end. Full `selftest.py` passes.
+
+**B0 result (2026-11-25).** `monster_hr_check.py`: `IOU_BARS["EF6"]` (attack 0.80, hurt 0.70, kneel 0.65) and
+`targets(tg, ...)` reading `<id>.puppet.targets.<recipe>` (`chest` / `head` / `prop` / `prop_delta` ranges inclusive,
+`height_max`; flags `t_<key>`); EF5's targets moved into dark_wizard's yaml (its posed sha256s unchanged).
+`monster_hr_br.py`: `status` lists every pass of the ledger; `nobg <id>` (`monster_hr_br_nobg.py`: one
+`invoke("remove_bg", {image, output_format: png}, purpose="ef6_nobg")` on the prep raw, the key recorded as
+`prep.nobg_key` by `monster_hr_yaml.record_prep`). `monster_hr_prep.py` + `monster_hr_prep_nobg.py`: `key: remove_bg`
+(the alpha from the cached output, then the graft composited on top with its own alpha, union; `graft.erase` trims the
+graft layer; `keep`, `keep_light`, `erase_hue`, `erase_out` ignored, `restore_out` kept; without a cached `nobg_key`
+it exits naming the `nobg` command). `monster_hr_puppet.py` + `monster_hr_puppet_fill.py`: part option `mirror`.
+`monster_hr_review.py`: the picked row's `prompt_pose` in the monsters.yaml rewrite; `prep.nobg_key` in
+`inputs.idle.raw_keys` and un-ignored by `approve`. Selftests: `selftest_monster_hr_ef6.py` (RED first: 8 of 13 cases
+failed before the tools), the old file widened (EF6 tag, EF4-EF6 loop on `*_pose` requests, `nobg_key` in the
+skip-when-missing). vampire_lord's EF4 recipes are `attack_ef4`, `attack_r2_ef4`, `hurt_ef4`, `hurt_r2_ef4`,
+`kneel_ef4` (sha256 reproduced, every keyed EF4 row's `input:` renamed); vampire's keyless EF4 rows removed and its
+never-repainted EF4 G2 recipes replaced. pirate: `key: remove_bg` with the graft `erase` trim (v4's beige neck and the
+page-tinted hair beside the earring), waiting for the orchestrator's `nobg pirate --paid`.
+
+**B1 result (2026-11-25, no AI; vampire and vampire_lord).** Poses per the B0 targets, every agent check passes.
+
+| sprite | pose | IoU (bar) | chest | head | height / idle |
+|---|---|---|---|---|---|
+| vampire | attack | 0.783 (0.80) | +3 | +3 | 1.00 |
+| vampire | hurt | 0.564 (0.70) | -23 | -29 | 0.96 |
+| vampire | kneel | 0.410 (0.65) | +21 | +35 | 0.653 |
+| vampire_lord | attack | 0.762 (0.80) | +4 | +4 | 1.00 |
+| vampire_lord | hurt | 0.625 (0.70) | -28 | -32 | 0.94 |
+| vampire_lord | kneel | 0.434 (0.65) | +18 | +26 | 0.598 |
+
+The image reviewer (fresh each iteration, full size and 128 px):
+
+- **vampire:** ITERATE on all three poses after 3 iterations (the attack minor).
+- **vampire_lord:** attack PASS (iteration 2 and 3); hurt and kneel ITERATE after 3 iterations.
+- **The lord's G4 notes:** the face and eyes read at 128 px, and no rabbit ears or halo appear.
+
+Both sprites stopped at the gate with debriefs, `~/temp/ff-game/ef/bedrock6/<id>/DEBRIEF.md`; their sheets are
+`~/temp/ff-game/ef/bedrock6/<id>/posed/poses_sheet.png`. The EF6 rows are prepared without keys, at 0.30 with the
+upright `prompt_pose`:
+
+- vampire: idle, attack, hurt and kneel, each n 1;
+- vampire_lord: attack n 5, hurt n 6, kneel n 4;
+- pirate: n 1 for each pose.
+
+0 EF6 calls.
