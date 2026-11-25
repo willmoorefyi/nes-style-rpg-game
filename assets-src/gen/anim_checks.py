@@ -55,9 +55,12 @@ def palette_lock(a: np.ndarray, allowed: set) -> list[str]:
     return [f"off-palette colours {extra[:4]}{'...' if len(extra) > 4 else ''}"] if extra else []
 
 
-def magenta(a: np.ndarray) -> list[str]:
+def magenta(a: np.ndarray, allow: tuple = ()) -> list[str]:
+    """Key-coloured px (a magenta fringe); `allow`: exact colours that are drawn art (monster_check.MAGENTA_ART)."""
     rgb = a[..., :3].astype(int)
     near = (np.sqrt(((rgb - MAGENTA) ** 2).sum(2)) <= 90) | ((rgb[..., 0] > 180) & (rgb[..., 2] > 180) & (rgb[..., 1] < 90))
+    for c in allow:
+        near &= ~(rgb == np.array(c)).all(-1)
     bad = near & _solid(a)
     return [f"magenta / key fringe {int(bad.sum())} px at {_first(bad)}"] if bad.any() else []
 
@@ -163,11 +166,12 @@ def centroid(a: np.ndarray) -> tuple[float, float]:
 
 
 def continuity(prev: np.ndarray, nxt: np.ndarray, span: tuple[np.ndarray, np.ndarray], cell_h: int,
-               share: float = 0.5) -> list[str]:
+               share: float = 0.5, iou_margin: float = 0.02) -> list[str]:
     """Adjacent frames of a runtime sequence (same cell, feet aligned) against the keyframe pair they lie between.
-    `share`: the centroid cap's share of the span (0.5; the pass KT bridge swap passes kneel_checks.BRIDGE_SWAP_SHARE)."""
+    `share`: the centroid cap's share of the span (0.5; the pass KT bridge swap passes kneel_checks.BRIDGE_SWAP_SHARE);
+    `iou_margin`: the adjacent IoU's margin over the keys' (monster_check.ATTACK_SWAP_IOU)."""
     out = []
-    need = min(0.55, iou(*span) + 0.02)
+    need = min(0.55, iou(*span) + iou_margin)
     if iou(prev, nxt) < need:
         out.append(f"adjacent IoU {iou(prev, nxt):.2f} < {need:.2f}")
     (ax, ay), (bx, by) = centroid(prev), centroid(nxt)

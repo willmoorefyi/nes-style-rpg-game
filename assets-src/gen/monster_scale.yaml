@@ -105,3 +105,12 @@ crazy_horse: {scale: 2, tex: 2, smooth: [despur, edges]}   # EF-F (standing rule
 # User ruling 2026-11-25: keep him large like the ogre (a strong enemy), at his native pixel count and the default
 # scale 2 (idle 224 screen px with the staff; the hood and horns reach about the ogre's 204).
 dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}
+# EF-H (docs/ENEMY_FEEDBACK_PLAN.md EF-H): the user-rendered pirate and vampire (backend: user), large frames at the
+# user's own native size (idle 81 / 90 px; user ruling 2026-11-25: approved with the sizes, scale 2 = about 160 /
+# 180 screen px), smoothed under the standing rule; `edges` keeps the faces and the cutlass crisp, despur kept (the
+# review found no broken claw or blade)
+pirate: {scale: 2, tex: 2, smooth: [despur, edges]}
+vampire: {scale: 2, tex: 2, smooth: [despur, edges]}
+# EF-H: the user-rendered vampire_lord, the same size as the vampire (idle 91 px, scale 2, about 182 screen px;
+# user ruling 2026-11-25, the sibling rule), the same smoothing
+vampire_lord: {scale: 2, tex: 2, smooth: [despur, edges]}

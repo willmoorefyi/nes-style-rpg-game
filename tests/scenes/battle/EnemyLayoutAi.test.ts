@@ -166,7 +166,8 @@ describe('large crowds pack by their home art (defect 2)', () => {
     // crazy_horse (132 cell, home art 2-127 = 126 art px = 252 screen px, its hurt recoils to x 2; R290 was 98) leaves: 26
     // EF-B1: the 2.5 larges lay out as `huge` (capacity 1), so they leave the set: 11 of the 26, 15 left
     // EF-H: the user-rendered dark_wizard (small -> large, scale 2 placeholder) joins: 16
-    expect(s.length).toBe(16);
+    // ef-pv: the user-rendered pirate, vampire and vampire_lord (small -> large, native size, scale 2) join: 19
+    expect(s.length).toBe(19);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);

@@ -100,7 +100,7 @@ EF_B3 = ("blue_dragon", "green_dragon", "fire_lizard")
 EF_F = ("crazy_horse",)
 # EF-H: the user-rendered sheets (backend: user), smoothed under the same rule; dark_wizard's entry is a placeholder
 # until the user's size decision (monster_scale.yaml)
-EF_H = ("dark_wizard",)
+EF_H = ("dark_wizard", "pirate", "vampire", "vampire_lord")
 # int-ef2 (user ruling 2026-11-24): blue_dragon / green_dragon take tex 3 after all, the other four stay at the fallback
 EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon")
 # int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5, each the smallest multiple of
@@ -135,7 +135,7 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
         real[s]["smooth"] == ["despur", "edges"] for s in ("blue_dragon", "green_dragon"))   # int-ef2 B4 round 2
     hires = sorted(s for s, v in real.items() if v["tex"] != 1)
     check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3 + EF_F + EF_H) and b1 and b2 and b3
-          and len(hires) == 44,
+          and len(hires) == 47,
           f"EF-B: the dict entries are B1 (29 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the four fallback "
           f"scale-3 ones at tex 1 "
           f"({len(dicts)} entries, {len(hires)} hi-res)")

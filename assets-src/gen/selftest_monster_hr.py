@@ -149,8 +149,11 @@ def _check_approve(check: Callable[[bool, str], None], sp: dict) -> None:
     from gen import bedrock as B
     from gen import monster_hr_br as H
     from gen import selftest_roster as SRo
-    sid = next((s for s, sm in sp["sprites"].items() if sm.get("pick") and
-                all(B.is_cached(k) for *_, k in H.picks(s, sp))), None)
+    gen = Path(H.__file__).resolve().parent
+    user = {s for s in sp["sprites"] if (gen / "approved" / s / "monster_large.json").is_file()
+            and json.loads((gen / "approved" / s / "monster_large.json").read_text()).get("backend") == "user"}
+    sid = next((s for s, sm in sp["sprites"].items() if sm.get("pick") and s not in user   # EF-H: superseded by
+                and all(B.is_cached(k) for *_, k in H.picks(s, sp))), None)                 # a user-rendered sheet
     if sid is None:
         print("  skip approve shape (no picked set cached)")
         return

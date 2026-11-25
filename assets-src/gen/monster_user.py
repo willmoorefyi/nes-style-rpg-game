@@ -19,6 +19,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
+from typing import Callable
 
 if str(Path(__file__).resolve().parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -28,6 +29,7 @@ import yaml
 from PIL import Image
 
 from gen import pixelize as PX
+from gen import monster_user_palette as UP
 from gen import monster_user_review as UR
 from gen import spec as S
 
@@ -97,15 +99,18 @@ def scale(heights: list[int], band: S.MonsterBand) -> tuple[float, str]:
     return (round(fit, 4), "fit tallest") if fit < target else (target, why)
 
 
-def quantize(cells: list[tuple[np.ndarray, np.ndarray]], s: float) -> tuple[list[np.ndarray], np.ndarray]:
-    """The house quantizer: one sheet palette over the four poses (with the detail mask), applied per pose by
-    pixelize_native (s >= 1; an integer s is a nearest upscale first) or, s < 1, re-pixelized as monster.py shrinks."""
+def quantize(cells: list[tuple[np.ndarray, np.ndarray]], s: float,
+             keep: Callable[[np.ndarray], np.ndarray] | None = None) -> tuple[list[np.ndarray], np.ndarray]:
+    """The house quantizer: one sheet palette over the four poses (with the detail mask; `keep` applies the recipe's
+    region reserves, monster_user_palette), applied per pose by pixelize_native (s >= 1; an integer s is a nearest
+    upscale first) or, s < 1, re-pixelized as monster.py shrinks."""
     if s > 1.0:
         k = int(s)
         cells = [(np.asarray(Image.fromarray(rc).resize((rc.shape[1] * k, rc.shape[0] * k), Image.Resampling.NEAREST)),
                   np.repeat(np.repeat(m, k, 0), k, 1)) for rc, m in cells]
     detail = np.concatenate([rc[PX.detail_mask(rc, m, 1 / min(s, 1.0))] for rc, m in cells])
     pal = PX.sheet_palette([rc[m] for rc, m in cells], COLORS, SEED, detail_px=detail)
+    pal = keep(pal) if keep else pal
     figs = []
     for rc, m in cells:
         art = rc.copy()
@@ -115,7 +120,7 @@ def quantize(cells: list[tuple[np.ndarray, np.ndarray]], s: float) -> tuple[list
             figs.append(np.asarray(PX.pixelize(Image.fromarray(art), m, grid, colors=COLORS, seed=SEED, palette=pal)))
         else:
             figs.append(np.asarray(PX.pixelize_native(Image.fromarray(art), m, (m.shape[1], m.shape[0]), colors=COLORS,
-                                                      seed=SEED, palette=pal)[0]))
+                                                      seed=SEED, palette=pal, exact_key=True)[0]))
     return figs, pal
 
 
@@ -166,12 +171,15 @@ def cut(sid: str, rec: dict | None = None, gen: Path = HERE) -> tuple[list[Image
     cells = split(img)
     hs = [height(m) for _, m in cells]
     s, why = scale(hs, band)
-    figs, pal = quantize(cells, s)
+    regions = UP.masks(img, rec)                        # the recipe's `reserve` regions ({} without one)
+    figs, pal = quantize(cells, s, (lambda p: UP.reserve(p, img, rec, regions, SEED)) if regions else None)
     frames, pinfo = place(figs, band)
     src = np.asarray(img)
     info = {"source_size": list(img.size), "source_colours": len(np.unique(src[src[..., 3] > 0][:, :3], axis=0)),
             "native_heights": hs, "scale": s, "scale_why": why, **pinfo,
             "palette": [[int(v) for v in c] for c in pal], "error": UR.colour_error(cells, frames, s, pinfo)}
+    if regions and s == 1.0:
+        info["regions"] = UP.region_error(img, cells, frames, pinfo["offsets"], regions, SPECK)
     info["report"] = M.frame_report(frames, band)
     if not info["report"]["outline"]:
         raise SystemExit(f"{sid}: PX.OUTLINE missing from a frame (frame_report)")

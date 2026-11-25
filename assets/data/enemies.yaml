@@ -118,7 +118,7 @@
   name: Pirate
   num: 17
   tuned: true                # D4: keeps its tuned numbers
-  description: "A cutthroat of the Pravoka docks. Brave in a crowd, quick to break when the fight turns."
+  description: "A crimson-coated cutthroat of the Pravoka docks, cutlass bared under a gold-trimmed tricorn. Brave in a crowd, quick to break when the fight turns."
   stats:
     hp: 6
     strength: 10
@@ -136,6 +136,7 @@
   sprite: pirate
   attack: melee
   weakness: lightning
+  size: large
 # === end A1-T pirate ===
 - id: ogre
   name: Ogre
@@ -233,7 +234,7 @@
   name: Vampire
   num: 46
   tuned: true                # D4: keeps its tuned numbers
-  description: "A young noble of the old dead in a red-lined cape, who holds the Cavern of Earth. His red gaze locks the limbs of the living."
+  description: "A pale young noble of the old dead in copper-trimmed plate and a blood-lined cape, who holds the Cavern of Earth. His red gaze locks the limbs of the living."
   protect: [status, poison_stone, death, earth]
   attackStatus: [stun]
   specials: [{id: dazzle, rate: 0.25}]
@@ -254,6 +255,7 @@
   weakness: fire
   resist: dark
   family: undead
+  size: large
   # ERT-D (WORLD 3.7): he fights with three mummies from his crypt (cavern-earth-b3), and from the first round
   # (threshold 1) he strikes 4 times at attack 90, measured in tests/balance/w_ert_d.test.ts
   bossPhases:
@@ -2941,7 +2943,7 @@
 - id: vampire_lord
   name: Vampire Lord
   num: 116
-  description: "An elder vampire, white-haired and gaunt, his cape grown into bat wings. He casts as well as he bites."
+  description: "An elder vampire, white-haired and gaunt in a gold-trimmed crimson robe, his cape grown into bat wings. Purple witchfire runs from his claws: he casts as well as he bites."
   protect: [status, poison_stone, death, earth]
   attackStatus: [stun]
   spells: [afir, mute, ice2, lit2, fir2]
@@ -2973,7 +2975,7 @@
   weakness: fire
   resist: ice
   family: undead
-  size: small
+  size: large
 - id: dark_fighter
   name: Dark Fighter
   num: 117

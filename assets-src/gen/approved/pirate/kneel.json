@@ -1,36 +1,27 @@
 {
   "character": "pirate",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "8d46c3d71a89ad85",
-    "skel": "37de963048258e20",
-    "ref": "88e7c4422a64946d"
+  "backend": "user",
+  "source": "user_art/pirate/sheet_2026-11-25.png",
+  "sha256": "4a45f35c8c3e80314dedeed186a5f0337c844f4e4852b58064fc14af7b17335a",
+  "recipe": "monster_user.yaml#pirate",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs/pirate/",
+    "idle_master_sha256": "26ce4a3321f6bdabab7a0651cd2d7b925e43ff78d8ce142f9440c12fc6131c98",
+    "poses_reference_sha256": "c47b4a8ac4591a3eac650cd36d00698ebacc2c6523520451e3f3d490f90ce47a",
+    "prompt_sha256": "4bd7c3fe759c5de129dcfe56d3e9f20fd639e9e8f197de8e26cf7d540723f90a"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-hist, A-adj",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "aed52e52f62bb5e38524d909"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

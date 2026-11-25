@@ -59,11 +59,11 @@ function formations(): string[][] {
 }
 
 describe('EF-A hi-res sheets in the atlas', () => {
-  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (44 hi-res sheets; EF-H: dark_wizard)', () => {
+  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (47 hi-res sheets; EF-H: dark_wizard, pirate, vampire, vampire_lord)', () => {
     // the scale-3 B2 sheets (shark, hydra, fire_hydra, white_dragon) are at tex 1 with despur only (A4's budget
     // fallback); int-ef2 (user ruling 2026-11-24): blue_dragon and green_dragon at tex 3; ef-horse: crazy_horse at
     // tex 2 (the EF smoothing rule)
-    expect(hires.length).toBe(44);
+    expect(hires.length).toBe(47);
     expect(['blue_dragon', 'green_dragon'].map((s) => texOf(table[s]))).toEqual([3, 3]);
     for (const [s, e] of Object.entries(table)) {
       expect([atlas.sheets[s].scale, atlas.sheets[s].texScale ?? 1], s).toEqual([scaleOf(e), texOf(e)]);

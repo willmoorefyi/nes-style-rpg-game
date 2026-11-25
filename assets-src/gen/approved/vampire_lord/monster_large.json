@@ -1,0 +1,90 @@
+{
+  "character": "vampire_lord",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/vampire_lord/sheet_2026-11-25.png",
+  "sha256": "40681495a696a72feaad09ea1be5af2af70c739cd221bfcd212fa7faf7a14407",
+  "recipe": "monster_user.yaml#vampire_lord",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs/vampire_lord/",
+    "idle_master_sha256": "f9fcf34d0339ca97acfb3cac7a229bf0e418a1ee6826b8b1f19781df7d23968c",
+    "poses_reference_sha256": "c413944a130363d9de43aa5ddcb521dae6b596636e127266f469dbd0564806f4",
+    "prompt_sha256": "958242550670fda20edd9b93045d4e31822d3034ec2745f52359bfdac0394399"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    132,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      90,
+      89,
+      83,
+      62
+    ],
+    "anchors": [
+      23.4,
+      55.31,
+      23.23,
+      33.94
+    ],
+    "anchor_x": 55.4,
+    "error": {
+      "max": 75.2,
+      "p99": 47.8,
+      "mean": 19.6,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "magic": {
+        "px": 104,
+        "mean": 23.1,
+        "p90": 39.8,
+        "max": 52.1,
+        "colours": 2
+      },
+      "face": {
+        "px": 124,
+        "mean": 19.9,
+        "p90": 37.3,
+        "max": 47.0,
+        "colours": 5
+      },
+      "trim": {
+        "px": 586,
+        "mean": 26.1,
+        "p90": 45.0,
+        "max": 66.1,
+        "colours": 6
+      },
+      "gold": {
+        "px": 19,
+        "mean": 17.6,
+        "p90": 27.5,
+        "max": 29.1,
+        "colours": 1
+      }
+    }
+  }
+}

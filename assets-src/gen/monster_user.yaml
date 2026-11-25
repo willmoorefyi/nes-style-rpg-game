@@ -16,3 +16,113 @@ dark_wizard:
   refs_note: >-
     the user rendered it from the EF4 / EF5 images they had (bedrock4/ and bedrock5/ under ~/temp/ff-game/ef/), before
     the reference-pack route existed, so no idle_master / poses_reference sha256 is recorded
+pirate:
+  file: user_art/pirate/sheet_2026-11-25.png
+  sha256: 4a45f35c8c3e80314dedeed186a5f0337c844f4e4852b58064fc14af7b17335a
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs/pirate/
+    idle_master_sha256: 26ce4a3321f6bdabab7a0651cd2d7b925e43ff78d8ce142f9440c12fc6131c98
+    poses_reference_sha256: c47b4a8ac4591a3eac650cd36d00698ebacc2c6523520451e3f3d490f90ce47a
+    prompt_sha256: 4bd7c3fe759c5de129dcfe56d3e9f20fd639e9e8f197de8e26cf7d540723f90a
+  refs_note: >-
+    the user's 80 px render (~/temp/pirate_sprite_sheet_80px.png, 468x96, idle 80 px, feet row 90), approved by the
+    user with its size: the idle is below the large band, so s = 1.0 and the height is reported, never refused
+  # monster_user_palette: the face's skin, the cutlass, the hat's pale gold and the grey beard keep their own slots
+  # within the 16 (the plain house palette pulled the skin onto the gold trim, the blade onto two greys, the beard onto
+  # the navy); boxes are sheet px [x0, y0, x1, y1), per pose (the faces, the blades)
+  reserve:
+    - name: skin
+      select: skin
+      slots: 1
+      max_err: 20
+      boxes: [[51, 20, 63, 30], [168, 19, 181, 31], [278, 21, 289, 31], [412, 45, 426, 57]]
+    - name: steel
+      select: steel
+      slots: 3
+      max_err: 20
+      boxes: [[40, 18, 86, 56], [186, 18, 232, 40], [276, 16, 326, 56], [424, 48, 442, 92]]
+    - name: gold
+      select: gold
+      slots: 1
+      max_err: 20
+    - name: beard
+      select: grey
+      slots: 1
+      max_err: 16
+      boxes: [[51, 20, 63, 30], [168, 19, 181, 31], [278, 21, 289, 31], [412, 45, 426, 57]]
+vampire:
+  file: user_art/vampire/sheet_2026-11-25.png
+  sha256: 835f7e521c6419c9d71717c215f2782c89b82379ad2de1a83cb9cba5cb1a1066
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs/vampire/
+    idle_master_sha256: e5139d9981625ad0c25d927e94a13b8147ef59b4f4c823bd7b8baceb43bbc8ce
+    poses_reference_sha256: d7718d95d9111d23ba6f56e1c1d70fe19ae38ee88d50f0c60d02beede9f9f5c5
+    prompt_sha256: 3d7d2aea2c10f36065b0313aa34179f141c782fe830e84a5fe1a69f34eaefbdd
+  refs_note: >-
+    the user's 90 px render (~/temp/vampire_sprite_sheet_90px.png, 528x108, idle 90 px, feet row 101), approved by
+    the user with its size: the idle is below the large band, so s = 1.0 and the height is reported, never refused
+  # monster_user_palette: the pale face keeps its cool lilac greys and the armour its copper trim (the plain house
+  # palette warmed the face onto the cape's pinks and turned the trim plum); boxes are sheet px [x0, y0, x1, y1), per
+  # pose (the faces); the copper is every warm-brown px of the sheet
+  reserve:
+    - name: face
+      select: steel
+      slots: 3
+      max_err: 20
+      boxes: [[60, 15, 72, 26], [196, 18, 207, 30], [311, 24, 325, 36], [464, 46, 477, 56]]
+    - name: copper
+      select: skin
+      slots: 2
+      max_err: 20
+vampire_lord:
+  file: user_art/vampire_lord/sheet_2026-11-25.png
+  sha256: 40681495a696a72feaad09ea1be5af2af70c739cd221bfcd212fa7faf7a14407
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs/vampire_lord/
+    idle_master_sha256: f9fcf34d0339ca97acfb3cac7a229bf0e418a1ee6826b8b1f19781df7d23968c
+    poses_reference_sha256: c413944a130363d9de43aa5ddcb521dae6b596636e127266f469dbd0564806f4
+    prompt_sha256: 958242550670fda20edd9b93045d4e31822d3034ec2745f52359bfdac0394399
+  refs_note: >-
+    the user's render (~/temp/vampire_lord_sprite_sheet.png, 608x108, idle 90 px, feet row 101), approved by the user
+    with its size (equal to the vampire's): the idle is below the large band, so s = 1.0 and the height is reported,
+    never refused; the 3 px magic fleck right of the attack is a speck and is dropped
+  # monster_user_palette: the attack's purple-magenta magic, the pale face and the gold trim keep their own slots
+  # within the 16 (the plain house palette mapped the magic onto the coat reds, max error 118, and warmed the face);
+  # boxes are sheet px [x0, y0, x1, y1): the magic's in the attack, the faces per pose; the trim is every warm-gold px
+  reserve:
+    - name: magic
+      select: magenta
+      slots: 2
+      max_err: 20
+      boxes: [[190, 20, 296, 46]]
+    - name: face
+      select: steel
+      slots: 2
+      max_err: 20
+      boxes: [[60, 12, 75, 30], [215, 20, 232, 36], [345, 18, 365, 36], [512, 45, 532, 62]]
+    - name: trim
+      select: skin
+      slots: 1
+      max_err: 20
+    - name: gold
+      select: gold
+      slots: 1
+      max_err: 20

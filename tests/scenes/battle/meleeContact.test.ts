@@ -198,7 +198,10 @@ describe('I3: hit and miss sounds on the contact frame', () => {
   });
 });
 
-interface MonsterAtlas { scale: number; sheets: Record<string, { cell: [number, number]; frames: Record<string, [number, number]> }> }
+interface MonsterAtlas {
+  scale: number;
+  sheets: Record<string, { cell: [number, number]; frames: Record<string, [number, number]>; texScale?: number }>;
+}
 interface HeroAtlas { scale: number; cell: [number, number]; poses: string[]; sheets: Record<string, { row: number }> }
 
 function monsterRightInset(ids: string[]): number {
@@ -207,10 +210,13 @@ function monsterRightInset(ids: string[]): number {
     const img = monsterSheetPng(id);              // the sheet's atlas page (FW-8)
     const sheet = meta.sheets[id];
     const [fx, fy] = sheet.frames.idle;
-    const [w, h] = sheet.cell.map(v => v * meta.scale);
-    const bounds = opaqueBounds(img, fx * meta.scale, fy * meta.scale, w, h);
+    // ef-pv: a hi-res sheet (EF-A4) sits on its page at art px x texScale; before, the rect was read at the atlas scale,
+    // which measured whatever the packer put beside gr_imp (texScale 2.5) and broke when the pages were repacked
+    const t = sheet.texScale ?? meta.scale;
+    const [w, h] = sheet.cell.map(v => Math.ceil(v * t));
+    const bounds = opaqueBounds(img, Math.round(fx * t), Math.round(fy * t), w, h);
     if (!bounds) throw new Error(`monsters-ai: ${id} idle frame is empty`);
-    return w - bounds[2];
+    return (w - bounds[2]) * meta.scale / t;            // screen px
   }));
 }
 

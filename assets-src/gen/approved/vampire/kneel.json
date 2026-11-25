@@ -1,36 +1,27 @@
 {
   "character": "vampire",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "033cf80c9677e6f1",
-    "skel": "cbbfd1cc8d260de1",
-    "ref": "9853d1a7cd1864d5"
+  "backend": "user",
+  "source": "user_art/vampire/sheet_2026-11-25.png",
+  "sha256": "835f7e521c6419c9d71717c215f2782c89b82379ad2de1a83cb9cba5cb1a1066",
+  "recipe": "monster_user.yaml#vampire",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs/vampire/",
+    "idle_master_sha256": "e5139d9981625ad0c25d927e94a13b8147ef59b4f4c823bd7b8baceb43bbc8ce",
+    "poses_reference_sha256": "d7718d95d9111d23ba6f56e1c1d70fe19ae38ee88d50f0c60d02beede9f9f5c5",
+    "prompt_sha256": "3d7d2aea2c10f36065b0313aa34179f141c782fe830e84a5fe1a69f34eaefbdd"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-grey, A-hist, A-adj",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "0765b9fc87ec536ea46c3f90"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

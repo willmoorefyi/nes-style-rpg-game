@@ -643,3 +643,51 @@ poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered
   PASSED (1863 ok); `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:full` 432 files,
   10294 passed (mutation cache MISS, live 1284 s); browser `?mute=1&scenario=ef_user_dark_wizard&enemyAnim=loop`
   (new, beside the ogre) and `w_boss_evil_eye` (two dark wizards), no console warnings, 119 fps.
+
+#### EF-H result: pirate, vampire, vampire_lord (2026-11-25, branch `ef-pv`; no AI image call)
+
+The user's own ChatGPT renders, approved with their sizes (`~/temp/pirate_sprite_sheet_80px.png`,
+`vampire_sprite_sheet_90px.png`, `vampire_lord_sprite_sheet.png`), tracked in `gen/user_art/<id>/` with their sha256 and
+the sha256s of the reference packs (`~/temp/ff-game/ef/user_packs/<id>/`: idle, poses_reference, prompt) in
+`gen/monster_user.yaml`. `ef-br` (the EF6 pirate puppet rows of `monster_hr.yaml`) is merged in.
+
+- **Import fixes (framework, RED first in `selftest_monster_user.py`):** (1) the binary alpha is the figure: the
+  import keys onto exact magenta only (`pixelize.foreground(exact_key=True)` through `pixelize_native`); before, the
+  magenta-fringe rule ate 80 crimson coat-edge px of the pirate (colour error max 197) and `magenta_bg` keyed out the
+  vampire_lord's magic as background (max 348). dark_wizard re-imports byte for byte. (2) Recipe `reserve`
+  (`gen/monster_user_palette.py`): a region (sheet boxes x a colour class: skin, steel, bright, gold, grey, magenta)
+  is split into `slots` tones and each tone takes PX.reserve_detail's rule (>= 8 px over `max_err`: merge two
+  colours, give the slot to the tone), merging by Ward cost and never re-merging a reserved slot; still <= 16
+  colours, 15-bit, PX.OUTLINE darkest. (3) `monster_check.MAGENTA_ART = {vampire_lord: ((206, 66, 189),)}`: the
+  drawn magic is not key fringe (pinned: exactly the palette's flagged colours, each drawn by the render's magic).
+- **Import (s = 1.0, every idle below the large band, heights reported, never refused):** pirate idle 80 / attack 79
+  / hurt 77 / kneel 55, cell 128; vampire 90 / 88 / 80 / 62, cell 128; vampire_lord 90 / 89 / 83 / 62, cell 132 (its
+  3 px magic fleck dropped as a speck). Colour error before (plain house palette) -> after (mean / p90 / max):
+  pirate overall 20.1 / p99 66.3 / 197 -> 20.8 / p99 45.5 / 74; face skin 30.9 / 44.3 / 56.2 -> 25.1 / 36.0 / 50.6;
+  cutlass steel 33.3 / 54.9 / 81.1 -> 20.5 / 33.1 / 44.1 (a near-white highlight slot); hat gold 30.8 / - / 71.1 ->
+  26.3 / 43.7 / 74.0; beard grey 30.5 / - / 53.0 -> 21.6 / 32.1 / 41.7 (the cost: coat reds 13.1 -> about 20, 4
+  red tones). Vampire overall 15.0 / p99 40.1 / 66.4 -> 15.1 / 38.3 / 71.1; pale face 31.2 / 50.6 / 55.4 -> 19.6 /
+  35.7 / 45.5; copper trim 31.1 / 45.9 / 66.4 -> 19.7 / 30.8 / 71.1. Vampire_lord overall (after the key fix)
+  19.5 / p99 55.7 / 117.7 -> 19.6 / 47.8 / 75.2; magic 84.4 / 102.0 / 117.7 -> 23.1 / 39.8 / 52.1; face 30.1 / 47.4
+  / 66.7 -> 19.9 / 37.3 / 47.0; gold trim 34.2 / 50.7 / 64.1 -> 26.1 / 45.0 / 66.1.
+- **Fidelity reviews (fresh, image-only):** pirate SHIP WITH NITS at iteration 2 (it1: the beard turned navy, fixed by
+  the beard slot; left: the hat gold a little duller, the kneel face darker, the blade's top highlight slightly
+  flattened); vampire SHIP WITH NITS at iteration 2 (it1: the copper trim went plum and the face warm, fixed by the
+  face and copper slots; left: the darkest cloth shadows ink to the outline colour, the house ink rule); vampire_lord
+  SHIP WITH NITS at iteration 1 (the wings' mid-crimson folds merge into near-black, the hair a step lighter, the
+  magic slightly pinker).
+- **Approve:** `monster_user.py approve`, monster_small removed (archives pirate_v1, vampire_v2, vampire_lord_v1
+  byte-identical), `retire.py --move-rig` for each, monsters.yaml / enemies.yaml `size: large` and the user's briefs.
+- **Rigs (dark_wizard's recipe, every in-between a rigid lean of its key's upper body about the hip, arm parts
+  removed, `kneel: {source: ai}`):** pirate: hip where the legs leave the coat (y 98), wind 3.5 / 7 deg back with the
+  upper body 1 / 2 px back, mid / follow the lunge key 2 / 1 deg on; vampire: hip y 105, the attack frames also shift
+  the upper body (wind 4 / 8 px back, 1 / 2 px up; mid / follow 5 / 6 px forward: the centroid cap), 1 px cracks
+  closed with ink (7 paint px), kneel bridge `{keep_top: 0.1, keep_bot: 0.3}` (the default opened a second hole in
+  kneel_in2); vampire_lord: the robe is the torso with the hip at its hem, wings and magic ride the upper body.
+  **Integrator ruling (open for the user's veto):** the vampire_lord attack key draws 1.67x the idle's area, so no
+  rigid lean lifts the swap step over the keys' IoU + 0.02 (best 0.47 < 0.49); `monster_check.ATTACK_SWAP_IOU =
+  {vampire_lord: -0.03}` lowers the margin for its attack only (RED first). Animation reviews (fresh, image-only):
+  all three SHIP WITH NITS in 1 iteration (the shared nit: a weak wind-up / a one-frame recover; the pirate's wind
+  was deepened after its review). Locked (14 frames each).
+- **Size:** `{scale: 2, tex: 2, smooth: [despur, edges]}` for all three (about 160 / 180 / 182 screen px; despur kept,
+  the hi-res frames keep the blade and claws whole: `~/temp/ff-game/ef/user/<id>/smooth_hires_x2.png`).

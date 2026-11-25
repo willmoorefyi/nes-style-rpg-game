@@ -141,11 +141,16 @@ def _resize_mask(m: np.ndarray, size: tuple[int, int], how) -> np.ndarray:
     return np.asarray(Image.fromarray((m * 255).astype(np.uint8)).resize(size, how)) > 127
 
 
-def foreground(rgb: np.ndarray, guide_mask: np.ndarray, bg_tol: float = 40.0, dilate: int = 25) -> np.ndarray:
-    """Figure mask at render resolution: background removed, only blobs overlapping the guide kept."""
+def foreground(rgb: np.ndarray, guide_mask: np.ndarray, bg_tol: float = 40.0, dilate: int = 25,
+               exact_key: bool = False) -> np.ndarray:
+    """Figure mask at render resolution: background removed, only blobs overlapping the guide kept. `exact_key`: the
+    background is exactly MAGENTA and nothing else, no fringe (EF-H: a binary-alpha user sheet, keyed onto magenta by
+    its own alpha, may draw magenta-ish art: crimson edges, magic)."""
     magenta = is_magenta_bg(rgb)
     fg = ~(magenta_bg(rgb) if magenta else flood_bg(rgb, bg_tol))
-    if magenta:
+    if exact_key:
+        fg = ~(rgb == MAGENTA.astype(np.uint8)).all(-1)
+    elif magenta:
         fg &= ~magenta_fringe(rgb, fg)
     h, w = fg.shape
     work = (max(16, w // 4), max(16, h // 4)) if w > 200 else (w, h)
@@ -300,15 +305,16 @@ def reserve_detail(cent: np.ndarray, detail_px: np.ndarray, seed: int = 0, max_e
 
 def pixelize_native(art: Image.Image, guide_mask: np.ndarray, out_size: tuple[int, int], colors: int = 14,
                     seed: int = 0, bottom_row: int | None = None, ink_max: int = 40,
-                    palette: np.ndarray | None = None) -> tuple[Image.Image, dict]:
-    """1:1 path for renders that were drawn as pixel art: `art` is already one pixel per art pixel.
+                    palette: np.ndarray | None = None, exact_key: bool = False) -> tuple[Image.Image, dict]:
+    """1:1 path for renders that were drawn as pixel art: `art` is already one pixel per art pixel (`exact_key`:
+    see foreground).
 
     No resampling: background key, prop filter, palette snap (k-means only if there are more colours than
     allowed), outline only where the art has none, then placed into `out_size` with the feet on bottom_row.
     """
     rgb = np.asarray(art.convert("RGB"))
     h, w, _ = rgb.shape
-    fg = foreground(rgb, guide_mask, dilate=max(3, (min(w, h) // 20) | 1))
+    fg = foreground(rgb, guide_mask, dilate=max(3, (min(w, h) // 20) | 1), exact_key=exact_key)
     report = {"cropped": False}
     out = np.zeros((out_size[1], out_size[0], 4), np.uint8)
     if not fg.any():

@@ -105,6 +105,102 @@ def _check_cut(check: Callable[[bool, str], None]) -> None:
     check(winfo["cw"] > 128, f"EF-H place: a wide attack widens the cell ({winfo['cw']})")
 
 
+def _check_keep(check: Callable[[bool, str], None]) -> None:
+    """EF-H pirate: a crimson coat edge is kept (no magenta-fringe erosion on a binary-alpha sheet), and a recipe
+    `reserve` gives a small region (a face's skin, a blade's sparkle) its own palette slots within the 16."""
+    from gen import monster_user as U
+    from gen import monster_user_palette as UP
+    from gen import pixelize as PX
+    from gen import spec as S
+    band = S.MONSTER_BANDS["large"]
+    a = np.asarray(row()).copy()
+    fig = a[..., 3] > 0
+    body = fig & (a[..., :3].max(2) > 40)                                        # a many-colour body (k-means merges)
+    jit = np.random.default_rng(7).integers(-14, 15, (*a.shape[:2], 3))
+    a[body, :3] = np.clip(a[body, :3].astype(int) + jit[body], 41, 235).astype(np.uint8)
+    edge = fig & ~np.pad(fig, 1)[1:-1, 2:]                                       # every right-edge px of each figure
+    a[edge, :3] = (181, 42, 92)                                                  # the pirate's coat crimson
+    a[40:44, 40:46] = (228, 136, 95, 255)                                        # a skin patch on the idle (24 px)
+    a[60:63, 30:34] = (240, 250, 255, 255)                                       # a sparkle on the idle (12 px)
+    a[80:88, 216:224] = (185, 38, 170, 255)                                      # vampire_lord's magenta magic (attack)
+    img = Image.fromarray(a)
+    cells = U.split(img)
+    figs, pal0 = U.quantize(cells, 1.0)
+    frames, info = U.place(figs, band)
+    def lost(colour):
+        return sum(int((~(np.asarray(f)[np.where(m)[0] + ty, np.where(m)[1] + tx, 3] > 0)
+                        | (np.asarray(f)[np.where(m)[0] + ty, np.where(m)[1] + tx, :3] == PX.OUTLINE).all(1))[
+                           (rc[m] == colour).all(1)].sum())
+                   for (rc, m), f, (tx, ty) in zip(cells, frames, info["offsets"]))
+    check(lost((181, 42, 92)) == 0 and lost((185, 38, 170)) == 0,
+          f"EF-H keep: on a binary-alpha sheet the alpha is the figure: crimson edge px are not eroded as key fringe "
+          f"({lost((181, 42, 92))} lost) and magenta magic is not keyed out as background ({lost((185, 38, 170))} lost)")
+    rec = {"reserve": [{"name": "skin", "select": "skin", "slots": 1, "max_err": 20, "boxes": [[38, 38, 48, 46]]},
+                       {"name": "steel", "select": "bright", "slots": 1, "max_err": 20, "boxes": [[28, 58, 36, 65]]}]}
+    regions = UP.masks(img, rec)
+    _, pal = U.quantize(cells, 1.0, lambda p: UP.reserve(p, img, rec, regions))
+    def near(c, p):
+        return float(np.sqrt(((p.astype(np.float32) - np.array(c, np.float32)) ** 2).sum(1)).min())
+    skin, spark = (228, 136, 95), (240, 250, 255)
+    check(near(skin, pal0) > 20 and near(spark, pal0) > 20 and int(regions["skin"].sum()) == 24
+          and int(regions["steel"].sum()) == 12 and len(pal) <= 16 and near(skin, pal) <= 12 and near(spark, pal) <= 12
+          and tuple(int(v) for v in pal[int(pal.sum(1).argmin())]) == PX.OUTLINE,
+          f"EF-H reserve: the skin patch and the sparkle, merged by the plain house palette ({near(skin, pal0):.1f}, "
+          f"{near(spark, pal0):.1f}), get their own slots ({near(skin, pal):.1f}, {near(spark, pal):.1f}), "
+          f"<= 16 colours, PX.OUTLINE the darkest")
+    check(refused(lambda: UP.masks(img, {"reserve": [{"name": "x", "select": "nope"}]})),
+          "EF-H reserve: an unknown colour class is refused")
+
+
+def _check_magic(check: Callable[[bool, str], None]) -> None:
+    """EF-H vampire_lord: the attack's drawn purple-magenta magic is art, not key fringe. The in-between check
+    (anim_checks.magenta) takes a per-sprite allowance (monster_check.MAGENTA_ART): exactly the approved palette's
+    magic colours, each one the quantized colour of magic px of the user's render."""
+    from gen import anim_checks as C
+    from gen import monster_check as MC
+    from gen import monster_user as U
+    from gen import monster_user_palette as UP
+    a = np.zeros((8, 8, 4), np.uint8)
+    a[2:6, 2:6] = (206, 66, 189, 255)
+    check(bool(C.magenta(a)) and not C.magenta(a, ((206, 66, 189),)) and bool(C.magenta(a, ((156, 16, 140),))),
+          "EF-H magic: a magenta-ish px fails the key-fringe check unless its exact colour is allowed")
+    allow = getattr(MC, "MAGENTA_ART", None)
+    ok, why = allow is not None and set(allow) == {"vampire_lord"}, f"MAGENTA_ART {allow}"
+    if ok:
+        rec = U.recipe("vampire_lord")
+        img = U.source(rec)
+        frames, info = U.cut("vampire_lord", rec)
+        magic = UP.masks(img, {"reserve": [r for r in rec["reserve"] if r["name"] == "magic"]})["magic"]
+        (oy, ox), (tx, ty) = UP.origins(img, U.SPECK)[1], info["offsets"][1]
+        vy, vx = np.where(magic[oy:oy + 128, ox:ox + info["cw"]])
+        drawn = {tuple(int(v) for v in c) for c in np.asarray(frames[1])[vy + ty, vx + tx, :3]}
+        pal = {tuple(int(v) for v in c) for c in info["palette"]}
+        flagged = {c for c in pal if C.magenta(np.array([[[*c, 255]]], np.uint8))}
+        ok, why = set(allow["vampire_lord"]) == flagged and flagged <= drawn, f"allowed {allow['vampire_lord']}, " \
+            f"palette colours the check flags {sorted(flagged)}, the magic px's colours {sorted(drawn)}"
+    check(ok, f"EF-H magic: monster_check.MAGENTA_ART allows only vampire_lord, exactly its palette's flagged colours, "
+              f"each drawn by the render's magic ({why})")
+
+
+def _check_swap(check: Callable[[bool, str], None]) -> None:
+    """EF-H integrator ruling (2026-11-25, open for the user's veto): vampire_lord's attack key draws 1.67x the idle's
+    area (the robe and the hair flung out), so the rigid-lean in-betweens cannot lift the idle -> attack swap step over
+    the keys' own IoU + 0.02; monster_check.ATTACK_SWAP_IOU lowers that margin for its attack sequence only."""
+    from gen import anim_checks as C
+    from gen import monster_check as MC
+    k0, k1 = np.zeros((40, 40, 4), np.uint8), np.zeros((40, 40, 4), np.uint8)
+    k0[5:35, 10:20, 3] = 255
+    k1[5:35, 14:24, 3] = 255                            # the keys' IoU 0.429
+    p, n = k0.copy(), k1.copy()
+    n[5:35, 24, 3] = 255                                # the swap step a shade below the keys' IoU (0.4)
+    span, h = (k0, k1), 40
+    fails = [e for e in C.continuity(p, n, span, h) if "IoU" in e]
+    passes = [e for e in C.continuity(p, n, span, h, iou_margin=-0.03) if "IoU" in e]
+    check(bool(fails) and not passes and getattr(MC, "ATTACK_SWAP_IOU", None) == {"vampire_lord": -0.03},
+          f"EF-H swap: the adjacent-IoU margin (+0.02 over the keys' IoU) is lowered to -0.03 only for vampire_lord's "
+          f"attack ({fails} / {passes}; ATTACK_SWAP_IOU {getattr(MC, 'ATTACK_SWAP_IOU', None)})")
+
+
 def _check_tree(check: Callable[[bool, str], None]) -> None:
     from gen import monster_user as U
     from gen import selftest_roster as SRo
@@ -167,5 +263,8 @@ def _check_real(check: Callable[[bool, str], None]) -> None:
 
 def run_monster_user(check: Callable[[bool, str], None]) -> None:
     _check_cut(check)
+    _check_keep(check)
+    _check_magic(check)
+    _check_swap(check)
     _check_tree(check)
     _check_real(check)

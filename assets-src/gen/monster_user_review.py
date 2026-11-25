@@ -68,7 +68,8 @@ def metas(sid: str, rec: dict, info: dict, today: str) -> tuple[dict, dict]:
     meta = {"character": sid, "sheet": f"monster_{size}", **common, "layout": [3, 1], "size": size,
             "floating": False, "flip_frames": [], "poses": ["idle", "attack", "hurt"],
             "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
-            "cut": {k: info[k] for k in ("scale", "scale_why", "native_heights", "anchors", "anchor_x", "error")}}
+            "cut": {k: info[k] for k in ("scale", "scale_why", "native_heights", "anchors", "anchor_x", "error",
+                                         "regions") if k in info}}
     kneel = {"character": sid, "sheet": "kneel", **common, "foot_row": band.foot_row,
              "settings": {"route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"}}
     return meta, kneel
