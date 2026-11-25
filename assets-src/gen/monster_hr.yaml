@@ -31,6 +31,7 @@ sprites:
       hurt: staggering backward, flinching, the head thrown back, the free arm thrown up
       kneel: beaten down on one knee, slumped, head hanging, the cutlass lowered to the ground
     prep:
+      nobg_key: 007b216d7e0c178d22f5c2ae
       source: 795adfe0af7aef21dad2e6a8      # EF3 pirate idle v3 (sd35)
       flip: false
       key: remove_bg                        # EF6 (amendment B0): the alpha of the cached remove_bg output (nobg_key,

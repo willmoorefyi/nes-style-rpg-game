@@ -1566,3 +1566,5 @@
 {"event": "result", "key": "59842d5b548c3486bbb86274", "ok": true, "served": "stability.sd3-5-large-v1:0"}
 {"event": "request", "ts": "2026-11-25T00:21:01", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45024, "key": "79ee88c4450179016b8a79d7", "pass": "EF5"}
 {"event": "result", "key": "79ee88c4450179016b8a79d7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-25T01:39:43", "tool": "monster_hr_br.py", "model": "remove_bg", "purpose": "ef6_nobg", "seed": null, "key": "007b216d7e0c178d22f5c2ae", "pass": "EF6"}
+{"event": "result", "key": "007b216d7e0c178d22f5c2ae", "ok": true, "served": "us.stability.stable-image-remove-background-v1:0"}
