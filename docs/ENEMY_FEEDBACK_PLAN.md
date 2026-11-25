@@ -634,9 +634,9 @@ poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered
   in1 -> in2 swap step is 13.4 px = 0.88 of the span (cap 0.65 x span = 9.9). `kneel_checks.BRIDGE_SWAP_ALLOW =
   {dark_wizard: 0.9}` raises only that step (selftest RED first). The alternatives: a prop-aware bridge (a framework
   change) or a kneel re-render with the staff lowered.
-- **Size:** `monster_scale.yaml` `dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}` is a PLACEHOLDER: the user
-  ruled the dark wizard must not display bigger than the ogre (204 px; at 2 the idle is 224); the fine scale (~1.8)
-  needs `valid_scale` widened below 2, then an atlas rebuild.
+- **Size (final, user ruling 2026-11-25):** `dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}`: large like the
+  ogre (a strong enemy), native pixel count, the default scale 2 (idle 224 px with the staff). The kneel bridge's
+  one-sprite `BRIDGE_SWAP_ALLOW` (0.9) stays.
 - **Integrator gates (ef-dw):** atlas rebuilt and committed (30 pages, 44 hi-res sheets, 18 extra pages of max 18,
   preload + largest formation 74.8 MB); PYTHONHASHSEED 0 / 1 builds byte-identical (31 files); by-rect vs mainline: only
   dark_wizard differs (17 frames of 123 sheets); `monster_anim.py check --all` 123 OK lines only; `selftest.py` ALL
