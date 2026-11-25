@@ -9,17 +9,34 @@ from PIL import Image, ImageDraw
 
 from gen import monster_anim as MA
 from gen import monster_check as MC
+from gen.monster_recipes import KNEEL_IN, KNEEL_OUT, KNEEL_PERIOD
 
 OUT = MA.HERE / "out" / "anim" / "review" / "monsters"
 BG = MA.HERE.parent.parent / "assets" / "backgrounds" / "grassland.webp"
-# runtime order and frame counts (src/scenes/battle/enemyChoreography.ts)
+
+
+def kneel_timeline(idle: int = 24) -> list[tuple[str, int]]:
+    """EF-I: what a dazed (sleep, stun) enemy plays in game (kneelChoreography.ts KneelTrack), for an idle enemy put to
+    sleep mid-battle and woken while idle: idle, in (kneel_in1, kneel_in2), two full hold periods (kneel, kneel_b), out
+    (kneel_in2, kneel_in1), idle. Shown for actor index 0 with the hold on a period boundary: in game the hold reads the
+    absolute clock, so its first frame (kneel or kneel_b) and first period's length vary per actor. Not shown: an enemy
+    asleep at battle start snaps into the hold (no in); a sleeper woken by its own turn plays no out (the action cuts
+    the kneel and shows the rise kneel_in2 3, kneel_in1 3 inside the attack); a poisoned enemy rises to act each turn
+    and kneels again (in) after it. A sheet without kneel cells resolves the names along FALLBACK (kneel -> daze ...),
+    so its GIF holds fewer frames than the track (Pillow merges identical consecutive frames)."""
+    hold = [("kneel", KNEEL_PERIOD), ("kneel_b", KNEEL_PERIOD)] * 2
+    return [("idle", idle), *KNEEL_IN, *hold, *KNEEL_OUT, ("idle", idle)]
+
+
+LEGACY_DAZE = MA.SEQUENCES["daze"]                       # idle, daze, daze_b: generated and locked, the D-K7 fallback
+# runtime order and frame counts (src/scenes/battle/enemyChoreography.ts; daze: kneelChoreography.ts)
 TIMELINES = {"attack": [("atk_wind1", 5), ("atk_wind2", 6), ("atk_mid", 3), ("attack", 8), ("atk_follow", 4),
                         ("atk_recover", 5), ("idle", 12)],
              "hurt": [("hurt_in1", 2), ("hurt_in2", 2), ("hurt", 10), ("hurt_in2", 3), ("hurt_in1", 3), ("idle", 12)],
              "cast": [("cast_gather", 6), ("cast_rise", 4), ("cast", 10), ("cast_release", 4), ("cast_rise", 3),
                       ("cast_gather", 3), ("idle", 12)],
              "idle": [("idle", 36), ("idle_b", 36)],
-             "daze": [("idle", 24), ("daze", 48), ("daze_b", 48), ("daze", 48), ("daze_b", 48)],
+             "daze": kneel_timeline(),
              "heavy": [("atk_raise_in", 6), ("attack_raise", 4), ("atk_raise_b", 4), ("attack_raise", 4), ("atk_raise_b", 4),
                        ("attack_raise", 2), ("atk_swing", 3), ("atk_swing2", 2), ("attack", 12), ("atk_follow", 6),
                        ("atk_recover", 6), ("idle", 16)]}
@@ -92,6 +109,19 @@ def mark(sprite: str, k: int | None = None, out: Path = OUT) -> Path:
     return path
 
 
+def daze_names(have) -> list[str]:
+    """EF-I: the frame each entry of the daze (kneel) track shows on a sheet with these frames (FALLBACK, as the TS)."""
+    return [MA.resolve(n, have) for n, _ in TIMELINES["daze"]]
+
+
+def gif_frame(img: Image.Image, L: int, dx: int = 0) -> Image.Image:
+    """One review GIF frame: the cell at x = L + dx on a (w + 2L, h) canvas of (60, 60, 70), 4x, RGB."""
+    w, h = img.size
+    canvas = Image.new("RGBA", (w + 2 * L, h), (60, 60, 70, 255))
+    canvas.alpha_composite(img, (L + dx, 0))
+    return _zoom(canvas, 4).convert("RGB")
+
+
 def review(sprite: str, out: Path = OUT) -> dict:
     sid, meta, kfs = next(e for e in MA.load_entries() if e[0] == sprite)
     out.mkdir(parents=True, exist_ok=True)
@@ -109,20 +139,20 @@ def review(sprite: str, out: Path = OUT) -> dict:
         _strip([(n, get(n)) for n in names]).save(out / f"{sprite}_{seq}.png")
         if seq == "idle":
             continue
-        w, h = kfs["idle"].size
+        if seq == "daze":                                 # EF-I: the kneel track as resolved; legacy daze: PNG only
+            _strip([(n, get(n)) for n in LEGACY_DAZE]).save(out / f"{sprite}_daze_legacy.png")
+            tl = [(n, f) for n, (_, f) in zip(daze_names(frames), tl)]
         imgs, durs = [], []
         for n, frames_n in tl:
-            canvas = Image.new("RGBA", (w + 2 * L, h), (60, 60, 70, 255))
             dx = {"atk_wind1": -L // 6, "atk_wind2": -L // 4, "atk_mid": int(0.75 * L), "attack": L,
                   "atk_follow": int(0.58 * L), "atk_raise_in": -L // 6, "attack_raise": -L // 4, "atk_raise_b": -L // 4,
                   "atk_swing": int(0.5 * L), "atk_swing2": int(0.75 * L)}.get(n, 0) if seq in ("attack", "heavy") \
                 else (-3 if n == "hurt" else 0)
-            canvas.alpha_composite(get(n), (L + dx, 0))
-            imgs.append(_zoom(canvas, 4).convert("RGB"))
+            imgs.append(gif_frame(get(n), L, dx))
             durs.append(round(frames_n * 1000 / 60))
         imgs[0].save(out / f"{sprite}_{seq}.gif", save_all=True, append_images=imgs[1:], duration=durs, loop=0)
     order = [n for n in MA.SEQUENCES["attack"][:-1] + MA.SEQUENCES["hurt"][1:] + (MA.SEQUENCES["cast"][1:] if "cast" in kfs else [])
-             + MA.SEQUENCES["daze"] + (MA.SEQUENCES["heavy"][1:] if "attack_raise" in kfs else [])]
+             + MA.SEQUENCES["kneel"] + (MA.SEQUENCES["heavy"][1:] if "attack_raise" in kfs else [])]
     onion = []
     for a, b in zip(order, order[1:]):
         pa, pb = np.asarray(get(a)).astype(float), np.asarray(get(b))

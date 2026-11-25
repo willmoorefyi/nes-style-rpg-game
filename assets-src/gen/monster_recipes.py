@@ -10,6 +10,11 @@ MONSTER_FRAMES = ["idle", "idle_b", "atk_wind1", "atk_wind2", "atk_mid", "attack
                   "hurt_in1", "hurt_in2", "hurt", "daze", "daze_b", "kneel_in1", "kneel_in2", "kneel", "kneel_b"]
 # docs/KNEEL_PLAN.md D-K4 / D-K5: the derived `kneel` key (kneel.py, opt-in) and its in-betweens
 KNEEL_FRAMES = ("kneel_in1", "kneel_in2", "kneel", "kneel_b")
+# the runtime kneel track (src/scenes/battle/kneelChoreography.ts; EF-I, pinned by selftest_review_daze): in 8 frames
+# (kneel_in1, kneel_in2 split at / 2), the hold alternating kneel / kneel_b every 48 (offset index x 17), out 6
+KNEEL_IN_FRAMES, KNEEL_OUT_FRAMES, KNEEL_PERIOD, KNEEL_PHASE = 8, 6, 48, 17
+KNEEL_IN = (("kneel_in1", KNEEL_IN_FRAMES // 2), ("kneel_in2", KNEEL_IN_FRAMES - KNEEL_IN_FRAMES // 2))
+KNEEL_OUT = (("kneel_in2", KNEEL_OUT_FRAMES // 2), ("kneel_in1", KNEEL_OUT_FRAMES - KNEEL_OUT_FRAMES // 2))
 BOSS_FRAMES = MONSTER_FRAMES + ["cast_gather", "cast_rise", "cast", "cast_release"]
 RAISE_FRAMES = ["attack_raise", "atk_raise_in", "atk_raise_b", "atk_swing", "atk_swing2"]
 # EF-D (docs/ENEMY_FEEDBACK_PLAN.md, monster_orbit.py): a rig's `orbit` adds idle_o<k> / idle_b_o<k>, k < N <= ORBIT_MAX

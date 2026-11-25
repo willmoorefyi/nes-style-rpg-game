@@ -196,7 +196,8 @@ approved sheets are never modified. One rig per base sprite in `anim/monsters/<s
 ```bash
 python3 -I assets-src/gen/monster_anim.py mark <id>            # zoomed keyframes with joints and part labels
 python3 -I assets-src/gen/monster_anim.py check --all          # every check + lock files: only "OK" lines
-python3 -I assets-src/gen/monster_anim.py review <id> ...      # gen/out/anim/review/monsters/ (strips, onion, GIFs, _stage)
+python3 -I assets-src/gen/monster_anim.py review <id> ...      # gen/out/anim/review/monsters/ (strips, onion, GIFs, _stage;
+                                                               # _daze.gif = the in-game kneel track, _daze_legacy.png = daze / daze_b)
 python3 -I assets-src/gen/monster_anim.py lock <id>            # <id>.lock.json, only after the image review passes
 python3 -I assets-src/build_assets.py monsters_ai              # the build runs the same checks (efix gates on)
 ```
