@@ -643,3 +643,134 @@ poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered
   PASSED (1863 ok); `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:full` 432 files,
   10294 passed (mutation cache MISS, live 1284 s); browser `?mute=1&scenario=ef_user_dark_wizard&enemyAnim=loop`
   (new, beside the ogre) and `w_boss_evil_eye` (two dark wizards), no console warnings, 119 fps.
+
+
+## EF-J. Chaos: the orbs fall when he kneels (rev 2, 2026-11-25; Momus rev-1: 5 blocking findings, 7 notes, addressed; rev-2 OKAY, 2 notes applied)
+
+User request (approved): in Chaos's dazed kneel the four element orbs stay floating by his head (the AI key
+`approved/chaos/kneel.png` draws them there and the bridge copies them), which reads wrong while he stays down. In the
+kneel **hold** (`kneel` key cell and `kneel_b`) the four orbs rest on the ground beside him; in `kneel_in1` /
+`kneel_in2` they are part-way down, so the out (kneel_in2 then kneel_in1, `kneelChoreography.ts`) shows them rising
+back. No AI image call; numpy / Pillow only (no scipy: it is not importable here; pieces by `gen.pixelize.components`,
+4-connected); attack, cast, hurt, idle and the orbit frames unchanged; no runtime change.
+
+- **Measured facts (2026-11-25, chaos cell 200 x 200, feet row 192).** Idle orbs = EF-D's `orbit.parts` masks
+  (white 16 x 16, pale 15 x 15, teal 14 x 15, ember 16 x 16; bottom-centres (72.5, 48), (100, 20), (120.5, 28),
+  (127.5, 48)). In the AI key the orbs are smaller and placed differently: white 121 px x 94-106 y 64-77, teal 105 px
+  x 137-149 y 59-71, ember 135 px x 136-149 y 83-97 (each its own piece), pale 142 px x 122-136 y 49-62 (it touches
+  the flame). Key opaque rows 49-192 (59-192 without the orbs); idle 6-192 (14-192 without). The key's hem spans
+  x 28-171 at row 186, 27-173 at 187, 28-174 at 188, 47-154 at 190 (row 192: 4 px, x 82-95); the free ground is
+  x 1-26 (left) and 175-198 (right).
+- **Cut (where the orbs come from).** Every frame draws each orb with the pixels of **its own bridge source**:
+  `kneel_in1` (drawn from the idle) with the idle orbs, `kneel_in2`, `kneel`, `kneel_b` (drawn from the key) with the
+  key orbs. Idle masks: EF-D's `orbit.parts` unchanged (`monster_orbit._orb_masks`). Key masks: a new list
+  `kneel_orbs.parts` in the key's coordinates: a circle `at` / `r`, optionally `colors` (as EF-D) and `piece: true`
+  (the circle is also limited to the 4-connected piece of the key holding the most of the circle's opaque px, so a
+  circle never takes a flame px beside a free orb; no rounding of `at` involved):
+  white `{at: [100, 70.5], r: 9.5, piece: true}`, pale `{at: [129, 55], r: 8, colors: [[6, 4, 10], [82, 132, 140],
+  [41, 41, 49], [24, 0, 33], [231, 239, 222], [148, 140, 132], [24, 24, 33]]}` (the circle's 8th colour, the flame's
+  (140, 99, 74), 1 px, is left out), teal `{at: [143, 65], r: 9.5, piece: true}`, ember `{at: [142.5, 90], r: 9.5,
+  piece: true}` (measured: 121 / 142 / 105 / 135 px, the free orbs exactly their pieces). The holes:
+  `monster_orbit.clean` (EF-D's seal: a cut px 4-next to a kept non-outline px becomes outline ink), 13 px sealed in
+  the idle (EF-D's own), 3 px in the key; the clean key and the clean idle are each **one piece** (no orphan outline
+  dots, checked).
+- **Pipeline (a rig option alongside `orbit`, applied with the kneel bridge).** New module `gen/kneel_orbs.py`
+  (< 250 lines; it also holds the new checks, so `kneel_checks.py`, 228 lines, grows by a few lines only) and a
+  top-level rig block in `gen/anim/monsters/chaos.yaml`:
+  ```yaml
+  kneel_orbs:
+    fall: [0.3, 0.72]        # share of the way down in kneel_in1 / kneel_in2 (0 < f1 < f2 < 1): an accelerating fall
+    rest: {white: 11, pale: 27, teal: 170, ember: 186}   # ground spot: the orb's bottom-centre x; its bottom on the feet row
+    shadow: true             # a 1 px contact line in (41, 41, 49), already in chaos's palette (idle, attack, kneel)
+    parts: {...}             # the key masks above
+  ```
+  Validation (`kneel_orbs.cfg`, ValueError naming the rig): needs `orbit` with the same four orb names and
+  `kneel: {source: ai}`; `fall` two values strictly increasing in (0, 1); every orb's spot inside the cell clear of its
+  1 px border in every frame (the key orbs' hold spots at `ai_key`, the idle orbs' in1 and the key orbs' in2 spots at
+  `bridge_frames`). A rig with `kneel_orbs` but no `orbit` raises; a rig with neither is untouched.
+  **The raw key.** `kneel_source_ai.raw_key(sid, cfg, kfs)` = today's `ai_key` body (load, offset, paint);
+  `ai_key` = `kneel_orbs.rest_key(raw_key(...))` when the block is set (the clean key with the key orbs on their spots),
+  else `raw_key` unchanged. `ai_key` runs at `load_entries` (`kneel.add_key`), so `kfs["kneel"]` is the moved key;
+  `bridge_frames` therefore never reads `kfs["kneel"]` for the bridge but calls `raw_key` itself, cuts it and the idle,
+  runs `kneel_bridge.frames(clean idle, clean raw key, ...)` (the bridge squashes / stretches the body only) and pastes
+  the orbs: in1 the idle orbs, in2 / kneel_b the key orbs. An orb moves by whole px, its pixels unchanged (no scaling).
+  Position of an orb in a frame: its source bottom-centre B_src (mask bbox x centre, lowest row) moved f of the way to
+  the ground spot G = (rest x, 192), f = fall[0] (in1), fall[1] (in2), 1 (kneel, kneel_b); x rounded half up, y
+  rounded. Orbs are drawn in front of the body (on the ground they lie in front of the hem's flared tail; mid-fall
+  they pass in front of the arms). The shadow: row 192 from the orb's xmin + 2 to xmax - 2 where the orb draws
+  nothing. The resulting spots (prototype): in1 bottoms at rows 91 / 72 / 77 / 91 (white / pale / teal / ember), in2
+  at 160 / 156 / 158 / 165, the hold at 192 with x spans white 5-17, pale 20-34, teal 164-176, ember 180-193. Bottom
+  rows per orb run source -> in1 -> in2 -> 192 strictly downward and x moves monotonically toward its spot, so the out
+  plays the same path upward. `kneel_b` (the key's breath) keeps the orbs exactly where `kneel` has them.
+  **Frame entries.** The three bridge entries gain `kneel_orbs: {drawn: bool mask of the orb + shadow px, clean: the
+  frame before the orbs were pasted, clean_src: the clean source (idle or raw key), orbs: {name: {d, size, bottom}}}`;
+  the `kf:kneel` key's same record is rebuilt by `kneel_orbs.key_info(sid, cfg, kfs)` (recomputed from `raw_key`, it
+  is not in `gen`).
+- **Checks.** Every existing check applies to the four frames: alpha, palette lock, magenta, clipping / K-fit (no px
+  below row 192, none on the border), K-ground (lowest opaque row 192; in1 keeps the contact-share rule), K-order
+  (heights idle 187, in1 163, in2 150, key 134: monotonic), K-anchor, the bridge frame rules (bridge_holes, area
+  0.85-1.15 of the resized source, bbox height within 10 of the lerp: in1 163 vs 168.5, in2 150 vs 152.5,
+  outline_kept), `sequence:kneel` with the bridge swap cap 0.65 unchanged (no new allowance). **One named exception:**
+  the bridge `detached` rule (pieces <= the source's) cannot hold when an orb is mid-air in in2 but merged with the hem
+  in the key, so `monster_check.frame_checks` passes the entry's `kneel_orbs` record to `KC.bridge_frame` (new optional
+  argument), which then runs `kneel_orbs.detached(a, rec)` instead of `C.detached(a, S)`: pieces of the frame with the
+  drawn orb px removed <= pieces of `clean_src`, plus at most 4 orb pieces, and no new piece under MIN_PIECE (every
+  other sprite: the argument is None, unchanged). New `kneel_orbs.frame_checks(name, a, rec)`, called from
+  `monster_check.frame_checks`' bridge branch for the three frames and from `KC.ai_checks` for `kf:kneel` (record
+  from `key_info`): each orb's drawn px equal its source px translated (pixel-exact); in the hold each orb's lowest row
+  is 192 and at most 35 % of its px cover a clean-body px; no two orbs overlap; the frame with the orb and shadow px
+  reverted equals `clean`. If an existing check (holes, area, outline, centroid) fails, the spot or fall share is
+  tuned, never the check; the figures (area ratios, hole counts, cover shares) are recorded in the result.
+- **Known pop (accepted, as EF-D's).** The out ends on `kneel_in1` with the idle orbs 30 % of the way down, then the
+  idle shows `idle_o<k>` at the current orbit step, so the orbs finish their rise in one jump of about 30-45 px. The
+  in has the same jump in reverse (orbit step -> in1). The reviewer is told.
+- **Locks.** Only chaos's `kf:kneel`, `kneel_in1`, `kneel_in2`, `kneel_b` change (re-locked after the image review);
+  every other chaos frame and every other sheet is byte-identical (selftest asserts it for chaos; `check --all` for
+  the rest). `kneel_tools.py coverage` stays ai 123 / ai 12. The atlas binaries are not committed (integrator).
+- **Tests (RED first).** New `gen/selftest_kneel_orbs.py`, run from `selftest.py` (test_monster_anim, also `--anim`).
+  Variant entries: each rig variant rebuilds its own `kneel` key with the add_key step itself,
+  `kneel_source_ai.ai_key(sid, variant, kfs)` (it reads only `approved/chaos/kneel.png` and the entry's idle; chaos's
+  `paint` touches no kneel or idle cell), over the loaded entry, then `MA.generate(sid, variant, ...)`.
+  Asserts: only chaos's rig has `kneel_orbs`; RED: the variant without the block has an orb-coloured px above row 100
+  in `kneel` / `kneel_b` and no orb on row 192 (the current state; the suite fails before the code exists); with it:
+  the four orbs' bottoms on row 192 in kneel / kneel_b, strictly falling bottoms source -> in1 -> in2 -> 192,
+  pixel-exact orbs, clean key / idle one piece with no px left inside the cut masks but seal ink, every non-kneel
+  chaos frame byte-equal with and without the block, `MC.check_sprite` and the K checks all OK. Mutations, each RED
+  at its stage: at `add_key` (ValueError) a rest spot off the cell, orb names not matching `orbit`, `fall` not
+  increasing in (0, 1), the block without `kneel: {source: ai}` or without `orbit`; at the checks an orb moved onto
+  the body (cover cap), a body px changed (clean-frame rule), a split-off piece under MIN_PIECE (detached). EF-D's
+  `selftest_orbit.py` builds its `plain` rig without both `orbit` and `kneel_orbs` (else the new validation raises),
+  and its "every other chaos frame equal" check then compares the kneel frames of two rigs that both lack
+  `kneel_orbs` (touched file).
+- **Acceptance.** Review files in `~/temp/ff-game/ef/chaos_kneel/`: the 4 kneel frames (in1, in2, kneel, kneel_b) at
+  x4 in a strip, the in / hold / out GIF at game timing (`kneelChoreography.ts`: in1 4, in2 4, the hold alternating
+  kneel / kneel_b every 48, out in2 3, in1 3, then the idle), and a full-size before / after comparison. One fresh
+  image-only reviewer (`NEW_MONSTER_GUIDE.md` 3.4; criteria: the orbs clearly fall and rest on the ground beside him,
+  read as the same four orbs, no holes where they were, nothing clipped, the rise reads in reverse) -> SHIP, at most 3
+  iterations; after a third non-SHIP the work stops and is reported to the user with the reviewer's findings. Gates:
+  `selftest.py --anim` (worktree, gen/refs and gen/cache copied from the main checkout with `/bin/cp -c`),
+  `monster_anim.py check --all` (only OK), `kneel_tools.py coverage` unchanged, `npm run build`, `npm run test:fast`.
+  Browser (Chaos is immune to status, so the dev preview): `?mute=1&scenario=chaos_forms&kneel=on&poseLabel=1`
+  (`kneelPreview.ts`; F1 is the atlas sheet) with a built atlas in the worktree, screenshot of Chaos in the hold
+  (label `kneel` or `kneel_b`) with the four orbs on the ground; the built atlas is then restored.
+
+### EF-J result (2026-11-25)
+
+- **Tuned values (the plan's "tune the spot, not the check"):** `fall: [0.5, 0.9]` (was 0.3 / 0.72), `rest: {white: 10,
+  pale: 26, teal: 172, ember: 187}` (was 11 / 27 / 170 / 186). Why: at 0.72 kneel_in2's opaque area was 1.22 of the
+  resized source (the bridge area rule, 0.85-1.15; the key's bbox widens with the orbs on the ground), at 0.85 1.16, at
+  0.9 inside; teal at 170 covered 36 % body px (cap 35 %); the reviewer's iteration 1 nit (the fall uneven: in1 barely
+  down) moved in1 to 0.5; iteration 3 gave the left pair and the orange orb 1 px more room. Orb bottoms per frame
+  (white / pale / teal / ember): source idle 48 / 20 / 28 / 48, in1 120 / 106 / 110 / 120, key 77 / 62 / 71 / 97, in2
+  181 / 179 / 180 / 183, hold 192 (x spans 4-16, 19-33, 166-178, 181-194). In kneel_in1 the orbs pass in front of his
+  forearms (as designed).
+- **One deviation from the plan text:** the `detached` exception counts the body as the **clean bridge frame** (before
+  the orbs are pasted), not "the frame minus the drawn orb px": at in1 the orbs are in front of the forearms, and
+  removing their px cut the hands off into 3 extra pieces. Rule now: pieces(clean frame) <= pieces(clean source),
+  pieces(frame) <= that + 4 orbs, no new piece under MIN_PIECE (the speck mutation stays RED). The selftest's variant
+  entry uses `ai_key(sid, variant, kfs)` (the add_key step itself), as rev 2 notes.
+- **Review:** one fresh image-only reviewer, 3 iterations: SHIP WITH NITS (uneven fall), SHIP WITH NITS (orbs over the
+  forearms in in1; edge spacing), SHIP (left: the inner orbs touch the hem tips, cosmetic). Files:
+  `~/temp/ff-game/ef/chaos_kneel/r1..r3/` (strip x4, before / after x2 and 1x, game-timing GIF, slow GIF).
+- **Locks:** `chaos.lock.json` only `kf:kneel`, `kneel_b`, `kneel_in1`, `kneel_in2` changed (the other 47 of 51 entries equal).
+- **Gates:** `selftest.py --anim` ALL PASSED (worktree, gen/refs, gen/cache and gen/out/hr cloned from the main checkout); `monster_anim.py check --all` 123 OK lines only; `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:fast` passed. Browser `?mute=1&scenario=chaos_forms&kneel=on&poseLabel=1` on a worktree atlas build (only `monsters-ai-5.png` changed, restored, not committed): Chaos in `kneel_b` with the four orbs on the ground, no console warnings.
