@@ -81,6 +81,41 @@ sprites:
           - [[513, 180], [540, 180], [540, 280], [466, 280], [476, 260], [490, 243], [500, 232], [510, 226], [517, 214], [518, 198]]
                                             # beige neck / collar beside the ear (EF4 debrief iteration 4) and its
                                             # page-tinted hair right of the earring leave; v3's own body shows there
+    puppet:                                 # EF6 (amendment B1, for the EF-H reference pack): posed from the G1 master
+      sigma: 150
+      measure: {prop: cutlass}
+      parts:
+        - {name: hips, poly: null, pivot: [470, 560]}
+        - {name: chest, poly: null, pivot: [470, 560], parent: hips}
+        - {name: body, rest: true, warp: true, pins: [[300, 255], [530, 290], [465, 300], [330, 520], [610, 520], [470, 560], [175, 760], [300, 800], [430, 780], [560, 740], [670, 760], [215, 955], [290, 940], [570, 925], [690, 925], [300, 800], [630, 760]], follow: {0: chest, 1: chest, 2: chest}}
+        - {name: head, poly: [[285, 182], [330, 120], [400, 85], [480, 80], [540, 118], [600, 208], [555, 212], [545, 262], [520, 292], [480, 306], [440, 302], [408, 272], [395, 215], [300, 192]], pivot: [465, 300], parent: chest}
+        - {name: arm_b, poly: [[300, 248], [345, 262], [352, 330], [348, 400], [335, 440], [300, 448], [255, 432], [222, 405], [228, 340], [258, 290]], pivot: [310, 280], parent: chest}
+        - {name: arm_f, poly: [[505, 292], [545, 300], [585, 350], [612, 410], [650, 400], [668, 430], [660, 470], [640, 495], [605, 500], [580, 465], [550, 420], [520, 380], [505, 340]], pivot: [530, 310], parent: chest}
+        - {name: cutlass, poly: [[262, 482], [300, 468], [330, 455], [330, 408], [372, 404], [410, 422], [432, 428], [480, 436], [560, 418], [630, 396], [655, 372], [700, 360], [722, 300], [722, 232], [690, 168], [640, 108], [668, 106], [712, 134], [752, 186], [776, 256], [780, 330], [766, 384], [780, 430], [762, 458], [736, 458], [700, 445], [652, 432], [600, 456], [540, 472], [482, 492], [472, 524], [440, 518], [420, 502], [395, 508], [360, 494], [340, 506], [300, 522], [262, 516]], pivot: [385, 455], parent: chest}
+      targets:                              # amendment B0's EF6 targets (+ = forward / toward the right)
+        attack: {chest: [-5, 10], head: [-5, 10]}
+        hurt: {chest: [-90, -20]}
+        kneel: {height_max: 0.70}
+      poses:
+        attack:                             # EF6: upright, the cutlass driven out at the party to the right
+          pass: EF6
+          xf: {chest: [4], head: [0], arm_b: [-45], arm_f: [-30], cutlass: [25, 110, -40]}
+          z: [body, arm_b, head, cutlass, arm_f]
+          speck: 3000
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        hurt:                               # EF6: thrown back, staggering, the cutlass flung up and away
+          pass: EF6
+          xf: {hips: [-8, -30, 0], chest: [-16, -20, 0], head: [-14], arm_b: [20], arm_f: [60], cutlass: [-30, -40, -60]}
+          pins: {body: {6: [-20, 0], 10: [30, 0]}}
+          z: [body, arm_b, head, cutlass, arm_f]
+          speck: 3000
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
+        kneel:                              # EF6: collapsed on the back knee, the head hanging, the cutlass lowered
+          pass: EF6
+          xf: {body: [0, 0, 0, 1.1, 0.66], hips: [0, 0, 220], chest: [20], head: [20], cutlass: [20, 0, 0]}
+          z: [body, arm_b, head, cutlass, arm_f]
+          speck: 3000
+          fill: [[[0, 0], [1024, 0], [1024, 1024], [0, 1024]]]
     variations:                           # EF6 repaints (amendment B3, orchestrator only; <= 5 per image; attack rows upright)
       idle:
         - {n: 1, pass: EF6, seed: 48001, strength: 0.3}

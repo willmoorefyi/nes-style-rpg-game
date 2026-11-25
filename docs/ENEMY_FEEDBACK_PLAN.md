@@ -565,25 +565,41 @@ route: we deliver a reference pack per sprite (idle master, a one-row four-pose 
 `~/temp/ff-game/ef/user_packs/<id>/`; the user's renders come back and are imported by H1. Pass EF6 is closed at its
 ledger count (no further Bedrock calls in this route).
 
-**H1. Import tool** `gen/monster_user.py` (< 250 lines; RED-first `selftest_monster_user.py`, registered in
-`selftest.py`), recipe rows in `gen/monster_user.yaml` (`<id>: {file, sha256, poses: [idle, attack, hurt, kneel],
-flip: false, size: large, colours: 16}`):
-- split the row into its four figures by the alpha column gaps (refuse unless exactly four pieces after dropping
-  specks < 24 px);
-- fit each figure into the **large** cell (128 px, figure height in the 96-120 band, feet on row 122) with one common
-  scale for all four (the idle's height sets it; nearest-neighbour, integer or exact ratio; size is never a rejection
-  reason), centred on the idle's foot centre so poses keep their relative placement; refuse an opaque px on the cell
-  border (a wider cell is allowed for a long attack: the cell width is the widest pose + margins, as the cutter does);
-- quantize the four together to <= 16 colours (median cut on the union, the shared outline colour kept), report the
-  max colour error; write a before/after review sheet at 1x and screen x2 to `~/temp/ff-game/ef/user/<id>/`;
-- `approve <id>` (HELD for the user's size decision, recorded): archive is already in `_retired/` (dark_wizard_v1),
-  writes `approved/<id>/monster_large.{png,json}` (`backend: user`, `source: user_art/<id>/<file>`, `sha256`,
-  `recipe: monster_user.yaml#<id>`, `approved` date, `poses`) and `kneel.{png,json}` (the 4th figure, `backend: user`,
-  the shape the kneel tools need), removes `approved/<id>/monster_small.*`, sets `size: large` and the brief in
-  `monsters.yaml`, and adds the smoothing-rule entry to `monster_scale.yaml`.
-- **Selftest/style lock:** a `backend: user` json is checked by re-running the import from the tracked source (sha256
-  match, byte-identical output) instead of re-planning a Gemini/Bedrock request (`selftest.py` style lock,
-  `selftest_roster.kneel_ok` and `kneel_tools.py coverage` accept `user` as an AI key source; the kneel-key count pin
-  still holds).
-**H2. After approval:** a rig agent (F4: `retire.py --move-rig`, new rig, kneel bridge, review, lock, atlas) and the
-integrator batch.
+**H1. Import tool** (rev 2, Momus rev-1: 9 findings) `gen/monster_user.py` (< 250 lines; RED-first
+`selftest_monster_user.py`, registered in `selftest.py`), recipe rows in `gen/monster_user.yaml` (`<id>: {file, sha256,
+poses: [idle, attack, hurt, kneel], flip: false, size: large, tool, rendered, author: user, refs: {idle_master_sha256,
+poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered: 2026-11-25`):
+- **Split:** the row into exactly four 8-connected pieces after dropping specks < 24 px (else refuse).
+- **Scale:** `s = min(target_idle, fit_tallest)`, where `target_idle` brings the idle into the large band (96-120) and
+  `fit_tallest` keeps the tallest pose clear of the cell's top border with the feet on row 122; **s = 1.0 when the
+  idle is already in the band** (dark_wizard: idle 112, tallest hurt 115 -> s = 1.0, no resample). s < 1 re-pixelizes
+  as `monster.py:646` does, never nearest; s > 1 is not used (refuse and report).
+- **Placement:** each pose's anchor = the mean x of its opaque px in its bottom 6 rows; every pose is placed with its
+  anchor at the same x as the idle's, feet on row 122; the cell width `cw` follows the cutter's widening rule
+  (`monster.py:695-702`; the attack is 166 px wide, so cw >= 170); no opaque px on the 1-px border.
+- **Colours:** the house quantizer, not median cut: one palette for all four through `PX.sheet_palette(...,
+  detail_px=PX.detail_mask(...))` applied with `pixelize_native` (as `monster.py:672-680`): 15-bit snap, the darkest
+  entry forced to `PX.OUTLINE` (`pixelize.py:259-280`), <= 16 colours; the review reports max / p99 colour error and
+  that the glow green survives; `monster.frame_report` must pass (PX.OUTLINE present, `monster.py:784`).
+- **Review:** before/after at 1x and screen x2 to `~/temp/ff-game/ef/user/<id>/`, one fresh image-only reviewer.
+- **Approve, rig and lock in ONE commit / batch** (`retire.py:16`: `--move-rig` in the commit that approves the first
+  new sheet): `monster_user.py approve <id>`, modelled on `monster_hr_br.approve` (`monster_hr_br.py:168-197`:
+  `AP.overwrite_gate` on both sheets, the `_retired` archive check (dark_wizard_v1 is byte-identical to the live
+  files), the `monster_small.*` unlink), writes `approved/<id>/monster_large.json` with `backend: user`, `source`,
+  `sha256`, `recipe`, `tool`, `rendered`, `author`, `refs`, `approved`, `grid [cw, 128]`, `bottom_row 122`,
+  `layout [3, 1]`, `size: large`, `floating: false`, `flip_frames: []`, `poses`, the cut info (scale, anchors, colour
+  error), and `kneel.{png,json}` (the 4th pose in the idle's cell size, `kneel_source_ai.py:12`; json `backend: user`,
+  `grid`, `bottom_row`, `foot_row`, no `j0`); sets `size: large` and the brief in `monsters.yaml`; adds the smoothing
+  rule's entry to `monster_scale.yaml`: **`dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}`** (despur
+  re-checked on the staff, dropped to `[edges]` if it breaks it), changeable by the user's size decision. Then, in
+  the same batch: `retire.py --move-rig dark_wizard`, a new rig with **`kneel: {source: ai}`** (coverage counts
+  `kneel.source == "ai"`, `kneel_tools.py:54-58`; a `source: user` would be refused by `kneel_ok`,
+  `selftest_roster.py:209`, and counted as derived), the kneel bridge, the guide's review, lock, atlas rebuild, and
+  the integrator gates.
+- **Selftest / style lock (named):** `selftest.py:263-279`: a `backend: user` `monster_*` json is checked by re-running
+  the import from the tracked source (sha256 match, byte-identical sheet) **before** the Gemini re-plan at :275; the
+  user `kneel.json` stays in the `KNEEL_SHEETS` branch (:268) through `kneel_ok`, so the `>= 135` pin (:280) holds;
+  `selftest_roster.kneel_ok` (:213-223) gains `elif meta.get("backend") == "user"` before the BR-keys path (the same
+  re-import check); `selftest_roster._approved_keys` (:240-255) gains a user branch beside the bedrock one, counted as
+  `done`. AGENTS.md "AI sprite generation" gets one line on `backend: user` (the third approved-sheet source). The
+  atlas page group's 2048 cap is checked at the rebuild.
