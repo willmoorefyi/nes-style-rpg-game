@@ -191,9 +191,10 @@ def kg1_kg2(check) -> None:
     fix = sum(x.get("event") == "request" and x.get("pass") == "KA-FIX" for x in br)
     later = {h.get("pass") for h in real.get("bedrock_history") or [] if h.get("closed")}   # LM .. AR, closed since KA
     other = {x.get("pass") for x in br if x.get("event") == "request"} - {"C", "KA", "KA-FIX"} - later
+    other -= {(real.get("bedrock") or {}).get("pass")} - {"KA", "KA-FIX", "KA-G"}   # a live non-kneel pass (EF6)
     check(ka == 54 and fix == 2 and not other, f"KG2: the BR ledger holds 54 pass-KA rows, the 2 rows of KA-FIX (closed "
           f"by KT3, 2026-11-18) and otherwise only passes closed in bedrock_history ({ka}, {fix}, {other})")
-    with br_sandbox(real) as (BB, tmp, cl):
+    with br_sandbox({k: v for k, v in real.items() if k != "bedrock"}) as (BB, tmp, cl):   # as after any pass closes
         r = refused(lambda: BB.invoke("core", {"prompt": "x", "seed": 1}, paid=True, purpose="ka_probe"), "bedrock")
         check(bool(r) and not cl.calls, f"bedrock.invoke refuses every call with no live bedrock block ({r[:60]!r})")
 

@@ -116,9 +116,10 @@ def _budget(check) -> None:
     real = json.loads((HERE / "budget.json").read_text())
     hist = {h.get("pass"): h for h in real.get("bedrock_history") or []}
     ka, c = hist.get("KA") or {}, hist.get("C") or {}
-    check("bedrock" not in real and (ka.get("cap"), ka.get("per_purpose_caps"), ka.get("used")) ==
+    live = (real.get("bedrock") or {}).get("pass")      # another pass's live block (EF6) is allowed; no KA one
+    check(not str(live or "").startswith("KA") and (ka.get("cap"), ka.get("per_purpose_caps"), ka.get("used")) ==
           (91, {"ka_probe": 55, "ka_pilot": 36}, 54) and bool(ka.get("closed")),
-          "budget.json: pass KA closed into bedrock_history at 54 / 91 (rev 5); no live bedrock block")
+          "budget.json: pass KA closed into bedrock_history at 54 / 91 (rev 5); no live KA bedrock block")
     check(c.get("cap") == 80 and c.get("used") == 25, "pass C closed into bedrock_history at 25 / 80")
     out = io.StringIO()
     with contextlib.redirect_stdout(out):

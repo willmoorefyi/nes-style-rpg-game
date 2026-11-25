@@ -3,7 +3,8 @@
   closed pass C 25/80, closed pass KA 54/91, closed pass KA-FIX 2/60
   OK pass KA-G pilot <p>/30, batch <b>/375, reserve <r>/135, total <t>/540, expiry <e>/125, est $<x.xx>
 
-Breaches: a live `bedrock` block (pass KA-G makes no Bedrock call); a closed Bedrock pass whose ledger rows differ from
+Breaches: a live `bedrock` block of a kneel pass (KA, KA-FIX, KA-G: pass KA-G makes no Bedrock call; another
+pass's live block, e.g. EF6 of docs/ENEMY_FEEDBACK_PLAN.md, is not KA-G's and its rows are allowed); a closed Bedrock pass whose ledger rows differ from
 its `used`, or a Bedrock row of any other pass; a Gemini attempt after KA-G's gemini_before that is not a KA-G row;
 an unknown purpose or one over its cap; the total over 540 or `max_new`; a sheet outside `only_sheet_names`, another
 model, more than 4 counted attempts at a sheet, or a 4th without ka_g_reserve (ka_g_expiry rows are not counted per
@@ -21,7 +22,8 @@ PASS, CLOSED = "pass KA-G", ("C", "KA", "KA-FIX")   # KA-FIX closed by KT3 (2026
 
 def breaches(budget: dict, br_rows: list[dict], ledger: list[dict]) -> tuple[list[str], dict]:
     out: list[str] = []
-    if budget.get("bedrock"):
+    live = (budget.get("bedrock") or {}).get("pass")
+    if budget.get("bedrock") and (live is None or str(live).startswith("KA")):
         out.append(f"a live bedrock block (pass {budget['bedrock'].get('pass')}) exists; pass KA-G makes no Bedrock "
                    "call")
     hist = {h.get("pass"): h for h in budget.get("bedrock_history") or []}
@@ -31,7 +33,8 @@ def breaches(budget: dict, br_rows: list[dict], ledger: list[dict]) -> tuple[lis
         used[name] = (n, h.get("cap"))
         if not h.get("closed") or h.get("used") != n:
             out.append(f"bedrock_history pass {name}: closed {bool(h.get('closed'))}, used {h.get('used')} != {n} rows")
-    stray = sorted({str(r.get("pass")) for r in br_rows if r.get("event") == "request" and r.get("pass") not in hist})
+    stray = sorted({str(r.get("pass")) for r in br_rows if r.get("event") == "request" and r.get("pass") not in hist
+                    and (r.get("pass") != live or str(live).startswith("KA"))})
     out += [f"Bedrock rows of pass {p}, which is not a closed pass" for p in stray]
     cap = next((p for p in budget.get("passes", []) if p.get("name") == PASS), None)
     stats = {"used": used, "purposes": {}, "total": 0, "est": 0.0, "caps": {}}
