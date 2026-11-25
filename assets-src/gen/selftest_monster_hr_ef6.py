@@ -79,6 +79,9 @@ def _check_prep_nobg(check: Callable[[bool, str], None]) -> None:
     p = {"key": "remove_bg", "keep": [1], "keep_light": [1], "erase_hue": [1], "erase_out": [1], "restore_out": [2],
          "cx": 470}
     e = Q.effective(p)
+    e2 = Q.effective({**p, "nobg_erase_hue": [3], "nobg_erase_out": [4]})
+    check(e2.get("erase_hue") == [3] and e2.get("erase_out") == [4] and "nobg_erase_hue" not in e2,
+          "EF6 prep: under remove_bg its own nobg_erase_hue / nobg_erase_out polygons take the colour-key ones' places")
     check(set(e) == {"key", "restore_out", "cx"} and Q.effective({**p, "key": {"mode": "flat"}}) == {**p, "key":
           {"mode": "flat"}}, "EF6 prep: under key remove_bg the colour-key hand polygons are ignored, restore_out kept")
     nb = np.zeros((40, 40, 4), np.uint8)

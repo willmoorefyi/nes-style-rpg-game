@@ -14,8 +14,16 @@ IGNORED = ("keep", "keep_light", "erase_hue", "erase_out")
 
 
 def effective(p: dict) -> dict:
-    """The prep recipe as used: under `key: remove_bg` without the colour-key hand polygons."""
-    return {k: v for k, v in p.items() if k not in IGNORED} if p.get("key") == "remove_bg" else p
+    """The prep recipe as used: under `key: remove_bg` without the colour-key hand polygons; its own canvas fixes
+    `nobg_erase_hue` / `nobg_erase_out` (page-teal leftovers of the remove_bg cut) take their places, and
+    `nobg_deteal` clears the darker teal fringe."""
+    if p.get("key") != "remove_bg":
+        return p
+    out = {k: v for k, v in p.items() if k not in IGNORED and not k.startswith("nobg_erase")}
+    out.update({k[5:]: p[k] for k in ("nobg_erase_hue", "nobg_erase_out") if p.get(k)})
+    if p.get("nobg_deteal"):                           # the darker teal fringe (gen/monster_hr_fix.canvas_fixes)
+        out["deteal"] = p["nobg_deteal"]
+    return out
 
 
 def body_alpha(nobg: Image.Image, shape: tuple[int, int]) -> np.ndarray:

@@ -38,6 +38,15 @@ sprites:
                                             # `monster_hr_br.py nobg pirate --paid`); keep / keep_light / erase_hue /
                                             # erase_out below are ignored under it, restore_out is kept
       key_ef4: {mode: rows, tol: 34, hue: 16, sat: 0.5, val: 0.38, holes: 400}   # EF4's colour key (record only)
+      nobg_deteal:                          # EF6 G1 iteration 3: the darker teal fringe round the face (canvas; the
+        gap: 22                             # hat's own teal above y 205 is outside the polygons)
+        polys:
+          - [[385, 205], [428, 205], [428, 262], [385, 262]]          # left of the face, by the earring
+          - [[505, 206], [604, 206], [604, 214], [560, 214], [560, 262], [505, 262]]   # right of the beard and the earring (the lapel kept)
+      nobg_erase_out:                       # EF6 G1: the page-teal patches remove_bg kept beside the grafted face (canvas)
+        - [[358, 196], [404, 196], [410, 208], [409, 225], [407, 245], [404, 258], [382, 250], [358, 244]]   # left of the face
+        - [[537, 214], [560, 214], [562, 282], [548, 282], [544, 262], [540, 246]]   # right of the earring
+        - [[520, 252], [545, 250], [547, 266], [528, 266]]                            # under the earring, by the jaw
       cx: 470
       keep_tol: 10
       close: 2
@@ -66,10 +75,10 @@ sprites:
         key: {mode: flat, tol: 30}          # v4's own page: its teal never comes along
         src_marks: [[429, 165], [474, 164], [452, 186], [442, 254]]   # v4: eyes, nose tip, chin
         dst_marks: [[391, 189], [450, 189], [432, 211], [432, 278]]   # v3: eye sockets, nose, chin (face 10 % up)
-        feather: 10
+        feather: 5                          # EF6 G1: a harder beard / jaw edge (EF4: 10)
         over: []
         erase:                              # EF6: the graft trimmed to v4's face and beard (v4 raw coordinates): v4's
-          - [[516, 180], [540, 180], [540, 280], [466, 280], [476, 260], [490, 243], [500, 231], [512, 228], [516, 215]]
+          - [[513, 180], [540, 180], [540, 280], [466, 280], [476, 260], [490, 243], [500, 232], [510, 226], [517, 214], [518, 198]]
                                             # beige neck / collar beside the ear (EF4 debrief iteration 4) and its
                                             # page-tinted hair right of the earring leave; v3's own body shows there
     variations:                           # EF6 repaints (amendment B3, orchestrator only; <= 5 per image; attack rows upright)

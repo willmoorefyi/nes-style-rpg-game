@@ -90,6 +90,9 @@ def canvas_fixes(a: np.ndarray, p: dict, rgb: np.ndarray, full: np.ndarray | Non
         f = a[..., :3].astype(int)
         teal = (np.minimum(f[..., 1], f[..., 2]) - f[..., 0] > 40) & (f[..., 1:].max(2) > 70) & (f[..., 0] < 70)
         a[poly_mask(a.shape[:2], p["erase_hue"]) & teal] = 0
+    if p.get("deteal"):                                # EF6 G1 (remove_bg): the darker page-teal fringe the cut kept
+        d, f = p["deteal"], a[..., :3].astype(int)     # (min(g, b) - r >= gap), inside the polygons: cleared
+        a[poly_mask(a.shape[:2], d["polys"]) & (np.minimum(f[..., 1], f[..., 2]) - f[..., 0] >= d.get("gap", 25))] = 0
     if p.get("erase_out"):                             # leftovers found on the master (canvas coordinates)
         a[poly_mask(a.shape[:2], p["erase_out"])] = 0
     if p.get("paint_out"):                             # stray px (a magenta cross on the tabard): nearest fill

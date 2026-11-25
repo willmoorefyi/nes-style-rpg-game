@@ -540,3 +540,16 @@ upright `prompt_pose`:
 - pirate: n 1 for each pose.
 
 0 EF6 calls.
+
+**Pirate G1 on the remove_bg body (2026-11-25).** The orchestrator's `nobg pirate --paid` (1 of 1 `ef6_nobg`, key
+007b216d...) gave the body's alpha. The master then got three fixes:
+
+- `nobg_erase_out` polygons and `nobg_deteal` (new canvas fixes valid under `key: remove_bg`, mapped by
+  `monster_hr_prep_nobg.effective`; `deteal` is in `monster_hr_fix.canvas_fixes`) clear the page-teal leftovers round
+  the face;
+- the graft feather is 5;
+- the graft `erase` trim is rounded.
+
+Three fresh image-only reviewers all said ITERATE. The last one flagged only a straight edge at the right jaw and a
+squared lapel block (`~/temp/ff-game/ef/bedrock6/pirate/DEBRIEF.md`). The sprite stops at G1: no B1 poses, master
+not recorded.
