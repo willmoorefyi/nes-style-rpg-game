@@ -553,3 +553,37 @@ upright `prompt_pose`:
 Three fresh image-only reviewers all said ITERATE. The last one flagged only a straight edge at the right jaw and a
 squared lapel block (`~/temp/ff-game/ef/bedrock6/pirate/DEBRIEF.md`). The sprite stops at G1: no B1 poses, master
 not recorded.
+
+### EF-H. User-rendered sheets (rev 1, 2026-11-25)
+
+User ruling 2026-11-25: after our cut-out and posing, the user renders the final sprite sheet in an interactive
+image UI (ChatGPT) and supplies it. dark_wizard first: `~/temp/dark_wizard_sprite_sheet.png` (704x144 RGBA, binary
+alpha, ~5,900 colours, four poses in one row facing right: idle, attack, hurt, kneel), copied into the repo as
+`assets-src/gen/user_art/dark_wizard/sheet_2026-11-25.png` (tracked; sha256 recorded). The EF-G repaint route stops
+for dark_wizard; the EF5 set stays in `bedrock5/` as an alternative. pirate, vampire and vampire_lord follow the same
+route: we deliver a reference pack per sprite (idle master, a one-row four-pose posed sheet, a suggested prompt) to
+`~/temp/ff-game/ef/user_packs/<id>/`; the user's renders come back and are imported by H1. Pass EF6 is closed at its
+ledger count (no further Bedrock calls in this route).
+
+**H1. Import tool** `gen/monster_user.py` (< 250 lines; RED-first `selftest_monster_user.py`, registered in
+`selftest.py`), recipe rows in `gen/monster_user.yaml` (`<id>: {file, sha256, poses: [idle, attack, hurt, kneel],
+flip: false, size: large, colours: 16}`):
+- split the row into its four figures by the alpha column gaps (refuse unless exactly four pieces after dropping
+  specks < 24 px);
+- fit each figure into the **large** cell (128 px, figure height in the 96-120 band, feet on row 122) with one common
+  scale for all four (the idle's height sets it; nearest-neighbour, integer or exact ratio; size is never a rejection
+  reason), centred on the idle's foot centre so poses keep their relative placement; refuse an opaque px on the cell
+  border (a wider cell is allowed for a long attack: the cell width is the widest pose + margins, as the cutter does);
+- quantize the four together to <= 16 colours (median cut on the union, the shared outline colour kept), report the
+  max colour error; write a before/after review sheet at 1x and screen x2 to `~/temp/ff-game/ef/user/<id>/`;
+- `approve <id>` (HELD for the user's size decision, recorded): archive is already in `_retired/` (dark_wizard_v1),
+  writes `approved/<id>/monster_large.{png,json}` (`backend: user`, `source: user_art/<id>/<file>`, `sha256`,
+  `recipe: monster_user.yaml#<id>`, `approved` date, `poses`) and `kneel.{png,json}` (the 4th figure, `backend: user`,
+  the shape the kneel tools need), removes `approved/<id>/monster_small.*`, sets `size: large` and the brief in
+  `monsters.yaml`, and adds the smoothing-rule entry to `monster_scale.yaml`.
+- **Selftest/style lock:** a `backend: user` json is checked by re-running the import from the tracked source (sha256
+  match, byte-identical output) instead of re-planning a Gemini/Bedrock request (`selftest.py` style lock,
+  `selftest_roster.kneel_ok` and `kneel_tools.py coverage` accept `user` as an AI key source; the kneel-key count pin
+  still holds).
+**H2. After approval:** a rig agent (F4: `retire.py --move-rig`, new rig, kneel bridge, review, lock, atlas) and the
+integrator batch.
