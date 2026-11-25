@@ -360,8 +360,9 @@ sprites:
         - {n: 1, seed: 44021, strength: 0.3, input: hurt_ef4, key: 479aeb3a4c26554936919fe6, iou: 0.959}
         - {n: 2, seed: 44022, strength: 0.45, input: hurt_ef4, note: "G4 round 2 ITERATE (hurt weak): the highest strength", key: a7f39f2c873de2a797522de4, iou: 0.938}
         - {n: 3, pass: EF5, seed: 45023, strength: 0.3, prompt_pose: "knocked backward, recoiling, head thrown back, the staff tilting away, the free claw flung up", key: 3175b0fe77a469074a51e321, iou: 0.952}
+        - {n: 4, pass: EF5, seed: 45024, strength: 0.38, prompt_pose: "knocked backward, recoiling, head thrown back, the staff tilting away, one skeletal claw raised to shield the face", key: 79ee88c4450179016b8a79d7, iou: 0.947}
       kneel:
         - {n: 1, seed: 44031, strength: 0.3, input: kneel_ef4, key: 35d6f46ddc56c736e4227f11, iou: 0.948}
         - {n: 2, pass: EF5, seed: 45032, strength: 0.3, key: 59842d5b548c3486bbb86274, iou: 0.954}
     scale_entry: "{scale: 2, tex: 2}"   # prepared, not applied; no despur: it breaks the thin staff shaft
-    pick: {idle: 1, attack: 3, hurt: 3, kneel: 2}   # EF5 (amendment A3): the re-posed repaints at 0.30   # G4 round 2: attack v2 (0.38) draws the reaching claw
+    pick: {idle: 1, attack: 3, hurt: 4, kneel: 2}   # EF5 (amendment A3): re-posed repaints (hurt v4 at 0.38: the claw reads as a claw)   # G4 round 2: attack v2 (0.38) draws the reaching claw

@@ -1564,3 +1564,5 @@
 {"event": "result", "key": "3175b0fe77a469074a51e321", "ok": true, "served": "stability.sd3-5-large-v1:0"}
 {"event": "request", "ts": "2026-11-25T00:15:40", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45032, "key": "59842d5b548c3486bbb86274", "pass": "EF5"}
 {"event": "result", "key": "59842d5b548c3486bbb86274", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-25T00:21:01", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45024, "key": "79ee88c4450179016b8a79d7", "pass": "EF5"}
+{"event": "result", "key": "79ee88c4450179016b8a79d7", "ok": true, "served": "stability.sd3-5-large-v1:0"}
