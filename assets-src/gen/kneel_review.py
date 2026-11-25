@@ -28,10 +28,8 @@ from gen import kneel_checks as KC  # noqa: E402
 OUT = HERE / "out" / "anim" / "review" / "kneel"
 BG = HERE.parent.parent / "assets" / "backgrounds" / "grassland.webp"
 COLS = ("idle", "kneel_in1", "kneel_in2", "kneel", "kneel_b")
-# section 3 (kneelChoreography.ts): in 4 + 4, hold period 48, out 3 + 3
-KNEEL_IN = (("kneel_in1", 4), ("kneel_in2", 4))
-KNEEL_OUT = (("kneel_in2", 3), ("kneel_in1", 3))
-KNEEL_PERIOD, KNEEL_OUT_FRAMES, KNEEL_IN_FRAMES = 48, 6, 8
+# section 3 (kneelChoreography.ts): in 4 + 4, hold period 48, out 3 + 3 (one copy: monster_recipes, EF-I)
+from gen.monster_recipes import KNEEL_IN, KNEEL_IN_FRAMES, KNEEL_OUT, KNEEL_OUT_FRAMES, KNEEL_PERIOD  # noqa: E402,F401
 # enemyChoreography.ts ATTACK (in place): (frame, len, from, to, ease), dx in fractions of the lunge
 ATTACK = (("atk_wind1", 5, 0, -1 / 6, "out"), ("atk_wind2", 6, -1 / 6, -1 / 4, ""), ("atk_mid", 3, -1 / 4, 0.75, "in"),
           ("attack", 2, 0.75, 1, ""), ("attack", 6, 1, 1, ""), ("atk_follow", 4, 1, 0.58, ""),

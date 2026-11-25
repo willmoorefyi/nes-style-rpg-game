@@ -715,3 +715,92 @@ enemies): at most one enemy lunges at a time and the lunging one is the top chil
 every frame and nothing clipped (`~/temp/ff-game/ef/user/smoke2/<id>_attack_frames.png`). The disappearing leg was
 the old 20-frame stagger only: two lungers overlapping, the later-drawn pirate over the vampire. No real-battle drawing
 changed; the loop now takes turns (`loop_staggered.png`; at most 1 lunger over 12 s, 111 fps).
+
+## EF-I. Review tool: the dazed GIF shows the kneel track (rev 2, 2026-11-25; user-approved task; Momus rev-1: REJECT, 10 findings, applied; rev-2: OKAY, 3 notes applied)
+
+**Why.** `monster_anim.py review <id>` writes `<id>_daze.{gif,png}` from `monster_review.TIMELINES["daze"]`
+(`monster_review.py:22`: idle 24, daze 48, daze_b 48, daze 48, daze_b 48), the hurt_in1-derived slump of ENEMY_ANIM
+item 5a. Since pass KT3 the game never shows that for sleep / stun / poison: `EnemyPoseController` (`kneels`: posture
+`daze` or `kneel`) runs a `KneelTrack` (`kneelChoreography.ts`) on the AI kneel cells, and `daze` / `daze_b` appear
+only through `FRAME_FALLBACK` on a sheet without kneel cells (D-K7: kneel -> daze, kneel_b -> daze_b, kneel_in2 ->
+daze, kneel_in1 -> idle). The user reviewed `vampire_lord_daze.gif` and concluded the kneel was unused.
+
+**Change (review output only; no rig, recipe, lock, atlas or runtime change).**
+- One Python copy of the runtime track, in `gen/monster_recipes.py` beside `KNEEL_FRAMES`: `KNEEL_IN_FRAMES` 8,
+  `KNEEL_OUT_FRAMES` 6, `KNEEL_PERIOD` 48, `KNEEL_PHASE` 17, and the derived `KNEEL_IN` = ((kneel_in1, 4),
+  (kneel_in2, 4)), `KNEEL_OUT` = ((kneel_in2, 3), (kneel_in1, 3)) (the splits at `/ 2`, as `KneelTrack.frame`).
+  `kneel_review.py` drops its own copy (`:32-34`) and imports these names from `monster_recipes`.
+- `TIMELINES["daze"]` becomes the case the GIF shows, an idle enemy put to sleep mid-battle and woken while idle
+  (`setPosture` -> `syncKneel` -> `track.set(on, clock)` without `hold`, `EnemyPoseController.ts:55-72`): idle 24,
+  `KNEEL_IN`, the hold kneel 48, kneel_b 48, kneel 48, kneel_b 48 (two full periods), `KNEEL_OUT`, idle 24; built from
+  the constants (`kneel_timeline()` in `monster_review.py`), never typed. The hold reads the absolute clock
+  (`floor((clock + index x 17) / 48) % 2`, `kneelChoreography.ts:94`), so in game the first hold frame (kneel or
+  kneel_b) and the first period's length vary per actor and clock; the GIF shows the boundary-aligned case of index 0.
+  The runtime cases the GIF does not show are written in the module docstring beside the timeline:
+  (a) an enemy asleep at battle start snaps straight into the hold, no `in` (`BattleDisplayManager.ts:196`
+  `snapKneel`); (b) a sleeper woken by its own turn plays no `out`: the action cuts the kneel and shows the rise
+  kneel_in2 3, kneel_in1 3 inside the attack (`EnemyPoseController.ts:89-92, 203`); (c) a poisoned enemy (posture
+  `kneel`) rises to act every turn and goes through `in` again after the action.
+- File names stay `<id>_daze.gif` / `<id>_daze.png` (the posture is still `daze` in status-visuals.yaml and the
+  user's review vocabulary); the PNG strip shows the unique frames idle, kneel_in1, kneel_in2, kneel, kneel_b.
+- Fallback as the runtime: every name goes through the existing `get` = `MA.resolve` over `monster_recipes.FALLBACK`,
+  whose four kneel entries `selftest_kneel` (`:155-159`) already pins to TS `FRAME_FALLBACK`.
+- **The legacy strip: renamed, PNG only.** `<id>_daze_legacy.png` (idle, daze, daze_b; no GIF). Kept because
+  `daze` / `daze_b` are still generated, locked (`check --all`), continuity-checked (`SEQUENCES["daze"]`,
+  `monster_recipes.py:44`) and are what an unopted sheet plays, so a re-lock after a rig edit must be able to see them.
+  No GIF and a new name, because a GIF with an in-game-looking timeline is what misled the review. No other tool reads
+  `TIMELINES` or `_daze.*`.
+- The onion strip and `_stage.png` order (`monster_review.py:124-125`) take `SEQUENCES["kneel"]` (idle, kneel_in1,
+  kneel_in2, kneel, kneel_b) in place of `SEQUENCES["daze"]`.
+- `gen/README.md:199`: the `review` line names `_daze.gif` (the kneel track) and `_daze_legacy.png`.
+- Out of scope: a floater's `kneelSink` offset and a kneeler's hit shake (the other review GIFs draw no bob either;
+  `kneel_review.py` / `kneel_bridge_review.py` remain the kneel-specific tools).
+
+**Files.** `assets-src/gen/monster_recipes.py` (constants), `monster_review.py` (timeline, legacy strip, onion /
+stage order, docstring), `kneel_review.py` (imports), new `selftest_review_daze.py`, `selftest.py` (one line,
+registered in `test_monster_anim` right after the pass-KT kneel-bridge line, `:530`, in the same `__import__` style,
+so `--anim` runs it), `gen/README.md`. Every touched Python file but `selftest.py` (already 555) stays under 250 lines.
+
+**Tests (RED first).** `selftest_review_daze.run_review_daze(check)`:
+1. parses `src/scenes/battle/kneelChoreography.ts` for `KNEEL_IN_FRAMES`, `KNEEL_OUT_FRAMES`, `KNEEL_PERIOD`,
+   `KNEEL_PHASE` and checks they equal the Python constants; checks the source still has the `frame()` branches
+   `e < KNEEL_IN_FRAMES / 2 ? 'kneel_in1' : 'kneel_in2'`, `e < KNEEL_OUT_FRAMES / 2 ? 'kneel_in2' : 'kneel_in1'` and
+   `% 2 === 0 ? 'kneel' : 'kneel_b'` (a TS change fails the selftest);
+2. derives the track from the TS numbers alone (idle 24, in1 IN/2, in2 IN/2, kneel P, kneel_b P, kneel P, kneel_b P,
+   in2 OUT/2, in1 OUT/2, idle 24) and checks `monster_review.TIMELINES["daze"]` equals it; `kneel_review.KNEEL_IN` /
+   `KNEEL_OUT` are the `monster_recipes` tuples (`is`), and `kneel_review.py`'s source has no `KNEEL_PERIOD ... = 48`
+   or `KNEEL_IN = ((` assignment (it imports them);
+3. `review("goblin", out=tmp)` (goblin: rigged, AI kneel): `goblin_daze.gif` read back has 10 frames, durations
+   `10 * (round(n x 1000 / 60) // 10)` per track entry (GIF centiseconds, Pillow truncates), and each frame
+   (`.convert("RGB")`) pixel-equal to the frame composed as the tool composes it from the generated cell of that
+   track name (so the hold frames are the kneel / kneel_b cells, not daze); `goblin_daze_legacy.png` exists and
+   `goblin_daze_legacy.gif` does not; the old daze timeline's frame (daze cell) is not among the GIF's frames;
+4. a pure helper `daze_names(have) -> list[str]` (the resolved name per track entry) is pinned to literals: with the
+   goblin's full frame set it is the track names unchanged; with `{idle, attack, hurt, hurt_in1, daze, daze_b}` (an
+   unopted rigged sheet) it is idle, idle, daze, daze, daze_b, daze, daze_b, daze, idle, idle; with
+   `{idle, attack, hurt}` (no rig) every entry is idle; and `review()` really uses it: with `daze_names` patched to
+   all-idle, goblin's daze GIF reads back as one frame (Pillow merges identical consecutive frames, so a GIF of an
+   unopted sheet has fewer frames than the track; the docstring says so).
+Unchanged: `monster_anim.py check --all` output byte-identical to the run before the change; no lock or atlas file in
+`git status`.
+
+**Acceptance.** `python3 -I assets-src/gen/selftest.py --anim` ALL PASSED; `check --all` identical; `npm run build`,
+`npm run test:fast` pass. The user's vampire_lord sheet (`monster_large`, EF-H) is on `ef-pv`, not on mainline
+(mainline has the Roster-D `monster_small`), so the render is goblin and dark_wizard into
+`~/temp/ff-game/ef/review_daze/`, with the pass rule: each `_daze.gif` frame, downscaled by 4 and cropped at x = L
+(the canvas is w + 2L on (60, 60, 70)), is pixel-equal to its track cell (kneel_in1 / kneel_in2 / kneel / kneel_b,
+idle) composited on the same background; the vampire_lord `anim_v2/` render
+follows once `ef-pv` and this branch meet.
+
+#### EF-I result (2026-11-25, branch `ef-review-daze`)
+
+- `monster_review.TIMELINES["daze"]` = `kneel_timeline()` (idle 24, kneel_in1 4, kneel_in2 4, kneel / kneel_b 48 x 2,
+  kneel_in2 3, kneel_in1 3, idle 24) from the one Python copy in `monster_recipes` (`KNEEL_IN_FRAMES`,
+  `KNEEL_OUT_FRAMES`, `KNEEL_PERIOD`, `KNEEL_PHASE`, `KNEEL_IN`, `KNEEL_OUT`; `kneel_review.py` imports them);
+  `daze_names` resolves the track along FALLBACK, `gif_frame` composes a GIF frame; `<id>_daze_legacy.png` holds
+  idle / daze / daze_b; the onion and stage take `SEQUENCES["kneel"]`.
+- `selftest_review_daze.py` RED first (12 of 19 failed before the change), then green; `selftest.py --anim` ALL PASSED;
+  `monster_anim.py check --all` output byte-identical (123 OK lines); `npm run build` OK; `npm run test:fast` 430
+  files, 10262 tests passed. No lock, atlas or runtime file changed.
+- Renders: goblin and dark_wizard in `~/temp/ff-game/ef/review_daze/<id>/`; every `_daze.gif` frame (1/4, cropped at
+  x = L) is pixel-equal to its kneel / idle cell on (60, 60, 70). vampire_lord's `anim_v2/` waits for `ef-pv`.
