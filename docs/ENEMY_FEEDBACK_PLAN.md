@@ -434,7 +434,7 @@ per pose**; the EF4 idle repaint is reused). Budget: `pass EF5` becomes the sing
 `note`, as EF4's entry), closed into `bedrock_history` with `used` / `closed` at the end. Then G4 (cut into
 `bedrock5/`, review, hold for approval).
 
-### EF-G amendment B (rev 2, 2026-11-25): the other three humanoids by the EF5 method (Momus rev-1: 11 findings)
+### EF-G amendment B (rev 3, 2026-11-25): the other three humanoids by the EF5 method (Momus rev-1: 11 findings; rev-2 OKAY, 4 notes applied)
 
 EF5 proved the method on dark_wizard (re-posed with large measured moves, user-approved poses, SD 3.5 Large at
 0.30-0.38: 4 calls for three poses; final review SHIP WITH NITS). User ruling 2026-11-25: use the same method for
@@ -453,13 +453,15 @@ repaints only after each sprite's B2 user gate; sub-agents make none.
 - `monster_hr_check.py`: `IOU_BARS["EF6"]` = attack 0.80 (an upright attack overlaps the idle a lot; its readability
   is reviewer-judged), hurt 0.70, kneel 0.65; `targets()` reads per-sprite targets from `monster_hr.yaml`
   `<id>.puppet.targets.<pose>` = `{chest: [lo, hi], head: [lo, hi], prop: [lo, hi] (optional, world deg from vertical),
+  `prop_delta: [lo, hi]` (optional, the prop's world angle minus its idle angle; EF5's `d >= 50` / `d <= -15` become
+  `prop_delta` [50, 180] / [-180, -15], exact),
   height_max: f (optional, body height / idle)}`, any key optional, ranges inclusive in degrees (+ = forward); EF5's
   hard-coded targets move into dark_wizard's yaml (byte-identical results). EF6 attack targets: chest [-5, 10], head
   [-5, 10]; hurt: chest [-90, -20]; kneel: height_max 0.70. "Weapon or claw driven at the party" is reviewer-only.
 - `monster_hr_br.py`: `status` lists every pass found in the ledger; new command `nobg <id>` (in a new module
   `monster_hr_br_nobg.py`, imported by the CLI) makes one Stability Remove Background request through
-  `bedrock.invoke(MODELS["remove_bg"], {"image": b64png(raw.convert("RGB")), "output_format": "png"}, paid=True,
-  purpose="ef6_nobg")` (the body of `landmark_cut.py:139`), records the returned cache key as
+  `bedrock.invoke("remove_bg", {"image": B.png_b64(raw.convert("RGB")), "output_format": "png"}, paid=True,
+  purpose="ef6_nobg")` (the short model name: `invoke` looks up `MODELS` itself, `bedrock.py:196-201`) (the body of `landmark_cut.py:139`), records the returned cache key as
   `<id>.prep.nobg_key` in `monster_hr.yaml`; a cache hit is free and needs no `--paid`.
 - `monster_hr_prep.py` (+ `monster_hr_prep_nobg.py`): `prep.key: remove_bg` takes the body's alpha from the cached
   remove_bg output (`nobg_key`) instead of the colour key, and **then** composites the graft (the graft's own alpha
@@ -473,12 +475,14 @@ repaints only after each sprite's B2 user gate; sub-agents make none.
 - `monster_hr_review.py`: `write_monsters_yaml` writes the **picked row's `prompt_pose`** when present (else
   `poses[pose]`); `approve_json` adds `prep.nobg_key` to `inputs.idle.raw_keys`, and `approve` un-ignores it with the
   render cache files.
-- New `selftest_monster_hr_ef6.py`, registered in `selftest.py`: `_check_yaml` accepts the EF6 tag; `_check_recorded`
+- The old `selftest_monster_hr.py` checks are **widened** in place where they gate passes (`:66-67` accepts EF6,
+  `:125` loops EF4-EF6), and the new cases go in a new `selftest_monster_hr_ef6.py`, registered in `selftest.py`: `_check_yaml` accepts the EF6 tag; `_check_recorded`
   loops EF4, EF5, EF6 and counts only `*_pose` requests against variation rows (the `ef6_nobg` row is checked
   separately: its key = `nobg_key`, cached, successful); the skip-when-missing test includes `nobg_key`; `_check_budget`
-  covers EF5 closed and EF6 live / closed; the targets schema; the `mirror` option; the `nobg` body.
-**Supersede (EF4 and EF5 reproducible).** vampire_lord: every existing pose recipe (`attack`, `attack_r2`, `hurt`,
-`hurt_r2`, `kneel`) is renamed with an `_ef4` suffix with its sha256 field, every keyed EF4 row's `input:` set to its
+  covers EF5 closed and EF6 live / closed; the targets schema; the `mirror` option; the `nobg` body (asserting the model argument `"remove_bg"`, as `selftest_colossus.py:168`).
+**Supersede (EF4 and EF5 reproducible).** vampire_lord: the existing pose recipes are renamed `attack` -> `attack_ef4`, `attack_r2` ->
+`attack_r2_ef4`, `hurt` -> `hurt_ef4`, `hurt_r2` -> `hurt_r2_ef4`, `kneel` -> `kneel_ef4` (`base_pose` keeps the text
+before the first `_`, `monster_hr_check.py:23`), with their five sha256 fields, every keyed EF4 row's `input:` set to its
 renamed recipe, the `_ef4` posed PNGs rebuilt and sha256-checked; the new EF6 recipes take the plain names. vampire:
 its EF4 rows have no keys (0 calls) and are removed. EF6 rows continue `n`. Every EF6 attack row carries a
 `prompt_pose` with the upright wording (EF4's `poses` texts unchanged).
