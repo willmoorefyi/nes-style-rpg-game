@@ -165,7 +165,8 @@ describe('large crowds pack by their home art (defect 2)', () => {
     // 118 art px = 236 screen px; the retired hound was 274) joins the set: 27. V8 W4 (REDESIGN_FIX_PLAN F1): the R321
     // crazy_horse (132 cell, home art 2-127 = 126 art px = 252 screen px, its hurt recoils to x 2; R290 was 98) leaves: 26
     // EF-B1: the 2.5 larges lay out as `huge` (capacity 1), so they leave the set: 11 of the 26, 15 left
-    expect(s.length).toBe(15);
+    // EF-H: the user-rendered dark_wizard (small -> large, scale 2 placeholder) joins: 16
+    expect(s.length).toBe(16);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);

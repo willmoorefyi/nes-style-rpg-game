@@ -503,12 +503,14 @@ npx tsc --noEmit && npm run build && npm test
 ```
 
 - [ ] Unchanged sprites are byte-equal **by frame rect** across pages (the packer moves cells, so a whole-PNG diff
-  can't tell); this reads both the paged index and the R0 single-page shape (`docs/ROSTER_PLAN.md` 12.2):
+  can't tell); this reads both the paged index and the R0 single-page shape (`docs/ROSTER_PLAN.md` 12.2). Compare
+  against the batch base (`BASE=mainline`, not `HEAD`: once the atlas is committed, HEAD already holds the new pages);
+  a hi-res sheet's frame rect is its art-px position and cell times its `texScale` (EF-A4, the `rect` below):
 
 ```bash
-mkdir -p /tmp/head && git show HEAD:assets/sprites/monsters-ai.json > /tmp/head/monsters-ai.json
+BASE=${BASE:-mainline}; mkdir -p /tmp/head && git show "$BASE:assets/sprites/monsters-ai.json" > /tmp/head/monsters-ai.json
 for f in $(python3 -I -c "import json; m = json.load(open('/tmp/head/monsters-ai.json')); print(*[p['file'] for p in m.get('pages', [{'file': 'monsters-ai.png'}])])"); do
-  git show "HEAD:assets/sprites/$f" > "/tmp/head/$f"; done
+  git show "$BASE:assets/sprites/$f" > "/tmp/head/$f"; done
 python3 -I - <<'EOF'
 import json, math, os
 from PIL import Image

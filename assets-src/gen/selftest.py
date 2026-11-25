@@ -265,6 +265,12 @@ def test_style_lock() -> None:
             check(SRo.bedrock_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: Bedrock keys "
                                                    f"{SRo.bedrock_keys(meta)} BR-ledgered and cached")
             continue
+        if meta.get("backend") == "user" and meta.get("sheet") not in KNEEL_SHEETS:   # EF-H: a user-rendered sheet
+            from gen import monster_user as MU
+            why = MU.check(meta)
+            check(why is None, f"{meta['character']} {meta['sheet']}: backend user, {meta.get('source')} sha256 "
+                               f"matched and re-imported byte for byte {why or ''}")
+            continue
         if meta.get("sheet") in KNEEL_SHEETS:              # pass KA: kneel_ai_gem's requests, checked as kneel_ai approves
             kneel_keys += 1
             why = SRo_.kneel_ok(meta, gem_ledger, br_ledger, HERE)
@@ -517,6 +523,8 @@ def test_monster_anim() -> None:
     print("EF-G amendment B0 (EF6: targets schema, nobg body, remove_bg prep, mirror, prompt_pose rewrite, EF6 budget)")
     from gen import selftest_monster_hr_ef6 as SMh6
     SMh6.run_monster_hr_ef6(check)
+    print("EF-H user-rendered sheets (monster_user.py: split, scale, place, house palette, approve, re-import check)")
+    __import__("gen.selftest_monster_user", fromlist=["x"]).run_monster_user(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501

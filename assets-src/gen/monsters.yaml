@@ -1820,28 +1820,26 @@
   extra_negative: wings, a stinger tail, pincers, fire outside the body, flames, rearing up, more than six legs
   seeds: [1234]
 - id: dark_wizard
-  # "Dark Wizard" (074): a hunched caster in a star-patterned robe
-  size: small
+  # "Dark Wizard" (074). EF-H (docs/ENEMY_FEEDBACK_PLAN.md EF-H, user ruling 2026-11-25): the user rendered this
+  # sprite sheet themselves (ChatGPT, interactive) and it is the approved design: gen/user_art/dark_wizard/ (tracked,
+  # sha256 in gen/monster_user.yaml), imported by gen/monster_user.py at s = 1.0 with the house palette;
+  # approved/dark_wizard/*.json say `backend: user`. The star-robed look is archived as dark_wizard_v1
+  # (docs/RETIRED_SPRITES.md). The fields below describe the user's design; nothing re-plans a request from them.
+  size: large
   body: biped
-  motion: >-
-    Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
-    the heroes and thrust the staff and free hand with the elbows bent, so every reaching part stays well inside its
-    own cell. Draw only the parts and clothing named in the description, the same in every cell: no cape, cloak or
-    extra cloth, and no spell effects, smear or motion lines.
   prompt: >-
-    a hunched old wizard in a long black robe patterned with small silver stars, a wide-brimmed tall pointed black hat,
-    a long grey beard, a hooked nose and two bright glowing yellow eyes clearly visible under the brim, clearly
-    visible silver stars on the robe, holding one gnarled wooden staff in the
-    hand on the right side of the image in every cell; centred in its own cell with empty space on both sides, the hat
-    tip well below the top of the grey box
+    a sinister dark sorcerer in a tattered hooded midnight-blue robe, two curved grey horns rising from the hood, a
+    gaunt grey-green face in the hood's shadow with two glowing green eyes, grey bony hands, holding a gnarled dark
+    staff topped by a bone skull wreathed in a green glow
   attack: >-
-    leaning his body far forward toward the heroes and raising the staff upright in front of his chest with both
-    hands, the staff vertical (not pointed forward), its top level with the hat brim and glowing faintly, the whole
-    staff well inside the middle cell, the glowing yellow eyes wide under the brim
-  hurt: knocked back, the hat tipped askew, the free hand thrown up, the staff upright in the same hand
-  face: his bearded face with glowing yellow eyes under the hat brim is readable
-  extra_negative: a sword, armour, a crown, an orb, spell effects, a cape, a second staff
-  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R196): the attack hand thrust back; 1235 (R197): the forward staff sliced at the raw cell line
+    a deep forward lunge, low on bent legs, the robe tatters streaming behind, both hands thrusting the staff forward
+    so the glowing skull points at the heroes
+  hurt: >-
+    thrown back from a blow, the hooded head jerked back, the free hand clawing up before the face, the staff held
+    diagonally
+  kneel: >-
+    collapsed to one knee, hunched low under the hood, one hand on the ground, the staff still upright in the other hand
+  seeds: [1234]
 - id: desert_baretta
   # "Desert Baretta" (076): a sand ankylosaur with a club tail (distinct from the baretta)
   size: large

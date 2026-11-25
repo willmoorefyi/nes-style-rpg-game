@@ -606,3 +606,40 @@ poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered
   `done`. AGENTS.md "AI sprite generation" gets one line on `backend: user` (the third approved-sheet source). The
   2048 cap is checked on the `filter: linear` hi-res page the tex-2 sheet lands on (`monster_hires_pages`,
   `monster_atlas.py:225`) at the rebuild.
+
+#### EF-H result: dark_wizard (2026-11-25, branch `ef-dw`; no AI image call)
+
+- **H1 tool:** `gen/monster_user.py` (241 lines; measures, review pages, json shapes and the re-import check in
+  `gen/monster_user_review.py`), recipes `gen/monster_user.yaml`, selftest `selftest_monster_user.py` (registered in
+  `selftest.py`; RED first: `kneel_ok` refused the user kneel before its `backend: user` branch). Consumers: the style
+  lock in `selftest.py` (a `backend: user` monster json re-imports byte for byte), `selftest_roster.kneel_ok` and
+  `_approved_keys` (user branch, counted as done).
+- **Import:** 4 pieces (4347 / 6308 / 4332 / 3243 px), heights idle 112 / attack 93 / hurt 115 / kneel 113, so
+  s = 1.0 (no resample); anchors (bottom 6 rows) 31.5 / 61.5 / 33.6 / 38.0 aligned to the idle's; cell 170 x 128;
+  ~5,900 colours -> 16 (one house palette, PX.OUTLINE, 15-bit); colour error max 70.0, p99 49.7, mean 11.9 (most of it
+  the house ink rule: px darker than 40 become the outline); the glow: 250 bright green px, 100 % still green;
+  frame_report: feet on 122, edges ok, pose diff 1.14 / 0.82 / 0.70. Fidelity review (fresh, image-only, against the
+  user's file): SHIP WITH NITS (the skull's bone tones drift toward the glow's yellow-green, the lightest robe blues
+  flatten; both a cost of 16 colours, kept as notes).
+- **Approve:** `approved/dark_wizard/monster_large.{png,json}` + `kneel.{png,json}` (`backend: user`), monster_small
+  removed (archived as dark_wizard_v1), `retire.py --move-rig dark_wizard`, monsters.yaml and enemies.yaml `size:
+  large` with the new brief / description.
+- **Rig:** biped, robe as torso with the hip at the hem, staff prop, sleeves riding the torso (arm parts removed);
+  every in-between is the source key's upper body leaned rigidly about the hip (wind 1.5 / 3 deg in, mid / follow the
+  thrust 4 deg back, hurt_in1 3 deg back, hurt_in2 4 deg forward, daze 2 deg), `kneel: {source: ai}`. Animation review
+  (fresh, image-only): SHIP WITH NITS in 1 iteration (the wind-up leans in rather than drawing back; kneel_in1 barely
+  squashes, so the drop happens at the swap; the kneel key is drawn without the skull's glow rim). Locked (14 frames).
+- **Integrator ruling (open for the user's veto):** the kneel key keeps the staff upright, so it is as tall as the
+  idle (113 / 112 px) while the body drops 13 px; the bridge resizes by bbox height and K-order pins the heights, so its
+  in1 -> in2 swap step is 13.4 px = 0.88 of the span (cap 0.65 x span = 9.9). `kneel_checks.BRIDGE_SWAP_ALLOW =
+  {dark_wizard: 0.9}` raises only that step (selftest RED first). The alternatives: a prop-aware bridge (a framework
+  change) or a kneel re-render with the staff lowered.
+- **Size:** `monster_scale.yaml` `dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}` is a PLACEHOLDER: the user
+  ruled the dark wizard must not display bigger than the ogre (204 px; at 2 the idle is 224); the fine scale (~1.8)
+  needs `valid_scale` widened below 2, then an atlas rebuild.
+- **Integrator gates (ef-dw):** atlas rebuilt and committed (30 pages, 44 hi-res sheets, 18 extra pages of max 18,
+  preload + largest formation 74.8 MB); PYTHONHASHSEED 0 / 1 builds byte-identical (31 files); by-rect vs mainline: only
+  dark_wizard differs (17 frames of 123 sheets); `monster_anim.py check --all` 123 OK lines only; `selftest.py` ALL
+  PASSED (1863 ok); `kneel_tools.py coverage` ai 123 / ai 12; `npm run build` OK; `npm run test:full` 432 files,
+  10294 passed (mutation cache MISS, live 1284 s); browser `?mute=1&scenario=ef_user_dark_wizard&enemyAnim=loop`
+  (new, beside the ogre) and `w_boss_evil_eye` (two dark wizards), no console warnings, 119 fps.

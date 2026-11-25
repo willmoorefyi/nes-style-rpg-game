@@ -1,0 +1,18 @@
+# EF-H (docs/ENEMY_FEEDBACK_PLAN.md EF-H): user-rendered sprite sheets, imported by gen/monster_user.py. Each recipe
+# names the tracked render (`file`, relative to assets-src/gen/, with its sha256), the four poses in row order (always
+# idle, attack, hurt, kneel), `flip` (mirror the row first when the render faces left), the size band, and the
+# provenance: the tool the user rendered it in, the date, the author and the sha256 of the reference pack it was
+# made from (`refs`; `unknown` when it predates the pack route).
+dark_wizard:
+  file: user_art/dark_wizard/sheet_2026-11-25.png
+  sha256: d9c750afc1872133733ae156e06dace91659b4a9fc9f3af67d35cbd76523072a
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs: unknown
+  refs_note: >-
+    the user rendered it from the EF4 / EF5 images they had (bedrock4/ and bedrock5/ under ~/temp/ff-game/ef/), before
+    the reference-pack route existed, so no idle_master / poses_reference sha256 is recorded

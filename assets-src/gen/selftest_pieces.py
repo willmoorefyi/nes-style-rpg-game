@@ -145,7 +145,8 @@ def run_pieces(check: Callable[[bool, str], None]) -> None:
                                           f"cuts are byte-identical to b75421a {bad}")
     moved = []
     for sid, meta in sorted(metas.items()):
-        if not meta.get("sheet", "").startswith(("monster_", "boss_")) or meta.get("revived_from"):
+        if not meta.get("sheet", "").startswith(("monster_", "boss_")) or meta.get("revived_from") \
+                or meta.get("backend") == "user":           # EF-H: a user-rendered sheet has no request to re-plan
             continue
         ch = GEN.load_character(meta["character"])
         k0 = GEN.plan_request(ch, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"]).key

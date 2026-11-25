@@ -1,0 +1,55 @@
+{
+  "character": "dark_wizard",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/dark_wizard/sheet_2026-11-25.png",
+  "sha256": "d9c750afc1872133733ae156e06dace91659b4a9fc9f3af67d35cbd76523072a",
+  "recipe": "monster_user.yaml#dark_wizard",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": "unknown",
+  "approved": "2026-11-25",
+  "grid": [
+    170,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      112,
+      93,
+      115,
+      113
+    ],
+    "anchors": [
+      31.46,
+      61.45,
+      33.61,
+      37.96
+    ],
+    "anchor_x": 61.46,
+    "error": {
+      "max": 70.0,
+      "p99": 49.7,
+      "mean": 11.9,
+      "glow_px": 250,
+      "glow_kept": 1.0
+    }
+  }
+}

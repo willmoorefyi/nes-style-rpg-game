@@ -210,6 +210,9 @@ def kneel_ok(meta: dict, ledger: list[dict], br_ledger: list[dict], gen: Path) -
         return f"{rig.relative_to(gen)} has no kneel: {{source: ai}}"
     if meta.get("j0") and not meta.get("user_review"):
         return f"J0 {meta['j0']} without a user review"
+    if meta.get("backend") == "user":                 # EF-H: a user-rendered key, re-imported from its tracked render
+        from gen import monster_user as MU
+        return MU.check(meta, gen)
     if meta.get("arm") == "g":
         keys, rows = meta.get("gemini_cache_keys") or [], ledger
         asked = {r.get("key") for r in rows if r.get("event") == "attempt" and r.get("character") == cid
@@ -236,6 +239,13 @@ def _approved_keys(check: Callable[[bool, str], None]) -> None:
             if not revived_ok(meta, GEN.CACHE):
                 bad.append(f"{cid} {meta['sheet']}: revived from {meta['revived_from']}, cache/{meta.get('cache_key')} "
                            "missing")
+            continue
+        if meta.get("backend") == "user":            # EF-H: user-rendered sheets, re-imported byte for byte
+            from gen import monster_user as MU
+            done += 1
+            why = MU.check(meta)
+            if why:
+                bad.append(f"{cid} {meta['sheet']}: {why}")
             continue
         if meta.get("backend") == "bedrock" or meta.get("vehicle"):   # LM-INT .. LM5-INT: Bedrock cuts (landmarks, NPCs, vehicles)
             done += 1

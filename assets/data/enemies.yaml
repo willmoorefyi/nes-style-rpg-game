@@ -1827,7 +1827,7 @@
 - id: dark_wizard
   name: Dark Wizard
   num: 74
-  description: "A hunched wizard in a black star-patterned robe who has studied only the spells that kill."
+  description: "A horned sorcerer in a tattered midnight-blue hood, green eyes burning in the shadow. The skull on his staff glows with the spells that kill."
   spells: [rub, lit3, fir3, bane, slo2, stun]
   stats:
     hp: 105
@@ -1846,7 +1846,7 @@
   sprite: dark_wizard
   attack: melee
   family: magical
-  size: small
+  size: large
 # === FIR-D2 evil_eye (pass W: owned by FIR-D2; only its bossPhases, ai and specials) ===
 - id: evil_eye
   name: Evil Eye

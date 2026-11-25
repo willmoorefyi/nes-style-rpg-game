@@ -132,7 +132,8 @@ def check_sprite(sprite: str, cfg: dict, keyframes: dict[str, Image.Image], meta
             if a in gen or b in gen:                     # a pair of keyframes (holds) is the approved art itself
                 span = tuple(arrs[k] for k in MA.span_of(seq, i))
                 fails += [f"{a}->{b}: {e}" for e in C.continuity(imgs[MA.resolve(a, imgs)], imgs[MA.resolve(b, imgs)],
-                                                                    span, cell_h, KC.continuity_share(seq, a, b, gen))]
+                                                                    span, cell_h,
+                                                                    KC.continuity_share(seq, a, b, gen, sprite))]
         rep[f"sequence:{seq}"] = fails
     rep.update(MO.sequence_checks(gen, cfg))              # EF-D: the orbit's steps (orb pixels exempt)
     rep["holds"] = C.holds_cap([h["frame"] for h in cfg.get("holds") or []])

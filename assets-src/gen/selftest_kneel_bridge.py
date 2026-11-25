@@ -96,6 +96,13 @@ def run_kneel_bridge(check: Callable[[bool, str], None]) -> None:
           KC.continuity_share("kneel", "kneel_in1", "kneel_in2", {"kneel_in1": {}, "kneel_in2": {}}) == 0.5 and
           KC.continuity_share("daze", "kneel_in1", "kneel_in2", br) == 0.5,
           "continuity_share: 0.65 only for the bridge pair kneel_in1 -> kneel_in2 (derived and other steps 0.5)")
+    # EF-H integrator ruling (2026-11-25, BRIDGE_SWAP_ALLOW): dark_wizard's swap step only (a tall upright staff)
+    check(KC.continuity_share("kneel", "kneel_in1", "kneel_in2", br, "dark_wizard") == 0.9 and
+          KC.continuity_share("kneel", "kneel_in1", "kneel_in2", br, "goblin") == 0.65 and
+          KC.continuity_share("kneel", "idle", "kneel_in1", br, "dark_wizard") == 0.5 and
+          KC.continuity_share("kneel", "kneel_in1", "kneel_in2", {"kneel_in1": {}, "kneel_in2": {}},
+                              "dark_wizard") == 0.5 and KC.BRIDGE_SWAP_ALLOW == {"dark_wizard": 0.9},
+          "continuity_share: BRIDGE_SWAP_ALLOW raises only dark_wizard's bridge swap step to 0.9 (exactly that entry)")
     # integrator ruling (KT3, 2026-11-18): AI-key-drawn frames skip the K-ground contact share, not the feet row
     wide, tip = np.zeros((80, 80, 4), np.uint8), np.zeros((80, 80, 4), np.uint8)
     wide[40:77, 10:70, 3] = 255

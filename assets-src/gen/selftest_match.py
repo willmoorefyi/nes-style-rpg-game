@@ -236,7 +236,8 @@ def run_match(check: Callable[[bool, str], None]) -> None:
     metas = {f"{p.parent.name}/{p.stem}": json.loads(p.read_text()) for p in sorted((GEN.HERE / "approved").glob("*/*.json"))}
     moved = []
     for sid, meta in sorted(metas.items()):
-        if not meta.get("sheet", "").startswith(("monster_", "boss_")) or meta.get("revived_from"):
+        if not meta.get("sheet", "").startswith(("monster_", "boss_")) or meta.get("revived_from") \
+                or meta.get("backend") == "user":           # EF-H: a user-rendered sheet has no request to re-plan
             continue
         ch = GEN.load_character(meta["character"])
         a = GEN.plan_request(ch, GEN.SHEETS[meta["sheet"]], meta["seed"], "gemini", meta["model"]).key
