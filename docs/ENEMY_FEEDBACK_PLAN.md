@@ -434,32 +434,61 @@ per pose**; the EF4 idle repaint is reused). Budget: `pass EF5` becomes the sing
 `note`, as EF4's entry), closed into `bedrock_history` with `used` / `closed` at the end. Then G4 (cut into
 `bedrock5/`, review, hold for approval).
 
-### EF-G amendment B (rev 1, 2026-11-25): the other three humanoids by the EF5 method
+### EF-G amendment B (rev 2, 2026-11-25): the other three humanoids by the EF5 method (Momus rev-1: 11 findings)
 
 EF5 proved the method on dark_wizard (re-posed with large measured moves, user-approved poses, SD 3.5 Large at
-0.30-0.38: 4 calls for three poses). User ruling 2026-11-25: use the same for pirate, vampire and vampire_lord, the
-**attack pose an upright villain attacking the heroes** (standing tall, the weapon or claw driven at the party toward
-the right; no deep forward lunge or bent-over torso: chest world angle within -5..+10 deg, head upright -5..+10 deg).
-Pass **EF6**; review dirs `~/temp/ff-game/ef/bedrock6/<id>/`.
-- **B0 Prerequisites (per sprite).**
-  - pirate: G1 stopped on keying v3's teal page. One `remove_bg` call (Stability Remove Background, `us.stability.stable-
-    image-remove-background-v1:0`, `MODELS["remove_bg"]`) on v3's raw, then the face graft of G1 on the keyed result;
-    tool change: `monster_hr_prep.py` gains a `key: remove_bg` source option reading the cached remove_bg output by its
-    cache key (the call itself made by a small `monster_hr_br.py nobg <id>` command through `bedrock.invoke`, purpose
-    `ef6_nobg`). G1 gate as before (<= 3 iterations).
-  - vampire: G2 stopped because the armour skirt covers both thighs. Fix (no AI): split the skirt into front panels
-    warped with the legs (the G2 mesh warp) and paint the hidden thigh/knee from the visible leg's own pixels (mirror
-    or extend); gate as A1.
-  - vampire_lord: keep the user's pick v4 (its EF4 idle master and idle repaint are reused).
-- **B1 Re-pose (no AI)** per A1 with per-sprite targets recorded in `monster_hr.yaml` (attack upright as above; hurt
-  thrown back chest <= -20 deg; kneel body height <= 70 % of idle), measured by `monster_hr_check.py` (A0), gate = the
-  checks + one image-only reviewer (<= 3 iterations; debrief on failure). Supersede any EF4 recipe as `<pose>_ef4`
-  with `input:` on the EF4 rows (EF4 keys reproducible); EF6 rows continue `n`.
-- **B2 User gate** per sprite: the poses sheet `bedrock6/<id>/posed/poses_sheet.png` is shown to the user; no repaint
-  call before the user approves it. (Repaint calls are made by the orchestrator session after that approval.)
-- **B3 Repaint** as A3 (0.30 first; <= 5 EF6 calls per image; pirate and vampire also need their idle repainted, the
-  lord's EF4 idle is reused). Budget: `pass EF6` the single live `bedrock` block (EF5 closed into `bedrock_history`
-  first): cap 56, `ef6_pose` 55 (pirate 4 + vampire 4 + lord 3 images x 5), `ef6_nobg` 1, reserve 0. Then G4 (cut,
-  independent review, hold approval for the size decision).
-- **B4 Tests.** RED-first selftest cases for the `remove_bg` source option and the `nobg` command (gate purpose,
-  cache reuse), the per-sprite upright-attack targets, and EF6 key reproducibility; full `selftest.py` passes.
+0.30-0.38: 4 calls for three poses; final review SHIP WITH NITS). User ruling 2026-11-25: use the same method for
+pirate, vampire and vampire_lord (and the background-removal step proposed for the pirate), the **attack pose an
+upright villain attacking the heroes** (standing tall, the weapon or claw driven at the party toward the right; no deep
+lunge or bent-over torso). Pass **EF6**; review dirs `~/temp/ff-game/ef/bedrock6/<id>/`.
+
+**B-budget (first, by the orchestrator session).** Close EF5 into `bedrock_history` (`used` = its ledger count,
+`closed` text); open `pass EF6` as the single live `bedrock` block: `cap` 57, `per_purpose_caps` `{ef6_pose: 56,
+ef6_nobg: 1, reserve: 0}` (pirate 4 + vampire 4 + lord 3 images x 5 = 55, plus 1 for dark_wizard's hurt nit fix if the
+user asks for it), `gemini_before` = the current count, `reserve_max_usd` 0.08, `note` citing the user's 2026-11-25
+approval. **All EF6 Bedrock calls (the `nobg` call and every repaint) are made by the orchestrator session**, the
+repaints only after each sprite's B2 user gate; sub-agents make none.
+
+**B0. Tool changes** (RED-first; every module < 250 lines; overflow modules named here).
+- `monster_hr_check.py`: `IOU_BARS["EF6"]` = attack 0.80 (an upright attack overlaps the idle a lot; its readability
+  is reviewer-judged), hurt 0.70, kneel 0.65; `targets()` reads per-sprite targets from `monster_hr.yaml`
+  `<id>.puppet.targets.<pose>` = `{chest: [lo, hi], head: [lo, hi], prop: [lo, hi] (optional, world deg from vertical),
+  height_max: f (optional, body height / idle)}`, any key optional, ranges inclusive in degrees (+ = forward); EF5's
+  hard-coded targets move into dark_wizard's yaml (byte-identical results). EF6 attack targets: chest [-5, 10], head
+  [-5, 10]; hurt: chest [-90, -20]; kneel: height_max 0.70. "Weapon or claw driven at the party" is reviewer-only.
+- `monster_hr_br.py`: `status` lists every pass found in the ledger; new command `nobg <id>` (in a new module
+  `monster_hr_br_nobg.py`, imported by the CLI) makes one Stability Remove Background request through
+  `bedrock.invoke(MODELS["remove_bg"], {"image": b64png(raw.convert("RGB")), "output_format": "png"}, paid=True,
+  purpose="ef6_nobg")` (the body of `landmark_cut.py:139`), records the returned cache key as
+  `<id>.prep.nobg_key` in `monster_hr.yaml`; a cache hit is free and needs no `--paid`.
+- `monster_hr_prep.py` (+ `monster_hr_prep_nobg.py`): `prep.key: remove_bg` takes the body's alpha from the cached
+  remove_bg output (`nobg_key`) instead of the colour key, and **then** composites the graft (the graft's own alpha
+  from its v4 polygon and v4's page key, union with the body's alpha, the graft drawn on top); the colour-key hand
+  polygons (`keep`, `keep_light`, `erase_hue`, `erase_out`) are ignored under `remove_bg`, `restore_out` is kept. The
+  beige strip beside the ear (debrief iteration 4) is removed by trimming the graft polygon to v4's face and beard
+  (an `erase` polygon on the graft layer) and checked by the G1 reviewer.
+- `monster_hr_puppet.py` (+ `monster_hr_puppet_fill.py`): a part option `mirror: {from: <part>, about: [x, y]}` that
+  paints a hidden limb from the visible one's own pixels mirrored about a vertical line through the point, drawn under
+  the covering parts (the vampire's hidden thigh / knee); skirt front panels as warped parts with the legs.
+- `monster_hr_review.py`: `write_monsters_yaml` writes the **picked row's `prompt_pose`** when present (else
+  `poses[pose]`); `approve_json` adds `prep.nobg_key` to `inputs.idle.raw_keys`, and `approve` un-ignores it with the
+  render cache files.
+- New `selftest_monster_hr_ef6.py`, registered in `selftest.py`: `_check_yaml` accepts the EF6 tag; `_check_recorded`
+  loops EF4, EF5, EF6 and counts only `*_pose` requests against variation rows (the `ef6_nobg` row is checked
+  separately: its key = `nobg_key`, cached, successful); the skip-when-missing test includes `nobg_key`; `_check_budget`
+  covers EF5 closed and EF6 live / closed; the targets schema; the `mirror` option; the `nobg` body.
+**Supersede (EF4 and EF5 reproducible).** vampire_lord: every existing pose recipe (`attack`, `attack_r2`, `hurt`,
+`hurt_r2`, `kneel`) is renamed with an `_ef4` suffix with its sha256 field, every keyed EF4 row's `input:` set to its
+renamed recipe, the `_ef4` posed PNGs rebuilt and sha256-checked; the new EF6 recipes take the plain names. vampire:
+its EF4 rows have no keys (0 calls) and are removed. EF6 rows continue `n`. Every EF6 attack row carries a
+`prompt_pose` with the upright wording (EF4's `poses` texts unchanged).
+
+**B1. Prerequisites and re-pose (no AI; sub-agent).** pirate: the G1 master from the remove_bg body + graft (after the
+orchestrator's `nobg` call; G1 gate <= 3 iterations). vampire: the skirt and `mirror` fix, then the poses. vampire_lord:
+v4 (the user's pick; EF4 master and idle repaint reused); its G4 notes (the face lost at 1x, the "rabbit ear" hair)
+are put to the B1 reviewer explicitly. Poses per the B0 targets, gate = the checks + one image-only reviewer at full
+size and 128 px (<= 3 iterations; a debrief on failure).
+**B2. User gate** per sprite: `bedrock6/<id>/posed/poses_sheet.png` shown to the user; no repaint before approval.
+**B3. Repaint** (orchestrator) as A3: 0.30 first, <= 5 EF6 calls per image (pirate and vampire repaint their idle too;
+the lord's EF4 idle is reused). Then G4: cut into `bedrock6/`, an independent image-only review, approval held for the
+user's size decision. EF6 closed into `bedrock_history` at the end. Full `selftest.py` passes.
