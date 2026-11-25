@@ -81,7 +81,7 @@ def run_pages(check: Callable[[bool, str], None]) -> None:
 # V4 (docs/REDESIGN_PLAN.md 2.4, D-V2, D-V3): bigeyes (large) and the 22 tier-H (huge) sheets at display scale 3
 V4_RESCALED = ("bigeyes", "shark", "minotaur", "ochu", "neochu", "hydra", "earth_elemental", "fire_elemental",
                "water_elemental", "air_elemental", "hill_gigas", "fire_gigas", "ice_gigas", "dragon", "white_dragon",
-               "blue_dragon", "green_dragon", "dragon_zombie", "white_shark", "minotaur_zombie", "fire_hydra", "deepeyes",
+               "blue_dragon", "green_dragon", "dragon_zombie", "white_shark", "minotaur_zombie", "deepeyes",
                "evil_eye")
 # V6 (REDESIGN_PLAN 4.2, D-V6 = C2): the redesigned chaos, boss band 200 shown at scale 3 (by design, not a rescale).
 V6_SCALED = ("chaos",)
@@ -90,19 +90,20 @@ V8_SCALED = ("hollow_seraph",)
 # EF-B (docs/ENEMY_FEEDBACK_PLAN.md; the user's 2026-11-24 request overrides D-V1 S1): the dict entries. B1: bigger at
 # 2.5 (the user's 26 plus six greater siblings); B2: smoothed at today's size; B3: the low-res trio.
 EF_B1 = ("gr_imp", "werewolf", "ghast", "shadow", "gargoyle", "bloodbones", "piscodemon", "mummy", "horned_devil",
-         "mindflayer", "weretiger", "king_mummy", "medusa", "rakshasa", "sahagin_prince", "black_knight", "earth_medusa",
+         "mindflayer", "weretiger", "king_mummy", "medusa", "rakshasa", "sahagin_prince", "earth_medusa",
          "gr_wolf", "ogre_chief", "troll", "sphinx", "manticore", "clay_golem", "tyrannosaur", "rhyos", "iron_golem",
          "death_knight", "stone_golem", "chimera", "sea_troll", "winter_wolf", "ogre_mage")
 EF_B2 = ("black_widow", "gr_wolf", "ogre_chief", "tarantula", "shark", "ghast", "shadow", "anaconda", "hyenadon",
-         "crocodile", "hydra", "fire_hydra", "lava_worm", "hellhound", "white_dragon")
-EF_B3 = ("blue_dragon", "green_dragon", "fire_lizard")
+         "crocodile", "hydra", "lava_worm", "hellhound", "white_dragon")
+EF_B3 = ("blue_dragon", "green_dragon")   # fire_lizard: the user's render since EF-H batch 2 (EF_H)
 # EF-F: the Bedrock-regenerated sheets, smoothed under the standing rule (user, 2026-11-24; NEW_MONSTER_GUIDE.md 1.4)
 EF_F = ("crazy_horse",)
 # EF-H: the user-rendered sheets (backend: user), smoothed under the same rule; dark_wizard's entry is a placeholder
 # until the user's size decision (monster_scale.yaml)
-EF_H = ("dark_wizard", "pirate", "vampire", "vampire_lord")
+EF_H = ("dark_wizard", "pirate", "vampire", "vampire_lord",
+        "fire_hydra", "fire_lizard", "black_knight")   # EF-H batch 2 (fire_hydra in the tall frame, EF-H amendment A)
 # int-ef2 (user ruling 2026-11-24): blue_dragon / green_dragon take tex 3 after all, the other four stay at the fallback
-EF_FALLBACK = ("shark", "hydra", "fire_hydra", "white_dragon")
+EF_FALLBACK = ("shark", "hydra", "white_dragon")
 # int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5, each the smallest multiple of
 # 0.05 that keeps it at least as tall as its lesser sibling (stone, iron >= clay; iron >= stone; sea_troll >= troll)
 EF_GROW = {"stone_golem": 2.8, "iron_golem": 3.3, "sea_troll": 2.7}
@@ -112,7 +113,7 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     """FW-S (docs/REDESIGN_PLAN.md 2.2, 7): gen/monster_scale.yaml -> the atlas sheet field `scale`, nothing else. On a
     two-sprite fixture build: an explicit {}, a missing file and a comment-only table give byte-identical pages and
     JSON; {goblin: 3} keeps every page byte-identical and adds only `"scale": 3` to goblin's JSON; a value of 4 or an
-    unknown sprite is refused. The real table (empty at V1) holds the 23 V4 sheets at 3 since V4 (REDESIGN_PLAN 2.4) and chaos since V6 (D-V6 = C2), hollow_seraph since V8 N-1; it
+    unknown sprite is refused. The real table (empty at V1) holds the 22 V4 sheets at 3 (23 until EF-H batch 2 moved fire_hydra to 2) since V4 (REDESIGN_PLAN 2.4) and chaos since V6 (D-V6 = C2), hollow_seraph since V8 N-1; it
     names sprites the fixture lacks, so the fixture builds take explicit tables only."""
     import tempfile
     from gen import monster_atlas as MAT
@@ -122,7 +123,7 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
                                                                         f"({len(real)} entries)")
     at3 = {s for s, v in real.items() if v["scale"] == 3}
     check(at3 == set(V4_RESCALED + V6_SCALED + V8_SCALED),
-          f"FW-S: the scale-3 sheets are the 23 V4 sheets + chaos (V6) + hollow_seraph (V8 N-1) ({sorted(at3)})")
+          f"FW-S: the scale-3 sheets are the 22 V4 sheets (fire_hydra at 2 since EF-H batch 2) + chaos (V6) + hollow_seraph (V8 N-1) ({sorted(at3)})")
     import yaml
     raw = yaml.safe_load(MAT.SCALE_TABLE.read_text())
     dicts = {s for s, v in raw.items() if isinstance(v, dict)}
@@ -134,9 +135,9 @@ def run_scale(check: Callable[[bool, str], None]) -> None:
     b3 = all(real[s]["tex"] == (1 if s in EF_FALLBACK else real[s]["scale"]) for s in EF_B3) and all(
         real[s]["smooth"] == ["despur", "edges"] for s in ("blue_dragon", "green_dragon"))   # int-ef2 B4 round 2
     hires = sorted(s for s, v in real.items() if v["tex"] != 1)
-    check(len(set(EF_B1)) == 32 and dicts == set(EF_B1 + EF_B2 + EF_B3 + EF_F + EF_H) and b1 and b2 and b3
-          and len(hires) == 47,
-          f"EF-B: the dict entries are B1 (29 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the four fallback "
+    check(len(set(EF_B1)) == 31 and dicts == set(EF_B1 + EF_B2 + EF_B3 + EF_F + EF_H) and b1 and b2 and b3
+          and len(hires) == 48,
+          f"EF-B: the dict entries are B1 (28 at 2.5, EF_GROW's 3 above), B2 (despur) and B3, the three fallback "
           f"scale-3 ones at tex 1 "
           f"({len(dicts)} entries, {len(hires)} hi-res)")
     with tempfile.TemporaryDirectory() as tmp, RT.fixture_tree(("goblin", "ogre")):

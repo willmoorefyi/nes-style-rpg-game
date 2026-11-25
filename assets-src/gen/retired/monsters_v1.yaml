@@ -301,3 +301,42 @@
   extra_negative: slicked black hair, a red vest, a separate cape, a crown on the head, a weapon, real bat wings on the back, a young face
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R267): the attack's trailing cape sliced at the raw cell line
   retired_as: vampire_lord_v1
+- id: fire_hydra
+  # "Fire Hydra" (061): three red smoking heads, magma-cracked scales (distinct from the hydra)
+  size: large
+  body: quadruped
+  prompt: >-
+    a three-headed crimson hydra on four short thick legs seen from the side, a heavy low body hunched forward with a
+    row of tall black spines along the back, dark red scales cracked with glowing orange magma seams, exactly three
+    short thick necks each ending in a broad horned dragon head with a spiky black frill and glowing orange eyes,
+    wisps of smoke from the nostrils (attached), a spiked thick tail; the heads inside the box; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
+  attack: >-
+    the body lunging forward low, the three heads snapping down toward the heroes with the jaws open and glowing
+    inside, exactly three heads as in the idle cell, one high, one in the middle and one low, each on its own short
+    curved neck and clearly apart; the heads stay above and just in front of its front feet, every snout well before
+    the right edge of the middle cell (no head stretched out to the cell edge); all four feet on the ground
+  hurt: >-
+    knocked back, the three necks recoiling and twisting back, exactly three heads as in the idle cell, all four feet
+    on the ground
+  face: its three red heads with glowing orange eyes are readable
+  extra_negative: a fourth head, two heads, wings, green scales, fire breath streams, flames outside the body, rearing up
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R179): two attack snouts sliced, the hydra's silhouette; 1235 (R180): the low attack head sliced in half
+  retired_as: fire_hydra_v1
+- id: fire_lizard
+  # "Fire Lizard" (064): a large frilled fire lizard (distinct from the small green lizard)
+  size: large
+  body: quadruped
+  prompt: >-
+    a large orange fire lizard in a low sprawl seen from the side, a wide spiny neck frill of red and yellow, dark
+    smouldering back plates with glowing orange edges and thin wisps of smoke rising from them (attached), rough orange
+    and brown scales, a blunt head with a yellow eye, clawed feet, a long thick tail curled up behind it; the whole creature, tail tip to snout, sits in the middle of its own cell with empty space on both sides in every cell
+  attack: >-
+    lunging forward low with the jaws open in a snapping bite at the heroes, the frill flared wide, all four feet
+    planted on the ground line (no leap, no dive, the hind legs on the ground), the body low and level, the tail
+    curled up behind the hips as in the idle cell, no taller than its idle height, the whole lizard well inside the
+    middle cell
+  hurt: knocked back low, the frill folded, the head pulled in, the tail curling, all four feet down
+  face: its blunt head with the yellow eye and jagged teeth is readable
+  extra_negative: green scales, wings, fire breath, flames outside the body, standing upright, rearing up
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R185): a diving leap attack, the tail tip at the cell edge
+  retired_as: fire_lizard_v1

@@ -1,36 +1,28 @@
 {
   "character": "fire_lizard",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1235,
-  "try": 2,
-  "guide_sha": {
-    "sil": "855dd13154a1959f",
-    "skel": "554bf9531a4cf9af",
-    "ref": "d0ec97fde26b224a"
+  "backend": "user",
+  "source": "user_art/fire_lizard/sheet_2026-11-25.png",
+  "sha256": "557ba9206c5ba5a37ca3554d8579d12966d4570ab1af034f24ef14c6dabcff02",
+  "recipe": "monster_user.yaml#fire_lizard",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/fire_lizard/",
+    "current_x2_sha256": "02ca603686b8e17dfa1a094a4d3bb6d1d52ec34d055adc25c0aa08f89133211e",
+    "poses_reference_sha256": "3139be9e9369629af0a4254a360ce95d54f04ed0f8ac4929cf954e21027720ae",
+    "prompt_sha256": "84f83c10482fdba0683034330ea1a4489999f056772faee620f0e80df00bd055",
+    "prompt_v1_sha256": "c776f3b25a8c232dac465b9ee17e9af3fd909d7b32988fe63de70760441fcc75"
   },
+  "approved": "2026-11-25",
   "grid": [
-    218,
+    224,
     128
   ],
   "bottom_row": 122,
   "foot_row": 122,
-  "j0": "FAIL A-hist, A-adj, A-area",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "f4e02f7af9a509e0b8f68f48"
-  ],
-  "refs": [
-    "edit:raw_g_1",
-    "idle"
-  ],
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

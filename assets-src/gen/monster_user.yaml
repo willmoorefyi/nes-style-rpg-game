@@ -126,3 +126,81 @@ vampire_lord:
       select: gold
       slots: 1
       max_err: 20
+fire_hydra:
+  file: user_art/fire_hydra/sheet_2026-11-25.png
+  sha256: 3e6ee6ad66d3956411928e54491c930920c001503c0f0e23961300e932aacb16
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/fire_hydra/
+    current_x2_sha256: a0d0ad19f8a78e4547abc9ad09efc554998721d6bd40d8dfcbe5c95b9e8852f7
+    poses_reference_sha256: 3ae25ee7f214269a6e19e93e5040efa5bb18aea65fcfdb3fbffbbafd22b68788
+    prompt_sha256: ce6171798b595c3d7d7370a281eaa5dbb511c44064829d40a9c00a3b50615d35
+  refs_note: >-
+    the user's render (~/temp/fire_hydra_sprite_sheet.png, 864x168, idle 122 px, hurt 134, feet row 153), approved by
+    the user as is (the hurt reads slightly like a rear-up: accepted); its tallest pose is over the large cell's 121
+    rows, so it is cut at s = 1.0 in the tall frame (EF-H amendment A: cell 200, feet row 192)
+  # monster_user_palette: the lava's hot yellow-orange (its brightest seams and the eyes) keeps its own slots within
+  # the 16 (the plain house palette merged the yellow core onto the orange, error 46, and spent two slots on equal reds)
+  reserve:
+    - name: lava
+      select: skin
+      slots: 2
+      max_err: 16
+fire_lizard:
+  file: user_art/fire_lizard/sheet_2026-11-25.png
+  sha256: 557ba9206c5ba5a37ca3554d8579d12966d4570ab1af034f24ef14c6dabcff02
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/fire_lizard/
+    current_x2_sha256: 02ca603686b8e17dfa1a094a4d3bb6d1d52ec34d055adc25c0aa08f89133211e
+    poses_reference_sha256: 3139be9e9369629af0a4254a360ce95d54f04ed0f8ac4929cf954e21027720ae
+    prompt_sha256: 84f83c10482fdba0683034330ea1a4489999f056772faee620f0e80df00bd055
+    prompt_v1_sha256: c776f3b25a8c232dac465b9ee17e9af3fd909d7b32988fe63de70760441fcc75
+  refs_note: >-
+    the user's render (~/temp/fire_lizard_sprite_sheet.png, 936x120, idle 93 px, feet row 108 for the standing poses,
+    the kneel's draped tail tip at row 117), approved by the user: the large frame, s = 1.0; every pose's lowest row
+    goes on the feet row (the kneel by its tail tip, so its belly sits 9 rows above the standing feet line)
+  # monster_user_palette: the frill's crimson keeps its own slots (the plain house palette turned it orange, error 28)
+  reserve:
+    - name: frill
+      select: red
+      slots: 2
+      max_err: 16
+  # the kneel's bottom rows are its draped tail tip (far left), so the kneel is placed by its box centre (keeping the
+  # idle's feet-to-centre offset) instead of putting the tail tip under the idle's feet (monster_user_frame.anchors)
+  anchor: {kneel: bbox}
+black_knight:
+  file: user_art/black_knight/sheet_2026-11-25.png
+  sha256: a397b16aa8de5e72162a8d7f414e035252f2fdf2fc90e05180c6b8fd675f2853
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/black_knight/
+    current_x2_sha256: 3282b35abbf361ef8de838183be2268485761514ea82319d97b4c0df667e1bf3
+    poses_reference_sha256: b7bac25d88707bf8f6d9191917f81def56c07d4af40a6d269ffd9703f45387a7
+    prompt_sha256: 188e9aa72b7f2dfaea7e46e5f166711c4596ea8fbc3fa9a9932a2be572a62269
+    prompt_v1_sha256: ba4cade8afdc00f65cefc550b2d7bbce287f8f7274ac4656bc66cdff5f80baaf
+  refs_note: >-
+    the user's render (~/temp/black_knight_sprite_sheet.png, 608x120, idle 94 px, feet row 109), approved by the user:
+    the large frame (the sprite was small at 2.5x), s = 1.0
+  # monster_user_palette: the visor's ember glow (46 px) keeps its own slots (the plain house palette made it grey,
+  # error 143)
+  reserve:
+    - name: visor
+      select: ember
+      slots: 3
+      max_err: 16

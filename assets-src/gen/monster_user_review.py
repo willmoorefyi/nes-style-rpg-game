@@ -7,7 +7,6 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-from gen import spec as S
 
 REVIEW = Path.home() / "temp" / "ff-game" / "ef" / "user"
 
@@ -60,11 +59,13 @@ def review(sid: str, out: Path | None = None) -> list[Path]:
 
 def metas(sid: str, rec: dict, info: dict, today: str) -> tuple[dict, dict]:
     """approved/<id>/monster_<size>.json and kneel.json (backend: user)."""
-    size, (cw, ch) = rec.get("size", "large"), (info["cw"], S.MONSTER_BANDS[rec.get("size", "large")].cell)
-    band = S.MONSTER_BANDS[size]
+    from gen import monster_user_frame as UF
+    size, band = rec.get("size", "large"), UF.band_of(info.get("frame", rec.get("size", "large")))
+    cw, ch = info["cw"], band.cell
     common = {"backend": "user", "source": rec["file"], "sha256": rec["sha256"], "recipe": f"monster_user.yaml#{sid}",
               "tool": rec["tool"], "rendered": str(rec["rendered"]), "author": rec.get("author", "user"),
-              "refs": rec.get("refs"), "approved": today, "grid": [cw, ch], "bottom_row": band.foot_row}
+              "refs": rec.get("refs"), "approved": today, "grid": [cw, ch], "bottom_row": band.foot_row,
+              **({"frame": "tall"} if info.get("frame") == "tall" else {})}
     meta = {"character": sid, "sheet": f"monster_{size}", **common, "layout": [3, 1], "size": size,
             "floating": False, "flip_frames": [], "poses": ["idle", "attack", "hurt"],
             "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",

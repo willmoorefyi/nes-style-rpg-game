@@ -1,36 +1,28 @@
 {
   "character": "black_knight",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "8e45332aa2bac680",
-    "skel": "14005bfa23a031d5",
-    "ref": "147a8b556be5384a"
+  "backend": "user",
+  "source": "user_art/black_knight/sheet_2026-11-25.png",
+  "sha256": "a397b16aa8de5e72162a8d7f414e035252f2fdf2fc90e05180c6b8fd675f2853",
+  "recipe": "monster_user.yaml#black_knight",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/black_knight/",
+    "current_x2_sha256": "3282b35abbf361ef8de838183be2268485761514ea82319d97b4c0df667e1bf3",
+    "poses_reference_sha256": "b7bac25d88707bf8f6d9191917f81def56c07d4af40a6d269ffd9703f45387a7",
+    "prompt_sha256": "188e9aa72b7f2dfaea7e46e5f166711c4596ea8fbc3fa9a9932a2be572a62269",
+    "prompt_v1_sha256": "ba4cade8afdc00f65cefc550b2d7bbce287f8f7274ac4656bc66cdff5f80baaf"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-grey, A-hist, A-adj",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "385b361da4cad90163f34364"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

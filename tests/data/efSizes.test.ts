@@ -22,10 +22,12 @@ const scaleOf = (e: Entry): number => (typeof e === 'number' ? e : e.scale);
 const texOf = (e: Entry): number => (typeof e === 'number' ? 1 : e.tex ?? 1);
 
 const B1 = ['gr_imp', 'werewolf', 'ghast', 'shadow', 'gargoyle', 'bloodbones', 'piscodemon', 'mummy', 'horned_devil',
-  'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'black_knight', 'earth_medusa', 'gr_wolf',
+  'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'earth_medusa', 'gr_wolf',
   'ogre_chief', 'troll', 'sphinx', 'manticore', 'clay_golem', 'tyrannosaur', 'rhyos', 'iron_golem',
   'death_knight', 'stone_golem', 'chimera', 'sea_troll', 'winter_wolf', 'ogre_mage'];
 /** (lesser, greater) sibling pairs the B1 sizes must keep in order (NEW_MONSTER_GUIDE.md 1.4; EF-B1). */
+/** EF-H batch 2: black_knight (the user's render, large at 2, idle 188 px) left B1; death_knight (2.5, 177.5 px) is
+ *  re-rendered later, so the pair's screen heights are inverted until then (its scales still keep the order). */
 const SIBLINGS: [string, string][] = [['black_knight', 'death_knight'], ['clay_golem', 'stone_golem'], ['stone_golem', 'iron_golem'],
   ['manticore', 'chimera'], ['troll', 'sea_troll'], ['gr_wolf', 'winter_wolf'], ['ogre_chief', 'ogre_mage'],
   ['mummy', 'king_mummy'], ['medusa', 'earth_medusa'], ['ogre', 'ogre_chief'], ['wolf', 'gr_wolf'], ['goblin', 'gr_imp']];
@@ -59,11 +61,11 @@ function formations(): string[][] {
 }
 
 describe('EF-A hi-res sheets in the atlas', () => {
-  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (47 hi-res sheets; EF-H: dark_wizard, pirate, vampire, vampire_lord)', () => {
-    // the scale-3 B2 sheets (shark, hydra, fire_hydra, white_dragon) are at tex 1 with despur only (A4's budget
+  it('the atlas matches gen/monster_scale.yaml: scale and texScale per sheet (48 hi-res sheets; EF-H: dark_wizard, pirate, vampire, vampire_lord; batch 2: fire_hydra, fire_lizard, black_knight)', () => {
+    // the scale-3 B2 sheets (shark, hydra, white_dragon) are at tex 1 with despur only (A4's budget
     // fallback); int-ef2 (user ruling 2026-11-24): blue_dragon and green_dragon at tex 3; ef-horse: crazy_horse at
     // tex 2 (the EF smoothing rule)
-    expect(hires.length).toBe(47);
+    expect(hires.length).toBe(48);   // EF-H batch 2: fire_hydra tex 1 -> 2
     expect(['blue_dragon', 'green_dragon'].map((s) => texOf(table[s]))).toEqual([3, 3]);
     for (const [s, e] of Object.entries(table)) {
       expect([atlas.sheets[s].scale, atlas.sheets[s].texScale ?? 1], s).toEqual([scaleOf(e), texOf(e)]);
@@ -114,8 +116,8 @@ describe('EF-A hi-res sheets in the atlas', () => {
 });
 
 describe('EF-B1 sizes', () => {
-  it('the 32 B1 sheets are at 2.5 (int-ef2: EF_GROW\'s 3 above it); no lesser sibling outgrows its greater one', () => {
-    expect(new Set(B1).size).toBe(32);
+  it('the 31 B1 sheets are at 2.5 (int-ef2: EF_GROW\'s 3 above it); no lesser sibling outgrows its greater one', () => {
+    expect(new Set(B1).size).toBe(31);
     for (const s of B1) expect(scaleOf(table[s]), s).toBe(EF_GROW[s] ?? 2.5);
     for (const [a, b] of GROWN) expect(screenH(b), `${b} at least as tall as ${a}`).toBeGreaterThanOrEqual(screenH(a));
     // the smallest 0.05 step: one step less would leave it shorter than its target

@@ -29,6 +29,7 @@ import yaml
 from PIL import Image
 
 from gen import pixelize as PX
+from gen import monster_user_frame as UF
 from gen import monster_user_palette as UP
 from gen import monster_user_review as UR
 from gen import spec as S
@@ -131,19 +132,19 @@ def anchor(a: np.ndarray) -> float:
     return float(xs[sel].mean())
 
 
-def place(figs: list[np.ndarray], band: S.MonsterBand) -> tuple[list[Image.Image], dict]:
+def place(figs: list[np.ndarray], band: S.MonsterBand, modes: dict | None = None) -> tuple[list[Image.Image], dict]:
     """Every pose with its anchor at the idle's x and its feet on the feet row; the cell widened as the cutter
     does (monster.cut: max(cell, span + 4), even, the idle centred, clamped 2 px from the sides)."""
     def bbox(a):
         ys, xs = np.where(a[..., 3] > 0)
         return int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())
-    anchors = [anchor(f) for f in figs]
+    anchors = UF.anchors(figs, anchor, modes)          # EF-H A: a recipe's `anchor: {pose: bbox}`
     shift = [-int(round(x)) for x in anchors]
     boxes = [bbox(f) for f in figs]
     lo_x = min(b[0] + s for b, s in zip(boxes, shift))
     hi_x = max(b[2] + s for b, s in zip(boxes, shift))
     c = band.cell
-    cw = max(c, hi_x - lo_x + 1 + 4)
+    cw = max(min(c, UF.MIN_W), hi_x - lo_x + 1 + 4)                  # a tall cell: never under the large width
     cw += cw % 2
     ix0, ix1 = boxes[0][0] + shift[0], boxes[0][2] + shift[0]
     dx = cw // 2 - (ix0 + ix1 + 1) // 2
@@ -166,17 +167,17 @@ def cut(sid: str, rec: dict | None = None, gen: Path = HERE) -> tuple[list[Image
     """The four placed frames (idle, attack, hurt, kneel) and the import measures."""
     from gen import monster as M
     rec = rec or recipe(sid)
-    band = S.MONSTER_BANDS[rec.get("size", "large")]
     img = source(rec, gen)
     cells = split(img)
     hs = [height(m) for _, m in cells]
+    frame, band = UF.frame_of(rec.get("size", "large"), hs)       # EF-H A: the tall frame over the large cell
     s, why = scale(hs, band)
     regions = UP.masks(img, rec)                        # the recipe's `reserve` regions ({} without one)
     figs, pal = quantize(cells, s, (lambda p: UP.reserve(p, img, rec, regions, SEED)) if regions else None)
-    frames, pinfo = place(figs, band)
+    frames, pinfo = place(figs, band, dict(zip(POSES, [None] * 4), **(rec.get("anchor") or {})))
     src = np.asarray(img)
     info = {"source_size": list(img.size), "source_colours": len(np.unique(src[src[..., 3] > 0][:, :3], axis=0)),
-            "native_heights": hs, "scale": s, "scale_why": why, **pinfo,
+            "native_heights": hs, "frame": frame, "scale": s, "scale_why": why, **pinfo,
             "palette": [[int(v) for v in c] for c in pal], "error": UR.colour_error(cells, frames, s, pinfo)}
     if regions and s == 1.0:
         info["regions"] = UP.region_error(img, cells, frames, pinfo["offsets"], regions, SPECK)

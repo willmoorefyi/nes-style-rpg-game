@@ -148,9 +148,9 @@ def foreground(rgb: np.ndarray, guide_mask: np.ndarray, bg_tol: float = 40.0, di
     its own alpha, may draw magenta-ish art: crimson edges, magic)."""
     magenta = is_magenta_bg(rgb)
     fg = ~(magenta_bg(rgb) if magenta else flood_bg(rgb, bg_tol))
-    if exact_key:
-        fg = ~(rgb == MAGENTA.astype(np.uint8)).all(-1)
-    elif magenta:
+    if exact_key:     # the alpha is the figure (its specks are dropped by the caller): no blob filter either, whose
+        return ~(rgb == MAGENTA.astype(np.uint8)).all(-1)   # 4x-reduced mask trims 1-px tips over 200 px (EF-H A)
+    if magenta:
         fg &= ~magenta_fringe(rgb, fg)
     h, w = fg.shape
     work = (max(16, w // 4), max(16, h // 4)) if w > 200 else (w, h)

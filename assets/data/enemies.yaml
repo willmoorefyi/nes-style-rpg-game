@@ -2653,7 +2653,7 @@
   goldReward: 1800
   sprite: black_knight
   attack: melee
-  size: small
+  size: large
 - id: chimera
   name: Chimera
   num: 105

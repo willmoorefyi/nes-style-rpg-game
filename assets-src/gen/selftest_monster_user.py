@@ -268,3 +268,4 @@ def run_monster_user(check: Callable[[bool, str], None]) -> None:
     _check_swap(check)
     _check_tree(check)
     _check_real(check)
+    __import__("gen.selftest_monster_user_frame", fromlist=["x"]).run_monster_user_frame(check)   # EF-H amendment A

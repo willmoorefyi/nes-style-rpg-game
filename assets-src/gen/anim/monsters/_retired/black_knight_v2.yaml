@@ -1,0 +1,151 @@
+# Black Knight v2 (pass V R293, docs/REDESIGN_PLAN.md 3.1): a horned gunmetal plate knight with a notched two-handed
+# greatsword. The keys are far apart (the attack is a downward cut, the hurt a stagger), so every in-between is a
+# translation-only copy of its source key (moves: []): the upper body, sword and hips move as one piece, the knees by
+# about half and the feet by at most 1 px (2 in atk_mid); the motion lives in the key switch.
+# fixmeasure.py switch (no rig): attack need 0.550 cap 6.0 d (5, 0), IoU 0.695; hurt d (0, 1), IoU 0.784.
+# Keyframe paint (FW-P, V8 F3, docs/REDESIGN_FIX_PLAN.md): the closed ram curls read as round ears at 1x, so on each
+# key the lower curl is erased or inked and each horn sweeps out and up to a 1 px tip (bull horns, the sprite's own
+# ash greys and outline ink); the visor is a T-shaped slit (a 6 px bar over a 2 px stem) in the sprite's crimson
+# (148, 24, 82) and dark (74, 0, 66). Paint: idle 93 px, attack 85, hurt 75 (cap 100 per key).
+sprite: black_knight
+body: biped
+facing: right
+sampler: nearest
+breath: true
+planted: foot_n
+weapon_hand: n
+attack_hand: n
+keyframes:
+  idle:
+    crown: [39, 7]
+    neck: [39, 20]
+    chest: [38, 28]
+    hip: [38, 45]
+    sh_n: [46, 22]
+    el_n: [47, 30]
+    hand_n: [46, 38]
+    sh_f: [24, 22]
+    el_f: [24, 32]
+    hand_f: [42, 40]
+    tip: [61, 4]
+    hip_n: [43, 48]
+    knee_n: [47, 59]
+    foot_n: [47, 72]
+    toe_n: [53, 74]
+    hip_f: [31, 48]
+    knee_f: [26, 60]
+    foot_f: [22, 72]
+    toe_f: [24, 75]
+  attack:
+    crown: [41, 9]
+    neck: [41, 22]
+    chest: [36, 31]
+    hip: [35, 46]
+    sh_n: [44, 25]
+    el_n: [42, 35]
+    hand_n: [38, 46]
+    sh_f: [22, 28]
+    el_f: [17, 36]
+    hand_f: [34, 46]
+    tip: [67, 68]
+    hip_n: [39, 50]
+    knee_n: [42, 62]
+    foot_n: [43, 72]
+    toe_n: [49, 74]
+    hip_f: [30, 48]
+    knee_f: [20, 62]
+    foot_f: [12, 72]
+    toe_f: [14, 75]
+  hurt:
+    crown: [31, 6]
+    neck: [33, 19]
+    chest: [35, 28]
+    hip: [36, 44]
+    sh_n: [46, 22]
+    el_n: [46, 30]
+    hand_n: [40, 38]
+    sh_f: [24, 25]
+    el_f: [20, 32]
+    hand_f: [37, 40]
+    tip: [61, 4]
+    hip_n: [43, 50]
+    knee_n: [47, 58]
+    foot_n: [50, 68]
+    toe_n: [55, 69]
+    hip_f: [31, 50]
+    knee_f: [24, 63]
+    foot_f: [21, 72]
+    toe_f: [24, 75]
+parts:
+  ft_n: {bone: [foot_n, toe_n], radius: 4.0}
+  ft_f: {bone: [foot_f, toe_f], radius: 4.0}
+frames:
+  atk_wind1:                   # the upper body 1 px back: the coil starts
+    t: 0
+    moves: []
+    tweaks: {crown: [-1, 0], neck: [-1, 0], chest: [-1, 0], hip: [-1, 0], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0], tip: [-1, 0], hip_n: [-1, 0], hip_f: [-1, 0]}
+  atk_wind2:                   # 2 px back and 3 down (the coil), knees and feet 1 back
+    t: 0
+    moves: []
+    dy: 3
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-2, 0], hip: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-1, 0], knee_f: [-1, 0], foot_n: [-1, 0], foot_f: [-1, 0]}
+  atk_mid:                     # the cut key 3 px short (toward the idle) as one piece, knees and feet 2
+    t: 0
+    moves: []
+    tweaks: {crown: [3, 0], neck: [3, 0], chest: [3, 0], hip: [3, 0], sh_n: [3, 0], el_n: [3, 0], hand_n: [3, 0], sh_f: [3, 0], el_f: [3, 0], hand_f: [3, 0], tip: [3, 0], hip_n: [3, 0], hip_f: [3, 0], knee_n: [2, 0], knee_f: [2, 0], foot_n: [2, 0], foot_f: [2, 0], toe_n: [2, 0], toe_f: [2, 0]}
+  atk_follow:                  # the cut key 2 px further through (overshoot), knees and feet 1
+    t: 1.0
+    moves: []
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], hip: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], tip: [2, 0], hip_n: [2, 0], hip_f: [2, 0], knee_n: [1, 0], knee_f: [1, 0], foot_n: [1, 0], foot_f: [1, 0], toe_n: [1, 0], toe_f: [1, 0]}
+  atk_recover:                 # the idle 2 px back and 1 down (settling), knees and feet 1 back
+    t: 0
+    moves: []
+    tweaks: {crown: [-2, 1], neck: [-2, 1], chest: [-2, 1], hip: [-2, 1], sh_n: [-2, 1], el_n: [-2, 1], hand_n: [-2, 1], sh_f: [-2, 1], el_f: [-2, 1], hand_f: [-2, 1], tip: [-2, 1], hip_n: [-2, 1], hip_f: [-2, 1], knee_n: [-1, 0], knee_f: [-1, 0], foot_n: [-1, 0], foot_f: [-1, 0]}
+  hurt_in1:                    # flinch: the upper body and hips 2 back, the helm 3 (translated, feet planted)
+    moves: []
+    tweaks: {crown: [-3, 0], neck: [-3, 0], chest: [-2, 0], hip: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0], tip: [-2, 0], hip_n: [-2, 0], hip_f: [-2, 0], knee_n: [-1, 0], knee_f: [-1, 0]}
+  hurt_in2:                    # from the hurt: the upper body 2 toward the idle, the hips 1
+    moves: []
+    tweaks: {crown: [2, 0], neck: [2, 0], chest: [2, 0], sh_n: [2, 0], el_n: [2, 0], hand_n: [2, 0], sh_f: [2, 0], el_f: [2, 0], hand_f: [2, 0], tip: [2, 0], hip: [1, 0], hip_n: [1, 0], hip_f: [1, 0]}
+  daze:                        # slump: the helm nods 1 forward and down over a 1 px body sink, translated
+    moves: []
+    tweaks: {crown: [1, 1], neck: [1, 1]}
+  daze_b:
+    moves: []
+    tweaks: {crown: [1, 2], neck: [1, 2]}
+masks:
+  weapon:
+    idle: [[57, 2], [64, 3], [64, 8], [59, 19], [53, 31], [49, 36], [40, 36], [40, 33], [48, 19], [55, 5]]
+    attack: [[34, 46], [41, 46], [56, 56], [69, 66], [69, 72], [56, 72], [49, 67], [43, 63], [39, 61], [35, 56], [33, 50]]
+    hurt: [[57, 2], [64, 3], [64, 8], [58, 19], [50, 30], [45, 36], [38, 36], [39, 32], [48, 18], [55, 5]]
+  ft_n:
+    idle: [[41, 71], [57, 71], [57, 77], [41, 77]]
+    attack: [[37, 70], [53, 70], [53, 77], [37, 77]]
+    hurt: [[43, 66], [58, 66], [58, 71], [43, 71]]
+  ft_f:
+    idle: [[17, 71], [29, 71], [29, 77], [17, 77]]
+    attack: [[6, 69], [19, 69], [19, 77], [6, 77]]
+    hurt: [[16, 70], [29, 70], [29, 77], [16, 77]]
+holds: []
+paint:                         # FW-P (V8 F3): pointed horns and the T visor on every key
+  - {frame: idle, xy: [[24, 2], [48, 2], [23, 3], [25, 3], [47, 3], [49, 3], [23, 4], [26, 4], [46, 4], [49, 4], [23, 5], [27, 5], [46, 5], [50, 5], [24, 6], [28, 6], [29, 6], [50, 6], [25, 7], [48, 7], [49, 7], [26, 8], [29, 10], [46, 10], [47, 10], [29, 11], [33, 13], [46, 13], [33, 14], [46, 14], [47, 14], [48, 14], [30, 15], [31, 15], [41, 17], [41, 18]], rgb: [6, 4, 10]}
+  - {frame: idle, xy: [[24, 3], [48, 3], [24, 4], [25, 4], [47, 4], [48, 4], [24, 5], [25, 5], [47, 5], [48, 5], [25, 6], [26, 6], [47, 6], [48, 6], [26, 7], [27, 7], [28, 7], [45, 7], [46, 7], [27, 8], [28, 8], [29, 8]], rgb: [173, 173, 173]}
+  - {frame: idle, xy: [[26, 5], [49, 5], [27, 6], [49, 6], [29, 7], [47, 7], [46, 8], [30, 10]], rgb: [123, 123, 132]}
+  - {frame: idle, xy: [[27, 10], [28, 10], [26, 11], [27, 11], [28, 11], [26, 12], [27, 12], [28, 12], [29, 12], [26, 13], [27, 13], [28, 13], [29, 13], [27, 14], [28, 14], [29, 14]], rgb: null}
+  - {frame: idle, xy: [[37, 16], [42, 16], [39, 19], [40, 19]], rgb: [74, 0, 66]}
+  - {frame: idle, xy: [[39, 16], [40, 16], [41, 16], [39, 17], [40, 17], [39, 18], [40, 18]], rgb: [148, 24, 82]}
+  - {frame: attack, xy: [[52, 3], [26, 4], [51, 4], [53, 4], [25, 5], [27, 5], [50, 5], [53, 5], [25, 6], [28, 6], [49, 6], [53, 6], [25, 7], [29, 7], [48, 7], [52, 7], [26, 8], [30, 8], [31, 8], [51, 8], [27, 9], [50, 9], [28, 10], [29, 10], [30, 12], [31, 12], [32, 12], [46, 12], [49, 12], [30, 13], [31, 13], [32, 13], [37, 13], [47, 13], [49, 13], [30, 14], [31, 14], [32, 14], [35, 14], [49, 14], [31, 15], [32, 15], [33, 16], [34, 16]], rgb: [6, 4, 10]}
+  - {frame: attack, xy: [[52, 4], [26, 5], [51, 5], [52, 5], [26, 6], [27, 6], [50, 6], [51, 6], [26, 7], [27, 7], [49, 7], [50, 7], [27, 8], [28, 8], [48, 8], [49, 8], [28, 9], [29, 9], [30, 9], [31, 9], [32, 9], [47, 9], [48, 9]], rgb: [173, 173, 173]}
+  - {frame: attack, xy: [[52, 6], [28, 7], [51, 7], [29, 8], [50, 8], [49, 9], [30, 10], [31, 10]], rgb: [123, 123, 132]}
+  - {frame: attack, xy: [[40, 17], [45, 17], [42, 19], [43, 19]], rgb: [74, 0, 66]}
+  - {frame: attack, xy: [[41, 17], [42, 17], [43, 17], [44, 17], [42, 18], [43, 18]], rgb: [148, 24, 82]}
+  - {frame: hurt, xy: [[17, 3], [16, 4], [18, 4], [43, 4], [16, 5], [19, 5], [42, 5], [44, 5], [16, 6], [20, 6], [41, 6], [44, 6], [17, 7], [21, 7], [22, 7], [40, 7], [44, 7], [18, 8], [43, 8], [19, 9], [42, 9], [41, 10], [20, 12], [21, 12], [20, 13], [21, 13], [20, 14], [21, 14], [25, 14], [30, 14], [20, 15], [21, 15], [25, 15], [21, 16], [22, 16]], rgb: [6, 4, 10]}
+  - {frame: hurt, xy: [[17, 4], [17, 5], [18, 5], [43, 5], [17, 6], [18, 6], [42, 6], [43, 6], [18, 7], [19, 7], [41, 7], [42, 7], [19, 8], [20, 8], [21, 8], [40, 8], [41, 8], [21, 9], [22, 9], [39, 9], [40, 9], [38, 10], [39, 10]], rgb: [173, 173, 173]}
+  - {frame: hurt, xy: [[19, 6], [20, 7], [43, 7], [22, 8], [42, 8], [20, 9], [41, 9], [40, 10]], rgb: [123, 123, 132]}
+  - {frame: hurt, xy: [[29, 13], [34, 13], [31, 15], [32, 15]], rgb: [74, 0, 66]}
+  - {frame: hurt, xy: [[30, 13], [31, 13], [32, 13], [33, 13], [32, 14]], rgb: [148, 24, 82]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+# KT2-A: the kneel_in1 -> kneel_in2 swap passes the 0.65-span centroid cap (integrator ruling 2026-11-18, KNEEL_TWEEN_PLAN 12)
+kneel:
+  source: ai

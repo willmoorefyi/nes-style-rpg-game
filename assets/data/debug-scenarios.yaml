@@ -998,6 +998,17 @@
   gold: 100
   enemies: [pirate, vampire, vampire_lord, goblin, ogre]
   background: assets/backgrounds/grassland.webp
+- id: ef_user_fire_hydra
+  name: EF-H batch 2 - user-rendered fire_hydra (tall frame), fire_lizard and black_knight beside the goblin
+  party:
+    - { class: knight, name: KNGT, level: 30, equipment: [], spells: [] }
+    - { class: ninja, name: NINJ, level: 30, equipment: [], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [], spells: [] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 100
+  enemies: [fire_hydra, fire_lizard, black_knight, goblin]
+  background: assets/backgrounds/grassland.webp
 - id: anim_boss_garland
   name: Anim - Garland, fight and magic 1:1
   party:

@@ -1,27 +1,70 @@
 {
   "character": "fire_hydra",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "215d55f41092411f3f7f2bc8",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/fire_hydra/sheet_2026-11-25.png",
+  "sha256": "3e6ee6ad66d3956411928e54491c930920c001503c0f0e23961300e932aacb16",
+  "recipe": "monster_user.yaml#fire_hydra",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/fire_hydra/",
+    "current_x2_sha256": "a0d0ad19f8a78e4547abc9ad09efc554998721d6bd40d8dfcbe5c95b9e8852f7",
+    "poses_reference_sha256": "3ae25ee7f214269a6e19e93e5040efa5bb18aea65fcfdb3fbffbbafd22b68788",
+    "prompt_sha256": "ce6171798b595c3d7d7370a281eaa5dbb511c44064829d40a9c00a3b50615d35"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    136,
-    128
+    224,
+    200
   ],
-  "bottom_row": 122,
+  "bottom_row": 192,
+  "frame": "tall",
   "layout": [
     3,
     1
   ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": false,
-  "flip_frames": [],
-  "note": "ROSTER_LOG R181"
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      122,
+      123,
+      134,
+      82
+    ],
+    "anchors": [
+      96.47,
+      90.57,
+      92.94,
+      103.4
+    ],
+    "anchor_x": 103.47,
+    "error": {
+      "max": 30.3,
+      "p99": 30.3,
+      "mean": 8.9,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "lava": {
+        "px": 816,
+        "mean": 5.3,
+        "p90": 4.4,
+        "max": 26.2,
+        "colours": 4
+      }
+    }
+  }
 }

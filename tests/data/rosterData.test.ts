@@ -29,11 +29,13 @@ const roster = enemies.filter((e) => !e.tuned);
 
 /** EF-B1: the 2.5 sheets (the user's 26 plus death_knight, stone_golem, chimera, sea_troll, winter_wolf, ogre_mage). */
 const EF_B1 = ['gr_imp', 'werewolf', 'ghast', 'shadow', 'gargoyle', 'bloodbones', 'piscodemon', 'mummy', 'horned_devil',
-  'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'black_knight', 'earth_medusa', 'gr_wolf',
+  'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'earth_medusa', 'gr_wolf',
   'ogre_chief', 'troll', 'sphinx', 'manticore', 'clay_golem', 'tyrannosaur', 'rhyos', 'iron_golem',
   'death_knight', 'stone_golem', 'chimera', 'sea_troll', 'winter_wolf', 'ogre_mage'];
 /** int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5 (efSizes.test.ts pins the heights). */
 const EF_GROW: Record<string, number> = { stone_golem: 2.8, iron_golem: 3.3, sea_troll: 2.7 };
+/** EF-H amendment A (docs/ENEMY_FEEDBACK_PLAN.md): data-`huge` user sheets in the tall frame, at the default scale 2. */
+const EF_H_TALL = ['fire_hydra'];
 
 describe('roster data: coverage and numbering', () => {
   it('every atlas sheet has an enemy, and every enemy a sheet', () => {
@@ -70,7 +72,8 @@ describe('roster data: coverage and numbering', () => {
     }
   });
 
-  it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6, 4.2): huge sheets, bigeyes, chaos and hollow_seraph at scale 3, the EF-B1 sheets at 2.5, every other at 2', () => {
+  it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6, 4.2): huge sheets (but EF_H_TALL), bigeyes, chaos and hollow_seraph at scale 3, the EF-B1 sheets at 2.5, every other at 2', () => {
+    // EF-H amendment A: fire_hydra (the user's render in the tall frame) stays `huge` at scale 2
     // V4: 22 tier-H `huge` enemies + bigeyes (`large`, FF1 large class) carry `scale: 3` from gen/monster_scale.yaml;
     // V6 (D-V6 = C2): chaos keeps `size: boss` (the 200 px boss band) and is shown at scale 3; V8 N-1: so is
     // hollow_seraph (hollow_seraph_2 shares the sprite)
@@ -80,6 +83,7 @@ describe('roster data: coverage and numbering', () => {
     const scaleOf = (e: EnemyData): number => atlas.sheets[e.sprite ?? e.id].scale ?? atlas.scale;
     for (const e of enemies) {
       const want = EF_B1.includes(e.sprite ?? e.id) ? EF_GROW[e.sprite ?? e.id] ?? 2.5
+        : EF_H_TALL.includes(e.sprite ?? e.id) ? 2
         : e.size === 'huge' || ['bigeyes', 'chaos', 'hollow_seraph'].includes(e.sprite ?? e.id) ? 3 : 2;
       expect(scaleOf(e), `${e.id} (${e.size ?? 'small'})`).toBe(want);
     }

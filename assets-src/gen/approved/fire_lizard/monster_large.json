@@ -1,13 +1,23 @@
 {
   "character": "fire_lizard",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1235,
-  "cache_key": "73c1afc6cef7122a2712a7e2",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/fire_lizard/sheet_2026-11-25.png",
+  "sha256": "557ba9206c5ba5a37ca3554d8579d12966d4570ab1af034f24ef14c6dabcff02",
+  "recipe": "monster_user.yaml#fire_lizard",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/fire_lizard/",
+    "current_x2_sha256": "02ca603686b8e17dfa1a094a4d3bb6d1d52ec34d055adc25c0aa08f89133211e",
+    "poses_reference_sha256": "3139be9e9369629af0a4254a360ce95d54f04ed0f8ac4929cf954e21027720ae",
+    "prompt_sha256": "84f83c10482fdba0683034330ea1a4489999f056772faee620f0e80df00bd055",
+    "prompt_v1_sha256": "c776f3b25a8c232dac465b9ee17e9af3fd909d7b32988fe63de70760441fcc75"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    218,
+    224,
     128
   ],
   "bottom_row": 122,
@@ -15,13 +25,46 @@
     3,
     1
   ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": false,
-  "flip_frames": [],
-  "note": "ROSTER_LOG R186"
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      93,
+      93,
+      91,
+      62
+    ],
+    "anchors": [
+      103.34,
+      110.97,
+      86.05,
+      91.34
+    ],
+    "anchor_x": 112.34,
+    "error": {
+      "max": 37.1,
+      "p99": 37.1,
+      "mean": 8.3,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "frill": {
+        "px": 3108,
+        "mean": 7.5,
+        "p90": 13.5,
+        "max": 13.5,
+        "colours": 3
+      }
+    }
+  }
 }

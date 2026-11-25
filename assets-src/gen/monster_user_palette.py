@@ -54,7 +54,21 @@ def _magenta(o: np.ndarray) -> np.ndarray:
     return (r >= 120) & (b >= 110) & (g < 0.5 * np.minimum(r, b))
 
 
-SELECT = {"skin": _skin, "bright": _bright, "steel": _steel, "gold": _gold, "grey": _grey, "magenta": _magenta}
+def _red(o: np.ndarray) -> np.ndarray:
+    """Crimson (fire_lizard's frill, EF-H A): red >= 120, green under 0.3 of red, blue near the green (>= 0.6 of it, so
+    a glowing orange-red with almost no blue stays out) and under 0.35 of red."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (r >= 120) & (g <= 0.3 * r) & (b <= 0.35 * r) & (b >= 0.6 * g)
+
+
+def _ember(o: np.ndarray) -> np.ndarray:
+    """Glowing ember orange (black_knight's visor, EF-H A): red >= 150, green <= 0.75 of red, blue <= 0.45 of green."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (r >= 150) & (g <= 0.75 * r) & (b <= 0.45 * g)
+
+
+SELECT = {"skin": _skin, "bright": _bright, "steel": _steel, "gold": _gold, "grey": _grey, "magenta": _magenta,
+          "red": _red, "ember": _ember}
 
 
 def masks(img: Image.Image, rec: dict) -> dict[str, np.ndarray]:

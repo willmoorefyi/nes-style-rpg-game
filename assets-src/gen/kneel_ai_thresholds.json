@@ -14,7 +14,6 @@
  },
  "excluded": {
   "ashen_queen": "key_offset",
-  "black_knight": "keyframe paint",
   "black_widow": "FW-Q alias",
   "chimera": "FW-Q alias",
   "cobra": "keyframe paint",

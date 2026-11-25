@@ -27,7 +27,8 @@ from PIL import Image  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 # pinned (section 6 Calibration): the hurt keys that are not approved art, excluded from every calibration
-EXCLUDED = {"ashen_queen": "key_offset", "black_knight": "keyframe paint", "black_widow": "FW-Q alias",
+# EF-H batch 2: black_knight left the list (its hurt key is the user's render; the old keyframe paint is retired)
+EXCLUDED = {"ashen_queen": "key_offset", "black_widow": "FW-Q alias",
             "chimera": "FW-Q alias", "cobra": "keyframe paint", "crocodile": "keyframe paint",
             "hollow_seraph": "FW-H hurt_from", "king_mummy": "keyframe paint"}
 BODY_KEYS = {"a": ("sd35", {"mode", "image", "strength"}),

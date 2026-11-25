@@ -36,7 +36,6 @@ dragon_zombie: 3
 # tier H siblings (D-V3), so no lesser sibling outgrows its greater one:
 white_shark: 3
 minotaur_zombie: 3
-fire_hydra: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
 deepeyes: 3
 evil_eye: 3
 # V6 (docs/REDESIGN_PLAN.md 4.2, ruling D-V6 = C2 after G-T0): the redesigned chaos, cut in the normal 200 px boss band
@@ -64,7 +63,6 @@ king_mummy: {scale: 2.5, tex: 2.5}
 medusa: {scale: 2.5, tex: 2.5}
 rakshasa: {scale: 2.5, tex: 2.5}
 sahagin_prince: {scale: 2.5, tex: 2.5}
-black_knight: {scale: 2.5, tex: 2.5}
 earth_medusa: {scale: 2.5, tex: 2.5}
 gr_wolf: {scale: 2.5, tex: 2.5, smooth: [despur]}
 # data-`large` sheets (laid out as `huge`, capacity 1):
@@ -80,14 +78,13 @@ rhyos: {scale: 2.5, tex: 2.5}
 # the smallest multiple of 0.05 that meets it (iron at 3.25 would be 292.5, under stone's 294)
 iron_golem: {scale: 3.3, tex: 3.3, crop: true}   # crop: its 423-px cells fit 16 a page, not its 17 frames (monster_hires.crop_sheet)
 # the greater siblings (NEW_MONSTER_GUIDE.md 1.4: no lesser sibling outgrows its greater one; beyond the user's list):
-death_knight: {scale: 2.5, tex: 2.5}   # > black_knight
+death_knight: {scale: 2.5, tex: 2.5}   # > black_knight (inverted since EF-H batch 2, 177.5 < 188 px: death_knight is re-rendered later)
 stone_golem: {scale: 2.8, tex: 2.8}   # > clay_golem < stone 200 < iron 304 HP; int-ef2: 105 px -> 294 >= clay's 292.5
 chimera: {scale: 2.5, tex: 2.5}   # > manticore
 sea_troll: {scale: 2.7, tex: 2.7}   # > troll; int-ef2 (user ruling 2026-11-24): 106 px -> 286.2 >= troll's 282.5 (113 px)
 winter_wolf: {scale: 2.5, tex: 2.5}   # > gr_wolf: 92 HP > 72
 ogre_mage: {scale: 2.5, tex: 2.5}   # > ogre_chief: 144 HP > 132
-# EF-B2: smoothed (`despur` and a Scale2x texture) at today's size; the scale-3 ones (shark, hydra, fire_hydra,
-# white_dragon) are above at tex 1 (the A4 budget fallback: despur only), the B1 ones in B1 (gr_wolf, ogre_chief, ghast, shadow):
+# EF-B2: smoothed (`despur` and a Scale2x texture) at today's size; the scale-3 ones (shark, hydra, white_dragon) are above at tex 1 (the A4 budget fallback: despur only), the B1 ones in B1 (gr_wolf, ogre_chief, ghast, shadow):
 black_widow: {scale: 2, tex: 2, smooth: [despur]}
 tarantula: {scale: 2, tex: 2, smooth: [despur]}
 anaconda: {scale: 2, tex: 2, smooth: [despur]}
@@ -96,9 +93,7 @@ crocodile: {scale: 2, tex: 2, smooth: [despur]}
 lava_worm: {scale: 2, tex: 2, smooth: [despur]}
 hellhound: {scale: 2, tex: 2, smooth: [despur]}
 # EF-B3: the low-res trio. blue_dragon / green_dragon above (tex 3 with despur; int-ef2 raised the page budget for
-# them, user ruling 2026-11-24); fire_lizard at tex 2 with despur (no block-mode reduction: only 46-61 % of its 2x2 blocks are uniform).
-# None adds detail the raw never had: real extra detail needs a new render.
-fire_lizard: {scale: 2, tex: 2, smooth: [despur]}
+# them, user ruling 2026-11-24); fire_lizard was the third (now the user's render, EF-H batch 2, below).
 crazy_horse: {scale: 2, tex: 2, smooth: [despur, edges]}   # EF-F (standing rule 2026-11-24, NEW_MONSTER_GUIDE 1.4); edges: the review kept the face crisp
 # EF-H (docs/ENEMY_FEEDBACK_PLAN.md EF-H): the user-rendered dark_wizard (backend: user), smoothed under the standing
 # rule; `edges`: the review kept the staff and skull crisp, despur leaves the staff whole (smooth_staff_x6.png).
@@ -114,3 +109,10 @@ vampire: {scale: 2, tex: 2, smooth: [despur, edges]}
 # EF-H: the user-rendered vampire_lord, the same size as the vampire (idle 91 px, scale 2, about 182 screen px;
 # user ruling 2026-11-25, the sibling rule), the same smoothing
 vampire_lord: {scale: 2, tex: 2, smooth: [despur, edges]}
+# EF-H batch 2 (docs/ENEMY_FEEDBACK_PLAN.md EF-H amendment A; the user's renders, backend: user, s = 1.0, the standing
+# smoothing rule replacing the old entries): fire_hydra in the tall frame (200-row cell, idle 120 rows, about 240
+# screen px; data `huge` kept; was scale 3 tex 1), fire_lizard (idle 93 px, about 186; was tex 2 despur on 2x2-block
+# art) and black_knight (idle 94 px, about 188; was small at 2.5, now large; death_knight, 177.5 px, re-rendered later)
+fire_hydra: {scale: 2, tex: 2, smooth: [despur, edges]}
+fire_lizard: {scale: 2, tex: 2, smooth: [despur, edges]}
+black_knight: {scale: 2, tex: 2, smooth: [despur, edges]}

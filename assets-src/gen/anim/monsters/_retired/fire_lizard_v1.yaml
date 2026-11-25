@@ -1,0 +1,164 @@
+sprite: fire_lizard
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Frilled orange fire lizard, low sprawl. The tail curls round behind the body in every key (a loose loop in idle and
+# attack, a tight loop pulled right in hurt) and never interpolates cleanly, so it stays out of every `moves` set and
+# rides the body. The far hind leg is hidden behind the near one (its parts are removed). The frill rides the chest and
+# neck warps; the head is masked per key (the attack's open lower jaw is head, the far forepaw under it is not).
+keyframes:
+  attack:
+    back: [105, 76]
+    chest: [140, 80]
+    el_f: [188, 110]
+    el_n: [115, 105]
+    foot_f: [46, 110]
+    foot_n: [38, 113]
+    ftoe_f: [205, 116]
+    ftoe_n: [130, 118]
+    head: [175, 68]
+    hip: [72, 85]
+    hip_f: [60, 92]
+    hip_n: [55, 92]
+    knee_f: [52, 103]
+    knee_n: [45, 104]
+    neck: [162, 78]
+    paw_f: [195, 114]
+    paw_n: [122, 114]
+    sh_f: [182, 104]
+    sh_n: [110, 92]
+    snout: [214, 66]
+    tail0: [68, 83]
+    tail1: [30, 82]
+    tail2: [8, 60]
+    tail3: [38, 33]
+    tail_tip: [60, 48]
+    toe_f: [42, 114]
+    toe_n: [32, 118]
+  hurt:
+    back: [115, 78]
+    chest: [145, 80]
+    el_f: [180, 105]
+    el_n: [128, 107]
+    foot_f: [58, 111]
+    foot_n: [55, 114]
+    ftoe_f: [196, 110]
+    ftoe_n: [140, 119]
+    head: [173, 67]
+    hip: [85, 88]
+    hip_f: [66, 95]
+    hip_n: [62, 95]
+    knee_f: [62, 105]
+    knee_n: [58, 106]
+    neck: [162, 75]
+    paw_f: [188, 108]
+    paw_n: [132, 114]
+    sh_f: [172, 100]
+    sh_n: [125, 95]
+    snout: [210, 72]
+    tail0: [80, 88]
+    tail1: [50, 85]
+    tail2: [42, 60]
+    tail3: [65, 36]
+    tail_tip: [88, 45]
+    toe_f: [55, 115]
+    toe_n: [50, 118]
+  idle:
+    back: [105, 76]
+    chest: [140, 78]
+    el_f: [178, 105]
+    el_n: [122, 104]
+    foot_f: [54, 110]
+    foot_n: [48, 112]
+    ftoe_f: [192, 111]
+    ftoe_n: [138, 117]
+    head: [170, 66]
+    hip: [75, 85]
+    hip_f: [64, 92]
+    hip_n: [60, 92]
+    knee_f: [58, 103]
+    knee_n: [52, 104]
+    neck: [158, 75]
+    paw_f: [185, 109]
+    paw_n: [128, 113]
+    sh_f: [172, 98]
+    sh_n: [120, 90]
+    snout: [210, 72]
+    tail0: [70, 83]
+    tail1: [35, 82]
+    tail2: [12, 62]
+    tail3: [35, 36]
+    tail_tip: [65, 47]
+    toe_f: [50, 114]
+    toe_n: [42, 117]
+parts:
+  body: {width: auto}
+  hpaw_f: {remove: true}
+  shin_f: {remove: true}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  thigh_f: {remove: true}
+masks:
+  head:
+    attack: [[166, 50], [185, 52], [200, 58], [216, 60], [216, 78], [206, 78], [204, 108], [188, 108], [176, 103], [168, 92]]
+    hurt: [[166, 48], [195, 52], [211, 64], [211, 86], [195, 92], [166, 94]]
+    idle: [[162, 48], [195, 50], [213, 62], [213, 80], [200, 85], [175, 86], [162, 86]]
+  neck:
+    attack: [[140, 30], [166, 30], [166, 110], [140, 110]]
+frames:
+  atk_follow:   # the settle (t 0.75): all feet and the near elbow planted
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, el_n, paw_f, foot_n, foot_f]
+    t: 0.75
+    tweaks: {tail2: [0, 1], tail3: [0, 2]}
+  atk_mid:   # the pass (t 0.25): near forepaw and elbow planted, the lower foreleg 1 px toward idle
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, el_n, foot_n]
+    t: 0.25
+    tweaks: {el_n: [1, 0], ftoe_n: [1, 0], paw_n: [1, 0], tail2: [0, 1], tail3: [0, 2]}
+  atk_recover:   # 30% toward the bite
+    moves: [back, chest, neck, head, snout]
+    t: 0.3
+  atk_wind1:   # anticipation: head drawn back and up, spine 1 px back
+    dy: 0
+    moves: []
+    t: 0.0
+    tweaks: {back: [-1, 0], chest: [-1, 0], head: [-2, 0], hip: [-1, 0], neck: [-1, 0], snout: [-2, -1], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+  atk_wind2:   # coil: head reared back, spine 2 px back and 1 down
+    dy: 1
+    moves: []
+    t: 0.0
+    tweaks: {back: [-2, 0], chest: [-2, 0], head: [-4, 0], hip: [-2, 0], neck: [-2, 0], snout: [-4, -2], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
+  daze:   # head and snout hang (the neck stays put)
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-1, 1], snout: [-2, 2]}
+  daze_b:
+    dy: 0
+    moves: [back, chest, head, snout]
+    t: 0.0
+    tweaks: {head: [-1, 1], snout: [-2, 3]}
+  hurt_in1:   # the flinch starts: head jerks back and up
+    moves: [hip, back, chest]
+    t: 0.2
+    tweaks: {head: [-3, -2], neck: [-1, -1], snout: [-3, -2]}
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f]
+  hurt_in2:   # 30% back toward idle; legs, elbows and the far shoulder planted
+    moves: [back, chest, neck, head, snout]
+    pins: [paw_n, paw_f, foot_n, foot_f, el_f, sh_f]
+    t: 0.3
+    tweaks: {back: [-1, 0], chest: [-1, 0], head: [-1, 0], hip: [-1, 0], neck: [-1, 0], snout: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
+holds: []
+paint:
+  - {frame: atk_wind2, rgb: [6, 4, 10], xy: [[178, 90], [179, 90], [177, 91], [178, 91]]}
+  - {frame: atk_wind1, rgb: [148, 66, 41], xy: [[57, 87], [52, 89]]}
+  - {frame: atk_wind1, rgb: [148, 90, 57], xy: [[54, 88]]}
+  - {frame: atk_wind1, rgb: [173, 107, 66], xy: [[49, 90], [47, 91], [45, 92], [43, 93]]}
+  - {frame: atk_wind2, rgb: [148, 66, 41], xy: [[56, 88], [57, 88], [51, 90], [52, 90]]}
+  - {frame: atk_wind2, rgb: [148, 90, 57], xy: [[53, 89], [54, 89]]}
+  - {frame: atk_wind2, rgb: [173, 107, 66], xy: [[48, 91], [49, 91]]}
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py)
+kneel:
+  source: ai

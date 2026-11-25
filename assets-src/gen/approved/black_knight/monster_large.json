@@ -1,0 +1,70 @@
+{
+  "character": "black_knight",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/black_knight/sheet_2026-11-25.png",
+  "sha256": "a397b16aa8de5e72162a8d7f414e035252f2fdf2fc90e05180c6b8fd675f2853",
+  "recipe": "monster_user.yaml#black_knight",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/black_knight/",
+    "current_x2_sha256": "3282b35abbf361ef8de838183be2268485761514ea82319d97b4c0df667e1bf3",
+    "poses_reference_sha256": "b7bac25d88707bf8f6d9191917f81def56c07d4af40a6d269ffd9703f45387a7",
+    "prompt_sha256": "188e9aa72b7f2dfaea7e46e5f166711c4596ea8fbc3fa9a9932a2be572a62269",
+    "prompt_v1_sha256": "ba4cade8afdc00f65cefc550b2d7bbce287f8f7274ac4656bc66cdff5f80baaf"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      94,
+      83,
+      94,
+      70
+    ],
+    "anchors": [
+      31.5,
+      38.76,
+      35.54,
+      35.21
+    ],
+    "anchor_x": 55.5,
+    "error": {
+      "max": 61.3,
+      "p99": 48.5,
+      "mean": 12.2,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "visor": {
+        "px": 46,
+        "mean": 12.3,
+        "p90": 61.3,
+        "max": 61.3,
+        "colours": 3
+      }
+    }
+  }
+}

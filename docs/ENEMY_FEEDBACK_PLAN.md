@@ -716,6 +716,191 @@ every frame and nothing clipped (`~/temp/ff-game/ef/user/smoke2/<id>_attack_fram
 the old 20-frame stagger only: two lungers overlapping, the later-drawn pirate over the vampire. No real-battle drawing
 changed; the loop now takes turns (`loop_staggered.png`; at most 1 lunger over 12 s, 111 fps).
 
+#### EF-H amendment A: a tall frame for user sheets over the large cell (rev 2, 2026-11-25; fire_hydra first; Momus rev-1: REJECT, 4 blocking findings, 8 notes, applied; rev-2: OKAY, 5 notes applied)
+
+**Why.** The user's fire_hydra render (`~/temp/fire_hydra_sprite_sheet.png`, 864x168, binary alpha, 34 colours, true
+1-px detail, USER-APPROVED as is) splits into four pieces of native (split) heights idle 122 / attack 123 / hurt 134 /
+kneel 82, widths 207 / 208 / 206 / 201 (feet row 153). The large frame (cell 128, feet row 122) gives a figure rows
+2..122, 121 rows, so H1's `scale()` would shrink the sheet to s = 0.903 ("fit tallest") and re-pixelize it: the user's
+1-px detail is lost. Target: native s = 1.0 at the default display scale 2 (the placed idle is 120 rows, 240 screen
+px, as the house quantizer's outline rule trims edge px; today's scale-3 sheet 243). More user sheets over 120 px are
+queued (white_dragon 144, blue_dragon 142, green_dragon 147, evil_eye 147; chimera 120 fits the large frame).
+
+**What the code assumes per size (checked 2026-11-25).**
+- *Data size and layout.* `enemies.yaml` `size` picks the layout class (`EnemyLayoutAi` ORDER / CAPACITY: a `huge`
+  column holds one enemy; `TRAVEL_HOP[class]`); `layoutSizeOf` changes the class only for a tier scale (fractional over
+  2) or a scale-3 `boss` (the titan rule). The box is the cell x the sheet scale; the feet sit on the box bottom
+  (`AiEnemyView.ts:155`: y = feetY - (footRow + 1) x scale). Nothing reads the cell height as a class: fire_hydra stays
+  data `huge`, so at scale 2 its class stays `huge`. Its real formations (gurgu-b3 / b4 / b5, 1-2 fire_hydra): two
+  444 x 400 boxes + 24 gap = 912 x 400, inside ENEMY_AREA 1260 x 545 at pass 1.
+- *Sheet loading and atlas.* `monster_anim.load_entries` crops by the json `grid`; `monster_atlas.sheet_meta` writes
+  `cell` = the frame size and `footRow` = the json `bottom_row`; `kneelSink` is floaters only. Any cell works.
+  `spec.MONSTER_BANDS` is also the Gemini request table (`MONSTER_GEOMS`, `generate.py`): the tall frame stays out.
+- *Kneel.* `kneel_source_ai.ai_key` needs the key in the idle's cell size; the K checks read the json `foot_row` and
+  the cell border; the bridge resizes by bbox. All per-cell.
+- *Size-scaled defaults and tolerances read the cell height* (not the figure): `rig.py:106` part radius / width x
+  h / 80; `monster_anim.py:256` the daze recipe's px factor k = int(h / 80 + 0.5) (3 at 200, 2 at 128: the generated,
+  locked `daze` / `daze_b` cells sag 1.5x deeper; the game shows them only through `FRAME_FALLBACK` on a sheet without
+  kneel cells, so not for fire_hydra); `anim_checks` `new_holes` reach 6h/80, `silhouette` tol 6 (h <= 128) / 10,
+  `continuity` centroid floor 6h/80; `anim_efix.crease` ceil(5h/80); `kneel_checks` bridge tol as silhouette. At h 200
+  these are the per-pose boss tier (cap 15.0, tol 10, crease 13) instead of the large tier (9.6, 6, 8); relative to
+  the figure (about 0.6-0.67 of a 200-row cell against about 0.94 of the large cell) every gate is about 1.6x looser.
+- *Atlas page budget.* The atlas has 30 pages, 18 of them extra (hi-res), and `monster_hires_pages.MAX_EXTRA_PAGES =
+  18`, so it is at its cap. fire_hydra goes from 17 frames of 136 x 128 at tex 1 (nearest page) to 17 frames of
+  444 x 400 texture px at tex 2 (about 3.0 M px, near a full 2048^2 linear page).
+
+**Decisions.**
+- **D-A1 the frame.** A user recipe of `size: large` is imported in the **tall frame** when its idle is above the large
+  band (`idle > LARGE.height[1]` = 120) or its tallest pose is over `LARGE.foot_row - 1` = 121 rows (the rows a large
+  cell gives the figure); both on the native (split) heights, before any quantizing. Tall frame: cell height 200, feet
+  row 192 (the per-pose boss cell, `spec.BOSS_POSE_GEOM`: every tool already handles a 200-row cell and the 192 feet
+  row), figure band (96, 184) for H1's scale rule (the large band's floor; 8 rows below the top for rig overshoot),
+  minimum width 128 (the large cell; `place` widens it by its rule). Selection is automatic and recorded:
+  `info["frame"]` is always `large` or `tall`; both approved jsons (`monster_large.json`, `kneel.json`) get
+  `frame: tall` only for a tall import (a new optional approved-json key; no reader rejects unknown keys), so the four
+  shipped jsons are unchanged. Not a new data size: `monsters.yaml` `size: large` and the sheet name `monster_large`
+  stay, `enemies.yaml` `huge` stays, battle behaviour (class, capacity, hop, travel rules) is unchanged.
+  New `gen/monster_user_frame.py`: `TALL = MonsterBand("tall", 200, (96, 184), 192)`, `MIN_W = 128`, and
+  `frame_of(size: str, heights: list[int]) -> tuple[str, MonsterBand]`: a size other than `large` returns
+  `(size, spec.MONSTER_BANDS[size])` unchanged (no tall variant of small); large returns `("tall", TALL)` by the rule
+  above, else `("large", MONSTER_BANDS["large"])`.
+- **D-A2 tolerances.** A tall sheet takes the tolerances and rig defaults of its 200-row cell, as every per-pose boss
+  sheet does (hollow_seraph, idle 138 px in the same cell, is the precedent): no new knob. The rig sets its own part
+  radii where the template's x2.5 radius over-grabs. **Made visible, not hidden:** `monster_user_frame.tier_report(sid)`
+  (report-only, run by `python3 -I assets-src/gen/monster_user_frame.py tiers <id>`, so `monster_user.py` gains no
+  command) recomputes, over exactly the frames, `monster_anim.SEQUENCES` steps and `span_of` pairs that
+  `monster_check.check_sprite` feeds `continuity` (with its `continuity_share` and `ATTACK_SWAP_IOU` margin), every sequence step's
+  `anim_checks.continuity(prev, next, span, 128, share, margin)` and every generated frame's
+  `anim_checks.silhouette(..., cell_h=128, ...)` (the large tier) beside the cell's own result, and writes
+  `~/temp/ff-game/ef/user/<id>/tier_report.json` plus a printed summary (steps and frames that pass at 200 but fail at
+  128). Consequence: every such step / frame is named to the animation reviewer, who must look at it; a flagged one is
+  tuned in the rig; one the rig cannot clear is listed in the result for the user's ruling. The result records the
+  report's counts.
+- **D-A3 fire_hydra's size and budget.** `monster_scale.yaml` `fire_hydra: {scale: 2, tex: 2, smooth: [despur,
+  edges]}` replaces `{scale: 3, tex: 1, smooth: [despur]}` (the EF smoothing rule the user named for this sheet; despur
+  re-checked on the spines and horn tips, dropped to `[edges]` if it breaks them). Box 444 x 400 screen px (today
+  408 x 384). Budget: the rebuild reports the extra-page delta; `MAX_EXTRA_PAGES` is raised by exactly that delta
+  (expected +1, at most +2; beyond that the work stops and is reported) with a comment citing the user's instruction
+  (2026-11-25, fire_hydra at the EF smoothing rule), as ef-horse's +1; `MAX_GPU_BYTES` (8 x 16 MB) is not raised: the
+  build's worst preload + formation (`check_budget`, which includes the 2-hydra gurgu formations) must stay under it,
+  else the work stops and is reported. The queued 142-147 px sheets cost about one linear page each at tex 2 (noted for
+  their own batches, not decided here).
+
+**Import measures (prototype, tall frame, s = 1.0).** cw 222, anchors (bottom 6 rows) 95.6 / 90.4 / 92.3 / 102.2
+aligned to the idle's (x 100.6); placed opaque rows idle 73-192 (120), attack 71-192 (122), hurt 60-192 (133), kneel
+111-192 (82); columns 8-213 / 13-219 / 13-216 / 2-200 (border clear).
+
+**Changes.**
+- `gen/monster_user_frame.py` (new, < 150 lines): `TALL`, `MIN_W`, `frame_of`, `tier_report`.
+- `monster_user.py` (249 lines, kept <= 250: the `cut` measures dict is built in one line less, nothing else moves; no
+  new command): `cut` takes `(name, band) = frame_of(size, heights)`; `place` builds the
+  cell `band.cell` rows high and `max(MIN_W, span + 4)` wide, even (for the large frame `MIN_W` = its cell: unchanged);
+  `info["frame"] = name`.
+- `monster_user_review.metas` and `review`: the band from `info["frame"]` (`grid [cw, band.cell]`, `bottom_row` /
+  `foot_row` = its feet row, `frame: tall` when tall), not from `rec["size"]`.
+- Docs: one line each in `AGENTS.md` (the monsters_ai row and the V4 text: 21 `huge` sheets at 3, fire_hydra at 2 in
+  the tall frame), `gen/README.md` (the `frame: tall` json key) and `docs/NEW_MONSTER_GUIDE.md` (the tall frame and
+  its tolerance tier).
+
+**Tests (RED first, `selftest_monster_user.py`; the new import is wrapped `try: from gen import monster_user_frame
+except ImportError: check(False, ...)`, since `selftest.py:527` runs the suite unguarded).**
+1. `frame_of`: large [122, 123, 134, 82] -> tall; [112, 93, 115, 113] -> large; idle 120 / tallest 121 -> large; idle
+   120 / tallest 122 -> tall; idle 121 / tallest 121 -> tall; small [70, 90, 60, 50] -> small with the small band.
+2. A synthetic 4-pose row (idle 122, a 134 px pose): `cut` gives four 200-row frames, feet on row 192, s = 1.0,
+   `info["frame"] == "tall"`, cw even and >= 128, 1-px border clear; the same row with idle 112 and every pose
+   <= 121 px gives 128-row frames on row 122, `info["frame"] == "large"`.
+3. `metas` of the tall cut: `grid[1] == 200`, `bottom_row == 192`, kneel `foot_row == 192`, both `frame == "tall"`;
+   of a large cut: no `frame` key, `bottom_row == 122`; `approve` in the temp tree writes a 200-row kneel.png.
+4. The four shipped user sheets re-import byte for byte (`check`) and their recomputed metas equal the committed jsons
+   but for `approved`.
+5. fire_hydra (after its recipe lands): `cut` -> tall, s = 1.0, cw 222, `check` byte-identical on both jsons.
+6. `tier_report`'s comparison (`compare_step`) on a synthetic pair: the step's frames are the span's keys, 12 px apart
+   (share 0.5 x 12 = 6 < 9.6, so the floor decides): passes at 200 (cap 15) and is listed as failing at 128 (cap 9.6).
+
+**Pins that change (fire_hydra leaves the scale-3 set, stays data `huge`; only lists, counts and names move, no
+tolerance or rule).**
+- `tests/scenes/battle/EnemyLayoutAi.test.ts`: `TIER_H` drops fire_hydra ("the 23 rescaled sheets" -> 22; the 128-144
+  px cell test -> 21 fixtures; the scale-3 set); new: fire_hydra `huge` at scale 2, layout class `huge`, box 444 x 400.
+- `tests/scenes/battle/tierHTravel.test.ts`: `TIER_H` drops fire_hydra (22 -> 21, header comment); new case:
+  fire_hydra alone and in its real 2-hydra formation, every sprite at whole-px positions, `screen[0] == 2`, every
+  displayed frame's top >= `TRAVEL_CLEAR_Y`.
+- `tests/scenes/bestiary/bestiaryCentre.test.ts`: `TIER_H` drops fire_hydra; new: fire_hydra at scale 2 centred
+  within 1 px, `bound == []`, a full loop's right edge <= the inner right - 8.
+- `tests/data/rosterData.test.ts:73-89`: the huge-at-3 rule gets a named exception list `EF_H_TALL = ['fire_hydra']`
+  (scale 2), test name and comment updated; the count of huge enemies stays 22.
+- `tests/data/efSizes.test.ts`: 47 -> 48 hi-res sheets, the comments.
+- `assets-src/gen/selftest_pages.py` `run_scale`: fire_hydra moves out of `V4_RESCALED`, `EF_B2` and `EF_FALLBACK`
+  into `EF_H`; hires 47 -> 48; the "23 V4 sheets" / "four fallback" messages and docstrings follow.
+- Any golden layout case with fire_hydra is re-measured, never hand-edited.
+
+**Then (the usual EF-H batch, one commit).** Recipe `fire_hydra` in `monster_user.yaml` (file
+`user_art/fire_hydra/sheet_2026-11-25.png`, its sha256, tool ChatGPT (interactive), rendered 2026-11-25, refs = the
+sha256s of `~/temp/ff-game/ef/user_packs2/fire_hydra/` `current_x2.png`, `poses_reference.png`, `prompt.txt`; a
+`reserve` for the lava cracks, eyes and horns only if the colour error by region asks for it); review pages and a fresh
+image-only fidelity reviewer; `retire.py fire_hydra` (-> `fire_hydra_v1`, the next free id) and `--move-rig`;
+`monster_user.py approve fire_hydra`; a new three-head multi-head quadruped rig (`neck<i> / head<i> / snout<i>`,
+`lead_heads`, translation-first per the guide) with `kneel: {source: ai}`, the kneel bridge, `tiers`, a fresh
+image-only animation reviewer, lock; monsters.yaml brief, enemies.yaml description if it changes; a dev scenario
+`ef_user_fire_hydra` (fire_hydra beside other enemies).
+
+**Acceptance.** `selftest.py` ALL PASSED; `monster_anim.py check --all` only OK lines; `kneel_tools.py coverage` ai 123 /
+ai 12; atlas rebuilt and committed, PYTHONHASHSEED 0 / 1 byte-identical; **by-rect against int-ef4**: every sheet's
+frame pixels equal but fire_hydra's (page indices and rects may move with the repack), the preload page set's sheets
+unchanged; budget as D-A3, with the build's printed hi-res report line (extra pages before / after, GPU worst MB and its
+formation) recorded in the result; `npm run build`; `npm run test:fast`; browser `?mute=1&scenario=ef_user_fire_hydra&enemyAnim=loop`
+with no console warnings, the hydras' feet on the plain (<= 770) and the cursor / damage numbers not floating over
+the cell's empty top rows. `test:full` is the user's (combined batch).
+
+#### EF-H amendment A result + batch 2: fire_hydra, fire_lizard, black_knight (2026-11-25, branch `ef-batch2`; no AI call)
+
+- **Amendment A:** Momus rev 1 REJECT (4 blocking: the tierHTravel claim, rosterData, selftest_pages pins, the page
+  budget; 8 notes), rev 2 OKAY (5 notes applied). `gen/monster_user_frame.py` (`TALL` 200 / feet 192, `MIN_W` 128,
+  `frame_of`, `anchors`, `compare_step`, `tiers`); `monster_user.py` 250 lines; `selftest_monster_user_frame.py` (RED
+  first: the import itself failed, then each of `frame_of` / tall cut / metas / tiers; registered from
+  `run_monster_user`).
+- **Found in review, fixed RED first:** (1) `pixelize.foreground(exact_key=True)` still ran the renders' blob filter on
+  a 4x-reduced mask, which for figures over 200 px wide trimmed 247-348 outer px per pose (claw and horn tips; the
+  fire_hydra fidelity reviewer's iteration 1); the user alpha is now the figure without it (the four shipped user
+  sheets re-import byte for byte). (2) Recipe `anchor: {kneel: bbox}` (fire_lizard: the kneel's bottom rows are its
+  draped tail, so the feet anchor pushed the cell to 260 px). (3) Reserve classes `red` (the lizard's crimson frill)
+  and `ember` (the knight's visor).
+- **Imports (s = 1.0, house palette, reserves):** fire_hydra tall frame, cell 224 x 200 (box 448 x 400 at 2; the
+  prototype's 222 / 444 grew 2 px with the kept tips), heights 122 / 123 / 134 / 82, error mean 8.9 / max 30.3
+  (before the edge fix 9.5 / 208.9), lava slots (816 px, mean 5.3; the yellow core was 46 off). fire_lizard large,
+  224 x 128, heights 94 / 95 / 92 / 62 (outline closed by 1 px), mean 8.3 / max 37.1, frill slots (3108 px, mean 7.5;
+  was 28 off); the kneel's belly sits 9 rows over the standing feet line (its tail tip on the ground). black_knight
+  large, 128 x 128, heights 96 / 85 / 95 / 72, mean 12.2 / max 61.3 (visor 3 slots, mean 12.3; was grey, 143 off; the
+  armour's darkest greys ink to the outline, the house rule).
+- **Fidelity reviewers (fresh, image-only):** fire_hydra ITERATE-grade nit in it. 1 (the edge trim) -> SHIP at it. 2;
+  fire_lizard SHIP WITH NITS -> SHIP at it. 2; black_knight SHIP WITH NITS (the visor's dark falloff thinner, the
+  bronze trim duller, the darkest plate shading inked).
+- **Approve / retire:** archives `fire_hydra_v1`, `fire_lizard_v1`, `black_knight_v2` (next free ids; RETIRED_SPRITES
+  rows), `--move-rig` each; black_knight `size: large` in monsters.yaml and enemies.yaml (death_knight, 2.5 at 177.5
+  px, is now smaller than black_knight's 188 px: a temporary inversion, death_knight is re-rendered later; the
+  efSizes scale pin still holds).
+- **Rigs (`kneel: {source: ai}`, locked 14 frames each):** fire_hydra three-head quadruped (FW-5 heads 2 / 3, lead 1),
+  translation-first: the three heads and necks as one group (wind 4 back 1 up / 7 back 1 down, mid -3, follow +1,
+  hurt_in1 -3 / -2, hurt_in2 +3 / +2, daze lifted 2 / 1 against the recipe's x3 slump), 1-7 px pockets inked
+  (12 paint entries), bridge `{keep_top: 0.4}`; `tiers`: 16 steps, 9 frames, none passes at 200 but fails at 128
+  (the first rig's daze bbox did; tuned). fire_lizard quadruped, head / jaw / frill as one group (wind 4 / 7 back),
+  `atk_mid t: 0.0` (the feet lerp), bridge `{keep_bot: 0.3}`. black_knight the pirate's rigid lean (wind 5 / 10 deg),
+  4 seam / pocket paints. Animation reviewers: all three SHIP WITH NITS in 2 iterations (it. 1: the weak wind-up,
+  deepened; left: wind1 still close to the idle on the hydra, the jaw opens at wind2 on the lizard, 1-px stair steps
+  of the knight's 10 deg lean, the kneel_in1 -> in2 pop at the bridge's 0.35 maximum).
+- **Size:** `{scale: 2, tex: 2, smooth: [despur, edges]}` for all three (fire_hydra's scale-3 tex-1 entry, fire_lizard's
+  tex-2 despur entry and black_knight's 2.5 entry replaced). Pins moved: selftest_pages (V4 22, B1 31, EF_H +3, hires
+  48), efSizes (48, B1 31), rosterData (`EF_H_TALL`), EnemyLayoutAi (TIER_H, fire_hydra 448 x 400 huge, the tier-L
+  set 20 with black_knight), tierHTravel and bestiaryCentre (fire_hydra's own scale-2 cases).
+- **Gates:** atlas rebuilt (48 hi-res sheets on 21 hi-res pages, 31 pages, 19 extra: `MAX_EXTRA_PAGES` 18 -> 19 per
+  D-A3; GPU preload + largest formation 89.8 MB of 128, clay_golem + king_mummy); by-rect vs int-ef4: frame pixels
+  differ only for fire_hydra, fire_lizard, black_knight (17 frames each), 120 sheets equal (57 on another page),
+  preload pages [0, 1, 2] unchanged; `check --all` 123 OK only; `kneel_tools.py coverage` ai 123 / ai 12; `npm run
+  build` OK; `npm run test:fast` 430 files, 10269 passed; `selftest.py` ALL PASSED (1926 ok; its PYTHONHASHSEED 0 / 1
+  atlas determinism included; `kneel_ai_thresholds.json` / `selftest_kneel_ai.EXCLUDED` drop black_knight, whose
+  keyframe-painted hurt is retired); browser `?mute=1&scenario=ef_user_fire_hydra&enemyAnim=loop` (new:
+  the three beside a goblin): feet on the plain, no console warnings or errors
+  (`~/temp/ff-game/ef/user/smoke_batch2/`). `test:full` left for the combined batch.
+
 ## EF-I. Review tool: the dazed GIF shows the kneel track (rev 2, 2026-11-25; user-approved task; Momus rev-1: REJECT, 10 findings, applied; rev-2: OKAY, 3 notes applied)
 
 **Why.** `monster_anim.py review <id>` writes `<id>_daze.{gif,png}` from `monster_review.TIMELINES["daze"]`

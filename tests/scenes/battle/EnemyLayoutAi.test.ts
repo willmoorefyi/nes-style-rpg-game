@@ -167,7 +167,8 @@ describe('large crowds pack by their home art (defect 2)', () => {
     // EF-B1: the 2.5 larges lay out as `huge` (capacity 1), so they leave the set: 11 of the 26, 15 left
     // EF-H: the user-rendered dark_wizard (small -> large, scale 2 placeholder) joins: 16
     // ef-pv: the user-rendered pirate, vampire and vampire_lord (small -> large, native size, scale 2) join: 19
-    expect(s.length).toBe(19);
+    // EF-H batch 2: the user-rendered black_knight (small at 2.5 -> large at 2, home art <= 236 px) joins: 20
+    expect(s.length).toBe(20);
     for (const sheet of s) {
       const id = enemyData.find((e) => e.size === 'large' && monsterSpriteKey(e) === sheet)!.id;
       expect(packed(Array(9).fill(id)).every((b) => b.scaleFactor === 1), sheet).toBe(true);
@@ -201,11 +202,11 @@ describe('large crowds pack by their home art (defect 2)', () => {
 describe('integer screen scales, tier H and the titan (TS-2)', () => {
   const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
     'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
-    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
+    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'deepeyes', 'evil_eye'];
   /** An enemy's layout input from the real data (V4: the sheet scale and size are in the atlas and enemies.yaml). */
   const rescaled = layoutInput;
 
-  it('the 23 rescaled sheets, chaos and hollow_seraph have scale 3 in the atlas and their size in enemies.yaml; no other sheet has a scale', () => {
+  it('the 22 rescaled sheets, chaos and hollow_seraph have scale 3 in the atlas and their size in enemies.yaml; no other sheet has a scale', () => {
     for (const id of [...TIER_H, 'bigeyes']) {
       expect([layoutInput(id).size, layoutInput(id).scale], id).toEqual([id === 'bigeyes' ? 'large' : 'huge', 3]);
     }
@@ -225,6 +226,11 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
     // EF-B adds 2.5 sheets and explicit scale-2 entries (smoothed sheets); the scale-3 set is unchanged
     const scaled = Object.keys(atlas.sheets).filter((s) => atlas.sheets[s].scale === 3).sort();
     expect(scaled).toEqual([...TIER_H, 'bigeyes', 'chaos', 'hollow_seraph'].sort());
+    // EF-H amendment A: fire_hydra (the user's render in the tall frame, 222 x 200 cell) stays data `huge` at scale 2,
+    // so its layout class stays `huge`; box 448 x 400 (cell 224 x 200)
+    const fh = layoutInput('fire_hydra');
+    expect([fh.size, fh.scale, fh.w, fh.h]).toEqual(['huge', 2, 448, 400]);
+    expect(layoutSizeOf('huge', 2)).toBe('huge');
   });
   const whole = (v: number) => Math.abs(v - Math.round(v)) < 1e-9;
   const screenScales = (inputs: EnemyBoxInput[]) =>
@@ -232,7 +238,7 @@ describe('integer screen scales, tier H and the titan (TS-2)', () => {
   const H = (): EnemyBoxInput => ({ size: 'huge', w: 384, h: 384, scale: 3 });
   const TITAN: EnemyBoxInput = { size: 'titan', w: 600, h: 600, scale: 2 };
 
-  it('the 22 tier-H fixtures exist in the atlas at 128-144 px cells (384-432 px boxes at scale 3)', () => {
+  it('the 21 tier-H fixtures exist in the atlas at 128-144 px cells (384-432 px boxes at scale 3)', () => {
     for (const id of TIER_H) {
       const b = rescaled(id);
       expect(b.h, id).toBe(384);

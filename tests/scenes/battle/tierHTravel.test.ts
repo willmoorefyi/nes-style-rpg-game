@@ -1,11 +1,13 @@
 /**
  * Tier H in battle (docs/REDESIGN_PLAN.md 2.5, 4.2; 9.5 lungeClearance / enemyTravel rows). Since V4 on the real data:
- * the 22 tier-H enemies are `size: huge` in enemies.yaml and their atlas sheets carry the FW-S `scale: 3` (lungePx
+ * the 21 tier-H enemies are `size: huge` in enemies.yaml and their atlas sheets carry the FW-S `scale: 3` (lungePx
  * x 1.5, as BattleArt.getMonsterFrames scales it); chaos is still checked as a titan fixture (alone in TITAN_AREA,
  * attacking in place) until its titan sheet is integrated.
  * - Every tier-H sheet, alone and in a 3-huge formation, attacking every hero: every displayed frame's own opaque top
  *   (atlas PNG) stays under the message window (TRAVEL_CLEAR_Y), the sprite at a whole screen scale (3 or 2) and a
  *   whole-px position.
+ * - EF-H amendment A: fire_hydra (the user's render in the tall frame) stays `huge` at scale 2: alone and in its real
+ *   2-hydra formation (gurgu-b3 / b4 / b5), whole-px positions, screen scale 2, every frame under the clear line.
  * - The titan: travel 0 on every hero (the heavy table in place), TRAVEL_HOP 0, and no frame above the clear line.
  */
 import { describe, it, expect } from 'vitest';
@@ -19,7 +21,7 @@ import type { EnemyData } from '../../../src/types/index.js';
 
 const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
   'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
-  'dragon_zombie', 'white_shark', 'minotaur_zombie', 'fire_hydra', 'deepeyes', 'evil_eye'];
+  'dragon_zombie', 'white_shark', 'minotaur_zombie', 'deepeyes', 'evil_eye'];
 
 const art: MonsterArtSource = { getMonsterFrames: atlasFrames };
 const huge = (id: string): EnemyData => enemyById(id);
@@ -72,6 +74,20 @@ describe('tier H travels under the message window at a whole screen scale (real 
       }
       expect(screen[0], `${id} at factor 1`).toBe(3);
       expect(highest(b, sheet, f), `${id} x${layout.length}`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
+    }
+  });
+});
+
+describe('EF-H amendment A: fire_hydra at scale 2 in the tall frame', () => {
+  it('alone and in its real 2-hydra formation: whole-px positions, screen scale 2, every frame under the clear line', () => {
+    const f = atlasFrames('fire_hydra')!;
+    expect([enemyById('fire_hydra').size, atlas.sheets.fire_hydra.scale, f.scale, f.cell[1]]).toEqual(['huge', 2, 2, 200]);
+    for (const layout of [[huge('fire_hydra')], [huge('fire_hydra'), huge('fire_hydra')]]) {
+      const b = battle(layout);
+      const screen = b.sprites.map((s) => (s.scale.x * f.scale) / f.artScale);
+      for (const s of b.sprites) expect(Number.isInteger(s.x) && Number.isInteger(s.y), `position ${s.x},${s.y}`).toBe(true);
+      expect(screen.map((v) => Math.round(v * 1e9) / 1e9)).toEqual(Array(layout.length).fill(2));
+      expect(highest(b, 'fire_hydra', f), `x${layout.length}`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
     }
   });
 });
