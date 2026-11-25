@@ -554,7 +554,7 @@ Three fresh image-only reviewers all said ITERATE. The last one flagged only a s
 squared lapel block (`~/temp/ff-game/ef/bedrock6/pirate/DEBRIEF.md`). The sprite stops at G1: no B1 poses, master
 not recorded.
 
-### EF-H. User-rendered sheets (rev 1, 2026-11-25)
+### EF-H. User-rendered sheets (rev 3, 2026-11-25; Momus OKAY, notes applied)
 
 User ruling 2026-11-25: after our cut-out and posing, the user renders the final sprite sheet in an interactive
 image UI (ChatGPT) and supplies it. dark_wizard first: `~/temp/dark_wizard_sprite_sheet.png` (704x144 RGBA, binary
@@ -568,12 +568,14 @@ ledger count (no further Bedrock calls in this route).
 **H1. Import tool** (rev 2, Momus rev-1: 9 findings) `gen/monster_user.py` (< 250 lines; RED-first
 `selftest_monster_user.py`, registered in `selftest.py`), recipe rows in `gen/monster_user.yaml` (`<id>: {file, sha256,
 poses: [idle, attack, hurt, kneel], flip: false, size: large, tool, rendered, author: user, refs: {idle_master_sha256,
-poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered: 2026-11-25`):
+poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered: 2026-11-25`, `refs: unknown` with a note: its references were the EF4 / EF5 images the user had,
+  before the pack route existed):
 - **Split:** the row into exactly four 8-connected pieces after dropping specks < 24 px (else refuse).
 - **Scale:** `s = min(target_idle, fit_tallest)`, where `target_idle` brings the idle into the large band (96-120) and
   `fit_tallest` keeps the tallest pose clear of the cell's top border with the feet on row 122; **s = 1.0 when the
   idle is already in the band** (dark_wizard: idle 112, tallest hurt 115 -> s = 1.0, no resample). s < 1 re-pixelizes
-  as `monster.py:646` does, never nearest; s > 1 is not used (refuse and report).
+  as `monster.py:646` does, never nearest; an idle below the band keeps s = 1.0 (or an integer upscale
+  if it is under half the band) and its height is reported, never refused (size is not a rejection reason).
 - **Placement:** each pose's anchor = the mean x of its opaque px in its bottom 6 rows; every pose is placed with its
   anchor at the same x as the idle's, feet on row 122; the cell width `cw` follows the cutter's widening rule
   (`monster.py:695-702`; the attack is 166 px wide, so cw >= 170); no opaque px on the 1-px border.
@@ -602,4 +604,5 @@ poses_reference_sha256}}`; dark_wizard: `tool: ChatGPT (interactive)`, `rendered
   `selftest_roster.kneel_ok` (:213-223) gains `elif meta.get("backend") == "user"` before the BR-keys path (the same
   re-import check); `selftest_roster._approved_keys` (:240-255) gains a user branch beside the bedrock one, counted as
   `done`. AGENTS.md "AI sprite generation" gets one line on `backend: user` (the third approved-sheet source). The
-  atlas page group's 2048 cap is checked at the rebuild.
+  2048 cap is checked on the `filter: linear` hi-res page the tex-2 sheet lands on (`monster_hires_pages`,
+  `monster_atlas.py:225`) at the rebuild.
