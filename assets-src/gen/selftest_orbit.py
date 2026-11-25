@@ -45,7 +45,7 @@ def run_orbit(check: Callable[[bool, str], None]) -> None:
           "an orbit name falls back to idle / idle_b (as the TS FRAME_FALLBACK)")
     sid, meta, kfs = next(e for e in MA.load_entries() if e[0] == "chaos")
     cfg = MA.load_rig("chaos")
-    plain = {k: v for k, v in cfg.items() if k != "orbit"}
+    plain = {k: v for k, v in cfg.items() if k not in ("orbit", "kneel_orbs")}   # EF-J needs `orbit`
     g0 = MA.generate(sid, plain, kfs, meta)
     check(not any(n.startswith("idle_o") or n.startswith("idle_b_o") for n in g0),
           "RED: chaos without `orbit` has no orbit frames")
@@ -53,7 +53,8 @@ def run_orbit(check: Callable[[bool, str], None]) -> None:
     n = int(cfg["orbit"]["steps"])
     names = [f for f in gen if f.startswith(("idle_o", "idle_b_o"))]
     check(sorted(names) == sorted(MA.orbit_names(n)), f"chaos: {len(names)} orbit frames (2 x {n})")
-    check(all(np.array_equal(g0[k]["img"], gen[k]["img"]) for k in g0), "the orbit leaves every other chaos frame equal")
+    check(all(np.array_equal(g0[k]["img"], gen[k]["img"]) for k in g0 if not k.startswith("kneel")),
+          "the orbit leaves every other chaos frame equal (the kneel bridge: EF-J's, selftest_kneel_orbs)")
     rep = MC.check_sprite(sid, cfg, kfs, meta, gen, with_lock=False)
     bad = {k: v for k, v in rep.items() if v and (k.startswith("idle_o") or k.startswith("idle_b_o") or k == "sequence:orbit")}
     check(not bad and "sequence:orbit" in rep, f"chaos orbit frames and sequence pass ({dict(list(bad.items())[:2])})")

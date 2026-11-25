@@ -187,6 +187,9 @@ def ai_checks(sprite: str, cfg: dict, kfs: dict, meta: dict, gen: dict, allowed:
     # the key's outline weight is the approved drawing's own (J0 / the review judged it): not compared with the idle
     out = {"kf:kneel": C.binary_alpha(key) + C.palette_lock(key, allowed) + C.magenta(key)
            + ground(key, idle, bottom, floating, contact=False) + fit(key, bottom)}
+    if cfg.get("kneel_orbs"):                         # EF-J: the key cell's orbs rest on the ground
+        from gen import kneel_orbs as KO
+        out["kf:kneel"] += KO.frame_checks("kneel", key, KO.key_info(sprite, cfg, kfs))
     for n in (f for f in KNEEL_FRAMES if f in gen):
         out[n] = ground(gen[n]["img"], idle, bottom, floating, contact=n not in KEY_DRAWN) + fit(gen[n]["img"], bottom)
     if all(n in gen for n in IN_BETWEENS):
@@ -208,13 +211,15 @@ def bridge_holes(a: np.ndarray, src: np.ndarray, min_px: int = 4) -> list[str]:
 
 
 def bridge_frame(name: str, a: np.ndarray, src: np.ndarray, toward: np.ndarray, u: float, cell_h: int,
-                 allowed: set) -> list[str]:
+                 allowed: set, orbs: dict | None = None) -> list[str]:
     """D-KT4: the plain checks of a bridge frame (monster_check.frame_checks hands them here). Alpha, palette, magenta,
     no new piece and the outline against its one source drawing; holes per bridge_holes; the opaque area within
     0.85-1.15 of the source's area resized to the frame's bbox (no chunk lost or gained; the plain rule, 0.85-1.15 of
     the source alone, would refuse any squash) and the bbox height within the cell's tolerance of the src -> toward
     lerp at u; nothing on the border; |u| <= 0.35 (kneel_b, the breath, is u 0)."""
-    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.detached(a, src) + C.outline_kept(a, src)
+    from gen import kneel_orbs as KO                     # EF-J: pieces judged on the body, plus the orbs' own checks
+    out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a) + C.outline_kept(a, src) + \
+        (KO.detached(a, orbs) + KO.frame_checks(name, a, orbs) if orbs else C.detached(a, src))
     out += bridge_holes(a, src)
     hs, ht, hf = (C._rows(x[..., 3] > 0) for x in (src, toward, a))
     ws, wf = (C._rows((x[..., 3] > 0).T) for x in (src, a))

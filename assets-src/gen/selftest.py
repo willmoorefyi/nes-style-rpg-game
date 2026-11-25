@@ -531,6 +531,7 @@ def test_monster_anim() -> None:
     print("EF-I review daze GIF (the in-game kneel track, constants pinned to kneelChoreography.ts, legacy strip)"); __import__("gen.selftest_review_daze", fromlist=["x"]).run_review_daze(check)  # noqa: E702,E501
     print("pass KA-G Gemini kneel (batch tool on a fake client, arm g, guard, KG1-KG8)"); __import__("gen.selftest_gemini_batch", fromlist=["x"]).run_gemini_batch(check)  # noqa: E702,E501
     print("EF-D idle orbit (rig `orbit`: chaos only, orbit frames and checks, mutations RED, idleOrbit, anchors)"); __import__("gen.selftest_orbit", fromlist=["x"]).run_orbit(check)  # noqa: E702,E501
+    print("EF-J kneel orbs (rig `kneel_orbs`: chaos only, the orbs fall in the bridge and rest on the ground, mutations RED)"); __import__("gen.selftest_kneel_orbs", fromlist=["x"]).run_kneel_orbs(check)  # noqa: E702,E501
     print("monster atlas build locks")
     SA.run_build_locks(check)
 

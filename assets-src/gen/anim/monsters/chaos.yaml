@@ -210,3 +210,18 @@ orbit:
     pale: {at: [100, 13], r: 8, a0: 270, colors: [[6, 4, 10], [66, 132, 148], [231, 239, 222]]}
     teal: {at: [120.5, 21], r: 8.5, a0: 0}
     ember: {at: [127.5, 40.5], r: 8.5, a0: 90}
+# EF-J (docs/ENEMY_FEEDBACK_PLAN.md, kneel_orbs.py): when he kneels the four orbs fall and rest on the ground beside
+# him. The orbs are cut out of the idle (the orbit masks above) and of the AI kneel key (these masks: the pale one
+# touches the flame, so only its own colours; the others are their own pieces); the bridge runs on the clean bodies;
+# kneel_in1 shows the idle orbs half way down, kneel_in2 the key orbs 90 %, the key cell and kneel_b the key
+# orbs on the feet row (two left of the hem, two right), each with a 1 px contact shadow. The out plays it upward.
+kneel_orbs:
+  fall: [0.5, 0.9]
+  rest: {white: 10, pale: 26, teal: 172, ember: 187}
+  shadow: true
+  parts:
+    white: {at: [100, 70.5], r: 9.5, piece: true}
+    pale: {at: [129, 55], r: 8, colors: [[6, 4, 10], [82, 132, 140], [41, 41, 49], [24, 0, 33], [231, 239, 222],
+                                         [148, 140, 132], [24, 24, 33]]}
+    teal: {at: [143, 65], r: 9.5, piece: true}
+    ember: {at: [142.5, 90], r: 9.5, piece: true}

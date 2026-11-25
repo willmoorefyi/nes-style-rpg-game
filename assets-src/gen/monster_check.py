@@ -84,7 +84,7 @@ def frame_checks(name: str, f: dict, arrs: dict[str, np.ndarray], gen: dict[str,
     if f.get("orbit"):                                    # EF-D: the idle with its orbs moved (monster_orbit)
         return MO.frame_checks(name, f, S, allowed)
     if f.get("bridge"):                                   # pass KT D-KT4: a bridge frame lies between two drawings
-        return KC.bridge_frame(name, a, S, T, f["u"], cell_h, allowed)
+        return KC.bridge_frame(name, a, S, T, f["u"], cell_h, allowed, f.get("kneel_orbs"))
     out = C.binary_alpha(a) + C.palette_lock(a, allowed) + C.magenta(a, MAGENTA_ART.get(meta.get("character"), ())) + \
         C.detached(a, S) + \
         C.new_holes(a0, S, 4, AF.unshift(f["labels"], f.get("shift")))
