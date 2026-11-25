@@ -102,7 +102,6 @@ fire_lizard: {scale: 2, tex: 2, smooth: [despur]}
 crazy_horse: {scale: 2, tex: 2, smooth: [despur, edges]}   # EF-F (standing rule 2026-11-24, NEW_MONSTER_GUIDE 1.4); edges: the review kept the face crisp
 # EF-H (docs/ENEMY_FEEDBACK_PLAN.md EF-H): the user-rendered dark_wizard (backend: user), smoothed under the standing
 # rule; `edges`: the review kept the staff and skull crisp, despur leaves the staff whole (smooth_staff_x6.png).
-# PLACEHOLDER, pending the user's size decision (2026-11-25: the dark wizard must not display bigger than the ogre,
-# 204 screen px; at scale 2 its 112 px idle is 224): the likely final is a fine scale below 2 (about 1.8), which needs
-# monster_hires.valid_scale widened below 2 first. Replace this entry (and rebuild the atlas) when the user decides.
+# User ruling 2026-11-25: keep him large like the ogre (a strong enemy), at his native pixel count and the default
+# scale 2 (idle 224 screen px with the staff; the hood and horns reach about the ogre's 204).
 dark_wizard: {scale: 2, tex: 2, smooth: [despur, edges]}
