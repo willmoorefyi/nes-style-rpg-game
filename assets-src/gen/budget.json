@@ -331,18 +331,21 @@
       "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment A3; the user approved the EF5 posed inputs directly in the session): pass EF5 repaints dark_wizard's re-posed attack, hurt and kneel by SD 3.5 Large image-to-image at low strength (monster_hr_br.py); <= 5 calls per pose; no remove_bg, no Gemini.",
       "used": 4,
       "closed": "2026-11-25, 4 of 15 (EF5: dark_wizard attack v3 0.30, hurt v3 0.30 + v4 0.38, kneel v2 0.30; SD 3.5 Large image-to-image only). Set cut in ~/temp/ff-game/ef/bedrock5/dark_wizard/ (final review SHIP WITH NITS), approval held for the user's size decision."
+    },
+    {
+      "pass": "EF6",
+      "cap": 57,
+      "per_purpose_caps": {
+        "ef6_pose": 56,
+        "ef6_nobg": 1,
+        "reserve": 0
+      },
+      "gemini_before": 553,
+      "reserve_max_usd": 0.08,
+      "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment B): pass EF6 repaints pirate, vampire and vampire_lord by the EF5 method (re-posed, user-approved poses, SD 3.5 Large image-to-image at low strength; upright attack), plus one Stability Remove Background call for the pirate's v3 page (ef6_nobg) and at most one dark_wizard hurt repaint if the user asks for it. ef6_pose 56 = (4 + 4 + 3 images) x 5 + 1. All EF6 calls made by the orchestrator session. No Gemini.",
+      "used": 1,
+      "closed": "2026-11-25, 1 of 57 (EF6: the pirate's Remove Background call only). User ruling 2026-11-25 (EF-H): final sprites are rendered by the user in an interactive UI from our posed references; no EF6 repaints."
     }
   ],
-  "bedrock": {
-    "pass": "EF6",
-    "cap": 57,
-    "per_purpose_caps": {
-      "ef6_pose": 56,
-      "ef6_nobg": 1,
-      "reserve": 0
-    },
-    "gemini_before": 553,
-    "reserve_max_usd": 0.08,
-    "note": "User approval 2026-11-25 (docs/ENEMY_FEEDBACK_PLAN.md EF-G amendment B): pass EF6 repaints pirate, vampire and vampire_lord by the EF5 method (re-posed, user-approved poses, SD 3.5 Large image-to-image at low strength; upright attack), plus one Stability Remove Background call for the pirate's v3 page (ef6_nobg) and at most one dark_wizard hurt repaint if the user asks for it. ef6_pose 56 = (4 + 4 + 3 images) x 5 + 1. All EF6 calls made by the orchestrator session. No Gemini."
-  }
+  "bedrock": null
 }
