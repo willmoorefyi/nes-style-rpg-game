@@ -691,3 +691,11 @@ the sha256s of the reference packs (`~/temp/ff-game/ef/user_packs/<id>/`: idle, 
   was deepened after its review). Locked (14 frames each).
 - **Size:** `{scale: 2, tex: 2, smooth: [despur, edges]}` for all three (about 160 / 180 / 182 screen px; despur kept,
   the hi-res frames keep the blade and claws whole: `~/temp/ff-game/ef/user/<id>/smooth_hires_x2.png`).
+- **Integrator gates (ef-pv):** atlas rebuilt and committed (30 pages, 47 hi-res sheets on 20 hi-res pages, 18 extra
+  pages of max 18; preload + largest formation 90.4 MB of 128); PYTHONHASHSEED 0 / 1 builds byte-identical (31 files);
+  by-rect vs mainline: only pirate, vampire and vampire_lord differ (17 frames each of 123 sheets);
+  `monster_anim.py check --all` 123 OK lines only; `selftest.py` ALL PASSED (1867 ok); `kneel_tools.py coverage` ai
+  123 / ai 12; `npm run build` OK; `npm run test:fast` 430 files, 10265 passed; `npm run test:full` 432 files, 10297
+  passed, 2 skipped (mutation cache MISS caaa3078077a, live 1299 s on 4 workers); browser
+  `?mute=1&scenario=ef_user_pirate_vampire&enemyAnim=loop` (new: pirate, vampire and vampire_lord beside the goblin
+  and the ogre), no console warnings or errors (`~/temp/ff-game/ef/user/smoke/`).
