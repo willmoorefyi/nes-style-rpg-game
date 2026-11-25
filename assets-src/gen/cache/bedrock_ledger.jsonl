@@ -1558,3 +1558,9 @@
 {"event": "result", "key": "603effd84a930eaa7ae8e003", "ok": true, "served": "stability.sd3-5-large-v1:0"}
 {"event": "request", "ts": "2026-11-24T16:09:03", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef4_pose", "seed": 44022, "key": "a7f39f2c873de2a797522de4", "pass": "EF4"}
 {"event": "result", "key": "a7f39f2c873de2a797522de4", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-25T00:15:22", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45013, "key": "f6eaae31cfafb7ad77f72cac", "pass": "EF5"}
+{"event": "result", "key": "f6eaae31cfafb7ad77f72cac", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-25T00:15:31", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45023, "key": "3175b0fe77a469074a51e321", "pass": "EF5"}
+{"event": "result", "key": "3175b0fe77a469074a51e321", "ok": true, "served": "stability.sd3-5-large-v1:0"}
+{"event": "request", "ts": "2026-11-25T00:15:40", "tool": "monster_hr_br.py", "model": "sd35", "purpose": "ef5_pose", "seed": 45032, "key": "59842d5b548c3486bbb86274", "pass": "EF5"}
+{"event": "result", "key": "59842d5b548c3486bbb86274", "ok": true, "served": "stability.sd3-5-large-v1:0"}
