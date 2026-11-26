@@ -23,5 +23,17 @@
     "down",
     "victory"
   ],
-  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output"
+  "note": "battle.png is the pixelized 3x2 native sheet (240x160); battle_raw.png is the original Gemini output",
+  "facing_fix": [
+    {
+      "pose": "hurt",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R2, whole figure"
+    },
+    {
+      "pose": "down",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R1, whole figure"
+    }
+  ]
 }

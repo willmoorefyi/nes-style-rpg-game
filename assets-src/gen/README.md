@@ -78,6 +78,19 @@ sheet with `python3 -I assets-src/gen/approve.py <id> <battle|field> [--flip lef
 | `field_up` | 3x1 | same, seen from behind | 24x48 | 48x96 |
 | `field_left` | 3x1 | same, side view facing left (right = mirror) | 24x48 | 48x96 |
 
+**Build-time review fixes of a hero battle sheet** (`approved/<class>/battle.json`; the approved PNG stays
+byte-identical, it is a style reference). `face_fix` recolours pixels of one pose. `facing_fix` (pass HF,
+`puppet_facing.py`, `docs/HERO_FACING_PLAN.md`) turns poses to face left, applied after `face_fix` through
+`puppet.apply_review_fixes` / `battle_sheet_frames` (every reader: the battle_ai stage, the in-betweens, the kneel
+bridge): `{"pose": "hurt", "mirror": "figure"}` reflects the whole figure about its visual centre (x' = S - x, S = 2 x the opaque
+pixels' mean x rounded half up, clamped into columns 1..78; rows and feet kept, so the hero does not move in its cell); `{"pose": "ready", "mirror": "head", "box": [x0, y0, x1, y1],
+"exclude": [[...]], "sum": S}` reflects the opaque pixels of the box minus the excludes to x' = S - x, closes the
+outline in the box rows +- 1 and fails closed on a new piece or speck, a colour outside the cell's palette or
+non-binary alpha. A figure-mirrored keyframe (ready / attack / cast) keeps its yaml joints on the approved PNG:
+`puppet.load_cfg` mirrors them and swaps n / f (n = screen-left; `cast_hand` too) and the in-betweens cut from it
+draw with n / f exchanged in the z order; a head mirror's pixels are labelled `head` in the segmentation. Selftest
+`selftest_facing.py`; test `tests/rendering/heroFacing.test.ts`.
+
 Gemini requests send: the pose guide, a crop of `refs/style_reference.jpg`, and (optionally) `identity_ref` from
 `characters.yaml` upscaled 8x. Backgrounds are requested as solid magenta and keyed by colour; older white
 renders fall back to a border flood fill.

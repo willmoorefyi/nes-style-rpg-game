@@ -22,5 +22,29 @@
     "hurt",
     "down",
     "victory"
+  ],
+  "facing_fix": [
+    {
+      "pose": "ready",
+      "mirror": "head",
+      "box": [
+        28,
+        5,
+        54,
+        25
+      ],
+      "sum": 82,
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R5, the head faces left; idle_b, atk_wind1/2 and cast_gather follow"
+    },
+    {
+      "pose": "hurt",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R2, whole figure"
+    },
+    {
+      "pose": "down",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R1, whole figure"
+    }
   ]
 }
