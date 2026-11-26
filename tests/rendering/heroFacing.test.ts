@@ -122,15 +122,19 @@ describe('pass HF: hero battle facing fixes in the committed atlas', () => {
     }
   }
 
-  it('the ruled scope: down mirrored for 9 classes, cast for ninja / black_mage / white_mage, heads for ninja / master', () => {
-    const of = (pose: string) => classes.filter(cid => {
+  it('the ruled scope: down for 9 classes, cast for 3 (+ master head), heads for ninja / master', () => {
+    const of = (pose: string, mirror: 'figure' | 'head') => classes.filter(cid => {
       const meta = JSON.parse(readFileSync(`${APPROVED}/${cid}/battle.json`, 'utf8')) as BattleMeta;
-      return (meta.facing_fix ?? []).some(f => f.pose === pose);
+      return (meta.facing_fix ?? []).some(f => f.pose === pose && f.mirror === mirror);
     });
-    expect(of('down')).toEqual(['black_mage', 'knight', 'master', 'ninja', 'red_mage', 'red_wizard', 'thief', 'warrior',
-      'white_mage']);
-    expect(of('cast')).toEqual(['black_mage', 'ninja', 'white_mage']);
-    expect(of('ready')).toEqual(['master', 'ninja']);
-    expect(of('victory')).toEqual([]);
+    expect(of('down', 'figure')).toEqual(['black_mage', 'knight', 'master', 'ninja', 'red_mage', 'red_wizard', 'thief',
+      'warrior', 'white_mage']);
+    expect(of('cast', 'figure')).toEqual(['black_mage', 'ninja', 'white_mage']);
+    expect(of('ready', 'head')).toEqual(['master', 'ninja']);
+    // master's attack and cast heads already face left (two blind image reviews, docs/HERO_FACING_PLAN.md 11)
+    expect(of('attack', 'head')).toEqual([]);
+    expect(of('cast', 'head')).toEqual([]);
+    expect(of('victory', 'head')).toEqual([]);
+    expect(of('victory', 'figure')).toEqual([]);
   });
 });

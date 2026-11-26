@@ -55,7 +55,7 @@ already goes through. Each entry:
   `figure` entry with `box` / `exclude` / `sum`, a `head` entry without a 4-int `box` or with a non-integer `sum`, or
   a reflected pixel outside columns 1..78 raise `ValueError` at build time (fail closed).
 
-Entries (27): 24 figure entries (9 x down, 12 x hurt, 3 x cast) and 3 head entries: ninja ready `box [8, 2, 56, 28]`,
+Entries (27 at first, 26 after section 11): 24 figure entries (9 x down, 12 x hurt, 3 x cast) and 3 head entries (master attack dropped in 11): ninja ready `box [8, 2, 56, 28]`,
 `exclude [[18, 25, 31, 28]]` (the near fist's top), `sum 84` (82 before review 1); master ready `box [28, 5, 54, 25]`, `sum 82`; master
 attack `box [33, 8, 60, 27]`, `sum 91`. The boxes stop at the row above the collar / neck, measured on the cells.
 
@@ -275,3 +275,33 @@ with `&kneel=loop` and the fallen white mage's down pose; `ai_party_mixed` with 
   head against his body.
 - Weapons and shields change hands in every whole-figure mirror. The reviewers say they read naturally, and the white
   mage's staff now stays in the same hand through the cast.
+
+## 11. Follow-up rulings (coordinator, on the user's behalf, 2026-11-25) and what review found
+
+The open decisions of 10 were ruled: (1) keep master's attack-key head mirror; (2) add a head mirror for master's
+cast key so his head faces left through the whole cast; (3) add a head mirror for the ninja's victory key (head and
+bandana; the body and the raised arm as drawn). Lighting and weapon hands accepted. Same `facing_fix` mechanism.
+
+Tried (boxes measured on the cells): master cast `box [29, 2, 56, 22]`, `sum 82`; ninja victory `box [8, 4, 52, 29]`,
+`exclude [[30, 28, 52, 29]]`, `sum 80`. The fresh image review (round 3, `~/temp/ff-game/hero_facing/after/round3/
+review_3.txt`) returned ITERATE:
+- **master cast / cast_rise / cast_release now faced RIGHT.** The approved cast head already faces left (features left
+  of the skull centre, ear and shaded back of the skull on the right). A second, blind reviewer given only the three
+  unlabelled raw heads (`round3/master_heads_raw_ABC.png`) read ready = right (medium-high), **attack = left (high)**
+  and cast = left (high). So 1.1's call that master's attack head faced right was wrong; the user's original remark
+  ("the attack key itself already faces left") holds for master too, and ruling (1) rested on that error.
+- **ninja victory**: the head faced left, but the mirrored bandana tails ran across the raised forearm (drawn in front
+  of it), cutting the fist and kunai off visually, plus a 1-2 px gap at the hood / shoulder.
+
+Outcome (committed): the master cast entry is not added, and **the master attack head entry is removed** (attack,
+atk_mid and atk_follow are the approved / pre-HF frames again, facing left), so master's head faces left in every
+attack and cast frame. The ninja victory entry is not added: a clean result needs the reflected head drawn *behind*
+the raised arm (write only onto transparent or old-head pixels), which is a small new `facing_fix` option (code), and
+the coordinator asked to stop before any code. 26 `facing_fix` entries in total. Changed cells against the first HF
+commit: master attack, atk_mid, atk_follow (back to the pre-HF pixels); nothing else; no lock changed.
+
+Round 4 (fresh reviewer, master's attack and cast sequences): PASS. Every frame faces left, the facing is
+consistent, and there are no seams. Gates after section 11: `gen/selftest.py` ALL PASSED; `puppet.py review` 12 / 12;
+`puppet_kneel.py check` 12 / 12; `kneel_tools.py coverage` ai 123 / ai 12. battle_ai is byte-equal under
+PYTHONHASHSEED 0 / 1. The monster atlas is byte-equal (35 files). `npm run build` passes. `npm run test:fast`:
+431 files, 10,367 tests. The touched tests: 5 files, 415 tests.
