@@ -240,10 +240,10 @@ def _approved_keys(check: Callable[[bool, str], None]) -> None:
                 bad.append(f"{cid} {meta['sheet']}: revived from {meta['revived_from']}, cache/{meta.get('cache_key')} "
                            "missing")
             continue
-        if meta.get("backend") == "user":            # EF-H: user-rendered sheets, re-imported byte for byte
-            from gen import monster_user as MU
+        if meta.get("backend") == "user":            # EF-H / PT: user-rendered sheets, re-imported byte for byte
+            from gen import field_user as FU
             done += 1
-            why = MU.check(meta)
+            why = FU.user_check(meta)
             if why:
                 bad.append(f"{cid} {meta['sheet']}: {why}")
             continue

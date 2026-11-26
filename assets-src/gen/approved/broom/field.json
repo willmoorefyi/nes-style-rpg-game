@@ -1,0 +1,112 @@
+{
+  "character": "broom",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/broom/field_2026-11-25.png",
+    "sha256": "504aa7b4f46d37befd1c136c5d4984ec93856891dfc15cb097ad48ec655a89f2"
+  },
+  "recipe": "field_user.yaml#broom",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/playtest/art/packs/broom",
+    "poses_reference.png": "ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "walk": "hop",
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "broom",
+    "heights": [
+      64,
+      64,
+      64,
+      64,
+      64,
+      64,
+      64,
+      64,
+      64
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        9,
+        28
+      ],
+      [
+        10,
+        24
+      ],
+      [
+        6,
+        28
+      ],
+      [
+        9,
+        28
+      ],
+      [
+        10,
+        24
+      ],
+      [
+        6,
+        28
+      ],
+      [
+        13,
+        28
+      ],
+      [
+        14,
+        24
+      ],
+      [
+        8,
+        28
+      ]
+    ],
+    "lift": [
+      0,
+      4,
+      0,
+      0,
+      4,
+      0,
+      0,
+      4,
+      0
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}

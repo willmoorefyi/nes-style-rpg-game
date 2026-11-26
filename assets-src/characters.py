@@ -703,6 +703,11 @@ def build_block(look: Look) -> Image.Image:
         for col, open_ in enumerate((False, True)):
             block.paste(chest_cell(open_).img, (col * CELL_W, 0))
         return block
+    if look.prop == "broom":                             # pass PT: Matoya's broom (1x), a hop in frame 1
+        for row in range(4):
+            for col in range(3):
+                block.paste(broom_cell(col == 1).img, (col * CELL_W, row * CELL_H))
+        return block
     pal = Pal(look)
 
     def put(canvas: Canvas, col: int, row: int) -> None:
@@ -717,6 +722,17 @@ def build_block(look: Look) -> Image.Image:
     for col, pose in enumerate(("ready", "attack", "cast", "hurt", "down", "victory")):
         put(compose_side(look, pal, 0, pose), col, 4)
     return block
+
+
+def broom_cell(hop: bool) -> Canvas:
+    """A besom broom standing on its bristles (pass PT's 1x Look of the `broom` field sheet); `hop` lifts it 2 px."""
+    cv = new()
+    wood, straw = shade_ramp(18, 11, 5), shade_ramp(28, 21, 8)
+    dy = -2 if hop else 0
+    cv.rect(7, 12 + dy, 8, 23 + dy, wood[BASE]); cv.rect(7, 12 + dy, 7, 23 + dy, wood[LT])
+    box(cv, 4, 24 + dy, 11, 30 + dy, straw)
+    cv.rect(5, 25 + dy, 10, 25 + dy, shade_ramp(22, 5, 5)[BASE])
+    return _finish(cv)
 
 
 def chest_cell(open_: bool) -> Canvas:
@@ -858,4 +874,39 @@ ROSTER: dict[str, Look] = {
                          boots=(12, 7, 3), gear="round_hat", gear_color=(7, 18, 6)),
     "dwarf_nerrick": Look(hair=(17, 10, 5), beard=(17, 10, 5), outfit="tunic", cloth=(17, 10, 5), trim=(30, 30, 29),
                           pants=(4, 8, 14), boots=(12, 7, 3), gear="round_hat", gear_color=(22, 15, 7)),
+    # pass PT (docs/PLAYTEST_ART_PLAN.md 4.1 step 9): the 1x Looks of the user-rendered field sheets
+    "boy": Look(hair=(28, 21, 12), hair_style="spiky", outfit="tunic", cloth=(19, 6, 7), trim=(20, 14, 8),
+                pants=(17, 12, 8), boots=(10, 6, 4)),
+    "girl": Look(hair=(4, 4, 6), hair_style="bun", outfit="dress", cloth=(4, 16, 17), trim=(30, 30, 29),
+                 boots=(24, 4, 4)),
+    "townsman": Look(hair=(12, 7, 4), outfit="tunic", cloth=(26, 21, 7), trim=(13, 8, 4), pants=(6, 12, 7)),
+    "young_woman": Look(hair=(10, 6, 3), hair_style="long", outfit="dress", cloth=(9, 16, 27), trim=(18, 6, 8)),
+    "old_woman": Look(hair=(24, 24, 24), hair_style="bun", outfit="dress", cloth=(14, 7, 15), trim=(18, 18, 20),
+                      gear="hood", gear_color=(22, 18, 26), weapon="cane", weapon_color=(16, 10, 5)),
+    "sailor": Look(hair=(4, 4, 6), beard=(4, 4, 6), outfit="tunic", cloth=(28, 28, 28), trim=(5, 7, 16),
+                   pants=(20, 16, 10), gear="round_hat", gear_color=(5, 7, 16)),
+    "sea_captain": Look(hair=(16, 14, 12), beard=(16, 14, 12), outfit="coat", cloth=(18, 4, 6), trim=(28, 22, 8),
+                        pants=(4, 4, 6), gear="round_hat", gear_color=(4, 4, 6), weapon="sword"),
+    "pirate_crew": Look(hair=(6, 4, 3), outfit="tunic", cloth=(4, 4, 6), trim=(28, 14, 4), pants=(9, 9, 10),
+                        gear="bandana", gear_color=(24, 5, 4), weapon="dagger"),
+    "labourer": Look(hair=None, hair_style="bald", beard=(13, 8, 4), outfit="apron", cloth=(22, 10, 4),
+                     trim=(12, 8, 5), pants=(9, 7, 5)),
+    "scholar": Look(hair=(8, 8, 8), beard=(8, 8, 8), outfit="robe", cloth=(4, 6, 14), trim=(14, 9, 4)),
+    "healer": Look(hair=(20, 11, 5), outfit="robe", cloth=(17, 20, 14), trim=(30, 29, 24), gear="hood",
+                   gear_color=(28, 26, 21)),
+    "pilgrim": Look(hair=(16, 16, 16), beard=(16, 16, 16), outfit="robe", cloth=(15, 11, 7), trim=(12, 12, 12),
+                    gear="hood", gear_color=(15, 11, 7), weapon="staff", weapon_color=(16, 10, 5)),
+    "dancer": Look(hair=(18, 8, 22), hair_style="long", outfit="dress", cloth=(22, 3, 7), trim=(30, 12, 12)),
+    "elf_man": Look(hair=(28, 27, 22), hair_style="long", outfit="tunic", cloth=(6, 16, 11), trim=(24, 25, 28)),
+    "elf_woman": Look(hair=(29, 26, 16), hair_style="long", outfit="dress", cloth=(20, 28, 24), trim=(6, 15, 14),
+                      gear="crown", gear_color=(24, 25, 28)),
+    "elf_guard": Look(hair=(24, 25, 28), outfit="armor", cloth=(5, 15, 14), trim=(24, 25, 28), gear="helm",
+                      gear_color=(24, 25, 28), weapon="spear"),
+    "elf_elder": Look(hair=(30, 30, 30), hair_style="long", beard=(30, 30, 30), outfit="robe", cloth=(4, 13, 7),
+                      trim=(24, 25, 28), weapon="staff", weapon_color=(26, 22, 14)),
+    "elf_mage": Look(hair=(12, 6, 18), hair_style="long", outfit="robe", cloth=(14, 9, 22), trim=(24, 25, 28)),
+    "elf_child": Look(hair=(29, 26, 16), outfit="tunic", cloth=(6, 16, 11), trim=(24, 25, 28), pants=(28, 27, 22)),
+    "elf_prince": Look(hair=(30, 30, 30), hair_style="long", outfit="coat", cloth=(5, 14, 9), trim=(24, 25, 28),
+                       pants=(28, 28, 28), gear="crown", gear_color=(24, 25, 28), cape=(20, 24, 22)),
+    "broom": Look(hair=None, prop="broom"),
 }

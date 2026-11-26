@@ -1,0 +1,258 @@
+# Pass PT (docs/PLAYTEST_ART_PLAN.md 4.1): user-rendered NPC field sheets, imported by gen/field_user.py. Each recipe
+# names the tracked render (`file`, relative to assets-src/gen/, with its sha256), the height band of its stand frames
+# (adult 84-92, old 80-88, child 50-58, broom 56-72; outside it the sheet is scaled to the band's target), optional
+# `side_faces: right` (the side row was drawn facing right: mirrored) and `walk: hop` (the broom), and the provenance:
+# the tool the user rendered it in, the date, the author, the reference pack it was made from (`refs`: file and
+# sha256) and the user's review words once approved.
+boy:
+  file: user_art/boy/field_2026-11-25.png
+  sha256: f204b87bde87e3a8e9ce0fd56bf62a4e521583e684014d7d6bf0f376e236c19e
+  band: child
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/boy
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: townsfolk_boy_sprite_sheet.png
+  user_review: null
+broom:
+  file: user_art/broom/field_2026-11-25.png
+  sha256: 504aa7b4f46d37befd1c136c5d4984ec93856891dfc15cb097ad48ec655a89f2
+  band: broom
+  walk: hop
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/broom
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: enchanted_broom_sprite_sheet.png
+  user_review: null
+dancer:
+  file: user_art/dancer/field_2026-11-25.png
+  sha256: 6ac374dfc1674a71bcd130ba2fb435cd67b182e146bda599c8000f7023ca4ba6
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: "none: the user's own addition, Arylon the dancer, from the same references"
+  source_name: purple_haired_dancer_sprite_sheet.png
+  user_review: null
+elf_child:
+  file: user_art/elf_child/field_2026-11-25.png
+  sha256: e117b93d66ed551fbccfbbe8f6d601bd5ebe7d0264bf82705c71d56869fcb81c
+  band: child
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_child
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_child_sprite_sheet.png
+  user_review: null
+elf_elder:
+  file: user_art/elf_elder/field_2026-11-25.png
+  sha256: b8e74428ddab723a44892af3ee4529329c10002616310522261b11b74234a15b
+  band: old
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_elder
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_sage_sprite_sheet.png
+  user_review: null
+elf_guard:
+  file: user_art/elf_guard/field_2026-11-25.png
+  sha256: a99abc0c2c24f778bf578278f66f9c951a6cab6730f252063f6230e89c283deb
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_guard
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_guard_sprite_sheet.png
+  user_review: null
+elf_mage:
+  file: user_art/elf_mage/field_2026-11-25.png
+  sha256: ba9281fcc9125317850823933ca7c8a38f956d34064ce9a2d7200db669797bc6
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_mage
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_spell_teacher_sprite_sheet.png
+  user_review: null
+elf_man:
+  file: user_art/elf_man/field_2026-11-25.png
+  sha256: a205ec070456beb3dbeddf30cbd5dff37991a9455421f7f87d75ac036ddf94cf
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_man
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_townsman_sprite_sheet.png
+  user_review: null
+elf_prince:
+  file: user_art/elf_prince/field_2026-11-25.png
+  sha256: f321e50de34b577b51ca18c4af4c7da6dae625c78b778ee2ac20c8e3844762d1
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_prince
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_prince_sprite_sheet.png
+  user_review: null
+elf_woman:
+  file: user_art/elf_woman/field_2026-11-25.png
+  sha256: aa2ceea3d071988de86d974f36f54ae784518582f0aff4b3cf0698063f63fab1
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/elf_woman
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: elf_woman_sprite_sheet.png
+  user_review: null
+girl:
+  file: user_art/girl/field_2026-11-25.png
+  sha256: fa8d6a8358499538175f41464fca3f20e6f6797db6df3558115fcdd9cedad099
+  band: child
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/girl
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: pigtail_girl_sprite_sheet.png
+  user_review: null
+healer:
+  file: user_art/healer/field_2026-11-25.png
+  sha256: 0e467a65124275853c38c596a6511e873f7e4f768fd566cf42df5d3c04a7b415
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/healer
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: temple_healer_sprite_sheet.png
+  user_review: null
+labourer:
+  file: user_art/labourer/field_2026-11-25.png
+  sha256: 601591aa703c145d6a25c012626ce3976a989f8382900e09a10c69a9469ee022
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/labourer
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: burly_craftsman_sprite_sheet.png
+  user_review: null
+old_woman:
+  file: user_art/old_woman/field_2026-11-25.png
+  sha256: 9b8ca3f1261f8a614e1bc799f3637034e74cd93f7dbeb58dd814d9b65b9e6be1
+  band: old
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/old_woman
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: grandmother_sprite_sheet.png
+  user_review: null
+pilgrim:
+  file: user_art/pilgrim/field_2026-11-25.png
+  sha256: 703d356e1a50d6a368c5d6df1db42484bb7313f9701619a71e6f434746ebc431
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/pilgrim
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: pilgrim_wayfarer_sprite_sheet.png
+  user_review: null
+pirate_crew:
+  file: user_art/pirate_crew/field_2026-11-25.png
+  sha256: 7d6604dc1a624251586545cce87ec133823e0b6ebfcbe46e7bed2c558b328ce6
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/pirate_crew
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: pirate_deckhand_sprite_sheet.png
+  user_review: null
+sailor:
+  file: user_art/sailor/field_2026-11-25.png
+  sha256: 6c626bc4cb754409971b399cef4418ebd4e6eaf8391fe959ea79d567e45d76d3
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/sailor
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: sailor_dockhand_sprite_sheet.png
+  user_review: null
+scholar:
+  file: user_art/scholar/field_2026-11-25.png
+  sha256: da2a5877ed05741308905e9228eb0747b081d44264fc18a2180fda38223edc05
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/scholar
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: magic_shop_scholar_sprite_sheet.png
+  user_review: null
+sea_captain:
+  file: user_art/sea_captain/field_2026-11-25.png
+  sha256: e5dc2aace2e25aaba7c26a03988b42e91d65b9f8a82dc61c190827dcfb5163fc
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/sea_captain
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: weathered_sea_captain_sprite_sheet.png
+  user_review: null
+townsman:
+  file: user_art/townsman/field_2026-11-25.png
+  sha256: 778451374b8abdc8084e48665ae823f91cc416fe3afa6b904f9efa739463c76c
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/townsman
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: young_townsman_sprite_sheet.png
+  user_review: null
+young_woman:
+  file: user_art/young_woman/field_2026-11-25.png
+  sha256: 0cee1377f395f0789e7aa1a7cab490dc7d3e7f5c2f841c5636963ee4a4dda96c
+  band: adult
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/young_woman
+    poses_reference.png: ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e
+  source_name: young_townswoman_sprite_sheet.png
+  user_review: null

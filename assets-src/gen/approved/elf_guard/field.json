@@ -1,0 +1,100 @@
+{
+  "character": "elf_guard",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/elf_guard/field_2026-11-25.png",
+    "sha256": "a99abc0c2c24f778bf578278f66f9c951a6cab6730f252063f6230e89c283deb"
+  },
+  "recipe": "field_user.yaml#elf_guard",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/playtest/art/packs/elf_guard",
+    "poses_reference.png": "ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "adult",
+    "heights": [
+      90,
+      90,
+      90,
+      90,
+      90,
+      90,
+      90,
+      90,
+      90
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        2
+      ]
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}

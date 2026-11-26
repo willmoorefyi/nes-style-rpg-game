@@ -1,0 +1,100 @@
+{
+  "character": "elf_mage",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/elf_mage/field_2026-11-25.png",
+    "sha256": "ba9281fcc9125317850823933ca7c8a38f956d34064ce9a2d7200db669797bc6"
+  },
+  "recipe": "field_user.yaml#elf_mage",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/playtest/art/packs/elf_mage",
+    "poses_reference.png": "ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "adult",
+    "heights": [
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ]
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}

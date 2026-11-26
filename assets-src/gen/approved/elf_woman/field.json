@@ -1,0 +1,100 @@
+{
+  "character": "elf_woman",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/elf_woman/field_2026-11-25.png",
+    "sha256": "aa2ceea3d071988de86d974f36f54ae784518582f0aff4b3cf0698063f63fab1"
+  },
+  "recipe": "field_user.yaml#elf_woman",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/playtest/art/packs/elf_woman",
+    "poses_reference.png": "ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "adult",
+    "heights": [
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        6,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        4
+      ]
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}

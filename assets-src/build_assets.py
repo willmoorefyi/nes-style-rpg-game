@@ -242,6 +242,8 @@ def build_field_ai() -> None:
     for n, (cid, dirs) in enumerate(blocks):
         bx, by = (n % per_row) * gw * ncol, (n // per_row) * gh * 4
         cfg = PU.load_cfg(cid)
+        if any(m.get("walk") == "hop" for m, _ in dirs.values()):   # pass PT: the broom hops (no leg cut-outs)
+            cfg = {"field": {k: {"skip": True} for k in ("down", "up", "side")}}
         rows = {}
         for d in FIELD_DIRS:
             if d in dirs:

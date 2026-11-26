@@ -1,0 +1,99 @@
+{
+  "character": "dancer",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/dancer/field_2026-11-25.png",
+    "sha256": "6ac374dfc1674a71bcd130ba2fb435cd67b182e146bda599c8000f7023ca4ba6"
+  },
+  "recipe": "field_user.yaml#dancer",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "none: the user's own addition, Arylon the dancer, from the same references"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "adult",
+    "heights": [
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88,
+      88
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        4
+      ]
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}

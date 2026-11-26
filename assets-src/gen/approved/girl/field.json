@@ -1,0 +1,100 @@
+{
+  "character": "girl",
+  "sheet": "field",
+  "backend": "user",
+  "tool": "assets-src/gen/field_user.py",
+  "source": {
+    "file": "user_art/girl/field_2026-11-25.png",
+    "sha256": "fa8d6a8358499538175f41464fca3f20e6f6797db6df3558115fcdd9cedad099"
+  },
+  "recipe": "field_user.yaml#girl",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/playtest/art/packs/girl",
+    "poses_reference.png": "ef8abd495a9b31d5d8197c68750ff36381c455cf05db6b84a827b1aa58f0318e"
+  },
+  "grid": [
+    48,
+    96
+  ],
+  "bottom_row": 93,
+  "rows": [
+    "down",
+    "up",
+    "left"
+  ],
+  "frames": [
+    "stand",
+    "step_left",
+    "step_right"
+  ],
+  "flip_rows": [],
+  "cut": {
+    "source_size": [
+      144,
+      288
+    ],
+    "source_colours": 15,
+    "background": "alpha",
+    "pitch": 1.0,
+    "band": "child",
+    "heights": [
+      54,
+      54,
+      54,
+      54,
+      54,
+      54,
+      54,
+      54,
+      54
+    ],
+    "scale": 1.0,
+    "scale_why": "in band",
+    "colours": 15,
+    "offsets": [
+      [
+        4,
+        38
+      ],
+      [
+        4,
+        38
+      ],
+      [
+        4,
+        38
+      ],
+      [
+        4,
+        38
+      ],
+      [
+        4,
+        38
+      ],
+      [
+        4,
+        38
+      ],
+      [
+        8,
+        38
+      ],
+      [
+        7,
+        38
+      ],
+      [
+        8,
+        38
+      ]
+    ]
+  },
+  "imported": "2026-11-26",
+  "approved": null,
+  "user_review": null,
+  "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
+}
