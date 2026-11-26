@@ -40,8 +40,10 @@ export interface VehicleSheetMeta {
 /** Every frame the field draws: the three vehicles, the canoe's near-side layer and its ripple strip. */
 export const VEHICLE_FRAMES = ['ship', 'airship', 'canoe', 'canoe_front', 'canoe_ripple'] as const;
 
-/** The airship's end and turn views (docs/AIRSHIP_VIEWS_PLAN.md D-AV7): loaded when present; a missing one shows b_7. */
-export const OPTIONAL_VEHICLE_FRAMES = ['airship_back', 'airship_front', 'airship_back_turn', 'airship_front_turn'] as const;
+/** The airship's end and turn views (docs/AIRSHIP_VIEWS_PLAN.md D-AV7) and the ship's end views (pass PT): loaded when
+ *  present; a missing one shows the side view. */
+export const OPTIONAL_VEHICLE_FRAMES = ['airship_back', 'airship_front', 'airship_back_turn', 'airship_front_turn',
+  'ship_back', 'ship_front'] as const;
 export type OptionalVehicleFrame = (typeof OPTIONAL_VEHICLE_FRAMES)[number];
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);

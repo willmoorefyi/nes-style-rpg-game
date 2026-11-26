@@ -623,3 +623,26 @@ hero-facing, esc-menu-fix, cleanup-dead) before the edits.
   a `sailor` (5.3).
 - **Compile:** the 61 maps compiled; 152 chunk PNGs of 14 maps were RGBA at `int-pt1` and come out palette-indexed
   (`build_map.save_chunk`), pixel-identical (checked), so the compile is the compiler's own output.
+
+## 12. The ship's end views (PT-3 / PT-5 for 4.2, 4.3, 6.4; 2026-11-26)
+
+The user rendered `ship_views` (`~/temp/frigate_sprite_sheet.png`, 240 x 128, binary alpha, 20 colours; left the back
+3/4 view, right the front 3/4 view, both leaning right) and gave a blanket approval the same day ("all I've seen so far
+is good and nothing is a 1-way door"), recorded as the recipe's `approved` / `user_review`.
+
+- **A5 (the size gate):** 4.2 said "scaled to 112 when outside 104-118" and "the gate checks the height 112 +- 3",
+  which disagree for a render of 115-118 px (this one is 116). The gate is the band itself: a drawn height in
+  104-118 passes unscaled (the "resize, don't regenerate" rule; the airship's end views are 112 / 110 against a 94 px
+  side view, the ship's 116 against 94). Momus-reviewed with the ship code.
+- **Built:** `gen/vehicle_user.py` (+ `vehicle_user.yaml`, the render in `user_art/ship_views/`), writing
+  `approved/vehicles/ship_back.{png,json}` (98 x 118 with the 1 px margin, anchor 0.4104) and `ship_front` (100 x 118,
+  0.4178); no wake px were found to drop (the render has none); colours snapped to ship.png's 45, the outline in its
+  darkest. `vehicles.py` `OPTIONAL` and `vehicleLayout.ts` `OPTIONAL_VEHICLE_FRAMES` gain both frames;
+  `airshipHeading.headingFrame(h, t, has, 'ship')` is the same model for the ship (no turn frames); `FieldVehicleSprites`
+  keeps a ship heading (boarding keeps the parked one, D-AV10). The style-lock dispatch routes `backend: user`
+  vehicle jsons to `vehicle_user.check` before the Bedrock branch. Tests: `tests/scenes/shipHeading.test.ts`,
+  `fieldVehicleArt.test.ts` (the sources line, the ridden ship's frames and mirror, the parked heading),
+  `gen/selftest_vehicle_user.py` (in `selftest.py`).
+- **Momus on section 12: REJECT -> fixed:** `vehicle_user.py` takes `write | check` (argparse; anything else is
+  refused) and `write` refuses to replace a different approved frame without `retire.py`'s archive (7's gate is
+  `vehicle_user.py check`). `headingPick` returns `Partial<Pick<VehiclePlacement, ...>>`.

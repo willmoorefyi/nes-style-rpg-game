@@ -1,0 +1,15 @@
+# Pass PT (docs/PLAYTEST_ART_PLAN.md 4.2): the user-rendered ship end views, imported by gen/vehicle_user.py. The
+# tracked render (relative to assets-src/gen/, with its sha256): left the back 3/4 view, right the front 3/4 view, both
+# leaning right; the provenance: the tool, the date, the author, the reference pack and the user's approval.
+ship_views:
+  file: user_art/ship_views/sheet_2026-11-26.png
+  sha256: a3635c2530e77a2b4148ce7d0578aa11c7c974f3a03f731ced06edb2f9ac4687
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/playtest/art/packs/ship_views
+    ship_reference.png: 9921d73042c1fef2b86d89fe3885de4f6363313fcb6e48e6eb861d5982d0555a
+  source_name: frigate_sprite_sheet.png
+  approved: "2026-11-26"
+  user_review: "blanket approval of 2026-11-26: all I've seen so far is good and nothing is a 1-way door; merge it in"

@@ -57,6 +57,8 @@ export class FieldVehicleSprites {
   private readonly facing: Partial<Record<VehicleType, Facing>> = {};
   /** The airship's heading (D-AV4: its one owner; parked, it keeps the one it landed with, D-AV6). */
   private airship: AirshipHeading | null = null;
+  /** The ship's heading (pass PT: the same model, its back and front views; parked, it keeps its last one). */
+  private ship: AirshipHeading | null = null;
 
   constructor(private readonly world: Container | null, private readonly now: () => number = () => performance.now(),
     private readonly load: () => Promise<[unknown, Texture]> = defaultLoad) {}
@@ -112,7 +114,7 @@ export class FieldVehicleSprites {
     p.view.place({
       footX: x0 + o.dx, footY, facing: this.facing[p.state.type] ?? 'right',
       pose: 'parked', tMs: this.now(), sinceBoard: 0, z: footY - 1,   // just behind a hero standing on the same row
-      ...(p.state.type === 'airship' ? this.airshipPick() : {}),
+      ...this.headingPick(p.state.type),
     });
   }
 
@@ -125,6 +127,7 @@ export class FieldVehicleSprites {
     view.attach(this.world);
     for (const part of view.parts) vehicleParts.add(part);
     if (type === 'airship') this.airship = boardHeading(this.airship, player.direction, player.isMoving);
+    if (type === 'ship') this.ship = boardHeading(this.ship, player.direction, player.isMoving);
     this.ridden = { view, player, since: this.now() };
     view.main.onRender = () => this.follow();
     this.follow();
@@ -158,7 +161,7 @@ export class FieldVehicleSprites {
     view.place({
       footX: player.x, footY, facing: this.facing[type] ?? 'right', pose: 'ridden', tMs: t,
       sinceBoard: t - r.since, z: type === 'canoe' ? hero.zIndex - 1 : hero.zIndex,
-      ...(type === 'airship' ? this.airshipPick() : {}),
+      ...this.headingPick(type),
     });
     hero.visible = type === 'canoe';
     if (type === 'canoe') this.seat(view, hero, footY);
@@ -185,16 +188,30 @@ export class FieldVehicleSprites {
     this.heroMask.rect(hero.x - TILE_SIZE, top, TILE_SIZE * 3, maskY - view.rise - top).fill(0xffffff);
   }
 
-  /** While riding the airship: take this frame's hero direction into the heading (D-AV10; idempotent per frame). */
+  /** While riding the airship or the ship: take this frame's hero direction into its heading (D-AV10; idempotent per
+   *  frame). */
   noteHeading(): void {
     const r = this.ridden;
-    if (!r || r.view.type !== 'airship' || !this.airship) return;
-    this.airship = nextHeading(this.airship, r.player.direction, r.player.isMoving, this.now());
+    if (!r) return;
+    if (r.view.type === 'airship' && this.airship) {
+      this.airship = nextHeading(this.airship, r.player.direction, r.player.isMoving, this.now());
+    } else if (r.view.type === 'ship' && this.ship) {
+      this.ship = nextHeading(this.ship, r.player.direction, r.player.isMoving, this.now());
+    }
   }
 
   /** The airship's heading now (the side view facing right before any). */
   get heading(): AirshipHeading {
     return this.airship ?? { ...SIDE_RIGHT, seenDir: 'right', seenMoving: false };
+  }
+
+  /** The frame of a vehicle with a heading (the airship, the ship), or nothing for the canoe. */
+  private headingPick(type: VehicleType): Partial<Pick<VehiclePlacement, 'frame' | 'facing' | 'end'>> {
+    if (type === 'airship') return this.airshipPick();
+    if (type !== 'ship') return {};
+    const h = this.ship ?? { ...SIDE_RIGHT, side: this.facing.ship ?? 'right', seenDir: 'right' as const, seenMoving: false };
+    const { frame, flip } = headingFrame(h, this.now(), (f) => !!this.art?.frames[f], 'ship');
+    return { frame, facing: flip ? 'left' : 'right' };
   }
 
   /** The airship's frame, mirror and shadow end for this frame. */

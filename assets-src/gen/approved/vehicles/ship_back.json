@@ -1,0 +1,44 @@
+{
+  "vehicle": "ship",
+  "frame": "ship_back",
+  "pass": "PT",
+  "backend": "user",
+  "view": "back 3/4 (from above and behind, sailing away, up the screen), the bow to the upper right",
+  "source": {
+    "file": "user_art/ship_views/sheet_2026-11-26.png",
+    "sha256": "a3635c2530e77a2b4148ce7d0578aa11c7c974f3a03f731ced06edb2f9ac4687"
+  },
+  "recipe": "vehicle_user.yaml#ship_views",
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "tool": "assets-src/gen/vehicle_user.py",
+  "cut_settings": {
+    "background": "alpha",
+    "wake_px_dropped": 0,
+    "source_px": [
+      96,
+      116
+    ],
+    "scale": 1.0,
+    "band": [
+      104,
+      118
+    ],
+    "snap": "ship.png colour set, argmin",
+    "outline": "1 px, ship.png's darkest colour"
+  },
+  "native_size": [
+    98,
+    118
+  ],
+  "anchor": [
+    0.4104,
+    1.0
+  ],
+  "d7": 2.6538,
+  "faces": "right",
+  "mirrored": false,
+  "approved": "2026-11-26",
+  "user_review": "blanket approval of 2026-11-26: all I've seen so far is good and nothing is a 1-way door; merge it in"
+}

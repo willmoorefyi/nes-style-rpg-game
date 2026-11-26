@@ -33,7 +33,7 @@ ORDER = ("ship", "airship", "canoe")
 # The airship's end and turn views (docs/AIRSHIP_VIEWS_PLAN.md 4.2): approved only, cut by gen/vehicle_view_cut.py; the
 # json `anchor` is stated in the cropped frame (the centroid rule) and used as written. A missing one is left out (the
 # runtime then shows the side view for that heading).
-OPTIONAL = ("airship_back", "airship_front", "airship_back_turn", "airship_front_turn")
+OPTIONAL = ("airship_back", "airship_front", "airship_back_turn", "airship_front_turn", "ship_back", "ship_front")
 GAP = 2
 HERO_WAIST = 56                 # the field hero's waist row (48x96 native cell): the canoe cuts it here
 KEEL_ROWS = 6                   # the bottom rows whose centroid is the keel centre
@@ -172,7 +172,7 @@ def build(assets: Path) -> None:
     for name in OPTIONAL:
         path = APPROVED / f"{name}.png"
         if not path.exists():
-            print(f"vehicles: no approved {name}; the airship uses its side view for that heading")
+            print(f"vehicles: no approved {name}; the vehicle uses its side view for that heading")
             continue
         img = Image.open(path).convert("RGBA")
         images[name] = img.crop(bbox(img))

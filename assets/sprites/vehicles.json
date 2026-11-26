@@ -100,6 +100,28 @@
         1.0
       ],
       "footRow": 101
+    },
+    "ship_back": {
+      "x": 944,
+      "y": 0,
+      "w": 96,
+      "h": 116,
+      "anchor": [
+        0.4104,
+        1.0
+      ],
+      "footRow": 115
+    },
+    "ship_front": {
+      "x": 1042,
+      "y": 0,
+      "w": 98,
+      "h": 116,
+      "anchor": [
+        0.4178,
+        1.0
+      ],
+      "footRow": 115
     }
   },
   "canoe": {
@@ -114,6 +136,8 @@
     "airship_back": "approved",
     "airship_front": "approved",
     "airship_back_turn": "approved",
-    "airship_front_turn": "approved"
+    "airship_front_turn": "approved",
+    "ship_back": "approved",
+    "ship_front": "approved"
   }
 }

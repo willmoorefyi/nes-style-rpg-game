@@ -158,7 +158,11 @@ def check(meta: dict, gen: Path | None = None) -> str | None:
 
 def user_check(meta: dict) -> str | None:
     """The style-lock dispatch of a `backend: user` approved json (selftest.py, selftest_roster.py; plan 4.1): a
-    field sheet -> check above, every other user sheet (EF-H monsters and kneels) -> monster_user.check."""
+    vehicle frame -> vehicle_user.check, a field sheet -> check above, every other user sheet (EF-H monsters and kneels)
+    -> monster_user.check."""
+    if meta.get("vehicle"):                              # the ship's end views (gen/vehicle_user.py)
+        from gen import vehicle_user as VU
+        return VU.check(meta)
     if meta.get("sheet") == "field":
         return check(meta)
     from gen import monster_user as MU

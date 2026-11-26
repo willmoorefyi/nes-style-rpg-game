@@ -74,7 +74,7 @@ describe('vehicle art: the sheet contract (assets-src/vehicles.py)', () => {
     }
     expect(META.sources).toEqual({
       ship: 'approved', airship: 'approved', canoe: 'approved', airship_back: 'approved', airship_front: 'approved',
-      airship_back_turn: 'approved', airship_front_turn: 'approved',
+      airship_back_turn: 'approved', airship_front_turn: 'approved', ship_back: 'approved', ship_front: 'approved',
     });
     expect([META.frames.canoe_front.w, META.frames.canoe_front.h]).toEqual([META.frames.canoe.w, META.frames.canoe.h]);
   });
@@ -214,6 +214,7 @@ describe('vehicle art: the fallback', () => {
 });
 
 /** The texture frame's x on the sheet of the ridden or parked view's hull (which frame is drawn). */
+const AIRSHIP_VIEWS = ['airship_back', 'airship_front', 'airship_back_turn', 'airship_front_turn'] as const;
 const frameX = (v: { main: { texture: Texture } }): number => v.main.texture.frame.x;
 
 describe('vehicle art: the airship views (docs/AIRSHIP_VIEWS_PLAN.md)', () => {
@@ -221,7 +222,7 @@ describe('vehicle art: the airship views (docs/AIRSHIP_VIEWS_PLAN.md)', () => {
     const art = vehicleArt(RAW, sheet());
     const sizes = { airship_back: [87, 112], airship_front: [87, 110], airship_back_turn: [126, 102],
       airship_front_turn: [126, 103] } as const;
-    for (const name of OPTIONAL_VEHICLE_FRAMES) {
+    for (const name of AIRSHIP_VIEWS) {
       const f = META.frames[name];
       expect(art.frames[name].frame, name).toEqual(f);
       expect(Math.abs(f.w - sizes[name][0]), name).toBeLessThanOrEqual(3);
@@ -267,6 +268,32 @@ describe('vehicle art: the airship views (docs/AIRSHIP_VIEWS_PLAN.md)', () => {
     r.face('up'); r.follow(); r.tick(TURN_MS); r.follow();
     expect(frameX(v)).toBe(META.frames.airship_back.x);
     expect(v.main.scale.x).toBeLessThan(0);                       // leaning left: mirrored
+  });
+
+  it('pass PT: the ship sails up in its back view, down in its front view, and parks with its last heading', async () => {
+    const r = await rig();
+    r.sprites.ride('ship', r.player);
+    const v = r.sprites.views.ridden!;
+    expect(frameX(v)).toBe(META.frames.ship.x);
+    r.face('up'); r.follow();
+    expect(frameX(v)).toBe(META.frames.ship_back.x);              // no turn frame: instant
+    expect(v.main.anchor.x).toBeCloseTo(META.frames.ship_back.anchor[0]);
+    expect(v.main.scale.x).toBeGreaterThan(0);
+    r.face('down'); r.follow();
+    expect(frameX(v)).toBe(META.frames.ship_front.x);
+    r.face('left'); r.follow();
+    expect(frameX(v)).toBe(META.frames.ship.x);
+    expect(v.main.scale.x).toBeLessThan(0);
+    r.face('down'); r.follow();
+    expect(frameX(v)).toBe(META.frames.ship_front.x);
+    expect(v.main.scale.x).toBeLessThan(0);                       // leaning left: mirrored
+    r.sprites.ride(null, r.player);
+    r.sprites.showParked([{ type: 'ship', map: 'm', x: 5, y: 5 }]);
+    expect(frameX(r.sprites.views.parked[0])).toBe(META.frames.ship_front.x);
+    for (const name of ['ship_back', 'ship_front'] as const) {
+      const j = JSON.parse(readFileSync(`assets-src/gen/approved/vehicles/${name}.json`, 'utf-8'));
+      expect([j.backend, j.anchor[0]], name).toEqual(['user', META.frames[name].anchor[0]]);
+    }
   });
 
   it('boarding keeps the parked heading until the hero\'s direction changes or a step starts (D-AV10)', async () => {

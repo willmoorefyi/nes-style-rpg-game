@@ -49,17 +49,25 @@ export function nextHeading(h: AirshipHeading, dir: Direction, moving: boolean, 
   return { ...taken, seenDir: dir, seenMoving: moving };
 }
 
-/** The frame to draw and its mirror. `has` says which frames the sheet holds (a missing one falls back). */
+/** The ship's frames (pass PT, docs/PLAYTEST_ART_PLAN.md 4.3): the side view and the two end views, no turn frames. */
+export type ShipFrame = 'ship' | 'ship_back' | 'ship_front';
+
+/** The frame to draw and its mirror. `has` says which frames the sheet holds (a missing one falls back). The same
+ *  model drives the ship (pass PT, `base` 'ship'): it has no turn frames, so each of its heading changes is instant. */
 export function headingFrame(h: AirshipHeading, nowMs: number, has: (f: string) => boolean):
-  { frame: AirshipFrame; flip: boolean; turning: boolean } {
+  { frame: AirshipFrame; flip: boolean; turning: boolean };
+export function headingFrame(h: AirshipHeading, nowMs: number, has: (f: string) => boolean, base: 'ship'):
+  { frame: ShipFrame; flip: boolean; turning: boolean };
+export function headingFrame(h: AirshipHeading, nowMs: number, has: (f: string) => boolean,
+  base: 'airship' | 'ship' = 'airship'): { frame: AirshipFrame | ShipFrame; flip: boolean; turning: boolean } {
   const flip = h.side === 'left';
-  const endOf = (e: HeadingEnd): AirshipFrame => (e === 'side' ? 'airship' : `airship_${e}`);
+  const endOf = (e: HeadingEnd): AirshipFrame | ShipFrame => (e === 'side' ? base : `${base}_${e}`);
   const turning = h.turnFrom !== null && nowMs - h.turnAt < TURN_MS;
   if (turning) {
     const end = h.end === 'side' ? h.turnFrom! : h.end;
-    const turn = `airship_${end}_turn` as AirshipFrame;
-    if (end !== 'side' && has(turn)) return { frame: turn, flip, turning: true };
+    const turn = `${base}_${end}_turn`;
+    if (end !== 'side' && has(turn)) return { frame: turn as AirshipFrame, flip, turning: true };
   }
   const target = endOf(h.end);
-  return { frame: has(target) ? target : 'airship', flip, turning: false };
+  return { frame: has(target) ? target : base, flip, turning: false };
 }

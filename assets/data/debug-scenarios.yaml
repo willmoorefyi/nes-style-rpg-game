@@ -1607,6 +1607,58 @@
   items: { lute: 1, potion: 5 }
   gold: 600
   enemies: []
+# Pass PT (docs/PLAYTEST_ART_PLAN.md 7): field previews of the new NPC sheets (the user-rendered townsfolk, the elves,
+# Matoya's brooms, Bikke's crew before and after the fight, Arylon) and of the ship's end views.
+- id: pt_cornelia
+  name: PT - Cornelia's square (Arylon the dancer)
+  mode: field
+  map: cornelia
+  spawn: [35, 52]
+  flags: *a1t_s2_flags
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+- id: pt_pravoka
+  name: PT - Pravoka before Bikke (his untinted crew)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: *a1t_s2_flags
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+- id: pt_pravoka_after
+  name: PT - Pravoka after Bikke (the dockhands and the beaten captain)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED]
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+- id: pt_elfheim
+  name: PT - Elfheim's gate (the elves)
+  mode: field
+  map: elfheim
+  entrance: gate
+  flags: *a1t_s2_flags
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
+- id: pt_matoya
+  name: PT - Matoya's cave (the brooms)
+  mode: field
+  map: matoya-cave
+  entrance: arrival
+  flags: *a1t_s2_flags
+  party: *a1t_b1_party
+  items: { lute: 1, potion: 5 }
+  gold: 600
+  enemies: []
 # Bikke's nine at the band's test level 4 with the stage kit w_s2 (B2; WORLD_PLAN 3.7, tests/balance/w_a1_t.test.ts).
 - id: w_boss_pirate
   name: W A1-T - Bikke's nine pirates (band level 4, kit w_s2)

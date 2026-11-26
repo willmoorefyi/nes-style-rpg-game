@@ -260,6 +260,11 @@ def test_style_lock() -> None:
             check(SRo.revived_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: revived from "
                                                    f"{meta['revived_from']}, cache/{meta['cache_key']} present")
             continue
+        if meta.get("backend") == "user" and meta.get("vehicle"):   # PT: the user-rendered ship end views
+            from gen import field_user as FU
+            why = FU.user_check(meta)
+            check(why is None, f"{meta['character']} {meta['sheet']}: backend user vehicle frame re-imported {why or ''}")
+            continue
         if meta.get("backend") == "bedrock" or meta.get("vehicle"):   # LM-INT .. LM5-INT: Stability renders re-cut offline
             from gen import selftest_roster as SRo
             check(SRo.bedrock_ok(meta, GEN.CACHE), f"{meta['character']} {meta['sheet']}: Bedrock keys "
@@ -527,6 +532,8 @@ def test_monster_anim() -> None:
     __import__("gen.selftest_monster_user", fromlist=["x"]).run_monster_user(check)
     print("pass PT user-rendered field sheets (field_user.py: split, A1 placement, scale, hop, outline, refusals, check)")
     __import__("gen.selftest_field_user", fromlist=["x"]).run_field_user(check)
+    print("pass PT user-rendered ship end views (vehicle_user.py: wake, split, snap, outline, centroid rule, check)")
+    __import__("gen.selftest_vehicle_user", fromlist=["x"]).run_vehicle_user(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501
