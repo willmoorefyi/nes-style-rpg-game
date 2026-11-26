@@ -1,36 +1,29 @@
 {
   "character": "green_dragon",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "dede868942c87f3c",
-    "skel": "9448a03eafb9584f",
-    "ref": "99c1b70e742c1b58"
+  "backend": "user",
+  "source": "user_art/green_dragon/sheet_2026-11-25.png",
+  "sha256": "230eb4d0b36fbccac02657657691e244b2d47f21ecdb1dd5afba421c10751965",
+  "recipe": "monster_user.yaml#green_dragon",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/green_dragon/",
+    "current_x2_sha256": "8b7df11158f77a62799e9a04efac12f13847694bf5e03b844183fe53ce628862",
+    "poses_reference_sha256": "763d1a2896e41550fd64bd926283588e83ad1ca21f9f3fef4c4ed7c2236cc4c5",
+    "prompt_sha256": "eb971ff47decadc33c2ba34dd6ff462e0adfbfa6d3687938529cbb1e7d1b5db3",
+    "prompt_v1_sha256": "96def72d2df192d4d9c12ca5415a1fe968ed6682f17c3bde9ba42e66b6bc11ce"
   },
+  "approved": "2026-11-25",
   "grid": [
-    144,
-    128
+    248,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-hist, A-outline, A-width",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "fee9c58ebb96fcf3ea0b023f"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

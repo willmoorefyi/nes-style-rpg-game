@@ -651,7 +651,7 @@
   goldReward: 120
   sprite: buccaneer
   attack: melee
-  size: small
+  size: large
 - id: shark
   name: Shark
   num: 21
@@ -2171,7 +2171,7 @@
   weakness: fire
   resist: ice
   family: undead
-  size: small
+  size: large
 - id: medusa
   name: Medusa
   num: 88
@@ -2195,7 +2195,7 @@
   sprite: medusa
   attack: melee
   family: magical
-  size: small
+  size: large
 - id: rakshasa
   name: Rakshasa
   num: 89
@@ -2231,7 +2231,7 @@
   attack: melee
   elementalProfile: {weaknesses: [], resistances: [fire, ice, lightning], immunities: [], absorbs: []}
   family: magical
-  size: small
+  size: large
 - id: clay_golem
   name: Clay Golem
   num: 90
@@ -2733,7 +2733,7 @@
 - id: green_dragon
   name: Green Dragon
   num: 108
-  description: "A heavy green dragon with a bony frill and swollen throat sacs. Its breath is a cloud of choking venom."
+  description: "A heavy green dragon with a bony frill and two small wings. Its breath is a cloud of choking venom."
   protect: [earth]
   specials: [{id: poison, rate: 0.5}]
   stats:
@@ -2864,7 +2864,7 @@
   goldReward: 3000
   sprite: death_knight
   attack: melee
-  size: small
+  size: large
 - id: earth_medusa
   name: Earth Medusa
   num: 113
@@ -2892,7 +2892,7 @@
   weakness: fire
   resist: ice
   family: magical
-  size: small
+  size: large
 - id: black_flan
   name: Black Flan
   num: 114
@@ -3003,7 +3003,7 @@
     - {type: magic, spellId: cure3, weight: 1}
   sprite: dark_fighter
   attack: melee
-  size: small
+  size: large
 # === WND-D2 warmech (pass W: owned by WND-D2; only its bossPhases, ai and specials) ===
 - id: warmech
   name: Warmech

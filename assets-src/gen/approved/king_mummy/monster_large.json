@@ -1,0 +1,77 @@
+{
+  "character": "king_mummy",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/king_mummy/sheet_2026-11-25.png",
+  "sha256": "333065fd8a0afba9bd43277d47a51c134f8c90733a78f2528dd513e8cd710d9a",
+  "recipe": "monster_user.yaml#king_mummy",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/king_mummy/",
+    "current_x2_sha256": "ffe672ada7916efae20cd85f1fbcb16103cce1293b63b10b59bc8de6361dfb1b",
+    "poses_reference_sha256": "f79c9659ecc9ae8a8767b9e0196d3f3e2f0c0b2cbff4469baf67617381e11209",
+    "prompt_sha256": "27804dbb173dcb67e13cb7f877fa7c7cc5e7eff899039957d22f15152fb5abb1",
+    "prompt_v1_sha256": "060b1ecc04e84c7bcab2bb15c0574a67754caf88fa14add744233a736bf2564e"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      91,
+      95,
+      87,
+      64
+    ],
+    "anchors": [
+      18.04,
+      35.81,
+      42.29,
+      28.94
+    ],
+    "anchor_x": 58.04,
+    "error": {
+      "max": 42.4,
+      "p99": 37.3,
+      "mean": 11.7,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "gold": {
+        "px": 2427,
+        "mean": 7.1,
+        "p90": 21.6,
+        "max": 21.6,
+        "colours": 7
+      },
+      "headdress": {
+        "px": 492,
+        "mean": 6.8,
+        "p90": 14.4,
+        "max": 14.4,
+        "colours": 4
+      }
+    }
+  }
+}

@@ -1,36 +1,29 @@
 {
   "character": "white_dragon",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "b074f5632b5c69ad",
-    "skel": "881a319a580ff615",
-    "ref": "d719393a00152d52"
+  "backend": "user",
+  "source": "user_art/white_dragon/sheet_2026-11-25.png",
+  "sha256": "b138eddc203f668ac4ab81635a87289154af446744807f6ee84f71125281d111",
+  "recipe": "monster_user.yaml#white_dragon",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/white_dragon/",
+    "current_x2_sha256": "0e6dc383d5167016bc3975a0b0f0cc307daad077aa0ddbe411575de300f87977",
+    "poses_reference_sha256": "a718982bc5a016d7e84f7fb9a512367eb9c1bb9c19725d292ec21ba202557544",
+    "prompt_sha256": "72180eb3313f653dd16794485eb2379646aa4cc330acd6cd9710119eaf425ca7",
+    "prompt_v1_sha256": "e8b54e7992dcc77534b345acc0ba63b9143e1c965cc86409d0ea37c7419759eb"
   },
+  "approved": "2026-11-25",
   "grid": [
-    134,
-    128
+    238,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-hist, K-height",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "9d28015967e2a848f10794df"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

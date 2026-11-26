@@ -901,6 +901,162 @@ the cell's empty top rows. `test:full` is the user's (combined batch).
   the three beside a goblin): feet on the plain, no console warnings or errors
   (`~/temp/ff-game/ef/user/smoke_batch2/`). `test:full` left for the combined batch.
 
+#### EF-H amendment B: floating user sheets and six palette classes (rev 2, 2026-11-25; evil_eye first; Momus rev-1: REJECT, 2 blocking findings, 7 notes, applied; rev-2: OKAY, 4 notes applied)
+
+**Why.** (1) The user's evil_eye render (`~/temp/evil_eye_sprite_sheet.png`, 944x184, binary alpha, 42 colours; idle
+x55-185 h147 bottom row 167, attack x312-459 h150 bottom 167, hurt x494-625 h134 bottom 171, kneel x767-892 h132 bottom
+169) is a floater: today's `approved/evil_eye/monster_large.json` has `floating: true`, its rig is `body: floating`
+(`rig_floating.py`, the float band of `anim_feet.float_band`), and the atlas writes `kneelSink` for floaters with a kneel
+key (`monster_atlas.py:238-244`). H1 puts every pose's lowest row on the feet row (`monster_user.place`: `ty =
+band.foot_row - y1`), so a floater's hover gap, which the render draws per pose (167 / 167 / 171 / 169), would be lost
+and the four poses would bob by their own heights. (2) EF-H batch 3 (this branch) added six reserve colour classes
+RED first before this rule was stated to the agent; they are listed here for review.
+
+**Decisions.**
+- **D-B1 recipe key `floating: true`** (default false). A floating recipe is placed like `monster.cut` places a floating
+  Gemini sheet (`monster.py:716-723`): one shared vertical offset `dy_shared = feet_row - idle_bottom` (the idle's
+  lowest row on the feet row, as before), and every other pose keeps its vertical offset to the idle **as drawn in the
+  render** (its sheet bottom row minus the idle's), for the attack and the hurt only; the **kneel's lowest row goes on
+  the idle's** (the floating K-ground gate, `kneel_checks.ground`, needs the key's lowest row equal to the idle's; the
+  sink is the runtime's `kneelSink`, as for every floater). A pose that would pass the 2 px bottom margin (`row >
+  cell - 3`) is lifted to it (FW-C, at most `monster.LIFT_MAX`, else refused), the lift recorded in `info["lifted"]`;
+  a lift that would start the pose above row 2 is refused as in `monster.cut` (`y0 + dy - over < 2`). For evil_eye in
+  the tall frame (cell 200, feet 192): idle and attack on 192, hurt 196, kneel 192; no lift. A floating recipe needs
+  s = 1.0 (the gaps are sheet rows; any other scale is refused). Only the vertical follows `monster.cut`: the
+  horizontal placement is the user path's own, unchanged (re-centred on the anchors; the recipe can name `anchor:
+  {<pose>: bbox}`, evil_eye takes bbox for attack, hurt and kneel, the feet anchor being meaningless for a floater).
+  The frame choice (`frame_of`) is unchanged (evil_eye: 150 > 121 -> tall).
+- **D-B2 jsons.** A floating import writes `floating: true` in `monster_large.json` (today's key, read by
+  `monster_atlas.sheet_meta`, `monster_check` (float band), `monster_anim`); `kneel.json` stays as for the others (the
+  kneel key on the idle's lowest row, D-B1; the kneel bridge and `kneelSink` read the rig). A non-floating recipe writes
+  exactly what it writes today (`floating: false`), so the 14 shipped user sheets re-import byte for byte and their
+  recomputed metas equal the committed jsons.
+- **D-B3 where the code goes.** `monster_user.py` is at its 250-line ceiling: the per-pose vertical offsets are computed
+  in `monster_user_frame.py` (`float_rows(img, cells, s, band, rec) -> list[int] | None`: None for a non-floating
+  recipe; the floating, s == 1 and lift checks inside; the pieces' sheet bottoms from `monster_user_palette.origins` +
+  the split masks); `cut` gains exactly one line (the call, folded into the `place` call's line budget) and `place`
+  takes the rows as an optional argument (`ty = rows[k] - y1` when given), within the 120-character lines; any line
+  over the 250 ceiling is paid by folding `cut`'s `regions` assignment into the `info` dict; `monster_user_review.metas`
+  reads `rec.get("floating", False)`.
+- **D-B4 palette classes (already in, RED first, `selftest_monster_user_frame._selects`).** `green` (olive scales:
+  g >= r, g >= 1.4 b, g >= 50; chimera's dragon head), `taupe` (warm greys: r >= g >= b, r - b in [5, 40], r - g <= 25,
+  r in [60, 170]; chimera's goat head), `cyan` (g >= 150, b >= 0.7 g, r <= 0.8 g; dark_fighter's shield glyph),
+  `crimson` (r >= 30, blue 0.3-0.77 of red (r >= 1.3 b), b >= 1.3 g; death_knight's cloak), `glow` (g >= 180 and 30 over r and b;
+  dragon_zombie's eyes), `pale` (every channel >= 120, spread <= 50; medusa's skin). Each is a pure per-px predicate
+  used only by a recipe's `reserve` that names it; no shipped recipe changes. `pale` also matches light neutral greys
+  and whites, so a recipe using it near teeth or tips names boxes (medusa: whole sheet, no teeth; evil_eye uses
+  `bright` with boxes for its tips and teeth).
+
+**Tests (RED first, `selftest_monster_user_frame.py`).**
+1. A synthetic 4-pose row whose pieces' bottoms are 40 / 40 / 44 / 42 (sheet rows), recipe `floating: true`, tall
+   frame: the four frames' lowest rows are 192 / 192 / 196 / 192 (the kneel on the idle's), `info["frame"] == "tall"`;
+   the same row without `floating`: all four on 192; a floating recipe at s != 1 is refused.
+2. A floating row whose hurt sits 8 rows below the idle in the tall cell (200: 192 + 8 = 200 > 197): lifted by 3 to
+   row 197, `info["lifted"] == {"hurt": 3}`; a lift over `LIFT_MAX` is refused (SystemExit).
+3. `metas` of a floating cut: `floating: true` in the monster json and `bottom_row` 192 (the atlas `footRow`); of a
+   non-floating cut: `floating: false`.
+4. `_shipped` loops over **every** `backend: user` json under `approved/*/monster_*.json` (14 before evil_eye): its
+   recipe must exist (a missing one fails, never skips), the recomputed monster and kneel metas equal the committed
+   jsons but for `approved`, the expected `frame` is the committed json's (`tall` or absent), and `U.check(meta) is
+   None`.
+
+**Then.** Recipe `evil_eye` (`floating: true`, `anchor: {attack: bbox, hurt: bbox, kneel: bbox}`, reserves for the green
+iris (`green`) and the pale eyestalk tips and teeth (`bright`, with boxes)), the fidelity review (exactly five eyestalks in every pose), `retire.py`
+(evil_eye_v1) and `--move-rig`, approve, a new `body: floating` rig with `kneel: {source: ai}`, the animation review,
+lock; `monster_scale.yaml` `evil_eye: {scale: 2, tex: 2, smooth: [despur, edges]}` replacing `3`; data size `huge`
+kept; the pins (`V4_RESCALED`, TIER_H lists, rosterData `EF_H_TALL`, efSizes, bestiary / travel cases) as for
+fire_hydra in amendment A.
+
+**Acceptance.** As amendment A's, plus: evil_eye's atlas sheet has `floating: true` and a `kneelSink`; the float band
+check passes on every generated frame and `kneel_checks` (K-ground) on the key and every bridge frame; in the browser
+the eye hovers (no frame's lowest row on the plain).
+
+#### EF-H amendment C: the `navy` palette class (rev 1, 2026-11-25; white_dragon, king_mummy; Momus OKAY, 3 notes applied)
+
+**Why.** The house palette merges the white_dragon's darkest blue shading (the outline-side scale tones (59, 80, 111) /
+(47, 66, 96) / (37, 60, 95), 2,455 px) up onto one mid blue (82, 107, 140): errors 46 / 70 / 79, so the white figure's
+dark side flattens toward its highlights (the user's point: keep the highlights distinct from the outline-side greys).
+The king_mummy's blue headdress stripes ((57, 63, 136) / (84, 82, 123) / (65, 69, 130), 245 px) merge into one
+(57, 57, 115): mean error 18.8, max 37.7. None of the amendment-B classes selects deep blues (`steel` needs a channel
+>= 120, `grey` a spread <= 24, `cyan` green >= 150).
+
+**Decision.** One more reserve colour class in `gen/monster_user_palette.SELECT`: `navy` = deep blue: blue >= red + 30,
+blue >= green + 15, blue <= 140 (the white_dragon's pale blue scales, blue 147-255, the king_mummy's gold and bandage
+greys, the outline ink and every non-blue tone stay out). A pure per-px predicate used only by a recipe `reserve` that
+names it, as amendment B's six; no shipped recipe changes, so the 15 shipped user sheets re-import byte for byte
+(`_shipped`).
+
+**Tests (RED first, `selftest_monster_user_frame._selects`).** `navy` is true for (59, 80, 111), (47, 66, 96),
+(37, 60, 95), (57, 63, 136), (84, 82, 123), (36, 38, 77) and false for (107, 149, 184), (120, 162, 195),
+(237, 242, 250), (146, 106, 49), (128, 128, 128), (6, 4, 10), (87, 113, 147) (both edges pinned).
+
+**Then.** The class selects every deep blue (white_dragon 4,638 px: the named three plus (80, 101, 133), (67, 92, 124),
+(45, 78, 118); king_mummy 492 px), intended: the reserve's k-means splits them into its slots. white_dragon recipe
+`reserve: [{name: shade, select: navy, slots: 4, max_err: 12}]`, king_mummy `reserve: [{name: gold, select: skin, slots:
+2, max_err: 14}, {name: headdress, select: navy, slots: 2, max_err: 14}]`. Targets: each named white_dragon dark tone's
+error <= 14 after the change; the king_mummy headdress blues' mean error under 10; the fidelity reviews as for the
+others.
+
+#### EF-H amendments B / C result + batch 3: thirteen user-rendered sheets (2026-11-25, branch `ef-batch3` from `ef-batch2`; no AI call)
+
+chimera, buccaneer, blue_dragon, dark_fighter, death_knight, dragon_zombie, medusa, earth_medusa, green_dragon,
+evil_eye, white_dragon, king_mummy, rakshasa: the user's ChatGPT renders (`~/temp/<id>_sprite_sheet.png`), tracked in
+`gen/user_art/<id>/` with their sha256 and the reference pack's sha256s (`current_x2`, `poses_reference`, `prompt`,
+`prompt_v1`) in `gen/monster_user.yaml`.
+
+- **Amendment B** (Momus rev 1 REJECT, 2 blocking, 7 notes; rev 2 OKAY, 4 notes applied): recipe `floating: true`
+  (`monster_user_frame.float_rows`; evil_eye: idle / attack on 192, hurt 196 as drawn, kneel 192; no lift), the six
+  palette classes; `_shipped` now re-imports every `backend: user` sheet (18). **Amendment C** (Momus OKAY, 3 notes
+  applied): `navy`. RED first in `selftest_monster_user_frame.py` (`_selects`, `_floating`, `_shipped`). Process note:
+  amendment B's six classes were written (RED first) before the any-pipeline-change rule reached this branch and were
+  reviewed after the fact in B; `navy` and floating were planned and OKAYed first.
+- **Imports (s = 1.0; frame, cell; native heights idle / attack / hurt / kneel; colour error mean / max; reserves
+  mean / max):** chimera tall 208x200, 120/103/126/92, 12.9 / 31.7, dragon 11.0 / 31.0, goat 11.5 / 27.7 (were 20.8 /
+  20.4 with the two heads' hues swapped); buccaneer large 128, 84/82/87/64, 15.2 / 50.4 (no reserve: skin 4.1, stripes
+  red 15.9 / white 3.7, axe 4.5); blue_dragon tall 236x200, 142/74/117/48, 9.5 / 79.5 (one 20 px highlight), crest 7.8 /
+  28.2 (was 25.5); dark_fighter large, 73/73/69/55, 13.5 / 44.5, crescent 2.4 / 5.1 (was 26.0 / 54.2), the eyes' own
+  slot 5.1; death_knight large, 97/96/97/78, 14.2 / 45.6, eyes 2.2 (was 114), skull 7.9, cloak 10.3; dragon_zombie tall
+  210x200, 114/124/104/57, 11.6 / 48.7, eyes 7.2 (glow kept 0.94, was 0), bone 9.0; medusa large, 92/81/92/58, 12.6 /
+  41.8, eyes 11.5, skin 3.4 (was 25); earth_medusa large, 92/77/86/55, 10.5 / 96.5, eyes 24.8 (the orange px 15.8, was
+  138), stone 6.1; green_dragon tall 248x200, 147/124/128/74, 10.1 / 47.5, eyes 2.3 (was 44), belly 4.9; evil_eye tall
+  154x200 floating, 147/150/134/132, 9.1 / 38.5, iris 8.0 (was 27-53), tips 4.7; white_dragon tall 238x200,
+  144/136/122/52, 9.1 / 18.2, shade 5.8 (was 58.5 / 79.1); king_mummy large, 91/95/87/64, 11.7 / 42.4, gold 7.1,
+  headdress 6.8 (was 18.8); rakshasa large, 92/81/89/64, 13.0 / 53.5, orange 5.9 (was 22.3), trim 12.0 (one 12 px gold
+  highlight stays 53 off). The darkest shades ink to the outline (the house rule) everywhere.
+- **Fidelity reviews (fresh, image-only):** blue_dragon SHIP; the other twelve SHIP WITH NITS in iteration 1. Design
+  points confirmed: chimera three heads in every pose; buccaneer distinct from the pirate; dark_fighter's eyes and
+  death_knight's skull + red eyes, dragon_zombie's bone white, medusa's and earth_medusa's snake heads visible at 1x;
+  green_dragon two wings (no throat sacs: user ruling 2026-11-25, brief and description updated); **evil_eye has four
+  eyestalks in every pose of the render** (consistent; the brief said five); king_mummy grander than the mummy. Nits:
+  flatter dark folds (house ink), rakshasa's spread claws closed by the outline ring, earth_medusa's hair a step darker.
+- **Approve / retire:** `<id>_v1` archives for all thirteen (RETIRED_SPRITES rows), `--move-rig`; buccaneer,
+  dark_fighter, death_knight, medusa, earth_medusa, king_mummy, rakshasa `size: large`; chimera leaves FW-Q
+  (`FWQ_ALLOW` 4 -> 3) and the kneel calibration's exclusions; the fix-pass fixtures that read chimera, king_mummy and
+  earth_medusa (`selftest_fixmeasure`) run on the v1 archives, `selftest_keyoffset` on hydra.
+- **Rigs (`kneel: {source: ai}`, locked 14 frames each):** bipeds (buccaneer, dark_fighter, death_knight, king_mummy,
+  rakshasa) the pirate's rigid lean / shift about the hip (36 / 2 / 11 / 3 / 0 ink paints); quadrupeds translation-first
+  (chimera three heads as one group, blue_dragon split head dip for the 142 -> 74 swing, dragon_zombie, green_dragon,
+  white_dragon with the neck at half the head's move); medusa / earth_medusa `body: naga` over a pinned coil; evil_eye
+  `body: floating` as one rigid mass. Animation reviews (fresh, image-only): every one SHIP WITH NITS (chimera,
+  blue_dragon after one fix each; green_dragon after 4 iterations: belly-crack ink repainted, deeper wind-up, frill
+  fragments rejoined). Shared nits: weak wind-ups and one-frame recover snaps (rigid leans cannot blend stances).
+  `tiers` (report only; steps that pass at the 200-row cell but not at 128): chimera 3, blue_dragon 2, dragon_zombie 3,
+  green_dragon 3, white_dragon 2, evil_eye 0: open for the user's ruling (D-A2).
+- **Size:** `{scale: 2, tex: 2, smooth: [despur, edges]}` for all thirteen (despur kept: an image review found no eaten
+  tip). Idle screen heights: chimera 244 (manticore 220), buccaneer 170, blue_dragon 288, dark_fighter 148,
+  death_knight 196 (black_knight 192: the batch-2 inversion is gone), dragon_zombie 232, medusa 188 = earth_medusa 188,
+  green_dragon 294, evil_eye 298, white_dragon 292, king_mummy 182 vs the mummy's 182.5 (equal, the orchestrator's
+  ruling; efSizes compares a user render's sibling pair by screen height), rakshasa 186.
+- **Budget:** `MAX_EXTRA_PAGES` 19 -> 22 (+3 for thirteen tex-2 sheets; open for the user's veto); 34 pages, 53 hi-res
+  sheets on 25 hi-res pages; GPU preload + largest formation 93.0 MB of 128 (green_dragon + black_knight).
+- **Gates:** atlas rebuilt and committed (34 pages); `selftest.py` ALL PASSED (1952 ok; its PYTHONHASHSEED 0 / 1 atlas
+  determinism included); by-rect vs `ef-batch2`: frame pixels differ only for the thirteen (17 frames each), 110 sheets
+  equal (25 on another page), preload pages [0, 1, 2] unchanged; `monster_anim.py check --all` 123 OK lines only;
+  `kneel_tools.py coverage` ai 123 / ai 12; `monster_user.py check` byte-identical for all thirteen; `npm run build` OK;
+  `npm run test:fast` 430 files, 10282 passed; browser `?mute=1&scenario=ef_user_batch3_beasts | _beasts2 | _fighters |
+  _fighters2&enemyAnim=loop` (new; death_knight beside black_knight, king_mummy beside the mummy, evil_eye hovering): no
+  console warnings or errors (`~/temp/ff-game/ef/user/smoke_batch3/`). `test:full` is the user's.
+
 ## EF-I. Review tool: the dazed GIF shows the kneel track (rev 2, 2026-11-25; user-approved task; Momus rev-1: REJECT, 10 findings, applied; rev-2: OKAY, 3 notes applied)
 
 **Why.** `monster_anim.py review <id>` writes `<id>_daze.{gif,png}` from `monster_review.TIMELINES["daze"]`

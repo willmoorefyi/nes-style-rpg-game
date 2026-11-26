@@ -23,7 +23,7 @@ from gen.anim_rules import MAX_PAGE
 from gen.monster_hires import unit
 
 GUTTER = 1
-MAX_EXTRA_PAGES = 19               # EF-A/B 14 + EF-D chaos spill 1 + int-ef2 2 (blue / green_dragon at tex 3, user ruling 2026-11-24) + ef-horse 1 (crazy_horse tex 2, the EF smoothing rule) + EF-H batch 2 1 (fire_hydra tex 2 in the tall frame, the user's instruction 2026-11-25; EF-H amendment A D-A3)
+MAX_EXTRA_PAGES = 22               # EF-A/B 14 + EF-D chaos spill 1 + int-ef2 2 (blue / green_dragon at tex 3, user ruling 2026-11-24) + ef-horse 1 (crazy_horse tex 2, the EF smoothing rule) + EF-H batch 2 1 (fire_hydra tex 2 in the tall frame, the user's instruction 2026-11-25; EF-H amendment A D-A3) + EF-H batch 3 3 (thirteen user renders at tex 2, the user's instruction 2026-11-25: {scale: 2, tex: 2, smooth: [despur, edges]}; GPU worst 93.0 MB of 128; open for the user's veto)
 BASE_PAGES = 12                    # the atlas pages before EF (3ba8aa91): `extra` = pages - BASE_PAGES
 PAGE_BYTES = 2048 * 2048 * 4
 MAX_GPU_BYTES = 8 * PAGE_BYTES

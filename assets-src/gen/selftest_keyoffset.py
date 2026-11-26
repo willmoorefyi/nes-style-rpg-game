@@ -42,9 +42,11 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     from gen import monster_check as MC
     from gen import monster_keys as MK
     from gen import rig as R
-    sid = "chimera"                                      # hurt and attack masks, room in its 128 px cell
+    # hurt and attack head masks, room in its 128 px cell; EF-H batch 3: hydra (was chimera, whose user-rendered tall
+    # sheet and new rig have no head masks)
+    sid = "hydra"
     cfg = copy.deepcopy(MA.load_rig(sid))
-    # chimera's rig has `kneel: {source: ai}` since KT3: the FW-O fixture is the pre-kneel rig (KT3 ruling, 2026-11-18)
+    # the rig has `kneel: {source: ai}` since KT3: the FW-O fixture is the pre-kneel rig (KT3 ruling, 2026-11-18)
     cfg.pop("kneel", None)
     check("key_offset" not in cfg and MK.offset_cfg(sid, cfg) is cfg,
           "FW-O: a rig without key_offset comes back as the same object (every frame and lock byte-identical)")
@@ -77,7 +79,7 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     check(np.array_equal(np.asarray(rokfs["hurt"].convert("RGBA")), _shift(np.asarray(rkfs["hurt"].convert("RGBA")), dx, dy)),
           "FW-O: --raw (paint=False) applies the offset too")
 
-    ex, ey = 2, -2                                       # the attack key reaches x 165 of 168: room for 2 px only
+    ex, ey = 2, -2                                       # a small offset every key has room for
     every = {**copy.deepcopy(cfg), "key_offset": {k: [ex, ey] for k in kfs}}
     _, emeta, ekfs = _entries(sid, every)
     egen = MA.generate(sid, MK.offset_cfg(sid, every), ekfs, emeta)
@@ -86,7 +88,7 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     off_px = {n: int((egen[n]["img"] != _shift(base[n]["img"], ex, ey)).any(2).sum()) for n in base}
     exact = [n for n, v in off_px.items() if v == 0]
     # the solved joints move exactly; a part rendered at fractional joints (lerped poses) can flip a few nearest-
-    # neighbour samples on float rounding (chimera atk_mid 14 px, atk_recover 75 px of ~5000): <= 2 % of the frame
+    # neighbour samples on float rounding (chimera, the first fixture: atk_mid 14 px, atk_recover 75 px of ~5000): <= 2 %
     small = all(v <= 0.02 * int((base[n]["img"][..., 3] > 0).sum()) for n, v in off_px.items())
     check(jok and small and len(exact) >= len(base) - 2,
           f"FW-O: with every key and its joints offset, every frame's joints move by exactly (2, -2) and its pixels "
@@ -102,16 +104,15 @@ def run_key_offset(check: Callable[[bool, str], None]) -> None:
     check(np.array_equal(np.asarray(bk["hurt"].convert("RGBA")), _shift(np.asarray(pk["hurt"].convert("RGBA")), dx, dy))
           and bmeta.get("kf_painted") == ["hurt"],
           "FW-O: keyframe paint is translated with its key (offset + paint = the painted key moved)")
-    # an attack in-between: the live chimera rig aliases its hurt sequence since G3b round 2 (FW-Q), so it generates
-    # no hurt_in2
+    # an attack in-between (the first fixture, chimera, aliased its hurt sequence under FW-Q)
     ib = {**copy.deepcopy(off), "paint": [{"frame": "atk_mid", "xy": [[40, 40]], "rgb": list(pal[2])}]}
     _, imeta, ik = _entries(sid, ib)
     ig = MA.generate(sid, MK.offset_cfg(sid, ib), ik, imeta)["atk_mid"]["img"]
     check(tuple(ig[40, 40]) == (*pal[2], 255), "FW-O: in-between paint stays at its written xy (the rig agent re-derives it)")
 
     lock = MC.lock_frames(MA.generate(sid, ocfg, okfs, ometa), okfs, ometa)
-    # the live chimera rig paints its attack key since ROSTER_FIX_PLAN_2 G3b (D-R1 B, kf:attack in its lock), so the
-    # "no key paint" case drops the rig's paint list rather than use the live rig as is
+    # a live rig may paint its keys (chimera did, kf:attack), so the "no key paint" case drops the rig's paint list
+    # rather than use the live rig as is
     bare = {k: v for k, v in copy.deepcopy(cfg).items() if k not in ("paint", "kf_paint_cap")}
     _, nmeta, nkfs = _entries(sid, bare)
     plain = MC.lock_frames(MA.generate(sid, bare, nkfs, nmeta), nkfs, nmeta)

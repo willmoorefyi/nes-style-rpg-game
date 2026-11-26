@@ -1,27 +1,78 @@
 {
   "character": "evil_eye",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "af20279b977795c051dbbc3c",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/evil_eye/sheet_2026-11-25.png",
+  "sha256": "0b96161c7219ea3b3fca50208378d03ea8988fa698a05eff565add19948dbe6a",
+  "recipe": "monster_user.yaml#evil_eye",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/evil_eye/",
+    "current_x2_sha256": "4c5cfb7b34472a237c167d7f550f8f9455aaae291408b3ccf093c2ad56260392",
+    "poses_reference_sha256": "4fa7625bb300c9d95164d71e5f4fd916eb45886b1f6fd955d4611b71f90e5a27",
+    "prompt_sha256": "d088da215c57ab185b255152d9e0d6e73aef6fd88f8fb3aa31f789acee2bfd7e",
+    "prompt_v1_sha256": "cc41ff08832c7513759b5ff4430ade6c68bd83eae6d8c6a69af425b2af077ba2"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    128,
-    128
+    154,
+    200
   ],
-  "bottom_row": 122,
+  "bottom_row": 192,
+  "frame": "tall",
   "layout": [
     3,
     1
   ],
+  "size": "large",
+  "floating": true,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": true,
-  "flip_frames": [],
-  "note": "ROSTER_LOG R79"
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      147,
+      150,
+      134,
+      132
+    ],
+    "anchors": [
+      64.28,
+      72.78,
+      64.78,
+      61.78
+    ],
+    "anchor_x": 74.28,
+    "error": {
+      "max": 38.5,
+      "p99": 38.5,
+      "mean": 9.1,
+      "glow_px": 192,
+      "glow_kept": 1.0
+    },
+    "regions": {
+      "iris": {
+        "px": 658,
+        "mean": 8.0,
+        "p90": 14.5,
+        "max": 14.5,
+        "colours": 3
+      },
+      "tips": {
+        "px": 1282,
+        "mean": 4.7,
+        "p90": 4.7,
+        "max": 4.7,
+        "colours": 1
+      }
+    }
+  }
 }

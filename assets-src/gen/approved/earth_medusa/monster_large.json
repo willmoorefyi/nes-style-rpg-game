@@ -1,0 +1,77 @@
+{
+  "character": "earth_medusa",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/earth_medusa/sheet_2026-11-25.png",
+  "sha256": "52575be52bd78d5932ff53613385779899ea8ed426e55e4840506a0c30d1c971",
+  "recipe": "monster_user.yaml#earth_medusa",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/earth_medusa/",
+    "current_x2_sha256": "0e7e696a07ed7000ed8402288c5b38d9ff5f9d7c85fc749744ff5e44e7ca4540",
+    "poses_reference_sha256": "37e6b97efc683060430684c458cdb4d529fcc7ba4cc114d8b3cc6d10a47e2b13",
+    "prompt_sha256": "29a0c697a805843fb9c7be99c7d3710849b2b14527c9a6ef5775678249947c2d",
+    "prompt_v1_sha256": "59ce502e4cc3cff2fb69b20e8d8ff306cc12177f39fe2eec479f9d563a7eef08"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      92,
+      77,
+      86,
+      55
+    ],
+    "anchors": [
+      28.81,
+      28.26,
+      33.51,
+      27.1
+    ],
+    "anchor_x": 61.81,
+    "error": {
+      "max": 96.5,
+      "p99": 42.9,
+      "mean": 10.5,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "eyes": {
+        "px": 9,
+        "mean": 24.8,
+        "p90": 59.9,
+        "max": 96.5,
+        "colours": 1
+      },
+      "stone": {
+        "px": 5723,
+        "mean": 6.1,
+        "p90": 9.3,
+        "max": 18.2,
+        "colours": 11
+      }
+    }
+  }
+}

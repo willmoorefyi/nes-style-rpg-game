@@ -1,161 +1,160 @@
 sprite: blue_dragon
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H amendment A): the user-rendered sheet (approved/blue_dragon/
+# monster_large.png, backend: user, the tall frame: 236x200 cells, feet row 192, the idle 144 rows with the neck
+# raised, the attack a 74-row low lunge). The old rig is archived as anim/monsters/_retired/blue_dragon_v1.yaml.
+# Translation-first (NEW_MONSTER_GUIDE.md hard sheets: the idle -> attack height swing is too far for rotations):
+# every in-between is its source key with the neck and head moved as one group by whole-px tweaks (`moves: []`);
+# body, tail and legs stay put, feet pinned; the large swing is bridged by the head dipping in the wind-up and
+# rising after the strike (each step under the 200-row cell's centroid cap) and a 6 px body sink (`dy`).
 body: quadruped
 facing: right
 sampler: nearest
 breath: true
-# Long wingless blue dragon (pass R batch D, quadruped): the white_dragon recipe without wings. The tail is a loop in
-# idle, a low sweep in the attack and a tight spiral in the hurt: it stays out of every move set (it rides the hip),
-# so each frame keeps its source key's tail. The head carries the forked horns (head mask per key). No breath fx: the
-# approved attack draws none.
 keyframes:
   idle:
-    hip: [42, 90]
-    back: [62, 82]
-    chest: [82, 86]
-    neck: [92, 68]
-    head: [98, 50]
-    snout: [119, 58]
-    tail0: [34, 92]
-    tail1: [16, 92]
-    tail2: [8, 76]
-    tail3: [18, 64]
-    tail_tip: [34, 70]
-    sh_n: [76, 92]
-    el_n: [76, 104]
-    paw_n: [80, 114]
-    ftoe_n: [88, 120]
-    sh_f: [95, 92]
-    el_f: [94, 104]
-    paw_f: [97, 114]
-    ftoe_f: [106, 118]
-    hip_n: [40, 95]
-    knee_n: [37, 105]
-    foot_n: [37, 114]
-    toe_n: [46, 120]
-    hip_f: [57, 95]
-    knee_f: [57, 104]
-    foot_f: [60, 112]
-    toe_f: [67, 114]
+    hip: [75, 150]
+    back: [110, 130]
+    chest: [150, 150]
+    neck: [160, 100]
+    head: [172, 88]
+    snout: [190, 92]
+    tail0: [60, 150]
+    tail1: [35, 150]
+    tail2: [25, 120]
+    tail3: [45, 105]
+    tail_tip: [65, 115]
+    sh_n: [158, 160]
+    el_n: [160, 175]
+    paw_n: [165, 186]
+    ftoe_n: [172, 191]
+    sh_f: [138, 160]
+    el_f: [138, 175]
+    paw_f: [140, 186]
+    ftoe_f: [148, 191]
+    hip_n: [72, 155]
+    knee_n: [65, 172]
+    foot_n: [65, 186]
+    toe_n: [72, 191]
+    hip_f: [100, 155]
+    knee_f: [100, 172]
+    foot_f: [105, 186]
+    toe_f: [112, 191]
   attack:
-    hip: [32, 88]
-    back: [55, 76]
-    chest: [78, 88]
-    neck: [90, 94]
-    head: [100, 96]
-    snout: [124, 108]
-    tail0: [30, 82]
-    tail1: [14, 86]
-    tail2: [7, 98]
-    tail3: [10, 106]
-    tail_tip: [16, 112]
-    sh_n: [68, 94]
-    el_n: [70, 104]
-    paw_n: [74, 114]
-    ftoe_n: [82, 120]
-    sh_f: [86, 100]
-    el_f: [90, 108]
-    paw_f: [96, 114]
-    ftoe_f: [104, 117]
-    hip_n: [30, 94]
-    knee_n: [26, 104]
-    foot_n: [24, 113]
-    toe_n: [30, 119]
-    hip_f: [48, 94]
-    knee_f: [47, 104]
-    foot_f: [52, 112]
-    toe_f: [58, 115]
+    hip: [60, 160]
+    back: [100, 140]
+    chest: [140, 160]
+    neck: [175, 165]
+    head: [200, 170]
+    snout: [215, 175]
+    tail0: [45, 165]
+    tail1: [25, 178]
+    tail2: [10, 183]
+    tail3: [5, 185]
+    tail_tip: [3, 186]
+    sh_n: [155, 175]
+    el_n: [160, 182]
+    paw_n: [162, 188]
+    ftoe_n: [168, 191]
+    sh_f: [130, 172]
+    el_f: [132, 182]
+    paw_f: [135, 188]
+    ftoe_f: [140, 191]
+    hip_n: [65, 170]
+    knee_n: [58, 180]
+    foot_n: [57, 188]
+    toe_n: [62, 191]
+    hip_f: [95, 170]
+    knee_f: [95, 180]
+    foot_f: [98, 188]
+    toe_f: [104, 191]
   hurt:
-    hip: [45, 92]
-    back: [60, 76]
-    chest: [80, 82]
-    neck: [88, 64]
-    head: [92, 52]
-    snout: [116, 60]
-    tail0: [40, 96]
-    tail1: [25, 105]
-    tail2: [10, 95]
-    tail3: [15, 84]
-    tail_tip: [22, 90]
-    sh_n: [75, 92]
-    el_n: [76, 104]
-    paw_n: [80, 114]
-    ftoe_n: [88, 120]
-    sh_f: [90, 92]
-    el_f: [94, 104]
-    paw_f: [100, 114]
-    ftoe_f: [108, 118]
-    hip_n: [42, 98]
-    knee_n: [40, 108]
-    foot_n: [42, 115]
-    toe_n: [48, 120]
-    hip_f: [58, 98]
-    knee_f: [56, 106]
-    foot_f: [60, 112]
-    toe_f: [68, 114]
-parts:
-  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
-  body: {width: 24}
+    hip: [60, 165]
+    back: [80, 150]
+    chest: [140, 165]
+    neck: [118, 130]
+    head: [115, 100]
+    snout: [125, 92]
+    tail0: [45, 165]
+    tail1: [40, 178]
+    tail2: [50, 175]
+    tail3: [55, 168]
+    tail_tip: [52, 170]
+    sh_n: [150, 170]
+    el_n: [170, 180]
+    paw_n: [180, 188]
+    ftoe_n: [188, 191]
+    sh_f: [140, 175]
+    el_f: [150, 184]
+    paw_f: [155, 188]
+    ftoe_f: [160, 191]
+    hip_n: [65, 175]
+    knee_n: [70, 184]
+    foot_n: [72, 188]
+    toe_n: [76, 191]
+    hip_f: [90, 175]
+    knee_f: [95, 184]
+    foot_f: [98, 188]
+    toe_f: [104, 191]
 masks:
   head:                        # the head with both forked horns and the jaw
-    idle: [[80, 26], [110, 26], [122, 52], [122, 66], [108, 68], [98, 64], [90, 58], [84, 44]]
-    attack: [[84, 66], [114, 66], [122, 96], [127, 104], [127, 118], [110, 118], [100, 112], [96, 102], [86, 92]]
-    hurt: [[64, 42], [100, 40], [120, 54], [120, 68], [104, 72], [92, 66], [84, 56], [70, 50]]
+    idle: [[132, 45], [180, 45], [185, 75], [198, 90], [196, 102], [170, 100], [158, 96], [148, 80], [140, 65]]
+    attack: [[155, 128], [200, 128], [205, 150], [222, 172], [222, 190], [195, 190], [178, 178], [170, 160], [160, 145]]
+    hurt: [[46, 78], [90, 72], [110, 78], [132, 85], [132, 106], [115, 112], [100, 112], [85, 118], [70, 112], [50, 100]]
 frames:
-  atk_wind1:                   # anticipation: body sinks 1 and shifts 1 back, neck and head drawn back and low as one
-    t: 0.0
-    dy: 1
+  atk_wind1:                # the neck and head dip 12 (the strike coils low), the body sinks 2
     moves: []
-    tweaks: {neck: [-3, 2], head: [-3, 2], snout: [-3, 2], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
-  atk_wind2:                   # coil: body 2 down and 2 back, neck and head pulled 6 back and 3 low as one, ready to lunge
-    t: 0.0
+    t: 0.2
     dy: 2
+    tweaks: {neck: [1, 12], head: [1, 12], snout: [1, 12]}
+  atk_wind2:                # dipped 24 and 4 forward, the body 6 down: the lunge cocked
     moves: []
-    tweaks: {neck: [-5, 3], head: [-5, 3], snout: [-5, 3], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
-  atk_mid:                     # the pass: the attack pose with the neck and head lifted 6-9 px back toward the coil
-    t: 0.1                     # (chest only 2 px: a higher chest dragged the pinned legs)
+    t: 0.35
+    dy: 6
+    tweaks: {neck: [4, 24], head: [4, 24], snout: [4, 24]}
+  atk_mid:                  # the lunge key, the head 2 back and 14 up (the bridge from the high idle)
     moves: []
-    pins: [foot_n, foot_f, paw_n, paw_f]
-    tweaks: {chest: [-1, -2], neck: [-3, -6], head: [-4, -9], snout: [-4, -9]}
-  atk_follow:                  # settle after the bite: head and neck ease up 3-5 px
-    t: 0.9
+    t: 0.15
+    dy: 0
+    tweaks: {neck: [-2, -14], head: [-2, -14], snout: [-2, -14]}
+  atk_follow:               # the lunge key, the head 1 on and rising 15 (on its way back up)
     moves: []
-    pins: [foot_n, foot_f, paw_n, paw_f]
-    tweaks: {neck: [0, -1], head: [-1, -2], snout: [-1, -2]}
-  atk_recover:                 # idle with the body 1 lower and the head still low and forward
-    t: 0.3
-    dy: 1
+    t: 1.0
+    dy: 0
+    tweaks: {neck: [1, -15], head: [1, -15], snout: [1, -15]}
+  atk_recover:              # the idle, the head still 24 down and the body 6 down (as wind2)
     moves: []
-    tweaks: {neck: [4, 7], head: [5, 13], snout: [5, 13], chest: [1, 2]}
-  hurt_in1:                    # the flinch: head snaps 5 back and 4 down toward the hurt key, body 1 down
-    t: 0.3
-    dy: 1
+    t: 0.35
+    dy: 6
+    tweaks: {neck: [4, 24], head: [4, 24], snout: [4, 24]}
+  hurt_in1:                 # flinch: the idle's head thrown 12 back and 18 down toward the coiled hurt
     moves: []
-    tweaks: {neck: [-3, 2], head: [-5, 4], snout: [-5, 5], chest: [-1, 0]}
-  hurt_in2:                    # easing out of the recoil: head and neck 3 px back up toward idle
-    t: 0.3
+    t: 0.35
+    dy: 0
+    tweaks: {neck: [-12, 18], head: [-12, 18], snout: [-12, 18]}
+  hurt_in2:                 # the hurt key, the head 3 forward and 3 up on the way back
     moves: []
-    tweaks: {neck: [1, -2], head: [2, -4], snout: [2, -4], chest: [0, -1]}
-  daze:                        # sleep / stun: the neck sags, head hangs 4 px, nose dipped 6
     t: 0.0
     dy: 0
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [1, 2], head: [1, 4], snout: [0, 6]}
-  daze_b:                      # the sway's low point: body 1 px lower
-    t: 0.0
-    dy: 1
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [1, 2], head: [1, 4], snout: [0, 6]}
+    tweaks: {neck: [3, -3], head: [3, -3], snout: [3, -3]}
+  daze:                     # slump: the head 2 down
+    moves: []
+    dy: 0
+    tweaks: {neck: [0, 2], head: [0, 2], snout: [0, 2]}
+  daze_b:                   # the head 3 down
+    moves: []
+    dy: 0
+    tweaks: {neck: [0, 3], head: [0, 3], snout: [0, 3]}
 holds: []
-paint:                         # 1 px cracks between the neck, head, legs and body closed with outline ink; a 4 px
-  # pocket between the lifted horns and the crest in atk_mid inked
-  - {frame: atk_wind2, xy: [[80, 73], [30, 103]], rgb: [6, 4, 10]}
-  - {frame: atk_mid, xy: [[100, 75], [101, 75], [100, 76], [101, 76]], rgb: [6, 4, 10]}
-  - {frame: atk_mid, xy: [[88, 95], [89, 95], [88, 96], [89, 96], [90, 96], [89, 97], [90, 97], [91, 97], [93, 97], [94, 97], [95, 97], [96, 97], [90, 98], [91, 98], [92, 98], [93, 98], [94, 98], [95, 98], [96, 98], [91, 99], [92, 99], [93, 99], [94, 99], [95, 99], [96, 99], [97, 99], [92, 100], [93, 100], [94, 100], [95, 100], [96, 100], [97, 100], [98, 100], [99, 100], [93, 101], [94, 101], [95, 101], [96, 101], [97, 101], [98, 101], [99, 101], [100, 101], [94, 102], [95, 102], [98, 102]], rgb: [33, 24, 66]}   # the wedge the lifted neck opens over the far foreleg, shadow
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+paint:                         # 1 px cracks the translations open, inked; the hurt key's gap between the hind legs
+                               # (closed by the seam fill in hurt_in2) re-opened as in the approved art
+  - {frame: atk_wind2, xy: [[154, 113], [158, 113], [153, 114], [157, 114], [154, 120], [153, 126], [152, 131], [151, 132], [137, 135], [140, 135], [151, 135], [173, 135], [152, 136], [174, 152], [168, 157], [160, 170], [138, 172]], rgb: [6, 4, 10]}
+  - {frame: atk_recover, xy: [[154, 113], [158, 113], [153, 114], [157, 114], [154, 120], [153, 126], [152, 131], [137, 135], [140, 135], [151, 135], [173, 135], [152, 136], [174, 152], [168, 157], [160, 170], [138, 172]], rgb: [6, 4, 10]}
+  - {frame: hurt_in1, xy: [[169, 116], [158, 121], [157, 123], [158, 123], [162, 128]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[97, 180], [98, 180], [98, 181], [99, 181], [100, 181], [101, 181], [97, 182], [98, 182], [101, 182], [102, 182], [103, 182], [98, 183], [99, 183], [100, 183], [101, 183], [102, 183], [103, 183], [104, 183], [100, 184], [101, 184], [102, 184], [103, 184], [101, 185], [102, 185]], rgb: null}
+  - {frame: hurt_in1, xy: [[166, 130], [167, 130], [168, 130], [169, 130], [170, 130], [171, 130]], rgb: [6, 4, 10]}         # the neck-chest notch under the jaw: the outline closed
+  - {frame: hurt_in1, xy: [[164, 131], [166, 131], [167, 131], [168, 131], [169, 131], [170, 131], [171, 131], [164, 132], [165, 132], [167, 132], [168, 132], [169, 132], [170, 132], [164, 133], [165, 133], [166, 133], [167, 134], [167, 135], [168, 135]], rgb: [148, 198, 231]}   # and the notch filled with the neck-belly light blue
+  - {frame: atk_recover, xy: [[170, 137], [169, 138], [170, 138], [171, 138]], rgb: [148, 198, 231]}   # the crack where the lowered neck meets the chest
+# pass KT: the approved kneel key (approved/blue_dragon/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai
-  offset: [0, 1]               # the approved key stands 1 px above the feet row 122 (K-ground)
-  # KT1 review 1 (T1): kneel_in2 stretched 26 % with a sideways squeeze smeared the tail loop and mane; stretch it
-  # 15 % of the way back and keep its width
-  bridge: {u: [0.35, 0.15], width: false}
+  bridge: {u: [0.15, 0.35]}   # in1 squashed less: the default 0.35 thinned its outline (second ring 0.65 vs 0.83)

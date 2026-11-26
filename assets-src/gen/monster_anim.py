@@ -121,9 +121,9 @@ def load_rig(sprite: str) -> dict | None:
 # FW-Q (ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens out,
 # so they resolve to their source keys as on a keyframe-only sheet. Only these sheets (rev-20 ruling, pinned by
 # selftest_efix.FWQ_ALLOW), one aliased sequence per rig. G6 removed the unused pre-allowlisted entries (scorpion/hurt,
-# hydra/attack, black_knight/hurt: their rigs bridge every sequence); a new entry needs orchestrator approval.
-FWQ_ALLOW = {("chimera", "hurt"),  # chimera: orchestrator, round 2 (D-R1 hurt)
-             ("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}
+# hydra/attack, black_knight/hurt: their rigs bridge every sequence); a new entry needs orchestrator approval. EF-H
+# batch 3 removed chimera/hurt (the user's render has three heads in every key: its new rig bridges the hurt).
+FWQ_ALLOW = {("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}
 ALIAS_FRAMES = {"hurt": ("hurt_in1", "hurt_in2"),
                 "attack": ("atk_wind1", "atk_wind2", "atk_mid", "atk_follow", "atk_recover")}
 

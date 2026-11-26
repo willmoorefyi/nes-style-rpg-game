@@ -1,176 +1,239 @@
 sprite: green_dragon
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H amendment A): the user-rendered sheet (approved/green_dragon/
+# monster_large.png, backend: user, the tall frame: 248x200 cells, feet row 192, the idle 147 rows with the head
+# raised; no throat sacs, user ruling 2026-11-25). The old rig is archived as anim/monsters/_retired/green_dragon_v1.yaml.
+# Translation-first (NEW_MONSTER_GUIDE.md hard sheets): every in-between is its source key with the neck and head
+# (the frill spikes in the head mask) moved as one group by whole-px tweaks (`moves: []`); body, wings (removed parts:
+# they ride the body), tail and legs stay put, every leg tip pinned.
 body: quadruped
 facing: right
 sampler: nearest
 breath: true
-# Heavy short-necked green dragon (pass R batch D, quadruped), the blue_dragon's sibling: where the blue one rears its
-# long neck and whips, this one hunches: the wind-up sinks the bulk and pulls the frilled head in low, the bite is a
-# heavy thrust. The small folded wing is one rigid part on its own root (wr -> wt) in every key. The spiral tail stays
-# out of every move set (it rides the hip). No breath fx: the approved attack draws none.
 keyframes:
   idle:
-    hip: [40, 86]
-    back: [62, 72]
-    chest: [90, 74]
-    neck: [100, 60]
-    head: [106, 46]
-    snout: [132, 55]
-    tail0: [34, 84]
-    tail1: [18, 86]
-    tail2: [10, 70]
-    tail3: [24, 55]
-    tail_tip: [26, 66]
-    wr: [86, 56]
-    wt: [46, 50]
-    sh_n: [82, 90]
-    el_n: [80, 104]
-    paw_n: [82, 115]
-    ftoe_n: [93, 119]
-    sh_f: [104, 95]
-    el_f: [103, 105]
-    paw_f: [106, 115]
-    ftoe_f: [117, 119]
-    hip_n: [45, 92]
-    knee_n: [40, 105]
-    foot_n: [40, 116]
-    toe_n: [48, 120]
-    hip_f: [68, 95]
-    knee_f: [66, 105]
-    foot_f: [68, 116]
-    toe_f: [75, 119]
+    hip: [80, 150]
+    back: [110, 110]
+    chest: [150, 140]
+    neck: [165, 100]
+    head: [180, 75]
+    snout: [205, 80]
+    tail0: [65, 140]
+    tail1: [35, 125]
+    tail2: [30, 100]
+    tail3: [50, 95]
+    tail_tip: [58, 110]
+    sh_n: [165, 150]
+    el_n: [170, 172]
+    paw_n: [175, 186]
+    ftoe_n: [182, 191]
+    sh_f: [135, 155]
+    el_f: [135, 172]
+    paw_f: [140, 186]
+    ftoe_f: [146, 191]
+    hip_n: [75, 160]
+    knee_n: [70, 175]
+    foot_n: [72, 186]
+    toe_n: [80, 191]
+    hip_f: [105, 160]
+    knee_f: [110, 175]
+    foot_f: [112, 186]
+    toe_f: [118, 191]
   attack:
-    hip: [35, 86]
-    back: [60, 76]
-    chest: [88, 88]
-    neck: [98, 86]
-    head: [110, 80]
-    snout: [140, 88]
-    tail0: [30, 84]
-    tail1: [12, 86]
-    tail2: [6, 70]
-    tail3: [22, 55]
-    tail_tip: [24, 66]
-    wr: [86, 62]
-    wt: [46, 56]
-    sh_n: [72, 92]
-    el_n: [72, 104]
-    paw_n: [78, 116]
-    ftoe_n: [88, 119]
-    sh_f: [100, 100]
-    el_f: [105, 108]
-    paw_f: [110, 116]
-    ftoe_f: [120, 119]
-    hip_n: [30, 92]
-    knee_n: [22, 106]
-    foot_n: [22, 116]
-    toe_n: [30, 120]
-    hip_f: [52, 95]
-    knee_f: [50, 105]
-    foot_f: [52, 116]
-    toe_f: [60, 120]
+    hip: [70, 150]
+    back: [110, 120]
+    chest: [160, 150]
+    neck: [185, 140]
+    head: [210, 135]
+    snout: [235, 135]
+    tail0: [55, 140]
+    tail1: [30, 120]
+    tail2: [30, 85]
+    tail3: [50, 80]
+    tail_tip: [55, 95]
+    sh_n: [190, 165]
+    el_n: [200, 178]
+    paw_n: [205, 186]
+    ftoe_n: [210, 191]
+    sh_f: [140, 165]
+    el_f: [145, 178]
+    paw_f: [145, 186]
+    ftoe_f: [150, 191]
+    hip_n: [60, 160]
+    knee_n: [50, 175]
+    foot_n: [50, 186]
+    toe_n: [55, 191]
+    hip_f: [95, 165]
+    knee_f: [100, 178]
+    foot_f: [100, 186]
+    toe_f: [105, 191]
   hurt:
-    hip: [50, 95]
-    back: [60, 75]
-    chest: [80, 70]
-    neck: [90, 62]
-    head: [95, 52]
-    snout: [122, 62]
-    tail0: [44, 100]
-    tail1: [25, 108]
-    tail2: [12, 95]
-    tail3: [22, 80]
-    tail_tip: [26, 88]
-    wr: [64, 56]
-    wt: [32, 62]
-    sh_n: [98, 90]
-    el_n: [103, 103]
-    paw_n: [108, 114]
-    ftoe_n: [118, 119]
-    sh_f: [94, 95]
-    el_f: [95, 105]
-    paw_f: [98, 112]
-    ftoe_f: [101, 114]
-    hip_n: [52, 95]
-    knee_n: [50, 108]
-    foot_n: [52, 116]
-    toe_n: [62, 120]
-    hip_f: [68, 98]
-    knee_f: [72, 108]
-    foot_f: [76, 116]
-    toe_f: [86, 120]
+    hip: [80, 160]
+    back: [100, 130]
+    chest: [140, 130]
+    neck: [120, 100]
+    head: [125, 80]
+    snout: [135, 72]
+    tail0: [65, 165]
+    tail1: [40, 175]
+    tail2: [25, 160]
+    tail3: [40, 150]
+    tail_tip: [45, 158]
+    sh_n: [165, 160]
+    el_n: [180, 178]
+    paw_n: [185, 186]
+    ftoe_n: [195, 191]
+    sh_f: [145, 170]
+    el_f: [150, 180]
+    paw_f: [150, 186]
+    ftoe_f: [155, 191]
+    hip_n: [75, 170]
+    knee_n: [80, 180]
+    foot_n: [80, 186]
+    toe_n: [85, 191]
+    hip_f: [110, 170]
+    knee_f: [115, 180]
+    foot_f: [115, 186]
+    toe_f: [122, 191]
 parts:
-  wing: {bone: [wr, wt], radius: 8.0}
-  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
-  body: {width: auto}
+  uwing_n: {remove: true}
+  fwing_n: {remove: true}
+  uwing_f: {remove: true}
+  fwing_f: {remove: true}
 masks:
-  body:                        # the pale belly down to its lower outline (its foot was the forelegs: the bulk's sink tore it)
-    idle: [[88, 74], [110, 74], [110, 93], [100, 97], [96, 103], [88, 103], [86, 90]]
-  tail:                        # the whole spiral (its inner coil was body: the source gaps between the coils read as cracks)
-    idle: [[6, 52], [38, 52], [38, 66], [34, 76], [38, 82], [38, 97], [20, 99], [6, 92]]
-    attack: [[1, 50], [36, 50], [36, 70], [32, 76], [36, 82], [36, 96], [15, 97], [1, 88]]
-    hurt: [[6, 72], [38, 72], [40, 95], [46, 104], [46, 117], [20, 117], [6, 102]]
-  wing:                        # the small folded leathery wing on the back
-    idle: [[42, 50], [60, 42], [82, 42], [92, 48], [90, 62], [78, 66], [62, 64], [50, 58]]
-    attack: [[40, 52], [62, 50], [82, 50], [96, 58], [92, 70], [70, 70], [55, 68]]
-    hurt: [[30, 62], [45, 50], [62, 48], [66, 60], [60, 70], [45, 68], [35, 66]]
-  neck:                        # the swollen throat sacs hang from the neck (they were the far foreleg in the attack)
-    attack: [[92, 92], [116, 92], [119, 104], [115, 114], [100, 116], [91, 108]]
-  head:                        # the frilled head and jaw, with the throat sacs under it in idle and hurt (they hang from the jaw)
-    idle: [[88, 24], [118, 24], [136, 45], [136, 62], [124, 64], [124, 78], [110, 79], [97, 76], [96, 62], [90, 50]]
-    attack: [[96, 66], [124, 66], [142, 80], [142, 96], [124, 100], [110, 96], [96, 88]]
-    hurt: [[80, 44], [112, 42], [128, 58], [128, 72], [114, 76], [112, 88], [100, 90], [86, 86], [84, 74], [80, 58]]
+  head:                        # the head with the frill spikes, the horns and the jaw
+    idle: [[140, 47], [185, 47], [200, 75], [210, 82], [210, 95], [190, 100], [170, 98], [150, 95], [140, 80]]
+    attack: [[160, 105], [205, 105], [225, 125], [245, 135], [245, 170], [220, 175], [200, 165], [175, 160], [160, 145]]
+    hurt: [[75, 62], [140, 62], [142, 82], [130, 95], [115, 100], [100, 105], [85, 100], [75, 85]]
 frames:
-  atk_wind1:                   # the hunch starts: bulk 1 down and 1 back, neck and head pulled in 3 and 2 low as one
-    t: 0.0
-    dy: 1
+  atk_wind1:                # the head rears back 7 and up 5 (the neck 3 / 2), the chest 1 down
     moves: []
-    tweaks: {neck: [-3, 2], head: [-3, 2], snout: [-3, 2], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], wr: [-1, 0], wt: [-1, 0]}
-  atk_wind2:                   # the coil: bulk 3 down and 2 back, neck and head tucked 7 back and 2 down as one, wing pressed flat
-    t: 0.0
-    dy: 3
-    moves: []
-    tweaks: {neck: [-7, 2], head: [-7, 2], snout: [-7, 2], hip: [-1, 0], back: [-3, 0], chest: [-3, 0], wr: [-3, 0], wt: [-3, 1]}
-  atk_mid:                     # the thrust passing: attack pose, head and neck held 4 back and up
-    t: 0.05
-    moves: []
-    pins: [foot_n, foot_f, paw_n, paw_f]
-    tweaks: {chest: [-1, -1], neck: [-2, -2], head: [-3, -4], snout: [-3, -4]}
-  atk_follow:                  # settle after the bite: head eases 2 up
-    t: 0.9
-    moves: []
-    pins: [foot_n, foot_f, paw_n, paw_f]
-    tweaks: {neck: [0, -1], head: [-1, -2], snout: [-1, -2]}
-  atk_recover:                 # idle with the bulk still 2 low and 2-3 back, the head (and its sacs) 11 low
-    t: 0.3
-    dy: 2
-    moves: []
-    tweaks: {hip: [-1, 0], back: [-3, 1], chest: [-3, 2], neck: [0, 7], head: [0, 11], snout: [0, 11], wr: [-3, 0], wt: [-3, 0]}
-  hurt_in1:                    # the flinch: head snaps back 5 and down 3 toward the hunch, bulk 1 down
-    t: 0.1
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
     dy: 0
+    tweaks: {chest: [0, 1], neck: [-3, -2], head: [-7, -5], snout: [-7, -5]}
+  atk_wind2:                # the head held high, back 10 and up 6 (the neck 4 / 2, so it bends, not shears): the bite cocked
     moves: []
-    tweaks: {neck: [-3, 1], head: [-5, 3], snout: [-5, 4], chest: [-1, 0], wr: [-1, 0], wt: [-2, 1]}
-  hurt_in2:                    # easing out of the hunch: head and neck 3 back up toward idle
-    t: 0.3
-    moves: []
-    tweaks: {neck: [1, -2], head: [2, -3], snout: [2, -3], chest: [0, -1]}
-  daze:                        # sleep / stun: the heavy head sags 3, nose dipped
-    t: 0.0
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
     dy: 0
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [0, 1], head: [1, 3], snout: [1, 4]}
-  daze_b:                      # the sway's low point: body 1 px lower
+    tweaks: {neck: [-4, -2], head: [-10, -6], snout: [-10, -6]}
+  atk_mid:                  # the lunge key, the head 10 back and 14 up (the bridge from the high idle)
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
     t: 0.0
-    dy: 1
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [0, 1], head: [1, 3], snout: [1, 4]}
+    tweaks: {neck: [-5, -6], head: [-10, -14], snout: [-10, -14]}
+  atk_follow:               # the lunge key, the head 2 back and 9 up (rising toward the idle) (on its way back up)
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [-2, -9], head: [-2, -9], snout: [-2, -9]}
+  atk_recover:              # the idle, the head still 6 forward and 16 down toward the crouch (the neck 3 / 8)
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [3, 8], head: [6, 16], snout: [6, 16]}
+  hurt_in1:                 # flinch: the idle's body 8 back toward the rearing hurt, the head thrown 16 back and 3 down
+                            # (the neck 7 / 1: it bends, not shears)
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dx: -8
+    dy: 0
+    tweaks: {neck: [-7, 1], head: [-16, 3], snout: [-16, 3]}
+  hurt_in2:                 # the hurt key, the head group 3 forward and 1 down, on the way back (more, or a neck/head split, detaches pieces of the frill) toward the idle
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    t: 0.0
+    tweaks: {neck: [3, 1], head: [3, 1], snout: [3, 1]}
+  daze:                     # slump: the head 2 down
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [0, 2], head: [0, 2], snout: [0, 2]}
+  daze_b:                   # the head 3 down
+    moves: []
+    pins: [paw_n, paw_f, ftoe_n, ftoe_f, foot_n, foot_f, toe_n, toe_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [0, 3], head: [0, 3], snout: [0, 3]}
 holds: []
-paint:
-  - {frame: atk_wind2, xy: [[61, 102], [62, 104]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
-  - {frame: hurt_in2, xy: [[85, 70], [85, 71], [85, 72], [84, 73], [85, 73], [85, 74], [85, 75], [85, 76], [85, 77], [85, 78], [85, 79]], rgb: [6, 4, 10]}   # 11 px pocket between parts filled
-  - {frame: hurt_in2, xy: [[81, 60]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+paint:                         # pockets the translations open, inked (the idle key's own ink there)
+  - {frame: hurt_in1, xy: [[174, 118], [171, 120], [173, 120], [117, 148], [117, 149]], rgb: [206, 181, 99]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[176, 118], [80, 163], [119, 156], [105, 165], [100, 166], [101, 166], [102, 166], [103, 166]], rgb: [49, 74, 49]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[170, 121], [170, 122], [168, 123], [167, 124]], rgb: [239, 214, 132]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[76, 164], [76, 166], [77, 172], [115, 161]], rgb: [41, 57, 41]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[82, 175], [79, 179], [78, 180], [79, 180], [80, 182]], rgb: [66, 90, 57]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[80, 178], [76, 179], [77, 179]], rgb: [90, 123, 66]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[98, 148], [110, 153], [114, 154], [111, 155]], rgb: [156, 132, 74]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[117, 154], [113, 157], [114, 160]], rgb: [74, 107, 66]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[114, 155], [113, 156], [113, 158], [107, 164]], rgb: [99, 90, 57]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[118, 155], [104, 166], [99, 168], [111, 171]], rgb: [33, 49, 41]}   # a crack stroke the shift drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[173, 98]], rgb: [6, 4, 10]}
+  - {frame: atk_wind2, xy: [[151, 92], [152, 92], [150, 93], [152, 93], [153, 93], [152, 94], [152, 95]], rgb: [41, 57, 41]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_wind2, xy: [[151, 93], [154, 93], [149, 94], [150, 94], [151, 94], [153, 94]], rgb: [49, 74, 49]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_wind2, xy: [[155, 93], [154, 94]], rgb: [74, 107, 66]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_wind2, xy: [[155, 94]], rgb: [90, 123, 66]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_wind2, xy: [[156, 94]], rgb: [66, 90, 57]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_recover, xy: [[149, 96], [148, 97], [149, 97], [147, 98], [148, 99], [150, 102]], rgb: [49, 74, 49]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_recover, xy: [[148, 98], [149, 98], [150, 98], [147, 99], [149, 99], [148, 100], [149, 100], [149, 101]], rgb: [41, 57, 41]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_recover, xy: [[148, 101]], rgb: [57, 82, 57]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_recover, xy: [[148, 102], [148, 103], [149, 103], [148, 104], [149, 104], [149, 105]], rgb: [74, 107, 66]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: atk_recover, xy: [[149, 102], [150, 103]], rgb: [66, 90, 57]}   # a pocket the head move opens, in the idle's own colours
+  - {frame: hurt_in1, xy: [[169, 105]], rgb: [99, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[172, 111]], rgb: [41, 57, 41]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[171, 115]], rgb: [156, 132, 74]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[174, 119], [172, 120], [171, 121]], rgb: [206, 181, 99]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: hurt_in1, xy: [[168, 122], [169, 122], [167, 123], [165, 125], [163, 126], [162, 127]], rgb: [239, 214, 132]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[183, 111], [154, 137]], rgb: [41, 57, 41]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[182, 115]], rgb: [156, 132, 74]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[180, 119], [180, 121], [179, 122]], rgb: [206, 181, 99]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[178, 122], [177, 123], [178, 123], [175, 125], [173, 126]], rgb: [239, 214, 132]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[156, 131], [155, 134], [155, 135]], rgb: [49, 74, 49]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[155, 136], [154, 138]], rgb: [99, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[144, 92], [148, 94], [156, 95], [157, 95]], rgb: [74, 107, 66]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[151, 94], [152, 94], [153, 94]], rgb: [90, 123, 66]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[148, 95], [154, 95], [155, 95], [141, 99], [142, 99]], rgb: [66, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[181, 106], [144, 92], [150, 92], [147, 93], [148, 93], [148, 95]], rgb: [90, 123, 66]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[181, 116], [179, 118], [155, 136]], rgb: [206, 181, 99]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[177, 121], [177, 122], [175, 124], [173, 125]], rgb: [239, 214, 132]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[156, 131], [149, 93], [144, 95], [150, 95], [151, 95], [153, 95]], rgb: [49, 74, 49]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[155, 134]], rgb: [99, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[154, 135], [153, 92]], rgb: [41, 57, 41]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[154, 92], [155, 92], [156, 93], [157, 93], [158, 93], [149, 95], [154, 95], [155, 95], [156, 95], [157, 95], [158, 95], [159, 95]], rgb: [74, 107, 66]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[143, 93], [152, 96], [140, 97]], rgb: [66, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[144, 95], [150, 99], [150, 100]], rgb: [41, 57, 41]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[149, 95], [150, 96], [142, 98]], rgb: [66, 90, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[146, 96], [147, 101], [147, 102], [147, 103], [147, 104], [150, 104], [150, 105], [150, 106]], rgb: [74, 107, 66]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[148, 96], [146, 97], [150, 97], [146, 98], [146, 99], [147, 100], [150, 101], [151, 103]], rgb: [49, 74, 49]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[141, 98], [143, 98], [144, 98]], rgb: [57, 82, 57]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[147, 105], [147, 106], [149, 107]], rgb: [115, 148, 82]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_recover, xy: [[147, 107]], rgb: [99, 140, 74]}   # a crack stroke the head move drew, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[137, 89]], rgb: [6, 4, 10]}   # a 1 px crack, inked
+  - {frame: atk_wind2, xy: [[137, 92]], rgb: [6, 4, 10]}   # a 1 px crack, inked
+  - {frame: atk_wind1, xy: [[183, 111], [184, 112], [184, 113], [185, 114], [185, 115], [185, 116], [186, 117], [186, 118], [187, 119], [187, 120], [189, 124]], rgb: [6, 4, 10]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind1, xy: [[185, 111], [185, 112], [185, 113], [188, 121]], rgb: null}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind1, xy: [[184, 114], [182, 117], [183, 117], [184, 117], [185, 117], [181, 118], [182, 118], [183, 118], [184, 118], [185, 118], [181, 119], [182, 119], [183, 119], [184, 119], [185, 119], [186, 119], [181, 120], [182, 120], [183, 120], [184, 120], [186, 120], [181, 121], [182, 121], [187, 122], [188, 124]], rgb: [239, 214, 132]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind1, xy: [[183, 115], [184, 115]], rgb: [231, 198, 123]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind1, xy: [[182, 116], [183, 116], [184, 116]], rgb: [156, 132, 74]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind2, xy: [[184, 111], [185, 112], [185, 113], [185, 114], [186, 115], [186, 116], [187, 118], [188, 123]], rgb: [6, 4, 10]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind2, xy: [[184, 112], [183, 113], [184, 113], [182, 116], [183, 116], [184, 116], [185, 116], [182, 117], [183, 117], [184, 117], [185, 117], [182, 118], [183, 118], [184, 118], [186, 118], [180, 119], [181, 119], [182, 119], [179, 120], [180, 120], [181, 120], [178, 121], [179, 121], [178, 122]], rgb: [239, 214, 132]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind2, xy: [[182, 114], [183, 114], [184, 114]], rgb: [231, 198, 123]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind2, xy: [[182, 115], [183, 115], [184, 115], [185, 115]], rgb: [156, 132, 74]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind2, xy: [[188, 119], [188, 120], [189, 123]], rgb: null}   # the neck-over-chest step in the outline smoothed
+  - {frame: hurt_in1, xy: [[173, 112], [175, 114], [175, 115], [176, 116], [176, 117], [177, 118], [178, 119], [178, 120], [179, 121], [180, 123]], rgb: [6, 4, 10]}   # the neck-over-chest step in the outline smoothed
+  - {frame: hurt_in1, xy: [[174, 112], [177, 117], [178, 117], [178, 118], [179, 119], [180, 119], [179, 120], [180, 120], [180, 121], [181, 123]], rgb: null}   # the neck-over-chest step in the outline smoothed
+  - {frame: hurt_in1, xy: [[173, 114], [174, 114], [171, 118], [172, 118], [173, 118], [175, 118], [172, 119], [173, 119]], rgb: [239, 214, 132]}   # the neck-over-chest step in the outline smoothed
+  - {frame: hurt_in1, xy: [[172, 115], [173, 115], [174, 115], [171, 117], [172, 117], [173, 117], [174, 117], [175, 117]], rgb: [206, 181, 99]}   # the neck-over-chest step in the outline smoothed
+  - {frame: hurt_in1, xy: [[171, 116], [172, 116], [173, 116], [174, 116], [175, 116]], rgb: [156, 132, 74]}   # the neck-over-chest step in the outline smoothed
+  - {frame: atk_wind1, xy: [[145, 91]], rgb: [41, 57, 41]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[149, 94]], rgb: [74, 107, 66]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[150, 94], [150, 95]], rgb: [90, 123, 66]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind1, xy: [[149, 95], [141, 96], [141, 97], [140, 98], [141, 98]], rgb: [66, 90, 57]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[144, 90], [145, 90], [142, 91], [148, 94]], rgb: [90, 123, 66]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[144, 91], [151, 91], [152, 91], [140, 93], [157, 94]], rgb: [74, 107, 66]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: atk_wind2, xy: [[140, 95], [140, 96]], rgb: [66, 90, 57]}   # a speck behind the frill, in its neighbours' colour
+  - {frame: hurt_in2, xy: [[80, 93], [81, 93], [82, 93], [80, 94], [81, 94], [82, 94]], rgb: [156, 132, 74]}   # two frill-spike tips the head move cut off, joined back
+  - {frame: hurt_in2, xy: [[84, 99], [85, 99], [86, 99], [84, 100], [85, 100], [86, 100]], rgb: [156, 132, 74]}   # (the tips and the spikes as one shape again)
+  - {frame: hurt_in2, xy: [[80, 95], [81, 95], [82, 95], [84, 101], [85, 101]], rgb: [6, 4, 10]}   # and their outline closed
+# pass KT: the approved kneel key (approved/green_dragon/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai
-  bridge: {shear: false}       # check: the head-lean shear thinned kneel_in1's outline (second ring 0.58 vs 0.67)
+  bridge: {keep_top: 0.4}

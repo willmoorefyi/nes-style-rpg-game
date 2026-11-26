@@ -1,36 +1,28 @@
 {
   "character": "king_mummy",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "5b313861a66875bc",
-    "skel": "a4f14990916fc15a",
-    "ref": "7c435780fdc30097"
+  "backend": "user",
+  "source": "user_art/king_mummy/sheet_2026-11-25.png",
+  "sha256": "333065fd8a0afba9bd43277d47a51c134f8c90733a78f2528dd513e8cd710d9a",
+  "recipe": "monster_user.yaml#king_mummy",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/king_mummy/",
+    "current_x2_sha256": "ffe672ada7916efae20cd85f1fbcb16103cce1293b63b10b59bc8de6361dfb1b",
+    "poses_reference_sha256": "f79c9659ecc9ae8a8767b9e0196d3f3e2f0c0b2cbff4469baf67617381e11209",
+    "prompt_sha256": "27804dbb173dcb67e13cb7f877fa7c7cc5e7eff899039957d22f15152fb5abb1",
+    "prompt_v1_sha256": "060b1ecc04e84c7bcab2bb15c0574a67754caf88fa14add744233a736bf2564e"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-pal, A-hist, A-adj",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "3f775c842f1dc9236a5c65d1"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

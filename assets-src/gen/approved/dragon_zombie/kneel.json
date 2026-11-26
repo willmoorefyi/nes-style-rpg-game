@@ -1,36 +1,29 @@
 {
   "character": "dragon_zombie",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "b5e1d0e843bc7921",
-    "skel": "6d7e0056481124a2",
-    "ref": "107daecc1f7bd6cb"
+  "backend": "user",
+  "source": "user_art/dragon_zombie/sheet_2026-11-25.png",
+  "sha256": "3359994b53b1ae23dfc0237d788432b6b942adc50822c60d546906deb94bc28f",
+  "recipe": "monster_user.yaml#dragon_zombie",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/dragon_zombie/",
+    "current_x2_sha256": "7468e66a874f299a9c373fbac765f26d47044f58b73c418161bd14a635fd620e",
+    "poses_reference_sha256": "b2c393c610527e5fc7c867dc25c0f292b59189b69c82dd79efc3873073da1dc7",
+    "prompt_sha256": "1da3ae4468afbf22538878bf795ae1a838976fa3001cc643614d61a8042f85e0",
+    "prompt_v1_sha256": "2aeccfb4c2aee1504e1953f3613184ae7a2d2d95adcc4b77f7c8ada2c80fc2e4"
   },
+  "approved": "2026-11-25",
   "grid": [
-    128,
-    128
+    210,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-hist, A-adj, A-outline, A-area",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "580511852169e77d0189fbaf"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

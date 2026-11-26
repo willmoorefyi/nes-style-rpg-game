@@ -16,7 +16,7 @@ BODY, FX, INK = (90, 90, 90, 255), (120, 200, 255, 255), (6, 4, 10, 255)
 # orchestrator-approved): hollow_seraph halo, which brightens (frames.<f>.brighten) only at the cast frames
 # FW-Q (ROSTER_FIX_PLAN_2.md 4, rev-20 ruling): the partial-rig aliases in use; G6 removed the unused pre-allowlisted
 # ones (scorpion/hurt, hydra/attack, black_knight/hurt), so this set equals the live rigs' aliases exactly
-FWQ_ALLOW = {("chimera", "hurt"), ("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}
+FWQ_ALLOW = {("black_widow", "hurt"), ("crawler", "attack"), ("astos", "attack")}   # EF-H batch 3: chimera left
 FX_ALLOWED = {"garland": {"glow"}, "lich": {"trail", "crystal"}, "hollow_seraph": {"halo"}}
 # FW-FX (docs/REDESIGN_PLAN.md 7, 9.5): the vampire and hollow_seraph rigs are retired in pass V; a pending entry
 # tolerates the missing part until the new rig re-confirms it (back to FX_ALLOWED only) or drops it (from both)
@@ -224,7 +224,7 @@ def run_fx_allowlist(check: Callable[[bool, str], None]) -> None:
 def run_fwq_allowlist(check: Callable[[bool, str], None]) -> None:
     """FW-Q: the code's allowlist is exactly this one, and every live rig's alias is on it (at most one per rig)."""
     from gen import monster_anim as MA
-    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the used entries (4) "
+    check(getattr(MA, "FWQ_ALLOW", None) == FWQ_ALLOW, f"FW-Q: MA.FWQ_ALLOW is exactly the used entries (3) "
           f"({sorted(getattr(MA, 'FWQ_ALLOW', set()))})")
     live = {(p.stem, a) for p in sorted(MA.RIGS.glob("*.yaml")) for a in (yaml.safe_load(p.read_text()) or {}).get("alias") or []}
     check(live <= FWQ_ALLOW, f"FW-Q: every live rig alias is allowlisted ({sorted(live)})")

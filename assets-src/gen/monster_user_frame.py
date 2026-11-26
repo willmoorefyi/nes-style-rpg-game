@@ -60,6 +60,30 @@ def anchors(figs: list[np.ndarray], foot, modes: dict | None = None) -> list[flo
     return [float(centre(f) + off) if (modes or {}).get(n) == "bbox" else x for f, x, n in zip(figs, out, names)]
 
 
+def float_rows(img, cells, s: float, band: S.MonsterBand, rec: dict) -> dict | None:
+    """EF-H amendment B: the lowest row of each placed pose of a `floating: true` recipe (None for any other): the idle
+    on the feet row, the attack and the hurt at their drawn offsets to the idle (sheet bottoms), the kneel on the idle's
+    row (the floating K-ground gate); a pose past the 2 px bottom margin is lifted to it (FW-C, at most
+    monster.LIFT_MAX), {"rows": [...], "lifted": {pose: px}}. Refused: s != 1, a lift over LIFT_MAX or one that would
+    start the pose above row 2."""
+    if not rec.get("floating"):
+        return None
+    from gen import monster as M
+    from gen import monster_user_palette as UP
+    if s != 1.0:
+        raise SystemExit(f"floating user sheet: s = {s} (the drawn hover gaps are sheet rows; s = 1.0 needed)")
+    bottoms = [oy + int(np.where(m.any(1))[0].max()) for (oy, _), (_, m) in zip(UP.origins(img, 24), cells)]
+    rows, lifted = [band.foot_row + b - bottoms[0] for b in bottoms[:3]] + [band.foot_row], {}
+    for k, pose in enumerate(("idle", "attack", "hurt", "kneel")):
+        over = rows[k] - (band.cell - 3)
+        h = int(np.ptp(np.where(cells[k][1].any(1))[0])) + 1
+        if over > 0 and (over > M.LIFT_MAX or rows[k] - over - h + 1 < 2):
+            raise SystemExit(f"floating user sheet: the {pose} needs a {over} px lift (LIFT_MAX {M.LIFT_MAX}, row 2)")
+        if over > 0:
+            rows[k], lifted[pose] = rows[k] - over, over
+    return {"rows": rows, "lifted": lifted}
+
+
 def compare_step(prev: np.ndarray, nxt: np.ndarray, span: tuple, cell_h: int, share: float, margin: float) -> dict:
     """One continuity step at the sheet's cell height and at the large tier."""
     from gen import anim_checks as C

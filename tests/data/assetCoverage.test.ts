@@ -35,7 +35,7 @@ const monsterAtlas = JSON.parse(readFileSync(join(assets, 'sprites/monsters-ai.j
 };
 /** The heavy attack's frames (pass F item 7): only a sheet with its own approved `attack_raise` lists them. */
 // FW-Q (docs/ROSTER_FIX_PLAN_2.md 4): a partial rig's `alias: [hurt]` or `[attack]` leaves that sequence's in-betweens
-// aliased to their source keys (monster_anim.ALIAS_FRAMES); since G6 chimera / black_widow hurt, crawler / astos attack.
+// aliased to their source keys (monster_anim.ALIAS_FRAMES); since G6 black_widow hurt, crawler / astos attack (chimera hurt until EF-H batch 3).
 const FWQ_FRAMES: Record<string, MonsterFrame[]> = {
   hurt: ['hurt_in1', 'hurt_in2'], attack: ['atk_wind1', 'atk_wind2', 'atk_mid', 'atk_follow', 'atk_recover'],
 };

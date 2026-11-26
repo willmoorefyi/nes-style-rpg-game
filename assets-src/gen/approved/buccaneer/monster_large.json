@@ -1,0 +1,61 @@
+{
+  "character": "buccaneer",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/buccaneer/sheet_2026-11-25.png",
+  "sha256": "60e6d83ecbe2d4aecf9ed92b94cb20d0397a8b5cb0f84cc076ef47365d151a21",
+  "recipe": "monster_user.yaml#buccaneer",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/buccaneer/",
+    "current_x2_sha256": "cd549e7a87c289ec6261202636ea45685f9d0c1cd1af5a422deb9110b7d89324",
+    "poses_reference_sha256": "87296c779b3cc18de32a6cb46cbd6b63786b9d423d3539b6fff48ab0caeca387",
+    "prompt_sha256": "3beca9e6b8a36e4b12920f55e60b5d53ba3dab8dbd1866c19455f4e2a39d8ac7",
+    "prompt_v1_sha256": "a63504e8d02235d8e650adf6acaba9638b5b767a0abee7d27c316bcdfabd4381"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      84,
+      82,
+      87,
+      64
+    ],
+    "anchors": [
+      36.28,
+      33.67,
+      52.81,
+      28.21
+    ],
+    "anchor_x": 67.28,
+    "error": {
+      "max": 50.4,
+      "p99": 44.6,
+      "mean": 15.2,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    }
+  }
+}

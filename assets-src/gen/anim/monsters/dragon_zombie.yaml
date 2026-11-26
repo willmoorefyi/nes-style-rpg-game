@@ -1,172 +1,159 @@
 sprite: dragon_zombie
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H amendment A): the user-rendered sheet (approved/dragon_zombie/
+# monster_large.png, backend: user, the tall frame: 210x200 cells, feet row 192, the idle 114 rows). The old rig is
+# archived as anim/monsters/_retired/dragon_zombie_v1.yaml. Translation-first (NEW_MONSTER_GUIDE.md hard sheets: the
+# three keys draw the wings folded, raised and hunched): every in-between is its source key with the neck, skull and
+# jaw moved as one group by whole-px tweaks (`moves: []`); body, wings, tail and legs stay put, feet pinned.
 body: quadruped
 facing: right
 sampler: nearest
 breath: true
-# The dragon's winged recipe: the folded idle wings are one rigid part (wing_i) on the withers; the raised attack wings
-# and the hunched hurt wing sit on their own root joints (wr_n / wr_f), so idle-sourced frames keep the idle wings and
-# attack- / hurt-sourced frames keep theirs. Every wing move is an explicit tweak.
 keyframes:
   idle:
-    hip: [46, 90]
-    back: [60, 88]
-    chest: [76, 88]
-    neck: [86, 78]
-    head: [95, 68]
-    snout: [118, 78]
-    tail0: [38, 86]
-    tail1: [24, 88]
-    tail2: [12, 100]
-    tail3: [14, 110]
-    tail_tip: [26, 113]
-    wtip_i: [20, 62]
-    sh_n: [70, 95]
-    el_n: [70, 106]
-    paw_n: [73, 116]
-    ftoe_n: [79, 120]
-    sh_f: [84, 96]
-    el_f: [86, 106]
-    paw_f: [90, 116]
-    ftoe_f: [97, 119]
-    hip_n: [45, 92]
-    knee_n: [40, 104]
-    foot_n: [38, 116]
-    toe_n: [42, 119]
-    hip_f: [56, 96]
-    knee_f: [55, 106]
-    foot_f: [57, 116]
-    toe_f: [61, 119]
+    hip: [55, 140]
+    back: [85, 132]
+    chest: [120, 140]
+    neck: [140, 125]
+    head: [160, 108]
+    snout: [180, 115]
+    tail0: [45, 135]
+    tail1: [25, 145]
+    tail2: [12, 160]
+    tail3: [15, 172]
+    tail_tip: [28, 178]
+    sh_n: [100, 150]
+    el_n: [105, 170]
+    paw_n: [110, 186]
+    ftoe_n: [118, 191]
+    sh_f: [130, 150]
+    el_f: [135, 170]
+    paw_f: [138, 186]
+    ftoe_f: [145, 191]
+    hip_n: [55, 150]
+    knee_n: [48, 170]
+    foot_n: [50, 186]
+    toe_n: [58, 191]
+    hip_f: [75, 150]
+    knee_f: [80, 170]
+    foot_f: [82, 186]
+    toe_f: [88, 191]
   attack:
-    hip: [40, 90]
-    back: [56, 88]
-    chest: [74, 90]
-    neck: [88, 92]
-    head: [100, 90]
-    snout: [122, 92]
-    tail0: [32, 84]
-    tail1: [22, 76]
-    tail2: [14, 60]
-    tail3: [10, 45]
-    tail_tip: [4, 34]
-    wr_n: [58, 76]
-    wt_n: [36, 38]
-    wr_f: [64, 74]
-    wt_f: [72, 26]
-    sh_n: [66, 96]
-    el_n: [68, 106]
-    paw_n: [71, 116]
-    ftoe_n: [77, 120]
-    sh_f: [86, 98]
-    el_f: [94, 106]
-    paw_f: [102, 116]
-    ftoe_f: [110, 119]
-    hip_n: [37, 92]
-    knee_n: [27, 105]
-    foot_n: [24, 116]
-    toe_n: [30, 119]
-    hip_f: [49, 98]
-    knee_f: [48, 106]
-    foot_f: [50, 116]
-    toe_f: [55, 118]
+    hip: [50, 150]
+    back: [80, 145]
+    chest: [115, 155]
+    neck: [135, 160]
+    head: [160, 160]
+    snout: [188, 165]
+    tail0: [40, 145]
+    tail1: [25, 120]
+    tail2: [15, 95]
+    tail3: [10, 80]
+    tail_tip: [3, 70]
+    sh_n: [95, 165]
+    el_n: [85, 178]
+    paw_n: [80, 186]
+    ftoe_n: [85, 191]
+    sh_f: [130, 165]
+    el_f: [140, 178]
+    paw_f: [150, 186]
+    ftoe_f: [158, 191]
+    hip_n: [45, 160]
+    knee_n: [35, 175]
+    foot_n: [30, 186]
+    toe_n: [36, 191]
+    hip_f: [70, 165]
+    knee_f: [78, 178]
+    foot_f: [90, 186]
+    toe_f: [96, 191]
   hurt:
-    hip: [36, 90]
-    back: [52, 86]
-    chest: [70, 86]
-    neck: [82, 80]
-    head: [92, 75]
-    snout: [115, 81]
-    tail0: [28, 86]
-    tail1: [20, 86]
-    tail2: [12, 90]
-    tail3: [8, 95]
-    tail_tip: [6, 98]
-    wr_n: [48, 70]
-    wt_n: [16, 66]
-    sh_n: [62, 98]
-    el_n: [66, 108]
-    paw_n: [70, 117]
-    ftoe_n: [75, 120]
-    sh_f: [78, 100]
-    el_f: [86, 110]
-    paw_f: [94, 116]
-    ftoe_f: [100, 118]
-    hip_n: [34, 95]
-    knee_n: [26, 107]
-    foot_n: [26, 116]
-    toe_n: [31, 119]
-    hip_f: [44, 100]
-    knee_f: [42, 108]
-    foot_f: [44, 116]
-    toe_f: [50, 119]
+    hip: [60, 165]
+    back: [90, 150]
+    chest: [120, 150]
+    neck: [125, 125]
+    head: [135, 100]
+    snout: [155, 98]
+    tail0: [50, 170]
+    tail1: [25, 175]
+    tail2: [10, 180]
+    tail3: [15, 186]
+    tail_tip: [30, 188]
+    sh_n: [110, 170]
+    el_n: [125, 180]
+    paw_n: [140, 186]
+    ftoe_n: [150, 191]
+    sh_f: [140, 160]
+    el_f: [160, 175]
+    paw_f: [175, 186]
+    ftoe_f: [185, 191]
+    hip_n: [60, 172]
+    knee_n: [65, 180]
+    foot_n: [70, 186]
+    toe_n: [78, 191]
+    hip_f: [85, 170]
+    knee_f: [95, 180]
+    foot_f: [100, 186]
+    toe_f: [108, 191]
 parts:
   uwing_n: {remove: true}
   fwing_n: {remove: true}
   uwing_f: {remove: true}
   fwing_f: {remove: true}
-  wing_i: {bone: [chest, wtip_i], radius: 8.0, in: [idle]}     # the folded idle wings ride the withers
-  wing_n: {bone: [wr_n, wt_n], radius: 8.0}
-  wing_f: {bone: [wr_f, wt_f], radius: 8.0}
   tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
-  body: {width: 16}
-masks:
-  wing_i:                      # the folded idle wings over the back, both membranes (left of the neck)
-    idle: [[12, 72], [20, 61], [30, 54], [36, 49], [48, 46], [66, 46], [85, 49], [85, 57], [80, 64], [76, 74], [64, 79], [45, 80], [34, 77], [22, 79], [14, 78]]
-  body:                        # the withers under the folded wing (the wing's bone crosses them)
-    idle: [[46, 80], [64, 79], [76, 75], [80, 80], [79, 90], [60, 87]]
-  wing_f:                      # the far (dark) raised wing
-    attack: [[62, 27], [66, 23], [72, 28], [80, 36], [88, 46], [93, 58], [90, 66], [80, 68], [74, 72], [70, 78], [66, 78], [64, 62], [66, 50], [62, 40]]
-  wing_n:                      # the near raised wing (attack); the hunched wing over the back (hurt)
-    attack: [[24, 36], [45, 37], [56, 40], [62, 46], [68, 56], [70, 64], [66, 72], [62, 78], [52, 78], [46, 72], [36, 68], [30, 58], [26, 50], [30, 44]]
-    hurt: [[14, 92], [20, 74], [30, 64], [40, 59], [50, 55], [64, 55], [66, 62], [62, 72], [56, 78], [50, 82], [40, 84], [30, 86], [22, 94]]
-holds: []
 frames:
-  atk_wind1:                   # anticipation: head drawn back, body 1 px back (the folded wings and the tail ride the body:
-    t: 0.0                     # a lifted idle wing opens the art gap over the back)
-    dy: 0
+  atk_wind1:               # the neck and skull draw back 3, up 1
     moves: []
-    tweaks: {head: [-2, -1], snout: [-2, -1], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], neck: [-1, 0], tail0: [-1, 0], tail1: [-1, 0], tail2: [-1, 0], tail3: [-1, 0], tail_tip: [-1, 0]}
-  atk_wind2:                   # coil: head reared back, body 2 px back
-    t: 0.1
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
     dy: 0
+    tweaks: {neck: [-3, -1], head: [-3, -1], snout: [-3, -1]}
+  atk_wind2:               # the body 2 back and 1 down (the crouch before the lunge), the skull 5 back
     moves: []
-    tweaks: {neck: [-3, -1], head: [-4, -2], snout: [-4, -2], hip: [-2, 0], back: [-2, 0], chest: [-2, 0], tail0: [-2, 0], tail1: [-2, 0], tail2: [-2, 0], tail3: [-2, 0], tail_tip: [-2, 0]}
-  atk_mid:                     # the pass: spine a third back, neck and head kept at the bite angle (a raised neck closed a
-    t: 0.35                    # hole under the far wing), both wings beat down (far 18 deg, near 14 deg), all four paws planted
-    moves: [back, chest]
-    pins: [paw_n, paw_f, foot_n, foot_f]
-    tweaks: {wt_n: [-4, 8], wt_f: [16, 5]}
-  atk_follow:                  # a settle after the bite: the wings beat down further
-    t: 0.68
-    moves: [back, chest, neck, head, snout]
-    tweaks: {wt_n: [-4, 8], wt_f: [16, 5]}
-  atk_recover:                 # settle: spine 30% toward the lunge, the folded wing lifted 3 px
-    t: 0.3
-    moves: [back, chest, neck, head, snout]
-    tweaks: {wtip_i: [3, -5]}
-  hurt_in1:                    # the flinch: spine and head toward the hunched hurt pose, hind legs stepping back with it
-    pins: [paw_n, paw_f]
-    moves: [hip, back, chest, neck, head, snout, hip_n, knee_n, foot_n, toe_n, hip_f, knee_f, foot_f, toe_f]
-    tweaks: {neck: [-2, -1], head: [-4, -3], snout: [-4, -3]}    # review 1: the head jerks back and up (a visible flinch)
-  hurt_in2:                    # spine 35% back toward idle; neck, head and legs keep the hurt pose (a turned neck closed a
-    moves: [back, chest]       # hole under the far wing arm; free knees dropped a paw 1 px under the plain)
-    pins: [paw_n, paw_f, foot_n, foot_f, knee_n, knee_f, el_n, el_f]
-  daze:                        # neck and head slump, no body drop
-    t: 0.05
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dx: -2
+    dy: 1
+    tweaks: {neck: [-5, 0], head: [-5, 0], snout: [-5, 0]}
+  atk_mid:                 # the bite key, the body 4 back toward the coil, the skull 6 back and 2 up of it
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dx: 4
     dy: 0
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [0, 1], head: [0, 2], snout: [0, 3]}
-  daze_b:
-    t: 0.05
+    t: 0.0
+    tweaks: {neck: [-6, -2], head: [-6, -2], snout: [-6, -2]}
+  atk_follow:              # the bite key, the body 6 back toward the idle, the skull 2 back (settling)
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dx: 6
     dy: 0
-    moves: [back, chest, neck, head, snout]
-    tweaks: {neck: [0, 2], head: [0, 3], snout: [0, 4]}
-paint:                         # 1-2 px notches between parts, closed with outline ink
-  - {frame: atk_wind2, xy: [[35, 75]], rgb: [6, 4, 10]}
-  - {frame: atk_recover, xy: [[39, 73], [37, 73], [76, 73]], rgb: [6, 4, 10]}
-  - {frame: daze, xy: [[92, 84]], rgb: [6, 4, 10]}
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+    tweaks: {neck: [-2, 0], head: [-2, 0], snout: [-2, 0]}
+  atk_recover:             # the idle, the skull 3 back and 1 up (as wind1)
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [-3, -1], head: [-3, -1], snout: [-3, -1]}
+  hurt_in1:                # flinch: the idle's skull 3 back, 2 up, the body 4 down toward the hunch
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dy: 4
+    tweaks: {neck: [-3, -2], head: [-3, -2], snout: [-3, -2]}
+  hurt_in2:                # the hurt key, the skull 3 forward and 2 down, the body 4 up on the way back
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dy: -4
+    tweaks: {neck: [3, 2], head: [3, 2], snout: [3, 2]}
+  daze:                       # slump: the skull 2 down
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [0, 2], head: [0, 2], snout: [0, 2]}
+  daze_b:                     # the skull 3 down
+    moves: []
+    pins: [paw_n, paw_f, foot_n, foot_f, el_n, el_f, knee_n, knee_f]
+    dy: 0
+    tweaks: {neck: [0, 3], head: [0, 3], snout: [0, 3]}
+holds: []
+paint:                         # pockets and 1 px cracks the translations open, inked
+  - {frame: atk_mid, xy: [[66, 162], [67, 162], [65, 163], [66, 163], [65, 164], [64, 165]], rgb: [6, 4, 10]}
+  - {frame: hurt_in2, xy: [[50, 158], [54, 159], [53, 160], [90, 177], [91, 177], [93, 176]], rgb: [6, 4, 10]}
+# pass KT: the approved kneel key (approved/dragon_zombie/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai
-  # KT3: KT2-C best iteration (in1 hole and swap step 14.2 at defaults; 12.4 here, under the 0.65 bridge-swap cap)
-  bridge: {keep_top: 0.49, keep_bot: 0.0, width: false}
+  bridge: {keep_top: 0.1}       # the default 0.28 opened a fourth hole in kneel_in1

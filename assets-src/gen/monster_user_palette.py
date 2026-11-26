@@ -67,8 +67,47 @@ def _ember(o: np.ndarray) -> np.ndarray:
     return (r >= 150) & (g <= 0.75 * r) & (b <= 0.45 * g)
 
 
+def _green(o: np.ndarray) -> np.ndarray:
+    """Olive / green scales (chimera's dragon head, EF-H batch 3): green >= red, green >= 1.4 x blue, green >= 50."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (g >= r) & (g >= 1.4 * b) & (g >= 50)
+
+
+def _taupe(o: np.ndarray) -> np.ndarray:
+    """Warm greys (chimera's goat head, EF-H batch 3): r >= g >= b, red 5-40 over blue (a neutral grey stays out) and
+    at most 25 over green, red 60-170 (the lion's oranges and the wings' red-browns stay out)."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (r >= g) & (g >= b) & (r - b >= 5) & (r - b <= 40) & (r - g <= 25) & (r >= 60) & (r <= 170)
+
+
+def _cyan(o: np.ndarray) -> np.ndarray:
+    """A glowing cyan glyph (dark_fighter's shield crescent, EF-H batch 3): green >= 150, blue >= 0.7 of green, red
+    at most 0.8 of green (the eyes' pale white-cyan stays out)."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (g >= 150) & (b >= 0.7 * g) & (r <= 0.8 * g)
+
+
+def _crimson(o: np.ndarray) -> np.ndarray:
+    """A crimson cloak from its darkest fold to its lit edge (death_knight, EF-H batch 3): red >= 30, blue 0.3-0.77 of
+    red, blue >= 1.3 x green (the steel greys, the bone, the oranges and the sword's hot rune reds stay out)."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (r >= 30) & (r >= 1.3 * b) & (b >= 0.3 * r) & (b >= 1.3 * g)
+
+
+def _glow(o: np.ndarray) -> np.ndarray:
+    """A pale glowing green (dragon_zombie's eyes, EF-H batch 3): green >= 180 and at least 30 over red and blue (the
+    bone whites and the olive greens stay out)."""
+    r, g, b = o[:, 0], o[:, 1], o[:, 2]
+    return (g >= 180) & (g >= r + 30) & (g >= b + 30)
+
+
 SELECT = {"skin": _skin, "bright": _bright, "steel": _steel, "gold": _gold, "grey": _grey, "magenta": _magenta,
-          "red": _red, "ember": _ember}
+          "red": _red, "ember": _ember, "green": _green, "taupe": _taupe, "cyan": _cyan, "crimson": _crimson,
+          "glow": _glow, "pale": lambda o: (o.min(1) >= 120) & (o.max(1) - o.min(1) <= 50),
+          "navy": lambda o: (o[:, 2] >= o[:, 0] + 30) & (o[:, 2] >= o[:, 1] + 15) & (o[:, 2] <= 140)}
+# `navy` (EF-H amendment C; white_dragon's dark scale shading, king_mummy's headdress): blue >= red + 30, >= green +
+# 15, <= 140 (the pale blue scales, the gold, the greys and the outline ink out)
+# `pale` (medusa's pale skin, EF-H batch 3): every channel >= 120, spread <= 50 (the gold scales, the green coils out)
 
 
 def masks(img: Image.Image, rec: dict) -> dict[str, np.ndarray]:

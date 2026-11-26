@@ -1,26 +1,78 @@
 {
   "character": "green_dragon",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1234,
-  "cache_key": "39190bdb6b7c7b25b24d3d9e",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/green_dragon/sheet_2026-11-25.png",
+  "sha256": "230eb4d0b36fbccac02657657691e244b2d47f21ecdb1dd5afba421c10751965",
+  "recipe": "monster_user.yaml#green_dragon",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/green_dragon/",
+    "current_x2_sha256": "8b7df11158f77a62799e9a04efac12f13847694bf5e03b844183fe53ce628862",
+    "poses_reference_sha256": "763d1a2896e41550fd64bd926283588e83ad1ca21f9f3fef4c4ed7c2236cc4c5",
+    "prompt_sha256": "eb971ff47decadc33c2ba34dd6ff462e0adfbfa6d3687938529cbb1e7d1b5db3",
+    "prompt_v1_sha256": "96def72d2df192d4d9c12ca5415a1fe968ed6682f17c3bde9ba42e66b6bc11ce"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    144,
-    128
+    248,
+    200
   ],
-  "bottom_row": 122,
+  "bottom_row": 192,
+  "frame": "tall",
   "layout": [
     3,
     1
   ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": false,
-  "flip_frames": []
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      147,
+      124,
+      128,
+      74
+    ],
+    "anchors": [
+      103.33,
+      111.33,
+      110.7,
+      125.83
+    ],
+    "anchor_x": 127.33,
+    "error": {
+      "max": 47.5,
+      "p99": 47.5,
+      "mean": 10.1,
+      "glow_px": 5775,
+      "glow_kept": 1.0
+    },
+    "regions": {
+      "eyes": {
+        "px": 16,
+        "mean": 2.3,
+        "p90": 3.2,
+        "max": 3.2,
+        "colours": 2
+      },
+      "belly": {
+        "px": 6247,
+        "mean": 4.9,
+        "p90": 7.1,
+        "max": 7.1,
+        "colours": 4
+      }
+    }
+  }
 }

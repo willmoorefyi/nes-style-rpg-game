@@ -1,23 +1,25 @@
-# Evil Eye (pass R, floating): a large floating eye with a fanged mouth and four eyestalks. body: floating
-# (rig_floating.py), judged by the float band. The ball is one rigid mass (head = the stalk crown on its upper rim,
-# body = the ball); turning either half would tear the iris or the teeth, so the in-betweens move the whole sprite
-# (moves: []) and the stalks and the attack's tail fin change only at keyframe boundaries. No cast key: Magic replays
-# the attack frames in place.
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H amendments A and B): the user-rendered sheet
+# (approved/evil_eye/monster_large.png, backend: user, the tall frame: 154x200 cells, feet row 192, floating: true;
+# the idle 148 rows, four eyestalks in every pose). The old rig is archived as anim/monsters/_retired/evil_eye_v1.yaml.
+# body: floating (rig_floating.py), judged by the float band. The ball is one rigid mass: turning any part would tear
+# the iris or the teeth, so every in-between moves the whole sprite (moves: []) and the stalks change only at the
+# keyframe boundaries.
 sprite: evil_eye
 body: floating
 facing: right
 sampler: nearest
 breath: true
 keyframes:
-  idle:   {core: [64, 85], base: [64, 120], neck: [64, 60], crown: [64, 30]}
-  attack: {core: [60, 85], base: [60, 120], neck: [62, 60], crown: [62, 33]}
-  hurt:   {core: [60, 88], base: [60, 122], neck: [62, 62], crown: [62, 32]}
+  idle:   {core: [70, 135], base: [70, 190], neck: [72, 100], crown: [72, 50]}
+  attack: {core: [55, 130], base: [55, 190], neck: [55, 98], crown: [60, 50]}
+  hurt:   {core: [85, 140], base: [90, 194], neck: [80, 105], crown: [70, 75]}
 frames:
-  atk_wind1: {moves: [], dx: -2, dy: 1}      # backs off and sinks (the shared 1 / 2 px drift barely read on a
-  atk_wind2: {moves: [], dx: -5, dy: 2}      # 128 px ball)
-  hurt_in1: {moves: [], dx: -4}              # knocked back 4
+  atk_wind1: {moves: [], dx: -2, dy: 1}      # backs off and sinks (wind2 9 back: the large-tier centroid step to the lunge)
+  atk_wind2: {moves: [], dx: -9, dy: 2}
+  atk_mid: {moves: [], dx: -1, dy: 0}       # the lunge key 1 back (clear of the cell's right border)
+  atk_recover: {moves: [], dx: -5}           # the idle 5 back, toward the lunge
+  hurt_in1: {moves: [], dx: -4, dy: 1, t: 0.1}   # knocked back 4, sinking 1 toward the drawn hurt
 holds: []
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); no derived kneel block existed (the D-K7 alias), so nothing was retired
+# pass KT: the approved kneel key (approved/evil_eye/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai

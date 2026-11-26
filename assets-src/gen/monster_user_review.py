@@ -67,7 +67,7 @@ def metas(sid: str, rec: dict, info: dict, today: str) -> tuple[dict, dict]:
               "refs": rec.get("refs"), "approved": today, "grid": [cw, ch], "bottom_row": band.foot_row,
               **({"frame": "tall"} if info.get("frame") == "tall" else {})}
     meta = {"character": sid, "sheet": f"monster_{size}", **common, "layout": [3, 1], "size": size,
-            "floating": False, "flip_frames": [], "poses": ["idle", "attack", "hurt"],
+            "floating": bool(rec.get("floating")), "flip_frames": [], "poses": ["idle", "attack", "hurt"],
             "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
             "cut": {k: info[k] for k in ("scale", "scale_why", "native_heights", "anchors", "anchor_x", "error",
                                          "regions") if k in info}}

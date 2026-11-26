@@ -122,8 +122,8 @@ describe('fitShift clamps', () => {
  */
 describe('tier H and the titan in the bestiary', () => {
   const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
-    'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
-    'dragon_zombie', 'white_shark', 'minotaur_zombie', 'deepeyes', 'evil_eye', 'bigeyes'];
+    'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon',
+    'white_shark', 'minotaur_zombie', 'deepeyes', 'bigeyes'];   // EF-H batch 3: four left for scale 2 (below)
   const art: MonsterArtSource = atlasArt;
 
   it.each(TIER_H)('%s at scale 3: centred within 1 px, every frame of a full loop <= the inner right - 8', (id) => {
@@ -155,15 +155,15 @@ describe('tier H and the titan in the bestiary', () => {
     preview.destroy();
   });
 
-  it('EF-H amendment A: fire_hydra (tall frame) at scale 2: centred within 1 px, no bound, a full loop <= the inner right - 8', () => {
-    const e = enemyById('fire_hydra');
-    expect([e.size, atlas.sheets.fire_hydra.scale]).toEqual(['huge', 2]);
+  it.each(['fire_hydra', 'blue_dragon', 'green_dragon', 'white_dragon', 'dragon_zombie', 'evil_eye'])('EF-H tall frame: %s at scale 2: centred within 1 px, no bound, a full loop <= the inner right - 8', (id) => {
+    const e = enemyById(id);
+    expect([e.size, atlas.sheets[id].scale]).toEqual(['huge', 2]);
     const preview = new BestiaryPreview(new Container(), new CachedArt(art), never, data);
     preview.show({ enemy: e, seen: true, hasSpells: false }, null);
     preview.update(0);
     const s = preview.enemySprite!;
-    expect(s.scale.x * texScaleOf('fire_hydra')).toBe(2);
-    const [l, t, r, b] = idleBoxOf('fire_hydra');
+    expect(s.scale.x * texScaleOf(id)).toBe(2);
+    const [l, t, r, b] = idleBoxOf(id);
     const g = s.getGlobalPosition();
     expect(Math.abs(g.x + ((l + r + 1) / 2) * 2 - CX)).toBeLessThanOrEqual(1);
     expect(Math.abs(g.y + ((t + b + 1) / 2) * 2 - CY)).toBeLessThanOrEqual(1);
@@ -176,7 +176,7 @@ describe('tier H and the titan in the bestiary', () => {
       const step = preview.loopStep;
       if (step === 'attack' && last !== 'attack') attacks++;
       last = step;
-      maxRight = Math.max(maxRight, s.getGlobalPosition().x + frameBox('fire_hydra', preview.poses!.state(0).pose)[2] * 2);
+      maxRight = Math.max(maxRight, s.getGlobalPosition().x + frameBox(id, preview.poses!.state(0).pose)[2] * 2);
     }
     expect(attacks).toBe(2);
     expect(maxRight).toBeLessThanOrEqual(PREVIEW_INNER.right - 8);

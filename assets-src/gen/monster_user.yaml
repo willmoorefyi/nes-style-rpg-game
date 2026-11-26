@@ -204,3 +204,387 @@ black_knight:
       select: ember
       slots: 3
       max_err: 16
+chimera:
+  file: user_art/chimera/sheet_2026-11-25.png
+  sha256: ef25921d6ab9fd0bd986b151f0343224fef3b997dfb82dd483c65d0e8d5d3fcf
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/chimera/
+    current_x2_sha256: 46aca29b12e9b9720a47c0e26ffbb07366ea0d8c4bc304929d538e7de6789ec1
+    poses_reference_sha256: 4e585a9ccb788075165916a6a2e5e684cf96aac539e7f0dd7b04c7f03ef9b54d
+    prompt_sha256: f1d7e710aeb4be4ac5c715d3e249bc008537a97a8b458267c868fad6c3b004be
+    prompt_v1_sha256: 8efe343b8ab8dbefb76fd04fd1fd10a498f6a61dc6d71cc0d17b38c025e1377f
+  refs_note: >-
+    the user's render (~/temp/chimera_sprite_sheet.png, 920x144, idle 120 px, hurt 126, feet row 132), approved by the
+    user: exactly three heads (goat, dragon, lion) in every pose; its tallest pose is over the large cell's 121 rows, so
+    it is cut at s = 1.0 in the tall frame (EF-H amendment A: cell 200, feet row 192)
+  # monster_user_palette: the dragon head's olive greens and the goat head's warm greys keep their own slots within
+  # the 16 (the plain house palette spent them on the lion's oranges: the dragon's mid greens fell onto the goat's grey
+  # and the goat's greys onto an olive, so two of the three heads swapped hues)
+  reserve:
+    - name: dragon
+      select: green
+      slots: 4
+      max_err: 12
+    - name: goat
+      select: taupe
+      slots: 2
+      max_err: 12
+buccaneer:
+  file: user_art/buccaneer/sheet_2026-11-25.png
+  sha256: 60e6d83ecbe2d4aecf9ed92b94cb20d0397a8b5cb0f84cc076ef47365d151a21
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/buccaneer/
+    current_x2_sha256: cd549e7a87c289ec6261202636ea45685f9d0c1cd1af5a422deb9110b7d89324
+    poses_reference_sha256: 87296c779b3cc18de32a6cb46cbd6b63786b9d423d3539b6fff48ab0caeca387
+    prompt_sha256: 3beca9e6b8a36e4b12920f55e60b5d53ba3dab8dbd1866c19455f4e2a39d8ac7
+    prompt_v1_sha256: a63504e8d02235d8e650adf6acaba9638b5b767a0abee7d27c316bcdfabd4381
+  refs_note: >-
+    the user's render (~/temp/buccaneer_sprite_sheet.png, 544x112, idle 84 px, feet row 100), approved by the user: the
+    large frame (the sprite was small at 2), s = 1.0; the idle is below the large band, so its height is reported, never
+    refused
+blue_dragon:
+  file: user_art/blue_dragon/sheet_2026-11-25.png
+  sha256: eeec8a04948e7ddd2894d71bc21ef96d9d6402f1332e9eb894222d8dbb3c92d4
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/blue_dragon/
+    current_x2_sha256: 3498375b9a63d130b6fdaccbbc33092c5e9a4ef2a3d800ce9631f370efc2bf99
+    poses_reference_sha256: 9a29b647e6b06b1cb13f7252a2a1ab39eefbc15ce91880fd4c1fb9e49f02c401
+    prompt_sha256: bc20a40447bbd61c0a2e24423fb985473a959a935cb37e6869000197b7ea5cb6
+    prompt_v1_sha256: ca137f632863194308bc1e7eb060fc290499702ac2a973b0cb3d5b30598d270f
+  refs_note: >-
+    the user's render (~/temp/blue_dragon_sprite_sheet.png, 912x168, idle 142 px, attack 74 (a low lunge), feet row
+    154), approved by the user: the idle is over the large band, so it is cut at s = 1.0 in the tall frame (EF-H
+    amendment A: cell 200, feet row 192)
+  # monster_user_palette: the spine crest's and the eyes' yellows keep their own slots (the plain house palette merged
+  # the gold and the lemon tones into one, error 38)
+  reserve:
+    - name: crest
+      select: gold
+      slots: 2
+      max_err: 16
+dark_fighter:
+  file: user_art/dark_fighter/sheet_2026-11-25.png
+  sha256: 6b3b51c93c6af759820f31553c7dc5dec06a204bdd132d9cd7d9037b4da4a8e9
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/dark_fighter/
+    current_x2_sha256: 5f3482b5f1c01520b72024fa007600b9b6dae0da696306385d2d0240c9e83c40
+    poses_reference_sha256: cdb887b760460604588582a7df8ce1dd39e0cd921f5a8757cdea4c3523262eb0
+    prompt_sha256: fe19b62bd2410cacdd082ab7fefa74b4db9d5a457c736197c0e38be5abd81da8
+    prompt_v1_sha256: ea1263cde6fc00f738cd9aa1b6ac9a5b4c86bdb6f1e65caa6b4eb399bec74fb6
+  refs_note: >-
+    the user's render (~/temp/dark_fighter_sprite_sheet.png, 472x104, idle 73 px, feet row 91), approved by the user:
+    the idle is 1 px over the small band, so the large frame (the sprite was small at 2), s = 1.0; the idle is below the
+    large band, so its height is reported, never refused; the design fix: two pale eyes in the hood (today's hood is
+    empty)
+  # monster_user_palette: the shield's cyan crescent glyph keeps its own slots (the plain house palette merged its
+  # darker cyan onto the bright one, error 54), then the hood's two pale eyes (1 px each per pose, the design fix) keep
+  # theirs, after the crescent's merge; boxes are sheet px [x0, y0, x1, y1), the eyes per pose
+  reserve:
+    - name: crescent
+      select: cyan
+      slots: 2
+      max_err: 16
+    - name: eyes
+      select: bright
+      slots: 1
+      max_err: 16
+      boxes: [[58, 27, 64, 30], [175, 29, 182, 32], [284, 27, 290, 31], [422, 49, 428, 52]]
+death_knight:
+  file: user_art/death_knight/sheet_2026-11-25.png
+  sha256: 093c8bcb1694bb90aec6e95834a5437cd05df42b9b7048eb0bdadc4ae3102862
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/death_knight/
+    current_x2_sha256: 367fb0e19ccfcb204860ad68f78577a7d11ac9322c810d0108cd9666b1fc382c
+    poses_reference_sha256: e05141b36a0cb4fb11c36364d5c46ed1aa98ad15d3f1e07384b4f331d509ee02
+    prompt_sha256: 7bdecd3d930776f88d436473d56e7dc47699cacdeb7389e4e3c041c1e58a2a20
+    prompt_v1_sha256: 1ff167eda1cc95480430454c3c08b24b8df156a4c852c863fbcfbed82e0f4cca
+  refs_note: >-
+    the user's render (~/temp/death_knight_sprite_sheet.png, 616x120, idle 97 px; feet rows 111 / 109 / 109 / 110, so
+    every pose's lowest row goes on the one feet row), approved by the user: the large frame (the sprite was small at
+    2.5), s = 1.0; it stands at least as tall as black_knight (idle 94), which ends the recorded sibling inversion
+  # monster_user_palette: the two red eye lights in the skull (2 px per pose; the plain house palette made them the
+  # cloak's dull crimson, error 114) and the skull's bone keep their own slots, then the crimson cloak keeps its tones;
+  # boxes are sheet px [x0, y0, x1, y1), per pose (the eyes, the skull)
+  reserve:
+    - name: eyes
+      select: red
+      slots: 1
+      max_err: 16
+      boxes: [[78, 28, 87, 33], [230, 29, 239, 34], [367, 28, 375, 34], [553, 52, 561, 58]]
+    - name: skull
+      select: bright
+      slots: 2
+      max_err: 16
+      boxes: [[70, 20, 92, 42], [222, 20, 244, 42], [356, 20, 380, 42], [545, 42, 568, 64]]
+    - name: cloak
+      select: crimson
+      slots: 3
+      max_err: 12
+dragon_zombie:
+  file: user_art/dragon_zombie/sheet_2026-11-25.png
+  sha256: 3359994b53b1ae23dfc0237d788432b6b942adc50822c60d546906deb94bc28f
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/dragon_zombie/
+    current_x2_sha256: 7468e66a874f299a9c373fbac765f26d47044f58b73c418161bd14a635fd620e
+    poses_reference_sha256: b2c393c610527e5fc7c867dc25c0f292b59189b69c82dd79efc3873073da1dc7
+    prompt_sha256: 1da3ae4468afbf22538878bf795ae1a838976fa3001cc643614d61a8042f85e0
+    prompt_v1_sha256: 2aeccfb4c2aee1504e1953f3613184ae7a2d2d95adcc4b77f7c8ada2c80fc2e4
+  refs_note: >-
+    the user's render (~/temp/dragon_zombie_sprite_sheet.png, 816x168, idle 114 px, attack 124, feet row 153), approved
+    by the user: the design fix (exposed bone-white ribs, skull and spine); its tallest pose is over the large cell's
+    121 rows, so it is cut at s = 1.0 in the tall frame (EF-H amendment A: cell 200, feet row 192)
+  # monster_user_palette: the faint pale-green eye glow (33 px; the plain house palette made it bone grey, error 49) and
+  # the bone white of the ribs, skull and spine (the design fix) keep their own slots within the 16
+  reserve:
+    - name: eyes
+      select: glow
+      slots: 2
+      max_err: 16
+    - name: bone
+      select: bright
+      slots: 2
+      max_err: 14
+medusa:
+  file: user_art/medusa/sheet_2026-11-25.png
+  sha256: e91a02d8ef3e3aaceb8d560b750be716dec1c7aee00732e276e1a5204e54847b
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/medusa/
+    current_x2_sha256: 24619b736cbf7c623dafbbfcd7e5e96254e9edc85b15db684cb086c60e06732a
+    poses_reference_sha256: bc974e45e8bc816a6b1fad9e29871addbdd4f82e0ee065a6364782acd26be9fc
+    prompt_sha256: d1fca387f20185d8a7c0a84a65cef0ed34fb870df9ded518df4469bf77121db8
+    prompt_v1_sha256: 827664a991b568a8c900f8edd0866b35174f8d2734332bec736d4ed532fe73b0
+  refs_note: >-
+    the user's render (~/temp/medusa_sprite_sheet.png, 592x120, idle 92 px, feet row 107), approved by the user: a naga
+    (snake coils, no legs), the large frame (the sprite was small at 2.5), s = 1.0
+  # monster_user_palette: the yellow eyes (2 px per pose; the plain house palette made them the belly's pale gold,
+  # error 41) and the pale skin (error 25: it fell onto the gold) keep their own slots; boxes are sheet px
+  # [x0, y0, x1, y1), the eyes per pose
+  reserve:
+    - name: eyes
+      select: gold
+      slots: 1
+      max_err: 16
+      boxes: [[74, 32, 82, 36], [234, 45, 241, 48], [357, 34, 364, 38], [530, 63, 536, 67]]
+    - name: skin
+      select: pale
+      slots: 2
+      max_err: 14
+earth_medusa:
+  file: user_art/earth_medusa/sheet_2026-11-25.png
+  sha256: 52575be52bd78d5932ff53613385779899ea8ed426e55e4840506a0c30d1c971
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/earth_medusa/
+    current_x2_sha256: 0e7e696a07ed7000ed8402288c5b38d9ff5f9d7c85fc749744ff5e44e7ca4540
+    poses_reference_sha256: 37e6b97efc683060430684c458cdb4d529fcc7ba4cc114d8b3cc6d10a47e2b13
+    prompt_sha256: 29a0c697a805843fb9c7be99c7d3710849b2b14527c9a6ef5775678249947c2d
+    prompt_v1_sha256: 59ce502e4cc3cff2fb69b20e8d8ff306cc12177f39fe2eec479f9d563a7eef08
+  refs_note: >-
+    the user's render (~/temp/earth_medusa_sprite_sheet.png, 592x120, idle 92 px, feet row 107), approved by the user:
+    medusa's sibling in stone (a naga, stone snakes in the hair), the large frame (the sprite was small at 2.5), s = 1.0
+  # monster_user_palette: the glowing orange eyes (9 px; the plain house palette made them stone grey, error 143) keep
+  # their own slot (class `skin`, the eyes' boxes per pose), then the stone greys keep theirs
+  reserve:
+    - name: eyes
+      select: skin
+      slots: 1
+      max_err: 16
+      boxes: [[75, 31, 84, 36], [244, 46, 251, 50], [355, 33, 364, 38], [535, 67, 543, 72]]
+    - name: stone
+      select: grey
+      slots: 2
+      max_err: 10
+green_dragon:
+  file: user_art/green_dragon/sheet_2026-11-25.png
+  sha256: 230eb4d0b36fbccac02657657691e244b2d47f21ecdb1dd5afba421c10751965
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/green_dragon/
+    current_x2_sha256: 8b7df11158f77a62799e9a04efac12f13847694bf5e03b844183fe53ce628862
+    poses_reference_sha256: 763d1a2896e41550fd64bd926283588e83ad1ca21f9f3fef4c4ed7c2236cc4c5
+    prompt_sha256: eb971ff47decadc33c2ba34dd6ff462e0adfbfa6d3687938529cbb1e7d1b5db3
+    prompt_v1_sha256: 96def72d2df192d4d9c12ca5415a1fe968ed6682f17c3bde9ba42e66b6bc11ce
+  refs_note: >-
+    the user's render (~/temp/green_dragon_sprite_sheet.png, 968x176, idle 147 px, feet row 161), approved by the user
+    as is: the throat sacs are left out on purpose (user ruling 2026-11-25: the user disliked them), exactly two small
+    wings; the idle is over the large band, so it is cut at s = 1.0 in the tall frame (EF-H amendment A)
+  # monster_user_palette: the yellow eyes (10 px; the plain house palette made them the belly's pale tan, error 44)
+  # keep their own slot (the eyes' boxes per pose), then the belly / frill's light tans keep theirs
+  reserve:
+    - name: eyes
+      select: gold
+      slots: 1
+      max_err: 16
+      boxes: [[183, 43, 189, 48], [440, 102, 448, 108]]
+    - name: belly
+      select: gold
+      slots: 2
+      max_err: 12
+evil_eye:
+  file: user_art/evil_eye/sheet_2026-11-25.png
+  sha256: 0b96161c7219ea3b3fca50208378d03ea8988fa698a05eff565add19948dbe6a
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/evil_eye/
+    current_x2_sha256: 4c5cfb7b34472a237c167d7f550f8f9455aaae291408b3ccf093c2ad56260392
+    poses_reference_sha256: 4fa7625bb300c9d95164d71e5f4fd916eb45886b1f6fd955d4611b71f90e5a27
+    prompt_sha256: d088da215c57ab185b255152d9e0d6e73aef6fd88f8fb3aa31f789acee2bfd7e
+    prompt_v1_sha256: cc41ff08832c7513759b5ff4430ade6c68bd83eae6d8c6a69af425b2af077ba2
+  refs_note: >-
+    the user's render (~/temp/evil_eye_sprite_sheet.png, 944x184, idle 147 px, attack 150; bottoms 167 / 167 / 171 /
+    169), approved by the user: a floater, five eyestalks; the tall frame (EF-H amendment A), s = 1.0, placed as a
+    floater (EF-H amendment B: the attack and the hurt keep their drawn offsets to the idle, the kneel on the idle's row)
+  floating: true
+  # a floater has no feet: the attack, hurt and kneel are placed by their box centres (the idle's feet-to-centre offset)
+  anchor: {attack: bbox, hurt: bbox, kneel: bbox}
+  # monster_user_palette: the green iris keeps its own slots (the plain house palette merged its four greens into one,
+  # error 53); the pale eyestalk tips and teeth (`bright`) keep theirs (their two light tones already within 5)
+  reserve:
+    - name: iris
+      select: green
+      slots: 2
+      max_err: 14
+    - name: tips
+      select: bright
+      slots: 2
+      max_err: 12
+white_dragon:
+  file: user_art/white_dragon/sheet_2026-11-25.png
+  sha256: b138eddc203f668ac4ab81635a87289154af446744807f6ee84f71125281d111
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/white_dragon/
+    current_x2_sha256: 0e6dc383d5167016bc3975a0b0f0cc307daad077aa0ddbe411575de300f87977
+    poses_reference_sha256: a718982bc5a016d7e84f7fb9a512367eb9c1bb9c19725d292ec21ba202557544
+    prompt_sha256: 72180eb3313f653dd16794485eb2379646aa4cc330acd6cd9710119eaf425ca7
+    prompt_v1_sha256: e8b54e7992dcc77534b345acc0ba63b9143e1c965cc86409d0ea37c7419759eb
+  refs_note: >-
+    the user's render (~/temp/white_dragon_sprite_sheet.png, 928x176, idle 144 px, feet row 161), approved by the
+    user: the idle is over the large band, so it is cut at s = 1.0 in the tall frame (EF-H amendment A)
+  # monster_user_palette (EF-H amendment C): the outline-side dark blue scale shading keeps its own slots (`navy`; the
+  # plain house palette lifted it onto one mid blue, errors 46-79, flattening the white figure's dark side)
+  reserve:
+    - name: shade
+      select: navy
+      slots: 4
+      max_err: 12
+king_mummy:
+  file: user_art/king_mummy/sheet_2026-11-25.png
+  sha256: 333065fd8a0afba9bd43277d47a51c134f8c90733a78f2528dd513e8cd710d9a
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/king_mummy/
+    current_x2_sha256: ffe672ada7916efae20cd85f1fbcb16103cce1293b63b10b59bc8de6361dfb1b
+    poses_reference_sha256: f79c9659ecc9ae8a8767b9e0196d3f3e2f0c0b2cbff4469baf67617381e11209
+    prompt_sha256: 27804dbb173dcb67e13cb7f877fa7c7cc5e7eff899039957d22f15152fb5abb1
+    prompt_v1_sha256: 060b1ecc04e84c7bcab2bb15c0574a67754caf88fa14add744233a736bf2564e
+  refs_note: >-
+    the user's render (~/temp/king_mummy_sprite_sheet.png, 584x120, idle 91 px, feet row 108), approved by the
+    user: the large frame (the sprite was small at 2.5), s = 1.0; at least as tall as the mummy (sibling rule)
+  # monster_user_palette: the headdress gold (`skin`) and its blue stripes (`navy`, EF-H amendment C; the plain house
+  # palette merged the three blues into one, mean error 19) keep their own slots
+  reserve:
+    - name: gold
+      select: skin
+      slots: 2
+      max_err: 14
+    - name: headdress
+      select: navy
+      slots: 2
+      max_err: 14
+rakshasa:
+  file: user_art/rakshasa/sheet_2026-11-25.png
+  sha256: 49c142cc85138399f6cf64cca6eea15e4a36609f20539f166d03e494c16b6214
+  poses: [idle, attack, hurt, kneel]
+  flip: false
+  size: large
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-25"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/ef/user_packs2/rakshasa/
+    current_x2_sha256: 6306ed2626a863c80b8a437aea215b50566249ca0c434ed8b1c1c5f92e93e8f3
+    poses_reference_sha256: 0fe0c6e1ab2cabb778063a88ee0a5a92a4c4c9b3207e4e79d2650331d5b19a36
+    prompt_sha256: f3dddd4f201d9ae9c80ec73029798369ce073e4b73b3d5f4304dab65c6840e8b
+    prompt_v1_sha256: 6d7a3a4b8817f8064da5cff42caf479e88d38a3d8c241e68f06e773a89bc7fa5
+  refs_note: >-
+    the user's render (~/temp/rakshasa_sprite_sheet.png, 592x120, idle 92 px, feet row 107), approved by the
+    user: the large frame (the sprite was small at 2.5), s = 1.0
+  # monster_user_palette: the tiger face's oranges (`ember`: the plain house palette merged five into two, mean error
+  # 22) and the trim's warm browns and gold (`skin`) keep their own slots within the 16
+  reserve:
+    - name: orange
+      select: ember
+      slots: 3
+      max_err: 12
+    - name: trim
+      select: skin
+      slots: 2
+      max_err: 12

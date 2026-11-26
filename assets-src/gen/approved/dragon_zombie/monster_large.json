@@ -1,27 +1,78 @@
 {
   "character": "dragon_zombie",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1235,
-  "cache_key": "6fe52702189d5abbb56bdd8f",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/dragon_zombie/sheet_2026-11-25.png",
+  "sha256": "3359994b53b1ae23dfc0237d788432b6b942adc50822c60d546906deb94bc28f",
+  "recipe": "monster_user.yaml#dragon_zombie",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/dragon_zombie/",
+    "current_x2_sha256": "7468e66a874f299a9c373fbac765f26d47044f58b73c418161bd14a635fd620e",
+    "poses_reference_sha256": "b2c393c610527e5fc7c867dc25c0f292b59189b69c82dd79efc3873073da1dc7",
+    "prompt_sha256": "1da3ae4468afbf22538878bf795ae1a838976fa3001cc643614d61a8042f85e0",
+    "prompt_v1_sha256": "2aeccfb4c2aee1504e1953f3613184ae7a2d2d95adcc4b77f7c8ada2c80fc2e4"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    128,
-    128
+    210,
+    200
   ],
-  "bottom_row": 122,
+  "bottom_row": 192,
+  "frame": "tall",
   "layout": [
     3,
     1
   ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": false,
-  "flip_frames": [],
-  "note": "ROSTER_LOG R62/R64: best of 3"
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      114,
+      124,
+      104,
+      57
+    ],
+    "anchors": [
+      96.03,
+      96.09,
+      96.86,
+      87.78
+    ],
+    "anchor_x": 98.03,
+    "error": {
+      "max": 48.7,
+      "p99": 48.7,
+      "mean": 11.6,
+      "glow_px": 33,
+      "glow_kept": 0.939
+    },
+    "regions": {
+      "eyes": {
+        "px": 33,
+        "mean": 7.2,
+        "p90": 5.8,
+        "max": 32.8,
+        "colours": 3
+      },
+      "bone": {
+        "px": 3940,
+        "mean": 9.0,
+        "p90": 14.0,
+        "max": 32.8,
+        "colours": 6
+      }
+    }
+  }
 }

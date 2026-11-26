@@ -29,13 +29,13 @@ const roster = enemies.filter((e) => !e.tuned);
 
 /** EF-B1: the 2.5 sheets (the user's 26 plus death_knight, stone_golem, chimera, sea_troll, winter_wolf, ogre_mage). */
 const EF_B1 = ['gr_imp', 'werewolf', 'ghast', 'shadow', 'gargoyle', 'bloodbones', 'piscodemon', 'mummy', 'horned_devil',
-  'mindflayer', 'weretiger', 'king_mummy', 'medusa', 'rakshasa', 'sahagin_prince', 'earth_medusa', 'gr_wolf',
+  'mindflayer', 'weretiger', 'sahagin_prince', 'gr_wolf',
   'ogre_chief', 'troll', 'sphinx', 'manticore', 'clay_golem', 'tyrannosaur', 'rhyos', 'iron_golem',
-  'death_knight', 'stone_golem', 'chimera', 'sea_troll', 'winter_wolf', 'ogre_mage'];
+  'stone_golem', 'sea_troll', 'winter_wolf', 'ogre_mage'];   // EF-H batch 3: medusa, earth_medusa, king_mummy, rakshasa, death_knight, chimera left (at 2)
 /** int-ef2 (user ruling 2026-11-24, "grow the tougher enemies"): the B1 sheets off 2.5 (efSizes.test.ts pins the heights). */
 const EF_GROW: Record<string, number> = { stone_golem: 2.8, iron_golem: 3.3, sea_troll: 2.7 };
 /** EF-H amendment A (docs/ENEMY_FEEDBACK_PLAN.md): data-`huge` user sheets in the tall frame, at the default scale 2. */
-const EF_H_TALL = ['fire_hydra'];
+const EF_H_TALL = ['fire_hydra', 'blue_dragon', 'green_dragon', 'white_dragon', 'dragon_zombie', 'evil_eye'];   // EF-H batch 3: + blue / green_dragon, dragon_zombie, evil_eye
 
 describe('roster data: coverage and numbering', () => {
   it('every atlas sheet has an enemy, and every enemy a sheet', () => {
@@ -73,7 +73,8 @@ describe('roster data: coverage and numbering', () => {
   });
 
   it('size and FW-S display scale agree (REDESIGN_PLAN 2.3, 2.6, 4.2): huge sheets (but EF_H_TALL), bigeyes, chaos and hollow_seraph at scale 3, the EF-B1 sheets at 2.5, every other at 2', () => {
-    // EF-H amendment A: fire_hydra (the user's render in the tall frame) stays `huge` at scale 2
+    // EF-H amendment A: fire_hydra (the user's render in the tall frame) stays `huge` at scale 2; batch 3: blue_dragon,
+    // green_dragon, dragon_zombie and evil_eye too
     // V4: 22 tier-H `huge` enemies + bigeyes (`large`, FF1 large class) carry `scale: 3` from gen/monster_scale.yaml;
     // V6 (D-V6 = C2): chaos keeps `size: boss` (the 200 px boss band) and is shown at scale 3; V8 N-1: so is
     // hollow_seraph (hollow_seraph_2 shares the sprite)

@@ -688,6 +688,11 @@
   # "Evil Eye" (075), the Levistone guardian: gazes and death magic (Magic replays the attack frames, D6/D7).
   # the floating line ("tilt the whole body along a strong diagonal ...") is replaced by a frontal line (orchestrator,
   # 2026-11-15); the hurt may tilt back a little (R75: a fully untilted hurt copies the idle)
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/evil_eye/) and it is the
+  # approved design: gen/user_art/evil_eye/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/evil_eye/*.json say `backend: user`. The old look is
+  # archived (evil_eye_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   floating: true
   body: floating
@@ -712,6 +717,11 @@
   seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R77): attack and hurt sliced at the cell bottom, stalk count drifts; 1235 (R78): stalks 4 / 5 / 5
 - id: dragon_zombie
   # "Dragon Zombie" (092), the undead dragon: a paralysing bite; must read apart from the red dragon (plan 3.3)
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/dragon_zombie/) and it is the
+  # approved design: gen/user_art/dragon_zombie/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/dragon_zombie/*.json say `backend: user`. The old look is
+  # archived (dragon_zombie_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   body: quadruped
   prompt: >-
@@ -939,7 +949,12 @@
   seeds: [1235, 1234]
 - id: buccaneer
   # "Buccaneer" (020): a roaming sea raider (no tricorn: distinct from the pirate)
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/buccaneer/) and it is the
+  # approved design: gen/user_art/buccaneer/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/buccaneer/*.json say `backend: user`. The old look is
+  # archived (buccaneer_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: biped
   motion: >-
     Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
@@ -1712,6 +1727,11 @@
 # up", floating figures with a level `motion:` line, counts placed high / middle / low.
 - id: white_dragon
   # "White Dragon" (068): a sleek frost dragon (distinct from the red dragon and the dragon zombie)
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/white_dragon/) and it is the
+  # approved design: gen/user_art/white_dragon/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/white_dragon/*.json say `backend: user`. The old look is
+  # archived (white_dragon_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   body: quadruped
   prompt: >-
@@ -2049,7 +2069,12 @@
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R214): the idle horn cut by the cell top, the horns lost in the attack and hurt
 - id: king_mummy
   # "King Mummy" (087): an upright regal mummy (distinct from the hunched mummy)
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/king_mummy/) and it is the
+  # approved design: gen/user_art/king_mummy/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/king_mummy/*.json say `backend: user`. The old look is
+  # archived (king_mummy_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: biped
   motion: >-
     Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
@@ -2073,7 +2098,12 @@
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R216): the attack reaches back to the left, away from the heroes
 - id: medusa
   # "Medusa" (088): a serpent-tailed woman with snake hair (small naga; distinct from the other nagas)
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/medusa/) and it is the
+  # approved design: gen/user_art/medusa/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/medusa/*.json say `backend: user`. The old look is
+  # archived (medusa_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: naga
   prompt: >-
     a serpent-tailed woman: a human upper body with pale sage-green skin, bronze armlets and a bronze breastband, a
@@ -2092,7 +2122,12 @@
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R218): the face and eyes lost in green-on-green at 1x
 - id: rakshasa
   # "Rakshasa" (089): a tiger-headed sorcerer in rich robes (distinct from the weretiger)
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/rakshasa/) and it is the
+  # approved design: gen/user_art/rakshasa/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/rakshasa/*.json say `backend: user`. The old look is
+  # archived (rakshasa_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: biped
   motion: >-
     Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
@@ -2408,6 +2443,11 @@
   seeds: [1235]   # 1234 (ROSTER_LOG R292): the cut armour nearly all black, the visor and horns lost
 - id: chimera
   # "Chimera" (105): lion body with goat and dragon heads, two bat wings, a snake tail (distinct from rhyos, manticore)
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/chimera/) and it is the
+  # approved design: gen/user_art/chimera/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/chimera/*.json say `backend: user`. The old look is
+  # archived (chimera_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   body: quadruped
   motion: >-
@@ -2466,6 +2506,11 @@
   seeds: [1235]   # 1234 (ROSTER_LOG R294): a ground line drawn under the feet in every cell, one scythe in the hurt
 - id: blue_dragon
   # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/blue_dragon/) and it is the
+  # approved design: gen/user_art/blue_dragon/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/blue_dragon/*.json say `backend: user`. The old look is
+  # archived (blue_dragon_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   body: quadruped
   motion: >-
@@ -2486,7 +2531,13 @@
   extra_negative: wings, red scales, green scales, white scales, lightning bolts, breath, sparks, rearing up, a rider
   seeds: [1234]
 - id: green_dragon
-  # "Green Dragon" (108): a heavy green dragon with toxic throat sacs and a bony frill
+  # "Green Dragon" (108): a heavy green dragon with a bony frill and two small wings (user ruling 2026-11-25: no
+  # throat sacs; the user disliked them and left them out of the render on purpose)
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/green_dragon/) and it is the
+  # approved design: gen/user_art/green_dragon/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette in the tall frame (cell 200, feet row 192); approved/green_dragon/*.json say `backend: user`. The old look is
+  # archived (green_dragon_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
   size: large
   body: quadruped
   motion: >-
@@ -2581,7 +2632,12 @@
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R258): the staff switches from the image-right hand (idle) to the image-left hand
 - id: death_knight
   # "Death Knight" (112): a skeletal knight in spiked dark plate with a tattered cloak and a runed black sword
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/death_knight/) and it is the
+  # approved design: gen/user_art/death_knight/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/death_knight/*.json say `backend: user`. The old look is
+  # archived (death_knight_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: biped
   motion: >-
     Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
@@ -2606,7 +2662,12 @@
   seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R260): the skull face lost in the dark cut; 1235 (R261): the helm lost in the hurt
 - id: earth_medusa
   # "Earth Medusa" (113): a stony grey medusa with rock scales and a petrified-snake crown (small naga)
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/earth_medusa/) and it is the
+  # approved design: gen/user_art/earth_medusa/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/earth_medusa/*.json say `backend: user`. The old look is
+  # archived (earth_medusa_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: naga
   motion: >-
     Lean and twist the upper body above the coils along a clear diagonal, reach the arms toward the heroes with the
@@ -2691,7 +2752,12 @@
   seeds: [1234]
 - id: dark_fighter
   # "Dark Fighter" (117): a warrior-mage in dark half-plate and a hooded tabard, a sword and a glowing glyph shield
-  size: small
+  # EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H, 2026-11-25): the user rendered this sprite sheet
+  # themselves (ChatGPT, interactive, from the reference pack ~/temp/ff-game/ef/user_packs2/dark_fighter/) and it is the
+  # approved design: gen/user_art/dark_fighter/ (tracked, sha256 in gen/monster_user.yaml), imported by gen/monster_user.py
+  # at s = 1.0 with the house palette; approved/dark_fighter/*.json say `backend: user`. The old look is
+  # archived (dark_fighter_v1, docs/RETIRED_SPRITES.md); the fields below describe the old request.
+  size: large
   body: biped
   motion: >-
     Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso

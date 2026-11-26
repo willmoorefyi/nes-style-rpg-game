@@ -1,131 +1,125 @@
 sprite: rakshasa
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H): the user-rendered sheet (approved/rakshasa/monster_large.png,
+# backend: user; 128x128 cells, the idle 93 px tall). The old rig is archived as anim/monsters/_retired/rakshasa_v1.yaml.
+# The pirate's recipe: the long robe is the torso with the hip low on it, the arms and claws ride the torso (arm parts
+# removed), so every in-between is a rigid lean or shift of its source key's upper body about the hip (tweaks under
+# `moves: []`: each upper joint rotated about `hip`, rounded to whole px).
 body: biped
 facing: right
 sampler: nearest
 breath: true
-planted: foot_n
-# idle: upright in long robes, the hands held before the chest; attack: a wide low stance, the near claw thrust out at
-# the heroes, the far arm flung back; hurt: thrown back roaring, both hands flung up and out, the far sleeve hanging.
-# The robe skirt is the two legs (the feet show under the hem)
+planted: foot_f
 keyframes:
   idle:
-    crown: [41, 4]
-    neck: [42, 20]
-    chest: [40, 28]
-    hip: [40, 42]
-    sh_n: [47, 22]
-    el_n: [52, 28]
-    hand_n: [54, 38]
-    sh_f: [33, 20]
-    el_f: [28, 28]
-    hand_f: [37, 31]
-    hip_n: [46, 46]
-    knee_n: [50, 58]
-    foot_n: [52, 69]
-    toe_n: [57, 72]
-    hip_f: [34, 46]
-    knee_f: [30, 58]
-    foot_f: [25, 69]
-    toe_f: [24, 74]
+    crown: [64, 32]
+    neck: [64, 48]
+    chest: [62, 58]
+    hip: [60, 98]
+    sh_n: [74, 56]
+    el_n: [78, 62]
+    hand_n: [80, 52]
+    sh_f: [50, 56]
+    el_f: [46, 70]
+    hand_f: [58, 64]
+    hip_n: [68, 100]
+    knee_n: [74, 108]
+    foot_n: [76, 116]
+    toe_n: [80, 121]
+    hip_f: [54, 100]
+    knee_f: [48, 108]
+    foot_f: [44, 116]
+    toe_f: [40, 121]
   attack:
-    crown: [47, 13]
-    neck: [46, 27]
-    chest: [40, 32]
-    hip: [38, 46]
-    sh_n: [47, 30]
-    el_n: [56, 32]
-    hand_n: [60, 40]
-    sh_f: [36, 20]
-    el_f: [28, 18]
-    hand_f: [22, 26]
-    hip_n: [44, 48]
-    knee_n: [50, 56]
-    foot_n: [50, 68]
-    toe_n: [55, 71]
-    hip_f: [32, 46]
-    knee_f: [22, 58]
-    foot_f: [12, 69]
-    toe_f: [10, 73]
+    crown: [82, 42]
+    neck: [80, 56]
+    chest: [76, 64]
+    hip: [72, 96]
+    sh_n: [88, 60]
+    el_n: [104, 58]
+    hand_n: [116, 52]
+    sh_f: [70, 62]
+    el_f: [80, 72]
+    hand_f: [92, 72]
+    hip_n: [80, 100]
+    knee_n: [88, 108]
+    foot_n: [92, 116]
+    toe_n: [96, 121]
+    hip_f: [60, 100]
+    knee_f: [44, 108]
+    foot_f: [34, 116]
+    toe_f: [28, 121]
   hurt:
-    crown: [22, 8]
-    neck: [26, 20]
-    chest: [30, 28]
-    hip: [36, 40]
-    sh_n: [36, 24]
-    el_n: [48, 22]
-    hand_n: [54, 12]
-    sh_f: [22, 26]
-    el_f: [12, 32]
-    hand_f: [9, 22]
-    hip_n: [44, 44]
-    knee_n: [48, 56]
-    foot_n: [51, 69]
-    toe_n: [56, 72]
-    hip_f: [32, 44]
-    knee_f: [28, 56]
-    foot_f: [24, 69]
-    toe_f: [24, 74]
+    crown: [38, 36]
+    neck: [42, 52]
+    chest: [50, 62]
+    hip: [58, 94]
+    sh_n: [70, 56]
+    el_n: [76, 48]
+    hand_n: [80, 40]
+    sh_f: [36, 62]
+    el_f: [24, 70]
+    hand_f: [16, 66]
+    hip_n: [70, 100]
+    knee_n: [78, 108]
+    foot_n: [84, 116]
+    toe_n: [90, 121]
+    hip_f: [46, 100]
+    knee_f: [38, 108]
+    foot_f: [32, 116]
+    toe_f: [28, 121]
 parts:
   weapon: {remove: true}
+  uarm_n: {remove: true}
+  farm_n: {remove: true}
+  uarm_f: {remove: true}
+  farm_f: {remove: true}
+  head: {radius: 14.0}
   ft_n: {bone: [foot_n, toe_n], radius: 4.0}
   ft_f: {bone: [foot_f, toe_f], radius: 4.0}
 frames:
-  atk_wind1:                   # half of wind2: the crouch starts (coil forward), knees give, claw drawn back
-    t: 0.15
-    dy: 2
-    pins: [foot_n, foot_f, toe_n, toe_f, knee_f]
-    moves: [crown, neck, chest, hip, hip_n, knee_n, hip_f]
-    tweaks: {crown: [-2, 0], neck: [-1, 0], sh_n: [-1, -1], el_n: [-3, -2], hand_n: [-4, -3]}
-  atk_wind2:                   # coil forward (t +0.35, IoU to mid): crouched 4 on bent knees, upper body leaning back, claw drawn back
-    t: 0.35
-    dy: 4
-    pins: [foot_n, foot_f, toe_n, toe_f, knee_f, knee_n]
-    moves: [crown, neck, chest, hip, hip_n, hip_f]
-    tweaks: {crown: [-4, 0], neck: [-3, 0], chest: [-2, 0], sh_n: [-3, -1], el_n: [-6, -4], hand_n: [-9, -6]}
-  atk_mid:
-    pins: [knee_n, foot_n, knee_f, foot_f, toe_n, toe_f]
-    tweaks: {knee_f: [3, 0], foot_f: [4, 0], toe_f: [4, 0], knee_n: [1, 0], foot_n: [1, 0], toe_n: [1, 0], el_n: [-1, -2], hand_n: [-2, -4]}
-    moves: [crown, neck, hip, hip_n, knee_n, foot_n, hip_f, knee_f, foot_f, toe_n, toe_f]
-  atk_follow:                  # overshoot: the claw and head drive on past the contact
-    t: 1.10
-    moves: [crown, neck, chest, sh_n, el_n, hand_n]
-    tweaks: {crown: [1, 0], sh_n: [1, 0], hand_n: [4, 1], el_n: [2, 0]}
-  atk_recover:
-    t: 0.35
-    dy: 2
-    moves: [crown, neck, chest, hip]
-  hurt_in1:                    # flinch: head knocked back (translated), both hands jerk up
+  atk_wind1:                  # draw back 3 deg, the upper body 2 px back
     moves: []
-    tweaks: {crown: [-5, 0], neck: [-3, 0], chest: [-1, 0], sh_n: [0, -1], el_n: [1, -3], hand_n: [2, -7]}
-  hurt_in2:
-    moves: [crown, neck, chest]
-  daze:                        # head droops, both hands sink
-    moves: [crown, neck, chest]
-    dy: 1
-    tweaks: {crown: [2, 1], neck: [1, 1], el_f: [0, 2], hand_f: [0, 3]}
-  daze_b:
-    moves: [crown, neck, chest]
-    dy: 2
-    tweaks: {crown: [2, 1], neck: [1, 1], el_f: [0, 2], hand_f: [0, 3]}
-masks:
-  head:
-    idle: [[32, 2], [51, 2], [51, 16], [49, 22], [45, 24], [37, 24], [33, 19], [32, 16]]
-  uarm_n:
-    idle: [[45, 16], [52, 16], [53, 22], [50, 26], [46, 25]]
-  farm_n:
-    idle: [[51, 21], [58, 21], [59, 41], [49, 41], [49, 27]]
-  uarm_f:
-    idle: [[23, 15], [33, 15], [34, 19], [36, 24], [33, 27], [24, 27]]
-  ft_n:
-    idle: [[45, 68], [61, 68], [61, 78], [45, 78]]
-    attack: [[44, 66], [59, 66], [59, 78], [44, 78]]
-    hurt: [[45, 68], [60, 68], [60, 78], [45, 78]]
-  ft_f:
-    idle: [[18, 68], [31, 68], [31, 78], [18, 78]]
-    attack: [[6, 67], [18, 67], [18, 78], [6, 78]]
-    hurt: [[17, 68], [30, 68], [30, 78], [17, 78]]
+    t: -0.05
+    dy: 0
+    tweaks: {crown: [-5, 0], neck: [-5, 0], chest: [-4, 0], sh_n: [-4, -1], el_n: [-4, -1], hand_n: [-4, -1], sh_f: [-4, 1], el_f: [-3, 1], hand_f: [-4, 0]}
+  atk_wind2:                  # gather: 2 deg and 2 px forward, 1 down, into the spring (the keys sit far apart)
+    moves: []
+    t: -0.1
+    dy: 0
+    tweaks: {crown: [4, 1], neck: [4, 1], chest: [3, 1], sh_n: [3, 2], el_n: [3, 2], hand_n: [4, 2], sh_f: [4, 1], el_f: [3, 0], hand_f: [3, 1]}
+  atk_mid:                  # the lunge key 5 deg and 7 px short of it (a bridge from the gather)
+    moves: []
+    t: 0.05
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-12, -1], neck: [-11, -1], chest: [-10, 0], sh_n: [-10, -1], el_n: [-10, -3], hand_n: [-11, -4], sh_f: [-10, 0], el_f: [-9, -1], hand_f: [-9, -2]}
+  atk_follow:                  # the lunge key, 2 px short
+    moves: []
+    t: 0.8
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [-2, 0], neck: [-2, 0], chest: [-2, 0], sh_n: [-2, 0], el_n: [-2, 0], hand_n: [-2, 0], sh_f: [-2, 0], el_f: [-2, 0], hand_f: [-2, 0]}
+  atk_recover:                  # the idle leaned 4 deg and 6 px toward the lunge, on the way back
+    moves: []
+    t: -0.1
+    dy: 0
+    tweaks: {crown: [11, 0], neck: [10, 0], chest: [9, 0], sh_n: [9, 1], el_n: [8, 1], hand_n: [9, 1], sh_f: [9, -1], el_f: [8, -1], hand_f: [8, 0]}
+  hurt_in1:                  # flinch: the idle thrown back 5 deg, 2 px back
+    moves: []
+    tweaks: {crown: [-8, 0], neck: [-6, 0], chest: [-5, 0], sh_n: [-6, -1], el_n: [-5, -1], hand_n: [-6, -2], sh_f: [-6, 1], el_f: [-4, 1], hand_f: [-5, 0]}
+  hurt_in2:                  # the hurt key 6 deg less thrown back, 2 px forward, on the way to the idle
+    moves: []
+    pins: [knee_n, foot_n, knee_f, foot_f]
+    tweaks: {crown: [8, -2], neck: [6, -1], chest: [5, -1], sh_n: [6, 1], el_n: [7, 2], hand_n: [8, 3], sh_f: [5, -2], el_f: [5, -3], hand_f: [5, -4]}
+  daze:                  # slump: the idle's upper body 1 px back
+    moves: []
+    dy: 0
+    tweaks: {crown: [-1, 0], neck: [-1, 0], chest: [-1, 0], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0]}
+  daze_b:                  # the same, the head 1 px lower
+    moves: []
+    dy: 0
+    tweaks: {crown: [-1, 1], neck: [-1, 0], chest: [-1, 0], sh_n: [-1, 0], el_n: [-1, 0], hand_n: [-1, 0], sh_f: [-1, 0], el_f: [-1, 0], hand_f: [-1, 0]}
+masks: {}
 holds: []
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+paint: []
+# pass KT: the approved kneel key (approved/rakshasa/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai

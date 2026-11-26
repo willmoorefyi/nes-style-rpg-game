@@ -1,0 +1,176 @@
+sprite: green_dragon
+body: quadruped
+facing: right
+sampler: nearest
+breath: true
+# Heavy short-necked green dragon (pass R batch D, quadruped), the blue_dragon's sibling: where the blue one rears its
+# long neck and whips, this one hunches: the wind-up sinks the bulk and pulls the frilled head in low, the bite is a
+# heavy thrust. The small folded wing is one rigid part on its own root (wr -> wt) in every key. The spiral tail stays
+# out of every move set (it rides the hip). No breath fx: the approved attack draws none.
+keyframes:
+  idle:
+    hip: [40, 86]
+    back: [62, 72]
+    chest: [90, 74]
+    neck: [100, 60]
+    head: [106, 46]
+    snout: [132, 55]
+    tail0: [34, 84]
+    tail1: [18, 86]
+    tail2: [10, 70]
+    tail3: [24, 55]
+    tail_tip: [26, 66]
+    wr: [86, 56]
+    wt: [46, 50]
+    sh_n: [82, 90]
+    el_n: [80, 104]
+    paw_n: [82, 115]
+    ftoe_n: [93, 119]
+    sh_f: [104, 95]
+    el_f: [103, 105]
+    paw_f: [106, 115]
+    ftoe_f: [117, 119]
+    hip_n: [45, 92]
+    knee_n: [40, 105]
+    foot_n: [40, 116]
+    toe_n: [48, 120]
+    hip_f: [68, 95]
+    knee_f: [66, 105]
+    foot_f: [68, 116]
+    toe_f: [75, 119]
+  attack:
+    hip: [35, 86]
+    back: [60, 76]
+    chest: [88, 88]
+    neck: [98, 86]
+    head: [110, 80]
+    snout: [140, 88]
+    tail0: [30, 84]
+    tail1: [12, 86]
+    tail2: [6, 70]
+    tail3: [22, 55]
+    tail_tip: [24, 66]
+    wr: [86, 62]
+    wt: [46, 56]
+    sh_n: [72, 92]
+    el_n: [72, 104]
+    paw_n: [78, 116]
+    ftoe_n: [88, 119]
+    sh_f: [100, 100]
+    el_f: [105, 108]
+    paw_f: [110, 116]
+    ftoe_f: [120, 119]
+    hip_n: [30, 92]
+    knee_n: [22, 106]
+    foot_n: [22, 116]
+    toe_n: [30, 120]
+    hip_f: [52, 95]
+    knee_f: [50, 105]
+    foot_f: [52, 116]
+    toe_f: [60, 120]
+  hurt:
+    hip: [50, 95]
+    back: [60, 75]
+    chest: [80, 70]
+    neck: [90, 62]
+    head: [95, 52]
+    snout: [122, 62]
+    tail0: [44, 100]
+    tail1: [25, 108]
+    tail2: [12, 95]
+    tail3: [22, 80]
+    tail_tip: [26, 88]
+    wr: [64, 56]
+    wt: [32, 62]
+    sh_n: [98, 90]
+    el_n: [103, 103]
+    paw_n: [108, 114]
+    ftoe_n: [118, 119]
+    sh_f: [94, 95]
+    el_f: [95, 105]
+    paw_f: [98, 112]
+    ftoe_f: [101, 114]
+    hip_n: [52, 95]
+    knee_n: [50, 108]
+    foot_n: [52, 116]
+    toe_n: [62, 120]
+    hip_f: [68, 98]
+    knee_f: [72, 108]
+    foot_f: [76, 116]
+    toe_f: [86, 120]
+parts:
+  wing: {bone: [wr, wt], radius: 8.0}
+  tail: {chain: [tail0, tail1, tail2, tail3, tail_tip]}
+  body: {width: auto}
+masks:
+  body:                        # the pale belly down to its lower outline (its foot was the forelegs: the bulk's sink tore it)
+    idle: [[88, 74], [110, 74], [110, 93], [100, 97], [96, 103], [88, 103], [86, 90]]
+  tail:                        # the whole spiral (its inner coil was body: the source gaps between the coils read as cracks)
+    idle: [[6, 52], [38, 52], [38, 66], [34, 76], [38, 82], [38, 97], [20, 99], [6, 92]]
+    attack: [[1, 50], [36, 50], [36, 70], [32, 76], [36, 82], [36, 96], [15, 97], [1, 88]]
+    hurt: [[6, 72], [38, 72], [40, 95], [46, 104], [46, 117], [20, 117], [6, 102]]
+  wing:                        # the small folded leathery wing on the back
+    idle: [[42, 50], [60, 42], [82, 42], [92, 48], [90, 62], [78, 66], [62, 64], [50, 58]]
+    attack: [[40, 52], [62, 50], [82, 50], [96, 58], [92, 70], [70, 70], [55, 68]]
+    hurt: [[30, 62], [45, 50], [62, 48], [66, 60], [60, 70], [45, 68], [35, 66]]
+  neck:                        # the swollen throat sacs hang from the neck (they were the far foreleg in the attack)
+    attack: [[92, 92], [116, 92], [119, 104], [115, 114], [100, 116], [91, 108]]
+  head:                        # the frilled head and jaw, with the throat sacs under it in idle and hurt (they hang from the jaw)
+    idle: [[88, 24], [118, 24], [136, 45], [136, 62], [124, 64], [124, 78], [110, 79], [97, 76], [96, 62], [90, 50]]
+    attack: [[96, 66], [124, 66], [142, 80], [142, 96], [124, 100], [110, 96], [96, 88]]
+    hurt: [[80, 44], [112, 42], [128, 58], [128, 72], [114, 76], [112, 88], [100, 90], [86, 86], [84, 74], [80, 58]]
+frames:
+  atk_wind1:                   # the hunch starts: bulk 1 down and 1 back, neck and head pulled in 3 and 2 low as one
+    t: 0.0
+    dy: 1
+    moves: []
+    tweaks: {neck: [-3, 2], head: [-3, 2], snout: [-3, 2], hip: [-1, 0], back: [-1, 0], chest: [-1, 0], wr: [-1, 0], wt: [-1, 0]}
+  atk_wind2:                   # the coil: bulk 3 down and 2 back, neck and head tucked 7 back and 2 down as one, wing pressed flat
+    t: 0.0
+    dy: 3
+    moves: []
+    tweaks: {neck: [-7, 2], head: [-7, 2], snout: [-7, 2], hip: [-1, 0], back: [-3, 0], chest: [-3, 0], wr: [-3, 0], wt: [-3, 1]}
+  atk_mid:                     # the thrust passing: attack pose, head and neck held 4 back and up
+    t: 0.05
+    moves: []
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    tweaks: {chest: [-1, -1], neck: [-2, -2], head: [-3, -4], snout: [-3, -4]}
+  atk_follow:                  # settle after the bite: head eases 2 up
+    t: 0.9
+    moves: []
+    pins: [foot_n, foot_f, paw_n, paw_f]
+    tweaks: {neck: [0, -1], head: [-1, -2], snout: [-1, -2]}
+  atk_recover:                 # idle with the bulk still 2 low and 2-3 back, the head (and its sacs) 11 low
+    t: 0.3
+    dy: 2
+    moves: []
+    tweaks: {hip: [-1, 0], back: [-3, 1], chest: [-3, 2], neck: [0, 7], head: [0, 11], snout: [0, 11], wr: [-3, 0], wt: [-3, 0]}
+  hurt_in1:                    # the flinch: head snaps back 5 and down 3 toward the hunch, bulk 1 down
+    t: 0.1
+    dy: 0
+    moves: []
+    tweaks: {neck: [-3, 1], head: [-5, 3], snout: [-5, 4], chest: [-1, 0], wr: [-1, 0], wt: [-2, 1]}
+  hurt_in2:                    # easing out of the hunch: head and neck 3 back up toward idle
+    t: 0.3
+    moves: []
+    tweaks: {neck: [1, -2], head: [2, -3], snout: [2, -3], chest: [0, -1]}
+  daze:                        # sleep / stun: the heavy head sags 3, nose dipped
+    t: 0.0
+    dy: 0
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [0, 1], head: [1, 3], snout: [1, 4]}
+  daze_b:                      # the sway's low point: body 1 px lower
+    t: 0.0
+    dy: 1
+    moves: [back, chest, neck, head, snout]
+    tweaks: {neck: [0, 1], head: [1, 3], snout: [1, 4]}
+holds: []
+paint:
+  - {frame: atk_wind2, xy: [[61, 102], [62, 104]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
+  - {frame: hurt_in2, xy: [[85, 70], [85, 71], [85, 72], [84, 73], [85, 73], [85, 74], [85, 75], [85, 76], [85, 77], [85, 78], [85, 79]], rgb: [6, 4, 10]}   # 11 px pocket between parts filled
+  - {frame: hurt_in2, xy: [[81, 60]], rgb: [6, 4, 10]}   # 1 px crack, outline ink
+# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
+# frames (kneel_bridge.py); the derived kneel block is archived in _retired/<id>_kneel_v1.yaml
+kneel:
+  source: ai
+  bridge: {shear: false}       # check: the head-lean shear thinned kneel_in1's outline (second ring 0.58 vs 0.67)

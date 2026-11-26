@@ -1,26 +1,78 @@
 {
   "character": "chimera",
   "sheet": "monster_large",
-  "backend": "gemini",
-  "model": "gemini-3.1-flash-lite-image",
-  "seed": 1236,
-  "cache_key": "4d9375967aedd0303d70b172",
-  "approved": "2026-11-15",
+  "backend": "user",
+  "source": "user_art/chimera/sheet_2026-11-25.png",
+  "sha256": "ef25921d6ab9fd0bd986b151f0343224fef3b997dfb82dd483c65d0e8d5d3fcf",
+  "recipe": "monster_user.yaml#chimera",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/chimera/",
+    "current_x2_sha256": "46aca29b12e9b9720a47c0e26ffbb07366ea0d8c4bc304929d538e7de6789ec1",
+    "poses_reference_sha256": "4e585a9ccb788075165916a6a2e5e684cf96aac539e7f0dd7b04c7f03ef9b54d",
+    "prompt_sha256": "f1d7e710aeb4be4ac5c715d3e249bc008537a97a8b458267c868fad6c3b004be",
+    "prompt_v1_sha256": "8efe343b8ab8dbefb76fd04fd1fd10a498f6a61dc6d71cc0d17b38c025e1377f"
+  },
+  "approved": "2026-11-25",
   "grid": [
-    168,
-    128
+    208,
+    200
   ],
-  "bottom_row": 122,
+  "bottom_row": 192,
+  "frame": "tall",
   "layout": [
     3,
     1
   ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
   "poses": [
     "idle",
     "attack",
     "hurt"
   ],
-  "size": "large",
-  "floating": false,
-  "flip_frames": []
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      120,
+      103,
+      126,
+      92
+    ],
+    "anchors": [
+      84.16,
+      85.15,
+      98.38,
+      104.11
+    ],
+    "anchor_x": 104.16,
+    "error": {
+      "max": 31.7,
+      "p99": 31.7,
+      "mean": 12.9,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "dragon": {
+        "px": 3764,
+        "mean": 11.0,
+        "p90": 21.4,
+        "max": 31.0,
+        "colours": 5
+      },
+      "goat": {
+        "px": 4404,
+        "mean": 11.5,
+        "p90": 27.7,
+        "max": 27.7,
+        "colours": 5
+      }
+    }
+  }
 }

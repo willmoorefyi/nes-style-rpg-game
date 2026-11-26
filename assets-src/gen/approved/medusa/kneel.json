@@ -1,36 +1,28 @@
 {
   "character": "medusa",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "1084bdce3e967ec4",
-    "skel": "ff2bf4b33e03bef8",
-    "ref": "08b2d234222f5f09"
+  "backend": "user",
+  "source": "user_art/medusa/sheet_2026-11-25.png",
+  "sha256": "e91a02d8ef3e3aaceb8d560b750be716dec1c7aee00732e276e1a5204e54847b",
+  "recipe": "monster_user.yaml#medusa",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/medusa/",
+    "current_x2_sha256": "24619b736cbf7c623dafbbfcd7e5e96254e9edc85b15db684cb086c60e06732a",
+    "poses_reference_sha256": "bc974e45e8bc816a6b1fad9e29871addbdd4f82e0ee065a6364782acd26be9fc",
+    "prompt_sha256": "d1fca387f20185d8a7c0a84a65cef0ed34fb870df9ded518df4469bf77121db8",
+    "prompt_v1_sha256": "827664a991b568a8c900f8edd0866b35174f8d2734332bec736d4ed532fe73b0"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-grey, A-hist",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "697b0e9f16817690f192f2d3"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

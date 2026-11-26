@@ -1,36 +1,28 @@
 {
   "character": "rakshasa",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "3cfea5cd6925efcf",
-    "skel": "19d89c6f25683a9c",
-    "ref": "35de9e681239dfda"
+  "backend": "user",
+  "source": "user_art/rakshasa/sheet_2026-11-25.png",
+  "sha256": "49c142cc85138399f6cf64cca6eea15e4a36609f20539f166d03e494c16b6214",
+  "recipe": "monster_user.yaml#rakshasa",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/rakshasa/",
+    "current_x2_sha256": "6306ed2626a863c80b8a437aea215b50566249ca0c434ed8b1c1c5f92e93e8f3",
+    "poses_reference_sha256": "0fe0c6e1ab2cabb778063a88ee0a5a92a4c4c9b3207e4e79d2650331d5b19a36",
+    "prompt_sha256": "f3dddd4f201d9ae9c80ec73029798369ce073e4b73b3d5f4304dab65c6840e8b",
+    "prompt_v1_sha256": "6d7a3a4b8817f8064da5cff42caf479e88d38a3d8c241e68f06e773a89bc7fa5"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-hist",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "e77b7658dd9ad74d8cc3500b"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

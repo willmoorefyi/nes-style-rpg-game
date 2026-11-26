@@ -27,10 +27,11 @@ from PIL import Image  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 # pinned (section 6 Calibration): the hurt keys that are not approved art, excluded from every calibration
+# EF-H batch 2: black_knight left the list; batch 3: chimera (its hurt key is the user's render, no FW-Q alias)
 # EF-H batch 2: black_knight left the list (its hurt key is the user's render; the old keyframe paint is retired)
 EXCLUDED = {"ashen_queen": "key_offset", "black_widow": "FW-Q alias",
-            "chimera": "FW-Q alias", "cobra": "keyframe paint", "crocodile": "keyframe paint",
-            "hollow_seraph": "FW-H hurt_from", "king_mummy": "keyframe paint"}
+            "cobra": "keyframe paint", "crocodile": "keyframe paint",
+            "hollow_seraph": "FW-H hurt_from"}   # EF-H batch 3: king_mummy left (its hurt key is the user render)
 BODY_KEYS = {"a": ("sd35", {"mode", "image", "strength"}),
              "b": ("style_transfer", {"init_image", "style_image", "change_strength", "style_strength",
                                       "composition_fidelity"}),

@@ -1,36 +1,29 @@
 {
   "character": "evil_eye",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "7b257c7633ed6d41",
-    "skel": "637ccefdd4c0275e",
-    "ref": "04a6103ecc7c1192"
+  "backend": "user",
+  "source": "user_art/evil_eye/sheet_2026-11-25.png",
+  "sha256": "0b96161c7219ea3b3fca50208378d03ea8988fa698a05eff565add19948dbe6a",
+  "recipe": "monster_user.yaml#evil_eye",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/evil_eye/",
+    "current_x2_sha256": "4c5cfb7b34472a237c167d7f550f8f9455aaae291408b3ccf093c2ad56260392",
+    "poses_reference_sha256": "4fa7625bb300c9d95164d71e5f4fd916eb45886b1f6fd955d4611b71f90e5a27",
+    "prompt_sha256": "d088da215c57ab185b255152d9e0d6e73aef6fd88f8fb3aa31f789acee2bfd7e",
+    "prompt_v1_sha256": "cc41ff08832c7513759b5ff4430ade6c68bd83eae6d8c6a69af425b2af077ba2"
   },
+  "approved": "2026-11-25",
   "grid": [
-    128,
-    128
+    154,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-hist, K-height",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "a29c2335abb90dd8299bc1bb"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

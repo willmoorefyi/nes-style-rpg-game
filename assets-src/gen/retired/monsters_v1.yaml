@@ -340,3 +340,300 @@
   extra_negative: green scales, wings, fire breath, flames outside the body, standing upright, rearing up
   seeds: [1235, 1234]   # 1234 (ROSTER_LOG R185): a diving leap attack, the tail tip at the cell edge
   retired_as: fire_lizard_v1
+- id: chimera
+  # "Chimera" (105): lion body with goat and dragon heads, two bat wings, a snake tail (distinct from rhyos, manticore)
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the heads toward the heroes with the necks bent so every head stays well inside
+    its own cell; the wings and the snake tail move with the motion, kept close to the body.
+  prompt: >-
+    a chimera on four legs seen from the side: a tawny lion body with a golden mane and exactly three different heads,
+    the same three in every cell and each clearly apart: one grey goat head with curled horns high on the back, one
+    green scaly dragon head on a neck in the middle above the shoulders, and one maned lion head low in front (only
+    one lion head); exactly two leathery bat wings half raised, a live green snake for
+    a tail curled up behind the hips with its head raised; the whole creature, tail to snout, sits in the middle of its
+    own cell with empty space on both sides; exactly one chimera in each of the three cells, filling its box (one
+    row, three figures in all)
+  attack: >-
+    lunging forward low, the same three heads as in the idle cell (goat high, dragon in the middle, lion low)
+    snapping toward the heroes with the jaws open, the heads above and just in front of its front feet, all four feet on the ground, the whole chimera well inside the middle cell
+  hurt: >-
+    knocked back, all four feet on the ground, the same three heads as in the idle cell (goat high, dragon in the
+    middle, lion low) recoiling, the wings flared, the snake tail coiled
+  face: the lion face with amber eyes is readable, and the goat and dragon heads are clearly visible
+  extra_negative: a fourth head, two lion heads, a scorpion tail, feathered wings, a human face, fire breath, rearing up, a second row
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R247): two rows of figures in the raw, the cut mixed them; 1235 (R248): the heads change between cells
+  retired_as: chimera_v1
+- id: buccaneer
+  # "Buccaneer" (020): a roaming sea raider (no tricorn: distinct from the pirate)
+  size: small
+  body: biped
+  motion: >-
+    Use a strong diagonal line of action through the whole body, shift the weight clearly onto one leg, twist the
+    torso and extend the arms and the axe far from the body. Draw only the parts and clothing named in the
+    description, the same in every cell: no cape, cloak, scarf or extra cloth, and no slash trail, smear,
+    motion arc or motion lines.
+  prompt: >-
+    a lanky sea raider in a red bandana tied over long black hair, a red-and-white striped shirt with rolled sleeves, a
+    wide leather belt, baggy dark trousers and boots, a scruffy beard and an eye patch, an iron hook in place of the
+    hand on the left side of the image and a short boarding axe in the hand on the right side of the image
+  attack: lunging forward and swinging the boarding axe down at the heroes, the hook raised
+  hurt: knocked back, the bandana slipping, the hook thrown up, the axe swinging low
+  face: his bearded face with an eye patch under the red bandana is readable
+  extra_negative: a tricorn hat, a coat, a cutlass, a sword, a pistol, a parrot
+  seeds: [1234]
+  retired_as: buccaneer_v1
+- id: blue_dragon
+  # "Blue Dragon" (107): a long wingless blue dragon with lightning-fork horns and a glowing crest
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the head toward the heroes with the neck bent so the head stays well inside its
+    own cell; the long tail stays curled close behind the hips.
+  prompt: >-
+    a long sleek blue dragon on four short legs seen from the side, no wings, a long low body of deep blue scales with
+    a pale blue belly, a glowing yellow crest of small fins along the spine, a narrow head with two branching horns
+    shaped like forked lightning, bright yellow eyes, a long tail curled up close behind the hips; the whole dragon,
+    tail tip to snout, sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    lunging the head forward and down with the jaws open toward the heroes, the head above and just in front of its
+    front feet, the crest glowing brighter, all four feet on the ground, the whole dragon well inside the middle cell
+  hurt: >-
+    knocked back, all four feet on the ground, the neck pulled back, the eyes shut, the tail coiled tight
+  face: its narrow blue head with yellow eyes and forked horns is readable
+  extra_negative: wings, red scales, green scales, white scales, lightning bolts, breath, sparks, rearing up, a rider
+  seeds: [1234]
+  retired_as: blue_dragon_v1
+- id: dark_fighter
+  # "Dark Fighter" (117): a warrior-mage in dark half-plate and a hooded tabard, a sword and a glowing glyph shield
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes behind the shield, the elbows bent, so the sword and shield stay well inside its own cell. Draw
+    only the parts named in the description, the same in every cell: no cape or cloak, and no slash trail, spell
+    effects, smear or motion lines.
+  prompt: >-
+    a warrior-mage in dark steel half-plate over a hooded deep crimson tabard, the hood up over a shadowed face with
+    two pale eyes, holding one straight sword in the hand on the right side of the image and one round dark shield
+    with a simple glowing teal crescent-moon emblem on the other arm, close to the body; in the idle cell the sword is held upright beside
+    the shield; centred in its own cell with empty space on both sides, the sword point well below the top of the
+    grey box
+  attack: >-
+    stepping forward toward the heroes behind the raised shield, the sword thrust low past the shield's edge
+    with the elbow bent, the whole sword well inside the middle cell, the crescent emblem glowing brighter
+  hurt: >-
+    knocked back, the hooded head thrown back, the shield lifted up in front of the chest, the sword in the same hand
+  face: a shadowed face with two pale eyes inside the hood
+  extra_negative: a cape, a helmet, a second sword, a staff, a plume, a skull face, black plate, a spell effect away from the shield, runes, letters, crosses, hooked symbols
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R269): the shield glyph cut to a hooked-cross shape
+  retired_as: dark_fighter_v1
+- id: death_knight
+  # "Death Knight" (112): a skeletal knight in spiked dark plate with a tattered cloak and a runed black sword
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg and lean the torso
+    toward the heroes, the elbows bent, so the sword stays well inside its own cell. The tattered cloak hangs close
+    behind the body in every cell (never flying out). Draw only the parts named in the description, the same in every
+    cell: no second cape, and no slash trail, smear or motion lines.
+  prompt: >-
+    a skeletal knight in spiked mid-grey steel plate armour with dark outlines, a horned open-faced helm with a big
+    bone-white grinning skull face filling the opening, clearly visible and bright against the armour, with two bright
+    red eye lights, a short tattered dark red cloak hanging close behind the shoulders, holding one black sword with glowing
+    red runes on the blade; in the idle cell the sword is held point down in front of the body; centred in its own
+    cell with empty space on both sides, the helm horns well below the top of the grey box
+  attack: >-
+    stepping forward toward the heroes at the end of a downward cut, the black sword angled down in front of him with
+    the point at knee height just ahead of his front foot, the whole sword well inside the middle cell (not raised
+    overhead, not reaching the cell edge)
+  hurt: >-
+    knocked back, the head thrown back with the horned helm still on the skull exactly as in the idle cell, the sword
+    held upright across the chest, the cloak close behind
+  face: a grinning skull with two red eye lights inside the horned helm
+  extra_negative: a shield, flesh, a closed visor, gold armour, a long flowing cape, a scythe, a second sword, wings, a shadowed face, a bare skull without the helm
+  seeds: [1236, 1235, 1234]   # 1234 (ROSTER_LOG R260): the skull face lost in the dark cut; 1235 (R261): the helm lost in the hurt
+  retired_as: death_knight_v1
+- id: dragon_zombie
+  # "Dragon Zombie" (092), the undead dragon: a paralysing bite; must read apart from the red dragon (plan 3.3)
+  size: large
+  body: quadruped
+  prompt: >-
+    an undead dragon on four legs seen from the side: rotting grey-green hide stretched tight over bone, a long
+    skull-like head with empty eye sockets glowing ghost-green and a jaw of broken fangs, exposed white ribs along its
+    flank, torn tattered wing membranes hanging from bony wing arms, a long bony tail ending in bare vertebrae, a faint
+    ghost-green glow between the ribs; palette of bone white, rotting grey-green, dark brown and ghost green; drawn at
+    the same large size in all three cells, the body filling the box (as tall as the box with the wings), the head and
+    jaws inside the cell
+  attack: >-
+    lunging its long neck forward in a biting snap with the jaws wide open, torn wings raised, the tail lashing, all
+    four feet still on the ground and the whole head inside the cell
+  # approved: seed 1235 with this text (ROSTER_LOG R62, R64: best of 3); 1236's hurt (R63) "recoiling on all four legs
+  # (no rearing up): the neck twisted up and back ..., the long bony tail still clearly visible ..." reared up again
+  hurt: >-
+    recoiling on all four legs (no rearing up), the neck twisted back, the torn wings drooping, bones rattling at the
+    joints
+  face: the dragon skull with ghost-green glowing eye sockets and broken fangs is readable in every cell
+  extra_negative: fire breath, red scales, a rider, horns
+  seeds: [1235, 1234, 1236]   # 1234 (ROSTER_LOG R61): the head cut, a rear-up hurt; 1236 (R63): a rear-up hurt
+  retired_as: dragon_zombie_v1
+- id: medusa
+  # "Medusa" (088): a serpent-tailed woman with snake hair (small naga; distinct from the other nagas)
+  size: small
+  body: naga
+  prompt: >-
+    a serpent-tailed woman: a human upper body with pale sage-green skin, bronze armlets and a bronze breastband, a
+    clear pale face with two large bright yellow eyes and a dark mouth, a head of about eight thick dark emerald snakes
+    for hair with small heads, clearly darker than the face, two arms, no legs: below the waist a long dark green snake
+    tail with a pale yellow belly coiled on the ground; centred in its own cell with empty space on both sides, the
+    snake hair well below the top of the grey box
+  attack: >-
+    leaning forward over the coils toward the heroes, both clawed hands reaching out with the elbows bent, the snake
+    hair lashing forward, the hands well inside the middle cell
+  hurt: >-
+    knocked back over the coils, the head tilted back with the pale face and yellow eyes still visible, the snake
+    hair writhing, the arms flung up
+  face: her pale sage-green face with two large bright yellow eyes under the dark snake hair is readable
+  extra_negative: legs, a weapon, a bow, a shield, a crown, wings, a fish tail, stone colour, a hidden face
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R218): the face and eyes lost in green-on-green at 1x
+  retired_as: medusa_v1
+- id: earth_medusa
+  # "Earth Medusa" (113): a stony grey medusa with rock scales and a petrified-snake crown (small naga)
+  size: small
+  body: naga
+  motion: >-
+    Lean and twist the upper body above the coils along a clear diagonal, reach the arms toward the heroes with the
+    elbows bent so the hands stay well inside its own cell; tighten or loosen the coils; the tail tip stays on the
+    ground beside the coils. Draw only the parts named in the description: no spell effects, smear or motion lines.
+  prompt: >-
+    a stony serpent-tailed woman: a human upper body of pale grey stone with cracked rock-plate scales, a smooth pale
+    face with two large bright glowing orange eyes, each a clear bright spot, a crown of short stiff dark charcoal stone
+    snakes frozen upright around her head, clearly darker than the face, rough brown granite armbands, two arms, no
+    legs: below the waist a long dark grey rock-scaled snake tail with a pale belly coiled on the ground;
+    centred in its own cell with empty space on both sides, the stone crown well below the top of the grey box
+  attack: >-
+    leaning forward over the coils toward the heroes, both stone hands reaching out with the elbows bent and the
+    amber eyes glaring wide, the hands well inside the middle cell
+  hurt: >-
+    knocked back over the coils, the head tilted back with the face and amber eyes still visible, the arms flung up,
+    a crack across the chest
+  face: her pale grey stone face with two glowing amber eyes under the stone snake crown is readable
+  extra_negative: green skin, writhing snakes, bronze, a weapon, legs, wings, moss, a hidden face, text, labels
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R263): the amber eyes lost in the grey-on-grey cut
+  retired_as: earth_medusa_v1
+- id: green_dragon
+  # "Green Dragon" (108): a heavy green dragon with toxic throat sacs and a bony frill
+  size: large
+  body: quadruped
+  motion: >-
+    Use a clear diagonal line of action through the whole body but keep all four feet on the ground and the body low
+    (no leap, no rearing up): reach the head toward the heroes with the short neck bent so the head stays well inside
+    its own cell; the wings stay folded close and the tail stays curled behind the hips.
+  prompt: >-
+    a heavy bulky green dragon on four thick legs seen from the side, a short thick neck, a broad head with a bony
+    frill of spikes around the back of the skull, swollen yellow-green poison sacs under the throat, two small folded
+    leathery wings on the back (exactly two), dark green scales with a pale yellow belly, a thick tail curled behind the
+    hips; the whole dragon sits in the middle of its own cell with empty space on both sides
+  attack: >-
+    lunging the broad head forward and down with the jaws open toward the heroes, the throat sacs swollen, the head
+    above and just in front of its front feet, all four feet on the ground, the whole dragon well inside the middle
+    cell; no breath, gas or cloud
+  hurt: >-
+    knocked back, all four feet on the ground, the head pulled back and the frill flattened, the eyes shut
+  face: its broad green head with a bony frill and yellow eyes is readable
+  extra_negative: blue scales, red scales, a long thin neck, large spread wings, gas clouds, breath, rearing up, a rider
+  seeds: [1234]
+  retired_as: green_dragon_v1
+- id: evil_eye
+  # "Evil Eye" (075), the Levistone guardian: gazes and death magic (Magic replays the attack frames, D6/D7).
+  # the floating line ("tilt the whole body along a strong diagonal ...") is replaced by a frontal line (orchestrator,
+  # 2026-11-15); the hurt may tilt back a little (R75: a fully untilted hurt copies the idle)
+  size: large
+  floating: true
+  body: floating
+  motion: >-
+    Keep the frontal view in every cell: the big eye faces the viewer with its iris looking toward the heroes on the
+    right, never turned to a side profile; in the attack the whole body surges forward to the right, level, not tilted
+    along a diagonal; in the hurt it is knocked back to the left and tilted back by about fifteen degrees; it always
+    hovers, nothing touches the ground; the eyestalks, the mouth and the trailing parts move with the motion.
+  prompt: >-
+    a large floating eye monster: a round fleshy body that is one huge green-irised eye with a black pupil, a wide
+    mouth of jagged fangs below the eye, exactly four writhing eyestalks rising from the top, each ending in a small
+    yellow eye, mottled purple-brown hide; it hovers, nothing touches the ground; in every cell the body floats at the
+    same height in its box with clear empty space below it, well above the bottom of the box
+  attack: >-
+    surging forward toward the heroes, the fanged mouth gaping wide, the same four eyestalks (exactly four, as in the
+    idle cell) lashing forward, the body at the same height as in the idle cell
+  hurt: >-
+    knocked back, the big eye squeezed shut, the mouth clenched, the same four eyestalks (exactly four, as in the idle
+    cell) recoiling and curling, the body at the same height as in the idle cell
+  face: the big iris and pupil are the face, with the fanged mouth below it
+  extra_negative: a fifth eyestalk, more than four eyestalks, tentacles below the body, arms, legs
+  seeds: [1236, 1234, 1235]   # 1234 (ROSTER_LOG R77): attack and hurt sliced at the cell bottom, stalk count drifts; 1235 (R78): stalks 4 / 5 / 5
+  retired_as: evil_eye_v1
+- id: rakshasa
+  # "Rakshasa" (089): a tiger-headed sorcerer in rich robes (distinct from the weretiger)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
+    the heroes and reach the hands out with the elbows bent, so every reaching part stays well inside its own cell.
+    Draw only the parts and clothing named in the description, the same in every cell: no cape, cloak or extra cloth,
+    and no spell effects, smear or motion lines.
+  prompt: >-
+    a tiger-headed sorcerer standing upright in rich long red robes with gold embroidery and a gold sash, a tiger head
+    with amber eyes and a white ruff, hands with the palms turned the wrong way and long curved claws, gold rings;
+    centred in its own cell with empty space on both sides
+  attack: >-
+    leaning forward toward the heroes, both reversed clawed hands thrust out with the elbows bent, the jaws snarling,
+    the hands well inside the middle cell
+  hurt: knocked back, the head thrown back, the robe sleeves flapping, the hands flung up
+  face: its tiger face with amber eyes and a white ruff is readable
+  extra_negative: bare chest, a kilt, a weapon, a staff, a hood, a crown, a cape, stripes on the robe
+  seeds: [1234]
+  retired_as: rakshasa_v1
+- id: white_dragon
+  # "White Dragon" (068): a sleek frost dragon (distinct from the red dragon and the dragon zombie)
+  size: large
+  body: quadruped
+  prompt: >-
+    a sleek white frost dragon on four legs seen from the side, smooth pale white and ice-blue scales, two wings of
+    translucent pale blue crystal feathers half raised on its back (exactly two wings), a narrow horned head with an
+    icicle beard under the jaw and pale blue eyes, a long thin tail curled up behind it; the whole dragon, tail tip to
+    snout, sits in the middle of its own cell with empty space on both sides in every cell
+  attack: >-
+    lunging its neck forward with the jaws open in a snapping bite at the heroes, the wings raised, all four feet on
+    the ground (no leap, no rearing up), the head well inside the middle cell
+  hurt: knocked back, the neck twisted back, the wings flared, all four feet on the ground
+  face: its narrow horned dragon head with pale blue eyes and the icicle beard is readable
+  extra_negative: red scales, green scales, fire, ice breath, a rider, a third wing, rearing up, bone wings
+  seeds: [1234]
+  retired_as: white_dragon_v1
+- id: king_mummy
+  # "King Mummy" (087): an upright regal mummy (distinct from the hunched mummy)
+  size: small
+  body: biped
+  motion: >-
+    Use a clear diagonal line of action through the whole body, shift the weight onto one leg, lean the torso toward
+    the heroes and thrust the sceptre and free hand with the elbows bent, so every reaching part stays well inside its
+    own cell. Draw only the parts and clothing named in the description, the same in every cell: no cape, cloak or
+    extra cloth, and no spell effects, smear or motion lines.
+  prompt: >-
+    a regal mummy standing upright, wrapped in yellowed bandages edged with gold, a gold death mask with two dark eye
+    holes, a tall striped blue-and-gold headdress hanging to the shoulders, a broad gold collar on the chest, holding
+    one gold sceptre with a hooked top in the hand on the right side of the image in every cell; centred in its own
+    cell with empty space on both sides
+  attack: >-
+    turned three-quarters toward the heroes on the right and leaning his body far forward to the right, raising the
+    sceptre upright in front of his chest with both hands, the sceptre vertical (not pointed forward), its hooked top
+    level with the headdress, the whole sceptre well inside the middle cell; nothing reaches back to the left
+  hurt: >-
+    knocked back to the left, the masked head tilted back, the free hand flung up, the sceptre upright in the same
+    hand, the headdress on the head as in the idle cell
+  face: the gold death mask with two dark eye holes
+  extra_negative: a hunched pose, loose trailing bandages, a crown, a sword, a skull face, a cape, a second sceptre
+  seeds: [1235, 1234]   # 1234 (ROSTER_LOG R216): the attack reaches back to the left, away from the heroes
+  retired_as: king_mummy_v1

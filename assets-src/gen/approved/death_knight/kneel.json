@@ -1,36 +1,28 @@
 {
   "character": "death_knight",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "64224f51891602a2",
-    "skel": "c6f1f733306bae42",
-    "ref": "6d8887bbfdd50a51"
+  "backend": "user",
+  "source": "user_art/death_knight/sheet_2026-11-25.png",
+  "sha256": "093c8bcb1694bb90aec6e95834a5437cd05df42b9b7048eb0bdadc4ae3102862",
+  "recipe": "monster_user.yaml#death_knight",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/death_knight/",
+    "current_x2_sha256": "367fb0e19ccfcb204860ad68f78577a7d11ac9322c810d0108cd9666b1fc382c",
+    "poses_reference_sha256": "e05141b36a0cb4fb11c36364d5c46ed1aa98ad15d3f1e07384b4f331d509ee02",
+    "prompt_sha256": "7bdecd3d930776f88d436473d56e7dc47699cacdeb7389e4e3c041c1e58a2a20",
+    "prompt_v1_sha256": "1ff167eda1cc95480430454c3c08b24b8df156a4c852c863fbcfbed82e0f4cca"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-grey, A-adj",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "76328296d290966975567d97"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

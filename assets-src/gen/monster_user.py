@@ -132,7 +132,7 @@ def anchor(a: np.ndarray) -> float:
     return float(xs[sel].mean())
 
 
-def place(figs: list[np.ndarray], band: S.MonsterBand, modes: dict | None = None) -> tuple[list[Image.Image], dict]:
+def place(figs: list[np.ndarray], band: S.MonsterBand, modes: dict | None = None, flt: dict | None = None) -> tuple:
     """Every pose with its anchor at the idle's x and its feet on the feet row; the cell widened as the cutter
     does (monster.cut: max(cell, span + 4), even, the idle centred, clamped 2 px from the sides)."""
     def bbox(a):
@@ -153,14 +153,14 @@ def place(figs: list[np.ndarray], band: S.MonsterBand, modes: dict | None = None
     frames, offs = [], []
     for f, (x0, y0, x1, y1), s in zip(figs, boxes, shift):
         out = np.zeros((c, cw, 4), np.uint8)
-        tx, ty = s + dx, band.foot_row - y1
+        tx, ty = s + dx, (flt['rows'][len(frames)] if flt else band.foot_row) - y1   # EF-H B: a floater's rows
         if x0 + tx < 1 or x1 + tx > cw - 2 or y0 + ty < 1:
             raise SystemExit(f"user sheet: a pose does not fit the {cw}x{c} cell clear of its border")
         out[ty + y0:ty + y1 + 1, tx + x0:tx + x1 + 1] = f[y0:y1 + 1, x0:x1 + 1]
         frames.append(Image.fromarray(out))
         offs.append((tx, ty))
     return frames, {"offsets": offs, "cw": cw, "anchors": [round(x, 2) for x in anchors],
-                    "anchor_x": round(anchors[0] + shift[0] + dx, 2)}
+                    "anchor_x": round(anchors[0] + shift[0] + dx, 2), **({"lifted": flt["lifted"]} if flt else {})}
 
 
 def cut(sid: str, rec: dict | None = None, gen: Path = HERE) -> tuple[list[Image.Image], dict]:
@@ -169,12 +169,12 @@ def cut(sid: str, rec: dict | None = None, gen: Path = HERE) -> tuple[list[Image
     rec = rec or recipe(sid)
     img = source(rec, gen)
     cells = split(img)
-    hs = [height(m) for _, m in cells]
-    frame, band = UF.frame_of(rec.get("size", "large"), hs)       # EF-H A: the tall frame over the large cell
+    frame, band = UF.frame_of(rec.get("size", "large"), hs := [height(m) for _, m in cells])   # EF-H A: the tall frame
     s, why = scale(hs, band)
     regions = UP.masks(img, rec)                        # the recipe's `reserve` regions ({} without one)
     figs, pal = quantize(cells, s, (lambda p: UP.reserve(p, img, rec, regions, SEED)) if regions else None)
-    frames, pinfo = place(figs, band, dict(zip(POSES, [None] * 4), **(rec.get("anchor") or {})))
+    frames, pinfo = place(figs, band, dict(zip(POSES, [None] * 4), **(rec.get("anchor") or {})),
+                          UF.float_rows(img, cells, s, band, rec))
     src = np.asarray(img)
     info = {"source_size": list(img.size), "source_colours": len(np.unique(src[src[..., 3] > 0][:, :3], axis=0)),
             "native_heights": hs, "frame": frame, "scale": s, "scale_why": why, **pinfo,

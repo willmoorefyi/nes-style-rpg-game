@@ -1,36 +1,28 @@
 {
   "character": "dark_fighter",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "58dba6d04301df71",
-    "skel": "01e6eadd81c993de",
-    "ref": "c26df405b1b4465b"
+  "backend": "user",
+  "source": "user_art/dark_fighter/sheet_2026-11-25.png",
+  "sha256": "6b3b51c93c6af759820f31553c7dc5dec06a204bdd132d9cd7d9037b4da4a8e9",
+  "recipe": "monster_user.yaml#dark_fighter",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/dark_fighter/",
+    "current_x2_sha256": "5f3482b5f1c01520b72024fa007600b9b6dae0da696306385d2d0240c9e83c40",
+    "poses_reference_sha256": "cdb887b760460604588582a7df8ce1dd39e0cd921f5a8757cdea4c3523262eb0",
+    "prompt_sha256": "fe19b62bd2410cacdd082ab7fefa74b4db9d5a457c736197c0e38be5abd81da8",
+    "prompt_v1_sha256": "ea1263cde6fc00f738cd9aa1b6ac9a5b4c86bdb6f1e65caa6b4eb399bec74fb6"
   },
+  "approved": "2026-11-25",
   "grid": [
-    80,
-    80
+    128,
+    128
   ],
-  "bottom_row": 76,
-  "foot_row": 76,
-  "j0": "FAIL A-adj, A-outline",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "cab55f3c4dda2d6567091d8a"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 122,
+  "foot_row": 122,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

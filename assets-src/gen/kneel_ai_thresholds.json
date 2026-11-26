@@ -15,11 +15,9 @@
  "excluded": {
   "ashen_queen": "key_offset",
   "black_widow": "FW-Q alias",
-  "chimera": "FW-Q alias",
   "cobra": "keyframe paint",
   "crocodile": "keyframe paint",
-  "hollow_seraph": "FW-H hurt_from",
-  "king_mummy": "keyframe paint"
+  "hollow_seraph": "FW-H hurt_from"
  },
  "palette_split": [
   "astos",

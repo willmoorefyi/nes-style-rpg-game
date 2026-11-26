@@ -1,0 +1,77 @@
+{
+  "character": "medusa",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/medusa/sheet_2026-11-25.png",
+  "sha256": "e91a02d8ef3e3aaceb8d560b750be716dec1c7aee00732e276e1a5204e54847b",
+  "recipe": "monster_user.yaml#medusa",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/medusa/",
+    "current_x2_sha256": "24619b736cbf7c623dafbbfcd7e5e96254e9edc85b15db684cb086c60e06732a",
+    "poses_reference_sha256": "bc974e45e8bc816a6b1fad9e29871addbdd4f82e0ee065a6364782acd26be9fc",
+    "prompt_sha256": "d1fca387f20185d8a7c0a84a65cef0ed34fb870df9ded518df4469bf77121db8",
+    "prompt_v1_sha256": "827664a991b568a8c900f8edd0866b35174f8d2734332bec736d4ed532fe73b0"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      92,
+      81,
+      92,
+      58
+    ],
+    "anchors": [
+      28.32,
+      28.1,
+      37.77,
+      35.3
+    ],
+    "anchor_x": 60.32,
+    "error": {
+      "max": 41.8,
+      "p99": 41.8,
+      "mean": 12.6,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "eyes": {
+        "px": 9,
+        "mean": 11.5,
+        "p90": 37.6,
+        "max": 37.6,
+        "colours": 2
+      },
+      "skin": {
+        "px": 703,
+        "mean": 3.4,
+        "p90": 3.6,
+        "max": 3.6,
+        "colours": 2
+      }
+    }
+  }
+}

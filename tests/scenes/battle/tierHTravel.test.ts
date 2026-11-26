@@ -1,6 +1,6 @@
 /**
  * Tier H in battle (docs/REDESIGN_PLAN.md 2.5, 4.2; 9.5 lungeClearance / enemyTravel rows). Since V4 on the real data:
- * the 21 tier-H enemies are `size: huge` in enemies.yaml and their atlas sheets carry the FW-S `scale: 3` (lungePx
+ * the 16 tier-H enemies are `size: huge` in enemies.yaml and their atlas sheets carry the FW-S `scale: 3` (lungePx
  * x 1.5, as BattleArt.getMonsterFrames scales it); chaos is still checked as a titan fixture (alone in TITAN_AREA,
  * attacking in place) until its titan sheet is integrated.
  * - Every tier-H sheet, alone and in a 3-huge formation, attacking every hero: every displayed frame's own opaque top
@@ -20,8 +20,8 @@ import { atlas, atlasFrames, enemyById, frameBox } from '../../helpers/atlasFram
 import type { EnemyData } from '../../../src/types/index.js';
 
 const TIER_H = ['shark', 'minotaur', 'ochu', 'neochu', 'hydra', 'earth_elemental', 'fire_elemental', 'water_elemental',
-  'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon', 'white_dragon', 'blue_dragon', 'green_dragon',
-  'dragon_zombie', 'white_shark', 'minotaur_zombie', 'deepeyes', 'evil_eye'];
+  'air_elemental', 'hill_gigas', 'fire_gigas', 'ice_gigas', 'dragon',
+  'white_shark', 'minotaur_zombie', 'deepeyes'];   // EF-H batch 3: blue / green_dragon, dragon_zombie, evil_eye at 2
 
 const art: MonsterArtSource = { getMonsterFrames: atlasFrames };
 const huge = (id: string): EnemyData => enemyById(id);
@@ -78,18 +78,19 @@ describe('tier H travels under the message window at a whole screen scale (real 
   });
 });
 
-describe('EF-H amendment A: fire_hydra at scale 2 in the tall frame', () => {
-  it('alone and in its real 2-hydra formation: whole-px positions, screen scale 2, every frame under the clear line', () => {
-    const f = atlasFrames('fire_hydra')!;
-    expect([enemyById('fire_hydra').size, atlas.sheets.fire_hydra.scale, f.scale, f.cell[1]]).toEqual(['huge', 2, 2, 200]);
-    for (const layout of [[huge('fire_hydra')], [huge('fire_hydra'), huge('fire_hydra')]]) {
-      const b = battle(layout);
-      const screen = b.sprites.map((s) => (s.scale.x * f.scale) / f.artScale);
-      for (const s of b.sprites) expect(Number.isInteger(s.x) && Number.isInteger(s.y), `position ${s.x},${s.y}`).toBe(true);
-      expect(screen.map((v) => Math.round(v * 1e9) / 1e9)).toEqual(Array(layout.length).fill(2));
-      expect(highest(b, 'fire_hydra', f), `x${layout.length}`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
-    }
-  });
+describe('EF-H amendment A: the tall-frame user sheets at scale 2 (fire_hydra; batch 3: blue / green_dragon, dragon_zombie, evil_eye)', () => {
+  it.each(['fire_hydra', 'blue_dragon', 'green_dragon', 'white_dragon', 'dragon_zombie', 'evil_eye'])(
+    '%s alone and two of it: whole-px positions, screen scale 2, every frame under the clear line', (id) => {
+      const f = atlasFrames(id)!;
+      expect([enemyById(id).size, atlas.sheets[id].scale, f.scale, f.cell[1]]).toEqual(['huge', 2, 2, 200]);
+      for (const layout of [[huge(id)], [huge(id), huge(id)]]) {
+        const b = battle(layout);
+        const screen = b.sprites.map((s) => (s.scale.x * f.scale) / f.artScale);
+        for (const s of b.sprites) expect(Number.isInteger(s.x) && Number.isInteger(s.y), `position ${s.x},${s.y}`).toBe(true);
+        expect(screen.map((v) => Math.round(v * 1e9) / 1e9)).toEqual(Array(layout.length).fill(2));
+        expect(highest(b, id, f), `x${layout.length}`).toBeGreaterThanOrEqual(TRAVEL_CLEAR_Y);
+      }
+    });
 });
 
 describe('the titan attacks in place (D-V7)', () => {

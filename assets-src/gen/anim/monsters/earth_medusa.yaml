@@ -1,124 +1,121 @@
 sprite: earth_medusa
-body: naga                     # a stone medusa: two arms on a rock-scaled serpent tail coiled on the ground (unarmed)
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H): the user-rendered sheet (approved/earth_medusa/monster_large.png,
+# backend: user; 128x128 cells, the idle 92 px tall). The old rig is archived as anim/monsters/_retired/earth_medusa_v1.yaml.
+# medusa's naga recipe (her sibling, the same body plan): the resting coil is static (pinned by its mask), the column
+# and the upper body (head, stone hair snakes, arms) move as one group by whole-px translations of its source key
+# (tweaks under `moves: []`); the wind-up draws back a little deeper than medusa's.
+body: naga                     # two arms on a serpent tail coiled on the ground (unarmed)
 facing: right
 sampler: nearest
 breath: true
-attack_hand: [n, f]            # both stone hands reach toward the heroes
+attack_hand: [n, f]            # both clawed hands reach toward the heroes
 keyframes:
   idle:
-    c_f: [20, 66]
-    c_n: [58, 68]
-    s0: [44, 60]
-    s1: [40, 48]
-    hip: [40, 38]
-    chest: [41, 25]
-    neck: [41, 22]
-    crown: [41, 5]
-    sh_n: [46, 26]
-    el_n: [50, 35]
-    hand_n: [53, 29]
-    sh_f: [34, 27]
-    el_f: [28, 33]
-    hand_f: [33, 37]
-    tail0: [16, 66]
-    tail1: [16, 65]
-    tail2: [16, 64]
-    tail_tip: [16, 63]
+    c_f: [42, 112]
+    c_n: [86, 110]
+    s0: [72, 100]
+    s1: [62, 84]
+    hip: [60, 72]
+    chest: [62, 64]
+    neck: [66, 54]
+    crown: [64, 32]
+    sh_n: [72, 60]
+    el_n: [76, 68]
+    hand_n: [82, 62]
+    sh_f: [56, 60]
+    el_f: [52, 70]
+    hand_f: [62, 72]
+    tail0: [46, 100]
+    tail1: [45, 94]
+    tail2: [46, 88]
+    tail_tip: [47, 84]
   attack:
-    c_f: [14, 66]
-    c_n: [52, 68]
-    s0: [38, 60]
-    s1: [32, 50]
-    hip: [30, 40]
-    chest: [38, 28]
-    neck: [44, 24]
-    crown: [44, 9]
-    sh_n: [48, 29]
-    el_n: [57, 30]
-    hand_n: [66, 31]
-    sh_f: [44, 34]
-    el_f: [46, 38]
-    hand_f: [49, 41]
-    tail0: [10, 66]
-    tail1: [10, 65]
-    tail2: [10, 64]
-    tail_tip: [10, 63]
+    c_f: [42, 112]
+    c_n: [86, 110]
+    s0: [74, 100]
+    s1: [62, 86]
+    hip: [64, 72]
+    chest: [72, 68]
+    neck: [84, 62]
+    crown: [88, 48]
+    sh_n: [80, 66]
+    el_n: [100, 68]
+    hand_n: [114, 66]
+    sh_f: [76, 70]
+    el_f: [86, 78]
+    hand_f: [92, 80]
+    tail0: [44, 100]
+    tail1: [43, 94]
+    tail2: [43, 88]
+    tail_tip: [44, 84]
   hurt:
-    c_f: [16, 66]
-    c_n: [56, 68]
-    s0: [50, 58]
-    s1: [48, 50]
-    hip: [46, 42]
-    chest: [42, 28]
-    neck: [32, 24]
-    crown: [24, 8]
-    sh_n: [45, 26]
-    el_n: [50, 20]
-    hand_n: [56, 12]
-    sh_f: [34, 27]
-    el_f: [24, 25]
-    hand_f: [13, 24]
-    tail0: [12, 66]
-    tail1: [12, 65]
-    tail2: [12, 64]
-    tail_tip: [12, 63]
+    c_f: [40, 112]
+    c_n: [88, 110]
+    s0: [78, 100]
+    s1: [72, 84]
+    hip: [64, 70]
+    chest: [58, 62]
+    neck: [56, 54]
+    crown: [52, 38]
+    sh_n: [66, 58]
+    el_n: [80, 52]
+    hand_n: [90, 44]
+    sh_f: [46, 58]
+    el_f: [38, 50]
+    hand_f: [34, 40]
+    tail0: [44, 100]
+    tail1: [43, 94]
+    tail2: [43, 88]
+    tail_tip: [45, 84]
 parts:
   weapon: {remove: true}
-  tail: {remove: true}         # no free tail: the tail end lies in the coil
 frames:
-  # stone, heavier than the medusa: the upper body leans back as one block, the far arm (half) lagging; every
-  # frame translates (the keys' arms are 60-120 deg apart, over the 30 deg cap at t 0.35)
-  atk_wind1:
+  atk_wind1:            # the upper body drawn back 4 px
     moves: []
-    tweaks: {hip: [-2, 0], chest: [-3, 0], neck: [-3, 0], crown: [-4, 0], sh_n: [-3, 0], el_n: [-4, 0], hand_n: [-6, 0], sh_f: [-3, 0], el_f: [-3, 0], hand_f: [-2, 0]}
-  atk_wind2:                   # the near claw drawn back past the chest
+    dy: 0
+    t: -0.1
+    tweaks: {hip: [-1, 0], chest: [-3, 0], neck: [-4, 0], crown: [-4, 0], sh_n: [-3, 0], el_n: [-4, 0], hand_n: [-4, 0], sh_f: [-3, 0], el_f: [-4, 0], hand_f: [-4, 0]}
+  atk_wind2:            # back 6, down 1: the head furthest back, the claws drawn in
     moves: []
-    dy: 1
-    tweaks: {hip: [-3, 0], chest: [-6, 1], neck: [-7, 1], crown: [-8, 1], sh_n: [-6, 1], el_n: [-8, 1], hand_n: [-11, 1], sh_f: [-6, 1], el_f: [-6, 1], hand_f: [-6, 1]}
-  atk_mid:                     # the reach pulled back toward the wind-up (t kept low: the coil is fixed per key)
-    t: 0.2
+    dy: 0
+    t: -0.15
+    tweaks: {hip: [-2, 0], chest: [-4, 1], neck: [-6, 1], crown: [-6, 1], sh_n: [-4, 1], el_n: [-6, 1], hand_n: [-6, 1], sh_f: [-4, 1], el_f: [-6, 1], hand_f: [-6, 1]}
+  atk_mid:              # the reach key pulled 8 back toward the wind-up
     moves: []
-    tweaks: {hip: [-2, 0], chest: [-4, 1], neck: [-4, 1], crown: [-4, 1], sh_n: [-4, 1], el_n: [-6, 1], hand_n: [-8, 1], sh_f: [-4, 1], el_f: [-6, 1], hand_f: [-8, 1]}
-  atk_follow:
+    dy: 0
+    t: 0.0
+    tweaks: {hip: [-3, 0], chest: [-6, 0], neck: [-8, 0], crown: [-8, 0], sh_n: [-6, 0], el_n: [-8, 0], hand_n: [-8, 0], sh_f: [-6, 0], el_f: [-8, 0], hand_f: [-8, 0]}
+  atk_follow:           # the reach key, 1 past
     moves: []
-    tweaks: {chest: [1, 0], neck: [1, 0], crown: [1, 0], sh_n: [1, 0], el_n: [2, 0], hand_n: [3, 0], sh_f: [1, 0], el_f: [2, 0], hand_f: [3, 0]}
-  atk_recover:                 # the head eases toward the attack (the chest held: moving it slid the far forearm's
-                               # pale armband under the far upper arm)
-    moves: [crown, neck]
-  hurt_in1:                    # flinch: thrown back and up; translated (interpolating the body toward the hurt key
-                               # swings it forward, the hurt column leaning right from the coil)
+    dy: 0
+    tweaks: {chest: [1, 0], neck: [1, 0], crown: [1, 0], sh_n: [1, 0], el_n: [1, 0], hand_n: [1, 0], sh_f: [1, 0], el_f: [1, 0], hand_f: [1, 0]}
+  atk_recover:          # the idle, the upper body 4 forward (coming back from the reach)
     moves: []
-    tweaks: {hip: [-3, 0], chest: [-6, 0], neck: [-8, -1], crown: [-8, -1], sh_n: [-6, 0], el_n: [-6, -2], hand_n: [-6, -4], sh_f: [-6, 0], el_f: [-6, 0], hand_f: [-6, 0]}
-  hurt_in2:                    # the body halfway back toward idle, the head held back (no forward wobble)
-    moves: [chest, hip, s1]
-    tweaks: {hip: [1, 0], chest: [3, 0], neck: [-3, 0], crown: [-3, 0], sh_n: [3, 0], el_n: [3, 0], hand_n: [3, 0], sh_f: [3, 0], el_f: [3, 0], hand_f: [3, 0]}
-  daze:                        # a heavy nod: the head drops forward, the near hand sags (the far arm stays:
-                               # moving it opened a hole in the torso)
-    tweaks: {crown: [3, 0], neck: [2, 0], el_n: [0, 3], hand_n: [0, 4]}
+    dy: 0
+    tweaks: {hip: [1, 0], chest: [2, 0], neck: [4, 0], crown: [4, 0], sh_n: [2, 0], el_n: [4, 0], hand_n: [4, 0], sh_f: [2, 0], el_f: [4, 0], hand_f: [4, 0]}
+  hurt_in1:             # flinch: the idle's upper body thrown 3 back, the head 4 back and 1 up
     moves: []
-  daze_b:
-    tweaks: {crown: [5, 0], neck: [4, 0], el_n: [0, 5], hand_n: [0, 6]}
+    dy: 0
+    tweaks: {hip: [-1, 0], chest: [-2, 0], neck: [-3, 0], crown: [-4, -1], sh_n: [-2, 0], el_n: [-3, -1], hand_n: [-3, -1], sh_f: [-2, 0], el_f: [-3, -1], hand_f: [-3, -1]}
+  hurt_in2:             # the hurt key, the upper body 3 forward and 1 down on the way back
     moves: []
+    dy: 0
+    tweaks: {hip: [1, 0], chest: [2, 1], neck: [3, 1], crown: [3, 1], sh_n: [2, 1], el_n: [3, 1], hand_n: [3, 1], sh_f: [2, 1], el_f: [3, 1], hand_f: [3, 1]}
+  daze:                 # slump: the head and arms 2 down
+    moves: []
+    dy: 0
+    tweaks: {neck: [1, 2], crown: [1, 2], el_n: [0, 1], hand_n: [0, 2], el_f: [0, 1], hand_f: [0, 2]}
+  daze_b:               # the head 3 down
+    moves: []
+    dy: 0
+    tweaks: {neck: [1, 3], crown: [1, 3], el_n: [0, 2], hand_n: [0, 3], el_f: [0, 2], hand_f: [0, 3]}
 masks:
   coil:                        # the resting coil below the rising body: static (pinned)
-    idle: [[0, 58], [80, 58], [80, 80], [0, 80]]
-    attack: [[0, 58], [80, 58], [80, 80], [0, 80]]
-    hurt: [[0, 56], [80, 56], [80, 80], [0, 80]]
+    idle: [[0, 99], [128, 99], [128, 128], [0, 128]]
+    attack: [[0, 99], [128, 99], [128, 128], [0, 128]]
+    hurt: [[0, 99], [128, 99], [128, 128], [0, 128]]
 holds: []
-paint:
-  # P2-8 (ROSTER_FIX_PLAN_2): FW-P on idle: the approved ink-outlined pale block on the chest (ink x 35-40, y 31-36,
-  # 19 px, none on the silhouette edge) is recoloured ring by ring to the 4-neighbour mode of the torso around it
-  - {frame: idle, xy: [[36, 31], [37, 31], [38, 31], [39, 31], [40, 31], [35, 32], [40, 32], [35, 33], [35, 34]], rgb: [206, 198, 189]}
-  - {frame: idle, xy: [[40, 33]], rgb: [82, 90, 90]}
-  - {frame: idle, xy: [[40, 34], [37, 36], [38, 36]], rgb: [140, 140, 132]}
-  - {frame: idle, xy: [[35, 35], [36, 36], [39, 36], [40, 36]], rgb: [165, 165, 156]}
-  - {frame: idle, xy: [[40, 35]], rgb: [115, 115, 107]}
-  - {frame: idle, xy: [[35, 36]], rgb: [66, 66, 74]}
-  # P2-8c (ROSTER_FIX_PLAN_2): hurt_in1's far-arm and hip join left ink spurs and unlined edges (spurs 6, edge gaps 4
-  # vs idle 1 / 0): the spurs are nulled, the opened and unlined edge px inked
-  - {frame: hurt_in1, xy: [[21, 25], [22, 26], [45, 37], [46, 37], [29, 38], [26, 40], [29, 42]], rgb: null}
-  - {frame: hurt_in1, xy: [[22, 25], [28, 38], [43, 39], [31, 41], [31, 42], [29, 54]], rgb: [6, 4, 10]}
-# pass KT (docs/KNEEL_TWEEN_PLAN.md): the approved AI kneel key (approved/<id>/kneel.png) and the bridge
-# frames (kneel_bridge.py); no derived kneel block to retire (it was the D-K7 alias)
+paint: []
+# pass KT: the approved kneel key (approved/earth_medusa/kneel.png, the user sheet's 4th pose) and the bridge frames
 kneel:
   source: ai

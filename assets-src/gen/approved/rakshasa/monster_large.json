@@ -1,0 +1,77 @@
+{
+  "character": "rakshasa",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/rakshasa/sheet_2026-11-25.png",
+  "sha256": "49c142cc85138399f6cf64cca6eea15e4a36609f20539f166d03e494c16b6214",
+  "recipe": "monster_user.yaml#rakshasa",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/rakshasa/",
+    "current_x2_sha256": "6306ed2626a863c80b8a437aea215b50566249ca0c434ed8b1c1c5f92e93e8f3",
+    "poses_reference_sha256": "0fe0c6e1ab2cabb778063a88ee0a5a92a4c4c9b3207e4e79d2650331d5b19a36",
+    "prompt_sha256": "f3dddd4f201d9ae9c80ec73029798369ce073e4b73b3d5f4304dab65c6840e8b",
+    "prompt_v1_sha256": "6d7a3a4b8817f8064da5cff42caf479e88d38a3d8c241e68f06e773a89bc7fa5"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle below band",
+    "native_heights": [
+      92,
+      81,
+      89,
+      64
+    ],
+    "anchors": [
+      22.95,
+      33.61,
+      47.9,
+      33.15
+    ],
+    "anchor_x": 58.95,
+    "error": {
+      "max": 53.5,
+      "p99": 37.0,
+      "mean": 13.0,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "orange": {
+        "px": 1521,
+        "mean": 5.9,
+        "p90": 11.0,
+        "max": 53.5,
+        "colours": 5
+      },
+      "trim": {
+        "px": 3112,
+        "mean": 12.0,
+        "p90": 35.8,
+        "max": 53.5,
+        "colours": 9
+      }
+    }
+  }
+}

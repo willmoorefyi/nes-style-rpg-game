@@ -1,0 +1,84 @@
+{
+  "character": "death_knight",
+  "sheet": "monster_large",
+  "backend": "user",
+  "source": "user_art/death_knight/sheet_2026-11-25.png",
+  "sha256": "093c8bcb1694bb90aec6e95834a5437cd05df42b9b7048eb0bdadc4ae3102862",
+  "recipe": "monster_user.yaml#death_knight",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/death_knight/",
+    "current_x2_sha256": "367fb0e19ccfcb204860ad68f78577a7d11ac9322c810d0108cd9666b1fc382c",
+    "poses_reference_sha256": "e05141b36a0cb4fb11c36364d5c46ed1aa98ad15d3f1e07384b4f331d509ee02",
+    "prompt_sha256": "7bdecd3d930776f88d436473d56e7dc47699cacdeb7389e4e3c041c1e58a2a20",
+    "prompt_v1_sha256": "1ff167eda1cc95480430454c3c08b24b8df156a4c852c863fbcfbed82e0f4cca"
+  },
+  "approved": "2026-11-25",
+  "grid": [
+    128,
+    128
+  ],
+  "bottom_row": 122,
+  "layout": [
+    3,
+    1
+  ],
+  "size": "large",
+  "floating": false,
+  "flip_frames": [],
+  "poses": [
+    "idle",
+    "attack",
+    "hurt"
+  ],
+  "route": "EF-H: user-rendered sheet imported by monster_user.py (house quantizer, no AI call)",
+  "cut": {
+    "scale": 1.0,
+    "scale_why": "idle in band",
+    "native_heights": [
+      97,
+      96,
+      97,
+      78
+    ],
+    "anchors": [
+      36.01,
+      47.56,
+      50.62,
+      44.91
+    ],
+    "anchor_x": 65.01,
+    "error": {
+      "max": 45.6,
+      "p99": 45.6,
+      "mean": 14.2,
+      "glow_px": 0,
+      "glow_kept": 0.0
+    },
+    "regions": {
+      "eyes": {
+        "px": 8,
+        "mean": 2.2,
+        "p90": 2.2,
+        "max": 2.2,
+        "colours": 1
+      },
+      "skull": {
+        "px": 334,
+        "mean": 7.9,
+        "p90": 20.3,
+        "max": 20.3,
+        "colours": 4
+      },
+      "cloak": {
+        "px": 2239,
+        "mean": 10.3,
+        "p90": 34.8,
+        "max": 34.8,
+        "colours": 6
+      }
+    }
+  }
+}

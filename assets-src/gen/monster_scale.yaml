@@ -26,18 +26,13 @@ hill_gigas: 3
 fire_gigas: 3
 ice_gigas: 3
 dragon: 3
-white_dragon: {scale: 3, tex: 1, smooth: [despur]}   # EF-B2 (A4 budget fallback: despur at today's texture)
 # EF-B3; int-ef2 (user ruling 2026-11-24): the tex-3 texture after all. B4 round 1 (image review, ITERATE): full
 # Scale2x rounded the horn and crest points and blotched the dithered scales; round 2: `edges`, Scale2x on the
-# silhouette only, the inside nearest
-blue_dragon: {scale: 3, tex: 3, smooth: [despur, edges]}
-green_dragon: {scale: 3, tex: 3, smooth: [despur, edges]}
-dragon_zombie: 3
+# silhouette only, the inside nearest (blue_dragon and green_dragon: the user's renders since EF-H batch 3, below)
 # tier H siblings (D-V3), so no lesser sibling outgrows its greater one:
 white_shark: 3
 minotaur_zombie: 3
 deepeyes: 3
-evil_eye: 3
 # V6 (docs/REDESIGN_PLAN.md 4.2, ruling D-V6 = C2 after G-T0): the redesigned chaos, cut in the normal 200 px boss band
 # (`size: boss` kept, no titan page group), shown at 3 screen px per art px so it is the largest monster on screen.
 chaos: 3
@@ -59,11 +54,7 @@ mummy: {scale: 2.5, tex: 2.5}
 horned_devil: {scale: 2.5, tex: 2.5}
 mindflayer: {scale: 2.5, tex: 2.5}
 weretiger: {scale: 2.5, tex: 2.5}
-king_mummy: {scale: 2.5, tex: 2.5}
-medusa: {scale: 2.5, tex: 2.5}
-rakshasa: {scale: 2.5, tex: 2.5}
 sahagin_prince: {scale: 2.5, tex: 2.5}
-earth_medusa: {scale: 2.5, tex: 2.5}
 gr_wolf: {scale: 2.5, tex: 2.5, smooth: [despur]}
 # data-`large` sheets (laid out as `huge`, capacity 1):
 ogre_chief: {scale: 2.5, tex: 2.5, smooth: [despur]}
@@ -78,9 +69,7 @@ rhyos: {scale: 2.5, tex: 2.5}
 # the smallest multiple of 0.05 that meets it (iron at 3.25 would be 292.5, under stone's 294)
 iron_golem: {scale: 3.3, tex: 3.3, crop: true}   # crop: its 423-px cells fit 16 a page, not its 17 frames (monster_hires.crop_sheet)
 # the greater siblings (NEW_MONSTER_GUIDE.md 1.4: no lesser sibling outgrows its greater one; beyond the user's list):
-death_knight: {scale: 2.5, tex: 2.5}   # > black_knight (inverted since EF-H batch 2, 177.5 < 188 px: death_knight is re-rendered later)
 stone_golem: {scale: 2.8, tex: 2.8}   # > clay_golem < stone 200 < iron 304 HP; int-ef2: 105 px -> 294 >= clay's 292.5
-chimera: {scale: 2.5, tex: 2.5}   # > manticore
 sea_troll: {scale: 2.7, tex: 2.7}   # > troll; int-ef2 (user ruling 2026-11-24): 106 px -> 286.2 >= troll's 282.5 (113 px)
 winter_wolf: {scale: 2.5, tex: 2.5}   # > gr_wolf: 92 HP > 72
 ogre_mage: {scale: 2.5, tex: 2.5}   # > ogre_chief: 144 HP > 132
@@ -116,3 +105,28 @@ vampire_lord: {scale: 2, tex: 2, smooth: [despur, edges]}
 fire_hydra: {scale: 2, tex: 2, smooth: [despur, edges]}
 fire_lizard: {scale: 2, tex: 2, smooth: [despur, edges]}
 black_knight: {scale: 2, tex: 2, smooth: [despur, edges]}
+# EF-H batch 3 (docs/ENEMY_FEEDBACK_PLAN.md EF-H; the user's renders, backend: user, s = 1.0, the standing smoothing
+# rule replacing the old entries): chimera in the tall frame (idle 122 rows, about 244 screen px; was 2.5, 240; still
+# > manticore), blue_dragon in the tall frame (idle 144 rows, about 288; data `huge` kept; was scale 3 tex 3, 285),
+# dragon_zombie in the tall frame (idle 115 rows, attack 125, about 230; data `huge` kept; was scale 3, 228), and the
+# small -> large ones: buccaneer (idle 85 px, about 170; was 2, 134), dark_fighter (idle 74 px, about 148; was 2,
+# 146), death_knight (idle 98 px, about 196 >= black_knight's 188: the batch-2 sibling inversion is gone; was 2.5,
+# 177.5), medusa and earth_medusa (idle 92 px each, about 184, equal siblings; were 2.5, 185), green_dragon in the tall
+# frame (idle 148 rows, about 296; data `huge` kept; was scale 3 tex 3, 294; user ruling: no throat sacs) and the
+# floating evil_eye in the tall frame (EF-H amendment B; idle 148 rows, about 296; data `huge` kept; was scale 3, 294),
+# white_dragon in the tall frame (idle 145 rows, about 290; data `huge` kept; was scale 3 tex 1 despur, 288),
+# king_mummy (idle 92 px, about 184 >= the mummy's 182.5: the sibling rule; was 2.5, 182.5) and rakshasa (idle 93 px,
+# about 186; was 2.5, 185)
+chimera: {scale: 2, tex: 2, smooth: [despur, edges]}
+blue_dragon: {scale: 2, tex: 2, smooth: [despur, edges]}
+dragon_zombie: {scale: 2, tex: 2, smooth: [despur, edges]}
+buccaneer: {scale: 2, tex: 2, smooth: [despur, edges]}
+dark_fighter: {scale: 2, tex: 2, smooth: [despur, edges]}
+death_knight: {scale: 2, tex: 2, smooth: [despur, edges]}
+medusa: {scale: 2, tex: 2, smooth: [despur, edges]}
+earth_medusa: {scale: 2, tex: 2, smooth: [despur, edges]}
+green_dragon: {scale: 2, tex: 2, smooth: [despur, edges]}
+evil_eye: {scale: 2, tex: 2, smooth: [despur, edges]}
+white_dragon: {scale: 2, tex: 2, smooth: [despur, edges]}
+king_mummy: {scale: 2, tex: 2, smooth: [despur, edges]}
+rakshasa: {scale: 2, tex: 2, smooth: [despur, edges]}

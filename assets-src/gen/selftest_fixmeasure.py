@@ -111,17 +111,21 @@ def run_m2_red(check: Callable[[bool, str], None]) -> None:
     """FW-M2: the plan-2 pre-measure numbers (sections 1-5) through the committed tool, on the fix2 fixtures."""
     from gen import fixmeasure as FM
     from gen import fixmeasure_edges as FE
-    chim = FM.Sprite("chimera", _fixture2("chimera"))
-    got = [r["px"] for r in FM.partc(chim, "dragon", ["attack", "atk_mid", "atk_follow", "hurt_in2", "hurt"])]
+    from gen import retire as RT
+    # EF-H batch 3: chimera, king_mummy and earth_medusa are the user's renders now; their plan-2 numbers are measured
+    # on the v1 archives (docs/REDESIGN_PLAN.md 9.5, retire.fixture_source), as black_knight's below
+    with RT.fixture_tree(("chimera",)):
+        chim = FM.Sprite("chimera", _fixture2("chimera"))
+        got = [r["px"] for r in FM.partc(chim, "dragon", ["attack", "atk_mid", "atk_follow", "hurt_in2", "hurt"])]
+        rig = _fixture2("chimera")
+        e_att = FE.poly(chim, ["attack", "atk_mid", "atk_follow"], "dragon2@attack", ["head", "dragon"], rig)
+        e_hurt = FE.poly(chim, ["hurt", "hurt_in2"], "dragon2@hurt", ["head", "dragon"], rig)
+        greens = [(66, 82, 49), (99, 132, 74), (148, 156, 90)]
+        ca = FE.colours(chim, ["attack"], greens, (120, 54, 168, 92), not_masks=["dragon@attack"], masks=rig)
+        ch = FE.colours(chim, ["hurt"], greens, (106, 54, 160, 88), not_masks=["dragon@hurt"], masks=rig)
     check(got == [794, 794, 795, 671, 673], f"1: chimera upper dragon part px 794 / 794 / 795 / 671 / 673 ({got})")
-    rig = _fixture2("chimera")
-    e_att = FE.poly(chim, ["attack", "atk_mid", "atk_follow"], "dragon2@attack", ["head", "dragon"], rig)
-    e_hurt = FE.poly(chim, ["hurt", "hurt_in2"], "dragon2@hurt", ["head", "dragon"], rig)
     check(e_att == {"attack": 732, "atk_mid": 691, "atk_follow": 746} and e_hurt == {"hurt": 234, "hurt_in2": 233},
           f"1: chimera |E| RED 732 / 691 / 746 and 234 / 233 (opaque px in dragon2 minus head and dragon) {e_att} {e_hurt}")
-    greens = [(66, 82, 49), (99, 132, 74), (148, 156, 90)]
-    ca = FE.colours(chim, ["attack"], greens, (120, 54, 168, 92), not_masks=["dragon@attack"], masks=rig)
-    ch = FE.colours(chim, ["hurt"], greens, (106, 54, 160, 88), not_masks=["dragon@hurt"], masks=rig)
     check(ca["attack"]["n"] == 375 and ch["hurt"]["n"] == 374,
           f"1: chimera colour gate RED 375 / 374 (the box holds 393 / 341 greens; the plan's 360 / 337 were estimates) ({ca}, {ch})")
     st = FM.Sprite("sea_troll", _fixture2("sea_troll"))
@@ -140,15 +144,15 @@ def run_m2_red(check: Callable[[bool, str], None]) -> None:
     check(cr["frames"]["hurt"]["bare_ink"] == 7 and cr["frames"]["hurt"]["spurs"] == 0,
           f"N-1b: crocodile bare ink 7 in box 15 36 30 47 (the plan's 5 = the tip block x 17-20, y 38 + (17, 39); plus "
           f"(29, 43) and (23, 44)), spurs 0 ({cr['frames']['hurt']})")
-    km = FM.colours(FM.Sprite("king_mummy", _fixture2("king_mummy")), ["hurt", "hurt_in2"], [(156, 115, 41), (222, 198, 99)],
-                    box=(49, 20, 53, 48))
+    with RT.fixture_tree(("king_mummy", "earth_medusa")):
+        km = FM.colours(FM.Sprite("king_mummy", _fixture2("king_mummy")), ["hurt", "hurt_in2"],
+                        [(156, 115, 41), (222, 198, 99)], box=(49, 20, 53, 48))
+        em = FM.colours(FM.Sprite("earth_medusa", _fixture2("earth_medusa")), ["idle"], [(6, 4, 10)], box=(35, 31, 41, 37))
     check(km == {"hurt": 7, "hurt_in2": 5}, f"P2-3: king_mummy gold staff px 7 / 5 ({km})")
-    em = FM.colours(FM.Sprite("earth_medusa", _fixture2("earth_medusa")), ["idle"], [(6, 4, 10)], box=(35, 31, 41, 37))
     check(em == {"idle": 19}, f"P2-8: earth_medusa chest-rectangle ink 19 ({em})")
     aq = FE.rowspan(FM.Sprite("ashen_queen", _fixture2("ashen_queen")), ["idle", "attack", "hurt", "cast"], (170, 200))
     check([v[0] for v in aq.values()] == [28, 25, 20, 25], f"N-4: ashen_queen coil base left edges 28 / 25 / 20 / 25 ({aq})")
     # black_knight is rigged since T-K (G5): drop its generated frames so `switch` runs the keyframe-only pre-check
-    from gen import retire as RT
     with RT.fixture_tree(("black_knight",)):        # docs/REDESIGN_PLAN.md 9.5: the black_knight_v1 archive if present
         bk = FM.Sprite("black_knight")
         bk.gen = {}

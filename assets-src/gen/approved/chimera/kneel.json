@@ -1,36 +1,29 @@
 {
   "character": "chimera",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "428089ed698020b7",
-    "skel": "b6bd486d6756f2a7",
-    "ref": "39ec3302038a28b0"
+  "backend": "user",
+  "source": "user_art/chimera/sheet_2026-11-25.png",
+  "sha256": "ef25921d6ab9fd0bd986b151f0343224fef3b997dfb82dd483c65d0e8d5d3fcf",
+  "recipe": "monster_user.yaml#chimera",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/chimera/",
+    "current_x2_sha256": "46aca29b12e9b9720a47c0e26ffbb07366ea0d8c4bc304929d538e7de6789ec1",
+    "poses_reference_sha256": "4e585a9ccb788075165916a6a2e5e684cf96aac539e7f0dd7b04c7f03ef9b54d",
+    "prompt_sha256": "f1d7e710aeb4be4ac5c715d3e249bc008537a97a8b458267c868fad6c3b004be",
+    "prompt_v1_sha256": "8efe343b8ab8dbefb76fd04fd1fd10a498f6a61dc6d71cc0d17b38c025e1377f"
   },
+  "approved": "2026-11-25",
   "grid": [
-    168,
-    128
+    208,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-hist",
-  "user_review": "orchestrator batch review 2026-11-17 (user rule: regenerate only serious flaws; J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "cfb05c46e1d68ac41aba8bde"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }

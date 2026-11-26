@@ -1,37 +1,29 @@
 {
   "character": "blue_dragon",
   "sheet": "kneel",
-  "arm": "g",
-  "seed": 1234,
-  "try": 1,
-  "guide_sha": {
-    "sil": "985dadbe7ae11b38",
-    "skel": "76f11c5c8cf5e71a",
-    "ref": "4129393d51bc4112",
-    "derived": "66938eb0804d5512"
+  "backend": "user",
+  "source": "user_art/blue_dragon/sheet_2026-11-25.png",
+  "sha256": "eeec8a04948e7ddd2894d71bc21ef96d9d6402f1332e9eb894222d8dbb3c92d4",
+  "recipe": "monster_user.yaml#blue_dragon",
+  "tool": "ChatGPT (interactive)",
+  "rendered": "2026-11-25",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/ef/user_packs2/blue_dragon/",
+    "current_x2_sha256": "3498375b9a63d130b6fdaccbbc33092c5e9a4ef2a3d800ce9631f370efc2bf99",
+    "poses_reference_sha256": "9a29b647e6b06b1cb13f7252a2a1ab39eefbc15ce91880fd4c1fb9e49f02c401",
+    "prompt_sha256": "bc20a40447bbd61c0a2e24423fb985473a959a935cb37e6869000197b7ea5cb6",
+    "prompt_v1_sha256": "ca137f632863194308bc1e7eb060fc290499702ac2a973b0cb3d5b30598d270f"
   },
+  "approved": "2026-11-25",
   "grid": [
-    128,
-    128
+    236,
+    200
   ],
-  "bottom_row": 122,
-  "foot_row": 122,
-  "j0": "FAIL A-pal, A-hist, A-outline, K-ground, K-height",
-  "user_review": "user sheet review 2026-11-17: pilot kneel approved (J0 advisory)",
-  "models": [
-    "gemini-nano-banana-2.1"
-  ],
-  "gemini_cache_keys": [
-    "d5acad8a6cb1f1b4628d1712"
-  ],
-  "refs": [
-    "idle",
-    "pose"
-  ],
+  "bottom_row": 192,
+  "frame": "tall",
+  "foot_row": 192,
   "settings": {
-    "model": "gemini-nano-banana-2.1",
-    "aspect_ratio": "1:1",
-    "image_size": "1K"
-  },
-  "approved": "2026-11-17"
+    "route": "EF-H: the user sheet's 4th pose in the idle's cell (monster_user.py)"
+  }
 }
