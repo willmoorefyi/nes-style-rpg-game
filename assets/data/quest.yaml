@@ -120,6 +120,11 @@ stages:
       - {map: pravoka, kind: npc, at: [40, 33], reason: "Bikke's hideIf only clears the beaten captain off the brig pier's end, a dead end"}
       # GT-4 in --stage S2 only: the full run catches the dock's removal as (c) SOFTLOCK (a caught row never reads this)
       - {map: overworld, kind: dock, ref: a1_pravoka, reason: "stage scope: @S2 holds once the brig spawns, and boarding needs no dock (W1-A); the full run catches GT-4 as SOFTLOCK"}
+      - {map: pravoka, kind: gate, at: [19, 13], reason: "PT-2: a shop shutter of the pirate occupation; the inn and the clinic open after S1 (opensAfter)"}
+      - {map: pravoka, kind: gate, at: [5, 23], reason: "PT-2: a shop shutter of the pirate occupation; the inn and the clinic open after S1 (opensAfter)"}
+      - {map: pravoka, kind: gate, at: [10, 23], reason: "PT-2: a shop shutter of the pirate occupation; the inn and the clinic open after S1 (opensAfter)"}
+      - {map: pravoka, kind: gate, at: [19, 23], reason: "PT-2: a shop shutter of the pirate occupation; the inn and the clinic open after S1 (opensAfter)"}
+      - {map: pravoka, kind: gate, at: [5, 33], reason: "PT-2: a shop shutter of the pirate occupation; the inn and the clinic open after S1 (opensAfter)"}
     status: built
   # === end A1-T ===
   # === ELF-O (pass W: owned by ELF-O) ===

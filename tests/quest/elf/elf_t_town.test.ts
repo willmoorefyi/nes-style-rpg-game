@@ -75,10 +75,27 @@ describe('Elfheim: doors, gates and links (WORLD_PLAN 4.2, canon)', () => {
     }
   });
 
-  it('the south gate leads to overworld:elf_elfheim, and the gate entrance stands inside it', () => {
+  it('the south gate leads to overworld:elf_elfheim, the side gates to their side doors (PT-5)', () => {
     const out = town.transitions.filter((t) => t.targetMap === 'overworld');
-    expect(out.map((t) => [t.x, t.y, t.targetEntrance])).toEqual([[25, 49, site.anchor], [26, 49, site.anchor]]);
+    expect(out.map((t) => [t.x, t.y, t.targetEntrance])).toEqual([[25, 49, site.anchor], [26, 49, site.anchor],
+      [0, 23, 'elf_elfheim_west'], [0, 24, 'elf_elfheim_west'], [51, 23, 'elf_elfheim_east'], [51, 24, 'elf_elfheim_east']]);
     expect(town.entrances!.gate).toEqual([25, 46]);
+    expect(town.entrances!.west_gate).toEqual([2, 23]);
+    expect(town.entrances!.east_gate).toEqual([49, 23]);
+  });
+
+  it('PT-5: each world door leads into its side of the town and back out to the arrival beside that door', () => {
+    for (const [ent, back] of [['gate', 'elf_elfheim'], ['west_gate', 'elf_elfheim_west'], ['east_gate', 'elf_elfheim_east']]) {
+      const door = ow.transitions.find((t) => t.targetMap === 'elfheim' && t.targetEntrance === ent)!;
+      expect(door, ent).toBeDefined();
+      expect(town.entrances![ent], ent).toBeDefined();
+      const [ax, ay] = ow.entrances![back];
+      expect(Math.abs(ax - door.x) + Math.abs(ay - door.y), `${back} beside its door`).toBe(1);
+      const outs = town.transitions.filter((t) => t.targetEntrance === back);
+      expect(outs.length, back).toBe(2);
+      const [ex, ey] = town.entrances![ent];
+      for (const t of outs) expect(Math.abs(t.x - ex) + Math.abs(t.y - ey), `${ent} inside its gate`).toBeLessThanOrEqual(4);
+    }
   });
 
   it('EXIT-safe: every walkable cell of the town and of each room reaches its way out (the keepers\' side excepted)', () => {

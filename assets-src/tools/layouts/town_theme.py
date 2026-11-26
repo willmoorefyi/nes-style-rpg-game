@@ -29,7 +29,7 @@ TOWNS: dict[str, dict] = {
     "pravoka": dict(theme="pra_tar", walls=["pra_tar", "pra_tar_drift", "pra_tar_red"],
                     decos=[("pra_stall", 2, 2, 23, 31, ALPHA), ("pra_cargo", 2, 1, 17, 18, ALPHA),
                            ("pra_stall", 2, 2, 21, 4, ALPHA)],
-                    swaps={"pirates_den": ("pra_tavern", 5, 4, None), "house_harbormaster": ("pra_house_a5", 5, 5, 2),
+                    swaps={"pirates_den": ("pra_tavern", 5, 4, 3), "house_harbormaster": ("pra_house_a5", 5, 5, 2),
                            "house_cooper": ("pra_house_a4", 5, 4, 2)}),
     "elfheim": dict(theme="elf_moon", walls=["elf_moon", "elf_moon_jade", "elf_moon_lilac"],
                     decos=[("elf_tree", 3, 4, 37, 28, ALPHA), ("elf_moongate", 2, 2, 39, 34, ALPHA),
@@ -85,6 +85,8 @@ def apply(doc: dict, town: str, grid=None) -> dict:
                 o.update({"type": "prefab", "prefab": prefab, "ridge_rows": 1})
                 if door is None:
                     o.pop("door", None)
+                else:
+                    o["door"] = door                 # PT-3: the prefab's drawn door column (the den's is 3)
                 continue
             o["roof"] = t.get("roof", theme)
             o["wall"] = walls[WALL_SLOT.get(o.get("wall"), 0)]

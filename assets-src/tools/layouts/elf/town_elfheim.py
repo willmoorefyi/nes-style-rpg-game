@@ -2,8 +2,9 @@
 
   python3 -I assets-src/tools/layouts/elf/town_elfheim.py && python3 -I assets-src/tools/build_map.py elfheim
 
-An original layout. A ring of living hedges, thick and bent into bastions, closes the town; the only way in is the
-south gate. A spring wells up under the castle rise in the north-west and its stream winds through the middle of the
+An original layout. A ring of living hedges, thick and bent into bastions, closes the town; the ways in are the
+south gate and (PT-5, docs/PLAYTEST_ELFHEIM_PLAN.md) the west and east gates at the ends of the north lane, each
+matching the door of the same side of the world map's icon. A spring wells up under the castle rise in the north-west and its stream winds through the middle of the
 town to a pond in the south-east, crossed by the high street and two footbridges. The houses stand among great oaks,
 green-roofed (the `elf` roof style); the shops face the high street and the lanes. North of an inner hedge the
 ground climbs to a wooded rise where the castle stands; its gate (`north_gate`) leads to `elfheim-castle`.
@@ -26,10 +27,11 @@ W, H = 52, 50
 CX = 25                                          # the high street, x 25-26; the castle door column
 NOTE = """Concept: an elven town closed by a ring of living hedges, its houses among great oaks, a spring stream through
 the middle and the castle on a wooded rise beyond an inner hedge.
-Distinct: a hedge ring bent into green bastions with a single south gate; a spring pool under the castle rise feeding
+Distinct: a hedge ring bent into green bastions with a south gate and two side gates; a spring pool under the castle rise feeding
 a stream that ends in a lily pond; an inner hedge with topiary guards between the town and the castle rise; a herb
 garden by the herbalist's house.
-Topology: one outdoor map, the south gate -> the high street -> the north gate (elfheim-castle); 6 houses, 5 shops
+Topology: one outdoor map, the south gate -> the high street -> the north gate (elfheim-castle), the west and
+east gates onto the north lane; 6 houses, 5 shops
 and the inn open off the high street and five lanes; no stairs."""
 
 g = Grid(W, H, ".")
@@ -59,6 +61,10 @@ g.rect(27, 39, 32, 39, ",", only=ROAD)                    # the inn's step
 g.rect(27, 33, 44, 33, ",", only=ROAD + "~")              # the east lane, over the second footbridge to the warden
 g.rect(32, 33, 33, 33, "=")
 g.rect(44, 32, 44, 32, ",", only=ROAD)
+SIDE_ROWS = (23, 24)                                      # PT-5: the side gates, 2 wide, at the north lane's ends
+g.rect(0, SIDE_ROWS[0], 5, SIDE_ROWS[1], ",")             # west: row 23 joins the lane (x 4), row 24 the west lane
+g.rect(46, SIDE_ROWS[0], W - 1, SIDE_ROWS[1], ",")        # east: row 23 joins the lane's end (x 45) ...
+g.rect(44, SIDE_ROWS[1], 45, SIDE_ROWS[1], ",")           # ... and row 24 meets it at x 44
 
 town = Outdoor()
 obj, deco, oak, lamp, fir = town.obj, town.deco, town.oak, town.lamp, town.fir
@@ -134,6 +140,7 @@ obj(type="signpost", x=SIGNPOST[0], y=SIGNPOST[1])
 INSPECT = [{"x": SIGNPOST[0], "y": SIGNPOST[1], "text": [
     "The sign reads: \"ELFHEIM. Walk softly; the hedges listen.\"",
     "North up the high street: the lanes to the shops and houses, then the castle on the rise.",
+    "The north lane runs on through the west and east gates.",
     "The magic shops: west along the south lane, then down to the magic lane. The inn stands east of the street.",
 ]}]
 
@@ -155,11 +162,13 @@ doc = {
     "name": "Elfheim",
     "kits": ["town", "castle"],
     "music": "town",
-    "entrances": {"gate": [CX, 46]},
+    "entrances": {"gate": [CX, 46], "west_gate": [2, SIDE_ROWS[0]], "east_gate": [W - 3, SIDE_ROWS[0]]},
     "objects": town.objects,
     "npcs": people.outdoor(),
     "inspect": INSPECT,
-    "transitions": [{"x": x, "y": H - 1, "targetMap": "overworld", "targetEntrance": "elf_elfheim"} for x in (CX, CX + 1)],
+    "transitions": [{"x": x, "y": H - 1, "targetMap": "overworld", "targetEntrance": "elf_elfheim"} for x in (CX, CX + 1)]
+    + [{"x": x, "y": y, "targetMap": "overworld", "targetEntrance": f"elf_elfheim_{side}"}
+       for side, x in (("west", 0), ("east", W - 1)) for y in SIDE_ROWS],
     "encounterRate": {"min": 999, "max": 999},
     "encounters": [],
     "canSave": True,

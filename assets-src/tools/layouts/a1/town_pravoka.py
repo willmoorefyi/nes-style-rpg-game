@@ -72,15 +72,21 @@ HOUSE = dict(type="house", w=5, door=2, windows=[1, 3])
 
 
 def home(slug, x, y, h, storeys, roof, wall, chimney=None, **kw):
-    obj(**HOUSE, name=f"house_{slug}", x=x, y=y, h=h, storeys=storeys, roof=roof, wall=wall,
-        **({"chimney": chimney} if chimney is not None else {}), **kw,
+    obj(**{**HOUSE, **kw}, name=f"house_{slug}", x=x, y=y, h=h, storeys=storeys, roof=roof, wall=wall,
+        **({"chimney": chimney} if chimney is not None else {}),
         enter={"map": f"{SITE.TOWN}-house-{slug}", "entrance": "door"})
+
+
+SHUTTERS = "The shutters are barred. A notice is nailed across them: \"CLOSED BY ORDER OF CAPTAIN BIKKE.\""
+GATES: list[dict] = []                              # PT-2: the shop doors stay shut while the pirates hold the town
 
 
 def shop(name, part, x, y, h, storeys, roof, wall, sign, chimney=None):
     obj(**HOUSE, name=name, x=x, y=y, h=h, storeys=storeys, roof=roof, wall=wall, sign=sign,
         **({"chimney": chimney} if chimney is not None else {}),
         enter={"map": f"{SITE.TOWN}-{part}", "entrance": "door"})
+    GATES.append({"id": f"pravoka_shut_{name}", "x": x + HOUSE["door"], "y": y + h - 1,
+                  "requiredFlag": PEOPLE.BEATEN, "message": SHUTTERS, "permanent": False})
 
 
 # Rope Walk (doors on y 13, the street on y 14-15)
@@ -96,14 +102,15 @@ obj(type="prefab", prefab="inn", name="inn", x=23, y=19, w=4, h=5, door=2, sign=
     enter={"map": f"{SITE.TOWN}-inn", "entrance": "door"})
 # the high street (doors on y 33)
 shop("armor_shop", "armor-shop", 3, 29, 5, 2, "brown", "plaster", "armor", 1)
-obj(**{**HOUSE, "windows": [1]}, name="sail_loft", x=8, y=30, h=4, roof="rose", wall="white")         # no door: shut
-obj(**{**HOUSE, "windows": [3]}, name="pirates_den", x=17, y=30, h=4, roof="slate", wall="stone")    # boarded up
+home("loft", 8, 30, 4, 1, "rose", "white", windows=[1])                       # PT-3: the sail loft
+obj(**{**HOUSE, "windows": [3], "door": 3}, name="pirates_den", x=17, y=30, h=4, roof="slate", wall="stone",
+    enter={"map": f"{SITE.TOWN}-den", "entrance": "door"})                    # PT-3: the den (its art's door, col 3)
 # the cooper's lane (doors on y 39)
 home("cooper", 3, 36, 4, 1, "red", "ochre", 3)
-obj(**{**HOUSE, "windows": []}, name="boarded_cottage", x=8, y=36, h=4, roof="brown", wall="rose")
+home("cottage", 8, 36, 4, 1, "brown", "rose", windows=[])                     # PT-3: the boarded cottage
 # over the water on piles, the doors onto the landing (y 19)
 home("warehouse", 31, 15, 4, 1, "brown", "stone", None, on_water=True)
-obj(**{**HOUSE, "windows": [1, 3]}, name="old_warehouse", x=37, y=15, h=4, roof="slate", wall="stone", on_water=True)
+home("storehouse", 37, 15, 4, 1, "slate", "stone", None, on_water=True)      # PT-3: the old warehouse
 # the lighthouse shelf: the keeper's house (the clinic) and the tower on the shelf's tip, at the range's foot
 home("lighthouse", 38, 2, 4, 1, "red", "white", 3)
 LIGHTHOUSE = (41, 10)
@@ -174,6 +181,7 @@ doc = {
     "npcs": PEOPLE.npcs(),
     "inspect": INSPECT,
     "scriptedEncounters": [PEOPLE.CAPTAIN_FIGHT],
+    "keyItemGates": GATES,
     "edge_exits": {"west": {"targetMap": "overworld", "targetEntrance": SITE.ANCHOR}},
     "noWander": PEOPLE.NO_WANDER,
     "road_check": {"materials": ["cobble", "dirt"], "ends": LANE_ENDS},

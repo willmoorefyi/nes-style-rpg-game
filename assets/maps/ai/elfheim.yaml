@@ -14,6 +14,8 @@ art:
     assets/maps/ai/elfheim/above_1_2.png, null, assets/maps/ai/elfheim/above_2_0.png, assets/maps/ai/elfheim/above_2_1.png, assets/maps/ai/elfheim/above_2_2.png, null, null, null, null, null]
 entrances:
   gate: [25, 46]
+  west_gate: [2, 23]
+  east_gate: [49, 23]
   north_gate: [25, 13]
   weapon_shop: [21, 23]
   armor_shop: [30, 23]
@@ -44,9 +46,9 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0,
   0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1,
   1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-  1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 0, 0, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 8, 8, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 8,
-  8, 9, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 8, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 0, 0, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 8, 8, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 1, 1, 8, 1, 1, 0, 0, 1, 1, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8,
+  8, 9, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 0, 0, 8, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 8, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 8, 8, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
   1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2, 2, 2, 2,
   2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 8, 8, 0, 0, 0,
@@ -254,6 +256,10 @@ npcs:
 transitions:
 - {x: 25, y: 49, targetMap: overworld, targetEntrance: elf_elfheim}
 - {x: 26, y: 49, targetMap: overworld, targetEntrance: elf_elfheim}
+- {x: 0, y: 23, targetMap: overworld, targetEntrance: elf_elfheim_west}
+- {x: 0, y: 24, targetMap: overworld, targetEntrance: elf_elfheim_west}
+- {x: 51, y: 23, targetMap: overworld, targetEntrance: elf_elfheim_east}
+- {x: 51, y: 24, targetMap: overworld, targetEntrance: elf_elfheim_east}
 - {x: 25, y: 12, targetMap: elfheim-castle, targetEntrance: gate}
 - {x: 21, y: 22, targetMap: elfheim-weapon-shop, targetEntrance: door, effect: door}
 - {x: 30, y: 22, targetMap: elfheim-armor-shop, targetEntrance: door, effect: door}
@@ -275,5 +281,5 @@ canSave: true
 inspect:
 - x: 27
   y: 46
-  text: ['The sign reads: "ELFHEIM. Walk softly; the hedges listen."', 'North up the high street: the lanes to the shops and houses, then the castle on the rise.', 'The magic shops: west along the south
-      lane, then down to the magic lane. The inn stands east of the street.']
+  text: ['The sign reads: "ELFHEIM. Walk softly; the hedges listen."', 'North up the high street: the lanes to the shops and houses, then the castle on the rise.', The north lane runs on through the west
+      and east gates., 'The magic shops: west along the south lane, then down to the magic lane. The inn stands east of the street.']

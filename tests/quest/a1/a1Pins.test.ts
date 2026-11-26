@@ -57,7 +57,9 @@ describe('act 1 pins (NW-3, 3.6.2)', () => {
     for (const [name, now, then] of [['objects', nw.objects, today.objects], ['inspect', nw.inspect, today.inspect],
       ['npcs', nw.npcs, today.npcs], ['vehicles', nw.vehicles, today.vehicles]] as const) {
       // (the lighthouse is placed anew, NW-RINT: its own test below)
-      const mine = (now ?? []).filter((o) => act1Cell([o.x, o.y]) && (o as { name?: string }).name !== 'lighthouse');
+      // (and PT-4's mooring posts at Pravoka's dock, docs/PLAYTEST_ELFHEIM_PLAN.md)
+      const mine = (now ?? []).filter((o) => act1Cell([o.x, o.y])
+        && !['lighthouse', 'pravoka_mooring'].includes((o as { name?: string }).name ?? ''));
       expect(mine.length, name).toBeGreaterThan(0);
       for (const o of mine) expect(was(then).has(key([o.x, o.y])), `${name} at (${o.x}, ${o.y})`).toBe(true);
     }

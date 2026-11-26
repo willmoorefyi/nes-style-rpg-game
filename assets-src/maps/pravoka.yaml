@@ -180,13 +180,24 @@ objects:
   w: 5
   door: 2
   windows: [1]
-  name: sail_loft
+  name: house_loft
   x: 8
   y: 30
   h: 4
+  storeys: 1
   roof: pra_tar
   wall: pra_tar
-- {type: prefab, w: 5, name: pirates_den, x: 17, y: 30, h: 4, prefab: pra_tavern, ridge_rows: 1}
+  enter: {map: pravoka-house-loft, entrance: door}
+- type: prefab
+  w: 5
+  door: 3
+  name: pirates_den
+  x: 17
+  y: 30
+  h: 4
+  enter: {map: pravoka-den, entrance: door}
+  prefab: pra_tavern
+  ridge_rows: 1
 - type: prefab
   w: 5
   door: 2
@@ -201,16 +212,19 @@ objects:
   w: 5
   door: 2
   windows: []
-  name: boarded_cottage
+  name: house_cottage
   x: 8
   y: 36
   h: 4
+  storeys: 1
   roof: pra_tar
   wall: pra_tar_red
+  enter: {map: pravoka-house-cottage, entrance: door}
 - type: house
   w: 5
   door: 2
   windows: *id001
+  on_water: true
   name: house_warehouse
   x: 31
   y: 15
@@ -218,19 +232,20 @@ objects:
   storeys: 1
   roof: pra_tar
   wall: pra_tar_red
-  on_water: true
   enter: {map: pravoka-house-warehouse, entrance: door}
 - type: house
   w: 5
   door: 2
-  windows: [1, 3]
-  name: old_warehouse
+  windows: *id001
+  on_water: true
+  name: house_storehouse
   x: 37
   y: 15
   h: 4
+  storeys: 1
   roof: pra_tar
   wall: pra_tar_red
-  on_water: true
+  enter: {map: pravoka-house-storehouse, entrance: door}
 - type: house
   w: 5
   door: 2
@@ -540,8 +555,8 @@ npcs:
   x: 2
   y: 36
   hideIf: BIKKE_DEFEATED
-  dialog: ['Pirate: Welcome to Pravoka, friends. Captain''s town now.', 'Pay at the shops, sleep at the inn, and don''t go near the brig. Simple
-      rules.']
+  dialog: ['Pirate: Welcome to Pravoka, friends. Captain''s town now.', 'The shops are shut by the Captain''s order. The inn and the keeper''s
+      sick-room stay open, at a price.', 'Sleep where you''re let, and don''t go near the brig. Simple rules.']
 - id: pirate_quay_n
   sprite: villager
   tint: '#8c7a64'
@@ -563,7 +578,7 @@ npcs:
   x: 18
   y: 34
   hideIf: BIKKE_DEFEATED
-  dialog: ['Pirate: That''s our den behind me. The door''s nailed shut because the last owner kept knocking.']
+  dialog: ['Pirate: That''s our den behind me. Knock if you like. The quartermaster counts your coin before you''re in.']
 - id: pirate_den_b
   sprite: guard
   tint: '#8c7a64'
@@ -612,6 +627,7 @@ npcs:
         have a prince who will not wake, they say.']
   - text: ['I sailed to Elfheim forty times before these pirates came. I''ll not see it again, I think.', 'South down the channel, west along
         the coast. A week with a fair wind. If anyone held a ship.']
+  showIf: BIKKE_DEFEATED
 - id: herbwife_hint
   sprite: vendor_f
   x: 24
@@ -622,6 +638,7 @@ npcs:
         to the north-west, over the pass. Blind as a stone, poor thing.']
   - text: ['Herbs, dried and fresh! Not much else to sell with the pirates eating everything.', 'If it''s a real cure you want, ask Matoya. She
         keeps a cave in the north-west woods, over the pass.']
+  showIf: BIKKE_DEFEATED
 - id: fishwife
   sprite: vendor_f
   x: 20
@@ -630,6 +647,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [Fresh fish again! The boats went out this morning for the first time in a month.]
   - text: ['Fish? I''ve three herrings and a sorry crab. The boats can''t put out past the pier.']
+  showIf: BIKKE_DEFEATED
   tint: '#a0c0d8'
 - id: fisher
   sprite: villager
@@ -639,6 +657,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Listen to that: oars! The whole fleet''s out. Pravoka breathes again.']
   - text: [The pirates let me fish off the pier. Generous. The fish off the pier are this long.]
+  showIf: BIKKE_DEFEATED
 - id: dockhand_a
   sprite: farmer
   x: 30
@@ -659,6 +678,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Every lamp on Lantern Street lit, and nobody to blow them out for a laugh. Lovely.']
   - text: [I light the lamps at dusk. The pirates blow them out. I light them again. It passes the evening.]
+  showIf: BIKKE_DEFEATED
   wander: true
 - id: watchman
   sprite: guard
@@ -668,6 +688,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Town watch! Er, we were biding our time. Waiting for the right moment. Which you found. Well done.']
   - text: [The town watch is on duty. Quietly. Out of sight of the quay.]
+  showIf: BIKKE_DEFEATED
 - id: girl
   sprite: villager_f
   x: 8
@@ -676,6 +697,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [My father works the warehouse again. He brought me a sugared fig!]
   - text: [The pirate captain has a cutlass taller than me. I saw it. I'm not scared. Much.]
+  showIf: BIKKE_DEFEATED
   wander: true
 - id: old_man
   sprite: old_man
@@ -685,6 +707,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Look there: the lighthouse will burn again tonight. Ships will find the fjord.']
   - text: [From this bench you can see the whole fjord. Not one sail on it. Not since the brig came.]
+  showIf: BIKKE_DEFEATED
 inspect:
 - x: 2
   y: 33
@@ -708,6 +731,17 @@ scriptedEncounters:
   isBoss: true
   message: 'Bikke: All hands! These four think Pravoka is free for the taking. Show them the price!'
   postVictoryCutscene: a1_bikke_yields
+keyItemGates:
+- {id: pravoka_shut_weapon_shop, x: 19, y: 13, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them:
+    "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_white_magic, x: 5, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them:
+    "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_black_magic, x: 10, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them:
+    "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_item_shop, x: 19, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them:
+    "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_armor_shop, x: 5, y: 33, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them:
+    "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
 edge_exits:
   west: {targetMap: overworld, targetEntrance: a1_pravoka}
 noWander:

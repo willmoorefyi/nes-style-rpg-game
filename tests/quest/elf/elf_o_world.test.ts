@@ -126,13 +126,36 @@ describe('NW-R ELF: Elfland on the NW world source', () => {
 
   it('the icons stand on their doors and every ELF door has exactly one way out', () => {
     const icon = (name: string): Obj => src.objects.find((o) => o.name === name)!;
-    for (const [name, e] of [['elfheim', 'elf_elfheim'], ['western_keep', 'elf_keep'], ['marsh_cave', 'elf_marsh']]) {
+    // PT-5 (docs/PLAYTEST_ELFHEIM_PLAN.md): Elfheim has three doors, the south one and the two side ones
+    const sites: [string, string[]][] = [['elfheim', ['elf_elfheim', 'elf_elfheim_west', 'elf_elfheim_east']],
+      ['western_keep', ['elf_keep']], ['marsh_cave', ['elf_marsh']]];
+    for (const [name, ents] of sites) {
       const o = icon(name);
-      const door = src.transitions.find((t) => Math.abs(t.x - E[e][0]) + Math.abs(t.y - E[e][1]) === 1)!;
-      expect(o.walk_cells!.map(([i, j]) => `${o.x + i},${o.y + j}`), name).toEqual([`${door.x},${door.y}`]);
-      const out = DIRS.filter(([dx, dy]) => walk(door.x + dx, door.y + dy));
-      expect(out, name).toHaveLength(1);
+      const doors = ents.map((e) => src.transitions.find((t) => Math.abs(t.x - E[e][0]) + Math.abs(t.y - E[e][1]) === 1
+        && o.walk_cells!.some(([i, j]) => o.x + i === t.x && o.y + j === t.y))!);
+      expect(o.walk_cells!.map(([i, j]) => `${o.x + i},${o.y + j}`).sort(), name)
+        .toEqual(doors.map((d) => `${d.x},${d.y}`).sort());
+      for (const [door, e] of doors.map((d, k) => [d, ents[k]] as const)) {
+        const out = DIRS.filter(([dx, dy]) => walk(door.x + dx, door.y + dy));
+        expect(out, `${name} ${e}`).toEqual([[E[e][0] - door.x, E[e][1] - door.y]]);
+      }
     }
+  });
+
+  it("PT-5: Elfheim's south door is the icon's bottom-middle cell, entered from the gate south of it", () => {
+    const o = src.objects.find((x) => x.name === 'elfheim')!;
+    const h = o.parts!.length;
+    const w = o.parts![0].length;
+    const south = src.transitions.find((t) => t.targetMap === 'elfheim' && t.targetEntrance === 'gate')!;
+    expect([south.x, south.y]).toEqual([o.x + (w >> 1), o.y + h - 1]);
+    expect([E.elf_elfheim[0], E.elf_elfheim[1]]).toEqual([south.x, south.y + 1]);
+    const side = (ent: string) => src.transitions.find((t) => t.targetMap === 'elfheim' && t.targetEntrance === ent)!;
+    expect([side('west_gate').x, side('west_gate').y]).toEqual([o.x, o.y + (h >> 1)]);
+    expect([side('east_gate').x, side('east_gate').y]).toEqual([o.x + w - 1, o.y + (h >> 1)]);
+    expect(E.elf_elfheim_west).toEqual([o.x - 1, o.y + (h >> 1)]);
+    expect(E.elf_elfheim_east).toEqual([o.x + w, o.y + (h >> 1)]);
+    // the south door's transition is Elfheim's first (`wayOutSearch` takes the first)
+    expect(src.transitions.filter((t) => t.targetMap === 'elfheim')[0].targetEntrance).toBe('gate');
   });
 
   it('the waystone stands beside the king\'s road; its inspect cell is its foot', () => {

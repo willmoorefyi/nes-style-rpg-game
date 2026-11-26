@@ -39,6 +39,10 @@ OBJECTS = [
     {"type": "deco", "name": "pravoka", "parts": [["town_pravoka_icon_0_0", "town_pravoka_icon_0_1", "town_pravoka_icon_0_2"], ["town_pravoka_icon_1_0", "town_pravoka_icon_1_1", "town_pravoka_icon_1_2"], ["town_pravoka_icon_2_0", "town_pravoka_icon_2_1", "town_pravoka_icon_2_2"]], "x": 38, "y": -13, "walk_cells": [[1, 2]], "collide": "alpha", "on_water": True},
     {"type": "deco", "name": "lighthouse", "parts": [["lighthouse_icon_0_0", "lighthouse_icon_0_1"], ["lighthouse_icon_1_0", "lighthouse_icon_1_1"], ["lighthouse_icon_2_0", "lighthouse_icon_2_1"]], "x": 46, "y": -13, "collide": "alpha"},
     {"type": "deco", "name": "cairn", "parts": [["boulder"]], "x": 34, "y": -15},
+    # PT-4 (docs/PLAYTEST_ELFHEIM_PLAN.md): Pravoka's berth, marked by two mooring posts in the water either side of
+    # the dock (non-blocking: the ship sails past them), beside the plank quay of TEMPLATE (rel (39, -9), (39, -8))
+    {"type": "deco", "name": "pravoka_mooring", "parts": [["dock_post_icon_0_0"]], "x": 40, "y": -10, "on_water": True, "block": False},
+    {"type": "deco", "name": "pravoka_mooring", "parts": [["dock_post_icon_0_0"]], "x": 40, "y": -8, "on_water": True, "block": False},
 ]
 INSPECT = [
     {"x": 22, "y": -4, "text": ["Here lies Erdrick."]},
@@ -62,6 +66,7 @@ NORTH_SHORE = (1, -19)
 JETTY = [(0, 7), (0, 8), (0, 9)]
 ALDI_SEED = (0, 10)
 PRAVOKA_DOCK = (40, -9)
+PRAVOKA_QUAY = [(39, -9), (39, -8)]      # PT-4: the plank quay beside the dock (TEMPLATE `=`)
 CITY_ICON = [(-2, -4), (-2, -3), (-2, -2), (-2, -1), (-1, -4), (-1, -3), (-1, -2), (-1, -1), (0, -4), (0, -3), (0, -2), (0, -1), (1, -4), (1, -3), (1, -2), (1, -1), (2, -4), (2, -3), (2, -2), (2, -1)]
 PRAVOKA_ICON = [(38, -13), (38, -12), (38, -11), (39, -13), (39, -12), (39, -11), (40, -13), (40, -12), (40, -11)]
 TEMPLE_ICON = [(-14, -10), (-14, -9), (-13, -10), (-13, -9), (-12, -10), (-12, -9)]
@@ -116,8 +121,8 @@ TEMPLATE = (
     "            mmmmmmf#############################mm##########mmmm.mmmooooo ",
     "           ommmmmmmf###########################mmmm#########mmmm....ooooo ",
     "          #..mmmmm..##########################..≈≈mm########.mmm....ooooo ",
-    "          #.....mm..##########################..≈≈≈mm#######..m.....ooooo ",
-    "          #....,....######,,,,,###############..rrmmm#######........ooooo ",
+    "          #.....mm..##########################..≈≈≈mm#######..m....=ooooo ",
+    "          #....,....######,,,,,###############..rrmmm#######.......=ooooo ",
     "         ##....,,...####.,,.,...,###...######..rrrmmmm######.......oooooo ",
     "         ###....,,.####.,,..,....,##...######..rrrmmmmm#####....ssooooooo ",
     "         ####....,#####,,...,.≈≈..##...#####..rrrmmmmmm###########        ",

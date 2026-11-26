@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import type { MapData, MapNPC } from '../../../src/types/index.js';
-import { baseTerrain, npcOutcome, terrainAllows, type FieldState } from '../../../src/systems/fieldRules.js';
+import { baseTerrain, gateAt, gateCheck, npcOutcome, terrainAllows, type FieldState } from '../../../src/systems/fieldRules.js';
 import { validateMapData } from '../../../src/core/schemaValidation.js';
 import { canonRows } from '../questMaps.js';
 
@@ -121,9 +121,71 @@ describe('Pravoka: Bikke and the pirates (S2)', () => {
     }
   });
 
-  it('the hint NPCs name Elfheim and Matoya before and after the fight', () => {
+  it('the hint NPCs name Elfheim and Matoya once the fight is won (PT-2: indoors before it)', () => {
     for (const [id, word] of [['old_sailor_hint', 'Elfheim'], ['herbwife_hint', 'Matoya']]) {
-      for (const f of [[], ['BIKKE_DEFEATED']]) expect(npcOutcome(npc(id), state(f), enc).dialog.join(' ')).toContain(word);
+      expect(npcOutcome(npc(id), state(['BRIDGE_BUILT']), enc).present, id).toBe(false);
+      expect(npcOutcome(npc(id), state(['BRIDGE_BUILT', 'BIKKE_DEFEATED']), enc).dialog.join(' ')).toContain(word);
+    }
+  });
+});
+
+describe('PT-2: Pravoka under the pirates (docs/PLAYTEST_ELFHEIM_PLAN.md)', () => {
+  const before = state(['BRIDGE_BUILT']);
+  const after = state(['BRIDGE_BUILT', 'BIKKE_DEFEATED']);
+  const present = (f: FieldState) => town.npcs.filter((n) => npcOutcome(n, f, town.scriptedEncounters ?? []).present);
+
+  it('before BIKKE_DEFEATED only the pirates and their captain are out; after it the townsfolk are back', () => {
+    const out = present(before);
+    expect(out.length).toBeGreaterThanOrEqual(7);
+    for (const n of out) expect(n.hideIf, `${n.id} is out under the pirates`).toBe('BIKKE_DEFEATED');
+    const folk = present(after).filter((n) => !n.hideIf);
+    expect(folk.length).toBeGreaterThanOrEqual(10);
+    for (const id of ['fishwife', 'fisher', 'lamplighter', 'watchman', 'girl', 'old_man']) {
+      expect(folk.map((n) => n.id)).toContain(id);
+    }
+  });
+
+  it('every shop door is shuttered before the fight and open after it; the inn and the clinic stay open', () => {
+    const shops = town.transitions.filter((t) => /^pravoka-(.*-shop|white-magic|black-magic)$/.test(t.targetMap));
+    expect(shops).toHaveLength(5);
+    for (const t of shops) {
+      const g = gateAt(town, { x: t.x, y: t.y });
+      expect(g, t.targetMap).not.toBeNull();
+      const shut = gateCheck(g!, before);
+      expect(shut.open, t.targetMap).toBe(false);
+      expect(shut.message).toContain('CLOSED BY ORDER OF CAPTAIN BIKKE');
+      expect(gateCheck(g!, after).open, t.targetMap).toBe(true);
+    }
+    for (const m of ['pravoka-inn', 'pravoka-house-lighthouse']) {
+      const t = town.transitions.find((x) => x.targetMap === m)!;
+      expect(gateAt(town, { x: t.x, y: t.y }), m).toBeNull();
+    }
+  });
+});
+
+describe('PT-3: every drawn door in Pravoka leads into a room and back out to it', () => {
+  type Obj = { type: string; name?: string; door?: number; enter?: { map: string } };
+  const objs = (parse(readFileSync('assets-src/maps/pravoka.yaml', 'utf-8')) as { objects: Obj[] }).objects;
+  const doors = objs.filter((o) => (o.type === 'house' || o.type === 'prefab') && o.door !== undefined);
+
+  it('every house or prefab with a door has a room behind it (no shut houses left)', () => {
+    expect(doors.length).toBeGreaterThanOrEqual(16);
+    for (const o of doors) expect(o.enter, `${o.name}'s door leads nowhere`).toBeDefined();
+  });
+
+  it('each door: its entrance in front of it, its room, and every way back out to that entrance', () => {
+    for (const o of doors) {
+      const here = o.name!;
+      const [ex, ey] = town.entrances![here] ?? [];
+      expect(ex, `${here}: no entrance in front of the door`).toBeDefined();
+      const door = town.transitions.find((t) => t.x === ex && t.y === ey - 1)!;
+      expect(door, `${here}: no transition on the door`).toBeDefined();
+      expect(door.targetMap).toBe(o.enter!.map);
+      const room = load(door.targetMap);
+      expect(room.entrances![door.targetEntrance!], `${door.targetMap}:${door.targetEntrance}`).toBeDefined();
+      const back = room.transitions.filter((t) => t.targetMap === 'pravoka');
+      expect(back.length, door.targetMap).toBeGreaterThan(0);
+      for (const t of back) expect(t.targetEntrance, door.targetMap).toBe(here);
     }
   });
 });

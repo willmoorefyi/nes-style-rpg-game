@@ -35,6 +35,15 @@ ELFLAND = ((-52, 15), (-44, 16), (-38, 19), (-32, 25), (-24, 31), (-16, 36), (-8
 PORT = (-12, 33)
 
 
+def elf_sites() -> dict[str, tuple[int, int]]:
+    """The anchored sites, plus Elfheim's side arrivals (PT-5): the cells beside its icon's middle row, 2 west / east
+    of the gate and 2 north (the icon stands north of the gate, its door the bottom-middle cell)."""
+    out = sites("elf")
+    gx, gy = out["elf_elfheim"]
+    out["elf_elfheim_west"], out["elf_elfheim_east"] = (gx - 2, gy - 2), (gx + 2, gy - 2)
+    return out
+
+
 def spec() -> RegionSpec:
     return RegionSpec(
         region="elf",
@@ -47,7 +56,7 @@ def spec() -> RegionSpec:
         isles=[IsleField((-22, 88), 12, 4, 106), IsleField((-60, 88), 12, 5, 109)],
         climate=[ClimateHint("wet", (-47, 61), 6), ClimateHint("wet", (-41, 67), 6), ClimateHint("wet", (-51, 68), 5),
                  ClimateHint("wet", (-24, 49), 10)],
-        sites=sites("elf"),
+        sites=elf_sites(),
         towns=("elf_elfheim",),
         docks=[Dock("elf_port", PORT, "aldi", "elf_elfheim")],
         corridors=[Corridor("elf_port", (PORT, (-12, 36), "elf_elfheim")),

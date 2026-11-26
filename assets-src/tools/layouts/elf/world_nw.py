@@ -65,13 +65,16 @@ class Place:
                    for dx, dy in N8 + [(0, 0)])
 
 
-def elfheim(p: Place, gate: tuple[int, int], door: tuple[int, int]) -> None:
+def elfheim(p: Place, gate: tuple[int, int], door: tuple[int, int], sides: tuple) -> None:
+    """PT-5: the icon above its door (the bottom-middle cell, where the art's gate is, entered from the gate south of
+    it) and its two side doors (the middle row's end cells, entered from the arrivals beside them)."""
     parts = _parts("town_elfheim")
     w, h = len(parts[0]), len(parts)
-    x0, y0 = door[0] - w // 2, door[1]
+    x0, y0 = door[0] - w // 2, door[1] - (h - 1)
     parts[0][0] = parts[0][w - 1] = "tree_clump"
-    p.stamp([(x0 + i, y0 + j) for j in range(h) for i in range(w)], ".")
-    p.deco(x0, y0, parts, walk=((door[0] - x0, 0),), name="elfheim", collide="alpha")
+    p.stamp([(x0 + i, y0 + j) for j in range(h) for i in range(w)] + list(sides), ".")
+    walk = ((door[0] - x0, h - 1), (0, h // 2), (w - 1, h // 2))
+    p.deco(x0, y0, parts, walk=walk, name="elfheim", collide="alpha")
     p.stamp([gate], ",")
 
 
@@ -158,8 +161,9 @@ def content(g: np.ndarray, meta: dict, doors: dict) -> dict:
     `doors`: entrance -> door offset."""
     ents = {e: tuple(meta["entrances"][e]) for e in ("elf_elfheim", "elf_keep", "elf_marsh")}
     door = {e: (x + doors[e][0], y + doors[e][1]) for e, (x, y) in ents.items()}
+    sides = tuple(tuple(meta["entrances"][e]) for e in ("elf_elfheim_west", "elf_elfheim_east"))
     p = Place(g)
-    elfheim(p, ents["elf_elfheim"], door["elf_elfheim"])
+    elfheim(p, ents["elf_elfheim"], door["elf_elfheim"], sides)
     keep(p, door["elf_keep"])
     marsh(p, door["elf_marsh"])
     port = next(d for d in meta["docks"] if d["id"] == "elf_port")
@@ -167,7 +171,9 @@ def content(g: np.ndarray, meta: dict, doors: dict) -> dict:
     marsh_road = RD.route(p.g, p.blocked, ents["elf_elfheim"], ents["elf_marsh"])
     errors = [f"elf: the king's road to {e} cannot be routed" for e, r in (("elf_keep", keep_road),
                                                                           ("elf_marsh", marsh_road)) if r is None]
-    road = set(keep_road or []) | set(marsh_road or [])
+    side_roads = [RD.route(p.g, p.blocked, s, ents["elf_elfheim"]) for s in sides]     # PT-5: to the side doors
+    errors += [f"elf: no road to Elfheim's side door at {s}" for s, r in zip(sides, side_roads) if r is None]
+    road = set(keep_road or []) | set(marsh_road or []) | {c for r in side_roads for c in (r or [])}
     if keep_road:
         waystone(p, keep_road, road)
     dock_post(p, port, road | set(ents.values()))

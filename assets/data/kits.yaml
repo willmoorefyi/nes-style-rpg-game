@@ -54,7 +54,7 @@ naked:
 # band shops at (the stage at its boss, or at its end). L5 black and L6-L8 spells come with W1-G and are not in
 # any kit yet. The 4-member price of a town kit drives proof (f). INT may tune the kits (5.5).
 # B1 Cornelia: the act-1 shops (the `full` gear with a Cap each)
-w_s1:
+w_s1: &w_s1
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
@@ -69,7 +69,9 @@ w_pravoka: &w_t2
   white_mage: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
   black_mage: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   red_mage: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-w_s2: *w_t2
+# PT-2 (docs/PLAYTEST_ELFHEIM_PLAN.md): Pravoka's shops are shut until Bikke is beaten, so S2 fights in Cornelia's
+# kit (flagged to the integrator: W1-F owns the w_* kits)
+w_s2: *w_s1
 w_s3: *w_t2
 # B3 Elfheim (the dwarf hall sells items only)
 w_elfheim: &w_t3

@@ -7,7 +7,10 @@ integrator regenerates them under the lock, never hand-merges (QUEST 4.0).
 TOWN = "elfheim"
 ANCHOR = "elf_elfheim"         # the land-gate entrance of the compiled overworld (assets/data/world-anchors.yaml)
 GATE = (82, 150)               # the anchor's cell, its 2.2 target (+-2 per axis allowed): the arrival on leaving
-ICON = [(x, y) for y in range(151, 154) for x in range(81, 84)]   # the town icon's cells (blocked art), 3x3
-DOOR = (82, 151)               # the icon cell whose transition leads to the town map's `gate` entrance
+# PT-5 (docs/PLAYTEST_ELFHEIM_PLAN.md): the icon stands north of the gate, its door the bottom-middle cell (where the
+# art draws the gate; `world_specs/later_doors.REDOOR`), with a side door on each end of its middle row
+ICON = [(x, y) for y in range(147, 150) for x in range(81, 84)]   # the town icon's cells (blocked art), 3x3
+DOOR = (82, 149)               # the icon cell whose transition leads to the town map's `gate` entrance
+WEST_DOOR, EAST_DOOR = (81, 148), (83, 148)   # -> `west_gate` / `east_gate`, entered from (80, 148) / (84, 148)
 DOCK = {"id": "elf_port", "x": 84, "y": 147, "basin": "aldi"}      # the harbour on Elfland's north coast
 SPAWN = None                   # no vehicle starts here

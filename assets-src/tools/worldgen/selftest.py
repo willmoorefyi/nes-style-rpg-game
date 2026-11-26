@@ -101,6 +101,25 @@ def case_fords() -> str:
     return "fords: 3 crossings -> 2 fords on the centre line, 1 cut"
 
 
+def case_ford_bend() -> str:
+    """PT-1: a corridor that runs down a river's bend gets its ford across the stream (walkable ends, river flanks),
+    never along it; a river the corridor runs beside with no shore-to-shore span gets none."""
+    grid = np.full((14, 14), ".")
+    for y in range(0, 6):
+        grid[y, 5] = "r"                     # the stream flows south ...
+    for x in range(5, 13):
+        grid[6, x] = "r"                     # ... and turns east along the corridor's row
+    grid[7, 6:13] = "m"                      # rock on its south bank: no span east of the bend
+    corr = {"c": [(x, 6) for x in range(1, 12)]}
+    fl, cut = hydro.fords(grid, corr, [], np.zeros((14, 14), bool))
+    assert cut == 0 and len(fl["c"]) == 1, (fl, cut)
+    (x, y), = fl["c"]
+    assert grid[y, x - 1] not in "rm=" and grid[y, x + 1] not in "rm=" or \
+        grid[y - 1, x] not in "rm=o" and grid[y + 1, x] not in "rm=o", ("a ford with a dry end", fl)
+    assert (x, y) == (5, 5), fl                # across the south-flowing stream, one cell above the bend
+    return "ford_bend: a corridor down a river's bend -> one ford across the stream, none along it"
+
+
 def case_locality() -> str:
     import world_specs
     from worldgen.bundle import merge
@@ -171,7 +190,7 @@ def main() -> int:
     g, m = compose.compose(synthetic(ridges=[RIDGE], routes={"R-test": ROUTE},
                                      corridors=[Corridor("c", ((-55, -40), (15, -40)))]))
     g0, meta, _b, _doc, ch = world.build()
-    cases = [case_square, lambda: case_ridge(g, m), lambda: case_rivers(g), lambda: case_route(g, m), case_fords,
+    cases = [case_square, lambda: case_ridge(g, m), lambda: case_rivers(g), lambda: case_route(g, m), case_fords, case_ford_bend,
              case_locality, case_cold, case_determinism, lambda: case_b(world.figures(g0, meta, ch))]
     for c in cases:
         try:
