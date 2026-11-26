@@ -107,8 +107,16 @@ describe('LM4-INT: the LM4 art at its sites', () => {
   it('the world icons: placed with their doors on the town transitions, each door where pass W had it in the icon', () => {
     const towns: [string, string][] = [['town_melmond', 'melmond'], ['town_onrac', 'onrac'], ['town_pravoka', 'pravoka'],
       ['town_elfheim', 'elfheim'], ['town_crescent', 'crescent'], ['town_gaia', 'gaia'], ['lufenia', 'lufenia']];
+    const key = (cs: number[][]) => cs.map((c) => c.join(',')).sort();
     for (const [lm, map] of towns) {
       const o = at(world, lm);
+      // PT-5 (docs/PLAYTEST_ELFHEIM_PLAN.md): Elfheim's door moved to the bottom-middle cell (its art's gate) and two
+      // side doors joined it, so its walk cells are the three doors, not pass W's one (the fixture stays frozen)
+      if (lm === 'town_elfheim') {
+        expect(key(door(o)), lm).toEqual(key(into(map)));
+        expect(key(o.walk_cells!), lm).toEqual(key([[1, 2], [0, 1], [2, 1]]));
+        continue;
+      }
       expect(door(o), lm).toEqual(into(map));
       expect(o.walk_cells, `${lm}: the door's cell in the icon`).toEqual(passWOne(lm).walk_cells);
     }

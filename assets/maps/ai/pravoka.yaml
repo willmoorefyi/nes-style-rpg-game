@@ -22,11 +22,12 @@ entrances:
   item_shop: [19, 24]
   inn: [25, 24]
   armor_shop: [5, 34]
-  sail_loft: [10, 34]
+  house_loft: [10, 34]
+  pirates_den: [20, 34]
   house_cooper: [5, 40]
-  boarded_cottage: [10, 40]
+  house_cottage: [10, 40]
   house_warehouse: [33, 19]
-  old_warehouse: [39, 19]
+  house_storehouse: [39, 19]
   house_lighthouse: [40, 6]
 collision: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0,
@@ -51,7 +52,7 @@ collision: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 8, 8, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 8,
   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3,
-  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 1, 1, 1, 8, 1, 1, 1, 1, 8, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1,
+  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 1, 1, 1, 8, 1, 1, 1, 1, 8, 1, 1, 1, 8, 8, 1, 1, 1, 1, 8,
   1, 0, 0, 0, 0, 0, 0, 1, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 2, 2, 2, 3, 3, 3, 3, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9,
   9, 2, 2, 2, 3, 3, 3, 3, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 8, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 8, 2, 2, 2, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 8, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8,
@@ -134,6 +135,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Now there''s a ship free, you could sail to Elfheim, the elves'' city.', 'South down the channel, then west along the coast. The elves have a prince who will not wake, they say.']
   - text: ['I sailed to Elfheim forty times before these pirates came. I''ll not see it again, I think.', 'South down the channel, west along the coast. A week with a fair wind. If anyone held a ship.']
+  showIf: BIKKE_DEFEATED
 - id: herbwife_hint
   sprite: vendor_f
   x: 24
@@ -142,6 +144,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [Matoya's broth is the only cure for what ails the deep sleepers. That's what my mother said., 'She lives in a cave in the woods, far to the north-west, over the pass. Blind as a stone, poor thing.']
   - text: ['Herbs, dried and fresh! Not much else to sell with the pirates eating everything.', 'If it''s a real cure you want, ask Matoya. She keeps a cave in the north-west woods, over the pass.']
+  showIf: BIKKE_DEFEATED
 - id: fishwife
   sprite: vendor_f
   x: 20
@@ -150,6 +153,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [Fresh fish again! The boats went out this morning for the first time in a month.]
   - text: ['Fish? I''ve three herrings and a sorry crab. The boats can''t put out past the pier.']
+  showIf: BIKKE_DEFEATED
   tint: '#a0c0d8'
 - id: fisher
   sprite: villager
@@ -159,6 +163,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Listen to that: oars! The whole fleet''s out. Pravoka breathes again.']
   - text: [The pirates let me fish off the pier. Generous. The fish off the pier are this long.]
+  showIf: BIKKE_DEFEATED
 - id: dockhand_a
   sprite: farmer
   x: 30
@@ -179,6 +184,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Every lamp on Lantern Street lit, and nobody to blow them out for a laugh. Lovely.']
   - text: [I light the lamps at dusk. The pirates blow them out. I light them again. It passes the evening.]
+  showIf: BIKKE_DEFEATED
   wander: true
 - id: watchman
   sprite: guard
@@ -188,6 +194,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Town watch! Er, we were biding our time. Waiting for the right moment. Which you found. Well done.']
   - text: [The town watch is on duty. Quietly. Out of sight of the quay.]
+  showIf: BIKKE_DEFEATED
 - id: girl
   sprite: villager_f
   x: 8
@@ -196,6 +203,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: [My father works the warehouse again. He brought me a sugared fig!]
   - text: [The pirate captain has a cutlass taller than me. I saw it. I'm not scared. Much.]
+  showIf: BIKKE_DEFEATED
   wander: true
 - id: old_man
   sprite: old_man
@@ -205,6 +213,7 @@ npcs:
   - condition: BIKKE_DEFEATED
     text: ['Look there: the lighthouse will burn again tonight. Ships will find the fjord.']
   - text: [From this bench you can see the whole fjord. Not one sail on it. Not since the brig came.]
+  showIf: BIKKE_DEFEATED
 transitions:
 - {x: 5, y: 13, targetMap: pravoka-house-netmaker, targetEntrance: door, effect: door}
 - {x: 10, y: 13, targetMap: pravoka-house-chandler, targetEntrance: door, effect: door}
@@ -215,8 +224,12 @@ transitions:
 - {x: 19, y: 23, targetMap: pravoka-item-shop, targetEntrance: door, effect: door}
 - {x: 25, y: 23, targetMap: pravoka-inn, targetEntrance: door, effect: door}
 - {x: 5, y: 33, targetMap: pravoka-armor-shop, targetEntrance: door, effect: door}
+- {x: 10, y: 33, targetMap: pravoka-house-loft, targetEntrance: door, effect: door}
+- {x: 20, y: 33, targetMap: pravoka-den, targetEntrance: door, effect: door}
 - {x: 5, y: 39, targetMap: pravoka-house-cooper, targetEntrance: door, effect: door}
+- {x: 10, y: 39, targetMap: pravoka-house-cottage, targetEntrance: door, effect: door}
 - {x: 33, y: 18, targetMap: pravoka-house-warehouse, targetEntrance: door, effect: door}
+- {x: 39, y: 18, targetMap: pravoka-house-storehouse, targetEntrance: door, effect: door}
 - {x: 40, y: 5, targetMap: pravoka-house-lighthouse, targetEntrance: door, effect: door}
 - {x: 0, y: 34, targetMap: overworld, targetEntrance: a1_pravoka}
 - {x: 0, y: 35, targetMap: overworld, targetEntrance: a1_pravoka}
@@ -234,6 +247,12 @@ scriptedEncounters:
   isBoss: true
   message: 'Bikke: All hands! These four think Pravoka is free for the taking. Show them the price!'
   postVictoryCutscene: a1_bikke_yields
+keyItemGates:
+- {id: pravoka_shut_weapon_shop, x: 19, y: 13, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them: "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_white_magic, x: 5, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them: "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_black_magic, x: 10, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them: "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_item_shop, x: 19, y: 23, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them: "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
+- {id: pravoka_shut_armor_shop, x: 5, y: 33, requiredFlag: BIKKE_DEFEATED, message: 'The shutters are barred. A notice is nailed across them: "CLOSED BY ORDER OF CAPTAIN BIKKE."', permanent: false}
 noWander:
 - [0, 34]
 - [0, 35]

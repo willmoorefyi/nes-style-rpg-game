@@ -148,9 +148,9 @@ describe('DebugScenarioLoader field mode', () => {
     const known = ['GARLAND_DEFEATED', 'PRINCESS_RESCUED', 'GOT_LUTE', 'INTRO_COMPLETE'];
     for (const s of scenarios) {
       // pass W's w_* stage starts (and pass CD's cd_* Cardia starts, AV's av_* airship previews) hold later story flags
-      // (WORLD 6.5): any known flag
+      // (WORLD 6.5), and PT's pt_* playtest previews (docs/PLAYTEST_ELFHEIM_PLAN.md): any known flag
       for (const f of s.flags ?? []) {
-        if (['w_', 'm7_', 'cd_', 'av_', 'wr_'].some((p) => s.id.startsWith(p))) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
+        if (['w_', 'm7_', 'cd_', 'av_', 'wr_', 'pt_'].some((p) => s.id.startsWith(p))) expect(known.includes(f) || isKnownFlag(f), `${s.id} flag ${f}`).toBe(true);
         else expect(known, `${s.id} flag ${f}`).toContain(f);
       }
       // pass F's f_* scenarios also start members stoned and afraid

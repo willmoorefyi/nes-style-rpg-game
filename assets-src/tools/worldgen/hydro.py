@@ -5,8 +5,9 @@ cell its D8 receiver; a rain field (fbm and moisture) is accumulated down the fl
 accumulation exceeds `a_r` (below mountain height, outside the banned walls, pins and kept cells), made 4-connected by
 the diagonal fix-up (the canoe moves orthogonally); pits deeper than `d_l` become lakes. The pinned canoe routes are
 laid by the composer over the result; `tarns` ends a river that reaches neither the sea nor a lake. `fords`: an
-unpinned river crossing a walking corridor gets a ford (a bridge
-cell `=` on the corridor's centre line) at most `max_fords` times; any further crossing is cut to grass. NW-0's pilot
+unpinned river crossing a walking corridor gets a ford (a straight bridge `=` of at most 3 river cells with walkable
+land at both ends, across the stream near the corridor's centre line: `crossing`, PT-1) at most `max_fords` times;
+any further crossing is cut to grass. NW-0's pilot
 math, unchanged.
 """
 from __future__ import annotations
@@ -109,6 +110,42 @@ def tarns(g: np.ndarray, elev: np.ndarray, frozen: np.ndarray) -> int:
     return made
 
 
+DRY = ("o", "m", "r", "≈", "=")              # a ford's end must be none of these (walkable land)
+WET = ("r", "≈")                             # a ford's flanks: the river it crosses
+MAX_SPAN = 3                                 # the longest ford (cells of river under it)
+
+
+def crossing(grid: np.ndarray, comp: list, line: list) -> list[tuple[int, int]]:
+    """PT-1 (docs/PLAYTEST_ELFHEIM_PLAN.md): the ford of one crossing, a straight run of the crossing's river cells
+    (at most MAX_SPAN) whose two ends are walkable land, so it joins two shores. Preferred: every flank cell river (a
+    bridge across the stream, not along it or over its mouth), then the shortest, then the nearest the corridor's line,
+    then (y, x, axis). No such run: [] (no ford; the river stays, the corridor walks round it or prewalk fails)."""
+    h, w = grid.shape
+    cs = set(comp)
+
+    def ok(x: int, y: int) -> bool:
+        return 0 <= x < w and 0 <= y < h and grid[y, x] not in DRY
+
+    best = None
+    for x, y in comp:
+        for ax, (dx, dy) in enumerate(((1, 0), (0, 1))):
+            if (x - dx, y - dy) in cs and grid[y - dy, x - dx] == "r":
+                continue                             # each run is scanned once, from its first cell
+            run, c = [], (x, y)
+            while c in cs and grid[c[1], c[0]] == "r" and len(run) <= MAX_SPAN:
+                run.append(c)
+                c = (c[0] + dx, c[1] + dy)
+            if not run or len(run) > MAX_SPAN or not ok(x - dx, y - dy) or not ok(*c):
+                continue
+            flanks = [(qx + dy * s, qy + dx * s) for qx, qy in run for s in (-1, 1)]
+            wet = all(0 <= fx < w and 0 <= fy < h and grid[fy, fx] in WET for fx, fy in flanks)
+            near = min(abs(qx - lx) + abs(qy - ly) for qx, qy in run for lx, ly in line)
+            key = (not wet, len(run), near, y, x, ax)
+            if best is None or key < best[0]:
+                best = (key, run)
+    return best[1] if best else []
+
+
 def fords(grid: np.ndarray, corridors: dict, routes_cells: list, keep: np.ndarray, limits: dict | None = None):
     """2.4 rule 4b on `grid` (in place). Returns ({corridor: [ford cells]}, the number of crossings cut)."""
     out, cut = {}, 0
@@ -135,10 +172,9 @@ def fords(grid: np.ndarray, corridors: dict, routes_cells: list, keep: np.ndarra
         fl = []
         for i, comp in enumerate(crossings):
             if i < max_fords:
-                for q in comp:
-                    if q in line:
-                        grid[q[1], q[0]] = "="
-                        fl.append(q)
+                for q in crossing(grid, comp, cells):
+                    grid[q[1], q[0]] = "="
+                    fl.append(q)
             else:
                 cut += 1
                 for q in comp:

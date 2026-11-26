@@ -3255,3 +3255,74 @@
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
+# --- PT (docs/PLAYTEST_ELFHEIM_PLAN.md) ---
+# Pravoka under the pirates (PT-2: only the pirates out, the shop doors shuttered) and after Bikke (the townsfolk
+# out, the shops open); the four rooms behind the old dead doors (PT-3); the marked berth on the world map (PT-4);
+# Elfheim's three doors on the world map (PT-5: south, west, east), each one step from its door.
+- id: pt_pravoka_pre
+  name: PT - Pravoka before Bikke (pirates out, shops shut)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: &pt_a1_flags [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT]
+  party: &pt_party
+    - { class: warrior, name: WAR, level: 5, equipment: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+    - { class: thief, name: THF, level: 5, equipment: [rapier, leather_armor, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 5, equipment: [hammer, cloth, cap], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: BLM, level: 5, equipment: [small_knife, cloth, cap], spells: [{ id: fire, level: 1 }] }
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+- id: pt_pravoka_post
+  name: PT - Pravoka after Bikke (townsfolk out, shops open)
+  mode: field
+  map: pravoka
+  entrance: gate
+  flags: &pt_a1_post [GARLAND_DEFEATED, PRINCESS_RESCUED, GOT_LUTE, INTRO_COMPLETE, BRIDGE_BUILT, BIKKE_DEFEATED]
+  party: *pt_party
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+- id: pt_pravoka_dock
+  name: PT - Pravoka's berth on the world map (quay and mooring posts, the brig docked)
+  mode: field
+  map: overworld
+  entrance: a1_pravoka
+  flags: *pt_a1_post
+  vehicles:
+    - { type: ship, map: overworld, at: a1_s_pravoka_ship }
+  party: *pt_party
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+- id: pt_elfheim_south
+  name: PT - Elfheim's south door on the world map
+  mode: field
+  map: overworld
+  entrance: elf_elfheim
+  flags: *pt_a1_post
+  party: *pt_party
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+- id: pt_elfheim_west
+  name: PT - Elfheim's west door on the world map
+  mode: field
+  map: overworld
+  entrance: elf_elfheim_west
+  flags: *pt_a1_post
+  party: *pt_party
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+- id: pt_elfheim_east
+  name: PT - Elfheim's east door on the world map
+  mode: field
+  map: overworld
+  entrance: elf_elfheim_east
+  flags: *pt_a1_post
+  party: *pt_party
+  items: { lute: 1, potion: 5 }
+  gold: 800
+  enemies: []
+# --- end PT ---
