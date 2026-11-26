@@ -51,5 +51,17 @@
       ]
     ],
     "note": "review fix 2026-11-13: Gemini shaded the attack face in armour grey; recoloured to the skin of the other poses"
-  }
+  },
+  "facing_fix": [
+    {
+      "pose": "hurt",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R2, whole figure"
+    },
+    {
+      "pose": "down",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R1, whole figure"
+    }
+  ]
 }

@@ -103,7 +103,6 @@ def build_battle_ai() -> None:
     from gen import puppet as PU, puppet_kneel as PK
     gw, gh = entries[0][0]["grid"]
     poses = entries[0][0]["poses"]
-    cols = entries[0][0]["layout"][0]
     # in-between poses (puppet.py, from gen/anim/<id>.yaml); a class without joints repeats its nearest keyframe
     all_poses = poses + PU.INBETWEENS + PK.KNEEL_POSES     # pass K kneel columns (docs/KNEEL_PLAN.md D-K7)
     atlas = Image.new("RGBA", (gw * len(all_poses), gh * len(entries)), (0, 0, 0, 0))
@@ -111,11 +110,7 @@ def build_battle_ai() -> None:
     for row, (meta, sheet) in enumerate(entries):
         if meta["grid"] != [gw, gh] or meta["poses"] != poses:
             raise SystemExit(f"battle_ai: {meta['character']} grid/poses differ from the first approved sheet")
-        sheet = PU.apply_face_fix(sheet, meta, gw, gh, cols, poses)
-        frames = {}
-        for i, pose in enumerate(poses):
-            x, y = (i % cols) * gw, (i // cols) * gh
-            frames[pose] = sheet.crop((x, y, x + gw, y + gh))
+        frames = PU.apply_review_fixes(sheet, meta)[0]      # face_fix, then facing_fix (docs/HERO_FACING_PLAN.md)
         tween = PU.battle_inbetweens(meta["character"])
         for pose in PU.INBETWEENS:
             frames[pose] = tween.get(pose, frames[PU.SOURCE[pose]])

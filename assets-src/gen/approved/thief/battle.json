@@ -22,5 +22,17 @@
     "hurt",
     "down",
     "victory"
+  ],
+  "facing_fix": [
+    {
+      "pose": "hurt",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R2, whole figure"
+    },
+    {
+      "pose": "down",
+      "mirror": "figure",
+      "note": "pass HF (docs/HERO_FACING_PLAN.md, user ruling 2026-11-25): R1, whole figure"
+    }
   ]
 }

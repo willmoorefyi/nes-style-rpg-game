@@ -8,6 +8,11 @@ a lifted passing foot) for every field sprite, with optional per-character overr
 
   python3 -I assets-src/gen/puppet.py review [id ...]    # contact sheets + GIFs + checks -> gen/out/anim/review/
 
+Joint labels: n / f = near / far limb on an unmirrored keyframe (n is also the screen-left one on every approved key).
+A keyframe turned by a battle.json `facing_fix` figure mirror (docs/HERO_FACING_PLAN.md, puppet_facing.py) keeps its
+joints on the approved PNG in the yaml; load_cfg mirrors them and swaps n / f so the labels follow the screen side
+(n = screen-left), and the in-betweens cut from it draw with n and f exchanged in the z order.
+
 Used by build_assets.py (battle_ai, field_ai), so the atlases always carry the frames.
 """
 from __future__ import annotations
@@ -63,6 +68,28 @@ def load_cfg(cid: str) -> dict | None:
             for j in [*JOINTS, "tip"]:
                 if j in kf and kf[j] is not None:
                     kf[j] = tuple(float(v) for v in kf[j])
+    return _mirror_keyframes(cid, cfg)
+
+
+def _mirror_keyframes(cid: str, cfg: dict) -> dict:
+    """Joints of the keyframes a battle.json `facing_fix` figure mirror turns: x' = sum - x with the approved cell's
+    `figure_sum` (the same S as the pixels), n / f swapped (also `cast_hand` for a mirrored cast); cfg['mirrored']
+    lists them for the draw order."""
+    from gen import puppet_facing as PF
+    meta_p = APPROVED / cid / "battle.json"
+    if not meta_p.exists() or not cfg.get("battle"):
+        return cfg
+    meta = json.loads(meta_p.read_text())
+    poses = [f["pose"] for f in PF.entries(meta) if f["mirror"] == "figure" and f["pose"] in KEYFRAMES]
+    if not poses:
+        return cfg
+    raw = battle_sheet_frames(cid, facing=False)
+    for p in poses:
+        if cfg["battle"].get(p):
+            cfg["battle"][p] = PF.mirror_joints(cfg["battle"][p], PF.figure_sum(np.asarray(raw[p])))
+    if "cast" in poses and cfg.get("cast_hand") in ("n", "f"):
+        cfg["cast_hand"] = PF.swap_side(f"x_{cfg['cast_hand']}")[-1]
+    cfg["mirrored"] = poses
     return cfg
 
 
@@ -85,14 +112,37 @@ def apply_face_fix(sheet: Image.Image, meta: dict, gw: int, gh: int, cols: int, 
     return Image.fromarray(a, "RGBA")
 
 
-def battle_sheet_frames(cid: str) -> dict[str, Image.Image]:
-    """The six approved battle poses of `cid`, review fixes applied."""
-    meta = json.loads((APPROVED / cid / "battle.json").read_text())
+def _cells(sheet: Image.Image, meta: dict) -> dict[str, Image.Image]:
     gw, gh = meta["grid"]
     cols = meta["layout"][0]
-    sheet = apply_face_fix(Image.open(APPROVED / cid / "battle.png").convert("RGBA"), meta, gw, gh, cols, meta["poses"])
     return {p: sheet.crop(((i % cols) * gw, (i // cols) * gh, (i % cols + 1) * gw, (i // cols + 1) * gh))
             for i, p in enumerate(meta["poses"])}
+
+
+def apply_review_fixes(sheet: Image.Image, meta: dict) -> tuple[dict[str, Image.Image], dict[str, np.ndarray]]:
+    """The cells of an approved battle sheet with `face_fix` then `facing_fix` (puppet_facing.py) applied, and the
+    reflected head masks {pose: bool[h, w]} of its head mirrors."""
+    from gen import puppet_facing as PF
+    gw, gh = meta["grid"]
+    sheet = apply_face_fix(sheet.convert("RGBA"), meta, gw, gh, meta["layout"][0], meta["poses"])
+    cells, masks = PF.apply({p: np.asarray(c).copy() for p, c in _cells(sheet, meta).items()}, meta)
+    return {p: Image.fromarray(a) for p, a in cells.items()}, masks
+
+
+def battle_sheet_frames(cid: str, facing: bool = True) -> dict[str, Image.Image]:
+    """The six approved battle poses of `cid`, review fixes applied (`facing=False`: `face_fix` only)."""
+    meta = json.loads((APPROVED / cid / "battle.json").read_text())
+    sheet = Image.open(APPROVED / cid / "battle.png").convert("RGBA")
+    if facing:
+        return apply_review_fixes(sheet, meta)[0]
+    gw, gh = meta["grid"]
+    return _cells(apply_face_fix(sheet, meta, gw, gh, meta["layout"][0], meta["poses"]), meta)
+
+
+def facing_masks(cid: str) -> dict[str, np.ndarray]:
+    """{source pose: reflected head mask} of the `facing_fix` head mirrors of `cid` (ready / attack)."""
+    meta = json.loads((APPROVED / cid / "battle.json").read_text())
+    return apply_review_fixes(Image.open(APPROVED / cid / "battle.png"), meta)[1]
 
 
 # ───────── segmentation & rendering ─────────
@@ -110,8 +160,9 @@ def _bone(part: str, joints: dict) -> tuple[str, str]:
     return j0, j1
 
 
-def segment(frame: Image.Image, joints: dict, robed: bool = False) -> np.ndarray:
-    """Label every opaque pixel with the index (into PARTS) of its nearest bone; -1 = transparent."""
+def segment(frame: Image.Image, joints: dict, robed: bool = False, head: np.ndarray | None = None) -> np.ndarray:
+    """Label every opaque pixel with the index (into PARTS) of its nearest bone; -1 = transparent. `head`: a
+    facing_fix head mirror's reflected mask, every pixel of which belongs to the head (its bandana tails included)."""
     a = np.asarray(frame)
     h, w = a.shape[:2]
     ys, xs = np.nonzero(a[..., 3] > 0)
@@ -133,6 +184,8 @@ def segment(frame: Image.Image, joints: dict, robed: bool = False) -> np.ndarray
         rgb = a[..., :3].astype(int)
         cape = (a[..., 3] > 0) & (rgb[..., 2] > rgb[..., 0] + 30) & (np.arange(w)[None, :] > joints["hip"][0] + 5)
         lab[cape & (lab != names.index("weapon"))] = names.index("torso")
+    if head is not None:
+        lab[head & (a[..., 3] > 0)] = names.index("head")
     return _absorb_orphans(lab)
 
 
@@ -206,8 +259,9 @@ def outline(img: Image.Image) -> Image.Image:
 
 
 def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src: dict[str, str], default: str,
-           z: list[str], robed: bool, size=(80, 80)) -> Image.Image:
-    """Pose every part (taken from its source keyframe) onto the target joints and composite back to front."""
+           z: list[str], robed: bool, size=(80, 80), masks: dict | None = None) -> Image.Image:
+    """Pose every part (taken from its source keyframe) onto the target joints and composite back to front.
+    `masks`: {source pose: head mask} of facing_fix head mirrors (segment's `head`)."""
     names = list(PARTS)
     labels: dict[str, np.ndarray] = {}
     out = np.zeros((size[1], size[0], 4), np.uint8)
@@ -222,7 +276,7 @@ def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src:
         if j0 not in sj or j1 not in sj or tj0 not in target or j1 not in target:
             continue
         if src not in labels:
-            labels[src] = segment(frame, sj, robed)
+            labels[src] = segment(frame, sj, robed, (masks or {}).get(src))
         lab, arr = labels[src], np.asarray(frame)
         rot = _angle(target[tj0], target[j1]) - _angle(sj[j0], sj[j1])
         c, s = np.cos(-rot), np.sin(-rot)
@@ -332,7 +386,9 @@ def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Imag
     cfg = cfg or load_cfg(cid)
     if not cfg or "battle" not in cfg:
         return {}
+    from gen.puppet_facing import swap_z
     frames = battle_sheet_frames(cid)
+    masks = facing_masks(cid)
     b = cfg["battle"]
     robed = bool(cfg.get("robed"))
     sources = {k: (frames[k], b[k]) for k in KEYFRAMES}
@@ -345,7 +401,9 @@ def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Imag
             return b[_ps.get(part, _src)] if part else b[_src]
         tj = keep_lengths(tj, src_of, robed)
         front = (cfg.get("front_far_arm") or {}).get(src, src != "attack")
-        out[name] = render(tj, sources, ps, src, Z_FRONT_ARM if front else Z_BACK_ARM, robed)
+        z = Z_FRONT_ARM if front else Z_BACK_ARM
+        out[name] = render(tj, sources, ps, src, swap_z(z) if src in cfg.get("mirrored", ()) else z, robed,
+                           masks=masks)
     return out
 
 

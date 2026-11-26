@@ -1,5 +1,8 @@
 # Puppet animation joints for the ninja (assets-src/gen/puppet.py). Native px on approved/ninja/battle.png cells
 # (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = kunai tip, held in hand_<weapon_hand>.
+# pass HF: the cast cell is turned by battle.json facing_fix (a figure mirror); its joints below stay on the approved
+# PNG, puppet.load_cfg mirrors them and swaps n / f (n = screen-left there) and the cast-cut in-betweens draw with n
+# and f exchanged in the z order (docs/HERO_FACING_PLAN.md 5.1).
 robed: false
 attack_hand: n
 front_far_arm: {ready: true, attack: true, cast: false}
@@ -27,7 +30,12 @@ tweaks:
   atk_mid: {neck: [-2.25, 0], crown: [-2.25, 0], el_f: [1.35, -2.25], hand_f: [1.8, 0.9]}
   atk_follow: {neck: [0, 0.5], crown: [0, 0.5], chest: [0, 0.5], hip: [0, 0.5], sh_n: [0.5, 0], sh_f: [0, 0.5], hip_n: [0.5, 0.5], hip_f: [0.5, 0.5]}
   cast_gather: {el_n: [-1, -2], el_f: [2, -2], hand_f: [3, -2], hip_n: [0, -1], hip_f: [0, -1]}
-  cast_rise: {crown: [0.5, 0], chest: [0, 1], hip: [0, 0.5], sh_n: [0.5, 0.5], el_n: [0.5, -2], hand_n: [0.5, 6], sh_f: [-1.5, 1], knee_n: [-0.5, 1], knee_f: [-0.5, 1], foot_n: [-3, 1], foot_f: [-4.5, 0]}
+  # pass HF (docs/HERO_FACING_PLAN.md 5.3): the cast is mirrored (battle.json facing_fix), so these tweaks are
+  # derived, not tuned: each joint's target is the pre-HF frame's target mirrored about the cast's figure_sum
+  # with n / f swapped (scratch translate2.py), so each frame keeps its old relation to the cast key, mirrored.
+  # The pre-HF values: git show fc793e05:assets-src/gen/anim/<class>.yaml
+  cast_rise: {neck: [-4, 0], crown: [-3.5, 0], chest: [-3, 1], hip: [-5, 0.5], sh_n: [-2.5, 0], el_n: [-3, -0.5], hand_n: [3, 3], sh_f: [-4.5, 1.5], el_f: [-3.5, -1.5], hand_f: [2.5, 3], hip_n: [-4, 0], knee_n: [-2, 2], foot_n: [-2, 1], hip_f: [-4, 0], knee_f: [-2, 0], foot_f: [-3.5, 0], tip: [3, -3]}
+  cast_release: {neck: [2, 0], crown: [2, 0], el_n: [-2, 0], hand_n: [2, 0]}
 # Pass KT kneel (docs/KNEEL_TWEEN_PLAN.md): the approved AI key approved/ninja/battle_kneel.png and the bridge
 # frames (puppet_kneel.make_ai); the derived variant-A block is archived as anim/_retired/ninja_kneel_v1.yaml.
 kneel: {source: ai}

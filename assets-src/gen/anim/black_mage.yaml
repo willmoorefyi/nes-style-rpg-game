@@ -1,5 +1,8 @@
 # Puppet animation joints for the black mage (assets-src/gen/puppet.py). Native px on approved/black_mage/battle.png cells
 # (80x80, figure faces left; n = near/viewer-side limb, f = far limb). tip = weapon tip, held in hand_<weapon_hand>.
+# pass HF: the cast cell is turned by battle.json facing_fix (a figure mirror); its joints below stay on the approved
+# PNG, puppet.load_cfg mirrors them and swaps n / f (n = screen-left there) and the cast-cut in-betweens draw with n
+# and f exchanged in the z order (docs/HERO_FACING_PLAN.md 5.1).
 # The whole mage is blue, so the blue-cape-behind heuristic is off (it would glue the far sleeve and hat to the torso).
 robed: true
 attack_hand: n
@@ -19,12 +22,17 @@ battle:
      sh_n: [33, 40], el_n: [28, 48], hand_n: [27, 55], sh_f: [50, 36], el_f: [56, 30], hand_f: [65, 20],
      hip_n: [36, 60], knee_n: [32, 67], foot_n: [28, 73], hip_f: [50, 60], knee_f: [54, 67], foot_f: [57, 74]}
 tweaks:
-  # the big near sleeve hangs in the cast keyframe; keep it (and the hat) at the cast pose and only raise the far arm
-  cast_rise: {neck: [2.5, 0.5], crown: [-6, -0.5], chest: [1, 1], hip: [1, 1],
-              sh_n: [0.5, 1], el_n: [0.5, 2.5], hand_n: [3.5, 9], hand_f: [6, -3]}
   atk_mid: {el_n: [2, 0]}
   atk_follow: {sh_n: [0, -2]}
   cast_gather: {el_n: [0, -2], el_f: [-1, 0]}
+  # pass HF (docs/HERO_FACING_PLAN.md 5.3): the cast is mirrored (battle.json facing_fix), so these tweaks are
+  # derived, not tuned: each joint's target is the pre-HF frame's target mirrored about the cast's figure_sum
+  # with n / f swapped (scratch translate2.py), so each frame keeps its old relation to the cast key, mirrored.
+  # The pre-HF values: git show fc793e05:assets-src/gen/anim/<class>.yaml
+  # (pre-HF intent: the big near sleeve hangs in the cast keyframe; keep it and the hat at the cast pose, raise the
+  # far arm only.)
+  cast_rise: {neck: [-1, 0.5], crown: [1.5, -0.5], chest: [-1.5, 1], hip: [-3.5, 1], sh_n: [-1, -2], el_n: [-1, 0], hand_n: [1.5, -1.5], sh_f: [-1.5, 3], el_f: [-1.5, 2.5], hand_f: [4, 7.5], hip_n: [-2.5, 0], knee_n: [-4, 0], foot_n: [-4, 0], hip_f: [-2.5, 0], knee_f: [-4, 0], foot_f: [-4, 0]}
+  cast_release: {neck: [2, 0], crown: [2, 0], el_n: [-2, 0], hand_n: [2, 0]}
 # Pass KT kneel (docs/KNEEL_TWEEN_PLAN.md): the approved AI key approved/black_mage/battle_kneel.png and the bridge
 # frames (puppet_kneel.make_ai); the derived variant-A block is archived as anim/_retired/black_mage_kneel_v1.yaml.
 kneel: {source: ai}
