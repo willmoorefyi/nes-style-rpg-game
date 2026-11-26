@@ -50,7 +50,8 @@ def npcs() -> list[dict]:
         # ── the pirates (gone once the captain is beaten) ──
         pirate("pirate_gate", "guard", RED, 2, 36, [
             "Pirate: Welcome to Pravoka, friends. Captain's town now.",
-            "Pay at the shops, sleep at the inn, and don't go near the brig. Simple rules."]),
+            "The shops are shut by the Captain's order. The inn and the keeper's sick-room stay open, at a price.",
+            "Sleep where you're let, and don't go near the brig. Simple rules."]),
         pirate("pirate_quay_n", "villager", TAR, 29, 18, [
             "Pirate: Those warehouses are the Captain's strongroom now. Every crate in them is ours by right.",
             "By right of being here first with cutlasses, that is."]),
@@ -58,7 +59,7 @@ def npcs() -> list[dict]:
             "Pirate: No boat leaves this fjord without the Captain's leave.",
             "The fishers asked. You can see how far it got them."]),
         pirate("pirate_den_a", "villager", RED, 18, 34, [
-            "Pirate: That's our den behind me. The door's nailed shut because the last owner kept knocking."]),
+            "Pirate: That's our den behind me. Knock if you like. The quartermaster counts your coin before you're in."]),
         pirate("pirate_den_b", "guard", TAR, 21, 35, [
             "Pirate: Nine of us, the Captain counted. Nobody in this town is fool enough to count higher."]),
         pirate("pirate_pier", "villager", SALT, 33, 33, [

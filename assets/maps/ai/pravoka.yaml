@@ -68,7 +68,8 @@ npcs:
   x: 2
   y: 36
   hideIf: BIKKE_DEFEATED
-  dialog: ['Pirate: Welcome to Pravoka, friends. Captain''s town now.', 'Pay at the shops, sleep at the inn, and don''t go near the brig. Simple rules.']
+  dialog: ['Pirate: Welcome to Pravoka, friends. Captain''s town now.', 'The shops are shut by the Captain''s order. The inn and the keeper''s sick-room stay open, at a price.', 'Sleep where you''re let,
+      and don''t go near the brig. Simple rules.']
 - id: pirate_quay_n
   sprite: villager
   tint: '#8c7a64'
@@ -89,7 +90,7 @@ npcs:
   x: 18
   y: 34
   hideIf: BIKKE_DEFEATED
-  dialog: ['Pirate: That''s our den behind me. The door''s nailed shut because the last owner kept knocking.']
+  dialog: ['Pirate: That''s our den behind me. Knock if you like. The quartermaster counts your coin before you''re in.']
 - id: pirate_den_b
   sprite: guard
   tint: '#8c7a64'
