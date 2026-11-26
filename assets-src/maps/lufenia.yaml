@@ -286,7 +286,7 @@ npcs:
   - text: ['Tiel vasso? Tiel vasso an''dur.']
   wander: true
 - id: lufenia_child
-  sprite: villager
+  sprite: boy
   x: 15
   y: 22
   dialog:
@@ -296,7 +296,6 @@ npcs:
     text: [Grandmother says our people came down from the sky in a boat made of light., 'I want to go back up. Will you take me? No? Then tell
         me what it looks like.']
   - text: ['Vaelin, vaelin... horu sae''qat.']
-  tint: '#dfe6f5'
 - id: lufenia_archivist
   sprite: luf_senator
   x: 8
@@ -317,7 +316,7 @@ npcs:
   tint: '#dfe6f5'
   wander: true
 - id: lufenia_bellwright
-  sprite: master
+  sprite: luf_citizen_m
   x: 25
   y: 27
   dialog:
@@ -327,7 +326,6 @@ npcs:
     text: ['I cast the elder''s chime anew every hundred years, from the same bronze.', 'It must never be rung in town. Here it only hums, as
         if it remembered the tower.']
   - text: ['Ka''thera ulun, si ven doloth.']
-  tint: '#dfe6f5'
 - id: lufenia_watcher
   sprite: luf_citizen_m
   x: 11

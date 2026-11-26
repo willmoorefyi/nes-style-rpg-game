@@ -133,6 +133,14 @@ npcs:
   - condition: PRINCESS_RESCUED
     text: [The princess is safe., 'Thank you, Warriors of Light!']
   - text: [The princess has been kidnapped!, 'Garland took her to the Temple of Fiends, north-west of here.']
+- id: cornelia_dancer
+  sprite: dancer
+  x: 35
+  y: 50
+  dialog:
+  - condition: PRINCESS_RESCUED
+    text: ['Arylon: The princess is home! I''ll dance till my shoes wear through.']
+  - text: ['Arylon: I''m Arylon, and I dance. The square needs a little joy while the princess is gone.']
 - id: south_gate_guard
   sprite: guard
   x: 28
@@ -176,13 +184,13 @@ npcs:
     text: ['Bread and cheese, the finest in Cornelia! Folk are buying again, now Her Highness is safe.', Once the north bridge is mended I'll take my cheeses across. They fetch double over there.]
   - text: ['Bread and cheese, the finest in Cornelia!', 'With the north bridge broken, nothing comes in from across the water. Flour costs a fortune.', 'And with the princess gone, who has an appetite?']
 - id: townswoman
-  sprite: villager_f
+  sprite: young_woman
   x: 44
   y: 49
   wander: true
   dialog: [The river runs right through the city., My grandmother says it once flooded the market square!]
 - id: gardener
-  sprite: villager
+  sprite: townsman
   x: 5
   y: 23
   wander: true
@@ -194,7 +202,7 @@ npcs:
   wander: true
   dialog: ['White magic heals, black magic harms.', A wise party carries both.]
 - id: fisher
-  sprite: villager
+  sprite: sailor
   x: 38
   y: 64
   dialog: [The fish bite best where the river bends.]

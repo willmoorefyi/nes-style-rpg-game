@@ -93,7 +93,7 @@ def build() -> list[Path]:
     for (x, y) in [(1, 5), (11, 5), (1, 7), (11, 7)]:
         r.thing("flowers", x, y)
     r.staff(5, 4, 7, 4)
-    GAIA.keeper(r, "white-magic", "white_mage", 6, 4, ["The highest words of healing are taught only here, where "
+    GAIA.keeper(r, "white-magic", "healer", 6, 4, ["The highest words of healing are taught only here, where "
                 "the air is thin and the sky is near."], "gaia_white")
     out.append(r.save(note("a white magic shrine room with bays on either side and two white orbs by the counter",
                            "a white orb at each end of the counter under an arched window; flowers in the two "
@@ -114,7 +114,7 @@ def build() -> list[Path]:
     r.tall("bookshelf", 1, 7)
     r.thing("crate", 7, 9)
     r.staff(1, 3, 7, 4)
-    GAIA.keeper(r, "black-magic", "black_mage", 4, 4, ["Storm-words and doom-words. The mountain sharpens them. Do "
+    GAIA.keeper(r, "black-magic", "scholar", 4, 4, ["Storm-words and doom-words. The mountain sharpens them. Do "
                 "be careful where you point them."], "gaia_black")
     out.append(r.save(note("a narrow, deep black magic shop, the counter wall to wall at the far end",
                            "a black orb in the keeper's corner; a dark runner from the door to the counter; a "

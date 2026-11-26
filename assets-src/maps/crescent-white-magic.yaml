@@ -69,7 +69,7 @@ npcs:
 - id: crescent-white-magic-keeper
   x: 5
   y: 4
-  sprite: white_mage
+  sprite: healer
   dialog: ['The deep healing, and the words that call the fallen back. Taught here to those the Circle would trust.']
   shopId: crescent_white
 transitions:

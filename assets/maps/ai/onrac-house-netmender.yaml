@@ -30,7 +30,7 @@ npcs:
     text: [Not one torn net all week. Whatever was ripping them out past the stacks is gone.]
   - text: ['Every net that goes past the sea-stacks comes back slashed, like something was cutting its way out.', I mend them. The boats take them out. They come back slashed. I'm a very busy woman.]
 - id: onrac_netmender_son
-  sprite: villager
+  sprite: boy
   x: 3
   y: 6
   dialog:

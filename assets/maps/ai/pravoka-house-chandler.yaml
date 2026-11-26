@@ -30,7 +30,7 @@ npcs:
     text: ['Rope, pitch, lamp oil, biscuit: whatever a ship needs, I stock. Your brig will want all of it.', 'Mind the sea west of the peninsula. Fair water, foul fish.']
   - text: ['A chandler with no ships to stock. I sell rope to the pirates, and they pay me in promises.']
 - id: chandler_boy
-  sprite: villager
+  sprite: boy
   x: 4
   y: 6
   dialog: ['I count the rope. Fifty fathoms, fifty-one, fifty... I lost count again.']

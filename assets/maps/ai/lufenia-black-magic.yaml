@@ -17,11 +17,10 @@ npcs:
 - id: lufenia-black-magic-keeper
   x: 2
   y: 4
-  sprite: black_wizard
+  sprite: luf_citizen_m
   dialog: [The makers' hardest words. Some of them unmake. Spend them only on what deserves it.]
   shopId: lufenia_black
   showIf: LUFENIAN_LEARNED
-  tint: '#dfe6f5'
 transitions:
 - {x: 7, y: 8, targetMap: lufenia, targetEntrance: black_magic}
 name: Black Magic

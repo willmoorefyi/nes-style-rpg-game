@@ -407,7 +407,8 @@ describe('Cornelia second pass (R4a)', () => {
     const sprite = (id: string) => cornelia.flatMap((m) => m.npcs).find((n) => n.id === id)?.sprite;
     expect([sprite('hall_noble'), sprite('chancellor')]).toEqual(['burgher', 'burgher']);
     expect([sprite('farmer'), sprite('royal_gardener')]).toEqual(['farmer', 'farmer']);
-    expect([sprite('fisher'), sprite('cellar_steward')]).toEqual(['villager', 'villager']);
+    // pass PT (docs/PLAYTEST_ART_PLAN.md 5.3): the fisher is a sailor now
+    expect([sprite('fisher'), sprite('cellar_steward')]).toEqual(['sailor', 'villager']);
   });
 
   it('no two interiors share a palette, and the weapon shop counter is one straight run (M9)', () => {

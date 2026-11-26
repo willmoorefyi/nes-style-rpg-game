@@ -94,14 +94,13 @@ objects:
 - {type: barrel, x: 8, y: 3}
 npcs:
 - id: healer
-  sprite: white_mage
+  sprite: healer
   x: 7
   y: 4
   dialog: ['Rest is the best healer, and I am the second best. Bring me your fallen and I''ll bring them round.', My fee is 60 G for each of their
       levels. The lake towns can't afford to do it for less.]
   action: clinic
   clinicPrice: 60
-  tint: '#e0e8f0'
 - id: healer_aide
   sprite: villager_f
   x: 4

@@ -97,7 +97,7 @@ objects:
 - {type: barrel, x: 10, y: 5}
 npcs:
 - id: lighthouse_keeper
-  sprite: white_mage
+  sprite: healer
   x: 7
   y: 4
   dialog: ['I keep the light, and I keep the hurt. In a harbour town the two jobs come to the same thing.', 'If one of yours has fallen, I can
@@ -106,7 +106,7 @@ npcs:
   clinicPrice: 10
   tint: '#e6dcc8'
 - id: keeper_daughter
-  sprite: villager_f
+  sprite: girl
   x: 3
   y: 7
   dialog:
@@ -115,7 +115,7 @@ npcs:
   - text: [The pirates made Father put out the light. Ships that can't see the fjord can't come and fight them., He keeps the lens polished anyway.
         Every night.]
 - id: hurt_sailor
-  sprite: villager
+  sprite: sailor
   x: 9
   y: 7
   dialog:

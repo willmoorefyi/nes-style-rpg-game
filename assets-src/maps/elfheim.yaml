@@ -3209,7 +3209,7 @@ objects:
   collide: alpha
 npcs:
 - id: elfheim_gate_warden
-  sprite: guard
+  sprite: elf_guard
   x: 23
   y: 45
   dialog:
@@ -3217,9 +3217,8 @@ npcs:
     text: [The prince walks his own halls again. Elfheim's gate is yours for as long as the hedges grow.]
   - text: ['A ship out of the Aldi, and humans on it. The hedge let you in, so I will too. Welcome to Elfheim.', 'Keep to the lanes. The hedges
         are older than the houses, and they remember who broke a branch.']
-  tint: '#cfe8c2'
 - id: elfheim_gate_sentry
-  sprite: guard
+  sprite: elf_guard
   x: 28
   y: 44
   dialog:
@@ -3227,9 +3226,8 @@ npcs:
     text: [I let Astos through this gate once. I've had a long sleep's worth of nights to be sorry for it.]
   - text: [Nothing on four legs gets through the ring. The hedge closes on wolves like a fist., 'On two legs it''s harder to tell. Astos came
         in through this very gate, smiling.']
-  tint: '#cfe8c2'
 - id: elfheim_rise_guard_w
-  sprite: guard
+  sprite: elf_guard
   x: 22
   y: 14
   dialog:
@@ -3239,18 +3237,16 @@ npcs:
     text: ['You smell of something bitter and green. Is that a witch''s herb? Go up to the prince, quickly!']
   - text: [The castle is open to guests. The prince's chamber is up the stair to the west of the hall., 'Speak softly in there. He has slept since
         the dark elf''s visit, and nothing we do will wake him.']
-  tint: '#cfe8c2'
 - id: elfheim_rise_guard_e
-  sprite: guard
+  sprite: elf_guard
   x: 29
   y: 14
   dialog:
   - condition: PRINCE_AWAKE
     text: ['The prince has given you his key? Then the vault under the hall is yours to open. He trusts you.']
   - text: ['Below the hall lies our vault. Its door was sealed with the prince''s own key, and the key sleeps with him.']
-  tint: '#cfe8c2'
 - id: elfheim_matoya_hint
-  sprite: old_man
+  sprite: elf_elder
   x: 21
   y: 27
   dialog:
@@ -3262,9 +3258,8 @@ npcs:
   - text: [Our healers have tried every leaf in the wood on the prince. A dark elf's sleep doesn't care for leaves., 'Only one herb would do it,
         and only one witch grows it: Matoya, in her cave north of Cornelia''s bridge.', But they say Matoya is blind and cross these days. Somebody
         stole her crystal eye.]
-  tint: '#e4e9d6'
 - id: elfheim_marsh_hint
-  sprite: white_mage
+  sprite: elf_woman
   x: 31
   y: 28
   dialog:
@@ -3277,45 +3272,40 @@ npcs:
     text: ['You brought a crown out of the Marsh Cave? Then the king of the Western Keep is waiting for you, up the long arm to the north-west.']
   - text: ['The king of the Western Keep, up the long arm to the north-west, lost his crown in the fens.', 'Whatever took it crawled into the
         Marsh Cave, south-west of here past the dead trees. Few who go in climb out again. Fewer climb out with anything.']
-  tint: '#cfe8c2'
 - id: elfheim_gardener
-  sprite: farmer
+  sprite: elf_man
   x: 3
   y: 18
   dialog:
   - condition: PRINCE_AWAKE
     text: ['My garden''s gone to seed while I wasn''t looking. Funny how nothing matters, and then everything does.']
   - text: ['Sleepwort, wake-me-not, goldenroot... I grew them all for the prince. Not one did anything.']
-  tint: '#cfe8c2'
 - id: elfheim_hedge_trimmer
-  sprite: monk
+  sprite: elf_man
   x: 46
   y: 15
   dialog:
   - condition: PRINCE_AWAKE
     text: [The hedges stopped growing the moment the prince woke. Gave my shears a rest at last.]
   - text: ['Every day the ring grows a hand thicker. The hedges are grieving, the old ones say. I just trim them.']
-  tint: '#cfe8c2'
   wander: true
 - id: elfheim_stream_child
-  sprite: villager
+  sprite: elf_child
   x: 13
   y: 25
   dialog:
   - condition: PRINCE_AWAKE
     text: [The prince came down to the stream and raced me! He didn't let me win. I think he's better now.]
   - text: [I float bark boats from the spring to the pond. The prince used to race me. He always let me win.]
-  tint: '#cfe8c2'
   wander: true
 - id: elfheim_fisher
-  sprite: villager
+  sprite: elf_elder
   x: 39
   y: 39
   dialog:
   - text: [There's one old pike in this pond that's never been caught. I'm in no hurry. Elves live a long time.]
-  tint: '#e4e9d6'
 - id: elfheim_weaver
-  sprite: villager_f
+  sprite: elf_woman
   x: 35
   y: 25
   dialog:
@@ -3323,15 +3313,13 @@ npcs:
     text: ['He asked for his riding cloak the moment he woke. I''m on the third start, and this one I''ll finish.']
   - text: ['I wove the prince''s coverlet in a single night after the curse. Green and silver, his colours.', When he wakes I'll weave him a cloak
         for riding. I've started it twice.]
-  tint: '#cfe8c2'
   wander: true
 - id: elfheim_lamplighter
-  sprite: villager
+  sprite: elf_man
   x: 28
   y: 41
   dialog:
   - text: [I light the street lamps at dusk and put them out at dawn. Some nights I forget which is which.]
-  tint: '#cfe8c2'
   wander: true
 - id: elfheim_trader
   sprite: merchant
@@ -3343,7 +3331,7 @@ npcs:
   - text: ['I''m from Pravoka, would you believe? Came over on a fishing boat before the pirates shut the harbour.', 'Elfheim''s mithril is the
         best on the Aldi. The elves won''t haggle, though. It takes the fun out of it.']
 - id: elfheim_elder
-  sprite: old_man
+  sprite: elf_elder
   x: 11
   y: 39
   dialog:
@@ -3351,7 +3339,6 @@ npcs:
     text: ['The harps are back in the hall. I''m too old to dance, but I tap my stick.']
   - text: ['When I was young, the castle''s lamps burned all night and the hall rang with harps.', 'Since the curse they burn all night still,
         but no one plays. We keep a light so he can find his way back.']
-  tint: '#e4e9d6'
 - id: elfheim_dwarf_peddler
   sprite: dwarf_trader
   x: 44
@@ -3363,7 +3350,7 @@ npcs:
   - text: ['Don''t stare, lad, dwarves travel too. I''m here for elven rope. The foreman back home has a mad plan.', Nerrick wants to blast a
         canal through the isthmus and let the sea through. All he lacks is the powder.]
 - id: elfheim_scout
-  sprite: ninja
+  sprite: elf_guard
   x: 10
   y: 9
   dialog:
@@ -3372,35 +3359,31 @@ npcs:
   - condition: ASTOS_DEFEATED
     text: [So the king at the keep was a mask over Astos. I watched that window every day and never saw through it.]
   - text: ['I ride the Keep Moor up the long arm. The keep''s soldiers wave at me, but their king never comes out.']
-  tint: '#cfe8c2'
 - id: elfheim_minstrel
-  sprite: red_mage
+  sprite: elf_mage
   x: 31
   y: 24
   dialog:
   - condition: PRINCE_AWAKE
     text: ['I made a new song: The Prince Who Woke. It''s very short, but it ends well.']
   - text: [I made a song about the sleeping prince. It's very sad. Nobody wants to hear it any more.]
-  tint: '#cfe8c2'
   wander: true
 - id: elfheim_herb_girl
-  sprite: villager_f
+  sprite: elf_child
   x: 40
   y: 44
   dialog:
   - condition: PRINCE_AWAKE
     text: [A witch's herb! Mother was right. I'm going to be a witch when I grow up.]
   - text: [Mother says a witch could wake the prince. I say a trumpet would. A big one.]
-  tint: '#cfe8c2'
 - id: elfheim_watcher
-  sprite: white_mage
+  sprite: elf_woman
   x: 16
   y: 15
   dialog:
   - condition: PRINCE_AWAKE
     text: ['His window was open this morning, and he waved. I shall come every morning anyway.']
   - text: [I come every morning to see if a light is lit in the prince's window. Not yet. Not yet.]
-  tint: '#e4e9d6'
 inspect:
 - x: 27
   y: 46

@@ -61,7 +61,7 @@ npcs:
 - id: onrac-black-magic-keeper
   x: 7
   y: 6
-  sprite: black_mage
+  sprite: scholar
   dialog: ['Thunder, quake and stillness. Spells the sea itself would fear.']
   shopId: onrac_black
 transitions:

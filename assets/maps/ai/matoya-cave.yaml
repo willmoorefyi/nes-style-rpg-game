@@ -32,8 +32,7 @@ npcs:
   requiredItem: crystal_eye
   cutscene: {id: a1_matoya_sight, onceFlag: A1_O_HERB_GIVEN}
 - id: broom_1
-  sprite: black_wizard
-  tint: '#a07a48'
+  sprite: broom
   x: 5
   y: 8
   wander: true
@@ -42,8 +41,7 @@ npcs:
     text: ['The broom stands to attention. Somewhere in its bristles, it is very pleased.']
   - text: ['The broom sweeps a circle round your feet, then sweeps the circle again, a little smaller.']
 - id: broom_2
-  sprite: black_wizard
-  tint: '#a07a48'
+  sprite: broom
   x: 12
   y: 9
   wander: true
@@ -52,8 +50,7 @@ npcs:
     text: ['Swish! The broom has found the dust under the bed at last, and it is thorough about it.']
   - text: [Swish. Swish. The broom knocks against a jar labelled EYE OF NEWT (NOT THAT EYE).]
 - id: broom_3
-  sprite: black_wizard
-  tint: '#a07a48'
+  sprite: broom
   x: 15
   y: 7
   wander: true

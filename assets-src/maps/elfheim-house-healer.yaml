@@ -84,22 +84,20 @@ objects:
   y: 7
 npcs:
 - id: elfheim-healer-keeper
-  sprite: white_mage
+  sprite: elf_woman
   x: 3
   y: 5
   dialog: ['Bring your fallen here. The wood''s own breath can still call them back, for a small offering.']
   action: clinic
   clinicPrice: 20
-  tint: '#cfe8c2'
 - id: elfheim_ward_patient
-  sprite: villager
+  sprite: elf_man
   x: 7
   y: 6
   dialog:
   - condition: PRINCE_AWAKE
     text: [The healer says I can go home now that the prince is up. I think she just wants the cot.]
   - text: [I tried to cut through the ring hedge on a dare. The hedge cut back.]
-  tint: '#cfe8c2'
 transitions:
 - {x: 2, y: 8, targetMap: elfheim, targetEntrance: house_healer}
 encounterRate: {min: 999, max: 999}

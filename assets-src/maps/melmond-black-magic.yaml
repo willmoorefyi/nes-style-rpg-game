@@ -70,7 +70,7 @@ npcs:
 - id: melmond-black-magic-keeper
   x: 2
   y: 4
-  sprite: black_mage
+  sprite: scholar
   dialog: [The rot has made folk curious about darker arts. Choose carefully.]
   shopId: melmond_black
 transitions:

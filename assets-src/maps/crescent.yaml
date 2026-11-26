@@ -555,7 +555,7 @@ npcs:
         you''ll find them, if they let themselves be found.']
   tint: '#8ca0b4'
 - id: geologist_hint
-  sprite: black_wizard
+  sprite: scholar
   x: 46
   y: 18
   dialog:
@@ -579,7 +579,7 @@ npcs:
   - text: ['Welcome to Crescent Lake. We''ve no wall: the terraces and the water keep us, and the scholars keep quiet.']
   tint: '#7890a8'
 - id: fisher
-  sprite: farmer
+  sprite: sailor
   x: 49
   y: 17
   dialog:
@@ -610,7 +610,7 @@ npcs:
   - text: ['The astronomer charts the stars, and I chart the astronomer''s moods. Both turn slowly.']
   tint: '#b4a0c8'
 - id: pupil_a
-  sprite: villager
+  sprite: boy
   x: 6
   y: 9
   dialog:
@@ -621,7 +621,7 @@ npcs:
   - text: [The tutor says the earth is sick. I asked if it needs soup. She said that's not funny.]
   wander: true
 - id: pupil_b
-  sprite: villager_f
+  sprite: girl
   x: 18
   y: 9
   dialog:
@@ -641,7 +641,7 @@ npcs:
     text: ['Smoke by day in the south, a white mist in the hollow beside it. Two omens. The sages like omens in pairs.']
   - text: [I count the lights on the lake at night. Fewer every year. The world grows dim at the edges.]
 - id: student_a
-  sprite: villager
+  sprite: townsman
   x: 22
   y: 14
   dialog:
@@ -651,7 +651,7 @@ npcs:
     text: ['Ever since the earth crystal shone again, the sages argue about fire. Loudly. Sages are never loud.']
   - text: ['I came to study the stars. The sages make us study rot instead: rot in the roots, rot in the stone.']
 - id: student_b
-  sprite: villager_f
+  sprite: young_woman
   x: 27
   y: 14
   dialog:
@@ -662,7 +662,7 @@ npcs:
   - text: [The well water tastes of earth this year. Not good earth. The sour kind.]
   wander: true
 - id: gardener
-  sprite: farmer
+  sprite: townsman
   x: 24
   y: 22
   dialog:
@@ -672,7 +672,7 @@ npcs:
     text: [My roses perked up the very day the earth crystal shone. I don't ask why. I water.]
   - text: [Half my roses died this spring. The soil's grey a hand down. I've never seen the like.]
 - id: pilgrim_a
-  sprite: monk
+  sprite: pilgrim
   x: 38
   y: 22
   dialog:
@@ -681,9 +681,8 @@ npcs:
   - condition: EARTH_CRYSTAL_LIT
     text: [Pilgrims come from every coast to the hostel now. The sages say the world is turning.]
   - text: [I walked three months to sit by the Circle. They let me sit on the causeway. It's a start.]
-  tint: '#c8b48c'
 - id: pilgrim_b
-  sprite: white_mage
+  sprite: old_woman
   x: 42
   y: 21
   dialog:
@@ -692,9 +691,8 @@ npcs:
   - condition: EARTH_CRYSTAL_LIT
     text: ['I prayed at the stones for the earth, and the earth answered. Now I pray about the fire.']
   - text: ['I pray at the edge of the lake for the earth. The lake doesn''t answer, but it listens.']
-  tint: '#d0c8b8'
 - id: boat_girl
-  sprite: villager_f
+  sprite: girl
   x: 41
   y: 26
   dialog:
@@ -704,7 +702,7 @@ npcs:
     text: [Father's mending every hull in the boathouse. He says the lake folk will travel again soon.]
   - text: ['Father builds boats, but nobody buys. Where would they sail? The rivers run into the ring and stop.']
 - id: old_scholar
-  sprite: white_wizard
+  sprite: scholar
   x: 16
   y: 30
   dialog:
@@ -725,7 +723,7 @@ npcs:
   - text: [A book on the blight of the earth. It's very thorough. It ends badly.]
   wander: true
 - id: child
-  sprite: villager
+  sprite: boy
   x: 12
   y: 28
   dialog:

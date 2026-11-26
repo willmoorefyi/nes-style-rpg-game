@@ -16,7 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1]
 npcs:
 - id: elfheim_scribe
-  sprite: white_wizard
+  sprite: elf_elder
   x: 9
   y: 6
   dialog:
@@ -26,14 +26,12 @@ npcs:
     text: ['I''ve written it down: ''Astos, the false king of the Western Keep, is fallen.'' It is my best line.']
   - text: ['I keep the prince''s chronicle. The last entry reads: ''Today the prince slept.'' So does every entry since.', 'Astos came as a guest from the west. He brought a gift box. The prince opened
         it, and slept.']
-  tint: '#e4e9d6'
 - id: elfheim_archive_reader
-  sprite: black_mage
+  sprite: elf_mage
   x: 3
   y: 7
   dialog:
   - text: [The archive says the dwarves of the strait once traded with us for mithril. They paid in powder for blasting rock. The prince keeps a cask in the vault still.]
-  tint: '#cfe8c2'
 transitions:
 - {x: 9, y: 10, targetMap: elfheim, targetEntrance: house_scribe}
 name: Scribe's House

@@ -91,7 +91,7 @@ objects:
   y: 8
 npcs:
 - id: onrac_healer
-  sprite: white_mage
+  sprite: healer
   x: 3
   y: 5
   dialog: ['Cold takes the weak and the sea takes the brave. I can call back either, if you''re quick. Lay them down.']
@@ -106,7 +106,7 @@ npcs:
     text: [My toes have stopped tingling. The healer says it's her salve. I say it's the warm wind.]
   - text: [Fell through the harbour ice chasing a hat. The hat got away. Two of my toes nearly did too.]
 - id: onrac_healer_nurse
-  sprite: white_wizard
+  sprite: young_woman
   x: 5
   y: 7
   dialog:

@@ -145,12 +145,11 @@ npcs:
   - text: [We walk the coast from thaw to frost and sell what the sea throws up., 'The best of it is the trader''s bottle. Folk in Gaia, beyond
         the eastern peaks, would weep to see it.']
 - id: scout
-  sprite: thief
+  sprite: pilgrim
   x: 7
   y: 13
   dialog: ['I''ve walked every mile of this coast but one: the gorge above Onrac. The river fills it wall to wall.', Nobody walks to the waterfall.
       You'd need a boat light enough to carry.]
-  tint: '#a0b8c8'
 - id: drover
   sprite: farmer
   x: 16

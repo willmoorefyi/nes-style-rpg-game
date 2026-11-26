@@ -53,7 +53,7 @@ npcs:
   dialog: [A crowned skeleton in plate rimed with frost sits on a throne of ice. Its sockets kindle blue., 'Rime Sovereign: I swore my realm would never end. I took the earth''s warmth to keep that oath.',
     It is still not enough. Yours will help.]
 - id: ert_d_altar_shade
-  sprite: knight
+  sprite: king
   tint: '#e4eef8'
   x: 24
   y: 6

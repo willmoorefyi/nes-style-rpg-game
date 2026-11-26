@@ -15,7 +15,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   8, 8, 8, 1, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 8, 8, 8, 8, 1, 1, 8, 8, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: gaia_healer
-  sprite: white_mage
+  sprite: healer
   x: 3
   y: 5
   dialog: ['Bring your fallen here, to the light. I can call them back, for a price that pays for the oil.']

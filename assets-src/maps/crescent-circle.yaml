@@ -185,7 +185,7 @@ objects:
   on_water: true
 npcs:
 - id: sage_elder
-  sprite: master
+  sprite: sage_star
   x: 13
   y: 8
   dialog:
@@ -203,7 +203,7 @@ npcs:
     onceFlag: CANOE_GIVEN
   tint: '#e8e0c8'
 - id: sage_lukahn
-  sprite: white_wizard
+  sprite: scholar
   x: 13
   y: 14
   dialog: ['Lukahn: Long ago I wrote down what the stones told me, and the town has copied it ever since.', '"When the four lights fail, four
@@ -243,7 +243,7 @@ npcs:
     text: [Last night the urn's water steamed on one side and froze on the other. We did not sleep.]
   - text: [Moss is dying on the stones. In three hundred years it has never died. I count the patches each dawn.]
 - id: sage_tide
-  sprite: red_wizard
+  sprite: pilgrim
   x: 18
   y: 11
   dialog:
@@ -253,7 +253,7 @@ npcs:
     text: [The lake has warmed by a finger's breadth along its south shore. The fire mountain is stirring.]
   - text: ['The lake''s level falls each year, and the fish grow fewer. The land beneath is thirsty and sick.']
 - id: sage_reed
-  sprite: black_wizard
+  sprite: sage_earth
   x: 10
   y: 13
   dialog:
@@ -273,7 +273,7 @@ npcs:
     text: ['The fire crystal sleeps in the mountain''s heart, under a tyrant made of ash. So the stones say.']
   - text: [The earth crystal is dimming. The stones are certain. We are only less certain how long it has.]
 - id: sage_north
-  sprite: white_mage
+  sprite: healer
   x: 4
   y: 10
   dialog:
@@ -294,7 +294,7 @@ npcs:
     text: [The volcano's grumble crosses the lake at night. The stones hum back at it.]
   - text: ['The earth has been sick before. Never this sick. The stones remember everything, and they are afraid.']
 - id: sage_shore
-  sprite: monk
+  sprite: pilgrim
   x: 6
   y: 16
   dialog:
@@ -305,7 +305,7 @@ npcs:
   - text: ['We fast for the earth, and the earth goes on rotting. Still, it is something to do with our hands.']
   tint: '#b0a090'
 - id: sage_lantern
-  sprite: red_mage
+  sprite: sage_flame
   x: 20
   y: 16
   dialog:

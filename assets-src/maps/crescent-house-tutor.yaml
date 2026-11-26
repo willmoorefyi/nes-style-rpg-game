@@ -98,7 +98,7 @@ objects:
   y: 8
 npcs:
 - id: tutor
-  sprite: red_mage
+  sprite: townsman
   x: 6
   y: 4
   dialog:
@@ -107,7 +107,6 @@ npcs:
   - condition: EARTH_CRYSTAL_LIT
     text: ['Lesson eleven: what heals the earth may wake the fire. I wrote it for the sages. Now I teach it.']
   - text: ['Lesson ten: the earth is sick, and the sick earth makes sick crops. My pupils know it better than I''d like.']
-  tint: '#c8a0a0'
 - id: pupil_c
   sprite: villager
   x: 4

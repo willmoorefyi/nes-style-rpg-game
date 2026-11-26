@@ -23,8 +23,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: elfheim_steward
-  sprite: old_man
-  tint: '#e4e9d6'
+  sprite: elf_elder
   x: 10
   y: 6
   dialog:
@@ -34,8 +33,7 @@ npcs:
     text: ['That herb... Matoya''s? Up the west stair, friend, and hold it under his nose. Hurry!']
   - text: [The throne has stood empty a year. I dust it every morning and do not sit in it., 'The prince sleeps upstairs, by the west stair. Visitors may look in. Nobody has woken him.']
 - id: elfheim_hall_guard
-  sprite: guard
-  tint: '#cfe8c2'
+  sprite: elf_guard
   x: 15
   y: 11
   dialog:
@@ -43,8 +41,7 @@ npcs:
     text: ['The prince''s key opens the living gate to the vault. If he gave it to you, you may pass.']
   - text: [The stair in the corner goes down to the vault. The gate is grown shut; only the prince's key opens it.]
 - id: elfheim_lady
-  sprite: villager_f
-  tint: '#cfe8c2'
+  sprite: elf_woman
   x: 8
   y: 11
   wander: true
@@ -53,8 +50,7 @@ npcs:
     text: [Court is lively again! The prince has already quarrelled with the steward twice.]
   - text: [We hold court without a prince. It is mostly sighing.]
 - id: elfheim_court_mage
-  sprite: white_wizard
-  tint: '#e4e9d6'
+  sprite: elf_mage
   x: 17
   y: 7
   dialog:

@@ -106,7 +106,7 @@
     ]
   },
   "imported": "2026-11-26",
-  "approved": null,
-  "user_review": null,
+  "approved": "2026-11-26",
+  "user_review": "approved all 21; flaws not noticeable, keep as rendered",
   "route": "PT: user-rendered field sheet (house quantizer, no AI call)"
 }

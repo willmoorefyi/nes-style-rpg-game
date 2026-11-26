@@ -9,7 +9,7 @@ from __future__ import annotations
 
 LEARNED, CHIME = "LUFENIAN_LEARNED", "CHIME_GIVEN"
 TINT = "#dfe6f5"                                 # the sky-folk's pale robes over the stock sheets (QUEST 4.2 tint)
-OWN = {"luf_citizen_m", "luf_citizen_f", "luf_senator"}   # AR: the Lufenians' own field sheets, drawn pale: no tint
+OWN = {"luf_citizen_m", "luf_citizen_f", "luf_senator", "boy"}   # AR / PT: sheets drawn in their own colours: no tint
 
 # the old tongue: a few fixed phrases, never real words (one per speaker, so the town sounds like many voices)
 TONGUE = [
@@ -54,7 +54,7 @@ def outdoor() -> list[dict]:
             "Some nights it hangs right over the mesa, black against the stars. It used to shine."], 4), wander=True),
         npc("lufenia_weaver", "luf_citizen_f", 24, 14, talk([
             "We dress in white so the wind can find us. It has not come looking for a long time."], 5), wander=True),
-        npc("lufenia_child", "villager", 15, 22, talk([
+        npc("lufenia_child", "boy", 15, 22, talk([
             "Grandmother says our people came down from the sky in a boat made of light.",
             "I want to go back up. Will you take me? No? Then tell me what it looks like."], 6,
             ["You're going up there, aren't you? Bring me back a feather from a sky bird!"])),
@@ -64,7 +64,7 @@ def outdoor() -> list[dict]:
         npc("lufenia_shepherd", "farmer", 27, 16, talk([
             "The mesa goats graze the moor below the domes. They do not like the silence any more than we do."], 8),
             wander=True),
-        npc("lufenia_bellwright", "master", 25, 27, talk([
+        npc("lufenia_bellwright", "luf_citizen_m", 25, 27, talk([
             "I cast the elder's chime anew every hundred years, from the same bronze.",
             "It must never be rung in town. Here it only hums, as if it remembered the tower."], 9,
             ["So the chime has gone with you. Mind it on the road. I am too old to cast another."])),

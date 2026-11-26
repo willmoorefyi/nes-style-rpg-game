@@ -598,3 +598,28 @@ rendered; 4.2 / 4.3's ship work waits for them.
   helpers) so both stay under 250 lines; of 4.2 / 4.3 / 6.4 only the ship work (`vehicle_user.py`, the ship heading,
   `shipHeading.test.ts`, the `vehicleLayout.ts` frames) is outside PT-3's delivered scope, waiting for the ship render;
   A3 stays a proposal and `a1_t_town.test.ts` is untouched until the user rules.
+
+## 11. PT-5 result (2026-11-26)
+
+User rulings (2026-11-26, verbatim): "approve them, I don't even notice the flaws so go ahead and move them. Drop the tint
+on the crew and keep Bikke's red. Add her and the lines are great." So all 21 sheets are approved as rendered
+(`approved` 2026-11-26, `user_review` "approved all 21; flaws not noticeable, keep as rendered"; no patches), A3 is
+adopted (Bikke's 7 crew untinted `pirate_crew`, `pirate()` lost its tint argument and RED / TAR / SALT; Bikke keeps
+his red as `sea_captain`; `a1_t_town.test.ts` checks the crew's sheet and Bikke's tint instead of the crew's tints) and
+A2 is in (`cornelia_dancer` at (CX + 5, 50) on the square). Rebased onto `int-pt1` (5557937d: playtest-world,
+hero-facing, esc-menu-fix, cleanup-dead) before the edits.
+
+- **The reassignment:** 161 rows of 5.1-5.3 applied in the layout scripts (130 by the id literal, 18 shop keepers
+  through `keeper(r, slug, sprite, ...)`, the brooms in `a1/matoya.py`); a check over every map source compares HEAD
+  and the tree: every sprite change is a table row, every row done, no other field changed, no tint left on a
+  reassigned row but the 11 "tint kept" ones (5.1) and Bikke. Tints: the Elfheim `ELF` / `ELDER` constants and every
+  use are gone (`npc()` defaults to no tint); the reassigned rows' explicit tints are removed in `water/caravan.py`,
+  `fire/town_crescent_people.py`, `fire/town_crescent_homes.py`, `wind/town_gaia_people.py` (its `SKY`),
+  `wind/lufenia_interiors.py` (the keepers take `TINT` only for sheets outside `lufenia_people.OWN`, which gains
+  `boy`). 61 map sources change; the overworld does not.
+- **Tests:** `tests/data/heroSpriteNpcs.test.ts` (6.1, the 7-entry allowlist; sources and compiled maps),
+  `tests/data/elfheimElves.test.ts` (6.2), `ptNpcArt.test.ts` gains 6.3's placement checks (every sheet placed and
+  approved, the per-town cap of 5.5, Arylon, the brooms); `corneliaLayout.test.ts`'s M8 line now expects the fisher as
+  a `sailor` (5.3).
+- **Compile:** the 61 maps compiled; 152 chunk PNGs of 14 maps were RGBA at `int-pt1` and come out palette-indexed
+  (`build_map.save_chunk`), pixel-identical (checked), so the compile is the compiler's own output.

@@ -127,7 +127,7 @@ def vintner(out: list[Path]) -> None:
         (LIT, ["Smell that? The vines are budding. This year's pressing will be the best in a lifetime."]),
         default=["The last good vintage is in those casks. I won't sell it. I'm saving it for the day the vines "
                  "come back.", "If they don't, I'll drink it myself, slowly, and complain."]))
-    r.npc("melmond_vintner_daughter", "villager_f", 5, 6, when(
+    r.npc("melmond_vintner_daughter", "girl", 5, 6, when(
         (VAMP, ["Father let me ride to the badlands' edge with the carter. The grey there is thinner, I think."]),
         default=["I'm meant to learn the vines from Father. All I've learned is how to sweep up dead leaves."]))
     out.append(r.save(note("a vintner's house, a front room and a room of casks off its east side", "the last "
@@ -155,7 +155,7 @@ def ploughman(out: list[Path]) -> None:
         (LIT, ["My plough's back in the furrow! Funny how a man misses blisters."]),
         default=["I've put the plough away in the shed. There's no use dragging it through dust.",
                  "My father ploughed these fields, and his. I'll be the one who stopped."]))
-    r.npc("melmond_plough_son", "villager", 3, 5, when(
+    r.npc("melmond_plough_son", "boy", 3, 5, when(
         (LIT, ["Father let me drive the ox today! It sat down. But still!"]),
         default=["I'm going to be a dwarf when I grow up. They dig, and nothing they dig dies."]))
     r.npc("melmond_plough_gran", "villager_f", 7, 4, when(
@@ -182,7 +182,7 @@ def healer(out: list[Path]) -> None:
     r.one("table", 1, 3)
     r.one("orb_white", 1, 7)
     r.one("plant", 11, 7)
-    r.npc("melmond_healer", "white_mage", 3, 4,
+    r.npc("melmond_healer", "healer", 3, 4,
           ["The fallen can be brought back, if you come quickly. Lay them here."],
           action="clinic", clinicPrice=20)              # GAP-16: 20 G per level of each fallen member
     r.npc("melmond_patient", "villager", 9, 5, when(

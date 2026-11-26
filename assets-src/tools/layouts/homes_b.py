@@ -159,7 +159,7 @@ def build() -> list[Path]:
     r.one("orb_white", 4, 3)
     cure = ("Cure magic mends wounds, but a knocked-out friend needs more than that. The inn or a phoenix down "
             "will do.")
-    r.npc("priestess", "white_mage", 6, 4, [
+    r.npc("priestess", "healer", 6, 4, [
         {"condition": "PRINCESS_RESCUED", "text": ["The light brought Her Highness home, and you with it. Bless you.",
                                                    cure]},
         {"text": ["Welcome to the wayside shrine. Say a prayer for the princess, if you would.", cure]}])

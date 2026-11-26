@@ -18,7 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parent))
 from common import Room as BaseRoom  # noqa: E402
-from town_elfheim_people import AWAKE, ELDER, ELF, HERB, talk  # noqa: E402
+from town_elfheim_people import AWAKE, HERB, talk  # noqa: E402
 
 KITS = ["castle", "interior", "town"]
 MATS = {"floor_stone": {"from": "marble", "shade": 0.9}, "in_wall_face": {"from": "castle_wall_in", "shade": 0.9},
@@ -68,19 +68,19 @@ def hall() -> Path:
         r.deco([["plant"]], x, y)
     r.transitions += [{"x": x, "y": 19, "targetMap": "elfheim", "targetEntrance": "north_gate"} for x in (12, 13)]
     r.npcs += [
-        {"id": "elfheim_steward", "sprite": "old_man", "tint": ELDER, "x": 10, "y": 6, "dialog": talk(
+        {"id": "elfheim_steward", "sprite": "elf_elder", "x": 10, "y": 6, "dialog": talk(
             ["The throne has stood empty a year. I dust it every morning and do not sit in it.",
              "The prince sleeps upstairs, by the west stair. Visitors may look in. Nobody has woken him."],
             herb=["That herb... Matoya's? Up the west stair, friend, and hold it under his nose. Hurry!"],
             awake=["The prince sat on his throne this morning and fell asleep in it. Only for a nap, he said. "
                    "I nearly fainted."])},
-        {"id": "elfheim_hall_guard", "sprite": "guard", "tint": ELF, "x": 15, "y": 11, "dialog": talk(
+        {"id": "elfheim_hall_guard", "sprite": "elf_guard", "x": 15, "y": 11, "dialog": talk(
             ["The stair in the corner goes down to the vault. The gate is grown shut; only the prince's key opens it."],
             awake=["The prince's key opens the living gate to the vault. If he gave it to you, you may pass."])},
-        {"id": "elfheim_lady", "sprite": "villager_f", "tint": ELF, "x": 8, "y": 11, "wander": True, "dialog": talk(
+        {"id": "elfheim_lady", "sprite": "elf_woman", "x": 8, "y": 11, "wander": True, "dialog": talk(
             ["We hold court without a prince. It is mostly sighing."],
             awake=["Court is lively again! The prince has already quarrelled with the steward twice."])},
-        {"id": "elfheim_court_mage", "sprite": "white_wizard", "tint": ELDER, "x": 17, "y": 7, "dialog": talk(
+        {"id": "elfheim_court_mage", "sprite": "elf_mage", "x": 17, "y": 7, "dialog": talk(
             ["Astos's gift box held no poison and no blade, only sleep, folded very small.",
              "I can unfold most curses. Not that one. It wants the bitter herb of a human witch."],
             awake=["Matoya's herb, and gone in a breath. I'll write to her. Respectfully."])},
@@ -113,22 +113,22 @@ def chamber() -> Path:
     r.deco([["plant"]], 1, 3)
     r.deco([["table"]], 12, 8)
     r.npcs += [
-        {"id": "elfheim_prince", "sprite": "knight", "tint": ELF, "x": 7, "y": 4, "hideIf": AWAKE,
+        {"id": "elfheim_prince", "sprite": "elf_prince", "x": 7, "y": 4, "hideIf": AWAKE,
          "requiredItem": "herb", "cutscene": PRINCE, "dialog": [
              {"condition": HERB, "text": ["The prince sleeps on his bier. The herb in your pack smells sharp enough to "
                                           "wake a stone. You crush a leaf beneath his nose..."]},
              {"text": ["The prince lies on his bier, breathing slow and deep. Nothing you say reaches him.",
                        "A faint frost of dark elf magic rimes his eyelashes."]}]},
-        {"id": "elfheim_prince_awake", "sprite": "knight", "tint": ELF, "x": 7, "y": 4, "showIf": AWAKE, "dialog": [
+        {"id": "elfheim_prince_awake", "sprite": "elf_prince", "x": 7, "y": 4, "showIf": AWAKE, "dialog": [
             "The key opens the living gate below the hall. Take whatever the vault holds that helps you.",
             "If the dwarves of the strait still want blasting powder, there is a cask of it down there. Astos never "
             "found it; that is something."]},
-        {"id": "elfheim_nurse", "sprite": "white_mage", "tint": ELF, "x": 10, "y": 6, "dialog": talk(
+        {"id": "elfheim_nurse", "sprite": "elf_woman", "x": 10, "y": 6, "dialog": talk(
             ["I turn his pillow, I open the window, I sing. He sleeps on.",
              "The court mage says only a human witch's herb could break it. Matoya's, he means."],
             herb=["Is that the herb? Oh, please, try it. Hold it close to him."],
             awake=["He sent me to bed for the first time in a year. I don't know what to do with a bed."])},
-        {"id": "elfheim_chamber_guard", "sprite": "guard", "tint": ELF, "x": 4, "y": 4, "dialog": talk(
+        {"id": "elfheim_chamber_guard", "sprite": "elf_guard", "x": 4, "y": 4, "dialog": talk(
             ["I've stood here since the curse. If he wakes, I want to be the first face he sees."],
             awake=["He saw my face first. He said I needed a shave. Best day of my life."])},
     ]

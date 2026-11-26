@@ -76,7 +76,7 @@ def ropemaker(out: list[Path]) -> None:
         (FREED, ["Every bridge in Gaia sings in the wind again. I'd forgotten how a good rope sounds under a gust."]),
         default=["Fifteen paces of plank: that's our rope walk. You twist the hemp walking backwards, all day.",
                  "Without the wind the bridges don't sway, so they don't wear, so nobody needs new rope. Sad trade."]))
-    r.npc("gaia_rope_apprentice", "thief", 10, 6, when(
+    r.npc("gaia_rope_apprentice", "boy", 10, 6, when(
         (BOTTLE, ["You've got a bottle that's glowing in your pack. That's not normal, is it? Is it?"]),
         default=["I can tie forty knots. The master says thirty-nine of them are the same knot."]), wander=True)
     out.append(r.save(note("a ropemaker's long house with a plank rope walk running down its length",
@@ -132,7 +132,7 @@ def healer(out: list[Path]) -> None:
     r.one("orb_white", 1, 4)
     r.one("table", 5, 4)
     r.one("plant", 8, 8)
-    r.npc("gaia_healer", "white_mage", 3, 5,
+    r.npc("gaia_healer", "healer", 3, 5,
           ["Bring your fallen here, to the light. I can call them back, for a price that pays for the oil."],
           action="clinic", clinicPrice=120)           # GAP-16: 120 G per level of each fallen member (B7)
     r.npc("gaia_patient", "burgher", 9, 4, when(
@@ -168,7 +168,7 @@ def beekeeper(out: list[Path]) -> None:
         (FREED, ["The hives emptied out in one roar this morning. The whole bowl's buzzing. Best sound there is."]),
         default=["Bees ride the wind to the high flowers. No wind, no ride. They sit at home and eat my profits.",
                  "Those jars on the shelf are last year's. When they're gone, they're gone."]))
-    r.npc("gaia_beekeeper_daughter", "villager_f", 3, 6, when(
+    r.npc("gaia_beekeeper_daughter", "girl", 3, 6, when(
         (FREED, ["I got stung four times today. Father says that's luck. Father's never been stung, he says."]),
         default=["I talk to the bees so they don't get lonely. They don't answer. They're sulking."]))
     out.append(r.save(note("a beekeeper's house with two shelves of bottles on the back wall",

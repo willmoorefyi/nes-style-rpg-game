@@ -17,7 +17,7 @@ npcs:
 - id: pravoka-black-magic-keeper
   x: 3
   y: 4
-  sprite: black_mage
+  sprite: scholar
   dialog:
   - condition: BIKKE_DEFEATED
     text: ['Ice and darkness, sold to the ones who beat the Captain. My best customers pay in deeds.']

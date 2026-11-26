@@ -70,7 +70,7 @@ def sage(pid: str, sprite: str, x: int, y: int, dialog, **kw) -> dict:
 
 ELDER = (13, 8)
 NPCS = [
-    sage("sage_elder", "master", *ELDER, [
+    sage("sage_elder", "sage_star", *ELDER, [
         {"condition": CANOE, "text": [
             "Elder: The canoe is yours, and the rivers with it. One runs to the fire mountain, one to the frozen hollow.",
             "Go to both in whatever order your courage likes. The crystals do not wait on our patience."]},
@@ -82,7 +82,7 @@ NPCS = [
             "But the earth is rotting under the western lands, and while it rots we can give you nothing.",
             "Heal the earth first. Light its crystal. Then come back across the causeway."]}],
         cutscene={"id": "fir_sages_canoe", "requiredFlags": [LIT], "onceFlag": CANOE}, tint="#e8e0c8"),
-    sage("sage_lukahn", "white_wizard", 13, 14, [
+    sage("sage_lukahn", "scholar", 13, 14, [
         "Lukahn: Long ago I wrote down what the stones told me, and the town has copied it ever since.",
         "\"When the four lights fail, four will walk out of the dark carrying them. Each fallen light they lift will "
         "show them the next.\"",
@@ -102,11 +102,11 @@ NPCS = [
         ["I have nothing to add. The elder said it all. That doesn't happen often; enjoy it."],
         ["Last night the urn's water steamed on one side and froze on the other. We did not sleep."],
         ["Moss is dying on the stones. In three hundred years it has never died. I count the patches each dawn."])),
-    sage("sage_tide", "red_wizard", 18, 11, said(
+    sage("sage_tide", "pilgrim", 18, 11, said(
         ["When you reach the fire, remember: it was here before the world, and it will be here after. Respect it."],
         ["The lake has warmed by a finger's breadth along its south shore. The fire mountain is stirring."],
         ["The lake's level falls each year, and the fish grow fewer. The land beneath is thirsty and sick."])),
-    sage("sage_reed", "black_wizard", 10, 13, said(
+    sage("sage_reed", "sage_earth", 10, 13, said(
         ["The frozen hollow keeps something that was never meant to be found. Go armed, and go warm."],
         ["Frost has a voice in the south. It is not a kind one. Something in the ice is watching."],
         ["The roots of the trees on the western shore have gone soft as rope. The earth has a fever."])),
@@ -114,7 +114,7 @@ NPCS = [
         ["We have given away our oldest boat. I feel lighter. Sages should own less, I always said."],
         ["The fire crystal sleeps in the mountain's heart, under a tyrant made of ash. So the stones say."],
         ["The earth crystal is dimming. The stones are certain. We are only less certain how long it has."])),
-    sage("sage_north", "white_mage", 4, 10, said(
+    sage("sage_north", "healer", 4, 10, said(
         ["From the islet's edge I watched you push off. The ripples are still reaching the far shore."],
         ["Look south over the water: smoke by day, a pale light by night. Two shrines are waking."],
         ["I watch the western sky. Each evening it is greyer. The earth's colour is leaving it."]), tint="#d8d0e8"),
@@ -122,12 +122,12 @@ NPCS = [
         ["A sage gave me a canoe when I was young. It took me here. Let it take you farther."],
         ["The volcano's grumble crosses the lake at night. The stones hum back at it."],
         ["The earth has been sick before. Never this sick. The stones remember everything, and they are afraid."])),
-    sage("sage_shore", "monk", 6, 16, said(
+    sage("sage_shore", "pilgrim", 6, 16, said(
         ["Rivers branch. If one way is shut, paddle another. That is the whole of my wisdom, and it took sixty years."],
         ["Pilgrims cross the causeway every day now, asking about fire. I tell them to ask you."],
         ["We fast for the earth, and the earth goes on rotting. Still, it is something to do with our hands."]),
         tint="#b0a090"),
-    sage("sage_lantern", "red_mage", 20, 16, said(
+    sage("sage_lantern", "sage_flame", 20, 16, said(
         ["Paddle well. Come back and tell us what the rivers said. We love a story, here."],
         ["I lit a lamp for the earth when its crystal shone. Now I light two more: one red, one white."],
         ["I keep the lamp at the islet's edge for the earth. While it burns, we have not given up."]),

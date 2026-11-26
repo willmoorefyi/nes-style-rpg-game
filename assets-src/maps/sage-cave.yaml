@@ -87,7 +87,7 @@ objects:
   y: 7
 npcs:
 - id: ert_sarda
-  sprite: master
+  sprite: sage_earth
   x: 7
   y: 5
   dialog:
@@ -103,7 +103,7 @@ npcs:
     requiredFlags: [VAMPIRE_DEFEATED]
     onceFlag: ERT_O_ROD_GIVEN
 - id: ert_sarda_pupil_a
-  sprite: white_mage
+  sprite: healer
   x: 4
   y: 7
   dialog:
@@ -111,7 +111,7 @@ npcs:
     text: [The master hasn't parted with that rod in my lifetime. Be worthy of it.]
   - text: [The master speaks to the stones. Mostly they don't answer.]
 - id: ert_sarda_pupil_b
-  sprite: black_mage
+  sprite: townsman
   x: 11
   y: 9
   dialog: ['We reached this coast before the giant blocked the tunnel. Now no one visits. You came through him?']

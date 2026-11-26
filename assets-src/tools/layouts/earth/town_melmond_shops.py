@@ -90,7 +90,7 @@ def build() -> list[Path]:
     r.one("plant", 1, 7)
     r.one("plant", 9, 7)
     r.staff(2, 3, 8, 4)
-    MEL.keeper(r, "white-magic", "white_mage", 6, 4, ["Healing words, for a town that needs them. Learn them well."],
+    MEL.keeper(r, "white-magic", "healer", 6, 4, ["Healing words, for a town that needs them. Learn them well."],
                "melmond_white")
     out.append(r.save(note("a white magic shop like a small chapel, a white orb in an alcove", "two arched windows "
                            "on either side of the orb's alcove; a carpet from the door to the counter"),
@@ -111,7 +111,7 @@ def build() -> list[Path]:
     r.tall("bookshelf", 4, 3)                         # closes the keeper's corner above the counter's east end
     r.thing("crate", 1, 7)
     r.staff(1, 3, 3, 4)
-    MEL.keeper(r, "black-magic", "black_mage", 2, 4, ["The rot has made folk curious about darker arts. Choose "
+    MEL.keeper(r, "black-magic", "scholar", 2, 4, ["The rot has made folk curious about darker arts. Choose "
                "carefully."], "melmond_black")
     out.append(r.save(note("a black magic shop, low and dark, its counter boxing in the north-west corner",
                            "a bookshelf that closes the keeper's corner; a black orb beside a second tall bookshelf"),

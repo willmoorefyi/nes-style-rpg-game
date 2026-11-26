@@ -17,13 +17,12 @@ npcs:
 - id: elfheim-item-keeper
   x: 2
   y: 4
-  sprite: vendor_f
+  sprite: elf_woman
   dialog:
   - condition: PRINCE_AWAKE
     text: [Business is brisk! Everyone's going on journeys now the prince is up.]
   - text: ['Potions brewed in the spring''s own water. Tents that pitch themselves, nearly.']
   shopId: elfheim_item
-  tint: '#cfe8c2'
 transitions:
 - {x: 6, y: 8, targetMap: elfheim, targetEntrance: item_shop}
 name: Item Shop

@@ -516,7 +516,7 @@ npcs:
   - text: ['Traders camp in the dunes far to the west. A caravan, with tents round a rock in the sand.', Their master keeps a bottle he won't
         name. Something glows in it. He wants a fortune for it., Pay it. A caravan man only asks a fortune for a thing that's worth two.]
 - id: onrac_fairy_lore
-  sprite: monk
+  sprite: old_woman
   x: 20
   y: 22
   dialog:
@@ -527,7 +527,7 @@ npcs:
   - text: ['There are fairies who live in springs and breathe a water that is also air. Oxyale, it''s called.', One of them was caught in a bottle
         long ago and carried off. Gaia's spring has been dry since.]
 - id: onrac_bell_child
-  sprite: villager
+  sprite: boy
   x: 25
   y: 21
   dialog:
@@ -536,7 +536,7 @@ npcs:
   - text: [Grandad rings the sea bell at dusk. He says it's so the drowned people know what time it is.]
   wander: true
 - id: onrac_rack_wife
-  sprite: villager_f
+  sprite: young_woman
   x: 9
   y: 17
   dialog:
@@ -555,7 +555,7 @@ npcs:
   - text: ['Pine tar, boiled thick. Every plank in this town drinks a pot of it a year, or the sea drinks it.', Don't lean on the pot. I've had
         two apprentices and both were careless.]
 - id: onrac_net_lad
-  sprite: thief
+  sprite: sailor
   x: 18
   y: 32
   dialog:
@@ -581,7 +581,7 @@ npcs:
     text: [No ice to cut this week! The harbour's soft as soup. I may have to sell fish like everybody else.]
   - text: ['I cut ice off the north pools and sell it south. Down there they put it in drinks. Can you imagine?']
 - id: onrac_widow
-  sprite: villager_f
+  sprite: old_woman
   x: 21
   y: 33
   dialog:
@@ -616,7 +616,7 @@ npcs:
   - text: [I watch the sea for the town. Mostly I watch weather. Lately the weather watches back., There's a dark patch out in the sound that
         never ices over. That's where the city went down.]
 - id: onrac_shipwright
-  sprite: master
+  sprite: labourer
   x: 36
   y: 24
   dialog:
@@ -627,7 +627,7 @@ npcs:
   - text: [The iron fish in the basin is mine. Twelve years riveting. She'll go down to the drowned shrine under the harbour., 'But her crew must
         breathe down there, and no lungs can. Not without oxyale, the fairy''s air.']
 - id: onrac_dock_hand
-  sprite: farmer
+  sprite: sailor
   x: 45
   y: 22
   dialog:
@@ -636,7 +636,7 @@ npcs:
   - text: ['Pump, caulk, pump, caulk. The master keeps the sea-gate shut till she''s ready to dive.']
   wander: true
 - id: onrac_sailor
-  sprite: burgher
+  sprite: sailor
   x: 45
   y: 30
   dialog:

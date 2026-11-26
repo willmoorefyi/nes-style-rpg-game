@@ -96,7 +96,7 @@ npcs:
   chestFlag: CHEST_FIR_T_ASTRONOMER
   dialog: [You found an Ether!]
 - id: astronomer
-  sprite: white_wizard
+  sprite: scholar
   x: 2
   y: 6
   dialog:
@@ -108,9 +108,8 @@ npcs:
         in the south: a red one that pulses, and a white one that never moves.']
   - text: ['My charts show the stars dimming at the edges of the sky, one a season. The sages call it the decay.', 'The worst of it lies west,
         under the land. The earth''s own light is going out.']
-  tint: '#d8c8f0'
 - id: astronomer_son
-  sprite: villager
+  sprite: boy
   x: 5
   y: 7
   dialog: [Mother stays up all night and sleeps all day. I've learned to cook breakfast at sunset.]

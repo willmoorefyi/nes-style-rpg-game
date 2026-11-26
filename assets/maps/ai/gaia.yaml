@@ -72,7 +72,7 @@ npcs:
     text: ['Feel that on your face? That''s the bowl breathing again. I''d stopped noticing I was holding my own breath.']
   - text: ['You came by air? Nobody walks up here. The passes are worse than the drop.', Welcome to Gaia. Take the switchbacks slowly; the town's built one terrace on the next.]
 - id: gaia_water_hauler
-  sprite: villager_f
+  sprite: young_woman
   x: 35
   y: 40
   dialog:
@@ -100,7 +100,7 @@ npcs:
   - text: ['South-west of the bowl, out in the sands, stands the Mirage Tower. Some days you see it, some days you don''t.', Its door has no handle and no lock. They say the sky-folk ring it open with a
         chime.]
 - id: gaia_child
-  sprite: villager
+  sprite: girl
   x: 22
   y: 43
   dialog:
@@ -117,7 +117,7 @@ npcs:
     text: ['The sails are full and pulling! I''ve three tears to mend already. Wonderful, wonderful tears.']
   - text: [I mend the canvas on the sails. A sail that never turns never tears., 'I''ve mended every sail in Gaia twice over, just to keep my hands busy.']
 - id: gaia_mill_lad
-  sprite: thief
+  sprite: boy
   x: 14
   y: 25
   dialog:
@@ -150,7 +150,7 @@ npcs:
     text: [The mountain thyme is waking up on the ledges. The wind carries its seed; it was waiting too.]
   - text: ['I pick herbs on the ledges. Without the wind the seed doesn''t travel, and the ledges are going bare.']
 - id: gaia_old_soldier
-  sprite: knight
+  sprite: guard
   x: 6
   y: 32
   dialog:
@@ -158,7 +158,7 @@ npcs:
     text: [I stood watch on that stair forty years. Never once did it feel as good as this breeze.]
   - text: [Nothing has come up the stairs to fight in a year. Not even weather., A town that can't hear the wind can't hear what's coming. I keep my sword by the bed.]
 - id: gaia_shepherd_boy
-  sprite: villager
+  sprite: boy
   x: 44
   y: 16
   dialog:
@@ -174,7 +174,7 @@ npcs:
     text: [The bees are out over the whole bowl! I'll have honey to sell by the next moon.]
   - text: ['The bees won''t fly in dead air. They sit in the hives and hum, sulking.', 'I''d sell you honey, but they''ve eaten most of it themselves.']
 - id: gaia_weaver_girl
-  sprite: villager_f
+  sprite: girl
   x: 14
   y: 15
   dialog:
@@ -182,7 +182,7 @@ npcs:
     text: [We hang the wool out to dry in the wind again. It used to take a morning; then it took a week.]
   - text: ['The spinner''s teaching me the long wheel. You need a dry wind for good wool, she says.']
 - id: gaia_wind_watcher
-  sprite: monk
+  sprite: old_woman
   x: 38
   y: 21
   dialog:
@@ -192,14 +192,13 @@ npcs:
     text: ['That bottle hums. Can you feel it? Something inside it knows where it is. Climb to the spring.']
   - text: ['We say the wind is the breath of the spring''s fairy. A little winged thing, no bigger than your thumb.', 'When the spring went dry, she was gone. Nobody saw her go.']
 - id: gaia_spring_pilgrim
-  sprite: monk
+  sprite: pilgrim
   x: 21
   y: 7
   dialog:
   - condition: FAIRY_FREED
     text: [Water in the channel and wind in the court. I'll go home and tell them the mountain is well.]
   - text: [I walked up from the lowlands to pray at the spring. I found a dry channel and a cold grotto., I'll pray anyway. It's a long walk back.]
-  tint: '#c8d8f0'
 - id: gaia_vane_keeper
   sprite: old_man
   x: 19
@@ -210,7 +209,7 @@ npcs:
         for this.]
   - text: ['I keep the weather vane. Every morning I oil it, and every morning it points the same way.', The spring is through the grotto behind the court. The warden sits by it day and night.]
 - id: gaia_court_child
-  sprite: villager
+  sprite: boy
   x: 30
   y: 4
   dialog:

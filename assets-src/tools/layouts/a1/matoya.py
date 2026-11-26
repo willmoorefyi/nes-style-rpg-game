@@ -48,7 +48,7 @@ def matoya_lines() -> list[dict]:
 
 
 def broom(n: int, x: int, y: int, before: str, after: str) -> dict:
-    return {"id": f"broom_{n}", "sprite": "black_wizard", "tint": "#a07a48", "x": x, "y": y, "wander": True,
+    return {"id": f"broom_{n}", "sprite": "broom", "x": x, "y": y, "wander": True,
             "dialog": [{"condition": SEEN, "text": [after]}, {"text": [before]}]}
 
 

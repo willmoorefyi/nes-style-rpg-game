@@ -32,7 +32,7 @@ npcs:
     text: ['The clay''s good again! It rolls smooth, not gritty. The earth''s well, my hands say so.']
   - text: [The clay's gone sour. My pots crack in the kiln. Even the mud is sick this year.]
 - id: potter_girl
-  sprite: villager_f
+  sprite: girl
   x: 8
   y: 5
   dialog: ['I keep the kiln fed. Too hot and the pots burst, too cool and they weep. It''s like minding a dragon.']

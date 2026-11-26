@@ -93,7 +93,7 @@ npcs:
     text: ['Hear that? Water, down the well again! Sweet, too. I''d almost forgotten the taste.']
   - text: ['Thirty fathoms of rope, and the bucket comes up full of grey sand. My grandfather dug this well.', 'He said it would never run dry. He also said the moon was a turnip, mind.']
 - id: melmond_oak_child
-  sprite: villager
+  sprite: girl
   x: 21
   y: 21
   dialog:
@@ -110,7 +110,7 @@ npcs:
     text: [Green from fence to fence! I planted on Monday and by Thursday I could hide in it.]
   - text: ['Plough it, seed it, water it, and the shoots come up grey and fall over.', It isn't the weather. Something is pulling the life out from under the roots.]
 - id: melmond_vine_dresser
-  sprite: villager_f
+  sprite: young_woman
   x: 10
   y: 7
   dialog:
@@ -118,7 +118,7 @@ npcs:
     text: [The vines are budding along every row. We'll press wine this autumn after all!]
   - text: ['These vines are older than the town. Their bark peels off in your hand now, like paper.']
 - id: melmond_shore_fisher
-  sprite: villager
+  sprite: sailor
   x: 40
   y: 9
   dialog:
@@ -135,7 +135,7 @@ npcs:
   - text: ['I haul grain to the quay. There''s no grain, so I haul my own empty cart up and down.', Nobody takes the badlands road after dark. Things walk there that cast no shadow.]
   wander: true
 - id: melmond_mill_lad
-  sprite: thief
+  sprite: boy
   x: 36
   y: 11
   dialog:
@@ -143,7 +143,7 @@ npcs:
     text: [The sails turned on their own this morning! Master Hobb says the earth's breathing again.]
   - text: [The windmill leans a hand's width further every year. The ground under it is going soft., Master Hobb won't let me grind. There's nothing to grind anyway.]
 - id: melmond_stall_widow
-  sprite: vendor_f
+  sprite: old_woman
   x: 26
   y: 23
   dialog:
@@ -175,7 +175,7 @@ npcs:
     text: ['Melmond grain for dwarf iron, a fair trade at last. Nerrick sends his regards.']
   - text: [Nerrick's canal brought me here with a hold full of picks and spades., Turns out nobody needs a spade for soil that's turned to dust.]
 - id: melmond_wayfarer
-  sprite: monk
+  sprite: pilgrim
   x: 27
   y: 30
   dialog:

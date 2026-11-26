@@ -109,10 +109,11 @@ describe('Pravoka: Bikke and the pirates (S2)', () => {
   it('on BIKKE_DEFEATED the captain and his crew are gone, and the dockhands and the beaten captain appear', () => {
     const pirates = town.npcs.filter((n) => n.id.startsWith('pirate_'));
     expect(pirates.length).toBeGreaterThanOrEqual(6);
-    for (const p of [...pirates, npc('bikke')]) {
-      expect(p.hideIf).toBe('BIKKE_DEFEATED');
-      expect(p.tint).toMatch(/^#[0-9a-f]{6}$/);
-    }
+    for (const p of [...pirates, npc('bikke')]) expect(p.hideIf).toBe('BIKKE_DEFEATED');
+    // pass PT (the user's ruling of 2026-11-26): the crew is the untinted pirate_crew sheet, Bikke the sea captain in red
+    for (const p of pirates) expect([p.sprite, p.tint], p.id).toEqual(['pirate_crew', undefined]);
+    expect(npc('bikke').sprite).toBe('sea_captain');
+    expect(npc('bikke').tint).toMatch(/^#[0-9a-f]{6}$/);
     const after = state(['BRIDGE_BUILT', 'BIKKE_DEFEATED']);
     expect(npcOutcome(npc('bikke'), after, enc).present).toBe(false);
     for (const id of ['dockhand_a', 'dockhand_b', 'bikke_after']) {

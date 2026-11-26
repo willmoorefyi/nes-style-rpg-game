@@ -36,7 +36,7 @@ def npcs() -> list[dict]:
             ["Out on the islet sit the sages, twelve of them, in a ring of standing stones.",
              "The causeway starts here. Walk it to the end and you'll find them, if they let themselves be found."]),
             tint="#8ca0b4"),
-        npc("geologist_hint", "black_wizard", 46, 18, said(
+        npc("geologist_hint", "scholar", 46, 18, said(
             ["A canoe! Take it down the south river and you'll reach the foot of Gurgu, the volcano.",
              "Bring me back a cooled cinder if you can. Bring yourselves back, more to the point."],
             ["The volcano south of the ring has woken: Gurgu, the old fire mountain. I felt it through my boots.",
@@ -49,7 +49,7 @@ def npcs() -> list[dict]:
             ["The harbour boats say the earth stopped trembling under Melmond. Your doing? The sages will want you."],
             ["Welcome to Crescent Lake. We've no wall: the terraces and the water keep us, and the scholars keep quiet."]),
             tint="#7890a8"),
-        npc("fisher", "farmer", 49, 17, said(
+        npc("fisher", "sailor", 49, 17, said(
             ["Your canoe went out past the landing this morning. Light as a leaf, that boat. Sages build well."],
             ["The lake's gone warm along the south shore. The fish swim north to get away from it."],
             ["The lake fish taste of iron this year. The sages say it's the earth rotting under the far country."])),
@@ -62,11 +62,11 @@ def npcs() -> list[dict]:
             ["The master says your canoe's track on the lake is the brightest thing she saw all night. She was joking."],
             ["We turned the big tube south last night. The volcano's glow lit the clouds from beneath."],
             ["The astronomer charts the stars, and I chart the astronomer's moods. Both turn slowly."]), tint="#b4a0c8"),
-        npc("pupil_a", "villager", 6, 9, said(
+        npc("pupil_a", "boy", 6, 9, said(
             ["Today's lesson was rivers. I already knew: you just get in a canoe and go!"],
             ["The tutor gave us a test on the four crystals. I got the earth one right!"],
             ["The tutor says the earth is sick. I asked if it needs soup. She said that's not funny."]), wander=True),
-        npc("pupil_b", "villager_f", 18, 9, said(
+        npc("pupil_b", "girl", 18, 9, said(
             ["I'm going to be a sage when I grow up. Then I'll build my own canoe."],
             ["The tutor is cross because nobody can see the volcano from the classroom. We tried."],
             ["Shh. If you're loud on the Star Walk the archivist puts your name in a book."])),
@@ -75,32 +75,32 @@ def npcs() -> list[dict]:
             ["Smoke by day in the south, a white mist in the hollow beside it. Two omens. The sages like omens in pairs."],
             ["I count the lights on the lake at night. Fewer every year. The world grows dim at the edges."])),
         # ── the Fountain Court and the Market Terrace ──
-        npc("student_a", "villager", 22, 14, said(
+        npc("student_a", "townsman", 22, 14, said(
             ["They say the sages kept that canoe forty years for the right hands. Were they yours?"],
             ["Ever since the earth crystal shone again, the sages argue about fire. Loudly. Sages are never loud."],
             ["I came to study the stars. The sages make us study rot instead: rot in the roots, rot in the stone."])),
-        npc("student_b", "villager_f", 27, 14, said(
+        npc("student_b", "young_woman", 27, 14, said(
             ["I copied the prophecy out twelve times for my exam. Now I've seen the people in it."],
             ["Fire beneath and frost beside it. I wrote that down from a sage, and now I can't stop thinking it."],
             ["The well water tastes of earth this year. Not good earth. The sour kind."]), wander=True),
-        npc("gardener", "farmer", 24, 22, said(
+        npc("gardener", "townsman", 24, 22, said(
             ["Roses bloom on the terraces again. The canoe has nothing to do with it, but I'm happy anyway."],
             ["My roses perked up the very day the earth crystal shone. I don't ask why. I water."],
             ["Half my roses died this spring. The soil's grey a hand down. I've never seen the like."])),
-        npc("pilgrim_a", "monk", 38, 22, said(
+        npc("pilgrim_a", "pilgrim", 38, 22, said(
             ["I walked here to see the Circle. I've stayed to see what the four of you do next."],
             ["Pilgrims come from every coast to the hostel now. The sages say the world is turning."],
-            ["I walked three months to sit by the Circle. They let me sit on the causeway. It's a start."]), tint="#c8b48c"),
-        npc("pilgrim_b", "white_mage", 42, 21, said(
+            ["I walked three months to sit by the Circle. They let me sit on the causeway. It's a start."])),
+        npc("pilgrim_b", "old_woman", 42, 21, said(
             ["Go well on the water. I'll pray for the rivers to be kind to your canoe."],
             ["I prayed at the stones for the earth, and the earth answered. Now I pray about the fire."],
-            ["I pray at the edge of the lake for the earth. The lake doesn't answer, but it listens."]), tint="#d0c8b8"),
+            ["I pray at the edge of the lake for the earth. The lake doesn't answer, but it listens."])),
         # ── the Lakeside ──
-        npc("boat_girl", "villager_f", 41, 26, said(
+        npc("boat_girl", "girl", 41, 26, said(
             ["Father helped tar your canoe's seams. If it leaks, he says, blame the sages."],
             ["Father's mending every hull in the boathouse. He says the lake folk will travel again soon."],
             ["Father builds boats, but nobody buys. Where would they sail? The rivers run into the ring and stop."])),
-        npc("old_scholar", "white_wizard", 16, 30, said(
+        npc("old_scholar", "scholar", 16, 30, said(
             ["A canoe in the right hands opens half a continent. I'd write that down if I weren't so old."],
             ["Fire and frost, the sages say now. I liked it better when the trouble was a long way off."],
             ["Forty years I've sat on this bench thinking about the earth. It has never been this ill."])),
@@ -108,7 +108,7 @@ def npcs() -> list[dict]:
             ["I'm reading about canoes. It's the town's favourite subject this week, thanks to you."],
             ["A history of the volcano, two hundred pages. It erupts on page four and never stops."],
             ["A book on the blight of the earth. It's very thorough. It ends badly."]), wander=True),
-        npc("child", "villager", 12, 28, said(
+        npc("child", "boy", 12, 28, said(
             ["Can I sit in your canoe? Just once? I'll be good!"],
             ["The boatwright says one day there'll be boats on every river. Can I have one?"],
             ["I throw stones in the lake to see how far the ripples go. Far! Much farther than me."]), wander=True),

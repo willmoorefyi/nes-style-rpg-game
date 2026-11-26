@@ -23,7 +23,7 @@ npcs:
     text: ['Fresh cod again, and fat with it! The smoke smells right for the first time in years.']
   - text: ['Alder smoke, three days, three nights. That''s how Onrac cod gets to the far side of the world.', The fish are thinner every season. I smoke them anyway. Thin smoked cod is still cod.]
 - id: onrac_smoker_apprentice
-  sprite: thief
+  sprite: boy
   x: 9
   y: 5
   dialog:

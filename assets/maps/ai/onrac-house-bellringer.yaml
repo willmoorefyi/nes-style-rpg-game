@@ -24,7 +24,7 @@ npcs:
   - text: ['The bell came up in my father''s net, green as weed, the winter the city under the harbour went down.', We hung it in the tower and I ring it every dusk. One stroke for every street they had
         down there.]
 - id: onrac_bellringer_girl
-  sprite: villager_f
+  sprite: girl
   x: 3
   y: 6
   dialog:

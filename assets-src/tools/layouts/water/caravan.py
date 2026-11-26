@@ -48,9 +48,9 @@ NPCS = [
         {"text": ["We walk the coast from thaw to frost and sell what the sea throws up.",
                   "The best of it is the trader's bottle. Folk in Gaia, beyond the eastern peaks, would weep to see "
                   "it."]}]),
-    npc("scout", "thief", 7, 13, [
+    npc("scout", "pilgrim", 7, 13, [
         "I've walked every mile of this coast but one: the gorge above Onrac. The river fills it wall to wall.",
-        "Nobody walks to the waterfall. You'd need a boat light enough to carry."], tint="#a0b8c8"),
+        "Nobody walks to the waterfall. You'd need a boat light enough to carry."]),
     npc("drover", "farmer", 16, 14, [
         "Keep to the packed sand between the dunes. The soft hollows are where the worms wait.",
         "The beasts smell them before we do. When they stamp, we turn back."], wander=True),

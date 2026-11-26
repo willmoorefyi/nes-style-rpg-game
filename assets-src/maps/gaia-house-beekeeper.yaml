@@ -86,7 +86,7 @@ npcs:
   - text: ['Bees ride the wind to the high flowers. No wind, no ride. They sit at home and eat my profits.', 'Those jars on the shelf are last
         year''s. When they''re gone, they''re gone.']
 - id: gaia_beekeeper_daughter
-  sprite: villager_f
+  sprite: girl
   x: 3
   y: 6
   dialog:

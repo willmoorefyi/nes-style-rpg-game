@@ -53,7 +53,7 @@ npcs:
 - id: gaia-white-magic-keeper
   x: 6
   y: 4
-  sprite: white_mage
+  sprite: healer
   dialog: ['The highest words of healing are taught only here, where the air is thin and the sky is near.']
   shopId: gaia_white
 transitions:

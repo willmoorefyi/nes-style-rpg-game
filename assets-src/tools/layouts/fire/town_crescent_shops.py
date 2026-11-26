@@ -110,7 +110,7 @@ def build() -> list[Path]:
     r.one("lectern", 1, 3)
     r.one("plant", 9, 3)
     r.staff(4, 3, 6, 4)
-    CRESCENT.keeper(r, "white-magic", "white_mage", 5, 4, [
+    CRESCENT.keeper(r, "white-magic", "healer", 5, 4, [
         "The deep healing, and the words that call the fallen back. Taught here to those the Circle would trust."],
         "crescent_white")
     out.append(r.save(note("Crescent's white magic shop: the keeper's bay between two white orbs under an arched "
@@ -135,7 +135,7 @@ def build() -> list[Path]:
     r.one("desk", 3, 3)
     r.thing("crate", 10, 7)
     r.staff(7, 3, 10, 4)
-    CRESCENT.keeper(r, "black-magic", "black_mage", 8, 4, said(
+    CRESCENT.keeper(r, "black-magic", "scholar", 8, 4, said(
         ["Fire's third word and the warp that takes you home. Use them on the far rivers, not on my shop."],
         ["Fire, the third and fiercest. The volcano woke, and suddenly everyone wants to fight fire with fire."],
         ["The third fire, slow time, the stone breath, the warp. Strong words. The sages make me check your eyes."]),

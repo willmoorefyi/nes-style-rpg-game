@@ -64,7 +64,7 @@ npcs:
 - id: gaia-black-magic-keeper
   x: 4
   y: 4
-  sprite: black_mage
+  sprite: scholar
   dialog: [Storm-words and doom-words. The mountain sharpens them. Do be careful where you point them.]
   shopId: gaia_black
 transitions:

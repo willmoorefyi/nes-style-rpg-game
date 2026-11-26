@@ -89,7 +89,7 @@ npcs:
   - text: [The last good vintage is in those casks. I won't sell it. I'm saving it for the day the vines come back., 'If they don''t, I''ll drink
         it myself, slowly, and complain.']
 - id: melmond_vintner_daughter
-  sprite: villager_f
+  sprite: girl
   x: 5
   y: 6
   dialog:

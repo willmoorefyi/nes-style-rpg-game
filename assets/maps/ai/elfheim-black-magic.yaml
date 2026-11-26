@@ -17,13 +17,12 @@ npcs:
 - id: elfheim-black-magic-keeper
   x: 8
   y: 4
-  sprite: black_wizard
+  sprite: elf_mage
   dialog:
   - condition: PRINCE_AWAKE
     text: ['A dark elf cursed our prince. Every spell I sell now, I sell with pleasure.']
   - text: ['Words that burn and words that freeze. Use them on the dark, not the woods.']
   shopId: elfheim_black
-  tint: '#cfe8c2'
 transitions:
 - {x: 2, y: 8, targetMap: elfheim, targetEntrance: black_magic}
 name: Black Magic

@@ -16,13 +16,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parent))
 from interiors_common import SHOP, STONE_FACE, wood  # noqa: E402
 from town_elfheim_homes import ELFHEIM, LEAF, note  # noqa: E402
-from town_elfheim_people import AWAKE, ELF  # noqa: E402
+from town_elfheim_people import AWAKE  # noqa: E402
 
 
 
 def keeper(r, slug: str, sprite: str, x: int, y: int, line: str, awake: str, shop: str, **kw) -> None:
     ELFHEIM.keeper(r, slug, sprite, x, y, line, shop)
-    r.npcs[-1].update({"dialog": [{"condition": AWAKE, "text": [awake]}, {"text": [line]}], "tint": ELF, **kw})
+    r.npcs[-1].update({"dialog": [{"condition": AWAKE, "text": [awake]}, {"text": [line]}], **kw})
 
 
 def build() -> list[Path]:
@@ -39,7 +39,7 @@ def build() -> list[Path]:
     r.one("armor_stand", 1, 7)
     r.one("plant", 9, 7)
     r.staff(1, 3, 9, 4)
-    keeper(r, "weapon", "warrior", 5, 4, "Mithril, folded and leaf-light. Elven steel bites deep and never rusts.",
+    keeper(r, "weapon", "elf_man", 5, 4, "Mithril, folded and leaf-light. Elven steel bites deep and never rusts.",
            "Good blades for good days. The prince took the first sword I made this year.", "elfheim_weapon")
     out.append(r.save(note("the weapon shop, mithril blades laid on a counter across the room",
                            "three weapon racks behind the counter; an armour stand by the door"),
@@ -57,7 +57,7 @@ def build() -> list[Path]:
     r.wall([["window_in"]], 4, 1)
     r.one("plant", 1, 7)
     r.staff(9, 3, 10, 7)
-    keeper(r, "armor", "knight", 9, 5, "Silver armlets, mithril mail, shields that ring like bells. Try them on.",
+    keeper(r, "armor", "elf_man", 9, 5, "Silver armlets, mithril mail, shields that ring like bells. Try them on.",
            "The castle guard re-armed this week. I sold out twice and stitched all night.", "elfheim_armor")
     out.append(r.save(note("the armour shop, mail on three stands, the counter along the east wall",
                            "a counter running north-south with the keeper behind it; stands in a row by the window"),
@@ -76,7 +76,7 @@ def build() -> list[Path]:
     r.thing("barrel", 8, 7)
     r.thing("crate", 1, 7)
     r.staff(1, 3, 3, 4)
-    keeper(r, "item", "vendor_f", 2, 4, "Potions brewed in the spring's own water. Tents that pitch themselves, nearly.",
+    keeper(r, "item", "elf_woman", 2, 4, "Potions brewed in the spring's own water. Tents that pitch themselves, nearly.",
            "Business is brisk! Everyone's going on journeys now the prince is up.", "elfheim_item")
     out.append(r.save(note("the item shop, a corner counter boxing the keeper into the north-west",
                            "an L-shaped counter; three shelves of bottles at the east end of the back wall"),
@@ -96,7 +96,7 @@ def build() -> list[Path]:
     r.one("plant", 1, 8)
     r.one("plant", 9, 8)
     r.staff(1, 3, 9, 4)
-    keeper(r, "white-magic", "white_wizard", 3, 4, "Songs of mending, written in leaf-script. Learn them, and heal.",
+    keeper(r, "white-magic", "elf_mage", 3, 4, "Songs of mending, written in leaf-script. Learn them, and heal.",
            "I sang at the prince's bedside every night for a year. The witch's herb was quicker.", "elfheim_white")
     out.append(r.save(note("the white magic shop, a white orb on a plinth behind the counter",
                            "two arched windows framing the orb; a carpet run from the door to the counter"),
@@ -115,7 +115,7 @@ def build() -> list[Path]:
     r.tall("bookshelf", 3, 3)
     r.one("table", 1, 6)
     r.staff(7, 3, 9, 4)
-    keeper(r, "black-magic", "black_wizard", 8, 4, "Words that burn and words that freeze. Use them on the dark, not the "
+    keeper(r, "black-magic", "elf_mage", 8, 4, "Words that burn and words that freeze. Use them on the dark, not the "
            "woods.", "A dark elf cursed our prince. Every spell I sell now, I sell with pleasure.", "elfheim_black")
     out.append(r.save(note("the black magic shop, a dim room with the keeper boxed into the north-east nook",
                            "a counter bent round a corner nook; a black orb glowing in the nook"),
@@ -139,7 +139,7 @@ def build() -> list[Path]:
     r.one("table", 7, 3)
     r.one("plant", 12, 9)
     r.staff(1, 3, 4, 4)
-    keeper(r, "inn", "innkeeper", 2, 4, "Beds of moss and linen, a hundred gold the night. You'll sleep like... well, not "
+    keeper(r, "inn", "elf_woman", 2, 4, "Beds of moss and linen, a hundred gold the night. You'll sleep like... well, not "
            "like the prince, I hope.", "A hundred gold the night, and I can joke about sleep again. Rest well!",
            "elfheim_inn", action="inn")
     r.npc("elfheim_inn_guest", "burgher", 11, 8, [

@@ -95,7 +95,7 @@ def b5() -> Room:
                        "A crowned skeleton in plate rimed with frost sits on a throne of ice. Its sockets kindle blue.",
                        "Rime Sovereign: I swore my realm would never end. I took the earth's warmth to keep that oath.",
                        "It is still not enough. Yours will help."]})
-    r.npcs.append({"id": "ert_d_altar_shade", "sprite": "knight", "tint": "#e4eef8", "x": 24, "y": 6,
+    r.npcs.append({"id": "ert_d_altar_shade", "sprite": "king", "tint": "#e4eef8", "x": 24, "y": 6,
                    "showIf": "EARTH_CAVE_COMPLETE", "hideIf": "EARTH_CRYSTAL_LIT",
                    "cutscene": {"id": "ert_earth_crystal", "onceFlag": "EARTH_CRYSTAL_LIT",
                                 "requiredFlags": ["EARTH_CAVE_COMPLETE"]},

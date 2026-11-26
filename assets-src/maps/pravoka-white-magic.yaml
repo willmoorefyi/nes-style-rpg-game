@@ -64,7 +64,7 @@ npcs:
 - id: pravoka-white-magic-keeper
   x: 6
   y: 4
-  sprite: white_mage
+  sprite: healer
   dialog: ['Light and quiet, for those with the gift. Every sailor here learns one prayer before he learns to swim.']
   shopId: pravoka_white
 transitions:

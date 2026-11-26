@@ -72,7 +72,7 @@ WARDEN = {"id": "wnd_fairy_freed", "onceFlag": FREED}
 
 def npcs() -> list[dict]:
     return [
-        {"id": "gaia_spring_warden", "sprite": "white_mage", "x": 8, "y": 9, "requiredItem": "fairy_bottle",
+        {"id": "gaia_spring_warden", "sprite": "healer", "x": 8, "y": 9, "requiredItem": "fairy_bottle",
          "cutscene": WARDEN, "tint": "#d8e8c8", "dialog": when(
              (FREED, ["A whole year I sat by a dry stone. Now I'll sit by a wet one and complain about the splashing.",
                       "She gave you her breath of the spring, didn't she? Drink it under the sea and you'll breathe."]),

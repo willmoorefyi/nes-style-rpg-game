@@ -95,7 +95,7 @@ objects:
   y: 7
 npcs:
 - id: elfheim_herbalist
-  sprite: vendor_f
+  sprite: elf_woman
   x: 8
   y: 5
   dialog:
@@ -105,14 +105,12 @@ npcs:
     text: ['You have it? Matoya''s herb? The smell alone could wake a stone. Take it up to the castle!']
   - text: ['Every jar here was opened for the prince. Dreamless-root, owl''s balm, nine kinds of mint. Nothing.', Elves make good medicine for
         elves. A dark elf's curse wants a human witch's herb.]
-  tint: '#cfe8c2'
 - id: elfheim_herb_apprentice
-  sprite: villager
+  sprite: elf_child
   x: 3
   y: 6
   dialog:
   - text: ['I chop, I dry, I label. Mistress says in a hundred years I may be allowed to mix.']
-  tint: '#cfe8c2'
 transitions:
 - {x: 4, y: 8, targetMap: elfheim, targetEntrance: house_herbalist}
 encounterRate: {min: 999, max: 999}

@@ -46,12 +46,12 @@ def build() -> Path:
             "But the rot runs deeper than one beast. Listen, and take what I have kept."]},
         {"text": ["Go away. I have watched too many brave fools walk into the Cavern of Earth.",
                   "Come back when the creature that drinks the land is gone, and not before."]}]
-    npc("ert_sarda", "master", 7, 5, sarda,
+    npc("ert_sarda", "sage_earth", 7, 5, sarda,
           cutscene={"id": "ert_sarda_rod", "requiredFlags": ["VAMPIRE_DEFEATED"], "onceFlag": "ERT_O_ROD_GIVEN"})
-    npc("ert_sarda_pupil_a", "white_mage", 4, 7, [
+    npc("ert_sarda_pupil_a", "healer", 4, 7, [
         {"condition": "ERT_O_ROD_GIVEN", "text": ["The master hasn't parted with that rod in my lifetime. Be worthy of it."]},
         {"text": ["The master speaks to the stones. Mostly they don't answer."]}])
-    npc("ert_sarda_pupil_b", "black_mage", 11, 9, [
+    npc("ert_sarda_pupil_b", "townsman", 11, 9, [
         "We reached this coast before the giant blocked the tunnel. Now no one visits. You came through him?"])
     r.transitions += [{"x": x, "y": 11, "targetMap": "overworld", "targetEntrance": "ert_sarda"} for x in (7, 8)]
     return r.write(NOTE, {"arrival": [7, 10]}, kits=KITS, mats=MATS, trim=None,

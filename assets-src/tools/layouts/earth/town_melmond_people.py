@@ -53,7 +53,7 @@ def outdoor() -> list[dict]:
             (LIT, ["Hear that? Water, down the well again! Sweet, too. I'd almost forgotten the taste."]),
             default=["Thirty fathoms of rope, and the bucket comes up full of grey sand. My grandfather dug this well.",
                      "He said it would never run dry. He also said the moon was a turnip, mind."])),
-        npc("melmond_oak_child", "villager", 21, 21, when(
+        npc("melmond_oak_child", "girl", 21, 21, when(
             (LIT, ["The old oak has a leaf! One leaf, right at the top. I'm going to name it."]),
             default=["Mum says the big tree on the green isn't dead, only sleeping. It's been sleeping a long time."]),
             wander=True),
@@ -61,10 +61,10 @@ def outdoor() -> list[dict]:
             (LIT, ["Green from fence to fence! I planted on Monday and by Thursday I could hide in it."]),
             default=["Plough it, seed it, water it, and the shoots come up grey and fall over.",
                      "It isn't the weather. Something is pulling the life out from under the roots."])),
-        npc("melmond_vine_dresser", "villager_f", 10, 7, when(
+        npc("melmond_vine_dresser", "young_woman", 10, 7, when(
             (LIT, ["The vines are budding along every row. We'll press wine this autumn after all!"]),
             default=["These vines are older than the town. Their bark peels off in your hand now, like paper."])),
-        npc("melmond_shore_fisher", "villager", 40, 9, when(
+        npc("melmond_shore_fisher", "sailor", 40, 9, when(
             (LIT, ["The fish are back in the shallows, fat and silly. The sea knew before we did."]),
             default=["Nets come up empty all along this shore. Even the fish keep away from the land now."])),
         npc("melmond_carter", "burgher", 34, 20, when(
@@ -72,11 +72,11 @@ def outdoor() -> list[dict]:
                     "If you did that, I'll carry your packs to the Cavern for free. Well, for half."]),
             default=["I haul grain to the quay. There's no grain, so I haul my own empty cart up and down.",
                      "Nobody takes the badlands road after dark. Things walk there that cast no shadow."]), wander=True),
-        npc("melmond_mill_lad", "thief", 36, 11, when(
+        npc("melmond_mill_lad", "boy", 36, 11, when(
             (LIT, ["The sails turned on their own this morning! Master Hobb says the earth's breathing again."]),
             default=["The windmill leans a hand's width further every year. The ground under it is going soft.",
                      "Master Hobb won't let me grind. There's nothing to grind anyway."])),
-        npc("melmond_stall_widow", "vendor_f", 26, 23, when(
+        npc("melmond_stall_widow", "old_woman", 26, 23, when(
             (LIT, ["Fresh beans, fresh greens, fresh everything! I'm opening the stall again tomorrow."]),
             default=["I sold vegetables from this stall for thirty years. Now I sell the stall's shade. Nobody's buying."])),
         npc("melmond_doctor_pupil", "mage", 24, 13, when(
@@ -91,7 +91,7 @@ def outdoor() -> list[dict]:
             (LIT, ["Melmond grain for dwarf iron, a fair trade at last. Nerrick sends his regards."]),
             default=["Nerrick's canal brought me here with a hold full of picks and spades.",
                      "Turns out nobody needs a spade for soil that's turned to dust."])),
-        npc("melmond_wayfarer", "monk", 27, 30, when(
+        npc("melmond_wayfarer", "pilgrim", 27, 30, when(
             (LIT, ["I felt the crystal wake from the road. It was like a held breath let go.",
                    "The earth is whole. Three more lights to go, they say: fire, water and wind."]),
             default=["I came to pray at the earth shrine in the badlands. Its roof has fallen in. Roots have split "

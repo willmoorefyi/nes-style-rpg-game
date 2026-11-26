@@ -31,7 +31,7 @@ MATS = {"floor_stone": {"from": "ar_cave"},                     # AR-T2: the AR 
         "in_wall_top": {"from": "temple_wall_top", "shade": 0.4},
         "in_wall_face": {"from": "temple_wall_face", "hue": 150, "sat": 0.6, "shade": 1.0}}
 AUTOMATON = {
-    "id": "automaton", "x": 14, "y": 4, "sprite": "knight", "tint": "#c8a860",
+    "id": "automaton", "x": 14, "y": 4, "sprite": "robot_ancient", "tint": "#c8a860",
     "dialog": [
         {"condition": "CUBE_GIVEN",
          "text": ["The automaton stands still again. Somewhere in its chest a slow tick keeps time with the falls."]},

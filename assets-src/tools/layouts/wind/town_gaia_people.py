@@ -11,7 +11,6 @@ comes back). The first matching entry wins, so the later state always comes firs
 from __future__ import annotations
 
 FREED, BOTTLE = "FAIRY_FREED", "item:fairy_bottle"
-SKY = "#c8d8f0"                                  # a pale sky-blue tint: the Lufenian pilgrim's robe
 
 SIGNPOST_TEXT = [
     "The sign reads: \"GAIA. Four terraces, one way up. Mind the bridges in a gust.\"",
@@ -53,7 +52,7 @@ def outdoor() -> list[dict]:
                      "own breath."]),
             default=["You came by air? Nobody walks up here. The passes are worse than the drop.",
                      "Welcome to Gaia. Take the switchbacks slowly; the town's built one terrace on the next."])),
-        npc("gaia_water_hauler", "villager_f", 35, 40, when(
+        npc("gaia_water_hauler", "young_woman", 35, 40, when(
             (FREED, ["The spring is running down the court's channel again. I'm leaving this bucket on the rope for "
                      "the gorge spirits."]),
             default=["Three hundred feet of rope, and the bucket comes up half spilled. That's our water now.",
@@ -72,7 +71,7 @@ def outdoor() -> list[dict]:
             default=["South-west of the bowl, out in the sands, stands the Mirage Tower. Some days you see it, some "
                      "days you don't.", "Its door has no handle and no lock. They say the sky-folk ring it open with "
                      "a chime."])),
-        npc("gaia_child", "villager", 22, 43, when(
+        npc("gaia_child", "girl", 22, 43, when(
             (FREED, ["My paper kite flew! It flew right up past the mill terrace and got stuck on the spinner's roof!"]),
             default=["I made a paper kite. Grandad says I'll have to run very fast for it to fly. I ran and ran."]),
             wander=True),
@@ -81,7 +80,7 @@ def outdoor() -> list[dict]:
             default=["I mend the canvas on the sails. A sail that never turns never tears.",
                      "I've mended every sail in Gaia twice over, just to keep my hands busy."])),
         # ── the mill terrace ──
-        npc("gaia_mill_lad", "thief", 14, 25, when(
+        npc("gaia_mill_lad", "boy", 14, 25, when(
             (FREED, ["The millstones are grinding! Master Brann sang. I didn't know he could. He can't, actually."]),
             default=["I'm the windmiller's lad. I oil the gears every morning in case today's the day.",
                      "It's never the day."])),
@@ -100,12 +99,12 @@ def outdoor() -> list[dict]:
             (FREED, ["The mountain thyme is waking up on the ledges. The wind carries its seed; it was waiting too."]),
             default=["I pick herbs on the ledges. Without the wind the seed doesn't travel, and the ledges are going "
                      "bare."])),
-        npc("gaia_old_soldier", "knight", 6, 32, when(
+        npc("gaia_old_soldier", "guard", 6, 32, when(
             (FREED, ["I stood watch on that stair forty years. Never once did it feel as good as this breeze."]),
             default=["Nothing has come up the stairs to fight in a year. Not even weather.",
                      "A town that can't hear the wind can't hear what's coming. I keep my sword by the bed."])),
         # ── the loom terrace ──
-        npc("gaia_shepherd_boy", "villager", 44, 16, when(
+        npc("gaia_shepherd_boy", "boy", 44, 16, when(
             (FREED, ["Father's taking the flock up to the high grass again tomorrow. The wind keeps the flies off them."]),
             default=["The fold's empty. Father drove the sheep down to the lower bowl; the grass up here went brown "
                      "with no rain."])),
@@ -113,24 +112,24 @@ def outdoor() -> list[dict]:
             (FREED, ["The bees are out over the whole bowl! I'll have honey to sell by the next moon."]),
             default=["The bees won't fly in dead air. They sit in the hives and hum, sulking.",
                      "I'd sell you honey, but they've eaten most of it themselves."])),
-        npc("gaia_weaver_girl", "villager_f", 14, 15, when(
+        npc("gaia_weaver_girl", "girl", 14, 15, when(
             (FREED, ["We hang the wool out to dry in the wind again. It used to take a morning; then it took a week."]),
             default=["The spinner's teaching me the long wheel. You need a dry wind for good wool, she says."])),
-        npc("gaia_wind_watcher", "monk", 38, 21, when(
+        npc("gaia_wind_watcher", "old_woman", 38, 21, when(
             (FREED, ["The fairy's breath is back in the bowl. It goes in at the spring and out over every sail. Listen."]),
             (BOTTLE, ["That bottle hums. Can you feel it? Something inside it knows where it is. Climb to the spring."]),
             default=["We say the wind is the breath of the spring's fairy. A little winged thing, no bigger than your "
                      "thumb.", "When the spring went dry, she was gone. Nobody saw her go."])),
         # ── the spring court ──
-        npc("gaia_spring_pilgrim", "monk", 21, 7, when(
+        npc("gaia_spring_pilgrim", "pilgrim", 21, 7, when(
             (FREED, ["Water in the channel and wind in the court. I'll go home and tell them the mountain is well."]),
             default=["I walked up from the lowlands to pray at the spring. I found a dry channel and a cold grotto.",
-                     "I'll pray anyway. It's a long walk back."]), tint=SKY),
+                     "I'll pray anyway. It's a long walk back."])),
         npc("gaia_vane_keeper", "old_man", 19, 5, when(
             (FREED, VANE_FREED + ["Ha! Look at it go. I've oiled that arrow every day for a year for this."]),
             default=["I keep the weather vane. Every morning I oil it, and every morning it points the same way.",
                      "The spring is through the grotto behind the court. The warden sits by it day and night."])),
-        npc("gaia_court_child", "villager", 30, 4, when(
+        npc("gaia_court_child", "boy", 30, 4, when(
             (FREED, ["The channel's full of water! I put a leaf boat in at the top and it got all the way to the end!"]),
             default=["I sail leaf boats down the dry channel. You have to push them. It isn't the same."]),
             wander=True),

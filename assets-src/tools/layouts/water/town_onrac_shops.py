@@ -89,7 +89,7 @@ def build() -> list[Path]:
     r.one("plant", 1, 7)
     r.one("plant", 9, 7)
     r.staff(1, 3, 9, 3)
-    ONR.keeper(r, "white-magic", "white_mage", 3, 3, ["Words for the deep: one to lift the dead to the surface, one "
+    ONR.keeper(r, "white-magic", "healer", 3, 3, ["Words for the deep: one to lift the dead to the surface, one "
                "to walk you home from anywhere."], "onrac_white")
     out.append(r.save(note("a pale white magic shop, the counter in front of a white orb, a runner from the door",
                            "a single carpet runner straight from the door to the counter; arched windows either side "
@@ -109,7 +109,7 @@ def build() -> list[Path]:
     r.tall("bookshelf", 1, 3)
     r.one("orb_black", 8, 3)
     r.staff(6, 6, 8, 7)
-    ONR.keeper(r, "black-magic", "black_mage", 7, 6, ["Thunder, quake and stillness. Spells the sea itself would "
+    ONR.keeper(r, "black-magic", "scholar", 7, 6, ["Thunder, quake and stillness. Spells the sea itself would "
                "fear."], "onrac_black")
     out.append(r.save(note("a dark black magic shop with the counter boxing in its south-east corner",
                            "the keeper's corner by the floor's south-east wall, not the back; a black orb on the "
@@ -138,7 +138,7 @@ def build() -> list[Path]:
     ONR.keeper(r, "inn", "innkeeper", 2, 4, ["A bed by the stove and fish stew till you burst. Five hundred, and worth "
                "every coin in this cold."], "onrac_inn")
     r.npcs[-1]["action"] = "inn"
-    r.npc("onrac_inn_skipper", "warrior", 7, 7, [
+    r.npc("onrac_inn_skipper", "sea_captain", 7, 7, [
         {"condition": LIT, "text": ["The harbour's calm as a millpond. I'm sailing at dawn, and I'll be sober for it. Mostly."]},
         {"text": ["Thirty years I've skippered out of Onrac. Never once past the stacks. I like being alive."]}])
     out.append(r.save(note("an inn: a common room round a stove with the counter in its north-west corner, a "

@@ -1,11 +1,12 @@
 /**
  * Pass PT (docs/PLAYTEST_ART_PLAN.md 6.3): the user-rendered NPC field sheets (ChatGPT renders imported by
  * assets-src/gen/field_user.py from assets-src/gen/user_art/): provenance, format, size bands, the walk, the broom's
- * hop, and the 2x field atlas. Where the maps place them is checked at the reassignment (PT-5).
+ * hop, and the 2x field atlas; where the maps place them (PT-5: every sheet placed, the user's approval recorded, the
+ * per-town variety cap of plan 5.5, Arylon in Cornelia, Matoya's brooms).
  */
 import { describe, it, expect } from 'vitest';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { readRgbaPng } from '../helpers/pngAlpha.js';
 
@@ -14,7 +15,8 @@ const recipes = parse(readFileSync('assets-src/gen/field_user.yaml', 'utf-8')) a
 const IDS = Object.keys(recipes);
 const meta = (id: string) => JSON.parse(readFileSync(`assets-src/gen/approved/${id}/field.json`, 'utf-8')) as {
   backend: string; source: { file: string; sha256: string }; grid: number[]; bottom_row: number; rows: string[];
-  frames: string[]; flip_rows: string[]; walk?: string; cut: { lift?: number[] } };
+  frames: string[]; flip_rows: string[]; walk?: string; cut: { lift?: number[] }; approved: string | null;
+  user_review: string | null };
 const atlas = JSON.parse(readFileSync('assets/sprites/characters-ai.json', 'utf-8')) as {
   sheets: Record<string, { x: number; y: number }>; cell: number[]; cols: number; fieldScale: number };
 const legacy = JSON.parse(readFileSync('assets/sprites/characters.json', 'utf-8')) as { sheets: Record<string, unknown> };
@@ -103,5 +105,45 @@ describe('PT: the user-rendered field sheets', () => {
   it.each(IDS)('%s: in the 2x field atlas and the 1x legacy atlas (its Look)', (id) => {
     expect(atlas.sheets[id]).toBeDefined();
     expect(legacy.sheets[id]).toBeDefined();
+  });
+});
+
+type MapNpc = { id: string; sprite: string; tint?: string; wander?: boolean; showIf?: string; hideIf?: string };
+const MAPS = 'assets/maps/ai';
+const mapNpcs = (m: string) => ((parse(readFileSync(`${MAPS}/${m}.yaml`, 'utf-8')) as { npcs?: MapNpc[] }).npcs ?? [])
+  .filter((n) => n.sprite !== 'chest');
+const allMaps = readdirSync(MAPS).filter((f) => f.endsWith('.yaml') && f !== 'index.yaml').map((f) => f.replace(/\.yaml$/, ''));
+/** plan 5.5: the outdoor town maps and the uniform sheets exempt from the per-town cap */
+const TOWNS = ['cornelia', 'pravoka', 'elfheim', 'melmond', 'crescent', 'onrac', 'gaia', 'lufenia'];
+const UNIFORMS = new Set(['guard', 'elf_guard', 'dwarf_guard', 'pirate_crew']);
+
+describe('PT-5: where the maps place the new sheets', () => {
+  it.each(IDS)('%s: placed at least once, and approved by the user', (id) => {
+    expect(allMaps.some((m) => mapNpcs(m).some((n) => n.sprite === id)), id).toBe(true);
+    const m = meta(id);
+    expect(m.approved).toBe('2026-11-26');
+    expect(m.user_review).toBeTruthy();
+  });
+
+  it.each(TOWNS)('%s: no sheet but the uniforms on more than 3 of its people', (town) => {
+    const count = new Map<string, number>();
+    for (const n of mapNpcs(town)) count.set(n.sprite, (count.get(n.sprite) ?? 0) + 1);
+    const over = [...count].filter(([s, k]) => !UNIFORMS.has(s) && k > 3);
+    expect(over).toEqual([]);
+  });
+
+  it('Cornelia has Arylon the dancer (amendment A2): sprite dancer, untinted, standing still, two lines', () => {
+    const n = mapNpcs('cornelia').find((x) => x.id === 'cornelia_dancer') as MapNpc & { dialog: { text: string[] }[] };
+    expect([n.sprite, n.tint, n.wander, n.showIf, n.hideIf]).toEqual(['dancer', undefined, undefined, undefined, undefined]);
+    expect(n.dialog.map((d) => d.text[0])).toEqual([
+      "Arylon: The princess is home! I'll dance till my shoes wear through.",
+      "Arylon: I'm Arylon, and I dance. The square needs a little joy while the princess is gone."]);
+    expect(allMaps.flatMap((m) => mapNpcs(m).filter((x) => x.sprite === 'dancer'))).toHaveLength(1);
+  });
+
+  it("Matoya's three brooms are brooms (untinted, still wandering)", () => {
+    const brooms = mapNpcs('matoya-cave').filter((n) => n.id.startsWith('broom_'));
+    expect(brooms.map((n) => [n.id, n.sprite, n.tint, n.wander])).toEqual([1, 2, 3].map((k) =>
+      [`broom_${k}`, 'broom', undefined, true]));
   });
 });

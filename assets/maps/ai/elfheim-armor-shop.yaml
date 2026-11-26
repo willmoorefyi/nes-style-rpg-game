@@ -17,13 +17,12 @@ npcs:
 - id: elfheim-armor-keeper
   x: 9
   y: 5
-  sprite: knight
+  sprite: elf_man
   dialog:
   - condition: PRINCE_AWAKE
     text: [The castle guard re-armed this week. I sold out twice and stitched all night.]
   - text: ['Silver armlets, mithril mail, shields that ring like bells. Try them on.']
   shopId: elfheim_armor
-  tint: '#cfe8c2'
 transitions:
 - {x: 3, y: 8, targetMap: elfheim, targetEntrance: armor_shop}
 name: Armor Shop

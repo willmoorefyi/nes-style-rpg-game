@@ -16,8 +16,7 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: elfheim_prince
-  sprite: knight
-  tint: '#cfe8c2'
+  sprite: elf_prince
   x: 7
   y: 4
   hideIf: PRINCE_AWAKE
@@ -28,16 +27,14 @@ npcs:
     text: [The prince sleeps on his bier. The herb in your pack smells sharp enough to wake a stone. You crush a leaf beneath his nose...]
   - text: ['The prince lies on his bier, breathing slow and deep. Nothing you say reaches him.', A faint frost of dark elf magic rimes his eyelashes.]
 - id: elfheim_prince_awake
-  sprite: knight
-  tint: '#cfe8c2'
+  sprite: elf_prince
   x: 7
   y: 4
   showIf: PRINCE_AWAKE
   dialog: [The key opens the living gate below the hall. Take whatever the vault holds that helps you., 'If the dwarves of the strait still want blasting powder, there is a cask of it down there. Astos
       never found it; that is something.']
 - id: elfheim_nurse
-  sprite: white_mage
-  tint: '#cfe8c2'
+  sprite: elf_woman
   x: 10
   y: 6
   dialog:
@@ -47,8 +44,7 @@ npcs:
     text: ['Is that the herb? Oh, please, try it. Hold it close to him.']
   - text: ['I turn his pillow, I open the window, I sing. He sleeps on.', 'The court mage says only a human witch''s herb could break it. Matoya''s, he means.']
 - id: elfheim_chamber_guard
-  sprite: guard
-  tint: '#cfe8c2'
+  sprite: elf_guard
   x: 4
   y: 4
   dialog:

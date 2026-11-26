@@ -75,7 +75,7 @@ objects:
 - {type: crate, x: 12, y: 6}
 npcs:
 - id: elfheim_bowyer
-  sprite: warrior
+  sprite: elf_man
   x: 9
   y: 5
   dialog:
@@ -83,14 +83,12 @@ npcs:
     text: [The prince sent down for his hunting bow. First order in a year. I wept on the string.]
   - text: ['Yew from the ring hedge, gut from the Aldi seals. An elven bow will outlive whoever draws it.', I don't sell them. The shop on the
         high street sells what I can bear to part with.]
-  tint: '#cfe8c2'
 - id: elfheim_bowyer_son
-  sprite: thief
+  sprite: elf_child
   x: 4
   y: 4
   dialog:
   - text: [Father says I'm not ready to string a bow. I've strung forty. He unstrings them when I'm asleep.]
-  tint: '#cfe8c2'
   wander: true
 transitions:
 - {x: 3, y: 7, targetMap: elfheim, targetEntrance: house_bowyer}

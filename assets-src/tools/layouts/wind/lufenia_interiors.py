@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(1, str(Path(__file__).resolve().parent))
 from interiors_common import SHOP, STONE_FACE, Town, wood  # noqa: E402
-from lufenia_people import LEARNED, TINT, talk  # noqa: E402
+from lufenia_people import LEARNED, OWN, TINT, talk  # noqa: E402
 
 LUF = Town("lufenia", script="wind/lufenia_interiors.py")
 PALE = {"in_wall_face": {"from": "castle_face", "shade": 1.15}, "in_wall_top": {"from": "slate", "shade": 0.9}}
@@ -27,7 +27,7 @@ def note(concept: str, distinct: str, topology: str = "one room; the door is the
 
 def keeper(r, slug: str, sprite: str, x: int, y: int, line: str, shop: str, **kw) -> None:
     LUF.keeper(r, slug, sprite, x, y, line, shop)
-    r.npcs[-1].update({"showIf": LEARNED, "tint": TINT, **kw})
+    r.npcs[-1].update({"showIf": LEARNED, **({} if sprite in OWN else {"tint": TINT}), **kw})
 
 
 def build() -> list[Path]:
@@ -46,10 +46,10 @@ def build() -> list[Path]:
     r.one("desk", 9, 3)
     r.tall("bookshelf", 9, 5)
     r.one("plant", 1, 7)
-    r.npc("lufenia_stargazer", "white_wizard", 7, 4, talk([
+    r.npc("lufenia_stargazer", "luf_senator", 7, 4, talk([
         "The castle above us is the one our makers flew. Its light went out when the wind stopped.",
         "Someone is inside it still. Something, I should say. It corrects the stars' courses, and it is getting worse."],
-        12), tint=TINT)
+        12))
     r.npc("lufenia_apprentice", "mage", 3, 6, talk([
         "Master says I may look through the long glass when the clouds part. They never part now."], 13), tint=TINT)
     out.append(r.save(note("the stargazer's round study, a brass globe on a stand under the roof slit",
@@ -106,9 +106,9 @@ def build() -> list[Path]:
     r.one("table", 1, 2)
     r.one("plant", 1, 6)
     r.one("orb_white", 10, 6)
-    r.npc("lufenia-healer-keeper", "white_mage", 3, 3,
+    r.npc("lufenia-healer-keeper", "luf_citizen_f", 3, 3,
           ["Fallen friends? Lay them here. The wind's breath can still be called back."],
-          action="clinic", clinicPrice=150, showIf=LEARNED, tint=TINT)       # GAP-16, B8: 150 G per level
+          action="clinic", clinicPrice=150, showIf=LEARNED)       # GAP-16, B8: 150 G per level
     r.npc("lufenia_patient", "luf_citizen_m", 8, 5, talk([
         "I climbed the rim to look at the castle and fell. The healer says I was lucky. I was looking at the castle."],
         15))
@@ -131,7 +131,7 @@ def build() -> list[Path]:
     r.one("plant", 1, 7)
     r.one("plant", 8, 7)
     r.staff(2, 3, 7, 4)
-    keeper(r, "white-magic", "white_wizard", 5, 4,
+    keeper(r, "white-magic", "luf_citizen_f", 5, 4,
            "These are the last songs of healing our makers wrote. Learn them well; nobody writes new ones.",
            "lufenia_white")
     out.append(r.save(note("the white magic shop, a pale room with a counter across it and two white orbs",
@@ -152,7 +152,7 @@ def build() -> list[Path]:
     r.wall([["potion_shelf"]], 6, 1)
     r.tall("bookshelf", 7, 3)
     r.staff(1, 3, 4, 4)
-    keeper(r, "black-magic", "black_wizard", 2, 4,
+    keeper(r, "black-magic", "luf_citizen_m", 2, 4,
            "The makers' hardest words. Some of them unmake. Spend them only on what deserves it.", "lufenia_black")
     out.append(r.save(note("the black magic shop, dim, its counter set against the west wall",
                            "two black orbs on the east side; a carpet square before the shelves"),

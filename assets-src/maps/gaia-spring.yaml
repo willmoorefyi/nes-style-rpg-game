@@ -83,7 +83,7 @@ objects:
 - {type: bush, x: 18, y: 7}
 npcs:
 - id: gaia_spring_warden
-  sprite: white_mage
+  sprite: healer
   x: 8
   y: 9
   requiredItem: fairy_bottle

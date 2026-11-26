@@ -15,14 +15,13 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 8, 8, 8, 8, 8, 8, 8, 8, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
 - id: lufenia-healer-keeper
-  sprite: white_mage
+  sprite: luf_citizen_f
   x: 3
   y: 3
   dialog: ['Fallen friends? Lay them here. The wind''s breath can still be called back.']
   action: clinic
   clinicPrice: 150
   showIf: LUFENIAN_LEARNED
-  tint: '#dfe6f5'
 - id: lufenia_patient
   sprite: luf_citizen_m
   x: 8

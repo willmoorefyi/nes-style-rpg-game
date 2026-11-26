@@ -121,7 +121,7 @@ objects:
   y: 3
 npcs:
 - id: priestess
-  sprite: white_mage
+  sprite: healer
   x: 6
   y: 4
   dialog:

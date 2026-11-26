@@ -550,59 +550,52 @@ objects:
   collide: alpha
 npcs:
 - id: pirate_gate
-  sprite: guard
-  tint: '#c86450'
+  sprite: pirate_crew
   x: 2
   y: 36
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: Welcome to Pravoka, friends. Captain''s town now.', 'The shops are shut by the Captain''s order. The inn and the keeper''s
       sick-room stay open, at a price.', 'Sleep where you''re let, and don''t go near the brig. Simple rules.']
 - id: pirate_quay_n
-  sprite: villager
-  tint: '#8c7a64'
+  sprite: pirate_crew
   x: 29
   y: 18
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: Those warehouses are the Captain''s strongroom now. Every crate in them is ours by right.', 'By right of being here first
       with cutlasses, that is.']
 - id: pirate_quay_s
-  sprite: guard
-  tint: '#b4c8dc'
+  sprite: pirate_crew
   x: 30
   y: 30
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: No boat leaves this fjord without the Captain''s leave.', The fishers asked. You can see how far it got them.]
 - id: pirate_den_a
-  sprite: villager
-  tint: '#c86450'
+  sprite: pirate_crew
   x: 18
   y: 34
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: That''s our den behind me. Knock if you like. The quartermaster counts your coin before you''re in.']
 - id: pirate_den_b
-  sprite: guard
-  tint: '#8c7a64'
+  sprite: pirate_crew
   x: 21
   y: 35
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: Nine of us, the Captain counted. Nobody in this town is fool enough to count higher.']
 - id: pirate_pier
-  sprite: villager
-  tint: '#b4c8dc'
+  sprite: pirate_crew
   x: 33
   y: 33
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: Off the pier, landlubber. The Captain''s at the end of it, and he''s in a mood.', 'Mind you, he''s always in a mood.']
 - id: pirate_inn
-  sprite: guard
-  tint: '#c86450'
+  sprite: pirate_crew
   x: 27
   y: 26
   hideIf: BIKKE_DEFEATED
   dialog: ['Pirate: The innkeeper gives us the best beds for nothing. Out of kindness, he says.']
   wander: true
 - id: bikke
-  sprite: warrior
+  sprite: sea_captain
   tint: '#a03c3c'
   x: 40
   y: 33
@@ -610,7 +603,7 @@ npcs:
   dialog: ['Bikke: So you''re the ones the town has been whispering about. Warriors, they say.', 'I took this harbour with eight blades, my own
       the ninth, and a fast hull. If you want it back, you''ll pay in blood.']
 - id: bikke_after
-  sprite: warrior
+  sprite: sea_captain
   x: 26
   y: 36
   dialog: ['Bikke: The brig is yours, and I keep my word. She''s tied at the quay outside the town.', 'Board her from the land and she''ll take
@@ -618,7 +611,7 @@ npcs:
   tint: '#a03c3c'
   showIf: BIKKE_DEFEATED
 - id: old_sailor_hint
-  sprite: old_man
+  sprite: sailor
   x: 36
   y: 27
   dialog:
@@ -650,7 +643,7 @@ npcs:
   showIf: BIKKE_DEFEATED
   tint: '#a0c0d8'
 - id: fisher
-  sprite: villager
+  sprite: sailor
   x: 33
   y: 27
   dialog:
@@ -659,13 +652,13 @@ npcs:
   - text: [The pirates let me fish off the pier. Generous. The fish off the pier are this long.]
   showIf: BIKKE_DEFEATED
 - id: dockhand_a
-  sprite: farmer
+  sprite: sailor
   x: 30
   y: 22
   dialog: ['Dockhand: Crates back where they belong, and wages paid in coin, not in threats. A good week.']
   showIf: BIKKE_DEFEATED
 - id: dockhand_b
-  sprite: burgher
+  sprite: labourer
   x: 38
   y: 20
   dialog: ['Dockhand: Old Hennick''s warehouse is open again. They hid half the town''s grain in there.']
@@ -690,7 +683,7 @@ npcs:
   - text: [The town watch is on duty. Quietly. Out of sight of the quay.]
   showIf: BIKKE_DEFEATED
 - id: girl
-  sprite: villager_f
+  sprite: girl
   x: 8
   y: 26
   dialog:

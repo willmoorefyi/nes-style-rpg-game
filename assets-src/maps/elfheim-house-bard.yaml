@@ -72,29 +72,26 @@ objects:
   y: 8
 npcs:
 - id: elfheim_bard
-  sprite: red_wizard
+  sprite: elf_man
   x: 5
   y: 3
   dialog:
   - condition: PRINCE_AWAKE
     text: ['Sit, sit! I''m writing the waking song. It needs a verse about you. What rhymes with ''Matoya''?']
   - text: [I haven't played since the curse. A harp in a sleeping town sounds like a lie.]
-  tint: '#cfe8c2'
 - id: elfheim_bard_listener
-  sprite: villager_f
+  sprite: elf_woman
   x: 8
   y: 7
   dialog:
   - condition: PRINCE_AWAKE
     text: [He's playing again! Every evening! I may need to find somewhere quiet.]
   - text: [I come every evening in case he plays. He never does. I stay for the quiet.]
-  tint: '#cfe8c2'
 - id: elfheim_bard_child
-  sprite: villager
+  sprite: elf_child
   x: 2
   y: 4
   dialog: ['A small elf is asleep on the stage, using a lute for a pillow.']
-  tint: '#cfe8c2'
 transitions:
 - {x: 5, y: 9, targetMap: elfheim, targetEntrance: house_bard}
 encounterRate: {min: 999, max: 999}

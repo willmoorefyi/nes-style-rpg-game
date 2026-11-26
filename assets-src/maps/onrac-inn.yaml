@@ -90,7 +90,7 @@ npcs:
   shopId: onrac_inn
   action: inn
 - id: onrac_inn_skipper
-  sprite: warrior
+  sprite: sea_captain
   x: 7
   y: 7
   dialog:

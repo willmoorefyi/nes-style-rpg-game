@@ -60,7 +60,7 @@ npcs:
 - id: melmond-white-magic-keeper
   x: 6
   y: 4
-  sprite: white_mage
+  sprite: healer
   dialog: ['Healing words, for a town that needs them. Learn them well.']
   shopId: melmond_white
 transitions:

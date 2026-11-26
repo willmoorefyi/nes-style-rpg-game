@@ -76,7 +76,7 @@ npcs:
   - text: [I've put the plough away in the shed. There's no use dragging it through dust., 'My father ploughed these fields, and his. I''ll be
         the one who stopped.']
 - id: melmond_plough_son
-  sprite: villager
+  sprite: boy
   x: 3
   y: 5
   dialog:

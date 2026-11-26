@@ -110,7 +110,7 @@ def build() -> list[Path]:
     r.one("plant", 3, 4)
     r.one("plant", 1, 3)
     r.staff(4, 3, 8, 4)
-    PRAVOKA.keeper(r, "white-magic", "white_mage", 6, 4, [
+    PRAVOKA.keeper(r, "white-magic", "healer", 6, 4, [
         "Light and quiet, for those with the gift. Every sailor here learns one prayer before he learns to swim."],
         "pravoka_white")
     out.append(r.save(note("Pravoka's white magic shop: a pale room where the counter guards one white orb under "
@@ -135,7 +135,7 @@ def build() -> list[Path]:
     r.thing("crate", 6, 4)
     r.thing("crate", 9, 7)
     r.staff(1, 3, 5, 4)
-    PRAVOKA.keeper(r, "black-magic", "black_mage", 3, 4, said(
+    PRAVOKA.keeper(r, "black-magic", "scholar", 3, 4, said(
         ["Ice and darkness, sold to the ones who beat the Captain. My best customers pay in deeds."],
         ["Frost for the hand, shadow for the eyes. Bikke's crew won't buy. They say spells are cheating."]),
         "pravoka_black")

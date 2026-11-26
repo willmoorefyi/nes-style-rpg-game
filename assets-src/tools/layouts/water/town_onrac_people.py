@@ -56,16 +56,16 @@ def outdoor() -> list[dict]:
             default=["Traders camp in the dunes far to the west. A caravan, with tents round a rock in the sand.",
                      "Their master keeps a bottle he won't name. Something glows in it. He wants a fortune for it.",
                      "Pay it. A caravan man only asks a fortune for a thing that's worth two."])),
-        npc("onrac_fairy_lore", "monk", 20, 22, when(
+        npc("onrac_fairy_lore", "old_woman", 20, 22, when(
             (LIT, ["The sea gave back its crystal's light. I felt the tide go out of my chest like a held breath."]),
             (OXY, ["You carry the fairy's air. Every drowned soul under the harbour will feel you coming down."]),
             default=["There are fairies who live in springs and breathe a water that is also air. Oxyale, it's called.",
                      "One of them was caught in a bottle long ago and carried off. Gaia's spring has been dry since."])),
-        npc("onrac_bell_child", "villager", 25, 21, when(
+        npc("onrac_bell_child", "boy", 25, 21, when(
             (LIT, ["The bell rang by itself last night! Three times! Grandad says that means the city is sleeping."]),
             default=["Grandad rings the sea bell at dusk. He says it's so the drowned people know what time it is."]),
             wander=True),
-        npc("onrac_rack_wife", "villager_f", 9, 17, when(
+        npc("onrac_rack_wife", "young_woman", 9, 17, when(
             (LIT, ["The cod are running again, thick as porridge. These racks won't hold the half of them."]),
             default=["Cod on the racks, a frost on the cod. The wind dries it, the cold keeps it. Onrac in a sentence.",
                      "The shoals have thinned every year since the sea went wrong. We dry what we can."]), wander=True),
@@ -73,7 +73,7 @@ def outdoor() -> list[dict]:
             (LIT, ["The pitch flows in this warm wind. I'll tar every hull in the harbour by the week's end."]),
             default=["Pine tar, boiled thick. Every plank in this town drinks a pot of it a year, or the sea drinks it.",
                      "Don't lean on the pot. I've had two apprentices and both were careless."])),
-        npc("onrac_net_lad", "thief", 18, 32, when(
+        npc("onrac_net_lad", "sailor", 18, 32, when(
             (LIT, ["My net came up so heavy I thought I'd caught the sunken city. It was only fish! Hundreds!"]),
             default=["We fish the shallows only. Past the sea-stacks the water turns black and the nets come back torn."]),
             wander=True),
@@ -84,7 +84,7 @@ def outdoor() -> list[dict]:
         npc("onrac_ice_trader", "merchant", 8, 32, when(
             (LIT, ["No ice to cut this week! The harbour's soft as soup. I may have to sell fish like everybody else."]),
             default=["I cut ice off the north pools and sell it south. Down there they put it in drinks. Can you imagine?"])),
-        npc("onrac_widow", "villager_f", 21, 33, when(
+        npc("onrac_widow", "old_woman", 21, 33, when(
             (LIT, ["The sea is quiet now. I think he can rest. I think I can too."]),
             default=["My husband went out past the stacks after the bell's twin. It's said a second bell lies down there.",
                      "That was nine winters ago. I come here at the turn of the tide. You'd think I'd stop."])),
@@ -100,16 +100,16 @@ def outdoor() -> list[dict]:
             (LIT, ["From up here the sound was always grey. Now it's blue as a jay. I'd forgotten it could be."]),
             default=["I watch the sea for the town. Mostly I watch weather. Lately the weather watches back.",
                      "There's a dark patch out in the sound that never ices over. That's where the city went down."])),
-        npc("onrac_shipwright", "master", 36, 24, when(
+        npc("onrac_shipwright", "labourer", 36, 24, when(
             (LIT, ["She came back with barnacles on her barnacles. Best dive a hull of mine ever made."]),
             (OXY, ["That's oxyale in your lungs, I can smell it, like snow and lightning. Board her! The gangway's yours."]),
             default=["The iron fish in the basin is mine. Twelve years riveting. She'll go down to the drowned shrine "
                      "under the harbour.", "But her crew must breathe down there, and no lungs can. Not without oxyale, "
                      "the fairy's air."])),
-        npc("onrac_dock_hand", "farmer", 45, 22, when(
+        npc("onrac_dock_hand", "sailor", 45, 22, when(
             (LIT, ["We're scraping her hull now she's back. The weed on her is a colour I've never seen."]),
             default=["Pump, caulk, pump, caulk. The master keeps the sea-gate shut till she's ready to dive."]), wander=True),
-        npc("onrac_sailor", "burgher", 45, 30, when(
+        npc("onrac_sailor", "sailor", 45, 30, when(
             (LIT, ["My ship's fitting out for the south. With the sea calm, I'll be home before the ice."]),
             default=["Stranded. My captain won't sail past the stacks, and I won't swim. So here I sit, eating cod."])),
     ]

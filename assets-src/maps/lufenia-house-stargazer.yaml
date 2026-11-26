@@ -76,7 +76,7 @@ objects:
   y: 7
 npcs:
 - id: lufenia_stargazer
-  sprite: white_wizard
+  sprite: luf_senator
   x: 7
   y: 4
   dialog:
@@ -84,7 +84,6 @@ npcs:
     text: [The castle above us is the one our makers flew. Its light went out when the wind stopped., 'Someone is inside it still. Something,
         I should say. It corrects the stars'' courses, and it is getting worse.']
   - text: ['Miradh oss''en, kal vethar ilun.']
-  tint: '#dfe6f5'
 - id: lufenia_apprentice
   sprite: mage
   x: 3

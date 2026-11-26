@@ -17,7 +17,7 @@ npcs:
 - id: onrac-white-magic-keeper
   x: 3
   y: 3
-  sprite: white_mage
+  sprite: healer
   dialog: ['Words for the deep: one to lift the dead to the surface, one to walk you home from anywhere.']
   shopId: onrac_white
 transitions:

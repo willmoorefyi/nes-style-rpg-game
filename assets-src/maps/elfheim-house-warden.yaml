@@ -76,7 +76,7 @@ objects:
 - {type: barrel, x: 1, y: 7}
 npcs:
 - id: elfheim_hedge_warden
-  sprite: knight
+  sprite: elf_guard
   x: 6
   y: 5
   dialog:
@@ -84,16 +84,14 @@ npcs:
     text: [The ring has stopped growing. I'll have the map redrawn. It's been a while.]
   - text: ['This map shows the ring as it was planted, nine hundred years ago. It''s half again as thick now.', 'Beyond the ring, the woods run
         south to the fens. Keep to the high ground; the peat swallows boots.']
-  tint: '#e4e9d6'
 - id: elfheim_warden_wife
-  sprite: villager_f
+  sprite: elf_woman
   x: 3
   y: 6
   dialog:
   - condition: PRINCE_AWAKE
     text: [He came home whistling today. I'd forgotten he could.]
   - text: [He measures the hedges every morning. I measure him every evening. He's getting thinner.]
-  tint: '#cfe8c2'
 transitions:
 - {x: 6, y: 8, targetMap: elfheim, targetEntrance: house_warden}
 encounterRate: {min: 999, max: 999}

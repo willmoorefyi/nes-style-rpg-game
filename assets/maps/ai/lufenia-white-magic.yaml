@@ -17,11 +17,10 @@ npcs:
 - id: lufenia-white-magic-keeper
   x: 5
   y: 4
-  sprite: white_wizard
+  sprite: luf_citizen_f
   dialog: [These are the last songs of healing our makers wrote. Learn them well; nobody writes new ones.]
   shopId: lufenia_white
   showIf: LUFENIAN_LEARNED
-  tint: '#dfe6f5'
 transitions:
 - {x: 5, y: 8, targetMap: lufenia, targetEntrance: white_magic}
 name: White Magic

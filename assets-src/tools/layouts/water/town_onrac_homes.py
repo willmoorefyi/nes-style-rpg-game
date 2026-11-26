@@ -46,7 +46,7 @@ def bellringer(out: list[Path]) -> None:
                "Fifty years I've rung that bell for the drowned. Tonight, I think, they rang it for me."]),
         default=["The bell came up in my father's net, green as weed, the winter the city under the harbour went down.",
                  "We hung it in the tower and I ring it every dusk. One stroke for every street they had down there."]))
-    r.npc("onrac_bellringer_girl", "villager_f", 3, 6, when(
+    r.npc("onrac_bellringer_girl", "girl", 3, 6, when(
         (LIT, ["Grandad cried, a bit. Then he said it was the cold. It isn't cold any more."]),
         default=["I write every tolling in Grandad's book. Thirty-one thousand and some. My hand aches just saying it."]))
     out.append(r.save(note("a bell-ringer's stone house with the tolling log on a lectern and a rug in the middle of the floor",
@@ -77,7 +77,7 @@ def netmender(out: list[Path]) -> None:
         (LIT, ["Not one torn net all week. Whatever was ripping them out past the stacks is gone."]),
         default=["Every net that goes past the sea-stacks comes back slashed, like something was cutting its way out.",
                  "I mend them. The boats take them out. They come back slashed. I'm a very busy woman."]))
-    r.npc("onrac_netmender_son", "villager", 3, 6, when(
+    r.npc("onrac_netmender_son", "boy", 3, 6, when(
         (OXY, ["Is it true you'll ride the iron fish? Bring me back a shell from the drowned city! A big one!"]),
         default=["Mum's teaching me the knots. This one's a sheet bend. This one's a mess. I'm on the mess."]))
     out.append(r.save(note("a net-mender's loft of dark planks, nets hung across the back wall over a long bench",
@@ -105,7 +105,7 @@ def smoker(out: list[Path]) -> None:
         (LIT, ["Fresh cod again, and fat with it! The smoke smells right for the first time in years."]),
         default=["Alder smoke, three days, three nights. That's how Onrac cod gets to the far side of the world.",
                  "The fish are thinner every season. I smoke them anyway. Thin smoked cod is still cod."]))
-    r.npc("onrac_smoker_apprentice", "thief", 9, 5, when(
+    r.npc("onrac_smoker_apprentice", "boy", 9, 5, when(
         (LIT, ["The master's whistling. The master never whistles. It's unsettling, honestly."]),
         default=["I count the salt barrels. There are four. I count them again tomorrow. There will be four."]))
     out.append(r.save(note("a smokehouse round a smoking hearth, crates of cod on the floor and salt in a back store",
@@ -161,13 +161,13 @@ def healer(out: list[Path]) -> None:
     r.one("table", 2, 4)
     r.one("orb_white", 1, 8)
     r.one("plant", 10, 8)
-    r.npc("onrac_healer", "white_mage", 3, 5,
+    r.npc("onrac_healer", "healer", 3, 5,
           ["Cold takes the weak and the sea takes the brave. I can call back either, if you're quick. Lay them down."],
           action="clinic", clinicPrice=90)              # GAP-16: 90 G per level of each fallen member (B6)
     r.npc("onrac_frostbitten", "villager", 8, 6, when(
         (LIT, ["My toes have stopped tingling. The healer says it's her salve. I say it's the warm wind."]),
         default=["Fell through the harbour ice chasing a hat. The hat got away. Two of my toes nearly did too."]))
-    r.npc("onrac_healer_nurse", "white_wizard", 5, 7, when(
+    r.npc("onrac_healer_nurse", "young_woman", 5, 7, when(
         (LIT, ["We let the stove go out this afternoon. Nobody even noticed. Imagine!"]),
         default=["Keep the stove fed, keep the blankets warm, and keep the sailors out of the brandy. That's the job."]))
     out.append(r.save(note("a healer's house: a row of cots along the back wall, the stove in the west corner, salves on shelves by it",

@@ -86,13 +86,12 @@ npcs:
 - id: elfheim-inn-keeper
   x: 2
   y: 4
-  sprite: innkeeper
+  sprite: elf_woman
   dialog:
   - condition: PRINCE_AWAKE
     text: ['A hundred gold the night, and I can joke about sleep again. Rest well!']
   - text: ['Beds of moss and linen, a hundred gold the night. You''ll sleep like... well, not like the prince, I hope.']
   shopId: elfheim_inn
-  tint: '#cfe8c2'
   action: inn
 - id: elfheim_inn_guest
   sprite: burgher

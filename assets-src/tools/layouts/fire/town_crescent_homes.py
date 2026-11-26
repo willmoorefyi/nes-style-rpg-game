@@ -51,10 +51,10 @@ def build() -> list[Path]:
     r.one("table", 11, 3)
     r.one("plant", 11, 8)
     r.thing("barrel", 8, 3)
-    r.npc("healer", "white_mage", 7, 4, [
+    r.npc("healer", "healer", 7, 4, [
         "Rest is the best healer, and I am the second best. Bring me your fallen and I'll bring them round.",
         "My fee is 60 G for each of their levels. The lake towns can't afford to do it for less."],
-        action="clinic", clinicPrice=60, tint="#e0e8f0")
+        action="clinic", clinicPrice=60)
     r.npc("healer_aide", "villager_f", 4, 6, said(
         ["The healer says the town's grown healthier since you came. She credits the lake air. I credit you."],
         ["The fevers from the south have stopped. Now we get burns from people who walked too near the volcano."],
@@ -87,14 +87,14 @@ def build() -> list[Path]:
     r.tall("bed", 10, 3)
     r.tall("bookshelf", 8, 3)
     chest(r, "astronomer", "ether", "an Ether", 10, 6)
-    r.npc("astronomer", "white_wizard", 2, 6, said(
+    r.npc("astronomer", "scholar", 2, 6, said(
         ["I watched your canoe cross the lake through the small glass. You paddle like scholars: earnestly.",
          "The rivers run out of the lake south and south-east. One ends in fire, the other in ice."],
         ["The earth crystal's light reached us on a clear night. A green star, low in the west. It was beautiful.",
          "Now two new lights show in the south: a red one that pulses, and a white one that never moves."],
         ["My charts show the stars dimming at the edges of the sky, one a season. The sages call it the decay.",
-         "The worst of it lies west, under the land. The earth's own light is going out."]), tint="#d8c8f0")
-    r.npc("astronomer_son", "villager", 5, 7, [
+         "The worst of it lies west, under the land. The earth's own light is going out."]))
+    r.npc("astronomer_son", "boy", 5, 7, [
         "Mother stays up all night and sleeps all day. I've learned to cook breakfast at sunset."])
     out.append(r.save(note("the astronomer's house on the Star Terrace: a study of charts and a globe, her "
                            "bedchamber through an arch.",
@@ -182,7 +182,7 @@ def build() -> list[Path]:
         ["Made you a cup with a canoe painted on it. Don't take it with you, it'll break. Just know it exists."],
         ["The clay's good again! It rolls smooth, not gritty. The earth's well, my hands say so."],
         ["The clay's gone sour. My pots crack in the kiln. Even the mud is sick this year."]))
-    r.npc("potter_girl", "villager_f", 8, 5, [
+    r.npc("potter_girl", "girl", 8, 5, [
         "I keep the kiln fed. Too hot and the pots burst, too cool and they weep. It's like minding a dragon."])
     out.append(r.save(note("the potter's house on the Market Terrace: a wheel room on boards and an earth-floored kiln room "
                            "through a side doorway.",
@@ -205,11 +205,10 @@ def build() -> list[Path]:
     r.tall("bookshelf", 1, 3)
     r.tall("bookshelf", 11, 3)
     r.one("plant", 1, 8)
-    r.npc("tutor", "red_mage", 6, 4, said(
+    r.npc("tutor", "townsman", 6, 4, said(
         ["Today we study rivers, because of you. Last week we studied the earth crystal, also because of you."],
         ["Lesson eleven: what heals the earth may wake the fire. I wrote it for the sages. Now I teach it."],
-        ["Lesson ten: the earth is sick, and the sick earth makes sick crops. My pupils know it better than I'd like."]),
-        tint="#c8a0a0")
+        ["Lesson ten: the earth is sick, and the sick earth makes sick crops. My pupils know it better than I'd like."]))
     r.npc("pupil_c", "villager", 4, 7, said(
         ["When I'm grown I'm going to paddle down every river on the map. Even the hot one."],
         ["The tutor drew a volcano on the slate. Then she drew it again, bigger."],

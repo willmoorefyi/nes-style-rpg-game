@@ -71,13 +71,12 @@ npcs:
 - id: elfheim-weapon-keeper
   x: 5
   y: 4
-  sprite: warrior
+  sprite: elf_man
   dialog:
   - condition: PRINCE_AWAKE
     text: [Good blades for good days. The prince took the first sword I made this year.]
   - text: ['Mithril, folded and leaf-light. Elven steel bites deep and never rusts.']
   shopId: elfheim_weapon
-  tint: '#cfe8c2'
 transitions:
 - {x: 5, y: 8, targetMap: elfheim, targetEntrance: weapon_shop}
 encounterRate: {min: 999, max: 999}

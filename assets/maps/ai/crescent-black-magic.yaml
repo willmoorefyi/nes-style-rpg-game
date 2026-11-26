@@ -17,7 +17,7 @@ npcs:
 - id: crescent-black-magic-keeper
   x: 8
   y: 4
-  sprite: black_mage
+  sprite: scholar
   dialog:
   - condition: CANOE_GIVEN
     text: ['Fire''s third word and the warp that takes you home. Use them on the far rivers, not on my shop.']

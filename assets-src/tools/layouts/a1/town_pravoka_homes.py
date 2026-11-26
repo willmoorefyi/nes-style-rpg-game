@@ -53,16 +53,16 @@ def build() -> list[Path]:
     r.one("plant", 10, 8)
     r.thing("barrel", 3, 3)                           # lamp oil
     r.thing("barrel", 10, 5)
-    r.npc("lighthouse_keeper", "white_mage", 7, 4, [
+    r.npc("lighthouse_keeper", "healer", 7, 4, [
         "I keep the light, and I keep the hurt. In a harbour town the two jobs come to the same thing.",
         "If one of yours has fallen, I can bring them round: 10 G for each of their levels."],
         action="clinic", clinicPrice=10, tint="#e6dcc8")
-    r.npc("keeper_daughter", "villager_f", 3, 7, said(
+    r.npc("keeper_daughter", "girl", 3, 7, said(
         ["Father has the lens back up. The light burns from dusk to dawn again.",
          "The fishing boats steer by it. So will your brig."],
         ["The pirates made Father put out the light. Ships that can't see the fjord can't come and fight them.",
          "He keeps the lens polished anyway. Every night."]))
-    r.npc("hurt_sailor", "villager", 9, 7, said(
+    r.npc("hurt_sailor", "sailor", 9, 7, said(
         ["The keeper says I'll sail again by spring. I mean to sail with a light to steer by."],
         ["Asked the Captain to let my boat out. He answered with the flat of his cutlass. I've had kinder answers."]))
     out.append(r.save(note("the lighthouse keeper's house on the shelf, a sick-room as much as a home: the keeper "
@@ -151,7 +151,7 @@ def build() -> list[Path]:
         ["Rope, pitch, lamp oil, biscuit: whatever a ship needs, I stock. Your brig will want all of it.",
          "Mind the sea west of the peninsula. Fair water, foul fish."],
         ["A chandler with no ships to stock. I sell rope to the pirates, and they pay me in promises."]))
-    r.npc("chandler_boy", "villager", 4, 6, [
+    r.npc("chandler_boy", "boy", 4, 6, [
         "I count the rope. Fifty fathoms, fifty-one, fifty... I lost count again."])
     out.append(r.save(note("the chandler's house: a front room of ship's stores and a store room up a step behind "
                            "it.",

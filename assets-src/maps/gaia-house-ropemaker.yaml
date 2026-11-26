@@ -68,7 +68,7 @@ npcs:
   - text: ['Fifteen paces of plank: that''s our rope walk. You twist the hemp walking backwards, all day.', 'Without the wind the bridges don''t
         sway, so they don''t wear, so nobody needs new rope. Sad trade.']
 - id: gaia_rope_apprentice
-  sprite: thief
+  sprite: boy
   x: 10
   y: 6
   dialog:

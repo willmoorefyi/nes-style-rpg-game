@@ -61,13 +61,12 @@ npcs:
 - id: elfheim-white-magic-keeper
   x: 3
   y: 4
-  sprite: white_wizard
+  sprite: elf_mage
   dialog:
   - condition: PRINCE_AWAKE
     text: [I sang at the prince's bedside every night for a year. The witch's herb was quicker.]
   - text: ['Songs of mending, written in leaf-script. Learn them, and heal.']
   shopId: elfheim_white
-  tint: '#cfe8c2'
 transitions:
 - {x: 5, y: 9, targetMap: elfheim, targetEntrance: white_magic}
 encounterRate: {min: 999, max: 999}
