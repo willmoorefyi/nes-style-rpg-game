@@ -122,6 +122,8 @@ export class SceneManager {
       this.currentScene = next;
       this.currentName = name;
       this.stage.addChild(next.container);
+      // a cached scene left hidden under a stack that a switchTo cleared (Field menu > Load) is shown again (ESC)
+      next.container.visible = true;
       await next.enter();
     });
   }

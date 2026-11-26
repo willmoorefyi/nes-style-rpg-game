@@ -65,6 +65,25 @@ describe('SceneManager', () => {
     expect(a.container.visible).toBe(true);
   });
 
+  it('a scene left hidden under a cleared stack is visible when pushed again (ESC: Field menu > Load)', async () => {
+    const exploration = createMockScene();
+    const fieldMenu = createMockScene();
+    const loadMenu = createMockScene();
+    manager.register('exploration', exploration);
+    manager.register('fieldMenu', fieldMenu);
+    manager.register('loadMenu', loadMenu);
+    await manager.switchTo('exploration');
+    await manager.push('fieldMenu');
+    await manager.push('loadMenu');          // the field menu is hidden under the load screen
+    await manager.switchTo('exploration');   // LoadScene.start: the stack is cleared, the field menu still hidden
+    await manager.push('fieldMenu');         // the next Esc in the field
+    expect(manager.current).toBe('fieldMenu');
+    expect(fieldMenu.container.visible).toBe(true);
+    expect(exploration.container.visible).toBe(false);
+    await manager.pop();
+    expect(exploration.container.visible).toBe(true);
+  });
+
   it('throws when switching to unregistered scene', async () => {
     await expect(manager.switchTo('missing')).rejects.toThrow("Scene 'missing' not found");
   });
