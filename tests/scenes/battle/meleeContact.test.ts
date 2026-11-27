@@ -227,9 +227,14 @@ function heroAttackLeftInset(): number {
   const col = meta.poses.indexOf('attack');
   // pass CL (docs/CLASS_LANCE_PLAN.md 3.1, D-CL12): an oversize sheet (`page`) leads with its `reach` column, so its
   // inset from the lead is 0 by construction (tests/rendering/lanceAtlas.test.ts); the main file's sheets only here
-  const main = Object.entries(meta.sheets).filter(([, s]) => !(s as { page?: number }).page);
+  // pass CB A5: an 80 x 80 class on an overflow page (no `body`) is read from its own page file, same layout
+  const pageImg = new Map<number, ReturnType<typeof readRgbaPng>>([[0, img]]);
+  const pages = (meta as { pages?: { file: string }[] }).pages ?? [];
+  const main = Object.entries(meta.sheets).filter(([, s]) => !(s as { body?: unknown }).body);
   return Math.max(...main.map(([id, sheet]) => {
-    const bounds = opaqueBounds(img, col * w, sheet.row * h, w, h);
+    const p = (sheet as { page?: number }).page ?? 0;
+    if (!pageImg.has(p)) pageImg.set(p, readRgbaPng(`assets/sprites/${pages[p].file}`));
+    const bounds = opaqueBounds(pageImg.get(p)!, col * w, sheet.row * h, w, h);
     if (!bounds) throw new Error(`battle-characters-ai: ${id} attack frame is empty`);
     return bounds[0];
   }));

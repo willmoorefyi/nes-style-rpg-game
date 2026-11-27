@@ -45,7 +45,7 @@ function onScreen(cid: string, pose: string, x: number, y: number, what: string)
 }
 
 describe('pass CL: a lance hero is never clipped (7.6)', () => {
-  for (const cid of Object.keys(meta.sheets).filter((c) => meta.sheets[c].page)) {   // every oversize hero
+  for (const cid of Object.keys(meta.sheets).filter((c) => meta.sheets[c].body)) {   // every oversize hero (A5: an overflow-page class has no body)
     const s = meta.sheets[cid];
     const art = { footRow: s.footRow!, scale: meta.scale, body: { x: s.body![0] } };
     for (const slot of [0, 1, 2, 3]) {

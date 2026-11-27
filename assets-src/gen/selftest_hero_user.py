@@ -65,6 +65,14 @@ def refused(fn) -> str:
     return ""
 
 
+def _refused(fn) -> bool:
+    try:
+        fn()
+    except SystemExit:
+        return True
+    return False
+
+
 def run_hero_user(check: Callable[[bool, str], None]) -> None:
     from gen import hero_user as HU
     from gen import pixelize as PX
@@ -261,6 +269,32 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
     share = lambda img, ref: [f for f in PK.frame_checks("kneel", img, W, 76, pal, ref) if "K-ground" in f]
     check(bool(share(N, None)) and not share(N, N) and bool(share(H, None)) and bool(share(H, H)),
           "CB A4: a drawn key's held frame skips the contact share, never the lowest row on 76")
+    # plan 15 (A5): the overflow pages of gen/battle_pages.yaml
+    from gen import battle_atlas as BA
+
+    def ov(text: str, oversize=()) -> str:
+        with tempfile.TemporaryDirectory() as t5:
+            (Path(t5) / "battle_pages.yaml").write_text(text)
+            try:
+                BA.overflow_lists(HU2.HERE / "approved", list(oversize), Path(t5) / "battle_pages.yaml")
+                return ""
+            except SystemExit as e:
+                return str(e)
+    check("no approved" in ov("overflow: [[no_such_class]]") and "twice" in ov("overflow: [[barbarian], [barbarian]]")
+          and "oversize" in ov("overflow: [[barbarian]]", ["barbarian"]) and ov("overflow: [[barbarian, berserker]]") == ""
+          and BA.overflow_lists(HU2.HERE / "approved", [], Path("/nonexistent/battle_pages.yaml")) == [],
+          "CB A5: battle_pages.yaml refuses an unknown, a repeated and an oversize id; no file = no overflow page")
+    big, fits = (type("I", (), {"width": 2880, "height": h})() for h in (4256, 4096))
+    check(_refused(lambda: BA.page_fits(big, "the main file")) and not _refused(lambda: BA.page_fits(fits, "a page")),
+          "CB A5: a page over 4096 px is refused, 4096 is not")
+    fake = {"cell": [80, 80], "footRow": 76, "scale": 2, "poses": [f"p{i}" for i in range(18)],
+            "sheets": {"main": {"row": 3}, "over": {"row": 1, "page": 3},
+                       "lance": {"row": 0, "page": 1, "cell": [160, 144], "footRow": 140, "grid": [6, 3]}}}
+    check(BA.cell_of(fake, "over") == (80, 80) and BA.foot_of(fake, "over") == 76
+          and BA.cell_box(fake, "over", "p5") == (5 * 160, 160, 6 * 160, 320)
+          and BA.cell_box(fake, "main", "p5") == (5 * 160, 3 * 160, 6 * 160, 4 * 160)
+          and BA.cell_of(fake, "lance") == (160, 144) and BA.foot_of(fake, "lance") == 140,
+          "CB A5: cell_of / foot_of / cell_box of an overflow entry give the main layout on its page")
     # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
     rec = HU2.recipe("barbarian_berserker")
     _, binfo = HU2.cut(rec)

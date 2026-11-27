@@ -70,10 +70,32 @@ describe('CharacterAtlas battle atlas loading', () => {
   const poses18 = [...BATTLE_POSES];
   const paged = {
     cell: [80, 80], scale: 2, footRow: 76, poses: poses18,
-    pages: [{ file: 'battle-characters-ai.png', w: 2880, h: 160 }, { file: 'battle-characters-ai-1.png', w: 1920, h: 1728 }],
+    pages: [{ file: 'battle-characters-ai.png', w: 2880, h: 160 }, { file: 'battle-characters-ai-1.png', w: 1920, h: 1728 },
+      { file: 'battle-characters-ai-2.png', w: 2880, h: 320 }],
     sheets: { knight: { row: 0 }, lancer: { row: 1, page: 1, cell: [160, 144], footRow: 140, body: [72, 64, 80, 80],
-      grid: [6, 3], reach: 4, heads: poses18.map(() => [110, 70]) } },
+      grid: [6, 3], reach: 4, heads: poses18.map(() => [110, 70]) },
+      // pass CB A5 (docs/CLASS_BARBARIAN_PLAN.md 15): an 80 x 80 class on an overflow page (the main layout)
+      shaman: { row: 1, page: 2 } },
   };
+
+  it('A5: an overflow-page class slices at the main layout on its page and has no body / reach / top', async () => {
+    aiResponse = () => respond(JSON.stringify(paged));
+    const loads: string[] = [];
+    vi.spyOn(Assets, 'load').mockImplementation(async (p: unknown) => { loads.push(String(p)); return fakeTexture() as never; });
+    const atlas = new CharacterAtlas();
+    await atlas.load();
+    expect(loads.some((p) => p.endsWith('battle-characters-ai-2.png'))).toBe(true);
+    const art = atlas.getBattleFrames('shaman')!;
+    expect(art.cell).toEqual([80, 80]);
+    expect(art.footRow).toBe(76);
+    expect(art.body).toBeUndefined();
+    expect(art.reach).toBeUndefined();
+    expect(art.top).toBeUndefined();
+    const f = (pose: string) => art.frames[BATTLE_POSES.indexOf(pose as never)].frame;
+    const col = (pose: string) => poses18.indexOf(pose as never);
+    expect([f('ready').x, f('ready').y, f('ready').width, f('ready').height]).toEqual([col('ready') * 160, 160, 160, 160]);
+    expect([f('kneel_b').x, f('kneel_b').y]).toEqual([col('kneel_b') * 160, 160]);
+  });
 
   it('slices a page sheet at its own cell and grid, with its body, feet row and reach; main classes as before', async () => {
     aiResponse = () => respond(JSON.stringify(paged));

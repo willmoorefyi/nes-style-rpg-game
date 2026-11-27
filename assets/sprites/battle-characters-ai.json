@@ -54,76 +54,68 @@
       "row": 6,
       "inbetweens": true
     },
-    "druid": {
+    "hunter": {
       "row": 7,
       "inbetweens": true
     },
-    "hunter": {
+    "knight": {
       "row": 8,
       "inbetweens": true
     },
-    "knight": {
+    "legionnaire": {
       "row": 9,
       "inbetweens": true
     },
-    "legionnaire": {
+    "master": {
       "row": 10,
       "inbetweens": true
     },
-    "master": {
+    "monk": {
       "row": 11,
       "inbetweens": true
     },
-    "monk": {
+    "ninja": {
       "row": 12,
       "inbetweens": true
     },
-    "ninja": {
+    "paladin": {
       "row": 13,
       "inbetweens": true
     },
-    "paladin": {
+    "ranger": {
       "row": 14,
       "inbetweens": true
     },
-    "ranger": {
+    "red_mage": {
       "row": 15,
       "inbetweens": true
     },
-    "red_mage": {
+    "red_wizard": {
       "row": 16,
       "inbetweens": true
     },
-    "red_wizard": {
+    "ronin": {
       "row": 17,
       "inbetweens": true
     },
-    "ronin": {
+    "samurai": {
       "row": 18,
       "inbetweens": true
     },
-    "samurai": {
+    "thief": {
       "row": 19,
       "inbetweens": true
     },
-    "shaman": {
+    "warrior": {
       "row": 20,
       "inbetweens": true
     },
-    "thief": {
+    "white_mage": {
       "row": 21,
       "inbetweens": true
     },
-    "warrior": {
-      "row": 22,
-      "inbetweens": true
-    },
-    "white_mage": {
-      "row": 23,
-      "inbetweens": true
-    },
     "white_wizard": {
-      "row": 24,
+      "row": 22,
       "inbetweens": true
     },
     "dragoon": {
@@ -413,13 +405,23 @@
           13
         ]
       ]
+    },
+    "shaman": {
+      "row": 0,
+      "page": 3,
+      "inbetweens": true
+    },
+    "druid": {
+      "row": 1,
+      "page": 3,
+      "inbetweens": true
     }
   },
   "pages": [
     {
       "file": "battle-characters-ai.png",
       "w": 2880,
-      "h": 4000
+      "h": 3680
     },
     {
       "file": "battle-characters-ai-1.png",
@@ -430,6 +432,11 @@
       "file": "battle-characters-ai-2.png",
       "w": 1920,
       "h": 480
+    },
+    {
+      "file": "battle-characters-ai-3.png",
+      "w": 2880,
+      "h": 320
     }
   ]
 }

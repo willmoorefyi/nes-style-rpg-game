@@ -1,0 +1,7 @@
+# Pass CB A5 (docs/CLASS_BARBARIAN_PLAN.md 15): overflow pages of the party battle atlas for 80 x 80 hero classes.
+# The main file (battle-characters-ai.png, one 160 px row per class) is capped at WebGL1's 4096 px: the classes listed
+# here go on extra pages with the same layout (one row per class, in this order), numbered after the oversize pages.
+# Every other 80 x 80 class stays on the main file. Refused: an id without approved/<id>/battle.json, an oversize
+# class, an id listed twice, a page over 4096 px.
+overflow:
+  - [shaman, druid]

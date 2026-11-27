@@ -1,7 +1,9 @@
 """The party battle atlas's pages (pass CL, docs/CLASS_LANCE_PLAN.md 3, 3.1): the main file (one row per 80 x 80
 class, the top-level `cell` / `footRow`) and extra pages for oversize classes (a sheet with `page` > 0 has its own
 `cell`, `footRow`, `body` and `grid` [cols, rows]: its `row` is its block index, pose p at cell
-(p % cols, row * rows + p // cols)). Every reader of assets/sprites/battle-characters-ai.json goes through these.
+(p % cols, row * rows + p // cols)). Pass CB A5 (docs/CLASS_BARBARIAN_PLAN.md 15): an overflow page of 80 x 80 classes
+(gen/battle_pages.yaml) has the main layout; its entries carry only `row`, `page`, `inbetweens`. Every reader of
+assets/sprites/battle-characters-ai.json goes through these.
 """
 from __future__ import annotations
 
@@ -24,13 +26,14 @@ def page_file(meta: dict, page: int) -> str:
 
 
 def cell_of(meta: dict, cid: str) -> tuple[int, int]:
+    """An oversize page entry's own `cell`; the top-level cell for a main-file or (A5) overflow-page entry."""
     s = meta["sheets"][cid]
-    return tuple(s["cell"]) if s.get("page") else tuple(meta["cell"])
+    return tuple(s.get("cell") or meta["cell"]) if s.get("page") else tuple(meta["cell"])
 
 
 def foot_of(meta: dict, cid: str) -> int:
     s = meta["sheets"][cid]
-    return int(s["footRow"]) if s.get("page") else int(meta["footRow"])
+    return int(s.get("footRow", meta["footRow"])) if s.get("page") else int(meta["footRow"])
 
 
 def cell_box(meta: dict, cid: str, pose: str, scaled: bool = True) -> tuple[int, int, int, int]:
@@ -40,7 +43,7 @@ def cell_box(meta: dict, cid: str, pose: str, scaled: bool = True) -> tuple[int,
     gw, gh = cell_of(meta, cid)
     i = meta["poses"].index(pose)
     if s.get("page"):
-        cols, rows = s["grid"]
+        cols, rows = s.get("grid") or [len(meta["poses"]), 1]   # A5: an overflow page has the main layout
         cx, cy = i % cols, s["row"] * rows + i // cols
     else:
         cx, cy = i, s["row"]
@@ -74,6 +77,37 @@ def class_frames(cid: str) -> tuple[dict, dict]:
             for n, (lance, _) in made["_lances"].items():
                 masks[n] = lance["mask"]
     return frames, masks
+
+
+MAX_PAGE_PX = 4096                     # WebGL1's texture limit, either side
+
+
+def page_fits(img, what: str) -> None:
+    """Refuse a page png over MAX_PAGE_PX on either side (pass CB A5)."""
+    if img.width > MAX_PAGE_PX or img.height > MAX_PAGE_PX:
+        raise SystemExit(f"battle_ai: {what} is {img.width} x {img.height}, over {MAX_PAGE_PX}")
+
+
+def overflow_lists(approved, oversize: list, path=None) -> list:
+    """Pass CB A5 (docs/CLASS_BARBARIAN_PLAN.md 15): the overflow pages of gen/battle_pages.yaml ([] without the file),
+    each a list of 80 x 80 class ids; refused: an id without approved/<id>/battle.json, an oversize id, a repeat."""
+    import yaml
+    from pathlib import Path
+    p = Path(path) if path else Path(__file__).resolve().parent / "battle_pages.yaml"
+    pages = ((yaml.safe_load(p.read_text()) or {}).get("overflow") or []) if p.exists() else []
+    seen = set()
+    for page in pages:
+        if not isinstance(page, list) or not page:
+            raise SystemExit(f"battle_ai: {p.name}: each overflow page must be a non-empty list of class ids")
+        for cid in page:
+            if cid in seen:
+                raise SystemExit(f"battle_ai: {p.name}: {cid} is listed twice")
+            if not (Path(approved) / str(cid) / "battle.json").is_file():
+                raise SystemExit(f"battle_ai: {p.name}: {cid} has no approved battle.json")
+            if cid in oversize:
+                raise SystemExit(f"battle_ai: {p.name}: {cid} is an oversize class (it has its own page)")
+            seen.add(cid)
+    return [list(page) for page in pages]
 
 
 def build_pages(big: list, poses: list, scale: int) -> tuple[list, dict]:

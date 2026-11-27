@@ -105,31 +105,50 @@ def build_battle_ai() -> None:
     # built from the 80 x 80 sheets exactly as before
     big = [(m, s) for m, s in entries if m["grid"] != [80, 80]]
     entries = [(m, s) for m, s in entries if m["grid"] == [80, 80]]
+    # pass CB A5 (docs/CLASS_BARBARIAN_PLAN.md 15): the classes of gen/battle_pages.yaml go on overflow pages laid out
+    # like the main file; they leave the main entries before entries[0] is read, so the main file is unchanged
+    from gen import battle_atlas as BA
+    overflow = BA.overflow_lists(APPROVED, [m["character"] for m, _ in big])
+    listed = {c for page in overflow for c in page}
+    by_id = {m["character"]: (m, s) for m, s in entries}
+    entries = [(m, s) for m, s in entries if m["character"] not in listed]
     gw, gh = entries[0][0]["grid"]
     poses = entries[0][0]["poses"]
     # in-between poses (puppet.py, from gen/anim/<id>.yaml); a class without joints repeats its nearest keyframe
     all_poses = poses + PU.INBETWEENS + PK.KNEEL_POSES     # pass K kneel columns (docs/KNEEL_PLAN.md D-K7)
-    atlas = Image.new("RGBA", (gw * len(all_poses), gh * len(entries)), (0, 0, 0, 0))
-    sheets = {}
-    for row, (meta, sheet) in enumerate(entries):
-        if meta["grid"] != [gw, gh] or meta["poses"] != poses:
-            raise SystemExit(f"battle_ai: {meta['character']} grid/poses differ from the first approved sheet")
-        frames = PU.apply_review_fixes(sheet, meta)[0]      # face_fix, then facing_fix (docs/HERO_FACING_PLAN.md)
-        tween = PU.battle_inbetweens(meta["character"])
-        for pose in PU.INBETWEENS:
-            frames[pose] = tween.get(pose, frames[PU.SOURCE[pose]])
-        kneel = PK.kneel_frames(meta["character"])                 # {} without a kneel: block -> ready
-        for pose in PK.KNEEL_POSES:
-            frames[pose] = kneel.get(pose, frames["ready"])
-        for i, pose in enumerate(all_poses):
-            atlas.paste(frames[pose], (i * gw, row * gh))
-        sheets[meta["character"]] = {"row": row, "inbetweens": bool(tween)}
-    main = scaled(atlas, AI_SCALE)
+    def main_layout(rows: list) -> tuple:
+        """One row per 80 x 80 class, the 18 pose columns (the main file's layout); ({cid: {row, inbetweens}}, png)."""
+        atlas = Image.new("RGBA", (gw * len(all_poses), gh * len(rows)), (0, 0, 0, 0))
+        out_sheets = {}
+        for row, (meta, sheet) in enumerate(rows):
+            if meta["grid"] != [gw, gh] or meta["poses"] != poses:
+                raise SystemExit(f"battle_ai: {meta['character']} grid/poses differ from the first approved sheet")
+            frames = PU.apply_review_fixes(sheet, meta)[0]      # face_fix, then facing_fix (docs/HERO_FACING_PLAN.md)
+            tween = PU.battle_inbetweens(meta["character"])
+            for pose in PU.INBETWEENS:
+                frames[pose] = tween.get(pose, frames[PU.SOURCE[pose]])
+            kneel = PK.kneel_frames(meta["character"])                 # {} without a kneel: block -> ready
+            for pose in PK.KNEEL_POSES:
+                frames[pose] = kneel.get(pose, frames["ready"])
+            for i, pose in enumerate(all_poses):
+                atlas.paste(frames[pose], (i * gw, row * gh))
+            out_sheets[meta["character"]] = {"row": row, "inbetweens": bool(tween)}
+        img = scaled(atlas, AI_SCALE)
+        BA.page_fits(img, "the main file (list classes in gen/battle_pages.yaml `overflow`)" if rows is entries else
+                     "an overflow page of gen/battle_pages.yaml")
+        return out_sheets, img
+    sheets, main = main_layout(entries)
     main.save(out / "battle-characters-ai.png")
     extra = {}
-    if big:
-        from gen import battle_atlas as BA
-        pages, sheets_big = BA.build_pages(big, all_poses, AI_SCALE)
+    pages, sheets_big = (BA.build_pages(big, all_poses, AI_SCALE) if big else ([], {}))
+    for page_ids in overflow:                            # A5: after the oversize pages, in the listed order
+        rows_ = [by_id[c] for c in page_ids]
+        page_sheets, img = main_layout(rows_)
+        n = len(pages) + 1
+        for c, e in page_sheets.items():
+            sheets_big[c] = {"row": e["row"], "page": n, "inbetweens": e["inbetweens"]}
+        pages.append((img, list(page_ids)))
+    if pages:
         for i, (img, _) in enumerate(pages, start=1):
             img.save(out / f"battle-characters-ai-{i}.png")
         sheets.update(sheets_big)

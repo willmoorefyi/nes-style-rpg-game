@@ -12,9 +12,12 @@ import { BATTLE_POSES } from '../../src/rendering/CharacterAtlas.js';
 
 const APPROVED = 'assets-src/gen/approved';
 const meta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json', 'utf8')) as {
-  cell: [number, number]; scale: number; footRow: number; poses: string[]; sheets: Record<string, { row: number; inbetweens: boolean }>;
+  cell: [number, number]; scale: number; footRow: number; poses: string[];
+  sheets: Record<string, { row: number; inbetweens: boolean; page?: number }>; pages?: { file: string }[];
 };
-const atlas = readRgbaPng('assets/sprites/battle-characters-ai.png');
+/** Pass CB A5: the png a class's cells are on (its `page`; the main file without one). */
+const pageOf = (cid: string): RgbaImage => readRgbaPng(`assets/sprites/${meta.sheets[cid].page
+  ? meta.pages![meta.sheets[cid].page!].file : 'battle-characters-ai.png'}`);
 const field = JSON.parse(readFileSync('assets/sprites/characters-ai.json', 'utf8')) as {
   sheets: Record<string, { x: number; y: number }>; aliases?: Record<string, string>;
 };
@@ -30,11 +33,13 @@ const rgbaAt = (img: RgbaImage, x: number, y: number) => {
 };
 
 function atlasCell(cid: string, pose: string): string[][] {
+  const atlas = pageOf(cid);
   const s = meta.scale, col = meta.poses.indexOf(pose), row = meta.sheets[cid].row;
   return Array.from({ length: GH }, (_, y) => Array.from({ length: GW }, (_, x) => rgbaAt(atlas, (col * GW + x) * s, (row * GH + y) * s)));
 }
 
 function lowestRow(cid: string, pose: string): number {
+  const atlas = pageOf(cid);
   const s = meta.scale, col = meta.poses.indexOf(pose), row = meta.sheets[cid].row;
   for (let y = GH * s - 1; y >= 0; y--) {
     for (let x = 0; x < GW * s; x++) if (alphaAt(atlas, col * GW * s + x, row * GH * s + y)) return Math.floor(y / s);

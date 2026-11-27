@@ -230,7 +230,8 @@ export class CharacterAtlas {
     const frames = slicePoses(meta, tex, id, BATTLE_POSES, (p) => POSE_FALLBACK[p as BattlePose] ?? 'ready');
     const s = meta.sheets[id];
     return { frames, scale: meta.scale, cell: cellOf(meta, id), footRow: footRowOf(meta, id),
-      ...(page ? { body: bodyOf(meta, id), reach: s.reach ?? 0, top: s.top ?? 0 } : {}) };
+      // pass CB A5: an overflow-page class (no `body`) lays out, lunges and previews like a main-file class
+      ...(page && s.body ? { body: bodyOf(meta, id), reach: s.reach ?? 0, top: s.top ?? 0 } : {}) };
   }
 }
 
