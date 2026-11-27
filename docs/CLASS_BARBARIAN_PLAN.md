@@ -312,3 +312,32 @@ bow) -> atk_mid / atk_follow rebuilt on the attack key; round 2 ITERATE (the dot
 section 5: `alias_frames: [atk_wind1, atk_wind2, atk_follow]` for both classes (those frames show ready, ready,
 attack); every other generated frame (atk_mid, cast_gather / rise / release, idle_b, the kneel bridge) passed round 3.
 For the user: the attack is a draw-and-hold until a bow-specific wind-up / release exists (e.g. drawn release frames).
+
+## 14. Amendment A4 (cleric / paladin): a drawn hero kneel key is exempt from the contact share
+
+`puppet_kneel.frame_checks` asks a held kneel frame (`kneel`, `kneel_b`) to cover at least half of ready's px on the
+bottom two rows (K-ground contact share). The paladin's drawn KNEEL (the user's art: a knee and a toe on the ground,
+the cape lifted) has 17 px there, under half of its wide-stance ready: the check fails on the user's own pixels, which
+may not be edited. The monster pass already ruled this (KT3, remorazz): an AI key and its key-drawn frames are exempt
+from the contact share but must still reach the feet row.
+
+- The hero check applies the same rule: when the frame is drawn from the key (`ring_ref` given: `source: ai | user`,
+  held frames `kneel`, `kneel_b`; the share never applied to `kneel_in2`), the contact share is skipped; the lowest-row-on-76 rule, K-fit, alpha,
+  palette, magenta, pieces and ring stay. A derived kneel (no `source`) keeps the share. The 12 AI classes and the
+  user classes before the paladin pass the share today, so their results do not change (gate: `puppet_kneel.py
+  check` over all classes, locks unchanged).
+- Selftest (`selftest_hero_user.py`): a held frame with a 2-px foot fails the share with `ring_ref=None` and passes
+  with a ring_ref; a frame whose lowest row is not 76 fails either way. Momus: OKAY (measured: only the paladin's
+  held frames fail the old share, 17 of 42 px; the other 15 classes pass it).
+
+### 14.1 Cleric / paladin result (2026-11-27, branch class-cleric)
+
+Exact copies of white_mage -> white_wizard (user ruling: new classes are exact copies, sprites only). A1-A3
+cherry-picked; A4 new (Momus OKAY). Image review: round 1 ITERATE (blended frames: shield fragments, the wind-ups
+pushing forward, the sparkle redrawn) -> every in-between on one key with a small offset; round 2 ITERATE (the separate
+sparkle gains an outline ring whenever its forearm moves; a knee seam in idle_b; a detached pommel) -> cast_rise /
+cast_release aliased to the cast key, hips kept, the pommel in the weapon box; round 3 ITERATE on atk_wind1 / atk_wind2
+only (a forearm sliver beside the shield, the weapon over the face) -> section 5 fallback: `alias_frames: [atk_wind1,
+atk_wind2, cast_rise, cast_release]`. atk_mid, atk_follow, cast_gather, idle_b and the kneel bridge passed round 3.
+For the user: a party with both the white mage and the cleric needs 430 G for the two starting kits (the 400 G NG-5
+bound skips that pair); the cleric shows in the magic shop's learner lists ("Learn: WHM RDM CLR").

@@ -18,6 +18,7 @@ export const DEFAULT_NAMES: Record<string, string> = {
   barbarian: 'BARB',
   legionnaire: 'LEGN',
   hunter: 'HUNT',
+  cleric: 'CLER',
 };
 
 function label(text: string, x: number, y: number, fill = 0xffffff): BitmapText {

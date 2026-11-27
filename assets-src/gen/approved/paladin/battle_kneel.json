@@ -1,0 +1,237 @@
+{
+  "character": "paladin",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/cleric/battle_2026-11-26.png",
+    "sha256": "f50c624f6df1c56645f29cf3ee18a4ef076ae2b85f0c91a6ae5ee643981ad388"
+  },
+  "recipe": "hero_user.yaml#cleric_paladin",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "cleric_paladin_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "the cleric / paladin combo (copy of the white mage) (delivered as final; the CAST sparkle kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          25,
+          22,
+          27
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          57,
+          48,
+          49
+        ],
+        [
+          57,
+          49,
+          49
+        ]
+      ],
+      [
+        [
+          86,
+          64,
+          54
+        ],
+        [
+          82,
+          66,
+          57
+        ]
+      ],
+      [
+        [
+          93,
+          90,
+          99
+        ],
+        [
+          90,
+          90,
+          99
+        ]
+      ],
+      [
+        [
+          121,
+          85,
+          60
+        ],
+        [
+          123,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          133,
+          133,
+          140
+        ],
+        [
+          132,
+          132,
+          140
+        ]
+      ],
+      [
+        [
+          143,
+          97,
+          22
+        ],
+        [
+          140,
+          99,
+          24
+        ]
+      ],
+      [
+        [
+          148,
+          103,
+          77
+        ],
+        [
+          148,
+          107,
+          74
+        ]
+      ],
+      [
+        [
+          177,
+          123,
+          86
+        ],
+        [
+          181,
+          123,
+          82
+        ]
+      ],
+      [
+        [
+          181,
+          183,
+          188
+        ],
+        [
+          181,
+          181,
+          189
+        ]
+      ],
+      [
+        [
+          201,
+          144,
+          32
+        ],
+        [
+          198,
+          148,
+          33
+        ]
+      ],
+      [
+        [
+          216,
+          157,
+          114
+        ],
+        [
+          214,
+          156,
+          115
+        ]
+      ],
+      [
+        [
+          216,
+          216,
+          216
+        ],
+        [
+          214,
+          214,
+          214
+        ]
+      ],
+      [
+        [
+          242,
+          194,
+          153
+        ],
+        [
+          239,
+          198,
+          156
+        ]
+      ],
+      [
+        [
+          243,
+          203,
+          90
+        ],
+        [
+          247,
+          206,
+          90
+        ]
+      ],
+      [
+        [
+          249,
+          240,
+          223
+        ],
+        [
+          247,
+          239,
+          222
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        9,
+        15,
+        70,
+        76
+      ]
+    }
+  }
+}

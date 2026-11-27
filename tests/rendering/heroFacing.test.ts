@@ -89,7 +89,7 @@ function faceFixPoses(meta: BattleMeta): Set<string> {
 describe('pass HF: hero battle facing fixes in the committed atlas', () => {
   it('every hero class has an approved battle sheet and json', () => {
     expect(classes.length).toBe(12);
-    expect(userClasses).toEqual(['barbarian', 'berserker', 'centurion', 'dark_fighter_hero', 'death_knight_hero', 'dragoon', 'hunter', 'landsknecht', 'legionnaire', 'ranger']);
+    expect(userClasses).toEqual(['barbarian', 'berserker', 'centurion', 'cleric', 'dark_fighter_hero', 'death_knight_hero', 'dragoon', 'hunter', 'landsknecht', 'legionnaire', 'paladin', 'ranger']);
     for (const cid of allClasses) expect(existsSync(`${APPROVED}/${cid}/battle.json`)).toBe(true);
     expect(readdirSync(APPROVED).filter(d => existsSync(`${APPROVED}/${d}/battle.json`)).sort()).toEqual(allClasses);
   });

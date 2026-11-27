@@ -3507,3 +3507,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-13): the cleric / paladin class pair (user-rendered battle art). CLER is
+# weak so it kneels; WWIZ is the like-for-like control for PALA. ?mute=1&scenario=cb_clerics (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_clerics
+  name: Cleric and Paladin (pass CB preview)
+  party:
+    - { class: cleric, name: CLER, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 12 }
+    - { class: paladin, name: PALA, level: 30, equipment: [thor_hammer, white_robe, cap], spells: [{ id: cure, level: 1 }] }
+    - { class: cleric, name: CLER2, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: white_wizard, name: WWIZ, level: 30, equipment: [thor_hammer, white_robe, cap], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp

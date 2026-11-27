@@ -12,3 +12,5 @@ legionnaire: warrior # temporary until the user renders the legionnaire's field 
 centurion: knight    # temporary until the user renders the centurion's field walk sheet
 hunter: thief        # temporary until the user renders the hunter's field walk sheet
 ranger: ninja        # temporary until the user renders the ranger's field walk sheet
+cleric: white_mage   # temporary until the user renders the cleric's field walk sheet
+paladin: white_wizard # temporary until the user renders the paladin's field walk sheet

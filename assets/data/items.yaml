@@ -16,6 +16,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   hit: 10
@@ -41,6 +42,7 @@
   price: 5
   usableBy:
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   - monk
@@ -96,6 +98,7 @@
   - legionnaire
   - barbarian
   - white_mage
+  - cleric
   hit: 0
   crit: 5
 - id: hand_axe
@@ -204,6 +207,7 @@
   - legionnaire
   - barbarian
   - white_mage
+  - cleric
   bonusVsFamily: undead
   hit: 10
   crit: 12
@@ -216,6 +220,7 @@
   price: 1000
   usableBy:
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   hit: 10
@@ -288,6 +293,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   bonusVsFamily: dragon
@@ -311,6 +317,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
@@ -324,6 +331,7 @@
   price: 20
   usableBy:
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
@@ -504,6 +512,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   weight: 1
@@ -633,6 +642,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
@@ -673,6 +683,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
@@ -728,6 +739,7 @@
   price: 9000
   usableBy:
   - white_mage
+  - cleric
   slot: armor
   weight: 2
 - id: black_robe
@@ -772,6 +784,7 @@
   - legionnaire
   - barbarian
   - white_mage
+  - cleric
   element: lightning
   hit: 10
   crit: 14
@@ -822,6 +835,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
@@ -933,6 +947,7 @@
   - hunter
   - monk
   - white_mage
+  - cleric
   - black_mage
   - red_mage
   slot: armor
