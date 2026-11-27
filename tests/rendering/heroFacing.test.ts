@@ -17,7 +17,12 @@ const APPROVED = 'assets-src/gen/approved';
 const atlasMeta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json', 'utf8')) as HeroAtlas;
 const atlas = readRgbaPng('assets/sprites/battle-characters-ai.png');
 const [GW, GH] = atlasMeta.cell;
-const classes = Object.keys(atlasMeta.sheets).sort();
+/** Pass CB (docs/CLASS_BARBARIAN_PLAN.md): a user-rendered class (hero_user.py) faces left as drawn and has no
+ * facing_fix; the HF rules below are the 12 Gemini classes'. */
+const isUser = (cid: string) => (JSON.parse(readFileSync(`${APPROVED}/${cid}/battle.json`, 'utf8')) as { backend?: string }).backend === 'user';
+const allClasses = Object.keys(atlasMeta.sheets).sort();
+const classes = allClasses.filter(cid => !isUser(cid));
+const userClasses = allClasses.filter(isUser);
 
 /** One native cell as rows of packed RGBA (0 = transparent). */
 type Cell = number[][];
@@ -76,9 +81,21 @@ function faceFixPoses(meta: BattleMeta): Set<string> {
 describe('pass HF: hero battle facing fixes in the committed atlas', () => {
   it('every hero class has an approved battle sheet and json', () => {
     expect(classes.length).toBe(12);
-    for (const cid of classes) expect(existsSync(`${APPROVED}/${cid}/battle.json`)).toBe(true);
-    expect(readdirSync(APPROVED).filter(d => existsSync(`${APPROVED}/${d}/battle.json`)).sort()).toEqual(classes);
+    expect(userClasses).toEqual(['barbarian', 'berserker']);
+    for (const cid of allClasses) expect(existsSync(`${APPROVED}/${cid}/battle.json`)).toBe(true);
+    expect(readdirSync(APPROVED).filter(d => existsSync(`${APPROVED}/${d}/battle.json`)).sort()).toEqual(allClasses);
   });
+
+  for (const cid of userClasses) {
+    it(`${cid}: user-rendered, faces left as drawn: no facing_fix / face_fix, every key cell is the approved cell`, () => {
+      const meta = JSON.parse(readFileSync(`${APPROVED}/${cid}/battle.json`, 'utf8')) as BattleMeta & { faces?: string };
+      expect(meta.faces).toBe('left');
+      expect(meta.facing_fix).toBeUndefined();
+      expect(meta.face_fix).toBeUndefined();
+      const img = readRgbaPng(`${APPROVED}/${cid}/battle.png`);
+      for (const pose of meta.poses) expect(atlasCell(cid, pose), pose).toEqual(approvedCell(img, meta, pose));
+    });
+  }
 
   for (const cid of classes) {
     const meta = JSON.parse(readFileSync(`${APPROVED}/${cid}/battle.json`, 'utf8')) as BattleMeta;

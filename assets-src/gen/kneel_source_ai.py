@@ -48,7 +48,8 @@ def hero_frames(cid: str, cfg: dict, frames: dict, bottom: int) -> dict:
     key = KB.offset(np.asarray(Image.open(PU.APPROVED / cid / "battle_kneel.png").convert("RGBA")).copy(),
                     b.get("offset"))
     made = KB.frames(np.asarray(frames["ready"].convert("RGBA")).copy(), key, bottom, KB.options(b, cid))
-    return {"kneel": (Image.fromarray(key), {}, "ai"), **{n: (Image.fromarray(a), {}, "bridge") for n, a in made.items()}}
+    tag = "user" if b.get("source") == "user" else "ai"   # pass CB: the user's drawn key (docs/CLASS_BARBARIAN_PLAN.md 4)
+    return {"kneel": (Image.fromarray(key), {}, tag), **{n: (Image.fromarray(a), {}, "bridge") for n, a in made.items()}}
 
 
 def bridge_frames(sid: str, cfg: dict, kfs: dict[str, Image.Image], meta: dict, floating: bool) -> dict[str, dict]:

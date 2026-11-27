@@ -158,7 +158,11 @@ def _lists(check) -> None:
     from gen import kneel_ai_guide as G
     sprites = D.conf().get("sprites") or {}
     bad_w, bad_h = [], []
+    import yaml
     for sid in D.monsters() + D.heroes():
+        if sid in D.heroes() and ((yaml.safe_load((D.HEROES / f"{sid}.yaml").read_text()) or {}).get("kneel") or {}) \
+                .get("source") == "user":
+            continue                                  # pass CB: a user-drawn key has no pass-KA request to list
         e, sp = sprites.get(sid) or {}, D.load(sid)
         props = [n for n in G.prop_parts(sp.rig) if sp.rig.present(n, "idle")]
         if props and not e.get("weapons"):
@@ -166,7 +170,8 @@ def _lists(check) -> None:
         if not isinstance(e.get("heads"), list) or (not e["heads"] and not e.get("heads_none")):
             bad_h.append(sid)
     check(not bad_w, f"every rig with a kind: prop or weapon-named part has a weapons entry ({bad_w[:5]})")
-    check(not bad_h, f"every sprite has a heads entry, [] only with heads_none ({bad_h[:5]})")
+    check(not bad_h, f"every sprite has a heads entry, [] only with heads_none ({bad_h[:5]}; `source: user` heroes "
+                     "skipped)")
     check(sprites.get("rhyos", {}).get("heads") == ["head", "ram_n", "ram_f", "lizard"]
           and sprites.get("goblin", {}).get("weapons") == ["dagger"], "reviewed lists: rhyos 4 heads, goblin dagger")
 
@@ -188,10 +193,12 @@ def _coverage(check) -> None:
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
         KT.coverage()
-    m = re.search(r"monsters (\d+)/123 \(ai (\d+), derived (\d+), alias (\d+)\)", out.getvalue())
-    h = re.search(r"heroes (\d+)/12 \(ai (\d+), derived (\d+), alias (\d+)\)", out.getvalue())
-    check(bool(m and h) and sum(map(int, m.groups()[1:])) == 123 and sum(map(int, h.groups()[1:])) == 12,
-          f"coverage: G3 format ({out.getvalue().splitlines()[:1]})")
+    from gen import kneel_ai_data as D
+    n = len(D.heroes())                                # pass CB: 14 hero class files (12 + barbarian / berserker)
+    m = re.search(r"monsters (\d+)/123 \(ai (\d+), user (\d+), derived (\d+), alias (\d+)\)", out.getvalue())
+    h = re.search(rf"heroes (\d+)/{n} \(ai (\d+), user (\d+), derived (\d+), alias (\d+)\)", out.getvalue())
+    check(bool(m and h) and sum(map(int, m.groups()[1:])) == 123 and sum(map(int, h.groups()[1:])) == n,
+          f"coverage: G3 format with user keys ({out.getvalue().splitlines()[:1]})")
 
 
 def run_kneel_ai(check: Callable[[bool, str], None]) -> None:

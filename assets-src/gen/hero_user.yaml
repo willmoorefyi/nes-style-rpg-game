@@ -1,0 +1,21 @@
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 3): user-rendered hero class sheets, imported by gen/hero_user.py. Each
+# recipe names the tracked render (`file`, relative to assets-src/gen/, with its sha256), its class rows (row r of the
+# render is class rows[r]: base, then enhanced), the seven columns in order, the facing (always left), and the
+# provenance: the tool the user rendered it in, the date, the author, the class pack it was made from (`refs`: file
+# and sha256) and the user's words on delivery.
+barbarian_berserker:
+  file: user_art/barbarian/battle_2026-11-26.png
+  sha256: dae7ba71a7aad214250eb94d534ac3bf9d578d1f13eb1c138286c564c6493e44
+  rows: [barbarian, berserker]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: barbarian_berserker_sprite_sheet.png
+  approved: "2026-11-26"
+  user_review: "The first instance of my new heroes is ready (delivered as final; used as rendered)"

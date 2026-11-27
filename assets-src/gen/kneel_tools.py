@@ -54,9 +54,11 @@ def coverage() -> int:
     for label, files in (("monsters", rigs), ("heroes", heroes)):      # KA G3: ai (`kneel.source: ai`), derived, alias
         b = {p.stem: _yaml(p).get("kneel") for p in files}
         ai = [s for s, v in b.items() if isinstance(v, dict) and v.get("source") == "ai"]
-        der = [s for s, v in b.items() if v is not None and s not in ai]
-        print(f"{label} {len(files)}/{len(files)} (ai {len(ai)}, derived {len(der)}, alias {len(files) - len(ai) - len(der)})")
-        print(f"  ai: {' '.join(ai) or '-'}\n  derived: {' '.join(der) or '-'}")
+        user = [s for s, v in b.items() if isinstance(v, dict) and v.get("source") == "user"]   # pass CB: user keys
+        der = [s for s, v in b.items() if v is not None and s not in ai and s not in user]
+        alias = len(files) - len(ai) - len(user) - len(der)
+        print(f"{label} {len(files)}/{len(files)} (ai {len(ai)}, user {len(user)}, derived {len(der)}, alias {alias})")
+        print(f"  ai: {' '.join(ai) or '-'}\n  user: {' '.join(user) or '-'}\n  derived: {' '.join(der) or '-'}")
     return 0
 
 

@@ -160,7 +160,8 @@ def swap_side(name: str) -> str:
 def swap_z(z: list[str]) -> list[str]:
     """A draw order with n and f exchanged: on a mirrored keyframe the labels follow the screen side, so the limb that
     is in front of the torso in the approved pixels (now labelled f) keeps its place in front."""
-    return [swap_side(p) for p in z]
+    # pass CB: `weapon_f` (the far hand's own weapon) has no `_n` twin, and puppet.load_cfg refuses it on a mirrored key
+    return [p if p == "weapon_f" else swap_side(p) for p in z]
 
 
 def mirror_joints(joints: dict, s: int) -> dict:

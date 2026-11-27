@@ -323,7 +323,19 @@
     "chest": {
       "x": 0,
       "y": 6912
+    },
+    "barbarian": {
+      "x": 0,
+      "y": 6528
+    },
+    "berserker": {
+      "x": 336,
+      "y": 3456
     }
   },
-  "fallbacks": {}
+  "fallbacks": {},
+  "aliases": {
+    "barbarian": "warrior",
+    "berserker": "knight"
+  }
 }

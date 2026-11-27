@@ -771,7 +771,14 @@ ROSTER: dict[str, Look] = {
     "red_mage": Look(hair=(28, 24, 8), hair_style="short", outfit="coat", cloth=(24, 5, 8), trim=(30, 30, 28),
                      pants=(30, 30, 28), boots=(12, 7, 4), gear="feather", gear_color=(25, 5, 8), gear_color2=(31, 31, 31),
                      weapon="rapier"),
+    # pass CB (docs/CLASS_BARBARIAN_PLAN.md 6): 1x legacy looks of the user-rendered class pair (fur-brown tunic, the
+    # plain helm (no horned 1x gear exists), a sword as the nearest 1x weapon; the berserker bearded)
+    "barbarian": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(14, 9, 5), trim=(20, 20, 23),
+                      pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), weapon="sword"),
     # Upgraded classes
+    "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
+                      pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
+                      weapon="sword"),
     "knight": Look(hair=(26, 22, 8), hair_style="short", outfit="armor", cloth=(18, 20, 27), trim=(27, 22, 6),
                    pants=(10, 12, 18), boots=(10, 11, 15), gear="plume_helm", gear_color=(18, 20, 27),
                    gear_color2=(28, 29, 31), weapon="sword", shield=True),

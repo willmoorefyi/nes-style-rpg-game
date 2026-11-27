@@ -206,6 +206,13 @@ def kneel_ok(meta: dict, ledger: list[dict], br_ledger: list[dict], gen: Path) -
     if not (gen / "approved" / str(cid) / f"{sheet}.png").is_file():
         return f"approved/{cid}/{sheet}.png missing"
     block = (yaml.safe_load(rig.read_text()) or {}).get("kneel") if rig.is_file() else None
+    user_block = isinstance(block, dict) and block.get("source") == "user"
+    if hero and (meta.get("backend") == "user") != user_block:   # pass CB: a user hero key <-> `kneel: {source: user}`
+        return (f"{rig.relative_to(gen)} has no kneel: {{source: user}}" if meta.get("backend") == "user"
+                else f"{rig.relative_to(gen)} says kneel: {{source: user}} but the key is not backend user")
+    if hero and user_block:
+        from gen import hero_user as HU
+        return HU.check(meta, gen)
     if not (isinstance(block, dict) and block.get("source") == "ai"):
         return f"{rig.relative_to(gen)} has no kneel: {{source: ai}}"
     if meta.get("j0") and not meta.get("user_review"):

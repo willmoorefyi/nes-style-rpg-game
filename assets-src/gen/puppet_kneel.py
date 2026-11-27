@@ -44,8 +44,12 @@ def bottom_row(cid: str) -> int:
     return int(json.loads((PU.APPROVED / cid / "battle.json").read_text())["bottom_row"])
 
 
+KEY_SOURCES = ("ai", "user")             # pass CB (docs/CLASS_BARBARIAN_PLAN.md 4): a drawn key, AI or the user's
+
+
 def is_ai(cfg: dict) -> bool:
-    return isinstance(cfg.get("kneel"), dict) and cfg["kneel"].get("source") == "ai"
+    """The class's kneel block names a drawn key (`source: ai`, or pass CB's `source: user`) bridged from ready."""
+    return isinstance(cfg.get("kneel"), dict) and cfg["kneel"].get("source") in KEY_SOURCES
 
 
 def make(cfg: dict, frames: dict, bottom: int, cid: str | None = None) -> dict:
@@ -164,6 +168,10 @@ def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str 
     palette = {tuple(int(v) for v in c) for f in frames.values()
                for c in np.asarray(f)[np.asarray(f)[..., 3] > 0][:, :3]}
     palette.add(tuple(PU.OUTLINE))
+    if (cfg.get("kneel") or {}).get("source") == "user":   # pass CB: the key and the battle cells share one render's
+        import json                                       # palette (hero_user.py), recorded in the key's json
+        meta = json.loads((PU.APPROVED / cid / "battle_kneel.json").read_text())
+        palette |= {tuple(int(v) for v in dst) for _, dst in meta["cut"]["palette"]}
     hr, hk = height(frames["ready"]), height(made["kneel"][0])
     for n in KNEEL_POSES:
         img, rots, _ = made[n]

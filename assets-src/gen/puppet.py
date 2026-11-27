@@ -33,7 +33,8 @@ KEYFRAMES = ["ready", "attack", "cast"]
 BATTLE_POSES = ["ready", "attack", "cast", "hurt", "down", "victory"]
 JOINTS = ["neck", "crown", "chest", "hip", "sh_n", "el_n", "hand_n", "sh_f", "el_f", "hand_f",
           "hip_n", "knee_n", "foot_n", "hip_f", "knee_f", "foot_f"]
-UPPER = ("neck", "crown", "chest", "hip", "sh_n", "el_n", "hand_n", "sh_f", "el_f", "hand_f", "hip_n", "hip_f", "tip")
+UPPER = ("neck", "crown", "chest", "hip", "sh_n", "el_n", "hand_n", "sh_f", "el_f", "hand_f", "hip_n", "hip_f", "tip",
+         "tip_f")
 
 # part -> (bone start, bone end, reach radius used for segmentation); the weapon bone starts at its holding hand
 PARTS = {
@@ -43,10 +44,13 @@ PARTS = {
     "thigh_n": ("hip_n", "knee_n", 4.0), "shin_n": ("knee_n", "foot_n", 4.5),
     "thigh_f": ("hip_f", "knee_f", 4.0), "shin_f": ("knee_f", "foot_f", 4.5),
     "weapon": ("hand_n", "tip", 2.0),
+    # pass CB (docs/CLASS_BARBARIAN_PLAN.md 5): an optional second weapon in the far hand (the barbarian's other axe);
+    # a keyframe without `tip_f` never segments or draws it, so every other class is unchanged
+    "weapon_f": ("hand_f", "tip_f", 2.0),
 }
 LEGS = ("thigh_n", "shin_n", "thigh_f", "shin_f")
-Z_BACK_ARM = ["uarm_f", "farm_f", "thigh_f", "shin_f", "torso", "thigh_n", "shin_n", "head", "uarm_n", "farm_n", "weapon"]
-Z_FRONT_ARM = ["thigh_f", "shin_f", "uarm_f", "torso", "farm_f", "thigh_n", "shin_n", "head", "uarm_n", "farm_n", "weapon"]
+Z_BACK_ARM = ["uarm_f", "farm_f", "weapon_f", "thigh_f", "shin_f", "torso", "thigh_n", "shin_n", "head", "uarm_n", "farm_n", "weapon"]
+Z_FRONT_ARM = ["thigh_f", "shin_f", "uarm_f", "torso", "farm_f", "weapon_f", "thigh_n", "shin_n", "head", "uarm_n", "farm_n", "weapon"]
 
 # battle in-betweens, in atlas order, with the keyframe they are cut from
 INBETWEENS = ["idle_b", "atk_wind1", "atk_wind2", "atk_mid", "atk_follow", "cast_gather", "cast_rise", "cast_release"]
@@ -65,10 +69,16 @@ def load_cfg(cid: str) -> dict | None:
     for k in KEYFRAMES:
         kf = (cfg.get("battle") or {}).get(k)
         if kf:
-            for j in [*JOINTS, "tip"]:
+            for j in [*JOINTS, "tip", "tip_f"]:
                 if j in kf and kf[j] is not None:
                     kf[j] = tuple(float(v) for v in kf[j])
-    return _mirror_keyframes(cid, cfg)
+    bad = sorted(set(cfg.get("alias_frames") or []) - set(INBETWEENS))
+    if bad:                                           # pass CB 5: in-betweens left aliased to their source keyframe
+        raise ValueError(f"{cid}: alias_frames {bad} are not in-between names ({', '.join(INBETWEENS)})")
+    cfg = _mirror_keyframes(cid, cfg)
+    if any("tip_f" in ((cfg.get("battle") or {}).get(k) or {}) for k in cfg.get("mirrored", ())):
+        raise ValueError(f"{cid}: tip_f on a facing_fix-mirrored keyframe (the n / f relabelling does not know it)")
+    return cfg
 
 
 def _mirror_keyframes(cid: str, cfg: dict) -> dict:
@@ -186,6 +196,14 @@ def segment(frame: Image.Image, joints: dict, robed: bool = False, head: np.ndar
         lab[cape & (lab != names.index("weapon"))] = names.index("torso")
     if head is not None:
         lab[head & (a[..., 3] > 0)] = names.index("head")
+    # pass CB: hand-marked boxes ([x0, y0, x1, y1), half-open) whose opaque px belong to one part (an axe head wider
+    # than its bone's reach); only parts the keyframe has joints for
+    for part, rects in (joints.get("part_boxes") or {}).items():
+        if part not in PARTS:
+            raise ValueError(f"part_boxes: unknown part {part!r}")
+        for x0, y0, x1, y1 in rects:
+            sub = lab[y0:y1, x0:x1]
+            sub[sub >= 0] = names.index(part)
     return _absorb_orphans(lab)
 
 
@@ -227,6 +245,8 @@ def keep_lengths(target: dict, src_of, robed: bool) -> dict:
     for chain in chains:
         if "tip" in t and chain[-1] == f"hand_{wh}":
             chain = (*chain, "tip")
+        elif "tip_f" in t and chain[-1] == "hand_f":     # pass CB: the far hand's own weapon
+            chain = (*chain, "tip_f")
         for a, b in zip(chain, chain[1:]):
             sj = src_of(a, b)
             if a not in t or b not in t or a not in sj or b not in sj:
@@ -322,6 +342,14 @@ def _carry_tip(t: dict, src: dict) -> dict:
             "weapon_hand": wh}
 
 
+def _far_tip(t: dict, src: dict) -> tuple[float, float]:
+    """`tip_f` on target `t`: the source's hand_f -> tip_f vector, rotated by the far forearm's turn (el_f -> hand_f)."""
+    rot = _angle(t["el_f"], t["hand_f"]) - _angle(src["el_f"], src["hand_f"])
+    dx, dy = src["tip_f"][0] - src["hand_f"][0], src["tip_f"][1] - src["hand_f"][1]
+    c, s = np.cos(rot), np.sin(rot)
+    return (t["hand_f"][0] + c * dx - s * dy, t["hand_f"][1] + s * dx + c * dy)
+
+
 def battle_targets(cfg: dict) -> dict[str, tuple[dict, dict[str, str]]]:
     """name -> (target joints, part sources). Offsets are the knight's, expressed relative to the character's joints;
     `tweaks` in the config add per-frame joint offsets (e.g. tweaks: {atk_wind1: {hand_n: [1, -2]}})."""
@@ -374,10 +402,16 @@ def battle_targets(cfg: dict) -> dict[str, tuple[dict, dict[str, str]]]:
     re[f"hand_{cast_h}"] = _add(C[f"hand_{cast_h}"], (-1, -6))
     t["cast_release"] = (_carry_tip(re, C), {})
 
-    for name, offs in (cfg.get("tweaks") or {}).items():
+    tweaks = cfg.get("tweaks") or {}
+    for name, offs in tweaks.items():
         tj = t[name][0]
         for j, d in offs.items():
-            tj[j] = _add(tj[j], d)
+            if j != "tip_f":
+                tj[j] = _add(tj[j], d)
+    for name, (tj, _) in t.items():                    # pass CB: the far weapon follows its (tweaked) forearm rigidly
+        src = b[SOURCE[name]]
+        if "tip_f" in src:
+            tj["tip_f"] = _add(_far_tip(tj, src), (tweaks.get(name) or {}).get("tip_f", (0, 0)))
     return t
 
 
@@ -404,6 +438,8 @@ def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Imag
         z = Z_FRONT_ARM if front else Z_BACK_ARM
         out[name] = render(tj, sources, ps, src, swap_z(z) if src in cfg.get("mirrored", ()) else z, robed,
                            masks=masks)
+    for name in cfg.get("alias_frames") or []:        # pass CB 5: the build falls back to the source keyframe
+        out.pop(name, None)
     return out
 
 
@@ -536,7 +572,7 @@ def review(cid: str, out: Path) -> dict:
     assert cfg is not None
     frames = battle_sheet_frames(cid)
     new = battle_inbetweens(cid, cfg)
-    allf = {**frames, **new}
+    allf = {**frames, **{n: new.get(n, frames[SOURCE[n]]) for n in INBETWEENS}}   # alias_frames: the key
     rep = {n: check(new[n], frames[SOURCE[n]]) for n in new}
     # keyframes with their joints, so the marking can be checked by eye
     marked = []
@@ -548,7 +584,7 @@ def review(cid: str, out: Path) -> dict:
             a, b = _bone(p, j)
             if a in j and b in j:
                 d.line([(j[a][0] * 4, j[a][1] * 4), (j[b][0] * 4, j[b][1] * 4)], fill=(255, 0, 0, 255), width=2)
-        for n in [*JOINTS, "tip"]:
+        for n in [*JOINTS, "tip", "tip_f"]:
             if n in j:
                 d.ellipse([j[n][0] * 4 - 3, j[n][1] * 4 - 3, j[n][0] * 4 + 3, j[n][1] * 4 + 3], fill=(0, 255, 0, 255))
         marked.append(im)

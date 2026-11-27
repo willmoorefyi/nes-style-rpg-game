@@ -3378,3 +3378,18 @@
   gold: 800
   enemies: []
 # --- end PT ---
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 2.1): the barbarian / berserker class pair (user-rendered battle art). BARB is
+# weak so it kneels; KNT is the like-for-like control for BERS. ?mute=1&scenario=cb_barbarians (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_barbarians
+  name: Barbarian and Berserker (pass CB preview)
+  party:
+    - { class: barbarian, name: BARB, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: berserker, name: BERS, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: barbarian, name: BARB2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: knight, name: KNT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp

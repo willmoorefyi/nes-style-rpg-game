@@ -8,6 +8,7 @@
   price: 5
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -50,6 +51,7 @@
   price: 10
   usableBy:
   - warrior
+  - barbarian
   - thief
   - red_mage
   hit: 5
@@ -63,6 +65,7 @@
   price: 550
   usableBy:
   - warrior
+  - barbarian
   - thief
   - red_mage
   hit: 10
@@ -76,6 +79,7 @@
   price: 10
   usableBy:
   - warrior
+  - barbarian
   - white_mage
   hit: 0
   crit: 5
@@ -88,6 +92,7 @@
   price: 550
   usableBy:
   - warrior
+  - barbarian
   hit: 5
   crit: 7
 - id: iron_nunchaku
@@ -111,6 +116,7 @@
   price: 300
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   hit: 10
   crit: 10
@@ -123,6 +129,7 @@
   price: 4000
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   bonusVsFamily: undead
   hit: 10
@@ -151,6 +158,7 @@
   price: 4500
   usableBy:
   - warrior
+  - barbarian
   bonusVsFamily: giant
   hit: 10
   crit: 14
@@ -163,6 +171,7 @@
   price: 2500
   usableBy:
   - warrior
+  - barbarian
   - white_mage
   bonusVsFamily: undead
   hit: 10
@@ -189,6 +198,7 @@
   price: 10000
   usableBy:
   - warrior
+  - barbarian
   element: fire
   bonusVsFamily: undead
   hit: 10
@@ -202,6 +212,7 @@
   price: 10000
   usableBy:
   - warrior
+  - barbarian
   element: ice
   hit: 10
   crit: 16
@@ -214,6 +225,7 @@
   price: 10000
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   element: lightning
   bonusVsFamily: aquatic
@@ -228,6 +240,7 @@
   price: 0
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -246,6 +259,7 @@
   price: 10
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -275,6 +289,7 @@
   price: 50
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - red_mage
@@ -289,6 +304,7 @@
   price: 50
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 8
 - id: chain_mail
@@ -300,6 +316,7 @@
   price: 80
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   slot: armor
   weight: 15
@@ -312,6 +329,7 @@
   price: 800
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 23
 - id: mythril_armor
@@ -323,6 +341,7 @@
   price: 7500
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 33
 - id: mythril_mail
@@ -334,6 +353,7 @@
   price: 3500
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   slot: armor
   weight: 8
@@ -346,6 +366,7 @@
   price: 0
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 10
 - id: wooden_shield
@@ -358,6 +379,7 @@
   price: 15
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   weight: 0
 - id: iron_shield
@@ -370,6 +392,7 @@
   price: 100
   usableBy:
   - warrior
+  - barbarian
   weight: 0
 - id: mythril_shield
   name: Mythril Shield
@@ -381,6 +404,7 @@
   price: 2500
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   weight: 0
 - id: cap
@@ -393,6 +417,7 @@
   price: 80
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -409,6 +434,7 @@
   price: 100
   usableBy:
   - warrior
+  - barbarian
   weight: 3
 - id: mythril_helm
   name: Mythril Helm
@@ -420,6 +446,7 @@
   price: 2500
   usableBy:
   - warrior
+  - barbarian
   weight: 3
 - id: potion
   name: Potion
@@ -509,6 +536,7 @@
   price: 1200
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -526,6 +554,7 @@
   price: 3000
   usableBy:
   - warrior
+  - barbarian
   - thief
   - red_mage
   hit: 5
@@ -539,6 +568,7 @@
   price: 4000
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -556,6 +586,7 @@
   price: 8000
   usableBy:
   - warrior
+  - barbarian
   - thief
   - red_mage
   hit: 10
@@ -615,6 +646,7 @@
   price: 15000
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   hit: 10
   crit: 16
@@ -627,6 +659,7 @@
   price: 14000
   usableBy:
   - warrior
+  - barbarian
   - white_mage
   element: lightning
   hit: 10
@@ -654,6 +687,7 @@
   price: 20000
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 30
 - id: opal_armlet
@@ -665,6 +699,7 @@
   price: 15000
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -682,6 +717,7 @@
   price: 16000
   usableBy:
   - warrior
+  - barbarian
   weight: 0
 - id: opal_helm
   name: Opal Helm
@@ -693,6 +729,7 @@
   price: 9000
   usableBy:
   - warrior
+  - barbarian
   weight: 3
 # B7 Gaia: 34 / 42 / 14 / 10
 - id: defender
@@ -704,6 +741,7 @@
   price: 30000
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   hit: 10
   crit: 18
@@ -716,6 +754,7 @@
   price: 28000
   usableBy:
   - warrior
+  - barbarian
   - thief
   hit: 10
   crit: 24
@@ -739,6 +778,7 @@
   price: 40000
   usableBy:
   - warrior
+  - barbarian
   slot: armor
   weight: 28
 - id: diamond_armlet
@@ -750,6 +790,7 @@
   price: 30000
   usableBy:
   - warrior
+  - barbarian
   - thief
   - monk
   - white_mage
@@ -767,6 +808,7 @@
   price: 25000
   usableBy:
   - warrior
+  - barbarian
   - red_mage
   weight: 0
 - id: diamond_helm
@@ -779,6 +821,7 @@
   price: 20000
   usableBy:
   - warrior
+  - barbarian
   weight: 3
 # Found: the optional S31, Smyth forges the adamant (WORLD_PLAN 3.1, open question 8)
 - id: excalibur
@@ -790,6 +833,7 @@
   price: 0
   usableBy:
   - warrior
+  - barbarian
   element: holy
   hit: 15
   crit: 20

@@ -1,0 +1,41 @@
+# Puppet animation joints for the berserker (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5). Native px
+# on approved/berserker/battle.png cells (80x80, the user's render, every pose faces left; n = near/viewer-side limb, f = far
+# limb). part_boxes: the axe heads' boxes ([x0, y0, x1, y1), half-open), wider than a bone's reach. tip = the near hand's axe, tip_f = the far hand's axe (puppet.py weapon_f). Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [38, 30], crown: [37, 9], chest: [42, 40], hip: [42, 55],
+     sh_n: [33, 37], el_n: [30, 45], hand_n: [25, 44], tip: [15, 36], weapon_hand: n,
+     sh_f: [52, 34], el_f: [60, 42], hand_f: [53, 50], tip_f: [41, 47],
+     hip_n: [34, 57], knee_n: [28, 63], foot_n: [26, 74], hip_f: [50, 57], knee_f: [60, 64], foot_f: [65, 74],
+     part_boxes: {weapon: [[10, 26, 21, 47], [21, 27, 25, 40]], weapon_f: [[37, 39, 46, 57]]}}
+  attack:
+    {neck: [37, 28], crown: [36, 9], chest: [42, 38], hip: [45, 52],
+     sh_n: [33, 34], el_n: [24, 33], hand_n: [16, 33], tip: [6, 32], weapon_hand: n,
+     sh_f: [52, 30], el_f: [60, 38], hand_f: [56, 45], tip_f: [45, 42],
+     hip_n: [36, 54], knee_n: [30, 60], foot_n: [30, 73], hip_f: [52, 54], knee_f: [62, 62], foot_f: [72, 72],
+     part_boxes: {weapon: [[0, 21, 15, 46]], weapon_f: [[41, 32, 49, 51]]}}
+  cast:
+    {neck: [38, 34], crown: [38, 13], chest: [40, 40], hip: [40, 52],
+     sh_n: [32, 33], el_n: [27, 30], hand_n: [21, 19], tip: [23, 4], weapon_hand: n,
+     sh_f: [48, 32], el_f: [52, 37], hand_f: [56, 31], tip_f: [60, 19],
+     hip_n: [33, 55], knee_n: [29, 63], foot_n: [27, 74], hip_f: [46, 55], knee_f: [50, 64], foot_f: [53, 74],
+     part_boxes: {weapon: [[16, 0, 31, 12]], weapon_f: [[53, 12, 67, 27]]}}
+# tweaks (review round 0): cast_gather keeps the far hand (and its axe) at its ready place, so the axe is not hidden
+# behind the near arm; cast_rise lifts both arms most of the way to cast (the plain 0.5 lerp laid the near axe flat).
+# round 1 (image review): cast_gather keeps the hips (no thigh seams, no wide X), atk_wind2 holds the near hand and
+# axe off the far fist and the thigh, cast_release keeps the near elbow (the upper arm no longer crosses the face);
+# round 2: cast_rise is the cast key's body and legs exactly (the 0.5 lerp cracked the thighs and doubled the chest
+# outline) with both hands a few px below the key; the kneel bridge keeps the head and the hafts row for row (keep_top / keep_bot).
+tweaks:
+  cast_gather: {el_f: [2, -3], hand_f: [8, 3], hip: [0, -1], hip_n: [0, -1], hip_f: [0, -1]}
+  atk_wind2: {el_n: [-3, 0], hand_n: [-4, -3], tip: [-4, -3]}
+  cast_release: {el_n: [-1, 3]}
+  cast_rise: {neck: [0, 2], crown: [0.5, 2], chest: [-1, 0], hip: [-1, -1.5], sh_n: [-0.5, -2], el_n: [-1.5, -6.5],
+              hand_n: [-2, -8.5], tip: [-2, -8.5], sh_f: [-2, -1], el_f: [-4, -2.5], hand_f: [1.5, -6.5],
+              hip_n: [-0.5, -1], knee_n: [0.5, 0], foot_n: [0.5, 0], hip_f: [-2, -1], knee_f: [-5, 0], foot_f: [-6, 0]}
+# pass CB (docs/CLASS_BARBARIAN_PLAN.md 4): the user's KNEEL column as the key + the one-source bridge
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

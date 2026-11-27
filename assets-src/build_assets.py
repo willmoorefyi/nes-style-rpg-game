@@ -222,6 +222,20 @@ def field_rows() -> dict[str, dict]:
     return chars
 
 
+def field_aliases(have: set[str], path: Path | None = None) -> dict[str, str]:
+    """Pass CB (docs/CLASS_BARBARIAN_PLAN.md 6): the temporary field aliases of gen/field_alias.yaml {alias: target};
+    refused when the alias has its own approved field sheet or the target has none."""
+    import yaml
+    p = path or HERE / "gen" / "field_alias.yaml"
+    aliases = (yaml.safe_load(p.read_text()) or {}) if p.exists() else {}
+    for alias, target in aliases.items():
+        if alias in have:
+            raise SystemExit(f"field_ai: {alias} has its own field sheet; drop its alias in {p.name}")
+        if target not in have:
+            raise SystemExit(f"field_ai: alias {alias} -> {target}, but {target} has no field sheet")
+    return dict(sorted(aliases.items()))
+
+
 def build_field_ai() -> None:
     """Approved AI field sheets -> characters-ai.png/.json: rows down, up, left, right; 7 columns per direction
     (stand, then the walk cycle contact/down/pass for each foot, puppet.walk_row). Right is baked as a mirror of
@@ -264,11 +278,15 @@ def build_field_ai() -> None:
         for r, d in enumerate(["down", "up", "left", "right"]):
             atlas.paste(rows[d], (bx, by + r * gh))
         sheets[cid] = {"x": bx, "y": by}
+    aliases = field_aliases(set(sheets))
+    for alias, target in aliases.items():              # pass CB: a class without its own field sheet yet
+        sheets[alias] = dict(sheets[target])
     scaled(atlas, AI_SCALE).save(out / "characters-ai.png")
     (out / "characters-ai.json").write_text(json.dumps({
         "cell": [gw, gh], "cols": ncol, "rows": 4, "fieldScale": AI_SCALE, "footRow": first["bottom_row"],
         "columns": PU.WALK_COLS, "walkSequence": PU.WALK_SEQUENCE, "walkPhases": PU.WALK_PHASES,
         "rowNames": ["down", "up", "left", "right"], "sheets": sheets, "fallbacks": fallbacks,
+        **({"aliases": aliases} if aliases else {}),
     }, indent=2) + "\n")
     print(f"field_ai: {list(sheets)}; fallbacks {fallbacks}")
 

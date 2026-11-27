@@ -1,0 +1,6 @@
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 6): TEMPORARY field-sprite aliases. A class here has no field walk sheet of
+# its own yet; build_assets.build_field_ai gives it its target's block in characters-ai.json (no pixel copy: the
+# atlas image is unchanged) and records the pair under `aliases`. Drop the entry when the user's field sheet
+# (3 x 3 of 48 x 96, the NPC pack format) is approved: an alias with its own approved field sheet is refused.
+barbarian: warrior   # temporary until the user renders the barbarian's field walk sheet
+berserker: knight    # temporary until the user renders the berserker's field walk sheet
