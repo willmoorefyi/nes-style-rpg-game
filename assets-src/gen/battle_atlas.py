@@ -56,17 +56,23 @@ def class_frames(cid: str) -> tuple[dict, dict]:
     meta = PL.meta_of(cid)
     keys = PU.battle_sheet_frames(cid)
     frames, masks = {}, {}
+    lines = (meta.get("prop") or {}).get("lines") or {}
     for p, img in keys.items():
         frames[p] = img
-        masks[p] = PL.lance_mask(meta, np.asarray(img.convert("RGBA")), meta["prop"]["lines"][p])
-    for n, f in PL.frames_of(cid).items():
-        frames[n], masks[n] = f["img"], f["lance"]["mask"]
+        masks[p] = PL.lance_mask(meta, np.asarray(img.convert("RGBA")), lines[p]) if p in lines else None
+    for n, f in PU.battle_inbetweens(cid).items():     # pass CD-K: the rigid frames of any oversize class
+        frames[n] = f
+    if lines:
+        for n, f in PL.frames_of(cid).items():
+            masks[n] = f["lance"]["mask"] if f["lance"] else None
     cfg = PU.load_cfg(cid)
     if cfg and cfg.get("kneel"):
         made = PK.make(cfg, keys, int(meta["bottom_row"]), cid)
-        frames["kneel"], masks["kneel"] = made["kneel"][0], made["_key"]["mask"]
-        for n, (lance, _) in made["_lances"].items():
-            frames[n], masks[n] = made[n][0], lance["mask"]
+        frames.update({n: made[n][0] for n in PK.KNEEL_POSES})
+        if "_key" in made:                             # a lance kneel (gen/kneel_lance.py); else pass CB's bridge
+            masks["kneel"] = made["_key"]["mask"]
+            for n, (lance, _) in made["_lances"].items():
+                masks[n] = lance["mask"]
     return frames, masks
 
 
@@ -85,7 +91,8 @@ def build_pages(big: list, poses: list, scale: int) -> tuple[list, dict]:
             raise SystemExit(f"battle_ai: {meta['character']} has an oversize grid {meta['grid']} but no body box")
         groups.setdefault(tuple(meta["grid"]), []).append(meta)
     pages, sheets = [], {}
-    for page, (grid, metas) in enumerate(sorted(groups.items()), start=1):
+    order = sorted(groups.items(), key=lambda kv: (-kv[0][1], -kv[0][0]))   # height, then width, descending:
+    for page, (grid, metas) in enumerate(order, start=1):                    # the lance page stays page 1
         gw, gh = grid
         if len({(m["bottom_row"], tuple(m["body"])) for m in metas}) != 1:
             raise SystemExit(f"battle_ai: the {gw} x {gh} sheets disagree on bottom_row / body")

@@ -7,7 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { readRgbaPng } from '../../helpers/pngAlpha.js';
-import { cellRect, type PagedBattleMeta } from '../../../src/rendering/battleAtlasPages.js';
+import { cellRect, pageFile, type PagedBattleMeta } from '../../../src/rendering/battleAtlasPages.js';
 import { partySpritePosition, PARTY_FEET_Y } from '../../../src/scenes/battle/BattleDisplayManager.js';
 import { ACTIVE_STEP } from '../../../src/scenes/battle/ActiveHeroMarker.js';
 import {
@@ -17,12 +17,15 @@ import { BATTLE_MESSAGE_HEIGHT, STRIP_Y } from '../../../src/scenes/battle/Battl
 import { GAME_WIDTH } from '../../../src/core/LayoutConstants.js';
 
 const meta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json', 'utf8')) as PagedBattleMeta;
-const page = readRgbaPng('assets/sprites/battle-characters-ai-1.png');
+const pages = new Map<number, ReturnType<typeof readRgbaPng>>();   // pass CD-K: each oversize sheet on its own page
 const ENEMY_FEET = [360, 745];                 // the battle plain's top and bottom feet rows (docs/ART_BATTLE_PLAN.md)
 const ENEMY_RIGHT = [300, 700, 1100];          // target right edges: far, middle, near the party
 
 /** A pose's opaque box in screen px relative to the sprite's top-left (the atlas page is at 2x already). */
 function opaque(cid: string, pose: string): { x0: number; y0: number; x1: number; y1: number } {
+  const p = meta.sheets[cid].page!;
+  if (!pages.has(p)) pages.set(p, readRgbaPng(`assets/sprites/${pageFile(meta, p, "")}`));
+  const page = pages.get(p)!;
   const r = cellRect(meta, cid, meta.poses.indexOf(pose));
   let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
   for (let y = 0; y < r.h; y++) for (let x = 0; x < r.w; x++) {
@@ -42,7 +45,7 @@ function onScreen(cid: string, pose: string, x: number, y: number, what: string)
 }
 
 describe('pass CL: a lance hero is never clipped (7.6)', () => {
-  for (const cid of ['landsknecht', 'dragoon']) {
+  for (const cid of Object.keys(meta.sheets).filter((c) => meta.sheets[c].page)) {   // every oversize hero
     const s = meta.sheets[cid];
     const art = { footRow: s.footRow!, scale: meta.scale, body: { x: s.body![0] } };
     for (const slot of [0, 1, 2, 3]) {

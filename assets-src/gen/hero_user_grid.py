@@ -33,8 +33,8 @@ def geometry(rec: dict) -> dict:
     if not (0 <= x0 <= x1 < cw and 0 <= y0 <= y1 < ch and y0 <= foot <= y1):
         raise SystemExit(f"body_box {list(body)} / foot_row {foot} do not fit the {cw} x {ch} cell")
     prop = rec.get("prop")
-    if prop is not None and prop.get("kind") != "lance":
-        raise SystemExit(f"prop kind {prop.get('kind')!r}: only lance exists")
+    if prop is not None and prop.get("kind") not in ("lance", "blade"):
+        raise SystemExit(f"prop kind {prop.get('kind')!r}: lance or blade")
     return {"cw": cw, "ch": ch, "foot": foot, "body": body, "palette": mode, "prop": prop}
 
 
@@ -79,24 +79,36 @@ def palette(a: np.ndarray, who: str = "user sheet") -> dict[tuple, tuple]:
     return out
 
 
+def row_geometry(rec: dict, g: dict, cid: str) -> dict:
+    """The class's own geometry (pass CD-K: `row_geometry: {<class>: {cell, body_box, place}}`; else the recipe's)."""
+    r = (rec.get("row_geometry") or {}).get(cid)
+    if not r:
+        return {**g, "place": (0, 0)}
+    gr = geometry({**rec, "cell": r["cell"], "body_box": r["body_box"], "foot_row": r.get("foot_row", g["foot"])})
+    return {**gr, "place": tuple(int(v) for v in r.get("place", (0, 0)))}
+
+
 def _lance(g: dict, cid: str, pose: str, src: np.ndarray) -> np.ndarray | None:
-    """The lance mask of one cell (source colours), checked; None without a prop."""
+    """The prop mask of one cell (source colours), checked; None without a prop or (pass CD-K) a line for the pose."""
     p = g["prop"]
     if not p:
         return None
     line = ((p.get("lines") or {}).get(cid) or {}).get(pose)
     if not line:
-        raise SystemExit(f"user sheet: {cid} {pose} has no lance line in the recipe")
+        if p["kind"] == "lance":
+            raise SystemExit(f"user sheet: {cid} {pose} has no lance line in the recipe")
+        return None
     m = HL.mask(src, line, (p.get("colours") or {}).get(cid) or [], p["radius"], HL.head_len(p, cid),
                (p.get("shaft_colours") or {}).get(cid))
-    bad = HL.problems(src, m, line, pose)
+    bad = HL.problems(src, m, line, pose, p["kind"])
     if bad:
         raise SystemExit(f"user sheet: {cid} {pose} lance: " + "; ".join(bad))
     return m
 
 
-def cut(rec: dict, a: np.ndarray) -> tuple[dict[str, dict[str, Image.Image]], dict]:
-    """{class: {pose: cell}} for every row of the recipe (the seven columns), and the import measures."""
+def cut(rec: dict, a: np.ndarray, gen=None) -> tuple[dict[str, dict[str, Image.Image]], dict]:
+    """{class: {pose: cell}} for every row of the recipe (the seven columns), and the import measures. `gen`: the
+    generator folder of the recipe's replacement renders (pass CD-K)."""
     g = geometry(rec)
     cw, ch, rows = g["cw"], g["ch"], rec["rows"]
     if a.shape[:2] != (len(rows) * ch, len(COLUMNS) * cw):
@@ -117,33 +129,38 @@ def cut(rec: dict, a: np.ndarray) -> tuple[dict[str, dict[str, Image.Image]], di
         for src, dst in pals[cid].items():
             out[r * ch:(r + 1) * ch][(band[..., :3] == src).all(-1) & mb, :3] = dst
     allow = rec.get("allow_outside") or {}
-    x0, y0, x1, y1 = g["body"]
     cells: dict[str, dict[str, Image.Image]] = {}
-    boxes, lance_px = {}, {}
+    boxes, lance_px, geoms = {}, {}, {}
+    from gen import hero_user_replace as HR
     for r, cid in enumerate(rows):
         cells[cid] = {}
+        gr = geoms[cid] = row_geometry(rec, g, cid)
+        x0, y0, x1, y1 = gr["body"]
         for c, pose in enumerate(COLUMNS):
             sl = (slice(r * ch, (r + 1) * ch), slice(c * cw, (c + 1) * cw))
             cell, src = out[sl], a[sl]
-            lance = _lance(g, cid, pose, src)
+            rp = (rec.get("replace") or {}).get(f"{cid}/{pose}")
+            if (gr["cw"], gr["ch"]) != (cw, ch) or rp:          # pass CD-K: placed in a bigger cell / replaced
+                cell, src = _place(gr, cell, src, rp, a[r * ch:(r + 1) * ch], pals[cid], cw, HR, gen)
+            lance = _lance(gr, cid, pose, src)
             body = (cell[..., 3] > 0) & (~lance if lance is not None else True)
             ys, xs = np.where(cell[..., 3] > 0)
             if not len(ys):
                 raise SystemExit(f"user sheet: {cid} {pose} is empty")
             by = np.where(body.any(1))[0]
-            if not len(by) or by.max() != g["foot"]:
+            if not len(by) or by.max() != gr["foot"]:
                 raise SystemExit(f"user sheet: {cid} {pose} feet on row {by.max() if len(by) else None}, "
-                                 f"need {g['foot']}")
+                                 f"need {gr['foot']}")
             outside = body.copy()
             outside[y0:y1 + 1, x0:x1 + 1] = False
             ok = allow.get(f"{cid}/{pose}")
-            if ok:
-                bx0, by0, bx1, by1 = ok["box"]
+            for box in (ok if isinstance(ok, list) else [ok] if ok else []):   # pass CD-K: a list of boxes
+                bx0, by0, bx1, by1 = box["box"]
                 inbox = np.zeros_like(outside)
                 inbox[by0:by1 + 1, bx0:bx1 + 1] = True
-                if int((outside & inbox).sum()) != int(ok["px"]):
-                    raise SystemExit(f"user sheet: {cid} {pose} allow_outside counts {int((outside & inbox).sum())} "
-                                     f"px, the recipe says {ok['px']}")
+                if int((outside & inbox).sum()) != int(box["px"]):
+                    raise SystemExit(f"user sheet: {cid} {pose} allow_outside {box['box']} counts "
+                                     f"{int((outside & inbox).sum())} px, the recipe says {box['px']}")
                 outside &= ~inbox
             if outside.any():
                 oy, ox = np.nonzero(outside)
@@ -157,5 +174,36 @@ def cut(rec: dict, a: np.ndarray) -> tuple[dict[str, dict[str, Image.Image]], di
             "colours": len(pals[rows[0]]) if g["palette"] == "sheet" else {c: len(p) for c, p in pals.items()},
             "palette": [[list(s), list(d)] for s, d in sorted(pals[rows[0]].items())],
             "palettes": {c: [[list(s), list(d)] for s, d in sorted(p.items())] for c, p in pals.items()},
-            "boxes": boxes, "lance_px": lance_px, "geometry": g}
+            "boxes": boxes, "lance_px": lance_px, "geometry": g, "geometries": geoms}
     return cells, info
+
+
+def _place(gr: dict, cell: np.ndarray, src: np.ndarray, rp: dict | None, band: np.ndarray, pal: dict, cw: int,
+           HR, gen) -> tuple[np.ndarray, np.ndarray]:
+    """Pass CD-K (docs/CLASS_DARKFIGHTER_PLAN.md 4b): a render cell placed at `place` in the class's bigger cell, or
+    the pose's replacement (hero_user_replace: converted onto the row's source colours, then the house map) at `at`."""
+    big = np.zeros((gr["ch"], gr["cw"], 4), np.uint8)
+    out_c, out_s = big.copy(), big.copy()
+    if rp:
+        row_src = np.unique(band[band[..., 3] > 0][:, :3], axis=0)
+        fig = HR.native(gen, rp, _height(band, cw, rp.get("height_of", "ready")), row_src)
+        mapped = fig.copy()
+        for s_, d_ in pal.items():
+            mapped[(fig[..., :3] == s_).all(-1) & (fig[..., 3] > 0), :3] = d_
+        ax, ay = (int(v) for v in rp["at"])
+        fh, fw = fig.shape[:2]
+        if ax < 0 or ay < 0 or ax + fw > gr["cw"] or ay + fh > gr["ch"]:
+            raise SystemExit(f"replacement {fw} x {fh} at {rp['at']} leaves the {gr['cw']} x {gr['ch']} cell")
+        out_c[ay:ay + fh, ax:ax + fw], out_s[ay:ay + fh, ax:ax + fw] = mapped, fig
+        return out_c, out_s
+    px, py = gr["place"]
+    h, w = cell.shape[:2]
+    out_c[py:py + h, px:px + w], out_s[py:py + h, px:px + w] = cell, src
+    return out_c, out_s
+
+
+def _height(band: np.ndarray, cw: int, pose: str) -> int:
+    """The opaque height of `pose`'s render cell in a row band (the replacement's scale rule)."""
+    i = COLUMNS.index(pose)
+    rows = np.nonzero((band[:, i * cw:(i + 1) * cw, 3] > 0).any(1))[0]
+    return int(rows.max() - rows.min() + 1)

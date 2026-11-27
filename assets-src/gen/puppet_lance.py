@@ -173,6 +173,8 @@ def frames_of(cid: str, cfg: dict | None = None) -> dict[str, dict]:
     the ground (the cast lance) is cut out (body footprint filled) and carried planted (x only), the body bobbed alone;
     `redraw` (kept for a lance that must turn): the lance at a clean angle, gripped at the near fist."""
     cfg = dict(cfg or PU.load_cfg(cid))
+    if "prop" not in meta_of(cid):
+        return plain_frames(cid, cfg)
     meta, keys = _keys(cid)
     head = float(meta["prop"]["head_len"])
     b = cfg["battle"]
@@ -201,6 +203,27 @@ def frames_of(cid: str, cfg: dict | None = None) -> dict[str, dict]:
             lance = redraw(keys[lk], ang_w1, b[lk]["hand_n"], grip, head, size)
         out[name] = {"img": compose(body, lance, None), "body": body, "lance": lance, "source": bk,
                      "target": {"hand_n": tuple(grip)}}
+    for name in cfg.get("alias_frames") or []:
+        out.pop(name, None)
+    return out
+
+
+def plain_frames(cid: str, cfg: dict) -> dict[str, dict]:
+    """Pass CD-K (docs/CLASS_DARKFIGHTER_PLAN.md 6.1): a rigid class without a prop (`inbetweens: rigid`): each
+    in-between is its RIGID key whole, everything above the cut row bobbed by dy, nothing cut out, so a blade moves
+    rigidly with the figure. `rigid_cut: feet` puts the cut on the feet row (a blade held low crosses the hips; the
+    feet row stays, so the figure sinks by its ankles); else the hips. `tweaks: {<frame>: {dy: n}}` as for a lance."""
+    meta = meta_of(cid)
+    keys = PU.battle_sheet_frames(cid)
+    b = cfg["battle"]
+    out = {}
+    for name, (bk, dy, _, _) in RIGID.items():
+        dy = int((((cfg.get("tweaks") or {}).get(name) or {}).get("dy", dy)))
+        cut = int(meta["bottom_row"]) if cfg.get("rigid_cut") == "feet" else \
+            int(round(min(b[bk]["hip_n"][1], b[bk]["hip_f"][1])))
+        img = bob(np.asarray(keys[bk].convert("RGBA")).copy(), cut, dy)
+        out[name] = {"img": Image.fromarray(img), "body": img, "lance": None, "source": bk,
+                     "target": {"hand_n": tuple(b[bk]["hand_n"])}}
     for name in cfg.get("alias_frames") or []:
         out.pop(name, None)
     return out

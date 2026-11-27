@@ -161,8 +161,10 @@ export class PartyCreationScene implements Scene {
     this.previewDisplay.removeChildren();
     const cls = this.baseClasses[classIndex];
     if (!cls) return;
-    const pose = characterAtlas.getBattleFrames(cls.id)?.frames[0] ?? null;
-    this.previewDisplay.addChild(buildClassPreview(cls, pose));
+    const art = characterAtlas.getBattleFrames(cls.id);
+    const pose = art?.frames[0] ?? null;
+    const anchor = art?.body ? { body: art.body, footRow: art.footRow, scale: art.scale, top: art.top } : null;   // oversize
+    this.previewDisplay.addChild(buildClassPreview(cls, pose, anchor));
   }
 
   update(dt: number): void {

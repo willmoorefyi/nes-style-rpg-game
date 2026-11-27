@@ -422,12 +422,18 @@ def is_lance(cid: str) -> bool:
     return p.exists() and (json.loads(p.read_text()).get("prop") or {}).get("kind") == "lance"
 
 
+def is_rigid(cid: str) -> bool:
+    """Pass CL / CD-K: the rigid in-betweens of puppet_lance.py (a lance class, or `inbetweens: rigid` in its yaml)."""
+    p = ANIM / f"{cid}.yaml"
+    return is_lance(cid) or (p.exists() and (yaml.safe_load(p.read_text()) or {}).get("inbetweens") == "rigid")
+
+
 def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Image]:
     """The eight in-between frames of `cid` (empty dict when it has no joint file)."""
     cfg = cfg or load_cfg(cid)
     if not cfg or "battle" not in cfg:
         return {}
-    if is_lance(cid):                                 # pass CL (docs/CLASS_LANCE_PLAN.md 5): the rigid lance prop
+    if is_rigid(cid):                                 # pass CL (docs/CLASS_LANCE_PLAN.md 5): the rigid lance prop
         from gen import puppet_lance as PL
         return PL.inbetweens(cid, cfg)
     from gen.puppet_facing import swap_z
@@ -583,7 +589,7 @@ def review(cid: str, out: Path) -> dict:
     frames = battle_sheet_frames(cid)
     new = battle_inbetweens(cid, cfg)
     allf = {**frames, **{n: new.get(n, frames[SOURCE[n]]) for n in INBETWEENS}}   # alias_frames: the key
-    if is_lance(cid):                                 # pass CL: the body check on the body, plus the lance checks
+    if is_rigid(cid):                                 # pass CL: the body check on the body, plus the lance checks
         from gen import puppet_lance as PL
         rep = PL.review_checks(cid, cfg, new)
     else:

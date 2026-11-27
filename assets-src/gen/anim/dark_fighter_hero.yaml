@@ -1,0 +1,17 @@
+# The dark fighter (pass CD-K, docs/CLASS_DARKFIGHTER_PLAN.md): the user's 80 x 80 render; in-betweens are rigid
+# (puppet_lance.plain_frames: one key whole, bobbed above the feet row, so the blade moves with the figure, never
+# re-posed). The joints place the hip cut and the near fist only (native px of approved/dark_fighter_hero cells).
+inbetweens: rigid
+rigid_cut: feet          # the blades are held low (the CAST blade crosses the hips): only the feet row stays
+robed: false
+attack_hand: n
+battle:
+  ready: {hip_n: [40, 52], hip_f: [55, 52], hand_n: [33, 40]}
+  attack: {hip_n: [42, 52], hip_f: [57, 52], hand_n: [30, 33]}
+  cast: {hip_n: [42, 50], hip_f: [58, 50], hand_n: [61, 45]}
+# a 2 px bob would squash the ankles (the cut is the feet row): every bob is 1 px
+tweaks:
+  atk_wind1: {dy: 1}
+  atk_wind2: {dy: 1}
+  atk_follow: {dy: 1}
+kneel: {source: user}

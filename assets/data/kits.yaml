@@ -11,6 +11,7 @@
 # full:   + chain mail, caps, LIT, SLEP, RUSE (the balance tests add 3 potions).
 # naked:  no gear and no spells.
 start:
+  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
@@ -20,6 +21,7 @@ start:
   black_mage: { gear: [small_knife, cloth], spells: [fire] }
   red_mage: { gear: [rapier, cloth], spells: [] }
 lv2:
+  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
@@ -29,6 +31,7 @@ lv2:
   black_mage: { gear: [small_knife, cloth], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth], spells: [] }
 arrive:
+  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
@@ -38,6 +41,7 @@ arrive:
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth, cap], spells: [] }
 full:
+  dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
@@ -47,6 +51,7 @@ full:
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
 naked:
+  dark_fighter_hero: { gear: [], spells: [] }
   landsknecht: { gear: [], spells: [] }
   warrior: { gear: [], spells: [] }
   barbarian: { gear: [], spells: [] }
@@ -65,6 +70,7 @@ naked:
 # any kit yet. The 4-member price of a town kit drives proof (f). INT may tune the kits (5.5).
 # B1 Cornelia: the act-1 shops (the `full` gear with a Cap each)
 w_s1: &w_s1
+  dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
@@ -75,6 +81,7 @@ w_s1: &w_s1
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
 # B2 Pravoka
 w_pravoka: &w_t2
+  dark_fighter_hero: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   landsknecht: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   warrior: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
@@ -89,6 +96,7 @@ w_s2: *w_s1
 w_s3: *w_t2
 # B3 Elfheim (the dwarf hall sells items only)
 w_elfheim: &w_t3
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
@@ -107,6 +115,7 @@ w_s9: *w_t3
 w_s10: *w_t3
 # B4 Melmond
 w_melmond: &w_t4
+  dark_fighter_hero: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   landsknecht: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   warrior: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
@@ -120,6 +129,7 @@ w_s12: *w_t4
 w_s13: *w_t4
 # B5 Crescent Lake
 w_crescent: &w_t5
+  dark_fighter_hero: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   landsknecht: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   warrior: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
@@ -134,6 +144,7 @@ w_s16: *w_t5
 w_s17: *w_t5
 # B6 Onrac; with the upgraded classes from here on (S19 and later)
 w_onrac: &w_t6
+  dark_fighter_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   landsknecht: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   warrior: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   barbarian: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
@@ -142,6 +153,7 @@ w_onrac: &w_t6
   white_mage: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   dragoon: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   berserker: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
@@ -157,6 +169,7 @@ w_s21: *w_t6
 w_s22: *w_t6
 # B7 Gaia (Lufenia sells magic only)
 w_gaia: &w_t7
+  dark_fighter_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   landsknecht: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   warrior: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   barbarian: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
@@ -165,6 +178,7 @@ w_gaia: &w_t7
   white_mage: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   dragoon: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   berserker: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }

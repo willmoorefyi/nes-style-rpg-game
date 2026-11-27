@@ -332,6 +332,14 @@
       "x": 336,
       "y": 3456
     },
+    "dark_fighter_hero": {
+      "x": 0,
+      "y": 6528
+    },
+    "death_knight_hero": {
+      "x": 336,
+      "y": 3456
+    },
     "dragoon": {
       "x": 336,
       "y": 3456
@@ -345,6 +353,8 @@
   "aliases": {
     "barbarian": "warrior",
     "berserker": "knight",
+    "dark_fighter_hero": "warrior",
+    "death_knight_hero": "knight",
     "dragoon": "knight",
     "landsknecht": "warrior"
   }

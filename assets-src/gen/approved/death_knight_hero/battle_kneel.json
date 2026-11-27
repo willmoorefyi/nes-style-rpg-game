@@ -1,0 +1,260 @@
+{
+  "character": "death_knight_hero",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/dark_fighter_hero/battle_2026-11-26.png",
+    "sha256": "68aca61b88e3aa4d550f3a4efd0c470fa6c1fa164ca57374abc23409c3343794"
+  },
+  "recipe": "hero_user.yaml#dark_fighter_death_knight",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt_darkfighter_deathknight.txt": "36eefd7c75c9683cbbf6877c527189ce12cce7c40b813fc0c79930374271587a"
+  },
+  "source_name": "dark_fighter_death_knight_sprite_sheet.png",
+  "grid": [
+    160,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-26",
+  "user_review": "The 'dark fighter' / 'death knight' combination. These are standard frames with 1 exception - ... use the picture from the file 'Death Knight's Leftward Sword Thrust.png' in the 'attack' pose for the death knight. ... Use that sprite for the death knight's 'attack'.",
+  "route": "CL: user-rendered oversize hero class sheet (body-box anchor; no AI call)",
+  "body": [
+    52,
+    0,
+    80,
+    80
+  ],
+  "palette": "per_row",
+  "replace": {
+    "attack": {
+      "file": "user_art/dark_fighter_hero/attack_thrust_2026-11-26.png",
+      "sha256": "70772bc87b35d59a79a47929403f871740ecc6ab74082d6718a66875d799cc6f",
+      "height_of": "ready",
+      "at": [
+        3,
+        0
+      ],
+      "native_size": [
+        154,
+        77
+      ],
+      "native_sha256": "d89da3a5e42617afa04f091a71ead9360936a3c6d576704941de3c5c952c2270",
+      "source_name": "Death Knight's Leftward Sword Thrust.png"
+    }
+  },
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          11,
+          11,
+          21
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          19,
+          20,
+          33
+        ],
+        [
+          16,
+          16,
+          33
+        ]
+      ],
+      [
+        [
+          28,
+          31,
+          48
+        ],
+        [
+          24,
+          33,
+          49
+        ]
+      ],
+      [
+        [
+          37,
+          23,
+          52
+        ],
+        [
+          33,
+          24,
+          49
+        ]
+      ],
+      [
+        [
+          38,
+          43,
+          66
+        ],
+        [
+          41,
+          41,
+          66
+        ]
+      ],
+      [
+        [
+          52,
+          32,
+          70
+        ],
+        [
+          49,
+          33,
+          74
+        ]
+      ],
+      [
+        [
+          52,
+          60,
+          87
+        ],
+        [
+          49,
+          57,
+          90
+        ]
+      ],
+      [
+        [
+          70,
+          81,
+          114
+        ],
+        [
+          74,
+          82,
+          115
+        ]
+      ],
+      [
+        [
+          72,
+          41,
+          98
+        ],
+        [
+          74,
+          41,
+          99
+        ]
+      ],
+      [
+        [
+          97,
+          50,
+          128
+        ],
+        [
+          99,
+          49,
+          132
+        ]
+      ],
+      [
+        [
+          97,
+          110,
+          145
+        ],
+        [
+          99,
+          107,
+          148
+        ]
+      ],
+      [
+        [
+          130,
+          60,
+          169
+        ],
+        [
+          132,
+          57,
+          173
+        ]
+      ],
+      [
+        [
+          130,
+          140,
+          176
+        ],
+        [
+          132,
+          140,
+          173
+        ]
+      ],
+      [
+        [
+          160,
+          168,
+          200
+        ],
+        [
+          156,
+          165,
+          198
+        ]
+      ],
+      [
+        [
+          180,
+          101,
+          228
+        ],
+        [
+          181,
+          99,
+          231
+        ]
+      ],
+      [
+        [
+          236,
+          173,
+          255
+        ],
+        [
+          239,
+          173,
+          255
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        60,
+        12,
+        125,
+        76
+      ]
+    }
+  }
+}

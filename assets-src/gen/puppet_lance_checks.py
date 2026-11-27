@@ -89,6 +89,8 @@ def turns(angles: dict[str, float], seqs) -> list[str]:
 
 def review_checks(cid: str, cfg: dict, new: dict | None = None) -> dict:
     """puppet.review's report for a lance class: the body check (on the body only) plus L1-L8 per frame."""
+    if "prop" not in PL.meta_of(cid):
+        return plain_checks(cid, cfg)
     meta, keys = PL._keys(cid)
     fr = PL.frames_of(cid, cfg)
     pal = {tuple(int(v) for v in d) for _, d in meta["cut"]["palette"]}
@@ -114,4 +116,26 @@ def review_checks(cid: str, cfg: dict, new: dict | None = None) -> dict:
     for n in rep:
         rep[n]["L8"] = not any(n in b for b in bad)
         rep[n]["ok"] = rep[n]["ok"] and rep[n]["L8"]
+    return rep
+
+
+def plain_checks(cid: str, cfg: dict) -> dict:
+    """A rigid class without a prop (pass CD-K): the body check against its key, the feet row, the palette."""
+    from gen.pixelize import components
+    fr = PL.frames_of(cid, cfg)
+    keys = PU.battle_sheet_frames(cid)
+    foot = int(PL.meta_of(cid)["bottom_row"])
+    pal = {tuple(int(v) for v in d) for _, d in PL.meta_of(cid)["cut"]["palette"]}
+    rep = {}
+    for n, f in fr.items():
+        src = keys[f["source"]]
+        r = PU.check(f["img"], src)
+        a = np.asarray(f["img"])
+        rows = np.nonzero((a[..., 3] > 0).any(1))[0]
+        r["feet"] = bool(len(rows) and int(rows.max()) == foot)
+        r["L6"] = {tuple(int(v) for v in c) for c in a[a[..., 3] > 0][:, :3]} <= pal
+        pieces = components(np.asarray(src)[..., 3] > 0)[1]
+        r["ok"] = bool(abs(r["ring"] - r["ring_src"]) <= 0.08 and 0.88 <= r["px"] <= 1.12 and
+                       abs(r["height"] - r["height_src"]) <= 4 and r["pieces"] <= max(2, pieces) and r["feet"] and r["L6"])
+        rep[n] = r
     return rep

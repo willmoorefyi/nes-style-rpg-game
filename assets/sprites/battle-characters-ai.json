@@ -42,44 +42,48 @@
       "row": 3,
       "inbetweens": true
     },
-    "knight": {
+    "dark_fighter_hero": {
       "row": 4,
       "inbetweens": true
     },
-    "master": {
+    "knight": {
       "row": 5,
       "inbetweens": true
     },
-    "monk": {
+    "master": {
       "row": 6,
       "inbetweens": true
     },
-    "ninja": {
+    "monk": {
       "row": 7,
       "inbetweens": true
     },
-    "red_mage": {
+    "ninja": {
       "row": 8,
       "inbetweens": true
     },
-    "red_wizard": {
+    "red_mage": {
       "row": 9,
       "inbetweens": true
     },
-    "thief": {
+    "red_wizard": {
       "row": 10,
       "inbetweens": true
     },
-    "warrior": {
+    "thief": {
       "row": 11,
       "inbetweens": true
     },
-    "white_mage": {
+    "warrior": {
       "row": 12,
       "inbetweens": true
     },
-    "white_wizard": {
+    "white_mage": {
       "row": 13,
+      "inbetweens": true
+    },
+    "white_wizard": {
+      "row": 14,
       "inbetweens": true
     },
     "dragoon": {
@@ -273,18 +277,119 @@
           79
         ]
       ]
+    },
+    "death_knight_hero": {
+      "row": 0,
+      "page": 2,
+      "inbetweens": true,
+      "cell": [
+        160,
+        80
+      ],
+      "footRow": 76,
+      "body": [
+        52,
+        0,
+        80,
+        80
+      ],
+      "grid": [
+        6,
+        3
+      ],
+      "reach": 3,
+      "top": 0,
+      "heads": [
+        [
+          109.0,
+          0
+        ],
+        [
+          109.0,
+          0
+        ],
+        [
+          99.5,
+          0
+        ],
+        [
+          118.5,
+          4
+        ],
+        [
+          84.0,
+          38
+        ],
+        [
+          101.5,
+          0
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          109.0,
+          1
+        ],
+        [
+          99.5,
+          1
+        ],
+        [
+          86.0,
+          0
+        ],
+        [
+          98.0,
+          4
+        ],
+        [
+          89.5,
+          8
+        ],
+        [
+          77.5,
+          12
+        ],
+        [
+          77.5,
+          13
+        ]
+      ]
     }
   },
   "pages": [
     {
       "file": "battle-characters-ai.png",
       "w": 2880,
-      "h": 2240
+      "h": 2400
     },
     {
       "file": "battle-characters-ai-1.png",
       "w": 1920,
       "h": 1728
+    },
+    {
+      "file": "battle-characters-ai-2.png",
+      "w": 1920,
+      "h": 480
     }
   ]
 }

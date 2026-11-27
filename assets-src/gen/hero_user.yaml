@@ -70,3 +70,39 @@ landsknecht_dragoon:
   source_name: landsknecht_dragoon_sprite_sheet.png
   approved: "2026-11-26"
   user_review: "a new character class ... the 'landsneckt' and 'dragoon' ... import and verify the character renders correctly with the unique overall sprite size (delivered as final; used as rendered)"
+# Pass CD-K (docs/CLASS_DARKFIGHTER_PLAN.md): the dark fighter / death knight pair, standard 80 x 80 cells, 16 + 16
+# colours (one palette per row). The death knight's cells sit in the 80 x 80 body box of a 160 x 80 cell (`place`), and
+# its ATTACK is the user's separate leftward-thrust render, brought to native px at READY's height (hero_user_replace)
+# and pasted at `at` (its helm over READY's): the sword and the fists reach left of the box, the cape's tip right.
+# Hero ids carry `_hero`: approved/dark_fighter/ and approved/death_knight/ hold the monster sheets of the same names.
+dark_fighter_death_knight:
+  file: user_art/dark_fighter_hero/battle_2026-11-26.png
+  sha256: 68aca61b88e3aa4d550f3a4efd0c470fa6c1fa164ca57374abc23409c3343794
+  rows: [dark_fighter_hero, death_knight_hero]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: per_row
+  row_geometry:
+    death_knight_hero: {cell: [160, 80], body_box: [52, 0, 131, 79], place: [52, 0]}
+  replace:
+    death_knight_hero/attack:
+      file: user_art/dark_fighter_hero/attack_thrust_2026-11-26.png
+      sha256: 70772bc87b35d59a79a47929403f871740ecc6ab74082d6718a66875d799cc6f
+      height_of: ready
+      at: [3, 0]
+      native_size: [154, 77]
+      native_sha256: d89da3a5e42617afa04f091a71ead9360936a3c6d576704941de3c5c952c2270   # of the native RGBA (source colours)
+      source_name: "Death Knight's Leftward Sword Thrust.png"
+  allow_outside:
+    death_knight_hero/attack:
+      - {box: [0, 0, 51, 79], px: 362, why: "the thrust: the sword, its guard and the fists reach left of the body box"}
+      - {box: [132, 0, 159, 79], px: 579, why: "the thrust: the cape's tip trails right of the body box"}
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt_darkfighter_deathknight.txt: 36eefd7c75c9683cbbf6877c527189ce12cce7c40b813fc0c79930374271587a
+  source_name: dark_fighter_death_knight_sprite_sheet.png
+  approved: "2026-11-26"
+  user_review: "The 'dark fighter' / 'death knight' combination. These are standard frames with 1 exception - ... use the picture from the file 'Death Knight's Leftward Sword Thrust.png' in the 'attack' pose for the death knight. ... Use that sprite for the death knight's 'attack'."

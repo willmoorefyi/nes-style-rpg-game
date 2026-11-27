@@ -7,6 +7,7 @@ import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN, LINE_HEIGHT } from '../../core/La
 
 /** Default name per base class; NameEntryGrid's uniqueDefaultName adds 2, 3... for repeats. */
 export const DEFAULT_NAMES: Record<string, string> = {
+  dark_fighter_hero: 'DARK',   // pass CD-K
   landsknecht: 'LANZ',   // pass CL
   warrior: 'FGHTR',
   thief: 'THIEF',
@@ -73,8 +74,20 @@ export function buildPartySummary(classes: readonly CharacterClassData[], names:
   return win;
 }
 
-/** The class preview panel beside the class menu, with the class's battle `ready` pose when the art is loaded. */
-export function buildClassPreview(cls: CharacterClassData, pose: Texture | null = null): Window {
+/** How an oversize battle frame (pass CL / CD-K) sits: its body box (native px), feet row and art scale. */
+export interface PreviewAnchor { body: { x: number; w: number }; footRow: number; scale: number; top?: number }
+
+/** The 80 x 80 preview's feet row (native) and scale: an oversize preview stands on the same feet line. */
+const PREVIEW_FOOT = 76;
+const PREVIEW_SCALE = 2;
+
+/** The class preview panel beside the class menu, with the class's battle `ready` pose when the art is loaded. An
+ *  80 x 80 class's pose stays at the content's top-left; an oversize class (`anchor`: a lance or a thrust past its
+ *  body box) is centred by its body box in the panel, its feet on the 80 x 80 preview's feet line, so the overhanging
+ *  weapon never pushes the figure aside (play-test note, pass CD-K); a weapon that would rise over the stat lines
+ *  (`top`: the art's highest opaque row) lowers the figure instead. */
+export function buildClassPreview(cls: CharacterClassData, pose: Texture | null = null,
+  anchor: PreviewAnchor | null = null): Window {
   const win = new Window({ x: 0, y: 0, width: 600, height: 800 });
   const lines = [
     cls.name,
@@ -89,7 +102,14 @@ export function buildClassPreview(cls: CharacterClassData, pose: Texture | null 
   if (pose) {
     const sprite = new Sprite(pose);
     sprite.label = 'classPose';
-    sprite.position.set(win.contentX, win.contentY + (lines.length + 1) * LINE_HEIGHT);
+    const top = win.contentY + (lines.length + 1) * LINE_HEIGHT;
+    if (anchor) {
+      const feet = top + (PREVIEW_FOOT + 1) * PREVIEW_SCALE;
+      sprite.position.set(Math.round(600 / 2 - (anchor.body.x + anchor.body.w / 2) * anchor.scale),
+        Math.max(feet - (anchor.footRow + 1) * anchor.scale, top - (anchor.top ?? 0) * anchor.scale));   // never over the stats
+    } else {
+      sprite.position.set(win.contentX, top);
+    }
     win.addChild(sprite);
   }
   return win;

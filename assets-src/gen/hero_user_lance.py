@@ -97,7 +97,7 @@ def unbroken(cell: np.ndarray, line, step: float = 0.5) -> list[tuple[int, int]]
     return sorted(set(gaps))
 
 
-def problems(cell: np.ndarray, m: np.ndarray, line, pose: str) -> list[str]:
+def problems(cell: np.ndarray, m: np.ndarray, line, pose: str, kind: str = "lance") -> list[str]:
     """The import checks of one cell's lance (4.2 item 4); [] when it holds."""
     out = []
     tip, u, n = seg(line)
@@ -113,9 +113,9 @@ def problems(cell: np.ndarray, m: np.ndarray, line, pose: str) -> list[str]:
     gaps = unbroken(cell, line)
     if gaps:
         out.append(f"the line crosses {len(gaps)} transparent px (first {gaps[0]}): the lance is broken")
-    if not LEN_MIN <= n <= LEN_MAX:
+    if kind == "lance" and not LEN_MIN <= n <= LEN_MAX:          # the length rule is the lance's (a blade: none)
         out.append(f"length {n:.1f} outside [{LEN_MIN}, {LEN_MAX}]")
-    if pose in KEY_FULL and n < LEN_FULL:
+    if kind == "lance" and pose in KEY_FULL and n < LEN_FULL:
         out.append(f"{pose}: the whole lance is in view, length {n:.1f} < {LEN_FULL}")
     major = max(abs(u[0]), abs(u[1])) * n
     if m.sum() < 0.9 * major:
@@ -213,13 +213,14 @@ def review_sheet(src, rec: dict, g: dict, k: int = 4):
     for r, cid in enumerate(rows):
         for c, pose in enumerate(poses):
             cell = src[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw].copy()
-            line = p["lines"][cid][pose]
-            m = mask(cell, line, p["colours"][cid], p["radius"], head_len(p, cid), (p.get("shaft_colours") or {}).get(cid))
+            line = (p["lines"].get(cid) or {}).get(pose)          # pass CD-K: optional per pose
+            m = mask(cell, line, p["colours"][cid], p["radius"], head_len(p, cid), (p.get("shaft_colours") or {}).get(cid)) \
+                if line else np.zeros(cell.shape[:2], bool)
             cell[m, :3] = (255, 0, 255)
             ox, oy = c * cw * k, r * ch * k
             out.alpha_composite(Image.fromarray(cell).resize((cw * k, ch * k), Image.Resampling.NEAREST), (ox, oy))
             x0, y0, x1, y1 = g["body"]
             d.rectangle([ox + x0 * k, oy + y0 * k, ox + (x1 + 1) * k - 1, oy + (y1 + 1) * k - 1], outline=(255, 255, 0))
-            for (x, y), col in zip(line, ((0, 255, 0), (255, 0, 0))):
+            for (x, y), col in zip(line or [], ((0, 255, 0), (255, 0, 0))):
                 d.ellipse([ox + x * k - 4, oy + y * k - 4, ox + x * k + 4, oy + y * k + 4], outline=col, width=2)
     return out

@@ -77,14 +77,14 @@ function lowest(c: Cell, skip?: boolean[][]): number {
 }
 
 describe('pass CL: the oversize lance classes in the battle atlas', () => {
-  it('the main file and its 14 80 x 80 sheets are as before (no page, the top-level cell and feet row)', () => {
+  it('the main file and its 80 x 80 sheets are as before (no page, the top-level cell and feet row); pages by height', () => {
     expect(meta.cell).toEqual([80, 80]);
     expect(meta.footRow).toBe(76);
     const main = Object.entries(meta.sheets).filter(([, s]) => !s.page);
-    expect(main).toHaveLength(14);
+    expect(main).toHaveLength(15);                       // pass CD-K: + the dark fighter
     for (const [cid, s] of main) expect(Object.keys(s).sort(), cid).toEqual(['inbetweens', 'row']);
-    expect(meta.pages).toEqual([{ file: 'battle-characters-ai.png', w: 2880, h: 2240 },
-      { file: 'battle-characters-ai-1.png', w: 1920, h: 1728 }]);
+    expect(meta.pages).toEqual([{ file: 'battle-characters-ai.png', w: 2880, h: 2400 },
+      { file: 'battle-characters-ai-1.png', w: 1920, h: 1728 }, { file: 'battle-characters-ai-2.png', w: 1920, h: 480 }]);
     expect([page1.width, page1.height]).toEqual([1920, 1728]);
   });
 

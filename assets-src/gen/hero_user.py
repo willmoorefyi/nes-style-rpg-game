@@ -75,7 +75,7 @@ def source(rec: dict, gen: Path = HERE) -> np.ndarray:
 def cut(rec: dict, gen: Path = HERE) -> tuple[dict[str, dict[str, Image.Image]], dict]:
     """{class: {pose: cell}} for every row of the recipe (the seven columns), and the import measures (the checks and
     the recipe geometry live in hero_user_grid.py: pass CB's 80 x 80 rule, pass CL's oversize cells)."""
-    return HG.cut(rec, source(rec, gen))
+    return HG.cut(rec, source(rec, gen), gen)
 
 
 def palette(a: np.ndarray) -> dict[tuple, tuple]:
@@ -91,16 +91,19 @@ def battle_sheet(cells: dict[str, Image.Image]) -> Image.Image:
 
 
 def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tuple[dict, dict]:
-    g = info["geometry"]
+    g = info["geometries"][cid]
     base = {"character": cid, "backend": "user", "tool": TOOL, "source": {"file": rec["file"], "sha256": rec["sha256"]},
             "recipe": f"hero_user.yaml#{rid}", "row": row, "rendered_in": rec.get("tool", "ChatGPT (interactive)"),
             "rendered": str(rec.get("rendered")), "author": rec.get("author", "user"), "refs": rec.get("refs"),
             "source_name": rec.get("source_name"), "grid": [g["cw"], g["ch"]], "bottom_row": g["foot"],
             "faces": "left", "imported": today, "approved": rec.get("approved"), "user_review": rec.get("user_review"),
             "route": "CB: user-rendered hero class sheet (house palette map, no AI call)"}
-    if (g["cw"], g["ch"]) != (CELL, CELL):             # pass CL (docs/CLASS_LANCE_PLAN.md 3, 4): the body anchor
+    if anchored(g):                                    # pass CL (docs/CLASS_LANCE_PLAN.md 3, 4): the body anchor
         base = {**base, "body": HG.body_xywh(g), "palette": g["palette"],
-                "route": "CL: user-rendered oversize hero class sheet (body-box anchor, lance prop; no AI call)"}
+                "route": "CL: user-rendered oversize hero class sheet (body-box anchor; no AI call)"}
+    rp = {k.split("/")[1]: v for k, v in (rec.get("replace") or {}).items() if k.startswith(f"{cid}/")}
+    if rp:                                             # pass CD-K: a pose replaced by a separate user render
+        base = {**base, "replace": rp}
     pal = info["palettes"][cid] if g["palette"] == "per_row" else info["palette"]
     cut_info = {"colours": len(pal) if g["palette"] == "per_row" else info["colours"], "palette": pal,
                 "boxes": {k.split("/")[1]: v for k, v in info["boxes"].items() if k.startswith(f"{cid}/")}}
@@ -109,12 +112,13 @@ def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tu
     def with_prop(m: dict, poses) -> dict:
         if not prop:
             return m
-        lines = prop["lines"][cid]
+        lines = prop["lines"].get(cid) or {}
+        have = [p for p in poses if p in lines]       # pass CD-K: a blade's lines are optional per pose
         return {**m, "prop": {"kind": prop["kind"], "radius": prop["radius"], "head_len": HG.HL.head_len(prop, cid),
                               "colours": prop["colours"][cid],
                               "shaft_colours": (prop.get("shaft_colours") or {}).get(cid),
-                              "lines": {p: lines[p] for p in poses}},
-                "cut": {**m["cut"], "lance_px": {p: info["lance_px"][f"{cid}/{p}"] for p in poses}}}
+                              "lines": {p: lines[p] for p in have}},
+                "cut": {**m["cut"], "lance_px": {p: info["lance_px"][f"{cid}/{p}"] for p in have}}}
     battle = with_prop({**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES),
                         "cut": {**cut_info, "boxes": {p: b for p, b in cut_info["boxes"].items() if p in POSES}}},
                        POSES)
@@ -161,6 +165,11 @@ def approve(rid: str, root: Path | None = None, today: str | None = None) -> lis
     return written
 
 
+def anchored(g: dict) -> bool:
+    """The class's json records its body box (and palette mode): an oversize cell or a prop."""
+    return (g["cw"], g["ch"]) != (CELL, CELL) or bool(g["prop"])
+
+
 def check(meta: dict, gen: Path | None = None) -> str | None:
     """A `backend: user` hero json (battle or battle_kneel): its recipe's source matches the recorded file and sha256,
     and re-importing gives the approved png pixel for pixel. None when it holds, else the reason."""
@@ -177,11 +186,11 @@ def check(meta: dict, gen: Path | None = None) -> str | None:
         cells, info = cut(rec, gen)
     except SystemExit as e:
         return str(e)
-    g = info["geometry"]
+    g = info["geometries"][cid]
     if [meta.get("grid"), meta.get("bottom_row"), meta.get("body")] != \
-            [[g["cw"], g["ch"]], g["foot"], HG.body_xywh(g) if "body" in meta or g["prop"] else None]:
+            [[g["cw"], g["ch"]], g["foot"], HG.body_xywh(g) if anchored(g) else None]:
         return "the json's grid / bottom_row / body differ from the recipe"       # pass CL: the anchor
-    if g["prop"] and any(meta["prop"]["lines"][p] != g["prop"]["lines"][cid][p] for p in meta["prop"]["lines"]):
+    if g["prop"] and any(meta["prop"]["lines"][p] != g["prop"]["lines"][cid].get(p) for p in meta["prop"]["lines"]):
         return "the json's lance lines differ from the recipe"
     want = np.asarray(files_of(cells[cid])[sheet])
     p = gen / "approved" / str(cid) / f"{sheet}.png"
@@ -198,12 +207,13 @@ def review(rid: str, out: Path | None = None) -> list[Path]:
     rec = recipe(rid)
     cells, info = cut(rec)
     k, sw = 4, 40
-    cw, ch = cells[rec["rows"][0]]["ready"].size
+    cw, ch = (max(c["ready"].size[i] for c in cells.values()) for i in (0, 1))   # the widest class cell (pass CD-K)
     h = len(rec["rows"]) * ch * k
     sheet = Image.new("RGBA", (len(COLUMNS) * cw * k, h + 2 * sw + 8), (60, 60, 70, 255))
     for r, cid in enumerate(rec["rows"]):
         for c, pose in enumerate(COLUMNS):
-            sheet.alpha_composite(cells[cid][pose].resize((cw * k, ch * k), Image.Resampling.NEAREST),
+            im = cells[cid][pose]
+            sheet.alpha_composite(im.resize((im.width * k, im.height * k), Image.Resampling.NEAREST),
                                   (c * cw * k, r * ch * k))
     for i, (src, dst) in enumerate(info["palette"]):          # the colour map: source (top) -> house colour (below)
         sheet.paste((*src, 255), (i * (sw + 4), h + 4, i * (sw + 4) + sw, h + 4 + sw))

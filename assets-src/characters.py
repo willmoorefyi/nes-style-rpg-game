@@ -787,6 +787,12 @@ ROSTER: dict[str, Look] = {
     "dragoon": Look(hair=(27, 22, 12), hair_style="short", outfit="armor", cloth=(5, 9, 11), trim=(26, 20, 9),
                     pants=(5, 8, 9), boots=(5, 8, 9), gear="plume_helm", gear_color=(5, 9, 11),
                     gear_color2=(26, 20, 9), weapon="sword"),
+    # pass CD-K (docs/CLASS_DARKFIGHTER_PLAN.md D-DK7): 1x legacy looks of the dark pair (black-violet plate)
+    "dark_fighter_hero": Look(hair=(4, 4, 6), hair_style="short", outfit="armor", cloth=(5, 5, 8), trim=(12, 10, 16),
+                              pants=(4, 4, 6), boots=(3, 3, 5), gear="helm", gear_color=(6, 6, 9), weapon="sword"),
+    "death_knight_hero": Look(hair=(4, 4, 6), hair_style="short", outfit="armor", cloth=(5, 5, 8), trim=(18, 8, 24),
+                              pants=(4, 4, 6), boots=(3, 3, 5), gear="plume_helm", gear_color=(6, 6, 9),
+                              gear_color2=(18, 8, 24), weapon="sword"),
     "knight": Look(hair=(26, 22, 8), hair_style="short", outfit="armor", cloth=(18, 20, 27), trim=(27, 22, 6),
                    pants=(10, 12, 18), boots=(10, 11, 15), gear="plume_helm", gear_color=(18, 20, 27),
                    gear_color2=(28, 29, 31), weapon="sword", shield=True),

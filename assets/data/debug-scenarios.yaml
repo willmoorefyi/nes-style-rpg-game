@@ -3441,3 +3441,40 @@
   gold: 0
   enemies: [wolf, wolf, wolf, wolf]
   background: assets/backgrounds/grassland.webp
+
+# Pass CD-K (docs/CLASS_DARKFIGHTER_PLAN.md): the dark fighter / death knight pair (the death knight's 160 x 80 cell,
+# its ATTACK the user's leftward thrust). DARK is weak (kneels); _b swaps the slots so each class stands in every slot;
+# _hurt lets the wolves hit back. ?mute=1&scenario=dk_heroes (&kneel=loop, &enemyAnim=loop).
+- id: dk_heroes
+  name: Dark Fighter and Death Knight (pass CD-K preview)
+  party:
+    - { class: dark_fighter_hero, name: DARK, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: death_knight_hero, name: DKNT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: dark_fighter_hero, name: DRK2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 0 }
+    - { class: death_knight_hero, name: DKN2, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: dk_heroes_b
+  name: Death Knight and Dark Fighter, slots swapped (pass CD-K preview)
+  party:
+    - { class: death_knight_hero, name: DKNT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: dark_fighter_hero, name: DARK, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: death_knight_hero, name: DKN2, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: dark_fighter_hero, name: DRK2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: dk_heroes_hurt
+  name: Dark Fighter and Death Knight taking hits (pass CD-K preview)
+  party:
+    - { class: death_knight_hero, name: DKNT, level: 1, equipment: [], spells: [] }
+    - { class: dark_fighter_hero, name: DARK, level: 1, equipment: [], spells: [] }
+    - { class: landsknecht, name: LANZ, level: 1, equipment: [], spells: [] }
+    - { class: death_knight_hero, name: DKN2, level: 1, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [wolf, wolf, wolf, wolf]
+  background: assets/backgrounds/grassland.webp

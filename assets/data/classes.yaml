@@ -249,6 +249,31 @@
   hitPercent: { base: 10, growth: 3 }
   magicDefense: { base: 15, growth: 3 }
 
+# ═══ DARK FIGHTER (pass CD-K, docs/CLASS_DARKFIGHTER_PLAN.md) ═══
+# An exact copy of the warrior (the user's standing rule for new classes). The id carries `_hero`: the monster
+# sheets dark_fighter / death_knight already own approved/<id>/.
+- id: dark_fighter_hero
+  name: Dark Fighter
+  abbr: DKF
+  baseStats:
+    hp: 35
+    strength: 20
+    agility: 5
+    intelligence: 1
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 13
+    strength: 4
+    agility: 1
+    intelligence: 0
+    vitality: 3
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield]
+  spellLevels: { white: 0, black: 0 }
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+
 # ═══════════════════════════════════
 # UPGRADED CLASSES (Phase 16)
 # ═══════════════════════════════════
@@ -514,6 +539,39 @@
   name: Dragoon
   abbr: DRG
   upgradeFrom: landsknecht
+  baseStats:
+    hp: 42
+    strength: 24
+    agility: 6
+    intelligence: 2
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 16
+    strength: 5
+    agility: 1
+    intelligence: 1
+    vitality: 4
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
+  spellLevels: { white: 3, black: 0 }
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+  spellCharges:
+    - [10, [1]]
+    - [15, [2, 1]]
+    - [20, [3, 2, 1]]
+    - [30, [5, 4, 3]]
+    - [40, [7, 6, 5]]
+    - [50, [9, 8, 7]]
+
+# ═══ DEATH KNIGHT (upgraded Dark Fighter; pass CD-K) ═══
+# An exact copy of the knight (its white magic L1-3 included). Battle art: an oversize 160 x 80 cell, the ATTACK
+# the user's leftward-thrust render.
+- id: death_knight_hero
+  name: Death Knight
+  abbr: DKN
+  upgradeFrom: dark_fighter_hero
   baseStats:
     hp: 42
     strength: 24

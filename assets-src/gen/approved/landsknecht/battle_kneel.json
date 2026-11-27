@@ -25,7 +25,7 @@
   "imported": "2026-11-27",
   "approved": "2026-11-26",
   "user_review": "a new character class ... the 'landsneckt' and 'dragoon' ... import and verify the character renders correctly with the unique overall sprite size (delivered as final; used as rendered)",
-  "route": "CL: user-rendered oversize hero class sheet (body-box anchor, lance prop; no AI call)",
+  "route": "CL: user-rendered oversize hero class sheet (body-box anchor; no AI call)",
   "body": [
     72,
     64,

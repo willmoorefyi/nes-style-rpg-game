@@ -1,0 +1,17 @@
+# The death knight (pass CD-K, docs/CLASS_DARKFIGHTER_PLAN.md): 160 x 80 cells, the user's 80 x 80 poses in the body
+# box at x 52, the ATTACK the user's leftward-thrust render (hero_user_replace). In-betweens are rigid
+# (puppet_lance.plain_frames: one key whole, bobbed above the feet row, so the thrust's blade moves with the figure,
+# never re-posed). The joints place the hip cut and the near fist only (native px of the 160 x 80 cells).
+inbetweens: rigid
+rigid_cut: feet          # READY's and CAST's blades run down to the ground: only the feet row stays
+robed: false
+attack_hand: n
+battle:
+  ready: {hip_n: [96, 56], hip_f: [110, 56], hand_n: [90, 50]}
+  attack: {hip_n: [98, 48], hip_f: [113, 48], hand_n: [75, 28]}
+  cast: {hip_n: [94, 56], hip_f: [108, 56], hand_n: [112, 52]}
+tweaks:
+  atk_wind1: {dy: 1}
+  atk_wind2: {dy: 1}
+  atk_follow: {dy: 1}
+kneel: {source: user}

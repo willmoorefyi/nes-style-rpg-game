@@ -1,0 +1,277 @@
+{
+  "character": "dark_fighter_hero",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/dark_fighter_hero/battle_2026-11-26.png",
+    "sha256": "68aca61b88e3aa4d550f3a4efd0c470fa6c1fa164ca57374abc23409c3343794"
+  },
+  "recipe": "hero_user.yaml#dark_fighter_death_knight",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt_darkfighter_deathknight.txt": "36eefd7c75c9683cbbf6877c527189ce12cce7c40b813fc0c79930374271587a"
+  },
+  "source_name": "dark_fighter_death_knight_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-26",
+  "user_review": "The 'dark fighter' / 'death knight' combination. These are standard frames with 1 exception - ... use the picture from the file 'Death Knight's Leftward Sword Thrust.png' in the 'attack' pose for the death knight. ... Use that sprite for the death knight's 'attack'.",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          12,
+          12,
+          21
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          20,
+          21,
+          33
+        ],
+        [
+          16,
+          24,
+          33
+        ]
+      ],
+      [
+        [
+          30,
+          32,
+          46
+        ],
+        [
+          33,
+          33,
+          49
+        ]
+      ],
+      [
+        [
+          41,
+          45,
+          64
+        ],
+        [
+          41,
+          41,
+          66
+        ]
+      ],
+      [
+        [
+          43,
+          35,
+          55
+        ],
+        [
+          41,
+          33,
+          57
+        ]
+      ],
+      [
+        [
+          50,
+          26,
+          81
+        ],
+        [
+          49,
+          24,
+          82
+        ]
+      ],
+      [
+        [
+          55,
+          61,
+          85
+        ],
+        [
+          57,
+          57,
+          82
+        ]
+      ],
+      [
+        [
+          65,
+          51,
+          78
+        ],
+        [
+          66,
+          49,
+          74
+        ]
+      ],
+      [
+        [
+          73,
+          81,
+          109
+        ],
+        [
+          74,
+          82,
+          107
+        ]
+      ],
+      [
+        [
+          86,
+          36,
+          130
+        ],
+        [
+          82,
+          33,
+          132
+        ]
+      ],
+      [
+        [
+          94,
+          104,
+          136
+        ],
+        [
+          90,
+          107,
+          140
+        ]
+      ],
+      [
+        [
+          98,
+          82,
+          113
+        ],
+        [
+          99,
+          82,
+          115
+        ]
+      ],
+      [
+        [
+          123,
+          133,
+          162
+        ],
+        [
+          123,
+          132,
+          165
+        ]
+      ],
+      [
+        [
+          131,
+          114,
+          151
+        ],
+        [
+          132,
+          115,
+          148
+        ]
+      ],
+      [
+        [
+          135,
+          67,
+          184
+        ],
+        [
+          132,
+          66,
+          181
+        ]
+      ],
+      [
+        [
+          156,
+          164,
+          193
+        ],
+        [
+          156,
+          165,
+          189
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        1,
+        6,
+        78,
+        76
+      ],
+      "attack": [
+        1,
+        9,
+        78,
+        76
+      ],
+      "cast": [
+        11,
+        0,
+        68,
+        76
+      ],
+      "hurt": [
+        2,
+        6,
+        78,
+        76
+      ],
+      "down": [
+        1,
+        40,
+        78,
+        76
+      ],
+      "victory": [
+        5,
+        0,
+        74,
+        76
+      ]
+    }
+  }
+}
