@@ -1,0 +1,278 @@
+{
+  "character": "warlock",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/warlock/battle_2026-11-27.png",
+    "sha256": "5528565a56e01dae02c36d1929a7047608a27f245d9d83e2d84ccc6a74dfdc2d"
+  },
+  "recipe": "hero_user.yaml#warlock_necromancer",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "warlock_necromancer_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "next do the 'warlock / necromancer' combo as a copy of the black mage / black wizard (delivered as final; the fel-fire, the arcs, the ground glow and the CAST skeletal hands kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          21,
+          20,
+          22
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          38,
+          37,
+          41
+        ],
+        [
+          41,
+          33,
+          41
+        ]
+      ],
+      [
+        [
+          54,
+          54,
+          58
+        ],
+        [
+          57,
+          57,
+          57
+        ]
+      ],
+      [
+        [
+          55,
+          32,
+          38
+        ],
+        [
+          57,
+          33,
+          41
+        ]
+      ],
+      [
+        [
+          67,
+          105,
+          29
+        ],
+        [
+          66,
+          107,
+          33
+        ]
+      ],
+      [
+        [
+          82,
+          60,
+          43
+        ],
+        [
+          82,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          83,
+          81,
+          85
+        ],
+        [
+          82,
+          82,
+          82
+        ]
+      ],
+      [
+        [
+          84,
+          44,
+          52
+        ],
+        [
+          82,
+          41,
+          49
+        ]
+      ],
+      [
+        [
+          117,
+          64,
+          69
+        ],
+        [
+          115,
+          66,
+          66
+        ]
+      ],
+      [
+        [
+          128,
+          95,
+          66
+        ],
+        [
+          132,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          151,
+          198,
+          44
+        ],
+        [
+          148,
+          198,
+          41
+        ]
+      ],
+      [
+        [
+          177,
+          141,
+          88
+        ],
+        [
+          181,
+          140,
+          90
+        ]
+      ],
+      [
+        [
+          184,
+          133,
+          109
+        ],
+        [
+          181,
+          132,
+          107
+        ]
+      ],
+      [
+        [
+          233,
+          188,
+          164
+        ],
+        [
+          231,
+          189,
+          165
+        ]
+      ],
+      [
+        [
+          235,
+          248,
+          146
+        ],
+        [
+          239,
+          247,
+          148
+        ]
+      ],
+      [
+        [
+          249,
+          227,
+          201
+        ],
+        [
+          247,
+          231,
+          198
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        9,
+        6,
+        71,
+        76
+      ],
+      "attack": [
+        1,
+        7,
+        78,
+        76
+      ],
+      "cast": [
+        13,
+        0,
+        71,
+        76
+      ],
+      "hurt": [
+        2,
+        6,
+        78,
+        76
+      ],
+      "down": [
+        1,
+        43,
+        78,
+        76
+      ],
+      "victory": [
+        15,
+        0,
+        66,
+        76
+      ]
+    }
+  }
+}

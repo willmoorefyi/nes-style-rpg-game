@@ -16,6 +16,7 @@ export const DEFAULT_NAMES: Record<string, string> = {
   black_mage: 'B.MAG',
   red_mage: 'R.MAG',
   barbarian: 'BARB',
+  warlock: 'WRLK',
   beastmaster: 'BEAST',
   shaman: 'SHAMN',
   legionnaire: 'LEGN',

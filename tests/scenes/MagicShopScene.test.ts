@@ -87,14 +87,14 @@ describe('MS-7: the magic shop shows the description and who can learn each spel
 
   it('black magic lists the black and red mages', () => {
     const { scene } = open(['black_mage'], 'cornelia_black');
-    expect(scene.learners).toEqual({ text: 'Learn: BLM RDM SHM', greyed: false });   // pass CB: the shaman, a black mage copy
+    expect(scene.learners).toEqual({ text: 'Learn: BLM RDM SHM WLK', greyed: false });   // pass CB: the shaman and the warlock, black mage copies
   });
 
   it('upgraded classes in the party are listed when they can learn the spell (Knight and White Wizard for CURE)', () => {
     const { scene } = open(['knight', 'white_wizard', 'ninja']);
     expect(scene.learners).toEqual({ text: 'Learn: WHM RDM CLR KNT WHW', greyed: false });
     // the Ninja learns black magic only: not listed for CURE; a Black Wizard is listed for the black shop's spells
-    expect(open(['black_wizard', 'ninja'], 'cornelia_black').scene.learners).toEqual({ text: 'Learn: BLM RDM SHM NIN BLW', greyed: false });
+    expect(open(['black_wizard', 'ninja'], 'cornelia_black').scene.learners).toEqual({ text: 'Learn: BLM RDM SHM WLK NIN BLW', greyed: false });
   });
 
   it('an upgraded class that cannot learn the spell is not listed', () => {

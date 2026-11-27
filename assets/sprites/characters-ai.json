@@ -372,6 +372,10 @@
       "x": 0,
       "y": 6528
     },
+    "necromancer": {
+      "x": 672,
+      "y": 0
+    },
     "paladin": {
       "x": 672,
       "y": 6528
@@ -395,6 +399,10 @@
     "summoner": {
       "x": 1008,
       "y": 3840
+    },
+    "warlock": {
+      "x": 336,
+      "y": 0
     }
   },
   "fallbacks": {},
@@ -411,11 +419,13 @@
     "hunter": "thief",
     "landsknecht": "warrior",
     "legionnaire": "warrior",
+    "necromancer": "black_wizard",
     "paladin": "white_wizard",
     "ranger": "ninja",
     "ronin": "thief",
     "samurai": "ninja",
     "shaman": "black_mage",
-    "summoner": "master"
+    "summoner": "master",
+    "warlock": "black_mage"
   }
 }

@@ -4,4 +4,4 @@
 # Every other 80 x 80 class stays on the main file. Refused: an id without approved/<id>/battle.json, an oversize
 # class, an id listed twice, a page over 4096 px.
 overflow:
-  - [shaman, druid, beastmaster, summoner]
+  - [shaman, druid, beastmaster, summoner, warlock, necromancer]

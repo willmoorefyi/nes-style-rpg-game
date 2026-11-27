@@ -20,3 +20,5 @@ shaman: black_mage   # temporary until the user renders the shaman's field walk 
 druid: black_wizard  # temporary until the user renders the druid's field walk sheet
 beastmaster: monk    # temporary until the user renders the beastmaster's field walk sheet
 summoner: master     # temporary until the user renders the summoner's field walk sheet
+warlock: black_mage  # temporary until the user renders the warlock's field walk sheet
+necromancer: black_wizard # temporary until the user renders the necromancer's field walk sheet

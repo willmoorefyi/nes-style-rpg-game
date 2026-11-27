@@ -390,3 +390,46 @@ summoner:
     near the ground beside the foot and its skull level with the hood, never above the 92 px cap; in the back view the
     staff is in the same hand and the feather mantle covers the back; in the side view facing left it is held in front
     of the body, upright. The staff touches the hand and stays inside the 48 x 96 cell
+
+warlock:
+  name: Warlock
+  tier: base
+  partner: necromancer
+  battle_sheet: ~/temp/heroes/warlock_necromancer_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: black_mage
+  look: >-
+    a young warlock, about 20: a slim build; untidy black hair falling over the forehead; a pale, sharp young face;
+    a long dark charcoal coat to the shins with a high collar, worn brown leather straps and pouches, dark trousers and
+    boots; a small green fel-fire charm at the throat; a curved dagger. Colours: black hair, pale skin, charcoal, dark
+    red-brown leather, a bright acid green for the fel-fire
+  carry: >-
+    the curved dagger is sheathed at his left hip on the belt, hilt forward, close to the coat; a small green flame
+    flickers in his free right hand, held low beside the hip (no taller than the hand). The dagger and the flame touch
+    the body and stay inside the 48 x 96 cell
+
+necromancer:
+  name: Necromancer
+  tier: enhanced
+  partner: warlock
+  battle_sheet: ~/temp/heroes/warlock_necromancer_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: white_wizard   # black_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the warlock long after, now an undead necromancer: a gaunt grey-green face, long white hair; a tattered dark
+    robe to the ground with ragged hems, bone ribs and straps over the chest, a dark red sash; a tall gnarled wooden
+    staff topped with a horned skull whose eyes glow green. Colours: grey-green skin, white hair, charcoal robe, bone,
+    dark red, acid green glow
+  carry: >-
+    the horned-skull staff is carried upright in his right hand (the hand toward the viewer's left in the front view),
+    its foot near the ground beside the foot and its skull level with the head, never above the 92 px cap; in the back
+    view the staff is in the same hand; in the side view facing left it is held in front of the body, upright. The
+    staff touches the hand and stays inside the 48 x 96 cell

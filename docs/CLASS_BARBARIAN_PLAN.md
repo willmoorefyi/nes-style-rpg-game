@@ -421,3 +421,12 @@ keep_specks for the 1 px whip, the streaks and the spirit. Image review: round 1
 so the cast snapped) -> a rising gather; round 2 beastmaster **APPROVE**, summoner ITERATE (the gather split the
 staff) -> the staff's middle in the torso box; round 3 summoner ITERATE (the raised hand parted from its forearm
 across the staff) -> section 5 fallback `alias_frames: [cast_gather]` for the summoner.
+
+### 15.2 Warlock / necromancer result (2026-11-27, branch class-shaman, fourth commit)
+
+Exact copies of black_mage -> black_wizard (stats, spells and learners, equipment, upgrade rule), like the shaman /
+druid. On the overflow page with the shaman / druid and the beastmaster / summoner (page 3: 6 rows, 2880 x 960, 3136
+px of the 4096 cap left). Rigs key-based; keep_specks for the fel-fire wisps, the blast and the ground glow. Image
+review: round 1 **APPROVE** for both classes, with no frame aliased. Report only: the warlock's kneel height is 64,
+outside the 52-62 band (not a gate). NG-5: a party with two of black_mage / shaman / warlock costs 425 G, over 400 G, so
+it is skipped like cleric + white mage (1485 parties are checked).

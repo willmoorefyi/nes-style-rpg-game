@@ -801,7 +801,13 @@ ROSTER: dict[str, Look] = {
     # monk; the summoner in a feathered brown robe with a staff
     "beastmaster": Look(hair=(10, 6, 3), hair_style="short", outfit="gi", cloth=(14, 9, 5), trim=(26, 19, 11),
                         pants=(11, 7, 4), boots=(10, 6, 4), gear="hood", gear_color=(26, 19, 11)),
+    # pass CB (plan 11-15): the warlock in a long dark coat with a dagger; the necromancer, pale, in a tattered dark robe
+    # with a staff (no horned-skull 1x staff exists)
+    "warlock": Look(hair=(3, 3, 4), hair_style="short", outfit="coat", cloth=(6, 5, 6), trim=(14, 6, 6),
+                    pants=(6, 5, 6), boots=(5, 4, 5), weapon="dagger"),
     # Upgraded classes
+    "necromancer": Look(skin=SKIN_LIGHT, hair=(26, 26, 24), hair_style="long", outfit="robe", cloth=(7, 8, 7),
+                        trim=(12, 20, 6), boots=(5, 5, 5), weapon="staff", weapon_color=(14, 10, 6)),
     "summoner": Look(hair=(10, 6, 3), hair_style="short", outfit="robe", cloth=(16, 11, 6), trim=(28, 25, 20),
                      boots=(10, 6, 4), gear="hood", gear_color=(26, 23, 18), weapon="staff", weapon_color=(16, 11, 6)),
     "druid": Look(hair=(8, 5, 3), hair_style="long", outfit="robe", cloth=(9, 14, 6), trim=(24, 20, 12),

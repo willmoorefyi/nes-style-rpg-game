@@ -77,13 +77,13 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
         // pass CB: a class copied from another (the cleric is the white mage, user ruling 2026-11-27) has its kit, so
         // a party with both is two healers' kits; its 400 G bound is a user decision (reported), not this rule's
         if (four.includes('cleric') && four.includes('white_mage')) continue;
-        if (four.includes('shaman') && four.includes('black_mage')) continue;   // pass CB: the shaman is the black mage
+        if (['black_mage', 'shaman', 'warlock'].filter((c) => four.includes(c)).length >= 2) continue;   // pass CB: the shaman and the warlock are the black mage
         expect(four.reduce((s, x) => s + cost(x), 0), four.join(' ')).toBeLessThanOrEqual(400);
         parties++;
       }
     // C(13, 4) = 715 parties of 13 base classes (+ barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric,
     // ronin) less the C(11, 2) = 55 with both cleric and white mage (skipped above)
-    expect(parties).toBe(1210);   // C(15, 4) = 1365 less the 78 cleric + white mage and the 78 shaman + black mage parties, plus the 1 with both pairs
+    expect(parties).toBe(1485);   // C(16, 4) = 1820 less the parties with the cleric + white mage or two of black mage / shaman / warlock
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
   });
 
