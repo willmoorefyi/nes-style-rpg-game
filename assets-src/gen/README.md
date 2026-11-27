@@ -122,6 +122,19 @@ lists the moved pieces. Selftest: `selftest_cut.py`.
 Add an entry to `characters.yaml` with `prompt` (costume only), `battle_gear`, `field_gear` and `seeds`. Generate,
 review `review.png`, and move the approved seed to the front of `seeds`.
 
+## Class field packs (pass CFP, `docs/CLASS_FIELD_PACKS_PLAN.md`)
+
+A new hero class with a battle sheet but no field (overworld) walk sheet gets a ChatGPT pack from
+`class_field_pack.py`: `prompt.txt`, `README.md` and the references (the class's READY / VICTORY battle crops, a
+stand-in hero's 3 x 3 field sheet labelled, the boy's walk sheet for the foot alternation, a grid guide). To add a
+class, add an entry for it and its partner to `class_field_packs.yaml` (keys in its header; `tier` base / enhanced,
+`partner` naming back, `battle_sheet`, `row`, `cell`, `body_box` for an oversize sheet, `poses`, `weapon_view`,
+`stand_in`, `look`, `carry`) and run `python3 -I assets-src/gen/class_field_pack.py <id> <partner>` (or `--all`;
+`--check` validates only; default out `~/temp/ff-game/class_field_packs`). The prompt template is
+`class_field_pack_prompt.txt`. The user's render is imported by `field_user.py` (a `field_user.yaml` recipe, `cut`,
+`approve`); then the class's TEMPORARY stand-in line in `field_alias.yaml` (branch class-barbarian) is deleted.
+Selftest: `selftest_class_field_pack.py`.
+
 ## Monster rig body templates (docs/ENEMY_ANIM_PLAN.md 4.1)
 
 A rig file `anim/monsters/<sprite>.yaml` picks `body: biped | quadruped | bird`. The biped template is in `rig.py`; the

@@ -540,6 +540,8 @@ def test_monster_anim() -> None:
     print("pass CL oversize lance sheets (cut, per-row palette, body box, lance mask, refusals; puppet_lance L1-L8)")
     __import__("gen.selftest_hero_lance", fromlist=["x"]).run_hero_lance(check)
     __import__("gen.selftest_hero_replace", fromlist=["x"]).run_hero_replace(check)
+    print("pass CFP class field walk-sheet packs (class_field_pack.py: crops, stand-in rows, prompt lines, refusals, determinism)")
+    __import__("gen.selftest_class_field_pack", fromlist=["x"]).run_class_field_pack(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501
