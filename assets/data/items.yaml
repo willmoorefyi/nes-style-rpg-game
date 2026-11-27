@@ -23,6 +23,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 2
@@ -53,6 +54,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   - monk
   - beastmaster
@@ -75,6 +77,7 @@
   - hunter
   - ronin
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 5
   crit: 4
@@ -95,6 +98,7 @@
   - hunter
   - ronin
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 6
@@ -157,6 +161,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 10
@@ -174,6 +179,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   bonusVsFamily: undead
   hit: 10
@@ -194,6 +200,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   bonusVsFamily: undead
   hit: 10
@@ -246,6 +253,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 10
@@ -296,6 +304,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   element: lightning
   bonusVsFamily: aquatic
@@ -325,6 +334,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   bonusVsFamily: dragon
   hit: 10
@@ -354,6 +364,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 2
@@ -371,6 +382,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 2
@@ -393,6 +405,7 @@
   - monk
   - beastmaster
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 8
@@ -425,6 +438,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 15
@@ -472,6 +486,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 8
@@ -505,6 +520,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   weight: 0
 - id: iron_shield
@@ -537,6 +553,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   weight: 0
 - id: cap
@@ -564,6 +581,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   weight: 1
 - id: iron_helm
@@ -699,6 +717,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 1
@@ -720,6 +739,7 @@
   - hunter
   - ronin
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 5
   crit: 10
@@ -747,6 +767,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 1
@@ -768,6 +789,7 @@
   - hunter
   - ronin
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 14
@@ -795,6 +817,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 5
   crit: 10
@@ -838,6 +861,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 16
@@ -875,6 +899,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 18
@@ -917,6 +942,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 1
@@ -965,6 +991,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   hit: 10
   crit: 18
@@ -1037,6 +1064,7 @@
   - warlock
   - shaman
   - red_mage
+  - scholar_hero
   - rune_knight
   slot: armor
   weight: 1
@@ -1055,6 +1083,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - scholar_hero
   - rune_knight
   weight: 0
 - id: diamond_helm

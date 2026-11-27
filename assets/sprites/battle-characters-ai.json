@@ -445,6 +445,16 @@
       "row": 7,
       "page": 3,
       "inbetweens": true
+    },
+    "scholar_hero": {
+      "row": 8,
+      "page": 3,
+      "inbetweens": true
+    },
+    "sage_hero": {
+      "row": 9,
+      "page": 3,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -466,7 +476,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 1280
+      "h": 1600
     }
   ]
 }

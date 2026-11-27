@@ -530,3 +530,22 @@ an ink ring in atk_mid / atk_follow / cast_rise / cast_release; the rune knight'
 amendment A6 (section 16, Momus OKAY 4/5) and `fx_colours` on both rigs, the rune knight's cast_rise hand 3 px down;
 round 3 rune knight **APPROVE**, mystic warrior ITERATE (the blade parted from the gauntlet at the grip in atk_wind2 and
 cast_gather) -> section 5 fallback `alias_frames: [atk_wind1, atk_wind2, cast_gather]` for the mystic warrior.
+
+### 16.2 Scholar / sage result (2026-11-27, branch class-rune, second commit)
+
+User (verbatim): "I've now added the 'scholar' / 'sage' character class, a shallow copy of the red mage / red wizard for
+classic." Exact copies of red_mage -> red_wizard: `scholar_hero` (Scholar, SCH, default name SCHLR) -> `sage_hero`
+(Sage, SAG). The `_hero` ids, as for dark_fighter_hero: `approved/scholar/` is the townsfolk scholar's field sheet and
+`sage_star` / `sage_earth` / `sage_flame` / `dragon_sage` are NPC sheets; no class id equals an NPC sprite name and
+their field sheets stay their own (`tests/rendering/scholarArt.test.ts`). On page 3 (10 rows, 2880 x 1600; 2496 px
+left, 15 more rows). Field alias red_mage / red_wizard (temporary); walk-sheet pack entries (the book under the arm,
+the sage's staff upright; the sage's stand-in is the knight, as for the mystic warrior).
+
+`fx_colours` (A6): the scholar's orange potion sparks; the sage's potion sparks (orange, green, cream) and the rune
+ring's bare gold and brown. The sage's gold and brown are its staff's colours too, so a staff seam stays un-inked (the
+known limit of plan 16): 1-6 edge px in atk_wind1 / atk_wind2 against the ready key's 0; the art test allows the
+sage ready + 6 (the scholar 0). Image review: round 1 ITERATE (the scholar's cast_gather hand broke under the book: the
+gather raises it 1 px straight up; the sage's sparks and ring gained an ink ring: the ring colours added); round 2
+scholar **APPROVE**, sage ITERATE (a shoulder seam in idle_b: the breath moves the head only); round 3 sage ITERATE
+(the wrist tore in atk_mid) -> section 5 fallback `alias_frames: [atk_mid]` for the sage. Minor notes kept: the
+kneel bridge slides the book on the ground 3 / 5 px between kneel_in2 and the key (a 60 ms frame).

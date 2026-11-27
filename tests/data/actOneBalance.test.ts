@@ -25,7 +25,7 @@ const ORIGINAL = ['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_m
 const COPY_OF: Record<string, string> = {
   barbarian: 'warrior', landsknecht: 'warrior', dark_fighter_hero: 'warrior', legionnaire: 'warrior', hunter: 'thief',
   cleric: 'white_mage', ronin: 'thief', shaman: 'black_mage', beastmaster: 'monk', warlock: 'black_mage',
-  rune_knight: 'red_mage',
+  rune_knight: 'red_mage', scholar_hero: 'red_mage',
 };
 
 describe('T4d Cornelia shops (FF1 Coneria lists)', () => {

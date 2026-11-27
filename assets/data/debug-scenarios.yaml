@@ -3597,3 +3597,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-16): the scholar / sage class pair (user-rendered battle art; ids
+# scholar_hero / sage_hero beside the townsfolk scholar and the sage NPC sheets). SCHLR is weak so it kneels; RDWZ is
+# the like-for-like control for SAGE. ?mute=1&scenario=cb_scholars (&kneel=loop, &enemyAnim=loop).
+- id: cb_scholars
+  name: Scholar and Sage (pass CB preview)
+  party:
+    - { class: scholar_hero, name: SCHLR, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: sage_hero, name: SAGE, level: 30, equipment: [wizard_staff, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: scholar_hero, name: SCHLR2, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [wizard_staff, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

@@ -809,7 +809,14 @@ ROSTER: dict[str, Look] = {
     # mystic warrior in dark steel with a helm, a rune sword, a kite shield and a cape
     "rune_knight": Look(hair=(28, 24, 16), hair_style="spiky", outfit="armor", cloth=(18, 19, 22), trim=(14, 9, 5),
                         pants=(8, 8, 10), boots=(14, 9, 5), weapon="sword", shield=True),
+    # pass CB (plan 11-16): the scholar (hero id scholar_hero; "scholar" is the townsfolk NPC), young, in a teal cap
+    # and a gold coat with a book; the sage (sage_hero), a white-bearded elder in a teal hat and robe with a gold staff
+    "scholar_hero": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(24, 18, 8), trim=(14, 9, 5),
+                         pants=(10, 7, 5), boots=(12, 8, 5), gear="hood", gear_color=(4, 10, 11)),
     # Upgraded classes
+    "sage_hero": Look(hair=(29, 29, 28), hair_style="long", beard=(29, 29, 28), outfit="robe", cloth=(4, 10, 11),
+                      trim=(28, 22, 10), boots=(12, 8, 5), gear="hood", gear_color=(4, 10, 11), weapon="staff",
+                      weapon_color=(28, 22, 10)),
     "mystic_warrior": Look(hair=(14, 9, 5), hair_style="short", outfit="armor", cloth=(5, 6, 8), trim=(20, 22, 26),
                            pants=(5, 6, 8), boots=(18, 19, 22), gear="helm", gear_color=(18, 19, 22), weapon="sword",
                            shield=True, cape=(4, 9, 20)),

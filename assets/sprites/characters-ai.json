@@ -396,9 +396,17 @@
       "x": 336,
       "y": 4992
     },
+    "sage_hero": {
+      "x": 672,
+      "y": 4992
+    },
     "samurai": {
       "x": 1008,
       "y": 4224
+    },
+    "scholar_hero": {
+      "x": 336,
+      "y": 4992
     },
     "shaman": {
       "x": 336,
@@ -433,7 +441,9 @@
     "ranger": "ninja",
     "ronin": "thief",
     "rune_knight": "red_mage",
+    "sage_hero": "red_wizard",
     "samurai": "ninja",
+    "scholar_hero": "red_mage",
     "shaman": "black_mage",
     "summoner": "master",
     "warlock": "black_mage"

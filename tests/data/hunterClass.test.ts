@@ -40,7 +40,7 @@ describe('pass CB: hunter / ranger are a shallow copy of thief / ninja', () => {
     for (const c of CLASSES) expect(classLabel(c), c.id).toHaveLength(3);
     const base = ClassRegistry.getAll().filter((c) => !c.upgradeFrom).map((c) => c.id);
     expect(base).toEqual(['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage', 'barbarian', 'landsknecht',
-      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight']);   // the base classes in merge order (pass CB: + rune_knight)
+      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero']);   // the base classes in merge order (pass CB: + scholar_hero)
     expect(DEFAULT_NAMES.hunter).toBe('HUNT');
   });
 

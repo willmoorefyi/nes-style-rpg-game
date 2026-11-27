@@ -1,0 +1,279 @@
+{
+  "character": "sage_hero",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/scholar_hero/battle_2026-11-27.png",
+    "sha256": "8a8e98738be15fd5894b1c114a9e46a92ea81504be588cd59dd59c9d48f49c35"
+  },
+  "recipe": "hero_user.yaml#scholar_hero_sage_hero",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "prompt_scholar_sage.txt": "f0d262b8c1489d78fe7b146caa5bfe6ade5ef9d0060c1a0e014a2d6d06994721",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "scholar_sage_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've now added the 'scholar' / 'sage' character class, a shallow copy of the red mage / red wizard for classic. (delivered as final; the thrown potion and sparks, the magnifier, the rune ring, the floating book, the loose pages and the books on the ground kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          32,
+          60,
+          64
+        ],
+        [
+          33,
+          57,
+          66
+        ]
+      ],
+      [
+        [
+          33,
+          27,
+          29
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          52,
+          90,
+          97
+        ],
+        [
+          49,
+          90,
+          99
+        ]
+      ],
+      [
+        [
+          75,
+          53,
+          41
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          116,
+          82,
+          56
+        ],
+        [
+          115,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          156,
+          109,
+          55
+        ],
+        [
+          156,
+          107,
+          57
+        ]
+      ],
+      [
+        [
+          181,
+          212,
+          87
+        ],
+        [
+          181,
+          214,
+          90
+        ]
+      ],
+      [
+        [
+          183,
+          174,
+          166
+        ],
+        [
+          181,
+          173,
+          165
+        ]
+      ],
+      [
+        [
+          184,
+          148,
+          94
+        ],
+        [
+          181,
+          148,
+          90
+        ]
+      ],
+      [
+        [
+          192,
+          138,
+          101
+        ],
+        [
+          189,
+          140,
+          99
+        ]
+      ],
+      [
+        [
+          212,
+          179,
+          133
+        ],
+        [
+          214,
+          181,
+          132
+        ]
+      ],
+      [
+        [
+          225,
+          106,
+          143
+        ],
+        [
+          222,
+          107,
+          140
+        ]
+      ],
+      [
+        [
+          233,
+          183,
+          79
+        ],
+        [
+          231,
+          181,
+          82
+        ]
+      ],
+      [
+        [
+          237,
+          187,
+          151
+        ],
+        [
+          239,
+          189,
+          148
+        ]
+      ],
+      [
+        [
+          244,
+          125,
+          45
+        ],
+        [
+          247,
+          123,
+          41
+        ]
+      ],
+      [
+        [
+          250,
+          237,
+          207
+        ],
+        [
+          247,
+          239,
+          206
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        14,
+        6,
+        68,
+        76
+      ],
+      "attack": [
+        3,
+        7,
+        76,
+        76
+      ],
+      "cast": [
+        4,
+        0,
+        76,
+        76
+      ],
+      "hurt": [
+        8,
+        6,
+        74,
+        76
+      ],
+      "down": [
+        1,
+        41,
+        78,
+        76
+      ],
+      "victory": [
+        15,
+        0,
+        66,
+        76
+      ]
+    }
+  }
+}

@@ -476,3 +476,45 @@ mystic_warrior:
     the sword is sheathed at his left hip on the belt, hilt forward, close to the body (a thin blue rune line on the
     scabbard); the kite rune shield is strapped on his left forearm, held against the side so it never hides the face;
     the cape hangs behind. The sword, the shield and the cape stay inside the 48 x 96 cell
+
+scholar_hero:
+  name: Scholar
+  tier: base
+  partner: sage_hero
+  battle_sheet: ~/temp/heroes/scholar_sage_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: red_mage
+  look: >-
+    a young scholar, about 18: a slim build; short brown hair under a soft teal cap with a white quill tucked in it;
+    a bright young face; a long mustard-gold coat with brown leather straps, a satchel and a belt of small potion vials
+    (orange, green, pink), dark brown trousers and boots. Colours: brown hair, fair skin, teal, mustard gold, dark
+    brown leather, small bright potion colours
+  carry: >-
+    a thick brown book is carried under his left arm, pressed against the side so it never hides the face; the free
+    right hand hangs by the belt of vials. The book touches the body and stays inside the 48 x 96 cell
+
+sage_hero:
+  name: Sage
+  tier: enhanced
+  partner: scholar_hero
+  battle_sheet: ~/temp/heroes/scholar_sage_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight   # red_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the scholar grown into an old sage: a long white beard and white hair under a tall dark teal hat with a gold band;
+    a long dark teal robe to the ground under a mustard-gold mantle with brown trim, a belt of potion vials and a round
+    gold rune medallion at the hip. Colours: white hair and beard, fair skin, dark teal, mustard gold, brown, small
+    bright potion colours
+  carry: >-
+    a tall gold staff topped with an ornate round head is held upright in his right hand (the hand toward the viewer's
+    left in the front view), its foot near the ground beside the foot and its head level with the hat, never above the
+    92 px cap; in the back view the staff is in the same hand; in the side view facing left it is held in front of the
+    body, upright. The staff touches the hand and stays inside the 48 x 96 cell

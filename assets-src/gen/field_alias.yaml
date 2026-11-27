@@ -24,3 +24,5 @@ warlock: black_mage  # temporary until the user renders the warlock's field walk
 necromancer: black_wizard # temporary until the user renders the necromancer's field walk sheet
 rune_knight: red_mage # temporary until the user renders the rune knight's field walk sheet
 mystic_warrior: red_wizard # temporary until the user renders the mystic warrior's field walk sheet
+scholar_hero: red_mage # temporary until the user renders the scholar's field walk sheet
+sage_hero: red_wizard  # temporary until the user renders the sage's field walk sheet
