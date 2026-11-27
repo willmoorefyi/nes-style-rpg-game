@@ -256,3 +256,52 @@ shared between the rows** (the class pack's prompt asks for "at most 16 colours 
   sections 2-9 per class pair: hunter (HNT) / ranger (RNG) copy thief / ninja (field alias thief / ninja); legionnaire
   (LGN) / centurion (CEN) copy warrior / knight (field alias warrior / knight). Each pair has its own branch from
   `class-barbarian` (bfc71d03): `class-hunter`, `class-legion`; this amendment's commit is cherry-picked onto both.
+
+## 12. Amendment A2 (hunter / ranger): the pieces cap follows the drawn key
+
+The hunter / ranger render draws the bow string as a dotted line and the ranger's CAST as a hand of loose leaves, so
+its keys are several separate pieces by design (4-connected `PX.components`, the count both checks use; no size filter):
+hunter ready 6, attack 17; ranger ready 5, attack 16, cast 4. Every key of the 14 classes before it is 1 piece. Two
+checks cap a generated frame at 2 pieces, which these keys break before any re-posing:
+
+- `puppet.check` (the in-between `ok` of `puppet.py review`): `pieces <= 2` becomes `pieces <= max(2, pieces of the
+  keyframe the frame is cut from)` (`SOURCE[name]`; the report gains `pieces_src`).
+- `puppet_kneel.frame_checks` (the kneel K-checks): `pieces <= 2` becomes `pieces <= max(2, pieces of the frame's pixel
+  source)`: ready for `kneel_in1`, the kneel key for `kneel_in2`, `kneel`, `kneel_b` (the `ring_ref` the D-KT4 rule
+  already passes, else ready).
+
+Every other check is unchanged. Since every earlier key is 1 piece, the cap stays 2 for the 12 + 2 earlier classes
+(their `puppet.py review` / `puppet_kneel.py check` lines and the locks are unchanged; gate: both commands over all
+classes). Measured: both kneel keys are 1 piece, hunter's hurt 3 (no check's source); today only ranger's cast
+in-betweens and both `kneel_in1` frames rely on the relaxed cap. The image reviewer still judges every frame for stray
+or detached bits (and a lost bow string). Selftest (`selftest_hero_user.py`):
+a 1-piece key keeps the cap 2 (a 3-piece frame cut from it fails), a 5-piece key allows 5 and not 6 at equal area,
+for both checks; a 1-piece kneel key over a 5-piece ready caps the key-drawn frames at 2. Momus: OKAY (4/5).
+
+## 13. Amendment A3 (hunter / ranger): keep the drawn specks
+
+`puppet.render` ends with `outline()`, which first drops every 4-connected piece under 12 px (stray bits of a cut).
+The hunter / ranger keys draw the bow string as a dotted line of 1-3 px dots, so every in-between loses its string
+(image review round 2: the string flickers off in atk_mid / atk_follow and on again in the attack key).
+
+- A class file may say `keep_specks: true` (default false: every class before it, unchanged byte for byte). Then
+  `render` passes it to `outline(img, keep_specks=True)`, which skips the speck drop only; the seam inking is unchanged.
+  `load_cfg` refuses a non-boolean. Used by `anim/hunter.yaml` and `anim/ranger.yaml` only.
+- The cut's own stray bits are then kept too; the image reviewer judges them (A2's pieces cap still bounds the count).
+- Scope: battle in-betweens only (`puppet.render`); the kneel frames of these classes come from the bridge, not the
+  rig renderer (`puppet_kneel_rot`, which keeps the default).
+- Gates: after `build_assets.py battle_ai field_ai characters` under PYTHONHASHSEED 0 / 1, the 14 earlier classes'
+  atlas rows unchanged by class (rowdiff), `puppet.py review` over all classes; the round-3 reviewer checks the string
+  in atk_mid / atk_follow.
+  Selftest (`selftest_hero_user.py`): `outline` drops a 3-px speck by default and keeps it with `keep_specks`;
+  `load_cfg` refuses `keep_specks: 1`; hunter's and ranger's atk_mid / atk_follow have more opaque px with the key on
+  than off (the dots kept; the outline ring joins the dots, so the piece count is no measure). Momus: OKAY (4/5).
+
+### 13.1 Hunter / ranger result (2026-11-27)
+
+Image review: round 1 ITERATE (atk_mid blended the ready and attack bows over the face; ranger atk_follow doubled
+bow) -> atk_mid / atk_follow rebuilt on the attack key; round 2 ITERATE (the dotted string dropped as specks) -> A3
+`keep_specks`; round 3 ITERATE (the string breaks in atk_wind1 / atk_wind2; atk_follow shows no release). Fallback of
+section 5: `alias_frames: [atk_wind1, atk_wind2, atk_follow]` for both classes (those frames show ready, ready,
+attack); every other generated frame (atk_mid, cast_gather / rise / release, idle_b, the kneel bridge) passed round 3.
+For the user: the attack is a draw-and-hold until a bow-specific wind-up / release exists (e.g. drawn release frames).
