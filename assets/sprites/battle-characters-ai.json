@@ -42,44 +42,52 @@
       "row": 3,
       "inbetweens": true
     },
-    "knight": {
+    "centurion": {
       "row": 4,
       "inbetweens": true
     },
-    "master": {
+    "knight": {
       "row": 5,
       "inbetweens": true
     },
-    "monk": {
+    "legionnaire": {
       "row": 6,
       "inbetweens": true
     },
-    "ninja": {
+    "master": {
       "row": 7,
       "inbetweens": true
     },
-    "red_mage": {
+    "monk": {
       "row": 8,
       "inbetweens": true
     },
-    "red_wizard": {
+    "ninja": {
       "row": 9,
       "inbetweens": true
     },
-    "thief": {
+    "red_mage": {
       "row": 10,
       "inbetweens": true
     },
-    "warrior": {
+    "red_wizard": {
       "row": 11,
       "inbetweens": true
     },
-    "white_mage": {
+    "thief": {
       "row": 12,
       "inbetweens": true
     },
-    "white_wizard": {
+    "warrior": {
       "row": 13,
+      "inbetweens": true
+    },
+    "white_mage": {
+      "row": 14,
+      "inbetweens": true
+    },
+    "white_wizard": {
+      "row": 15,
       "inbetweens": true
     }
   }

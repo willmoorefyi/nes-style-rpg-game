@@ -1,0 +1,42 @@
+# Puppet animation joints for the centurion (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11). Native
+# px on approved/centurion/battle.png cells (80x80, the user's render, every pose faces left; n = near/viewer-side limb, f =
+# far limb). tip = the gladius in the near hand (behind the scutum in ready / attack), the vine staff in the cast key.
+# part_boxes ([x0, y0, x1, y1), half-open): the scutum rides with the torso (the arm holding it is hidden behind it);
+# in the cast key the vine staff. Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [42, 26], crown: [43, 7], chest: [44, 36], hip: [46, 56],
+     sh_n: [40, 32], el_n: [30, 46], hand_n: [21, 58], tip: [7, 58], weapon_hand: n,
+     sh_f: [52, 32], el_f: [56, 42], hand_f: [50, 42],
+     hip_n: [40, 60], knee_n: [36, 66], foot_n: [36, 75], hip_f: [56, 58], knee_f: [66, 62], foot_f: [72, 74],
+     part_boxes: {torso: [[21, 28, 45, 72]]}}
+  attack:
+    {neck: [42, 26], crown: [43, 7], chest: [46, 36], hip: [48, 56],
+     sh_n: [42, 32], el_n: [32, 36], hand_n: [21, 37], tip: [3, 37], weapon_hand: n,
+     sh_f: [54, 32], el_f: [57, 42], hand_f: [51, 42],
+     hip_n: [42, 60], knee_n: [38, 66], foot_n: [36, 75], hip_f: [58, 58], knee_f: [66, 62], foot_f: [74, 74],
+     part_boxes: {torso: [[24, 28, 45, 71]]}}
+  cast:
+    {neck: [42, 30], crown: [42, 5], chest: [42, 40], hip: [44, 56],
+     sh_n: [30, 28], el_n: [24, 22], hand_n: [18, 16], tip: [24, 1], weapon_hand: n,
+     sh_f: [52, 34], el_f: [58, 44], hand_f: [58, 52],
+     hip_n: [34, 60], knee_n: [32, 66], foot_n: [28, 75], hip_f: [52, 60], knee_f: [56, 66], foot_f: [58, 75],
+     part_boxes: {weapon: [[20, 0, 28, 12]], torso: [[48, 36, 70, 72]]}}
+# round 1 (image review: atk_mid drew the sword hand over the shield face): atk_mid is the attack key leaned 1 px
+# back with the hand 2 px back, at the shield's left rim.
+# tweaks (round 0): the gladius stays behind the scutum, so the wind-ups and cast_gather keep the
+# sword hand at its ready place (body lean only, the hand 2-3 px back), atk_follow is the attack key with
+# the sword 2 px back and down, cast_rise the cast key with the pilum hand 4 px low (key + delta - the
+# generic target).
+tweaks:
+  atk_mid: {neck: [0.1, -0.9], crown: [0.1, -0.9], chest: [1, -0.9], hip: [1, -0.9], sh_n: [1, -0.9], el_n: [-6.2, -3.15], hand_n: [-7.9, -3.15], sh_f: [1, -0.9], el_f: [0.55, -0.9], hand_f: [0.55, -0.9], hip_n: [1, -0.9], knee_n: [1.9, -0.9], foot_n: [1, 0], hip_f: [1, -0.9], knee_f: [0.55, -0.9], foot_f: [1.9, 0], tip: [-7.9, -3.15]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-13, 5], hand_n: [-15, 17], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0], tip: [-10, 22]}
+  atk_wind2: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [-15, 4], hand_n: [-17, 15], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [2, -1], foot_n: [2, 1], hip_f: [0, -1], knee_f: [1, -1], foot_f: [2, 1], tip: [-11, 18]}
+  atk_follow: {neck: [0, 0], crown: [0, 0], chest: [0.5, 0], hip: [0.5, 0], sh_n: [0.5, 0], el_n: [0, -2], hand_n: [0, -4], sh_f: [0.5, 0], el_f: [0.25, 0], hand_f: [0.25, 0], hip_n: [0.5, 0], knee_n: [0.5, 0], foot_n: [0, 0], hip_f: [0.5, 0], knee_f: [0, 0], foot_f: [0.5, 0], tip: [1, -9]}
+  cast_gather: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, -2], hand_n: [-17, 15], sh_f: [0, 0], el_f: [2, -2], hand_f: [5, 0], hip_n: [0, 0], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, 0], knee_f: [0, 1], foot_f: [0, 1], tip: [-17, 15]}
+  cast_rise: {neck: [0, 2], crown: [-0.5, -1], chest: [-1, 2], hip: [-1, 0], sh_n: [-5, -2], el_n: [-3, -10], hand_n: [-1.5, -17], sh_f: [0, 1], el_f: [1, 1], hand_f: [4, 5], hip_n: [-3, 0], knee_n: [-2, 0], foot_n: [-4, 0], hip_f: [-2, 1], knee_f: [-5, 2], foot_f: [-7, 0.5], tip: [-1.5, -17]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

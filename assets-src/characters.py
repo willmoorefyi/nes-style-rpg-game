@@ -775,7 +775,15 @@ ROSTER: dict[str, Look] = {
     # plain helm (no horned 1x gear exists), a sword as the nearest 1x weapon; the berserker bearded)
     "barbarian": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(14, 9, 5), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), weapon="sword"),
+    # pass CB (plan 11): the legionnaire in red tunic and steel (plain helm, sword and shield); the centurion with the
+    # plume helm (the crest) and a red cape
+    "legionnaire": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(22, 22, 25),
+                        pants=(22, 5, 5), boots=(14, 9, 5), gear="helm", gear_color=(22, 22, 25), weapon="sword",
+                        shield=True),
     # Upgraded classes
+    "centurion": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(27, 22, 6),
+                      pants=(22, 5, 5), boots=(14, 9, 5), gear="plume_helm", gear_color=(22, 22, 25),
+                      gear_color2=(26, 4, 4), weapon="sword", shield=True, cape=(22, 4, 4)),
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),

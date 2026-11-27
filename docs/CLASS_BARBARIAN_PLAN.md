@@ -256,3 +256,11 @@ shared between the rows** (the class pack's prompt asks for "at most 16 colours 
   sections 2-9 per class pair: hunter (HNT) / ranger (RNG) copy thief / ninja (field alias thief / ninja); legionnaire
   (LGN) / centurion (CEN) copy warrior / knight (field alias warrior / knight). Each pair has its own branch from
   `class-barbarian` (bfc71d03): `class-hunter`, `class-legion`; this amendment's commit is cherry-picked onto both.
+
+### 11.1 Legionnaire / centurion result (2026-11-27, branch class-legion)
+
+Data-only beyond A1 (every key is 1 piece: A2 / A3 are not needed here). Rigs: the scutum rides with the torso
+(`part_boxes`), the gladius is the near hand's weapon, the pilum / vine staff the cast key's; the wind-ups and
+cast_gather keep the sword hand behind the shield. Image review: round 1 ITERATE (atk_mid drew the sword hand over the
+shield face) -> atk_mid on the attack key; round 2 **APPROVE** both (optional notes: the pilum's cast_release reads as
+more wind-back than a throw; cast_gather is near ready, so the shield swap pops at cast_rise, as the keys draw it).

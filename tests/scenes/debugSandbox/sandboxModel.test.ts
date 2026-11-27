@@ -32,17 +32,17 @@ describe('sandbox model: cycling', () => {
     expect(cycleLevel(DATA, defaultConfig(DATA), -1).level).toBe(DATA.levels[DATA.levels.length - 1].id);
   });
 
-  it('a slot cycles through the 7 base classes, and through all 14 with promoted on', () => {
+  it('a slot cycles through the 8 base classes, and through all 16 with promoted on', () => {
     let c = defaultConfig(DATA);
     c = { ...c, party: ['warrior', ...c.party.slice(1)] };
     const seen = new Set<string>();
-    for (let i = 0; i < 14; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
+    for (let i = 0; i < 16; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
     expect([...seen]).toEqual(DATA.classes.base);
     c = togglePromoted(DATA, c);
     seen.clear();
-    for (let i = 0; i < 14; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
-    expect(seen.size).toBe(14);
-    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker']));
+    for (let i = 0; i < 16; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
+    expect(seen.size).toBe(16);
+    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion']));
   });
 
   it('turning promoted off demotes a promoted member to its base class', () => {
