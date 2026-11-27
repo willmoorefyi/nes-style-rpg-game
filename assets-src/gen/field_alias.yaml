@@ -16,3 +16,5 @@ cleric: white_mage   # temporary until the user renders the cleric's field walk 
 paladin: white_wizard # temporary until the user renders the paladin's field walk sheet
 ronin: thief         # temporary until the user renders the ronin's field walk sheet
 samurai: ninja       # temporary until the user renders the samurai's field walk sheet
+shaman: black_mage   # temporary until the user renders the shaman's field walk sheet
+druid: black_wizard  # temporary until the user renders the druid's field walk sheet

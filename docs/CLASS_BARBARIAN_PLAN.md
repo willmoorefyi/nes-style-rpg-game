@@ -348,3 +348,67 @@ Exact copies of thief -> ninja. A1-A4 cherry-picked (the samurai's slash streaks
 is a key, imported as drawn). Rigs key-based from the start (the cleric lessons). Image review: round 1 samurai
 **APPROVE**; ronin ITERATE (atk_wind1 / atk_wind2 drew a second katana while the ready key keeps it sheathed) -> those
 two left to the ready key (`alias_frames`: the draw is one stroke); round 2 ronin **APPROVE**.
+
+### 14.3 Shaman / druid result (2026-11-27, branch class-shaman from mainline 8f5872fd)
+
+Exact copies of black_mage -> black_wizard (user: "For now these should come in as copies of the black mage"):
+stats, spells, equipment, magic-shop learners ("Learn: BLM RDM SHM"), upgrade rule. Data-only on top of A1-A4 (no
+pipeline change): `palette: rows`, keep_specks for the shaman's ice shard and the druid's floating leaves, key-based
+in-betweens. Image review round 1 **APPROVE** both (optional: the staff tip dropped 1 px below the feet in idle_b /
+cast_gather -> the staff hand kept still there; measured lowest row 76). The main battle page grows from 23 to 25
+rows of 160 px: 2880 x 4000, 96 px under the 4096 limit, so the next 80 x 80 class pair needs a new page. NG-5: a
+party with both the black mage and the shaman needs 425 G (skipped like the cleric + white mage pair; 870 parties).
+Field packs: shaman (stand-in black_mage), druid (stand-in white_wizard: black_wizard's field sheet carries head_from /
+row_from fixes the pack reader refuses).
+
+## 15. Amendment A5 (shaman / druid, beastmaster / summoner): an overflow page for 80 x 80 classes
+
+The main battle page (`battle-characters-ai.png`) holds one 160 px row per 80 x 80 class, 2880 px wide (18 poses x
+80 x 2). At mainline 8f5872fd it holds 23 classes (3680 px); WebGL1's texture limit is 4096, i.e. 25 rows. With the
+shaman / druid (first commit of `class-shaman`) it reaches 4000; the beastmaster / summoner (third commit) cannot fit.
+Pass CL's extra pages hold only oversize sheets (a 6 x 3 block per class with `cell`, `footRow`, `body`, `grid`,
+`reach`, `top`, `heads`). Commits on `class-shaman`: (1) shaman / druid on the main page (4000 / 4096); (2) this
+amendment, moving the shaman / druid to the overflow page; (3) the beastmaster / summoner, appended to it.
+
+- **Data:** `assets-src/gen/battle_pages.yaml`, key `overflow`: a list of pages, each a list of 80 x 80 class ids laid
+  out like the main page (one row per class in the listed order, the 18 pose columns, the top-level `cell` /
+  `footRow` / `poses`). After commit (2): `overflow: [[shaman, druid]]`; after (3): `[[shaman, druid, beastmaster,
+  summoner]]`. A missing file means no overflow page (the build as on mainline).
+- **Build (`build_battle_ai`):** the listed classes are removed from the 80 x 80 entries **before** the main page is
+  built and before `entries[0]` (grid, poses, footRow) is read, so every other class's main-page row and the main png
+  are exactly mainline's (barbarian stays `entries[0]`). The listed classes go onto `battle-characters-ai-<n>.png`,
+  numbered after the oversize pages (today 1 and 2, so the overflow page is 3), json entries `{row, page,
+  inbetweens}` (no `cell`, `grid`, `body`, `reach`, `top`, `heads`), appended to `sheets` after the main and oversize
+  entries, the page listed in `pages` with its size. Refused (SystemExit naming the fix): a listed id with no approved
+  `approved/<id>/battle.json`, an oversize (non-80 x 80) listed class, an id listed twice, any page over 4096 px on
+  either side (the main page's message names `battle_pages.yaml`).
+- **Readers:** an entry with `page` but no `cell` / `grid` / `footRow` falls back to the top-level values and the main
+  layout (`grid` = [len(poses), 1]).
+  - Python `gen/battle_atlas.py`: `cell_of`, `foot_of` and `cell_box` gain these fallbacks (they raise KeyError
+    today); `puppet_kneel.old_columns` and `kneel_tools.party_diff` already go through them.
+  - TS `battleAtlasPages.ts` already falls back (`cellOf`, `footRowOf`, `bodyOf`, `cellRect`); no change.
+  - **Task (runtime change):** `CharacterAtlas.getBattleFrames` today adds `body` / `reach` / `top` for any `page`
+    entry; it will add them only when the entry has a `body` (an oversize class), so an overflow-page class lays out,
+    lunges (`heroBody` registers only classes with `art.body`) and previews (`PartyCreationScene` keys on `art.body`)
+    like a main-page class.
+  - All pages are already loaded at start (`loadExtraPages`).
+- **Tests:**
+  - `tests/rendering/CharacterAtlas.test.ts`: the paged fixture gains an overflow entry (`page` without `cell` / `grid`
+    / `body`): it slices at the main layout on its page and `getBattleFrames` gives no `body` / `reach` / `top`.
+  - `tests/scenes/battle/lanceScreenFit.test.ts`: "every oversize hero" filters on `body`, not `page`.
+  - `tests/scenes/battle/meleeContact.test.ts` `heroAttackLeftInset`: every 80 x 80 class (main and overflow) read
+    through `pageFile` / `cellRect`.
+  - `tests/rendering/lanceAtlas.test.ts`: 23 main entries, `pages[0]` 2880 x 3680, the overflow page listed with
+    height 160 x its classes, every page <= 4096.
+  - `tests/rendering/shamanArt.test.ts` (and the beastmaster's): read the class's cells through its `page`
+    (`pages[page].file`) and `cellRect`, never a hard-coded page number.
+  - `tests/rendering/overflowPage.test.ts`: every class in `battle_pages.yaml` has an entry `{row, page, inbetweens}`
+    on the listed page, in the listed order, its key cells equal its approved cells, and no other class is on it.
+  - `selftest_hero_user.py`: the build's overflow split refuses an unknown / oversize / duplicate id and a page over
+    4096; `cell_of`, `foot_of`, `cell_box` of an overflow entry give the main-layout cell on its page.
+- **Gates (byte-identical claim):** after the rebuild, `assets/sprites/battle-characters-ai.png`, `-1.png` and
+  `-2.png` are byte-equal to `git show 8f5872fd:assets/sprites/<file>`; `kneel_tools.py party-diff --base 8f5872fd`
+  reports no change for any mainline class; the json's main-page rows equal mainline's.
+- **Headroom (reported per page):** main 3680 / 4096 (416 px: 2 rows); page 1 (lance) 1728 and page 2 480 unchanged;
+  page 3 320 / 4096 after (2), 640 / 4096 after (3) (3456 px: 21 more rows).
+- AGENTS.md's battle_ai row names `battle_pages.yaml`.

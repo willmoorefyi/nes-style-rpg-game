@@ -81,9 +81,10 @@ describe('pass CL: the oversize lance classes in the battle atlas', () => {
     expect(meta.cell).toEqual([80, 80]);
     expect(meta.footRow).toBe(76);
     const main = Object.entries(meta.sheets).filter(([, s]) => !s.page);
-    expect(main).toHaveLength(23);                       // int-classes: the 26 classes less the 3 oversize sheets
+    expect(main).toHaveLength(25);                       // the 28 classes less the 3 oversize sheets (pass CB: + shaman, druid)
     for (const [cid, s] of main) expect(Object.keys(s).sort(), cid).toEqual(['inbetweens', 'row']);
-    expect(meta.pages).toEqual([{ file: 'battle-characters-ai.png', w: 2880, h: 3680 },
+    expect(meta.pages?.[0].h).toBeLessThanOrEqual(4096);   // the main page's texture limit: 25 rows of 160 = 4000, 96 px left (no 26th row)
+    expect(meta.pages).toEqual([{ file: 'battle-characters-ai.png', w: 2880, h: 4000 },
       { file: 'battle-characters-ai-1.png', w: 1920, h: 1728 }, { file: 'battle-characters-ai-2.png', w: 1920, h: 480 }]);
     expect([page1.width, page1.height]).toEqual([1920, 1728]);
   });

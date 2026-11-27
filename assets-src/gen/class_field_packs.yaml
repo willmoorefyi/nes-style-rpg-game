@@ -242,7 +242,7 @@ paladin:
   body_box: null
   poses: [ready, victory]
   weapon_view: null
-  stand_in: white_wizard
+  stand_in: white_wizard   # black_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
   look: >-
     the cleric a few years later, now a paladin, a holy knight: the same face and brown hair, a little stubble, a calm,
     resolute bearing; a thin gold circlet on the brow, no helmet; full white-and-silver plate armour with gold trim, a
@@ -299,3 +299,50 @@ samurai:
     the katana stays sheathed in its black scabbard, thrust through the sash at his LEFT hip, the hilt forward and up,
     the scabbard angled back behind him; the hands are free and swing with the walk. The gold crescent crest counts in
     the 92 px height cap and the shoulder guards stay within 46 px wide. Crest and sword touch the body
+
+shaman:
+  name: Shaman
+  tier: base
+  partner: druid
+  battle_sheet: ~/temp/heroes/shaman_druid_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: black_mage
+  look: >-
+    a young tribal shaman, about 20: a lean build; long dark-brown hair under a headdress of two curved dark horns or
+    short antlers (kept compact: the whole figure, headdress included, stays within the 92 px height cap); a calm young
+    face with a small teal paint mark; a bare chest with a bone-and-teal bead necklace, a brown fur and hide mantle on
+    the shoulders, a tan hide loincloth and leggings with teal beads, brown hide boots; a gnarled wooden branch staff
+    topped with forked twigs, hung with feathers and teal beads. Colours: dark brown hair and horns, warm skin, tan and
+    brown hide, teal accents, pale feathers
+  carry: >-
+    the branch staff is carried upright in his right hand (the hand toward the viewer's left in the front view), its
+    foot near the ground beside the foot and its forked top level with the headdress, never above the 92 px cap; in
+    the back view the staff is in the same hand; in the side view facing left it is held in front of the body, upright.
+    The staff touches the hand and stays inside the 48 x 96 cell
+
+druid:
+  name: Druid
+  tier: enhanced
+  partner: shaman
+  battle_sheet: ~/temp/heroes/shaman_druid_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: white_wizard   # black_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the shaman a few years later, now a druid: the same face and long dark hair, under a crown of branching antlers
+    (kept compact: the whole figure, antlers included, stays within the 92 px height cap); a mantle of green leaves
+    over the shoulders and down the back, a leaf-and-bark robe to the knees, tan leggings, brown boots; a pale wooden
+    staff whose top curls into a ring holding a glowing green seed. Colours: dark brown hair and antlers, warm skin,
+    two leaf greens, olive, pale wood, a bright green glow
+  carry: >-
+    the seed staff is carried upright in his right hand (the hand toward the viewer's left in the front view), its foot
+    near the ground beside the foot and its glowing ring level with the antler crown, never above the 92 px cap; in the
+    back view the staff is in the same hand and the leaf mantle covers the back; in the side view facing left it is held
+    in front of the body, upright. The staff touches the hand and stays inside the 48 x 96 cell

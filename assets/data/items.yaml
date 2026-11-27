@@ -19,6 +19,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   hit: 10
   crit: 2
@@ -45,6 +46,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   - monk
   hit: 0
@@ -177,6 +179,7 @@
   - hunter
   - ronin
   - black_mage
+  - shaman
   - red_mage
   bonusVsFamily: undead
   hit: 10
@@ -226,6 +229,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   hit: 10
   crit: 10
@@ -300,6 +304,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   bonusVsFamily: dragon
   hit: 10
@@ -325,6 +330,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 2
@@ -339,6 +345,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 2
@@ -522,6 +529,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   weight: 1
 - id: iron_helm
@@ -653,6 +661,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 1
@@ -696,6 +705,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 1
@@ -739,6 +749,7 @@
   price: 5000
   usableBy:
   - black_mage
+  - shaman
   - red_mage
   hit: 5
   crit: 10
@@ -763,6 +774,7 @@
   price: 9000
   usableBy:
   - black_mage
+  - shaman
   slot: armor
   weight: 2
 # B6 Onrac: 30 / 38 / 12 / 8
@@ -813,6 +825,7 @@
   - hunter
   - ronin
   - black_mage
+  - shaman
   - red_mage
   hit: 10
   crit: 18
@@ -851,6 +864,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 1
@@ -965,6 +979,7 @@
   - white_mage
   - cleric
   - black_mage
+  - shaman
   - red_mage
   slot: armor
   weight: 1

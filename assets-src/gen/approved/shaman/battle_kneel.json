@@ -1,0 +1,237 @@
+{
+  "character": "shaman",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/shaman/battle_2026-11-27.png",
+    "sha256": "d7392cb5c247e2a228525e0416020d6775f749658d8bd12b2d1816b0346eecf9"
+  },
+  "recipe": "hero_user.yaml#shaman_druid",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "shaman_druid_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I have a new character class - 'Shaman' and 'Druid'. For now these should come in as copies of the black mage. (delivered as final; the CAST ice shard and the druid's floating leaves kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          27,
+          23,
+          26
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          48,
+          37,
+          34
+        ],
+        [
+          49,
+          33,
+          33
+        ]
+      ],
+      [
+        [
+          66,
+          105,
+          107
+        ],
+        [
+          66,
+          107,
+          107
+        ]
+      ],
+      [
+        [
+          75,
+          51,
+          38
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          104,
+          70,
+          53
+        ],
+        [
+          107,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          118,
+          182,
+          172
+        ],
+        [
+          115,
+          181,
+          173
+        ]
+      ],
+      [
+        [
+          139,
+          96,
+          61
+        ],
+        [
+          140,
+          99,
+          57
+        ]
+      ],
+      [
+        [
+          157,
+          99,
+          68
+        ],
+        [
+          156,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          171,
+          121,
+          71
+        ],
+        [
+          173,
+          123,
+          74
+        ]
+      ],
+      [
+        [
+          188,
+          232,
+          217
+        ],
+        [
+          189,
+          231,
+          214
+        ]
+      ],
+      [
+        [
+          201,
+          149,
+          82
+        ],
+        [
+          198,
+          148,
+          82
+        ]
+      ],
+      [
+        [
+          207,
+          147,
+          101
+        ],
+        [
+          206,
+          148,
+          99
+        ]
+      ],
+      [
+        [
+          222,
+          180,
+          117
+        ],
+        [
+          222,
+          181,
+          115
+        ]
+      ],
+      [
+        [
+          229,
+          172,
+          120
+        ],
+        [
+          231,
+          173,
+          123
+        ]
+      ],
+      [
+        [
+          237,
+          200,
+          151
+        ],
+        [
+          239,
+          198,
+          148
+        ]
+      ],
+      [
+        [
+          247,
+          228,
+          190
+        ],
+        [
+          247,
+          231,
+          189
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        14,
+        12,
+        67,
+        76
+      ]
+    }
+  }
+}

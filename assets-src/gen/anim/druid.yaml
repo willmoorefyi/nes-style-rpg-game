@@ -1,0 +1,28 @@
+# Puppet animation joints for the druid (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/druid/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). tip = the seed staff in the near hand (ready, attack; the attack's leaves ride with it); the cast key holds it upright in the far hand (it rides with the torso) and the floating leaves above ride with the raised forearm. part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the floating leaves survive the cut
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [44, 28], crown: [44, 10], chest: [46, 40], hip: [46, 56], sh_n: [38, 36], el_n: [34, 42], hand_n: [28, 42], tip: [24, 18], weapon_hand: n, sh_f: [58, 36], el_f: [62, 44], hand_f: [64, 52], hip_n: [40, 58], knee_n: [38, 66], foot_n: [34, 75], hip_f: [54, 58], knee_f: [58, 66], foot_f: [60, 75], part_boxes: {weapon: [[15, 8, 31, 40], [23, 44, 28, 77]]}}
+  attack:
+    {neck: [46, 38], crown: [46, 24], chest: [50, 46], hip: [52, 60], sh_n: [48, 48], el_n: [42, 52], hand_n: [36, 52], tip: [14, 52], weapon_hand: n, sh_f: [58, 40], el_f: [66, 48], hand_f: [70, 52], hip_n: [46, 62], knee_n: [42, 70], foot_n: [40, 75], hip_f: [62, 62], knee_f: [66, 70], foot_f: [70, 75], part_boxes: {weapon: [[0, 43, 34, 65]]}}
+  cast:
+    {neck: [44, 28], crown: [44, 10], chest: [44, 38], hip: [44, 54], sh_n: [36, 32], el_n: [28, 32], hand_n: [22, 28], sh_f: [56, 32], el_f: [60, 40], hand_f: [60, 42], hip_n: [38, 58], knee_n: [36, 66], foot_n: [34, 75], hip_f: [50, 58], knee_f: [52, 66], foot_f: [54, 75], part_boxes: {farm_n: [[10, 4, 29, 23]], torso: [[57, 12, 73, 77]]}}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, -1], sh_n: [0, 0], el_n: [0, -1], hand_n: [0, -1], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, -1], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, -1], knee_f: [0, 1], foot_f: [0, 1], tip: [0, -1]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-7, -3], hand_n: [-6, -4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0], tip: [9, -23]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-9, -6], hand_n: [-7, -8], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0], tip: [9, -29]}
+  atk_mid: {neck: [1, 2.6], crown: [1, 4.4], chest: [1.9, 0.8], hip: [2.8, -0.1], sh_n: [4.6, 3.5], el_n: [-0.8, 1.25], hand_n: [0.75, -1.2], sh_f: [0.1, -0.1], el_f: [1.9, -0.1], hand_f: [2.8, -1.9], hip_n: [2.8, -0.1], knee_n: [2.8, -0.1], foot_n: [3.7, -1], hip_f: [3.7, -0.1], knee_f: [4.15, -0.1], foot_f: [5.5, -1], tip: [0.75, -1.2]}
+  atk_follow: {neck: [0.5, 2.5], crown: [0.5, 3.5], chest: [1, 1.5], hip: [1.5, 1], sh_n: [2.5, 3], el_n: [-2, -2], hand_n: [-3, -5], sh_f: [0, 1], el_f: [1, 1], hand_f: [1.5, 0], hip_n: [1.5, 1], knee_n: [1, 1], foot_n: [1.5, 0], hip_f: [2, 1], knee_f: [2, 1], foot_f: [2.5, 0], tip: [-6, -10]}
+  cast_gather: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, -1], sh_n: [0, 0], el_n: [-1, -3], hand_n: [-12, -6], sh_f: [0, 0], el_f: [2, -2], hand_f: [17, 6], hip_n: [0, -1], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, -1], knee_f: [0, 1], foot_f: [0, 1], tip: [-12, -6]}
+  cast_rise: {neck: [0, 0], crown: [0, 0], chest: [-1, -1], hip: [-1, -1], sh_n: [-1, -2], el_n: [-3, -1], hand_n: [-3, -3], sh_f: [-1, -2], el_f: [-1, -2], hand_f: [-2, -5], hip_n: [-1, 0], knee_n: [-1, 0], foot_n: [0, 0], hip_f: [-2, 0], knee_f: [-3, 0], foot_f: [-3, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 1], hand_n: [1, 4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

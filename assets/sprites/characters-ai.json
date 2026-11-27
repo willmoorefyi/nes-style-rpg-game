@@ -352,6 +352,10 @@
       "x": 336,
       "y": 3456
     },
+    "druid": {
+      "x": 672,
+      "y": 0
+    },
     "hunter": {
       "x": 1008,
       "y": 5760
@@ -379,6 +383,10 @@
     "samurai": {
       "x": 1008,
       "y": 4224
+    },
+    "shaman": {
+      "x": 336,
+      "y": 0
     }
   },
   "fallbacks": {},
@@ -390,12 +398,14 @@
     "dark_fighter_hero": "warrior",
     "death_knight_hero": "knight",
     "dragoon": "knight",
+    "druid": "black_wizard",
     "hunter": "thief",
     "landsknecht": "warrior",
     "legionnaire": "warrior",
     "paladin": "white_wizard",
     "ranger": "ninja",
     "ronin": "thief",
-    "samurai": "ninja"
+    "samurai": "ninja",
+    "shaman": "black_mage"
   }
 }

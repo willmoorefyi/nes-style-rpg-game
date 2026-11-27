@@ -174,3 +174,20 @@ ronin_samurai:
   source_name: ronin_samurai_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "ronin / samurai pair (copy of the thief / ninja) (delivered as final; the straw hat off in DOWN and the CAST slash streaks kept as rendered)"
+shaman_druid:
+  file: user_art/shaman/battle_2026-11-27.png
+  sha256: d7392cb5c247e2a228525e0416020d6775f749658d8bd12b2d1816b0346eecf9
+  rows: [shaman, druid]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: shaman_druid_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "I have a new character class - 'Shaman' and 'Druid'. For now these should come in as copies of the black mage. (delivered as final; the CAST ice shard and the druid's floating leaves kept as rendered)"

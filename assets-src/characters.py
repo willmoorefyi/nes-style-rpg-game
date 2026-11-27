@@ -792,7 +792,14 @@ ROSTER: dict[str, Look] = {
     # katana); the samurai in red-and-black armour with the plain helm
     "ronin": Look(hair=(4, 3, 4), hair_style="long", outfit="tunic", cloth=(11, 11, 11), trim=(6, 6, 8),
                   pants=(12, 11, 10), boots=(26, 24, 20), gear="round_hat", gear_color=(24, 19, 10), weapon="sword"),
+    # pass CB (plan 11-14): the shaman in hide and fur with a witch-style hood as the nearest 1x headdress (no antler
+    # gear exists) and a staff; the druid in a leaf-green robe with the same
+    "shaman": Look(hair=(8, 5, 3), hair_style="long", outfit="tunic", cloth=(16, 10, 5), trim=(26, 21, 13),
+                   pants=(22, 17, 10), boots=(12, 8, 5), gear="hood", gear_color=(12, 8, 5), weapon="staff",
+                   weapon_color=(14, 9, 5)),
     # Upgraded classes
+    "druid": Look(hair=(8, 5, 3), hair_style="long", outfit="robe", cloth=(9, 14, 6), trim=(24, 20, 12),
+                  boots=(12, 8, 5), gear="hood", gear_color=(7, 11, 5), weapon="staff", weapon_color=(26, 22, 14)),
     "centurion": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(27, 22, 6),
                       pants=(22, 5, 5), boots=(14, 9, 5), gear="plume_helm", gear_color=(22, 22, 25),
                       gear_color2=(26, 4, 4), weapon="sword", shield=True, cape=(22, 4, 4)),

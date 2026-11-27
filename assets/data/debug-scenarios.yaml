@@ -3537,3 +3537,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-14): the shaman / druid class pair (user-rendered battle art). SHAMN is
+# weak so it kneels; BWIZ is the like-for-like control for DRUID. ?mute=1&scenario=cb_shamans (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_shamans
+  name: Shaman and Druid (pass CB preview)
+  party:
+    - { class: shaman, name: SHAMN, level: 10, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }], hp: 10 }
+    - { class: druid, name: DRUID, level: 30, equipment: [rune_knife, black_robe, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: shaman, name: SHAMN2, level: 10, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+    - { class: black_wizard, name: BWIZ, level: 30, equipment: [rune_knife, black_robe, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp
