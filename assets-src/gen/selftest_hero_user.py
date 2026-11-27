@@ -195,6 +195,61 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
     check(all(HU2.check(json.loads((HU2.HERE / f"approved/{c}/{s}.json").read_text())) is None
               for c in ("barbarian", "berserker") for s in ("battle", "battle_kneel")),
           "CB: the real barbarian_berserker recipe re-imports byte for byte")
+    # plan 12 (A2): the pieces cap follows the source key (puppet.check and puppet_kneel.frame_checks)
+    from gen import puppet_kneel as PK
+
+    def blobs(k: int) -> Image.Image:
+        """An 80 x 80 frame of k separate 4 x 4 outlined blocks standing on the feet row 76."""
+        z = np.zeros((80, 80, 4), np.uint8)
+        for i in range(k):
+            x, y = 4 + 9 * i, 73
+            z[y:y + 4, x:x + 4] = (*PX.OUTLINE, 255)
+            z[y + 1:y + 3, x + 1:x + 3] = (120, 120, 120, 255)
+        return Image.fromarray(z)
+    five = blobs(5)
+    fw = np.asarray(five).copy()                         # 5 pieces with the area of 6 blocks (one block doubled)
+    fw[73:77, 0:4] = (*PX.OUTLINE, 255)                  # a 16-px block joined to the first one
+    five_wide = Image.fromarray(fw)
+    one = np.zeros((80, 80, 4), np.uint8)               # one piece with the area of three blocks (px ratio 1)
+    one[73:77, 4:16] = (*PX.OUTLINE, 255)
+    one[74:76, 5:15] = (120, 120, 120, 255)
+    one = Image.fromarray(one)
+    check(PU.check(blobs(3), one)["pieces"] == 3 and not PU.check(blobs(3), one)["ok"]
+          and PU.check(blobs(2), blobs(2))["ok"],
+          "CB A2: puppet.check keeps the cap 2 for a 1-piece key (3 pieces fail)")
+    check(PU.check(blobs(5), five)["pieces"] == 5 and PU.check(blobs(5), five)["ok"]
+          and not PU.check(blobs(6), five_wide)["ok"] and PU.check(blobs(6), five_wide)["px"] == 1.0,
+          "CB A2: puppet.check allows a 5-piece key's 5 pieces, not 6 (same area)")
+    pal = {(120, 120, 120), tuple(PX.OUTLINE)}
+    kf = lambda img, ref, src: [f for f in PK.frame_checks("kneel_in1", img, src, 76, pal, ref) if "pieces" in f]
+    check(bool(kf(blobs(3), None, one)) and not kf(blobs(5), None, five) and bool(kf(blobs(6), None, five))
+          and not kf(blobs(5), five, one) and bool(kf(blobs(3), one, five)),
+          "CB A2: frame_checks caps pieces at max(2, the pixel source's pieces); a 1-piece key over a 5-piece ready caps 2")
+    # plan 13 (A3): keep_specks
+    sp = np.asarray(blobs(1)).copy()
+    sp[40, 40:43] = (120, 120, 120, 255)               # a 3-px speck away from the block
+    drop, keep = (np.asarray(PU.outline(Image.fromarray(sp), k))[40, 40:43, 3] > 0 for k in (False, True))
+    check(not drop.any() and keep.all(), "CB A3: outline drops a 3-px speck by default and keeps it with keep_specks")
+    with tempfile.TemporaryDirectory() as t4:
+        anim = Path(t4)
+        (anim / "barbarian.yaml").write_text(yaml.safe_dump(dict(yaml.safe_load((PU.ANIM / "barbarian.yaml").read_text()),
+                                                                  keep_specks=1)))
+        old = PUm.ANIM
+        PUm.ANIM = anim
+        try:
+            PU.load_cfg("barbarian")
+            why = ""
+        except ValueError as e:
+            why = str(e)
+        finally:
+            PUm.ANIM = old
+    check("keep_specks" in why, "CB A3: load_cfg refuses a non-boolean keep_specks")
+    def opaque(c, keep):
+        cfg = dict(PU.load_cfg(c), keep_specks=keep, alias_frames=[])
+        return [int((np.asarray(PU.battle_inbetweens(c, cfg)[n])[..., 3] > 0).sum()) for n in ("atk_mid", "atk_follow")]
+    dots = {c: (opaque(c, False), opaque(c, True)) for c in ("hunter", "ranger") if (PU.ANIM / f"{c}.yaml").is_file()}
+    check(all(k > d for off, on in dots.values() for d, k in zip(off, on)),   # hunter / ranger only, where they exist
+          f"CB A3: keep_specks keeps the dotted string in atk_mid / atk_follow (opaque px off / on {dots})")
     # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
     rec = HU2.recipe("barbarian_berserker")
     _, binfo = HU2.cut(rec)

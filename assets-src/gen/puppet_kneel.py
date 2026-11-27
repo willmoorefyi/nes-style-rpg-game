@@ -135,8 +135,9 @@ def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, p
     if any(c[0] > 200 and c[2] > 200 and c[1] < 80 for c in cols):
         out.append(f"{name}: magenta pixels")
     n = components(solid)[1]
-    if n > 2:
-        out.append(f"{name}: {n} pieces > 2")
+    cap = max(2, components(np.asarray(ring_ref or ready)[..., 3] > 0)[1])   # plan 12 (A2): the pixel source's pieces
+    if n > cap:
+        out.append(f"{name}: {n} pieces > {cap}")
     ring, ring_r = PU._second_ring(img), PU._second_ring(ring_ref or ready)   # KT: a key-drawn frame vs the key
     if abs(ring - ring_r) > 0.08:
         out.append(f"{name}: ring {ring:.2f} not within 0.08 of ready {ring_r:.2f}")
