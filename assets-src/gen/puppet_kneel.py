@@ -114,7 +114,8 @@ def rot_check(name: str, rots: dict) -> list[str]:
 def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, palette: set,
                  ring_ref: Image.Image | None = None) -> list[str]:
     """K-ground, K-fit, binary alpha, palette, magenta, pieces <= 2, ring within 0.08 of ready. The bottom-2-rows
-    contact rule applies to the held frames (kneel, kneel_b); the 4-frame transitions only touch the ground row."""
+    contact rule applies to the held frames (kneel, kneel_b) of a derived kneel (plan 14: not when they are drawn from a
+    key, ring_ref given); the 4-frame transitions only touch the ground row."""
     from gen.pixelize import components
     a = np.asarray(img)
     solid = a[..., 3] > 0
@@ -123,7 +124,9 @@ def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, p
     if not len(rows) or int(rows.max()) != bottom:
         out.append(f"{name}: K-ground lowest row {int(rows.max()) if len(rows) else None} != {bottom}")
     ra = np.asarray(ready)[..., 3] > 0
-    if name in HELD and solid[bottom - 1:bottom + 1].sum() < 0.5 * ra[bottom - 1:bottom + 1].sum():
+    # plan 14 (A4): a drawn key (ai / user, passed as ring_ref) and its key-drawn held frames keep only K-ground's
+    # lowest row (the KT3 ruling for monster keys); the contact share stays for derived kneels
+    if name in HELD and ring_ref is None and solid[bottom - 1:bottom + 1].sum() < 0.5 * ra[bottom - 1:bottom + 1].sum():
         out.append(f"{name}: K-ground bottom 2 rows {int(solid[bottom - 1:bottom + 1].sum())} px < half of ready's")
     if solid[bottom + 1:].any() or solid[0].any() or solid[:, 0].any() or solid[:, -1].any():
         out.append(f"{name}: K-fit pixels in the bottom margin or on the cell border")
