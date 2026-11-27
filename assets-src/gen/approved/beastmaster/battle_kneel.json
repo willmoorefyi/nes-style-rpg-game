@@ -1,0 +1,237 @@
+{
+  "character": "beastmaster",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/beastmaster/battle_2026-11-27.png",
+    "sha256": "a49ad23f7deab1e4e053af53ffddbda1932230f5e421c90f56aef5d5f73a3dc3"
+  },
+  "recipe": "hero_user.yaml#beastmaster_summoner",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "beastmaster_summoner_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've now added the 'beastmaster' / 'summoner' combo. For classic we'll treat them as an alias of the monk (delivered as final; the whip line, the CAST spirit and the ATTACK streaks kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          27,
+          22,
+          23
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          51,
+          39,
+          41
+        ],
+        [
+          49,
+          41,
+          41
+        ]
+      ],
+      [
+        [
+          76,
+          55,
+          48
+        ],
+        [
+          74,
+          57,
+          49
+        ]
+      ],
+      [
+        [
+          81,
+          71,
+          67
+        ],
+        [
+          82,
+          74,
+          66
+        ]
+      ],
+      [
+        [
+          104,
+          80,
+          67
+        ],
+        [
+          107,
+          82,
+          66
+        ]
+      ],
+      [
+        [
+          108,
+          104,
+          106
+        ],
+        [
+          107,
+          107,
+          107
+        ]
+      ],
+      [
+        [
+          117,
+          70,
+          46
+        ],
+        [
+          115,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          138,
+          97,
+          71
+        ],
+        [
+          140,
+          99,
+          74
+        ]
+      ],
+      [
+        [
+          142,
+          137,
+          137
+        ],
+        [
+          140,
+          140,
+          140
+        ]
+      ],
+      [
+        [
+          158,
+          98,
+          62
+        ],
+        [
+          156,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          167,
+          123,
+          84
+        ],
+        [
+          165,
+          123,
+          82
+        ]
+      ],
+      [
+        [
+          176,
+          169,
+          163
+        ],
+        [
+          173,
+          173,
+          165
+        ]
+      ],
+      [
+        [
+          195,
+          143,
+          92
+        ],
+        [
+          198,
+          140,
+          90
+        ]
+      ],
+      [
+        [
+          223,
+          170,
+          112
+        ],
+        [
+          222,
+          173,
+          115
+        ]
+      ],
+      [
+        [
+          241,
+          197,
+          140
+        ],
+        [
+          239,
+          198,
+          140
+        ]
+      ],
+      [
+        [
+          247,
+          228,
+          194
+        ],
+        [
+          247,
+          231,
+          198
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        11,
+        17,
+        70,
+        76
+      ]
+    }
+  }
+}

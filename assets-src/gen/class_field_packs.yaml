@@ -346,3 +346,47 @@ druid:
     near the ground beside the foot and its glowing ring level with the antler crown, never above the 92 px cap; in the
     back view the staff is in the same hand and the leaf mantle covers the back; in the side view facing left it is held
     in front of the body, upright. The staff touches the hand and stays inside the 48 x 96 cell
+
+beastmaster:
+  name: Beastmaster
+  tier: base
+  partner: summoner
+  battle_sheet: ~/temp/heroes/beastmaster_summoner_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: attack
+  stand_in: monk
+  look: >-
+    a young beast tamer, about 20: a broad, muscular build; the head and upper jaw of a sabre-toothed cat worn as a
+    hood, its two long curved fangs framing his face, its spotted tan pelt falling over the shoulders and back; a bare
+    muscular chest with a leather harness and a round metal buckle, dark brown hide breeches, wrapped forearms, brown
+    hide boots; a long dark leather whip. Colours: tan and cream spotted pelt, ivory fangs, warm skin, two dark leather
+    browns, a little grey metal
+  carry: >-
+    the whip is coiled in loops at his right hip, hanging from the belt, close to the leg (the coil a little loose so
+    it swings with the walk); in the back view the pelt covers the back and the coil shows at the hip. The whip must
+    touch the body and stay inside the 48 x 96 cell
+
+summoner:
+  name: Summoner
+  tier: enhanced
+  partner: beastmaster
+  battle_sheet: ~/temp/heroes/beastmaster_summoner_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: master
+  look: >-
+    the beastmaster a few years later, now a summoner: the same face under a pale animal-skull hood with teal-glowing
+    eyes; a heavy mantle of long brown and cream feathers over the shoulders and back, falling to the knees; a bone
+    and teal bead necklace, dark brown robes and wrapped legs, brown boots; a tall wooden staff topped with a horned
+    animal skull with teal eyes. Colours: pale bone, brown and cream feathers, dark browns, a bright teal glow
+  carry: >-
+    the skull staff is carried upright in his right hand (the hand toward the viewer's left in the front view), its foot
+    near the ground beside the foot and its skull level with the hood, never above the 92 px cap; in the back view the
+    staff is in the same hand and the feather mantle covers the back; in the side view facing left it is held in front
+    of the body, upright. The staff touches the hand and stays inside the 48 x 96 cell

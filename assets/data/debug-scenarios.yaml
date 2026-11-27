@@ -3552,3 +3552,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-15): the beastmaster / summoner class pair (user-rendered battle art). BEAST
+# is weak so it kneels; MSTR is the like-for-like control for SUMMN. ?mute=1&scenario=cb_beastmasters (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_beastmasters
+  name: Beastmaster and Summoner (pass CB preview)
+  party:
+    - { class: beastmaster, name: BEAST, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
+    - { class: summoner, name: SUMMN, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: beastmaster, name: BEAST2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

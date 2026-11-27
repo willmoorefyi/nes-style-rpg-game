@@ -328,6 +328,10 @@
       "x": 0,
       "y": 6528
     },
+    "beastmaster": {
+      "x": 672,
+      "y": 4224
+    },
     "berserker": {
       "x": 336,
       "y": 3456
@@ -387,11 +391,16 @@
     "shaman": {
       "x": 336,
       "y": 0
+    },
+    "summoner": {
+      "x": 1008,
+      "y": 3840
     }
   },
   "fallbacks": {},
   "aliases": {
     "barbarian": "warrior",
+    "beastmaster": "monk",
     "berserker": "knight",
     "centurion": "knight",
     "cleric": "white_mage",
@@ -406,6 +415,7 @@
     "ranger": "ninja",
     "ronin": "thief",
     "samurai": "ninja",
-    "shaman": "black_mage"
+    "shaman": "black_mage",
+    "summoner": "master"
   }
 }

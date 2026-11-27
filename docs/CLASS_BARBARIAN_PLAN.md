@@ -412,3 +412,12 @@ amendment, moving the shaman / druid to the overflow page; (3) the beastmaster /
 - **Headroom (reported per page):** main 3680 / 4096 (416 px: 2 rows); page 1 (lance) 1728 and page 2 480 unchanged;
   page 3 320 / 4096 after (2), 640 / 4096 after (3) (3456 px: 21 more rows).
 - AGENTS.md's battle_ai row names `battle_pages.yaml`.
+
+### 15.1 Beastmaster / summoner result (2026-11-27, branch class-shaman, third commit)
+
+Exact copies of monk -> master (user: "treat them as an alias of the monk"): stats, equipment, upgrade rule,
+`unarmedMartial` included. On the overflow page with the shaman / druid (page 3: 4 rows, 2880 x 640). Rigs key-based;
+keep_specks for the 1 px whip, the streaks and the spirit. Image review: round 1 ITERATE (cast_gather a copy of ready,
+so the cast snapped) -> a rising gather; round 2 beastmaster **APPROVE**, summoner ITERATE (the gather split the
+staff) -> the staff's middle in the torso box; round 3 summoner ITERATE (the raised hand parted from its forearm
+across the staff) -> section 5 fallback `alias_frames: [cast_gather]` for the summoner.

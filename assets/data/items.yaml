@@ -16,6 +16,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -33,6 +34,7 @@
   price: 10
   usableBy:
   - monk
+  - beastmaster
   hit: 0
   crit: 1
 - id: staff
@@ -49,6 +51,7 @@
   - shaman
   - red_mage
   - monk
+  - beastmaster
   hit: 0
   crit: 3
 - id: rapier
@@ -131,6 +134,7 @@
   price: 200
   usableBy:
   - monk
+  - beastmaster
   hit: 0
   crit: 9
 - id: iron_sword
@@ -301,6 +305,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -327,6 +332,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -366,6 +372,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - red_mage
   slot: armor
   weight: 8
@@ -526,6 +533,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -658,6 +666,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -702,6 +711,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -738,6 +748,7 @@
   price: 6500
   usableBy:
   - monk
+  - beastmaster
   hit: 10
   crit: 16
 - id: wizard_staff
@@ -861,6 +872,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage
@@ -942,6 +954,7 @@
   price: 26000
   usableBy:
   - monk
+  - beastmaster
   hit: 10
   crit: 20
 - id: diamond_armor
@@ -976,6 +989,7 @@
   - hunter
   - ronin
   - monk
+  - beastmaster
   - white_mage
   - cleric
   - black_mage

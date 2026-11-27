@@ -191,3 +191,20 @@ shaman_druid:
   source_name: shaman_druid_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "I have a new character class - 'Shaman' and 'Druid'. For now these should come in as copies of the black mage. (delivered as final; the CAST ice shard and the druid's floating leaves kept as rendered)"
+beastmaster_summoner:
+  file: user_art/beastmaster/battle_2026-11-27.png
+  sha256: a49ad23f7deab1e4e053af53ffddbda1932230f5e421c90f56aef5d5f73a3dc3
+  rows: [beastmaster, summoner]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: beastmaster_summoner_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "I've now added the 'beastmaster' / 'summoner' combo. For classic we'll treat them as an alias of the monk (delivered as final; the whip line, the CAST spirit and the ATTACK streaks kept as rendered)"

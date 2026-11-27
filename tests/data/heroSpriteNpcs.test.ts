@@ -29,8 +29,8 @@ function users(dir: string): string[] {
 }
 
 describe('PT: hero sheets are for the party', () => {
-  it('reads the 28 hero classes from classes.yaml (the class batch: + barbarian, landsknecht, dark_fighter_hero, legionnaire, hunter, cleric, ronin, shaman, berserker, dragoon, death_knight_hero, centurion, ranger, paladin, samurai, druid)', () => {
-    expect(classes).toHaveLength(28);
+  it('reads the 30 hero classes from classes.yaml (the class batch: + barbarian, landsknecht, dark_fighter_hero, legionnaire, hunter, cleric, ronin, shaman, berserker, dragoon, death_knight_hero, centurion, ranger, paladin, samurai, druid, beastmaster, summoner)', () => {
+    expect(classes).toHaveLength(30);
   });
 
   for (const dir of ['assets-src/maps', 'assets/maps/ai']) {

@@ -797,7 +797,13 @@ ROSTER: dict[str, Look] = {
     "shaman": Look(hair=(8, 5, 3), hair_style="long", outfit="tunic", cloth=(16, 10, 5), trim=(26, 21, 13),
                    pants=(22, 17, 10), boots=(12, 8, 5), gear="hood", gear_color=(12, 8, 5), weapon="staff",
                    weapon_color=(14, 9, 5)),
+    # pass CB (plan 11-15): the beastmaster in a tan pelt hood (the hood gear) and brown hide, bare-handed like the
+    # monk; the summoner in a feathered brown robe with a staff
+    "beastmaster": Look(hair=(10, 6, 3), hair_style="short", outfit="gi", cloth=(14, 9, 5), trim=(26, 19, 11),
+                        pants=(11, 7, 4), boots=(10, 6, 4), gear="hood", gear_color=(26, 19, 11)),
     # Upgraded classes
+    "summoner": Look(hair=(10, 6, 3), hair_style="short", outfit="robe", cloth=(16, 11, 6), trim=(28, 25, 20),
+                     boots=(10, 6, 4), gear="hood", gear_color=(26, 23, 18), weapon="staff", weapon_color=(16, 11, 6)),
     "druid": Look(hair=(8, 5, 3), hair_style="long", outfit="robe", cloth=(9, 14, 6), trim=(24, 20, 12),
                   boots=(12, 8, 5), gear="hood", gear_color=(7, 11, 5), weapon="staff", weapon_color=(26, 22, 14)),
     "centurion": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(27, 22, 6),

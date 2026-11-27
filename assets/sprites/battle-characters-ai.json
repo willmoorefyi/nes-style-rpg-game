@@ -415,6 +415,16 @@
       "row": 1,
       "page": 3,
       "inbetweens": true
+    },
+    "beastmaster": {
+      "row": 2,
+      "page": 3,
+      "inbetweens": true
+    },
+    "summoner": {
+      "row": 3,
+      "page": 3,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -436,7 +446,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 320
+      "h": 640
     }
   ]
 }

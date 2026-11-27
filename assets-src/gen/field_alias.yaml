@@ -18,3 +18,5 @@ ronin: thief         # temporary until the user renders the ronin's field walk s
 samurai: ninja       # temporary until the user renders the samurai's field walk sheet
 shaman: black_mage   # temporary until the user renders the shaman's field walk sheet
 druid: black_wizard  # temporary until the user renders the druid's field walk sheet
+beastmaster: monk    # temporary until the user renders the beastmaster's field walk sheet
+summoner: master     # temporary until the user renders the summoner's field walk sheet

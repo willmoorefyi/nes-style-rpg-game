@@ -83,7 +83,7 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
       }
     // C(13, 4) = 715 parties of 13 base classes (+ barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric,
     // ronin) less the C(11, 2) = 55 with both cleric and white mage (skipped above)
-    expect(parties).toBe(870);   // C(14, 4) = 1001 less the 66 cleric + white mage and the 66 shaman + black mage parties, plus the 1 with both pairs
+    expect(parties).toBe(1210);   // C(15, 4) = 1365 less the 78 cleric + white mage and the 78 shaman + black mage parties, plus the 1 with both pairs
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
   });
 
@@ -161,8 +161,8 @@ describe('T4d spells and classes', () => {
     expect(warrior.hitPercent).toEqual({ base: 10, growth: 3 });
   });
 
-  it('marks exactly the Monk and the Master as unarmed martial classes (data, not code)', () => {
-    expect(CLASSES.filter((c) => c.unarmedMartial === true).map((c) => c.id).sort()).toEqual(['master', 'monk']);
+  it('marks exactly the Monk and the Master (and the pass-CB copies, the Beastmaster and the Summoner) as unarmed martial classes (data, not code)', () => {
+    expect(CLASSES.filter((c) => c.unarmedMartial === true).map((c) => c.id).sort()).toEqual(['beastmaster', 'master', 'monk', 'summoner']);
   });
 
   it('has a power or an accuracy for every damage and status spell', () => {

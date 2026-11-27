@@ -1,0 +1,28 @@
+# Puppet animation joints for the beastmaster (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/beastmaster/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). No weapon in the ready / cast keys (the whip is coiled at the hip there); tip = the whip in the near hand in the attack key (part_boxes keep its 1 px line with the hand). part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the 1 px whip line survives the cut
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [42, 24], crown: [42, 6], chest: [44, 34], hip: [46, 50], sh_n: [34, 28], el_n: [24, 32], hand_n: [10, 30], sh_f: [56, 30], el_f: [64, 38], hand_f: [64, 48], hip_n: [36, 54], knee_n: [26, 62], foot_n: [20, 75], hip_f: [56, 54], knee_f: [62, 62], foot_f: [66, 75]}
+  attack:
+    {neck: [50, 24], crown: [50, 8], chest: [52, 36], hip: [52, 50], sh_n: [46, 30], el_n: [38, 32], hand_n: [30, 32], tip: [2, 34], weapon_hand: n, sh_f: [62, 30], el_f: [66, 40], hand_f: [64, 44], hip_n: [44, 54], knee_n: [38, 62], foot_n: [34, 75], hip_f: [60, 54], knee_f: [68, 64], foot_f: [72, 75], part_boxes: {weapon: [[0, 23, 27, 52]]}}
+  cast:
+    {neck: [44, 24], crown: [44, 6], chest: [44, 32], hip: [44, 46], sh_n: [30, 24], el_n: [24, 22], hand_n: [18, 12], sh_f: [58, 24], el_f: [66, 18], hand_f: [64, 4], hip_n: [38, 52], knee_n: [36, 62], foot_n: [32, 75], hip_f: [54, 52], knee_f: [58, 62], foot_f: [60, 75]}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, -1], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, -1], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, -1], knee_f: [0, 1], foot_f: [0, 1]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-13, -5], hand_n: [-20, -8], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-15, -8], hand_n: [-21, -12], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0]}
+  atk_mid: {neck: [3.7, -1.9], crown: [3.7, -1], chest: [3.7, -1], hip: [2.8, -1.9], sh_n: [5.5, -1], el_n: [-0.8, -4.15], hand_n: [-0.15, -6.6], sh_f: [2.8, -1.9], el_f: [1, -1], hand_f: [0.1, -3.7], hip_n: [3.7, -1.9], knee_n: [6.4, -1.9], foot_n: [7.3, -1], hip_f: [1.9, -1.9], knee_f: [3.25, -1], foot_f: [3.7, -1], tip: [-0.15, -6.6]}
+  atk_follow: {neck: [2, 0], crown: [2, 0.5], chest: [2, 0.5], hip: [1.5, 0], sh_n: [3, 0.5], el_n: [-2, -2], hand_n: [-3, -5], sh_f: [1.5, 0], el_f: [0.5, 0.5], hand_f: [0, -1], hip_n: [2, 0], knee_n: [3, 0], foot_n: [3.5, 0], hip_f: [1, 0], knee_f: [1.5, 0.5], foot_f: [1.5, 0], tip: [-12, -8]}
+  cast_gather: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [0, -8], hand_n: [-26, -20], sh_f: [0, -2], el_f: [2, -4], hand_f: [19, 6], hip_n: [0, -2], knee_n: [0, 0], foot_n: [0, -1], hip_f: [0, -2], knee_f: [0, 0], foot_f: [0, -1]}
+  cast_rise: {neck: [1, 1], crown: [1, 1], chest: [0, 0], hip: [-1, -1], sh_n: [-2, -1], el_n: [0, 1], hand_n: [4, -1], sh_f: [1, -2], el_f: [1, -9], hand_f: [0, -21], hip_n: [1, 0], knee_n: [5, 1], foot_n: [6, 0], hip_f: [-1, 0], knee_f: [-2, 1], foot_f: [-3, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 1], hand_n: [1, 4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}
