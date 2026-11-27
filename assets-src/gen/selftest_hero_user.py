@@ -21,10 +21,13 @@ PAL = [(24, 19, 27), (80, 53, 46), (164, 167, 182), (223, 148, 102), (118, 118, 
 
 def render(nrows: int = 2, foot: int = 76, colours: list | None = None, cross: bool = False,
            semi: bool = False) -> np.ndarray:
-    """A 560 x (80 nrows) render: one outlined block per cell standing on row `foot`."""
-    cols = colours or PAL
+    """A 560 x (80 nrows) render: one outlined block per cell standing on row `foot`; `colours` is one list for every
+    row or (plan 11) a list of lists, one per row (its first colour the block's outline)."""
+    per_row = colours if colours and isinstance(colours[0], list) else [colours or PAL] * nrows
+    cols = per_row[0]
     a = np.zeros((80 * nrows, 560, 4), np.uint8)
     for r in range(nrows):
+        cols = per_row[r]
         for c in range(7):
             x0, y0 = c * 80 + 20, r * 80 + 20
             blk = a[y0:r * 80 + foot + 1, x0:x0 + 30]
@@ -33,7 +36,7 @@ def render(nrows: int = 2, foot: int = 76, colours: list | None = None, cross: b
             for i in range(inner.shape[0]):
                 inner[i] = (*cols[1 + (i + c + r) % (len(cols) - 1)], 255)
     if cross:
-        a[30, 78:83] = (*cols[2], 255)
+        a[30, 78:83] = (*per_row[0][2], 255)
     if semi:
         a[40, 30, 3] = 128
     return a
@@ -108,6 +111,44 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
                 r2 = tree(Path(t2), a, over)
                 why = refused(lambda: HU.cut(r2, Path(t2) / "gen"))
                 check(word.split()[0] in why, f"CB: the cut refuses ({word}): {why[:90]}")
+        # plan 11 (A1): `palette: rows`
+        row0 = [(24, 19, 27)] + [(13 * i + 40, 100, 60) for i in range(15)]
+        row1 = [(20, 24, 22)] + [(60, 13 * i + 40, 160) for i in range(15)]
+        with tempfile.TemporaryDirectory() as t2:
+            r2 = tree(Path(t2), render(colours=[row0, row1]))
+            check("colours" in refused(lambda: HU.cut(r2, Path(t2) / "gen")),
+                  "CB A1: 16 disjoint colours per row (32 in all) are refused with palette: sheet")
+        with tempfile.TemporaryDirectory() as t2:
+            g2 = Path(t2) / "gen"
+            r2 = tree(Path(t2), render(colours=[row0, row1]), {"palette": "rows"})
+            cells2, info2 = HU.cut(r2, g2)
+            HU.approve("syn", g2 / "approved", "2026-11-27")
+            ms = {c: json.loads((g2 / f"approved/{c}/battle.json").read_text()) for c in ("syn_base", "syn_plus")}
+            fin = {c: {tuple(d) for _, d in m["cut"]["palette"]} for c, m in ms.items()}
+            src = {c: {tuple(s) for s, _ in m["cut"]["palette"]} for c, m in ms.items()}
+            check(src["syn_base"] == set(row0) and src["syn_plus"] == set(row1) and all(
+                  tuple(PX.OUTLINE) in f for f in fin.values()) and all(m["cut"]["colours"] == 16 for m in ms.values()),
+                  "CB A1: palette: rows imports each row with its own 16 colours, each row's darkest -> PX.OUTLINE")
+            check(all(HU.check(m, g2) is None for m in ms.values()), "CB A1: the rows import re-imports byte for byte")
+        shared = [(24, 19, 27), (60, 60, 60), (200, 40, 40), (40, 200, 40)]      # (24, 19, 27): the outline of row 0
+        other = [(10, 10, 12), (24, 19, 27), (90, 90, 200), (220, 200, 40)]       # ... and a shade in row 1
+        with tempfile.TemporaryDirectory() as t2:
+            r2 = tree(Path(t2), render(colours=[shared, other]), {"palette": "rows"})
+            cells3, _ = HU.cut(r2, Path(t2) / "gen")
+            got = lambda cid, pose: {tuple(int(v) for v in p[:3]) for p in np.asarray(cells3[cid][pose]).reshape(-1, 4)
+                                     if p[3]}
+            snap = tuple(int(v) for v in PX.snap15(np.array([(24, 19, 27)], np.float32))[0])
+            check(tuple(PX.OUTLINE) in got("syn_base", "ready") and snap not in got("syn_base", "ready")
+                  and snap in got("syn_plus", "ready"),
+                  "CB A1: a colour in both rows is mapped per row (the outline in row 0, its 15-bit shade in row 1)")
+        with tempfile.TemporaryDirectory() as t2:
+            r2 = tree(Path(t2), render(colours=[row0, row1 + [(250, 250, 5)]]), {"palette": "rows"})
+            why = refused(lambda: HU.cut(r2, Path(t2) / "gen"))
+            check(why.startswith("syn_plus:") and "17 colours" in why, f"CB A1: a row of 17 colours is refused naming it ({why[:50]})")
+        with tempfile.TemporaryDirectory() as t2:
+            r2 = tree(Path(t2), render(), {"palette": "per_pose"})
+            check("palette must be" in refused(lambda: HU.recipe("syn", Path(t2) / "gen" / "hero_user.yaml")),
+                  "CB A1: an unknown palette value is refused")
         # selftest_roster.kneel_ok: a user hero key needs `kneel: {source: user}`, and the block a user key
         from gen import selftest_roster as SR
         km = json.loads((gen / "approved/syn_base/battle_kneel.json").read_text())
@@ -154,3 +195,13 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
     check(all(HU2.check(json.loads((HU2.HERE / f"approved/{c}/{s}.json").read_text())) is None
               for c in ("barbarian", "berserker") for s in ("battle", "battle_kneel")),
           "CB: the real barbarian_berserker recipe re-imports byte for byte")
+    # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
+    rec = HU2.recipe("barbarian_berserker")
+    _, binfo = HU2.cut(rec)
+    same = True
+    for row, cid in enumerate(rec["rows"]):
+        for name, m in zip(("battle", "battle_kneel"), HU2.metas(cid, "barbarian_berserker", rec, row, binfo, "x")):
+            have = json.loads((HU2.HERE / f"approved/{cid}/{name}.json").read_text())
+            same &= {k: v for k, v in json.loads(json.dumps(m)).items() if k != "imported"} == \
+                {k: v for k, v in have.items() if k != "imported"}
+    check(same, "CB A1: metas() on the barbarian_berserker cut equals its four committed jsons (but `imported`)")
