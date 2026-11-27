@@ -2,8 +2,9 @@
 interactive image UI, e.g. ChatGPT, from the class pack ~/temp/ff-game/class_pack) as the approved battle sheets of
 its classes. The render is the approved design; the import only checks and splits it: a grid of 80 x 80 cells, one
 row per class (base, then enhanced), seven columns READY, ATTACK, CAST, HURT, DOWN, VICTORY, KNEEL, binary alpha,
-every figure inside its cell, its feet on row 76, every pose facing left. One house palette for the sheet: at most 16
-colours, each snapped to 15 bits (PX.snap15), the darkest PX.OUTLINE, one-to-one. No pixel is moved, added or
+every figure inside its cell, its feet on row 76, every pose facing left. One house palette for the sheet (or, with
+the recipe's `palette: rows`, one per class row, each applied to its own row only; plan 11): at most 16 colours, each
+snapped to 15 bits (PX.snap15), the darkest PX.OUTLINE, one-to-one. No pixel is moved, added or
 removed. Per class: approved/<class>/battle.png (3 x 2: ready, attack, cast / hurt, down, victory) and
 battle_kneel.png (the kneel key), with their jsons. Recipes: gen/hero_user.yaml; the renders: gen/user_art/<id>/.
 
@@ -36,6 +37,9 @@ CELL, FOOT, COLOURS = 80, 76, 16
 COLUMNS = ("ready", "attack", "cast", "hurt", "down", "victory", "kneel")
 POSES = COLUMNS[:6]                                    # battle.png, 3 x 2 (puppet._cells order)
 REVIEW = Path.home() / "temp/ff-game/class_pack/review/import"
+# docs/CLASS_BARBARIAN_PLAN.md 11 (A1): `sheet` = one house palette for the whole render (<= 16 colours); `rows` = one
+# per class row (<= 16 each, the renders that give every class its own 16 colours)
+PALETTES = ("sheet", "rows")
 
 
 def recipes(path: Path | None = None) -> dict:
@@ -53,6 +57,8 @@ def recipe(rid: str, path: Path | None = None) -> dict:
     rows = rec.get("rows") or []
     if not rows or len(set(rows)) != len(rows):
         raise SystemExit(f"{rid}: rows must name each class once")
+    if rec.get("palette", "sheet") not in PALETTES:
+        raise SystemExit(f"{rid}: palette must be one of {list(PALETTES)}")
     return rec
 
 
@@ -96,7 +102,8 @@ def _cells_apart(m: np.ndarray, ncols: int, nrows: int) -> list[str]:
 
 
 def palette(a: np.ndarray) -> dict[tuple, tuple]:
-    """The house mapping {source rgb: 15-bit rgb}: <= 16 colours, PX.snap15, the darkest PX.OUTLINE, one-to-one."""
+    """The house mapping {source rgb: 15-bit rgb} of the opaque px of `a` (the sheet, or one class row with
+    `palette: rows`): <= 16 colours, PX.snap15, the darkest PX.OUTLINE, one-to-one on the final colours."""
     uniq = [tuple(int(v) for v in c) for c in np.unique(a[a[..., 3] > 0][:, :3], axis=0)]
     if len(uniq) > COLOURS:
         raise SystemExit(f"user sheet: {len(uniq)} colours, at most {COLOURS} (no colour is invented by a k-means)")
@@ -123,10 +130,20 @@ def cut(rec: dict, gen: Path = HERE) -> tuple[dict[str, dict[str, Image.Image]],
     bad = _cells_apart(m, len(COLUMNS), nrows)
     if bad:
         raise SystemExit("user sheet: " + "; ".join(bad))
-    pal = palette(a)
     out = a.copy()
-    for src, dst in pal.items():
-        out[(a[..., :3] == src).all(-1) & m, :3] = dst
+    if rec.get("palette", "sheet") == "rows":         # A1: each class row's own 16 colours
+        maps = {}
+        for r, cid in enumerate(rec["rows"]):
+            try:
+                maps[cid] = palette(a[r * CELL:(r + 1) * CELL])
+            except SystemExit as e:
+                raise SystemExit(f"{cid}: {e}") from None
+    else:
+        maps = dict.fromkeys(rec["rows"], palette(a))
+    for r, cid in enumerate(rec["rows"]):
+        band, mb = a[r * CELL:(r + 1) * CELL], m[r * CELL:(r + 1) * CELL]
+        for src, dst in maps[cid].items():
+            out[r * CELL:(r + 1) * CELL][(band[..., :3] == src).all(-1) & mb, :3] = dst
     cells: dict[str, dict[str, Image.Image]] = {}
     boxes = {}
     for r, cid in enumerate(rec["rows"]):
@@ -140,8 +157,11 @@ def cut(rec: dict, gen: Path = HERE) -> tuple[dict[str, dict[str, Image.Image]],
                 raise SystemExit(f"user sheet: {cid} {pose} feet on row {ys.max()}, need {FOOT}")
             cells[cid][pose] = Image.fromarray(np.ascontiguousarray(cell))
             boxes[f"{cid}/{pose}"] = [int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())]
-    info = {"source_size": [int(a.shape[1]), int(a.shape[0])], "colours": len(pal),
-            "palette": [[list(s), list(d)] for s, d in sorted(pal.items())], "boxes": boxes}
+    listed = {cid: [[list(s), list(d)] for s, d in sorted(p.items())] for cid, p in maps.items()}
+    rows_mode = rec.get("palette", "sheet") == "rows"
+    info = {"source_size": [int(a.shape[1]), int(a.shape[0])],
+            "colours": {cid: len(p) for cid, p in maps.items()} if rows_mode else len(maps[rec["rows"][0]]),
+            "palette": listed if rows_mode else listed[rec["rows"][0]], "boxes": boxes}
     return cells, info
 
 
@@ -159,7 +179,9 @@ def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tu
             "source_name": rec.get("source_name"), "grid": [CELL, CELL], "bottom_row": FOOT, "faces": "left",
             "imported": today, "approved": rec.get("approved"), "user_review": rec.get("user_review"),
             "route": "CB: user-rendered hero class sheet (house palette map, no AI call)"}
-    cut_info = {"colours": info["colours"], "palette": info["palette"],
+    per_row = isinstance(info["palette"], dict)       # A1: a class's files carry only its own row's map
+    cut_info = {"colours": info["colours"][cid] if per_row else info["colours"],
+                "palette": info["palette"][cid] if per_row else info["palette"],
                 "boxes": {k.split("/")[1]: v for k, v in info["boxes"].items() if k.startswith(f"{cid}/")}}
     battle = {**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES),
               "cut": {**cut_info, "boxes": {p: b for p, b in cut_info["boxes"].items() if p in POSES}}}
@@ -238,14 +260,17 @@ def review(rid: str, out: Path | None = None) -> list[Path]:
     cells, info = cut(rec)
     k, sw = 4, 40
     h = len(rec["rows"]) * CELL * k
-    sheet = Image.new("RGBA", (len(COLUMNS) * CELL * k, h + 2 * sw + 8), (60, 60, 70, 255))
+    strips = list(info["palette"].values()) if isinstance(info["palette"], dict) else [info["palette"]]
+    sheet = Image.new("RGBA", (len(COLUMNS) * CELL * k, h + len(strips) * (2 * sw + 8)), (60, 60, 70, 255))
     for r, cid in enumerate(rec["rows"]):
         for c, pose in enumerate(COLUMNS):
             sheet.alpha_composite(cells[cid][pose].resize((CELL * k, CELL * k), Image.Resampling.NEAREST),
                                   (c * CELL * k, r * CELL * k))
-    for i, (src, dst) in enumerate(info["palette"]):          # the colour map: source (top) -> house colour (below)
-        sheet.paste((*src, 255), (i * (sw + 4), h + 4, i * (sw + 4) + sw, h + 4 + sw))
-        sheet.paste((*dst, 255), (i * (sw + 4), h + 4 + sw, i * (sw + 4) + sw, h + 4 + 2 * sw))
+    for j, strip in enumerate(strips):                      # the colour map per strip: source (top) -> house (below)
+        y = h + j * (2 * sw + 8) + 4
+        for i, (src, dst) in enumerate(strip):
+            sheet.paste((*src, 255), (i * (sw + 4), y, i * (sw + 4) + sw, y + sw))
+            sheet.paste((*dst, 255), (i * (sw + 4), y + sw, i * (sw + 4) + sw, y + 2 * sw))
     sheet.save(p := out / f"{rid}_import_x4.png")
     (q := out / f"{rid}_import.json").write_text(json.dumps(info, indent=2) + "\n")
     return [p, q]
