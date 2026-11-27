@@ -80,7 +80,7 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
         expect(four.reduce((s, x) => s + cost(x), 0), four.join(' ')).toBeLessThanOrEqual(400);
         parties++;
       }
-    expect(parties).toBe(495);  // C(12, 4): 12 base classes since the class batch (barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric)
+    expect(parties).toBe(715);  // C(13, 4): 13 base classes since the class batch (barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric, ronin)
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
   });
 

@@ -788,6 +788,10 @@ ROSTER: dict[str, Look] = {
     # 1x weapon is not drawn: rod); the paladin in white-and-gold plate with a sword and shield
     "cleric": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(29, 28, 26), trim=(26, 22, 8),
                    pants=(12, 8, 5), boots=(12, 8, 5), weapon="rod", weapon_color=(22, 22, 26), shield=True),
+    # pass CB (plan 11-14): the ronin in a grey kimono under a straw hat (the round_hat gear) with a sword (no 1x
+    # katana); the samurai in red-and-black armour with the plain helm
+    "ronin": Look(hair=(4, 3, 4), hair_style="long", outfit="tunic", cloth=(11, 11, 11), trim=(6, 6, 8),
+                  pants=(12, 11, 10), boots=(26, 24, 20), gear="round_hat", gear_color=(24, 19, 10), weapon="sword"),
     # Upgraded classes
     "centurion": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(27, 22, 6),
                       pants=(22, 5, 5), boots=(14, 9, 5), gear="plume_helm", gear_color=(22, 22, 25),
@@ -796,6 +800,8 @@ ROSTER: dict[str, Look] = {
                    pants=(9, 7, 4), boots=(9, 6, 4), gear="hood", gear_color=(7, 13, 7), weapon="dagger"),
     "paladin": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(30, 30, 29), trim=(28, 22, 6),
                     pants=(26, 26, 27), boots=(24, 24, 26), weapon="sword", shield=True, cape=(28, 24, 12)),
+    "samurai": Look(hair=(4, 3, 4), hair_style="short", outfit="armor", cloth=(20, 4, 4), trim=(6, 5, 7),
+                    pants=(7, 6, 9), boots=(26, 24, 20), gear="helm", gear_color=(8, 6, 8), weapon="sword"),
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),

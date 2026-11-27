@@ -1,0 +1,237 @@
+{
+  "character": "ronin",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/ronin/battle_2026-11-26.png",
+    "sha256": "7226e716aed4e3a36d71f09f5386ce7761818ff389c7fb000142e4acfd10ad84"
+  },
+  "recipe": "hero_user.yaml#ronin_samurai",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "ronin_samurai_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "ronin / samurai pair (copy of the thief / ninja) (delivered as final; the straw hat off in DOWN and the CAST slash streaks kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          24,
+          23,
+          30
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          48,
+          39,
+          42
+        ],
+        [
+          49,
+          41,
+          41
+        ]
+      ],
+      [
+        [
+          61,
+          66,
+          90
+        ],
+        [
+          57,
+          66,
+          90
+        ]
+      ],
+      [
+        [
+          82,
+          90,
+          115
+        ],
+        [
+          82,
+          90,
+          115
+        ]
+      ],
+      [
+        [
+          83,
+          81,
+          83
+        ],
+        [
+          82,
+          82,
+          82
+        ]
+      ],
+      [
+        [
+          108,
+          98,
+          90
+        ],
+        [
+          107,
+          99,
+          90
+        ]
+      ],
+      [
+        [
+          134,
+          115,
+          100
+        ],
+        [
+          132,
+          115,
+          99
+        ]
+      ],
+      [
+        [
+          155,
+          115,
+          80
+        ],
+        [
+          156,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          163,
+          163,
+          168
+        ],
+        [
+          165,
+          165,
+          165
+        ]
+      ],
+      [
+        [
+          171,
+          128,
+          92
+        ],
+        [
+          173,
+          132,
+          90
+        ]
+      ],
+      [
+        [
+          197,
+          153,
+          96
+        ],
+        [
+          198,
+          156,
+          99
+        ]
+      ],
+      [
+        [
+          212,
+          211,
+          211
+        ],
+        [
+          214,
+          214,
+          214
+        ]
+      ],
+      [
+        [
+          221,
+          182,
+          117
+        ],
+        [
+          222,
+          181,
+          115
+        ]
+      ],
+      [
+        [
+          230,
+          173,
+          132
+        ],
+        [
+          231,
+          173,
+          132
+        ]
+      ],
+      [
+        [
+          241,
+          211,
+          148
+        ],
+        [
+          239,
+          214,
+          148
+        ]
+      ],
+      [
+        [
+          243,
+          236,
+          218
+        ],
+        [
+          247,
+          239,
+          222
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        13,
+        16,
+        68,
+        76
+      ]
+    }
+  }
+}

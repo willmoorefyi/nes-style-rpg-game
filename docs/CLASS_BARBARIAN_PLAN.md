@@ -341,3 +341,10 @@ only (a forearm sliver beside the shield, the weapon over the face) -> section 5
 atk_wind2, cast_rise, cast_release]`. atk_mid, atk_follow, cast_gather, idle_b and the kneel bridge passed round 3.
 For the user: a party with both the white mage and the cleric needs 430 G for the two starting kits (the 400 G NG-5
 bound skips that pair); the cleric shows in the magic shop's learner lists ("Learn: WHM RDM CLR").
+
+### 14.2 Ronin / samurai result (2026-11-27, branch class-ronin)
+
+Exact copies of thief -> ninja. A1-A4 cherry-picked (the samurai's slash streaks keep_specks; the ronin's hat in DOWN
+is a key, imported as drawn). Rigs key-based from the start (the cleric lessons). Image review: round 1 samurai
+**APPROVE**; ronin ITERATE (atk_wind1 / atk_wind2 drew a second katana while the ready key keeps it sheathed) -> those
+two left to the ready key (`alias_frames`: the draw is one stroke); round 2 ronin **APPROVE**.

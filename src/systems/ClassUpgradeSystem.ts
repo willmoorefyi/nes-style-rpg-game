@@ -16,6 +16,7 @@ export const CLASS_UPGRADES: Record<string, string> = {
   legionnaire: 'centurion', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   hunter: 'ranger', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   cleric: 'paladin', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
+  ronin: 'samurai', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
 };
 
 /** Set of upgraded class IDs for quick lookup */

@@ -1,0 +1,28 @@
+# Puppet animation joints for the ronin (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/ronin/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). The katana is sheathed in ready (no tip), drawn in the near hand in attack; in the cast key it is held upright by the other hand (no weapon part; it rides with the torso). part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+# round 1 (image review: the wind-ups drew a second, drawn katana while the ready key's stays sheathed): the katana is
+# drawn in one stroke (iaido), so atk_wind1 / atk_wind2 are left to the ready key (the plan 5 alias)
+alias_frames: [atk_wind1, atk_wind2]
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [38, 26], crown: [38, 8], chest: [40, 36], hip: [40, 52], sh_n: [28, 34], el_n: [24, 42], hand_n: [32, 46], sh_f: [52, 34], el_f: [56, 42], hand_f: [48, 46], hip_n: [30, 56], knee_n: [24, 64], foot_n: [22, 75], hip_f: [50, 56], knee_f: [58, 64], foot_f: [62, 75]}
+  attack:
+    {neck: [46, 28], crown: [46, 8], chest: [50, 38], hip: [52, 52], sh_n: [44, 32], el_n: [34, 34], hand_n: [24, 34], tip: [2, 33], weapon_hand: n, sh_f: [58, 32], el_f: [64, 40], hand_f: [60, 46], hip_n: [42, 56], knee_n: [36, 64], foot_n: [30, 75], hip_f: [62, 56], knee_f: [70, 64], foot_f: [74, 75], part_boxes: {weapon: [[1, 31, 22, 37]]}}
+  cast:
+    {neck: [38, 28], crown: [40, 10], chest: [38, 38], hip: [40, 52], sh_n: [28, 36], el_n: [24, 40], hand_n: [22, 30], sh_f: [50, 36], el_f: [44, 44], hand_f: [31, 41], hip_n: [32, 56], knee_n: [28, 64], foot_n: [28, 75], hip_f: [48, 56], knee_f: [52, 64], foot_f: [56, 75], part_boxes: {torso: [[26, 0, 34, 36]]}}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, -1], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, -1], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, -1], knee_f: [0, 1], foot_f: [0, 1]}
+  atk_mid: {neck: [3.7, -1], crown: [3.7, -1.9], chest: [4.6, -1], hip: [5.5, -1.9], sh_n: [7.3, -2.8], el_n: [0.1, -5.95], hand_n: [-0.15, -8.4], sh_f: [2.8, -2.8], el_f: [3.7, -2.8], hand_f: [5.5, -1.9], hip_n: [5.5, -1.9], knee_n: [6.4, -1.9], foot_n: [4.6, -1], hip_f: [5.5, -1.9], knee_f: [5.95, -1.9], foot_f: [6.4, -1], tip: [-0.15, -8.4]}
+  atk_follow: {neck: [2, 0.5], crown: [2, 0], chest: [2.5, 0.5], hip: [3, 0], sh_n: [4, -0.5], el_n: [-2, -2], hand_n: [-3, -5], sh_f: [1.5, -0.5], el_f: [2, -0.5], hand_f: [3, 0], hip_n: [3, 0], knee_n: [3, 0], foot_n: [2, 0], hip_f: [3, 0], knee_f: [3, 0], foot_f: [3, 0], tip: [-6, -11]}
+  cast_gather: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, -1], sh_n: [0, 0], el_n: [-1, -2], hand_n: [-2, 3], sh_f: [0, 0], el_f: [2, -2], hand_f: [7, 4], hip_n: [0, -1], knee_n: [0, 1], foot_n: [0, 1], hip_f: [0, -1], knee_f: [0, 1], foot_f: [0, 1]}
+  cast_rise: {neck: [0, 1], crown: [1, 1], chest: [-1, 1], hip: [0, 0], sh_n: [0, 1], el_n: [0, 3], hand_n: [-5, -4], sh_f: [-1, 1], el_f: [-6, 1], hand_f: [-8.5, -2.5], hip_n: [1, 0], knee_n: [2, 0], foot_n: [3, 0], hip_f: [-1, 0], knee_f: [-3, 0], foot_f: [-3, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 1], hand_n: [1, 4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

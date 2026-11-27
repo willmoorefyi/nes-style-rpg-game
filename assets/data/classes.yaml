@@ -368,6 +368,31 @@
     - [40, [9, 9, 9, 9, 9, 9, 8, 7]]
     - [50, [9, 9, 9, 9, 9, 9, 9, 9]]
 
+# ═══ RONIN (pass CB, docs/CLASS_BARBARIAN_PLAN.md 11) ═══
+# A shallow copy of the thief (user request); every number is the thief's (tests pin the copy).
+- id: ronin
+  name: Ronin
+  abbr: RON
+  baseStats:
+    hp: 25
+    strength: 10
+    agility: 15
+    intelligence: 5
+    vitality: 5
+    luck: 15
+  statGrowth:
+    hp: 8
+    strength: 2
+    agility: 4
+    intelligence: 0
+    vitality: 1
+    luck: 3
+  usableEquipment: [knife, light_sword, light_armor]
+  spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 2 }
+  magicDefense: { base: 15, growth: 2 }
+
 # ═══════════════════════════════════
 # UPGRADED CLASSES (Phase 16)
 # ═══════════════════════════════════
@@ -805,3 +830,38 @@
     - [30, [9, 9, 9, 9, 8, 7, 6, 5]]
     - [40, [9, 9, 9, 9, 9, 9, 8, 7]]
     - [50, [9, 9, 9, 9, 9, 9, 9, 9]]
+
+# ═══ SAMURAI (upgraded Ronin; pass CB) ═══
+# A shallow copy of the ninja (its spells and equipment included, pending the user's ruling).
+- id: samurai
+  name: Samurai
+  abbr: SAM
+  upgradeFrom: ronin
+  baseStats:
+    hp: 30
+    strength: 12
+    agility: 18
+    intelligence: 6
+    vitality: 6
+    luck: 18
+  statGrowth:
+    hp: 10
+    strength: 3
+    agility: 5
+    intelligence: 1
+    vitality: 1
+    luck: 4
+  usableEquipment: [knife, light_sword, sword, nunchaku, light_armor]
+  spellLevels: { white: 0, black: 4 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 2 }
+  magicDefense: { base: 15, growth: 2 }
+  # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
+  spellCharges:
+    - [10, [1]]
+    - [15, [2, 1]]
+    - [20, [3, 2, 1]]
+    - [25, [4, 3, 2, 1]]
+    - [30, [5, 4, 3, 2]]
+    - [40, [7, 6, 5, 4]]
+    - [50, [9, 8, 7, 6]]
