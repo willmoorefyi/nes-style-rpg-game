@@ -13,6 +13,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -59,6 +60,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - red_mage
   hit: 5
   crit: 4
@@ -76,6 +78,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - red_mage
   hit: 10
   crit: 6
@@ -165,6 +168,7 @@
   price: 800
   usableBy:
   - thief
+  - hunter
   - black_mage
   - red_mage
   bonusVsFamily: undead
@@ -281,6 +285,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -303,6 +308,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -336,6 +342,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - red_mage
   slot: armor
@@ -494,6 +501,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -622,6 +630,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -643,6 +652,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - red_mage
   hit: 5
   crit: 10
@@ -660,6 +670,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -681,6 +692,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - red_mage
   hit: 10
   crit: 14
@@ -773,6 +785,7 @@
   price: 12000
   usableBy:
   - thief
+  - hunter
   - black_mage
   - red_mage
   hit: 10
@@ -806,6 +819,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage
@@ -873,6 +887,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   hit: 10
   crit: 24
 - id: dragon_claw
@@ -915,6 +930,7 @@
   - legionnaire
   - barbarian
   - thief
+  - hunter
   - monk
   - white_mage
   - black_mage

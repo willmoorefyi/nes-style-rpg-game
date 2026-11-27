@@ -72,6 +72,8 @@ def load_cfg(cid: str) -> dict | None:
             for j in [*JOINTS, "tip", "tip_f"]:
                 if j in kf and kf[j] is not None:
                     kf[j] = tuple(float(v) for v in kf[j])
+    if not isinstance(cfg.get("keep_specks", False), bool):
+        raise ValueError(f"{cid}: keep_specks must be true or false")
     bad = sorted(set(cfg.get("alias_frames") or []) - set(INBETWEENS))
     if bad:                                           # pass CB 5: in-betweens left aliased to their source keyframe
         raise ValueError(f"{cid}: alias_frames {bad} are not in-between names ({', '.join(INBETWEENS)})")
@@ -258,14 +260,14 @@ def keep_lengths(target: dict, src_of, robed: bool) -> dict:
     return t
 
 
-def outline(img: Image.Image) -> Image.Image:
+def outline(img: Image.Image, keep_specks: bool = False) -> Image.Image:
     """Drop specks, then ink the edge only where a seam left a light pixel on the silhouette (the parts keep their
     own 1 px outline from the approved art; a fresh ring everywhere would double it)."""
     from gen.pixelize import components
     a = np.asarray(img).copy()
     solid = a[..., 3] > 0
     comps, n = components(solid)
-    if n > 1:
+    if n > 1 and not keep_specks:                     # plan 13 (A3): a dotted bow string's dots are art, not specks
         sizes = [(comps == i).sum() for i in range(1, n + 1)]
         keepm = np.isin(comps, [i + 1 for i, sz in enumerate(sizes) if sz >= 12])
         a[solid & ~keepm] = 0
@@ -279,7 +281,8 @@ def outline(img: Image.Image) -> Image.Image:
 
 
 def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src: dict[str, str], default: str,
-           z: list[str], robed: bool, size=(80, 80), masks: dict | None = None, ink: bool = True) -> Image.Image:
+           z: list[str], robed: bool, size=(80, 80), masks: dict | None = None, ink: bool = True,
+           keep_specks: bool = False) -> Image.Image:
     """Pose every part (taken from its source keyframe) onto the target joints and composite back to front.
     `masks`: {source pose: head mask} of facing_fix head mirrors (segment's `head`). `ink=False` (pass CL's hands
     layer, puppet_lance.py) skips the outline pass; `size` is the cell (width, height)."""
@@ -308,7 +311,7 @@ def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src:
         hit = np.zeros_like(ok)
         hit[ok] = lab[sy[ok], sx[ok]] == names.index(part)
         out[hit] = arr[sy[hit], sx[hit]]
-    return outline(Image.fromarray(out, "RGBA")) if ink else Image.fromarray(out, "RGBA")
+    return outline(Image.fromarray(out, "RGBA"), keep_specks) if ink else Image.fromarray(out, "RGBA")
 
 
 # ───────── in-between targets (relative to each character's own keyframes) ─────────
@@ -453,7 +456,7 @@ def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Imag
         front = (cfg.get("front_far_arm") or {}).get(src, src != "attack")
         z = Z_FRONT_ARM if front else Z_BACK_ARM
         out[name] = render(tj, sources, ps, src, swap_z(z) if src in cfg.get("mirrored", ()) else z, robed,
-                           masks=masks)
+                           masks=masks, keep_specks=bool(cfg.get("keep_specks")))
     for name in cfg.get("alias_frames") or []:        # pass CB 5: the build falls back to the source keyframe
         out.pop(name, None)
     return out
@@ -554,11 +557,12 @@ def check(frame: Image.Image, source: Image.Image) -> dict:
     fa, sa = np.asarray(frame)[..., 3] > 0, np.asarray(source)[..., 3] > 0
     ys_f, ys_s = np.where(fa.any(1))[0], np.where(sa.any(1))[0]
     _, n = components(fa)
+    n_src = components(sa)[1]          # plan 12 (A2): a key drawn in several pieces (a dotted bow string) allows as many
     rep = {"ring": round(_second_ring(frame), 2), "ring_src": round(_second_ring(source), 2),
            "px": round(fa.sum() / max(sa.sum(), 1), 3), "height": int(np.ptp(ys_f) + 1), "height_src": int(np.ptp(ys_s) + 1),
-           "pieces": n}
+           "pieces": n, "pieces_src": n_src}
     rep["ok"] = bool(abs(rep["ring"] - rep["ring_src"]) <= 0.08 and 0.88 <= rep["px"] <= 1.12
-                 and abs(rep["height"] - rep["height_src"]) <= 4 and n <= 2)
+                 and abs(rep["height"] - rep["height_src"]) <= 4 and n <= max(2, n_src))
     return rep
 
 

@@ -780,10 +780,16 @@ ROSTER: dict[str, Look] = {
     "legionnaire": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(22, 22, 25),
                         pants=(22, 5, 5), boots=(14, 9, 5), gear="helm", gear_color=(22, 22, 25), weapon="sword",
                         shield=True),
+    # pass CB (plan 11): the hunter in brown leather with a dagger as the nearest 1x weapon (no 1x bow exists); the
+    # ranger in a green cloak-coloured tunic
+    "hunter": Look(hair=(14, 8, 4), hair_style="short", outfit="tunic", cloth=(13, 9, 5), trim=(26, 22, 16),
+                   pants=(11, 8, 5), boots=(9, 6, 4), weapon="dagger"),
     # Upgraded classes
     "centurion": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(24, 5, 5), trim=(27, 22, 6),
                       pants=(22, 5, 5), boots=(14, 9, 5), gear="plume_helm", gear_color=(22, 22, 25),
                       gear_color2=(26, 4, 4), weapon="sword", shield=True, cape=(22, 4, 4)),
+    "ranger": Look(hair=(14, 8, 4), hair_style="short", outfit="tunic", cloth=(7, 13, 7), trim=(20, 16, 8),
+                   pants=(9, 7, 4), boots=(9, 6, 4), gear="hood", gear_color=(7, 13, 7), weapon="dagger"),
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),

@@ -10,3 +10,5 @@ dark_fighter_hero: warrior # pass CD-K: temporary until the user renders the dar
 death_knight_hero: knight  # pass CD-K: temporary until the user renders the death knight's field walk sheet
 legionnaire: warrior # temporary until the user renders the legionnaire's field walk sheet
 centurion: knight    # temporary until the user renders the centurion's field walk sheet
+hunter: thief        # temporary until the user renders the hunter's field walk sheet
+ranger: ninja        # temporary until the user renders the ranger's field walk sheet
