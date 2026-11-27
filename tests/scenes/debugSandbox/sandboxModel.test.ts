@@ -33,16 +33,17 @@ describe('sandbox model: cycling', () => {
   });
 
   it('a slot cycles through the 8 base classes, and through all 16 with promoted on', () => {
+    const N = DATA.classes.base.length;   // pass CB: one slot cycles through every base class
     let c = defaultConfig(DATA);
     c = { ...c, party: ['warrior', ...c.party.slice(1)] };
     const seen = new Set<string>();
-    for (let i = 0; i < 16; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
+    for (let i = 0; i < N; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
     expect([...seen]).toEqual(DATA.classes.base);
     c = togglePromoted(DATA, c);
     seen.clear();
-    for (let i = 0; i < 16; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
-    expect(seen.size).toBe(16);
-    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer']));
+    for (let i = 0; i < N; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
+    expect(seen.size).toBe(N);
+    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer', 'mystic_warrior']));
   });
 
   it('turning promoted off demotes a promoted member to its base class', () => {

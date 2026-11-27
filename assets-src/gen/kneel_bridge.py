@@ -193,9 +193,10 @@ def _edge(a: np.ndarray) -> np.ndarray:
     return s & near
 
 
-def reink(a: np.ndarray, src: np.ndarray) -> np.ndarray:
+def reink(a: np.ndarray, src: np.ndarray, fx=None) -> np.ndarray:
     """Re-ink the outline: a row drop or a shear can leave an inside colour on the silhouette's edge. Where the source
-    inks its edge (dark share >= 0.9), every light edge pixel takes the source's most common dark edge colour."""
+    inks its edge (dark share >= 0.9), every light edge pixel takes the source's most common dark edge colour.
+    Plan 16 (A6): edge pixels of an `fx` colour (the rig's effect pieces, drawn without ink) are left as they are."""
     se = _edge(src)
     dark = se & (src[..., :3].max(2) < 60)
     if not se.any() or dark.sum() < 0.9 * se.sum():
@@ -204,17 +205,20 @@ def reink(a: np.ndarray, src: np.ndarray) -> np.ndarray:
     ink = cols[int(np.argmax(n))]
     out = a.copy()
     fix = _edge(a) & (a[..., :3].max(2) >= 60)
+    if fx:
+        from gen.puppet import fx_mask
+        fix &= ~fx_mask(a, fx)
     out[fix, :3] = ink
     return out
 
 
-def frames(idle: np.ndarray, key: np.ndarray, bottom: int, o: dict) -> dict[str, np.ndarray]:
+def frames(idle: np.ndarray, key: np.ndarray, bottom: int, o: dict, fx=None) -> dict[str, np.ndarray]:
     """{kneel_in1, kneel_in2, kneel_b} (RGBA uint8, the idle's cell) for an approved idle and AI kneel key."""
     if idle.shape != key.shape:
         raise ValueError(f"kneel bridge: key {key.shape} != idle {idle.shape}")
     u1, u2 = (float(v) for v in o["u"])
     low = max(_rows(idle)[1], _rows(key)[1])
     lim = max(bottom, low)
-    return {"kneel_in1": reink(clear_border(toward(idle, key, u1, o), lim), idle),
-            "kneel_in2": reink(clear_border(toward(key, idle, u2, o), lim), key),
-            "kneel_b": reink(clear_border(breath(key, float(o["breath_at"])), lim), key)}
+    return {"kneel_in1": reink(clear_border(toward(idle, key, u1, o), lim), idle, fx),
+            "kneel_in2": reink(clear_border(toward(key, idle, u2, o), lim), key, fx),
+            "kneel_b": reink(clear_border(breath(key, float(o["breath_at"])), lim), key, fx)}

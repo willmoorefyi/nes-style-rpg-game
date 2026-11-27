@@ -225,3 +225,21 @@ warlock_necromancer:
   source_name: warlock_necromancer_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "next do the 'warlock / necromancer' combo as a copy of the black mage / black wizard (delivered as final; the fel-fire, the arcs, the ground glow and the CAST skeletal hands kept as rendered)"
+rune_knight_mystic_warrior:
+  file: user_art/rune_knight/battle_2026-11-27.png
+  sha256: 094db0372c55ead0c807bfcc751e6442b20f2f4853c33080ee3c223cb5c8bc38
+  rows: [rune_knight, mystic_warrior]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    prompt_runewarrior_mysticknight.txt: 8f5e81b22d5328daef86cc64ff8438461478c8196b1cb952b1622978d6ad7377
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: rune_warrior_mystic_knight_sprite_sheet.png   # the file's words run the other way; the ids follow the user
+  approved: "2026-11-27"
+  user_review: "I've now added the rune knight / mystic warrior. This should be imported as a copy of the red mage. (delivered as final; the rune glows, the detached sigils and sparkles, the blue slash arc and the ground glow kept as rendered)"

@@ -295,6 +295,55 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
           and BA.cell_box(fake, "main", "p5") == (5 * 160, 3 * 160, 6 * 160, 4 * 160)
           and BA.cell_of(fake, "lance") == (160, 144) and BA.foot_of(fake, "lance") == 140,
           "CB A5: cell_of / foot_of / cell_box of an overflow entry give the main layout on its page")
+    # plan 16 (A6): fx_colours, effect pieces drawn without ink
+    from gen import kneel_bridge as KB
+    BODY, FXC = (120, 120, 120), (33, 140, 214)
+    cell = np.zeros((80, 80, 4), np.uint8)
+    cell[20:60, 20:40] = (*PX.OUTLINE, 255)             # an inked body block ...
+    cell[21:59, 21:39] = (*BODY, 255)
+    cell[30:40, 39] = (*BODY, 255)                      # ... with a seam: light body pixels on its right edge
+    cell[10:14, 60:64] = (*FXC, 255)                    # an un-inked effect blob away from the body
+    cell[45, 41] = (*FXC, 255)                          # an effect pixel and a light body pixel (45, 39) with one
+    cell[45, 39] = (*BODY, 255)                         # empty pixel (45, 40) between them
+    img = Image.fromarray(cell)
+    o0, oe, on = (np.asarray(PU.outline(img, True, f)) for f in (None, [], [FXC]))
+    ring = lambda o: (o[..., 3] > 0) & ~(cell[..., 3] > 0)
+    check((o0 == oe).all() and ring(o0)[9:15, 59:65].any() and not ring(on)[9:15, 59:65].any()
+          and ring(on)[30:40, 40].all() and ring(on)[45, 40],
+          "CB A6: outline with fx leaves an effect blob un-inked, still inks a light body seam and a pixel touching both; "
+          "fx=[] is fx=None")
+    src = np.zeros((80, 80, 4), np.uint8)
+    src[20:60, 20:40] = (*PX.OUTLINE, 255)
+    src[21:59, 21:39] = (*BODY, 255)
+    a = cell.copy()
+    r0, re_, rf = (KB.reink(a, src, f) for f in (None, [], [FXC]))
+    check((r0 == re_).all() and tuple(r0[11, 60, :3]) == tuple(PX.OUTLINE) and tuple(rf[11, 60, :3]) == FXC
+          and tuple(rf[35, 39, :3]) == tuple(PX.OUTLINE),
+          "CB A6: reink with fx leaves an effect edge pixel and still recolours a light body edge pixel; fx=[] is fx=None")
+
+    def fx_cfg(cid: str, value) -> str:
+        with tempfile.TemporaryDirectory() as t6:
+            anim = Path(t6)
+            base = yaml.safe_load((PU.ANIM / f"{cid}.yaml").read_text())
+            (anim / f"{cid}.yaml").write_text(yaml.safe_dump(dict(base, fx_colours=value)))
+            old = PUm.ANIM
+            PUm.ANIM = anim
+            try:
+                PU.load_cfg(cid)
+                return ""
+            except ValueError as e:
+                return str(e)
+            finally:
+                PUm.ANIM = old
+    rk = [[24, 74, 123], [33, 140, 214], [123, 214, 247]]
+    if (PU.ANIM / "rune_knight.yaml").is_file():
+        check(fx_cfg("rune_knight", rk) == "" and "triples" in fx_cfg("rune_knight", [[1, 2]])
+              and "triples" in fx_cfg("rune_knight", [[0, 0, 256]]) and "triples" in fx_cfg("rune_knight", [])
+              and "twice" in fx_cfg("rune_knight", [rk[0], rk[0]]) and "not in approved" in fx_cfg("rune_knight", [[1, 2, 3]]),
+              "CB A6: load_cfg takes the rune knight's fx_colours and refuses a bad shape, a value out of range, an empty "
+              "list, a duplicate and a colour not in the sheet")
+    if (PU.ANIM / "landsknecht.yaml").is_file():
+        check("rigid" in fx_cfg("landsknecht", [[0, 0, 0]]), "CB A6: load_cfg refuses fx_colours on a rigid / lance class")
     # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
     rec = HU2.recipe("barbarian_berserker")
     _, binfo = HU2.cut(rec)

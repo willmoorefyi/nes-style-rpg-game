@@ -430,3 +430,103 @@ px of the 4096 cap left). Rigs key-based; keep_specks for the fel-fire wisps, th
 review: round 1 **APPROVE** for both classes, with no frame aliased. Report only: the warlock's kneel height is 64,
 outside the 52-62 band (not a gate). NG-5: a party with two of black_mage / shaman / warlock costs 425 G, over 400 G, so
 it is skipped like cleric + white mage (1485 parties are checked).
+
+### 15.3 Ruling: balance enumerates the original classes only (2026-11-27)
+
+User ruling (verbatim): "For our classic game we don't need all permutations since any party could previously have
+duplicate players, so all these 'new' classes doesn't change anything with balance." The NG-5 starting-kit test
+(`tests/data/actOneBalance.test.ts`) enumerates the parties of four different classes over the 6 original base classes
+only (warrior, thief, monk, white mage, black mage, red mage: C(6, 4) = 15 parties). The skips for cleric + white mage
+and for two of black mage / shaman / warlock are gone. A separate cheap test pins every other base class as an exact
+copy of its original (`COPY_OF`: the rule fields, the start kit and every kit table row). The 430 G / 425 G notes in
+14.1, 14.3 and 15.2 are superseded: such a party is the same as a classic party with a duplicate class. No other
+balance test enumerates class combinations (`tests/balance/` runs fixed parties).
+
+## 16. Amendment A6 (rune knight / mystic warrior): un-inked effect colours
+
+Image review of the rune knight / mystic warrior (round 2) found two pipeline effects on the user's glow pieces, which
+the render draws soft, with no dark outline (the slash arc, the rune sigils and orbs, the sigil's tether, the ground
+glow):
+
+- `puppet.outline` (every battle in-between) adds a 1 px `OUTLINE` ring outside every light (max channel >= 60) edge
+  pixel. The body edge is inked in the keys, so the ring only fills seams there; a glow piece's edge is light, so each
+  moved glow piece gains a dark ring. Measured on the committed atlas: in atk_mid, atk_follow, cast_rise and
+  cast_release 71-124 `OUTLINE` pixels are 4-adjacent to an effect pixel, against the keys' 2-13. It flickers against
+  the un-inked keys.
+- `kneel_bridge.reink` (kneel_in1, kneel_in2, kneel_b) recolours every light edge pixel with the source's ink when the
+  source's edge is >= 90 % dark. The rune knight's kneel key qualifies, so the ground glow's edge pixels turn dark
+  (effect pixels in rows 72-76, x 0-40: 9 in kneel_in2 / kneel_b against the key's 40).
+
+No rig setting avoids either, and `alias_frames` does not cover the kneel bridge. The scholar / sage (next pair) have
+glow and spark pieces too.
+
+- **Data:** a rig key `fx_colours: [[r, g, b], ...]` (gen/anim/<class>.yaml), opt-in: the colours of the class's
+  effect pieces, as they are in `approved/<class>/battle.png`. Rune knight `[[24, 74, 123], [33, 140, 214], [123,
+  214, 247]]`, mystic warrior `[[16, 74, 123], [33, 140, 222], [132, 214, 255]]` (the blue ramp: the only light
+  colours on the keys' un-inked edge besides 5 px of brown).
+- **Refusals:** in `puppet.load_cfg` (so `battle_inbetweens`, `puppet_kneel.kneel_frames` -> `hero_frames` and every
+  check see a validated set), a ValueError naming the class for: not a list of 1-16 `[r, g, b]` integer triples in
+  0-255; a duplicate; a colour that is not in `approved/<class>/battle.png` (load_cfg opens that file, only when the
+  key is set); the key on a rigid or lance class (`PU.is_rigid`: pass CL's `PL.inbetweens` and `kneel_lance` would
+  ignore it).
+- **Change:** an edge pixel of an `fx_colours` colour is treated as already finished.
+  - `puppet.outline(img, keep_specks=False, fx=None)`: the "light" pixels that seed the ring exclude `fx` colours, so no
+    ring is added next to an effect pixel; a ring pixel next to both an effect pixel and a light non-effect pixel is
+    still inked.
+  - `puppet.render(..., fx=None)` passes it on; `battle_inbetweens` (puppet.py:458) passes the rig's set.
+  - `kneel_bridge.reink(a, src, fx=None)`: edge pixels of an `fx` colour are not recoloured;
+    `kneel_bridge.frames(..., fx=None)` passes it to the three `reink` calls; `kneel_source_ai.hero_frames`
+    (kneel_source_ai.py:50) passes the rig's set.
+  - The other callers pass nothing and are unchanged: `outline` in `rig_render.py` (monsters), `puppet_kneel_rot.py`,
+    the selftests; `KB.frames` in `kneel_source_ai.bridge_frames` (monster bridge), `kneel_orbs.py`, `kneel_lance.py`.
+  - Speck dropping, piece caps and every check are unchanged.
+- **Known limit:** the blue ramp is also a body colour (runes on the shield and armour: 93 px inside the rune knight's
+  ready key, 279 in the mystic warrior's, 0 / 2 of them on the edge). A seam that exposes such a body pixel is not
+  inked. Measured with A6: the frames drawn from ready (idle_b, atk_wind1, atk_wind2, cast_gather, kneel_in1) have at
+  most the ready key's count of effect-colour edge pixels (rune knight 0 / 0, mystic warrior 2 / 2).
+- **Frames that change (A6 against no A6, the same rig; measured by a scratch prototype):** rune knight idle_b,
+  atk_wind1, atk_wind2, atk_mid, atk_follow, cast_gather, cast_rise, cast_release 0 / 0 / 0 / 82 / 80 / 0 / 102 / 98
+  px, kneel_in1 / kneel_in2 / kneel_b 0 / 33 / 33; mystic warrior 3 / 3 / 3 / 110 / 108 / 3 / 74 / 65 and 2 / 0 / 0
+  (its ready key's 2 un-inked blue edge pixels; reink fires for kneel_in1, drawn from the idle).
+- **Check results (expected):** `puppet.py review rune_knight mystic_warrior` prints `battle OK` for both. Without the
+  ring the rune knight's cast_rise as rigged at round 2 (hand 6 px down) fails `puppet.check` (height 72 against the
+  key's 77, 5 pieces against the cap of 4), so its tweak drops the hand 3 px instead (height 75, 4 pieces); fallback if
+  a later change fails it again: `alias_frames: [cast_rise]`. Every other in-between of both classes passes unchanged
+  (heights within the check's 4, pieces equal to the key's). Momus: OKAY 4/5 (2026-11-27).
+- **Order:** implement; `build_assets.py battle_ai` (PYTHONHASHSEED 0 and 1, byte-equal); `puppet_kneel.py lock
+  rune_knight mystic_warrior` (their kneel frames change: rune knight kneel_in2 / kneel_b, mystic warrior kneel_in1);
+  `puppet_kneel.py check` (no ids: every rig with a kneel) passes, every other class's lock file unchanged (`git diff --stat
+  assets-src/gen/anim/*.lock.json` lists only the two).
+- **Scope (byte-identical claim):** with `fx` None or empty every function returns exactly what it returns today. Only
+  the two rigs set the key. Gates: `battle-characters-ai.png`, `-1.png` and `-2.png` byte-equal to mainline
+  19036df8; page 3's rows of the six classes already there byte-equal to mainline's; `characters-ai.*` unchanged; the
+  monster atlas is not rebuilt (no monster code path changes).
+- **Tests:**
+  - `selftest_hero_user.py`: on a synthetic cell, `outline` with `fx` leaves an effect blob's edge un-inked, still
+    inks a light body seam, and inks a ring pixel that touches both an effect pixel and a light body pixel; `outline`
+    and `reink` with `fx=[]` equal `fx=None` equal today's result; `reink` with `fx` leaves an effect edge pixel and
+    still recolours a light body edge pixel; the `load_cfg` refusals (bad shape, out of range, duplicate, not in the
+    sheet, a rigid class).
+  - `tests/rendering/runeKnightArt.test.ts` (on the committed atlas, both classes): in atk_mid, atk_follow, cast_rise
+    and cast_release the number of `OUTLINE` pixels 4-adjacent to an `fx_colours` pixel is at most its source key's
+    (attack / cast) + 5; kneel_in2 and kneel_b have at least the kneel key's count of `fx_colours` pixels in rows
+    72-76, x 0-40; the frames drawn from ready have at most the ready key's count of effect-colour edge pixels.
+- AGENTS.md: the puppet row names `fx_colours`, and the user hero sheets row lists "rune knight / mystic warrior
+  (`fx_colours`, plan 16)".
+
+### 16.1 Rune knight / mystic warrior result (2026-11-27, branch class-rune from mainline 19036df8)
+
+User (verbatim): "I've now added the rune knight / mystic warrior. This should be imported as a copy of the red mage."
+Exact copies of red_mage -> red_wizard (stats, white and black spells L1-5 / learners, equipment, upgrade rule):
+`rune_knight` (Rune Knight, RKN, default name RUNE) -> `mystic_warrior` (Mystic Warrior, MYS). The render's file name
+has the words the other way round (`rune_warrior_mystic_knight_sprite_sheet.png`); the ids follow the user's words, row
+1 = base. On the overflow page 3 (8 rows, 2880 x 1280; 2816 px left, 17 more rows). Field alias red_mage / red_wizard
+(temporary); walk-sheet pack entries (sword sheathed at the hip, shield on the arm; the mystic warrior's stand-in is
+the knight, as red_wizard's field sheet has head_from / row_from fixes the pack reader refuses).
+
+Image review: round 1 ITERATE (cast_gather / cast_rise and the mystic warrior's idle_b off the ground row by 1 px: the
+tweaks' whole-figure offsets dropped, the idle breath on the upper body only); round 2 ITERATE (the glow pieces gained
+an ink ring in atk_mid / atk_follow / cast_rise / cast_release; the rune knight's kneel ground glow re-inked dark) ->
+amendment A6 (section 16, Momus OKAY 4/5) and `fx_colours` on both rigs, the rune knight's cast_rise hand 3 px down;
+round 3 rune knight **APPROVE**, mystic warrior ITERATE (the blade parted from the gauntlet at the grip in atk_wind2 and
+cast_gather) -> section 5 fallback `alias_frames: [atk_wind1, atk_wind2, cast_gather]` for the mystic warrior.

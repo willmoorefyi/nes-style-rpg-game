@@ -23,6 +23,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   hit: 10
   crit: 2
 - id: wooden_nunchaku
@@ -52,6 +53,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   - monk
   - beastmaster
   hit: 0
@@ -73,6 +75,7 @@
   - hunter
   - ronin
   - red_mage
+  - rune_knight
   hit: 5
   crit: 4
 - id: short_sword
@@ -92,6 +95,7 @@
   - hunter
   - ronin
   - red_mage
+  - rune_knight
   hit: 10
   crit: 6
 - id: hammer
@@ -153,6 +157,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   hit: 10
   crit: 10
 - id: mythril_sword
@@ -169,6 +174,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   bonusVsFamily: undead
   hit: 10
   crit: 12
@@ -188,6 +194,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   bonusVsFamily: undead
   hit: 10
   crit: 12
@@ -239,6 +246,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   hit: 10
   crit: 10
 - id: flame_sword
@@ -288,6 +296,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   element: lightning
   bonusVsFamily: aquatic
   hit: 10
@@ -316,6 +325,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   bonusVsFamily: dragon
   hit: 10
   crit: 20
@@ -344,6 +354,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 2
 - id: robe
@@ -360,6 +371,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 2
 - id: leather_armor
@@ -381,6 +393,7 @@
   - monk
   - beastmaster
   - red_mage
+  - rune_knight
   slot: armor
   weight: 8
 - id: wooden_armor
@@ -412,6 +425,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   slot: armor
   weight: 15
 - id: iron_armor
@@ -458,6 +472,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   slot: armor
   weight: 8
 - id: dragon_armor
@@ -490,6 +505,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   weight: 0
 - id: iron_shield
   name: Iron Shield
@@ -521,6 +537,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   weight: 0
 - id: cap
   name: Cap
@@ -547,6 +564,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   weight: 1
 - id: iron_helm
   name: Iron Helm
@@ -681,6 +699,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 1
 # B4 Melmond: 23 / 34 / 8 / 6
@@ -701,6 +720,7 @@
   - hunter
   - ronin
   - red_mage
+  - rune_knight
   hit: 5
   crit: 10
 - id: gold_armlet
@@ -727,6 +747,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 1
 # B5 Crescent Lake: 26 / 34 / 8 / 6
@@ -747,6 +768,7 @@
   - hunter
   - ronin
   - red_mage
+  - rune_knight
   hit: 10
   crit: 14
 - id: cat_claw
@@ -773,6 +795,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   hit: 5
   crit: 10
 - id: white_robe
@@ -815,6 +838,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   hit: 10
   crit: 16
 - id: thor_hammer
@@ -851,6 +875,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   hit: 10
   crit: 18
 - id: opal_armor
@@ -892,6 +917,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 1
 - id: aegis_shield
@@ -939,6 +965,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   hit: 10
   crit: 18
 - id: vorpal_sword
@@ -1010,6 +1037,7 @@
   - warlock
   - shaman
   - red_mage
+  - rune_knight
   slot: armor
   weight: 1
 - id: diamond_shield
@@ -1027,6 +1055,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - rune_knight
   weight: 0
 - id: diamond_helm
   name: Diamond Helm

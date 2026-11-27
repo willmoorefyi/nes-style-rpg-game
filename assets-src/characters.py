@@ -805,7 +805,14 @@ ROSTER: dict[str, Look] = {
     # with a staff (no horned-skull 1x staff exists)
     "warlock": Look(hair=(3, 3, 4), hair_style="short", outfit="coat", cloth=(6, 5, 6), trim=(14, 6, 6),
                     pants=(6, 5, 6), boots=(5, 4, 5), weapon="dagger"),
+    # pass CB (plan 11-15): the rune knight, blond, in steel and brown leather with a rune sword and a round shield; the
+    # mystic warrior in dark steel with a helm, a rune sword, a kite shield and a cape
+    "rune_knight": Look(hair=(28, 24, 16), hair_style="spiky", outfit="armor", cloth=(18, 19, 22), trim=(14, 9, 5),
+                        pants=(8, 8, 10), boots=(14, 9, 5), weapon="sword", shield=True),
     # Upgraded classes
+    "mystic_warrior": Look(hair=(14, 9, 5), hair_style="short", outfit="armor", cloth=(5, 6, 8), trim=(20, 22, 26),
+                           pants=(5, 6, 8), boots=(18, 19, 22), gear="helm", gear_color=(18, 19, 22), weapon="sword",
+                           shield=True, cape=(4, 9, 20)),
     "necromancer": Look(skin=SKIN_LIGHT, hair=(26, 26, 24), hair_style="long", outfit="robe", cloth=(7, 8, 7),
                         trim=(12, 20, 6), boots=(5, 5, 5), weapon="staff", weapon_color=(14, 10, 6)),
     "summoner": Look(hair=(10, 6, 3), hair_style="short", outfit="robe", cloth=(16, 11, 6), trim=(28, 25, 20),

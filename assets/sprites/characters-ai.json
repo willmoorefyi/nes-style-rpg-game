@@ -372,6 +372,10 @@
       "x": 0,
       "y": 6528
     },
+    "mystic_warrior": {
+      "x": 672,
+      "y": 4992
+    },
     "necromancer": {
       "x": 672,
       "y": 0
@@ -387,6 +391,10 @@
     "ronin": {
       "x": 1008,
       "y": 5760
+    },
+    "rune_knight": {
+      "x": 336,
+      "y": 4992
     },
     "samurai": {
       "x": 1008,
@@ -419,10 +427,12 @@
     "hunter": "thief",
     "landsknecht": "warrior",
     "legionnaire": "warrior",
+    "mystic_warrior": "red_wizard",
     "necromancer": "black_wizard",
     "paladin": "white_wizard",
     "ranger": "ninja",
     "ronin": "thief",
+    "rune_knight": "red_mage",
     "samurai": "ninja",
     "shaman": "black_mage",
     "summoner": "master",

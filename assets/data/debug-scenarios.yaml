@@ -3582,3 +3582,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-15): the rune knight / mystic warrior class pair (user-rendered battle art).
+# RUNE is weak so it kneels; RDWZ is the like-for-like control for MYSTC. ?mute=1&scenario=cb_runeknights
+# (&kneel=loop, &enemyAnim=loop).
+- id: cb_runeknights
+  name: Rune Knight and Mystic Warrior (pass CB preview)
+  party:
+    - { class: rune_knight, name: RUNE, level: 10, equipment: [rapier, leather_armor, wooden_shield, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: mystic_warrior, name: MYSTC, level: 30, equipment: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: rune_knight, name: RUNE2, level: 10, equipment: [rapier, leather_armor, wooden_shield, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

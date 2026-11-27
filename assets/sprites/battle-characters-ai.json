@@ -435,6 +435,16 @@
       "row": 5,
       "page": 3,
       "inbetweens": true
+    },
+    "rune_knight": {
+      "row": 6,
+      "page": 3,
+      "inbetweens": true
+    },
+    "mystic_warrior": {
+      "row": 7,
+      "page": 3,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -456,7 +466,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 960
+      "h": 1280
     }
   ]
 }

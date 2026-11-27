@@ -1,0 +1,32 @@
+# Puppet animation joints for the mystic_warrior (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/mystic_warrior/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). tip = the rune sword in the near hand (ready, attack; the attack's blue slash arc and sigils ride with it); the kite rune shield on the near arm and the cape ride with the torso; in the cast key the sword stands upright in the far hand (rides with the torso) and the four rune orbs ride with the raised near forearm. part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the detached rune sigils and sparkles survive the cut
+fx_colours: [[16, 74, 123], [33, 140, 222], [132, 214, 255]]   # plan 16 (A6): the blue glow ramp, drawn without ink
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [46, 28], crown: [48, 8], chest: [44, 38], hip: [48, 58], sh_n: [34, 30], el_n: [32, 30], hand_n: [30, 28], tip: [11, 3], weapon_hand: n, sh_f: [56, 32], el_f: [58, 42], hand_f: [56, 48], hip_n: [34, 60], knee_n: [28, 66], foot_n: [24, 75], hip_f: [56, 60], knee_f: [60, 66], foot_f: [66, 75], part_boxes: {weapon: [[10, 1, 31, 28]], torso: [[22, 28, 48, 70]]}}
+  attack:
+    {neck: [44, 30], crown: [46, 8], chest: [46, 40], hip: [50, 58], sh_n: [36, 36], el_n: [30, 46], hand_n: [26, 52], tip: [2, 73], weapon_hand: n, sh_f: [58, 34], el_f: [62, 44], hand_f: [58, 50], hip_n: [42, 60], knee_n: [42, 68], foot_n: [44, 75], hip_f: [62, 60], knee_f: [70, 68], foot_f: [74, 75], part_boxes: {weapon: [[1, 46, 29, 75], [5, 30, 21, 58]], torso: [[27, 33, 48, 72]]}}
+  cast:
+    {neck: [46, 30], crown: [46, 12], chest: [46, 40], hip: [48, 56], sh_n: [36, 32], el_n: [28, 28], hand_n: [22, 24], sh_f: [58, 34], el_f: [58, 40], hand_f: [55, 38], hip_n: [38, 60], knee_n: [34, 68], foot_n: [30, 75], hip_f: [56, 60], knee_f: [60, 68], foot_f: [62, 75], part_boxes: {farm_n: [[13, 0, 37, 22]], torso: [[52, 1, 61, 40]]}}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, -1], hip: [0, -1], sh_n: [0, 0], el_n: [0, 0], hand_n: [0, 0], sh_f: [0, 0], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [0, 0]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-5, -9], hand_n: [0, -12], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0], tip: [0, -32]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-7, -12], hand_n: [-1, -16], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0], tip: [0, -38]}
+  atk_mid: {neck: [-0.8, 0], crown: [-0.8, -0.9], chest: [1, 0], hip: [1, -0.9], sh_n: [1, 1.8], el_n: [-4.4, 2.25], hand_n: [-1.95, 2.5], sh_f: [1, 0], el_f: [1.9, 0], hand_f: [1, 0], hip_n: [3.7, -0.9], knee_n: [7.3, 0], foot_n: [10, 0], hip_f: [2.8, -0.9], knee_f: [5.05, 0], foot_f: [4.6, 0], tip: [-1.95, 2.5]}
+  atk_follow: {neck: [-0.5, 0.5], crown: [-0.5, 0], chest: [0.5, 0.5], hip: [0.5, 0], sh_n: [0.5, 1.5], el_n: [-2, -2], hand_n: [-3, -5], sh_f: [0.5, 0.5], el_f: [1, 0.5], hand_f: [0.5, 0.5], hip_n: [2, 0], knee_n: [3.5, 0.5], foot_n: [5, 0], hip_f: [1.5, 0], knee_f: [2.5, 0.5], foot_f: [2, 0], tip: [-8, 11]}
+  cast_rise: {neck: [0, 1], crown: [-1, 2], chest: [1, 1], hip: [0, -1], sh_n: [1, 1], el_n: [-2, 3], hand_n: [-4, 4], sh_f: [1, 1], el_f: [0, -1], hand_f: [-0.5, -5], hip_n: [2, 0], knee_n: [3, 1], foot_n: [3, 0], hip_f: [0, 0], knee_f: [0, 1], foot_f: [-2, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 1], hand_n: [1, 4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+  cast_gather: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -4], hand_n: [-7, -20], sh_f: [0, -1], el_f: [2, -3], hand_f: [11, 3], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [-7, -20]}
+# section 5 fallback after image review round 3 (2026-11-27): the blade parted from the gauntlet at the grip in the
+# wind-up and the gather, so they stay on the ready key (atk_wind1 too, so the wind-up does not step back)
+alias_frames: [atk_wind1, atk_wind2, cast_gather]
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

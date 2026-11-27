@@ -1,0 +1,238 @@
+{
+  "character": "mystic_warrior",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/rune_knight/battle_2026-11-27.png",
+    "sha256": "094db0372c55ead0c807bfcc751e6442b20f2f4853c33080ee3c223cb5c8bc38"
+  },
+  "recipe": "hero_user.yaml#rune_knight_mystic_warrior",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "prompt_runewarrior_mysticknight.txt": "8f5e81b22d5328daef86cc64ff8438461478c8196b1cb952b1622978d6ad7377",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "rune_warrior_mystic_knight_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've now added the rune knight / mystic warrior. This should be imported as a copy of the red mage. (delivered as final; the rune glows, the detached sigils and sparkles, the blue slash arc and the ground glow kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          20,
+          73,
+          121
+        ],
+        [
+          16,
+          74,
+          123
+        ]
+      ],
+      [
+        [
+          21,
+          23,
+          33
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          33,
+          140,
+          219
+        ],
+        [
+          33,
+          140,
+          222
+        ]
+      ],
+      [
+        [
+          37,
+          43,
+          59
+        ],
+        [
+          33,
+          41,
+          57
+        ]
+      ],
+      [
+        [
+          52,
+          60,
+          84
+        ],
+        [
+          49,
+          57,
+          82
+        ]
+      ],
+      [
+        [
+          76,
+          88,
+          116
+        ],
+        [
+          74,
+          90,
+          115
+        ]
+      ],
+      [
+        [
+          87,
+          65,
+          48
+        ],
+        [
+          90,
+          66,
+          49
+        ]
+      ],
+      [
+        [
+          118,
+          133,
+          162
+        ],
+        [
+          115,
+          132,
+          165
+        ]
+      ],
+      [
+        [
+          132,
+          217,
+          255
+        ],
+        [
+          132,
+          214,
+          255
+        ]
+      ],
+      [
+        [
+          137,
+          102,
+          67
+        ],
+        [
+          140,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          163,
+          128,
+          98
+        ],
+        [
+          165,
+          132,
+          99
+        ]
+      ],
+      [
+        [
+          163,
+          177,
+          201
+        ],
+        [
+          165,
+          181,
+          198
+        ]
+      ],
+      [
+        [
+          192,
+          154,
+          118
+        ],
+        [
+          189,
+          156,
+          115
+        ]
+      ],
+      [
+        [
+          222,
+          180,
+          139
+        ],
+        [
+          222,
+          181,
+          140
+        ]
+      ],
+      [
+        [
+          227,
+          230,
+          232
+        ],
+        [
+          231,
+          231,
+          231
+        ]
+      ],
+      [
+        [
+          246,
+          213,
+          169
+        ],
+        [
+          247,
+          214,
+          173
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        10,
+        14,
+        72,
+        76
+      ]
+    }
+  }
+}

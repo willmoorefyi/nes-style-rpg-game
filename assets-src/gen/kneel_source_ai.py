@@ -47,7 +47,8 @@ def hero_frames(cid: str, cfg: dict, frames: dict, bottom: int) -> dict:
         raise ValueError(f"{cid}: kneel source ai refuses {sorted(set(b) - set(HERO_KEYS))}")
     key = KB.offset(np.asarray(Image.open(PU.APPROVED / cid / "battle_kneel.png").convert("RGBA")).copy(),
                     b.get("offset"))
-    made = KB.frames(np.asarray(frames["ready"].convert("RGBA")).copy(), key, bottom, KB.options(b, cid))
+    made = KB.frames(np.asarray(frames["ready"].convert("RGBA")).copy(), key, bottom, KB.options(b, cid),
+                     fx=cfg.get("fx_colours"))   # plan 16 (A6)
     tag = "user" if b.get("source") == "user" else "ai"   # pass CB: the user's drawn key (docs/CLASS_BARBARIAN_PLAN.md 4)
     return {"kneel": (Image.fromarray(key), {}, tag), **{n: (Image.fromarray(a), {}, "bridge") for n, a in made.items()}}
 

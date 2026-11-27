@@ -433,3 +433,46 @@ necromancer:
     its foot near the ground beside the foot and its skull level with the head, never above the 92 px cap; in the back
     view the staff is in the same hand; in the side view facing left it is held in front of the body, upright. The
     staff touches the hand and stays inside the 48 x 96 cell
+
+rune_knight:
+  name: Rune Knight
+  tier: base
+  partner: mystic_warrior
+  battle_sheet: ~/temp/heroes/rune_warrior_mystic_knight_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: red_mage
+  look: >-
+    a young rune knight, about 20: an athletic build; messy shoulder-length blond hair; a fair young face with pale
+    blue eyes; light steel plate over the shoulders, arms and shins, over dark brown leather and a dark grey tunic,
+    brown boots; thin glowing blue runes carved into the armour; a round brown wooden shield rimmed in steel with a
+    steel boss and glowing blue runes. Colours: blond, fair skin, steel grey, dark brown leather, a bright ice blue for
+    the runes
+  carry: >-
+    the sword is sheathed at his left hip on the belt, hilt forward, close to the body (a thin blue rune line on the
+    scabbard); the round rune shield is strapped on his left forearm, held against the side so it never hides the face.
+    The sword and the shield touch the body and stay inside the 48 x 96 cell
+
+mystic_warrior:
+  name: Mystic Warrior
+  tier: enhanced
+  partner: rune_knight
+  battle_sheet: ~/temp/heroes/rune_warrior_mystic_knight_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight   # red_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the rune knight grown into a mystic warrior: brown hair under an open-faced dark steel helm with a blue rune on the
+    brow; full dark blue-black plate with steel edges and glowing blue runes on the chest, belt and greaves; a long
+    dark navy cape; a tall dark kite shield rimmed in steel with a large glowing blue rune. Colours: brown hair, fair
+    skin, blue-black steel, light steel trim, dark navy, a bright ice blue for the runes
+  carry: >-
+    the sword is sheathed at his left hip on the belt, hilt forward, close to the body (a thin blue rune line on the
+    scabbard); the kite rune shield is strapped on his left forearm, held against the side so it never hides the face;
+    the cape hangs behind. The sword, the shield and the cape stay inside the 48 x 96 cell

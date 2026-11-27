@@ -77,10 +77,42 @@ def load_cfg(cid: str) -> dict | None:
     bad = sorted(set(cfg.get("alias_frames") or []) - set(INBETWEENS))
     if bad:                                           # pass CB 5: in-betweens left aliased to their source keyframe
         raise ValueError(f"{cid}: alias_frames {bad} are not in-between names ({', '.join(INBETWEENS)})")
+    if "fx_colours" in cfg:
+        cfg["fx_colours"] = _fx_colours(cid, cfg["fx_colours"])
     cfg = _mirror_keyframes(cid, cfg)
     if any("tip_f" in ((cfg.get("battle") or {}).get(k) or {}) for k in cfg.get("mirrored", ())):
         raise ValueError(f"{cid}: tip_f on a facing_fix-mirrored keyframe (the n / f relabelling does not know it)")
     return cfg
+
+
+def _fx_colours(cid: str, raw) -> list[tuple[int, int, int]]:
+    """Plan 16 (A6): the rig's `fx_colours`, the colours of its effect pieces (outline / reink leave their edge
+    un-inked). Refused: not 1-16 [r, g, b] integer triples in 0-255, a duplicate, a colour not in the approved battle
+    sheet, a rigid / lance class (its in-betweens and kneel do not read it)."""
+    ok = isinstance(raw, list) and 1 <= len(raw) <= 16 and all(
+        isinstance(c, list) and len(c) == 3 and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 255
+                                                    for v in c) for c in raw)
+    if not ok:
+        raise ValueError(f"{cid}: fx_colours must be 1-16 [r, g, b] integer triples in 0-255, not {raw!r}")
+    cols = [tuple(c) for c in raw]
+    if len(set(cols)) != len(cols):
+        raise ValueError(f"{cid}: fx_colours lists a colour twice")
+    if is_rigid(cid):
+        raise ValueError(f"{cid}: fx_colours on a rigid / lance class (puppet_lance and kneel_lance do not read it)")
+    a = np.asarray(Image.open(APPROVED / cid / "battle.png").convert("RGBA"))
+    have = {tuple(int(v) for v in c) for c in a[a[..., 3] > 0][:, :3]}
+    missing = [c for c in cols if c not in have]
+    if missing:
+        raise ValueError(f"{cid}: fx_colours {missing} are not in approved/{cid}/battle.png")
+    return cols
+
+
+def fx_mask(a: np.ndarray, fx) -> np.ndarray:
+    """Plan 16 (A6): the opaque pixels of `a` (RGBA) whose colour is one of `fx` (all False for None / empty)."""
+    m = np.zeros(a.shape[:2], bool)
+    for c in fx or ():
+        m |= (a[..., :3] == c).all(2)
+    return m & (a[..., 3] > 0)
 
 
 def _mirror_keyframes(cid: str, cfg: dict) -> dict:
@@ -260,9 +292,10 @@ def keep_lengths(target: dict, src_of, robed: bool) -> dict:
     return t
 
 
-def outline(img: Image.Image, keep_specks: bool = False) -> Image.Image:
+def outline(img: Image.Image, keep_specks: bool = False, fx=None) -> Image.Image:
     """Drop specks, then ink the edge only where a seam left a light pixel on the silhouette (the parts keep their
-    own 1 px outline from the approved art; a fresh ring everywhere would double it)."""
+    own 1 px outline from the approved art; a fresh ring everywhere would double it). Plan 16 (A6): pixels of an `fx`
+    colour (the rig's effect pieces, drawn without ink) seed no ring."""
     from gen.pixelize import components
     a = np.asarray(img).copy()
     solid = a[..., 3] > 0
@@ -274,6 +307,8 @@ def outline(img: Image.Image, keep_specks: bool = False) -> Image.Image:
         solid = keepm
     ring = _grow(solid) & ~solid
     light = solid & (a[..., :3].astype(int).max(axis=2) >= 60)
+    if fx:
+        light &= ~fx_mask(a, fx)
     ring &= _grow(light)
     a[ring, :3] = OUTLINE
     a[ring, 3] = 255
@@ -282,7 +317,7 @@ def outline(img: Image.Image, keep_specks: bool = False) -> Image.Image:
 
 def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src: dict[str, str], default: str,
            z: list[str], robed: bool, size=(80, 80), masks: dict | None = None, ink: bool = True,
-           keep_specks: bool = False) -> Image.Image:
+           keep_specks: bool = False, fx=None) -> Image.Image:
     """Pose every part (taken from its source keyframe) onto the target joints and composite back to front.
     `masks`: {source pose: head mask} of facing_fix head mirrors (segment's `head`). `ink=False` (pass CL's hands
     layer, puppet_lance.py) skips the outline pass; `size` is the cell (width, height)."""
@@ -311,7 +346,7 @@ def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src:
         hit = np.zeros_like(ok)
         hit[ok] = lab[sy[ok], sx[ok]] == names.index(part)
         out[hit] = arr[sy[hit], sx[hit]]
-    return outline(Image.fromarray(out, "RGBA"), keep_specks) if ink else Image.fromarray(out, "RGBA")
+    return outline(Image.fromarray(out, "RGBA"), keep_specks, fx) if ink else Image.fromarray(out, "RGBA")
 
 
 # ───────── in-between targets (relative to each character's own keyframes) ─────────
@@ -456,7 +491,7 @@ def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Imag
         front = (cfg.get("front_far_arm") or {}).get(src, src != "attack")
         z = Z_FRONT_ARM if front else Z_BACK_ARM
         out[name] = render(tj, sources, ps, src, swap_z(z) if src in cfg.get("mirrored", ()) else z, robed,
-                           masks=masks, keep_specks=bool(cfg.get("keep_specks")))
+                           masks=masks, keep_specks=bool(cfg.get("keep_specks")), fx=cfg.get("fx_colours"))
     for name in cfg.get("alias_frames") or []:        # pass CB 5: the build falls back to the source keyframe
         out.pop(name, None)
     return out

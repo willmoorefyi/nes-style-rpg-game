@@ -22,3 +22,5 @@ beastmaster: monk    # temporary until the user renders the beastmaster's field 
 summoner: master     # temporary until the user renders the summoner's field walk sheet
 warlock: black_mage  # temporary until the user renders the warlock's field walk sheet
 necromancer: black_wizard # temporary until the user renders the necromancer's field walk sheet
+rune_knight: red_mage # temporary until the user renders the rune knight's field walk sheet
+mystic_warrior: red_wizard # temporary until the user renders the mystic warrior's field walk sheet

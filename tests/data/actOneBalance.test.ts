@@ -20,6 +20,13 @@ const corneliaItems = [...shop('cornelia_weapon').inventory, ...shop('cornelia_a
 const corneliaSpells = [...shop('cornelia_white').inventory, ...shop('cornelia_black').inventory];
 const isBodyArmour = (id: string) => slotOf(item(id)) === 'armor';
 const baseClasses = CLASSES.filter((c) => !c.upgradeFrom).map((c) => c.id);
+/** The 6 classes of the classic game; every other base class is an exact copy of one (pass CB, plan 15.3). */
+const ORIGINAL = ['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage'];
+const COPY_OF: Record<string, string> = {
+  barbarian: 'warrior', landsknecht: 'warrior', dark_fighter_hero: 'warrior', legionnaire: 'warrior', hunter: 'thief',
+  cleric: 'white_mage', ronin: 'thief', shaman: 'black_mage', beastmaster: 'monk', warlock: 'black_mage',
+  rune_knight: 'red_mage',
+};
 
 describe('T4d Cornelia shops (FF1 Coneria lists)', () => {
   it('sell a body armour that both mages can wear (EB-7: Cloth)', () => {
@@ -68,23 +75,33 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
     }
   });
 
-  it('costs 400 G or less for every party of four different base classes; the plan\'s party costs 370', () => {
+  // User ruling 2026-11-27 (docs/CLASS_BARBARIAN_PLAN.md 15.3): "For our classic game we don't need all permutations
+  // since any party could previously have duplicate players, so all these 'new' classes doesn't change anything with
+  // balance." The pass-CB classes are exact copies (the next test pins it), so the parties are enumerated over the 6
+  // original base classes only.
+  it('costs 400 G or less for every party of four different original base classes; the plan\'s party costs 370', () => {
     const cost = (cls: string) => kitCost(START_KIT[cls], spellPrice);
     let parties = 0;
-    for (let a = 0; a < baseClasses.length; a++) for (let b = a + 1; b < baseClasses.length; b++)
-      for (let c = b + 1; c < baseClasses.length; c++) for (let d = c + 1; d < baseClasses.length; d++) {
-        const four = [baseClasses[a], baseClasses[b], baseClasses[c], baseClasses[d]];
-        // pass CB: a class copied from another (the cleric is the white mage, user ruling 2026-11-27) has its kit, so
-        // a party with both is two healers' kits; its 400 G bound is a user decision (reported), not this rule's
-        if (four.includes('cleric') && four.includes('white_mage')) continue;
-        if (['black_mage', 'shaman', 'warlock'].filter((c) => four.includes(c)).length >= 2) continue;   // pass CB: the shaman and the warlock are the black mage
+    for (let a = 0; a < ORIGINAL.length; a++) for (let b = a + 1; b < ORIGINAL.length; b++)
+      for (let c = b + 1; c < ORIGINAL.length; c++) for (let d = c + 1; d < ORIGINAL.length; d++) {
+        const four = [ORIGINAL[a], ORIGINAL[b], ORIGINAL[c], ORIGINAL[d]];
         expect(four.reduce((s, x) => s + cost(x), 0), four.join(' ')).toBeLessThanOrEqual(400);
         parties++;
       }
-    // C(13, 4) = 715 parties of 13 base classes (+ barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric,
-    // ronin) less the C(11, 2) = 55 with both cleric and white mage (skipped above)
-    expect(parties).toBe(1485);   // C(16, 4) = 1820 less the parties with the cleric + white mage or two of black mage / shaman / warlock
+    expect(parties).toBe(15);   // C(6, 4)
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
+  });
+
+  it('every other base class is a copy of an original one: the same rules and the same kit in every kit table', () => {
+    expect(Object.keys(COPY_OF).sort()).toEqual(baseClasses.filter((c) => !ORIGINAL.includes(c)).sort());
+    const byId = new Map(CLASSES.map((c) => [c.id, c]));
+    for (const [copy, of] of Object.entries(COPY_OF)) {
+      const a = byId.get(copy)!, b = byId.get(of)!;
+      for (const k of ['baseStats', 'statGrowth', 'usableEquipment', 'spellLevels', 'hitPercent', 'magicDefense',
+        'spellCharges', 'unarmedMartial'] as const) expect(a[k], `${copy} ${k}`).toEqual(b[k]);
+      expect(START_KIT[copy], copy).toEqual(START_KIT[of]);
+      for (const [name, kit] of Object.entries(KITS)) if (kit[of]) expect(kit[copy], `${name} ${copy}`).toEqual(kit[of]);
+    }
   });
 
   it('pass F kits (§3.2): lv2, arrive and full cover every base class; lv2 is the start kit + LIT (100 G), arrive is lv2 + a Cap each', () => {
