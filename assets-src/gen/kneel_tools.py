@@ -121,9 +121,15 @@ def party_diff(base: str, d: Path) -> int:
     import numpy as np
     nj, oj = _atlas(None, d, "battle-characters-ai.json"), _atlas(base, d, "battle-characters-ai.json")
     npng, opng = _atlas(None, d, "battle-characters-ai.png"), _atlas(base, d, "battle-characters-ai.png")
-    na, oa = np.asarray(npng.convert("RGBA")), np.asarray(opng.convert("RGBA"))
-    ow, oh = opng.size[0] // len(oj["poses"]), opng.size[1] // len(oj["sheets"])
-    nw, nh = npng.size[0] // len(nj["poses"]), npng.size[1] // len(nj["sheets"])
+    from gen import battle_atlas as BA                # pass CL 3.1: each sheet on its own page and cell
+    imgs: dict = {}
+
+    def page(js: dict, rev, sid: str):
+        f = BA.page_file(js, BA.sheet_page(js, sid))
+        if (rev, f) not in imgs:
+            im = _atlas(rev, d, f)
+            imgs[(rev, f)] = None if im is None else np.asarray(im.convert("RGBA"))
+        return imgs[(rev, f)]
     bad, rows = [], 0
     for sid, s in sorted(oj["sheets"].items()):
         t = nj["sheets"].get(sid)
@@ -131,10 +137,14 @@ def party_diff(base: str, d: Path) -> int:
             bad.append(f"{sid}: row missing")
             continue
         rows += 1
-        for i, pose in enumerate(oj["poses"]):
-            j = nj["poses"].index(pose) if pose in nj["poses"] else -1
-            a = oa[s["row"] * oh:(s["row"] + 1) * oh, i * ow:(i + 1) * ow]
-            b = na[t["row"] * nh:(t["row"] + 1) * nh, j * nw:(j + 1) * nw] if j >= 0 else None
+        oa, na = page(oj, base, sid), page(nj, None, sid)
+        for pose in oj["poses"]:
+            x0, y0, x1, y1 = BA.cell_box(oj, sid, pose)
+            a = oa[y0:y1, x0:x1]
+            b = None
+            if pose in nj["poses"]:
+                x0, y0, x1, y1 = BA.cell_box(nj, sid, pose)
+                b = na[y0:y1, x0:x1]
             if b is None or a.shape != b.shape or not np.array_equal(a, b):
                 bad.append(f"{sid} {pose}")
     print(f"{rows} rows x {len(oj['poses'])} old columns " + ("identical" if not bad else f"{len(bad)} differ")

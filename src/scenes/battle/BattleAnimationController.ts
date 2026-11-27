@@ -17,6 +17,7 @@ import { actionTargetIds, diffStatuses, pendingHolds, statusSets, type StatusDif
 import { afraidSkip, isAfraid } from './fearAnnounce.js';
 import type { SpellData } from '../../types/index.js';
 import { noopFormChange, type FormChangeHook } from './formChangeView.js';
+import { clampHeroY } from './heroBody.js';   // pass CL 7.6
 export { ELEMENT_COLORS } from './BattleEffects.js';
 export { ANNOUNCE_FRAMES, RESULT_FRAMES, ROUND_END_FRAMES } from './battleTiming.js';
 export { formatAnnouncement } from './battleMessageUtils.js';
@@ -266,7 +267,7 @@ export class BattleAnimationController {
   /** Moves the acting party member to an offset from its place in line and shows the frame's pose. */
   private placeActor(f: AttackFrame, remember = true): void {
     if (!this.animActorSprite) return;
-    this.animActorSprite.position.set(this.animActorOrigX + f.dx, this.animActorOrigY + f.dy);
+    this.animActorSprite.position.set(this.animActorOrigX + f.dx, clampHeroY(this.animActorSprite, this.animActorOrigY + f.dy));
     this.display.setActorPose(this.animActorSprite, f.pose);
     if (remember) this.lastAdvance = f;
   }

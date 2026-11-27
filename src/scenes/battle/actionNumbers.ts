@@ -15,6 +15,7 @@ import { headOf } from './fx/texturePixels.js';
 import { colossusAt } from './colossus/colossusProxy.js';
 import { FLOAT_FONT } from './BattleSceneTypes.js';
 import { GAME_WIDTH } from '../../core/LayoutConstants.js';
+import { heroRect } from './heroBody.js';
 
 /** C6-11 (D-C7-16): px between two numbers of one action that would meet, beyond the moved number's width. */
 export const NUMBER_SPREAD_GAP = 8;
@@ -40,7 +41,7 @@ export class ActionNumbers {
       if (!evt.targetId.startsWith('enemy_') || evt.isHeal) continue;
       const sprite = this.display.enemySprites[parseInt(evt.targetId.split('_')[1], 10)];
       if (!sprite) continue;
-      this.effects.addFlash(slashEffect(colossusAt(sprite)?.slashBox() ?? sprite), 12);   // a colossus: at its melee point
+      this.effects.addFlash(slashEffect(colossusAt(sprite)?.slashBox() ?? heroRect(sprite)), 12);   // a colossus: at its melee point; a hero: its body (pass CL)
     }
   }
 

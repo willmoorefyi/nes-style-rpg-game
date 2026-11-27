@@ -4,6 +4,7 @@ import type { CharacterClassData } from '../types/index.js';
 
 /** Base class → upgraded class mapping (FF1 class upgrades) */
 export const CLASS_UPGRADES: Record<string, string> = {
+  landsknecht: 'dragoon', // pass CL (docs/CLASS_LANCE_PLAN.md D-CL2)
   warrior: 'knight',
   thief: 'ninja',
   monk: 'master',

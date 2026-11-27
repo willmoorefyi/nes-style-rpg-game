@@ -100,7 +100,8 @@ def _approved_hashes() -> dict[str, str]:
 def _party_hashes() -> dict[str, str]:
     sp = ROOT / "assets" / "sprites"
     return {n: hashlib.sha256((sp / n).read_bytes()).hexdigest() for n in
-            ("battle-characters-ai.png", "battle-characters-ai.json", "characters-ai.png", "characters-ai.json") if (sp / n).exists()}
+            ("battle-characters-ai.png", "battle-characters-ai.json", "characters-ai.png", "characters-ai.json",
+             *(p.name for p in sorted(sp.glob("battle-characters-ai-*.png")))) if (sp / n).exists()}   # pass CL pages
 
 
 def run_build_locks(check: Callable[[bool, str], None]) -> None:

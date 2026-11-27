@@ -24,25 +24,25 @@ export interface CharacterAtlasMeta {
 }
 
 /** Layout of assets/sprites/battle-characters-ai.json (build stage battle_ai; docs/ART_2X_PLAN.md): one row per
- *  class, one column per pose, and the native row the feet stand on. */
-export interface BattleAtlasMeta {
-  cell: [number, number];
-  scale: number;
-  poses: string[];
-  footRow: number;
-  sheets: Record<string, { row: number }>;
-}
+ *  class, one column per pose, and the native row the feet stand on; pass CL's oversize pages (battleAtlasPages.ts). */
+export type BattleAtlasMeta = PagedBattleMeta;
 
-/** Battle frames for one character plus how to place them. */
+/** Battle frames for one character plus how to place them. `body` (pass CL): the 80 x 80 box (native px) the body is
+ *  drawn in, absent = the whole cell; `reach`: the attack frame's leftmost opaque column (0 when absent). */
 export interface BattleFrames {
   frames: Texture[];
   scale: number;
   cell: [number, number];
   footRow: number;
+  body?: CellRect;
+  reach?: number;
+  top?: number;
 }
 
 import { isPreviewAi } from '../core/artPreview.js';
 import { TILE_SIZE } from '../core/LayoutConstants.js';
+import { bodyOf, cellOf, footRowOf, sheetPage, type CellRect, type PagedBattleMeta } from './battleAtlasPages.js';
+import { loadExtraPages, slicePoses } from './battleAtlasSlice.js';
 export { isPreviewAi };
 
 /** Fetch JSON, rejecting HTTP errors and non-JSON bodies (e.g. a dev server's HTML fallback for a missing file). */
@@ -89,6 +89,8 @@ export class CharacterAtlas {
   private field: Texture | null = null;
   private aiBattleMeta: BattleAtlasMeta | null = null;
   private aiBattle: Texture | null = null;
+  /** Pass CL: the oversize pages (index = `page`; 0 unused, the main file is `aiBattle`). */
+  private aiBattlePages: (Texture | null)[] = [];
   private aiFieldMeta: CharacterAtlasMeta | null = null;
   private aiField: Texture | null = null;
   private aiAttempted = false;
@@ -140,6 +142,7 @@ export class CharacterAtlas {
       tex.source.scaleMode = 'nearest';
       this.aiBattleMeta = meta;
       this.aiBattle = tex;
+      this.aiBattlePages = await loadExtraPages(meta, AI_BATTLE_PATH.slice(0, AI_BATTLE_PATH.lastIndexOf('/')));
     } catch (err) {
       this.aiBattleMeta = null;
       this.aiBattle = null;
@@ -221,19 +224,14 @@ export class CharacterAtlas {
   getBattleFrames(id: string): BattleFrames | null {
     const meta = this.aiBattleMeta;
     if (!meta || !this.aiBattle || !meta.sheets[id]) return null;
-    return { frames: sliceRow(meta, this.aiBattle, meta.sheets[id].row), scale: meta.scale, cell: meta.cell,
-      footRow: meta.footRow };
+    const page = sheetPage(meta, id);
+    const tex = page ? this.aiBattlePages[page] ?? null : this.aiBattle;
+    if (!tex) return null;
+    const frames = slicePoses(meta, tex, id, BATTLE_POSES, (p) => POSE_FALLBACK[p as BattlePose] ?? 'ready');
+    const s = meta.sheets[id];
+    return { frames, scale: meta.scale, cell: cellOf(meta, id), footRow: footRowOf(meta, id),
+      ...(page ? { body: bodyOf(meta, id), reach: s.reach ?? 0, top: s.top ?? 0 } : {}) };
   }
-}
-
-function sliceRow(meta: BattleAtlasMeta, tex: Texture, row: number): Texture[] {
-  const fw = meta.cell[0] * meta.scale;
-  const fh = meta.cell[1] * meta.scale;
-  return BATTLE_POSES.map((pose) => {
-    let col = meta.poses.indexOf(pose);
-    if (col < 0) col = meta.poses.indexOf(POSE_FALLBACK[pose] ?? 'ready');
-    return new Texture({ source: tex.source, frame: new Rectangle(Math.max(0, col) * fw, row * fh, fw, fh) });
-  });
 }
 
 /** Shared by exploration and battle so art is loaded once. */

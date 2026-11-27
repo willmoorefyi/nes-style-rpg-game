@@ -10,6 +10,7 @@ import { iconsFor, tagsFor, type StatusVisuals } from './fx/statusRules.js';
 import { enemyIconRowTop } from './fx/statusIcons.js';
 import { headOf } from './fx/texturePixels.js';
 import { stoneTextures } from './fx/stoneTextures.js';
+import { heroAnchor, heroRect } from './heroBody.js';
 import { colossusArrowAt, colossusIconRowTop, drawColossusBracket, labelFloor, plateColossusLabel } from './colossus/colossusCursor.js';
 
 /** B10: the target arrow is yellow, so it never reads as the active hero's white arrow. */
@@ -140,7 +141,8 @@ export class BattleFieldTargeting {
     const arrow = new Graphics();
     arrow.poly([0, 0, 16, 0, 8, 12]).fill(TARGET_ARROW);
     const offsetX = isParty ? 24 : 40;
-    arrow.position.set(...(colossusArrowAt(sprite) ?? [sprite.x + offsetX, sprite.y - 20]));
+    const at = heroAnchor(sprite);                   // pass CL: an oversize hero's body, not its cell
+    arrow.position.set(...(colossusArrowAt(sprite) ?? [at.x + offsetX, at.y - 20]));
     this.mainContainer.addChild(arrow);
     this.targetArrow = arrow;
     const enemy = isParty ? undefined : this.battle.allEnemies[target.spriteIndex];
@@ -208,8 +210,9 @@ export class BattleFieldTargeting {
         }
         this.targetOutline.clear();
         if (!drawColossusBracket(this.targetOutline, sprite)) {   // a colossus: the bracket, never an off-screen outline
-          this.targetOutline.rect(-3, -3, sprite.width + 6, sprite.height + 6).stroke({ width: 2, color: 0xffffff });
-          this.targetOutline.position.set(sprite.x, sprite.y);
+          const r = heroRect(sprite);                    // pass CL: the body box
+          this.targetOutline.rect(-3, -3, r.width + 6, r.height + 6).stroke({ width: 2, color: 0xffffff });
+          this.targetOutline.position.set(r.x, r.y);
         }
         this.targetOutline.alpha = 0.3 + 0.7 * Math.abs(Math.sin(this.targetFlashTimer * 0.12));
       }

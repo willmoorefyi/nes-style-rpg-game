@@ -3,6 +3,7 @@ import type { GameEvents } from '../../core/EventBus.js';
 import type { ActionResult, NextActionInfo } from '../../battle/BattleStateMachine.js';
 import { attackReach, attackRise, MIN_ATTACK_REACH, type AttackReach } from './attackChoreography.js';
 import { colossusAt } from './colossus/colossusProxy.js';
+import { heroBounds, heroLead } from './heroBody.js';
 
 /** Pure helpers of BattleAnimationController (split out to keep it under its line ceiling). */
 
@@ -12,11 +13,12 @@ export type ActionSound = 'battleHit' | 'battleMiss' | 'spellCast';
  *  there is no target. U3: and from the attacker's feet row (its box's bottom) to the target's. */
 export function measureReach(actor: Container, target: Container | null): AttackReach {
   if (!target) return { dx: MIN_ATTACK_REACH, dy: 0 };
-  const b = target.getBounds();
-  const a = actor.getBounds();
+  const b = heroBounds(target);                      // pass CL: a hero target's body, not its oversize cell
+  const a = heroBounds(actor);
   const m = colossusAt(target)?.anchors().melee;      // a colossus: run to its melee point (CHAOS_FORMS_PLAN 4.4)
-  if (m) return { dx: attackReach(actor.x, m.x), dy: attackRise(a.y + a.height, m.y) };
-  return { dx: attackReach(actor.x, b.x + b.width), dy: attackRise(a.y + a.height, b.y + b.height) };
+  const lead = heroLead(actor);                      // D-CL12: a lance hero leads with its spear point
+  if (m) return { dx: attackReach(lead, m.x), dy: attackRise(a.y + a.height, m.y) };
+  return { dx: attackReach(lead, b.x + b.width), dy: attackRise(a.y + a.height, b.y + b.height) };
 }
 
 /** I3: a damaging Fight sounds a hit, a miss a miss, and a spell that really went off its cast (not when picked). */

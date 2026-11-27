@@ -4,6 +4,7 @@ import { BattleLayers } from './BattleLayers.js';
 import { stepAlpha } from './fx/emitterCore.js';
 import { stoneTextures } from './fx/stoneTextures.js';
 import { colossusAt } from './colossus/colossusProxy.js';
+import { heroRect } from './heroBody.js';
 
 export const ELEMENT_COLORS: Record<string, number> = {
   fire: 0xff4400, ice: 0x4488ff, lightning: 0xffff00, holy: 0xffffff, dark: 0x660066,
@@ -38,8 +39,9 @@ export class BattleEffects {
   addFloating(label: string, kind: FloatKind, sprite: Container, iconRowBottom: number | null = null): void {
     // a colossus (its proxy) takes the number at its core anchor, kept inside the field (docs/CHAOS_FORMS_PLAN.md 4.4)
     const core = colossusAt(sprite)?.anchors().core;
-    const { y, minY } = floatPlacement(core?.y ?? sprite.y, iconRowBottom);
-    const text = createFloatingNumber(label, kind, core ? { x: core.x, width: 0 } : sprite, y, core !== undefined);
+    const box = heroRect(sprite);                    // pass CL: an oversize hero's body box (else the sprite)
+    const { y, minY } = floatPlacement(core?.y ?? box.y, iconRowBottom);
+    const text = createFloatingNumber(label, kind, core ? { x: core.x, width: 0 } : box, y, core !== undefined);
     this.layers.fx.numbers.addChild(text);
     this.floatingTexts.push({ text, age: 0, maxAge: FLOAT_FRAMES, minY });
   }

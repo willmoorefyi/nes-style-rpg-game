@@ -537,6 +537,8 @@ def test_monster_anim() -> None:
     print("pass CB user-rendered hero class sheets (hero_user.py: cut, house palette, refusals, approve, check; kneel_ok "
           "source user; puppet alias_frames, part_boxes, weapon_f)")
     __import__("gen.selftest_hero_user", fromlist=["x"]).run_hero_user(check)
+    print("pass CL oversize lance sheets (cut, per-row palette, body box, lance mask, refusals; puppet_lance L1-L8)")
+    __import__("gen.selftest_hero_lance", fromlist=["x"]).run_hero_lance(check)
     print("pass K kneel (opt-in key, K-checks, variants, TS tables, kneelSink / preload, heroes)"); __import__("gen.selftest_kneel", fromlist=["x"]).run_kneel(check)  # noqa: E702,E501
     print("pass KA AI kneel (bodies, gate, budget, guides, lists, calibration, cut, fixtures)"); __import__("gen.selftest_kneel_ai", fromlist=["x"]).run_kneel_ai(check)  # noqa: E702,E501
     print("pass KT kneel bridge (one-source frames, seams, K-order, bridge checks, source ai)"); __import__("gen.selftest_kneel_bridge", fromlist=["x"]).run_kneel_bridge(check)  # noqa: E702,E501

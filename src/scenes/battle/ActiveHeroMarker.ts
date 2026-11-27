@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, type Texture } from 'pixi.js';
 import { setTint } from './actorTint.js';
 import { headOf } from './fx/texturePixels.js';
+import { heroRect } from './heroBody.js';
 import { stoneTextures } from './fx/stoneTextures.js';
 
 /** Each party sprite's standing (`ready`) texture, registered by BattleDisplayManager: the arrow's reference head. */
@@ -45,8 +46,9 @@ export class ActiveHeroMarker {
     sprite.alpha = 1;
     const arrow = new Graphics();
     arrow.moveTo(0, 0).lineTo(16, 0).lineTo(8, 16).lineTo(0, 0).fill(0xffffff);
-    this.arrowY = sprite.y - 20;
-    arrow.position.set(sprite.x + (sprite.width - 16) / 2, this.arrowY + this.sink());
+    const body = heroRect(sprite);                   // pass CL: over the body box, not the oversize cell
+    this.arrowY = body.y - 20;
+    arrow.position.set(body.x + (body.width - 16) / 2, this.arrowY + this.sink());
     this.parent.addChild(arrow);
     this.arrow = arrow;
   }

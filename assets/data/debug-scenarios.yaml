@@ -3393,3 +3393,51 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/grassland.webp
+
+# Pass CL (docs/CLASS_LANCE_PLAN.md 2): the landsknecht / dragoon pair (the oversize 160 x 144 lance sheet). LANZ is
+# weak (kneels), LAN2 is fallen (down); _b swaps the slots so each class stands in every slot; _mix sets them beside
+# 80 x 80 heroes (the body-box alignment). ?mute=1&scenario=cl_lances (&kneel=loop, &enemyAnim=loop).
+- id: cl_lances
+  name: Landsknecht and Dragoon (pass CL preview)
+  party:
+    - { class: landsknecht, name: LANZ, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: dragoon, name: DRAG, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: landsknecht, name: LAN2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 0 }
+    - { class: dragoon, name: DRG2, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: cl_lances_b
+  name: Dragoon and Landsknecht, slots swapped (pass CL preview)
+  party:
+    - { class: dragoon, name: DRAG, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: landsknecht, name: LANZ, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: dragoon, name: DRG2, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }], hp: 0 }
+    - { class: landsknecht, name: LAN2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: cl_lances_mix
+  name: Lance heroes beside 80 x 80 heroes (pass CL preview)
+  party:
+    - { class: knight, name: KNT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: landsknecht, name: LANZ, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: barbarian, name: BARB, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: dragoon, name: DRAG, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp
+- id: cl_lances_hurt
+  name: Lance heroes taking hits (pass CL preview; the enemies outlast the first round)
+  party:
+    - { class: dragoon, name: DRAG, level: 1, equipment: [], spells: [] }
+    - { class: landsknecht, name: LANZ, level: 1, equipment: [], spells: [] }
+    - { class: dragoon, name: DRG2, level: 1, equipment: [], spells: [] }
+    - { class: landsknecht, name: LAN2, level: 1, equipment: [], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [wolf, wolf, wolf, wolf]
+  background: assets/backgrounds/grassland.webp

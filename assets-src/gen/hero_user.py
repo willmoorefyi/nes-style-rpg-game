@@ -27,13 +27,12 @@ import numpy as np
 import yaml
 from PIL import Image
 
-from gen import pixelize as PX
+from gen import hero_user_grid as HG
 
 HERE = Path(__file__).resolve().parent
 RECIPES = HERE / "hero_user.yaml"
 TOOL = "assets-src/gen/hero_user.py"
-CELL, FOOT, COLOURS = 80, 76, 16
-COLUMNS = ("ready", "attack", "cast", "hurt", "down", "victory", "kneel")
+CELL, FOOT, COLOURS, COLUMNS = HG.CELL, HG.FOOT, HG.COLOURS, HG.COLUMNS
 POSES = COLUMNS[:6]                                    # battle.png, 3 x 2 (puppet._cells order)
 REVIEW = Path.home() / "temp/ff-game/class_pack/review/import"
 
@@ -73,98 +72,54 @@ def source(rec: dict, gen: Path = HERE) -> np.ndarray:
     return np.asarray(Image.open(gen / rec["file"]).convert("RGBA")).copy()
 
 
-def _cells_apart(m: np.ndarray, ncols: int, nrows: int) -> list[str]:
-    """Every pair of 8-adjacent opaque px on either side of a cell border (a piece crossing it)."""
-    bad = []
-    for c in range(1, ncols):
-        x = c * CELL
-        left, right = m[:, x - 1], m[:, x]
-        near = right.copy()
-        near[1:] |= right[:-1]
-        near[:-1] |= right[1:]
-        if (left & near).any():
-            bad.append(f"a figure crosses the border of columns {c - 1} / {c}")
-    for r in range(1, nrows):
-        y = r * CELL
-        top, bot = m[y - 1], m[y]
-        near = bot.copy()
-        near[1:] |= bot[:-1]
-        near[:-1] |= bot[1:]
-        if (top & near).any():
-            bad.append(f"a figure crosses the border of rows {r - 1} / {r}")
-    return bad
+def cut(rec: dict, gen: Path = HERE) -> tuple[dict[str, dict[str, Image.Image]], dict]:
+    """{class: {pose: cell}} for every row of the recipe (the seven columns), and the import measures (the checks and
+    the recipe geometry live in hero_user_grid.py: pass CB's 80 x 80 rule, pass CL's oversize cells)."""
+    return HG.cut(rec, source(rec, gen))
 
 
 def palette(a: np.ndarray) -> dict[tuple, tuple]:
-    """The house mapping {source rgb: 15-bit rgb}: <= 16 colours, PX.snap15, the darkest PX.OUTLINE, one-to-one."""
-    uniq = [tuple(int(v) for v in c) for c in np.unique(a[a[..., 3] > 0][:, :3], axis=0)]
-    if len(uniq) > COLOURS:
-        raise SystemExit(f"user sheet: {len(uniq)} colours, at most {COLOURS} (no colour is invented by a k-means)")
-    snapped = PX.snap15(np.array(uniq, np.float32)).astype(int)
-    dark = int(np.array(uniq).sum(1).argmin())
-    out = {c: tuple(int(v) for v in s) for c, s in zip(uniq, snapped)}
-    out[uniq[dark]] = tuple(PX.OUTLINE)
-    if len(set(out.values())) != len(out):
-        raise SystemExit("user sheet: two colours snap to the same 15-bit colour (the mapping must be one-to-one)")
-    return out
-
-
-def cut(rec: dict, gen: Path = HERE) -> tuple[dict[str, dict[str, Image.Image]], dict]:
-    """{class: {pose: 80 x 80 cell}} for every row of the recipe (the seven columns), and the import measures."""
-    a = source(rec, gen)
-    nrows = len(rec["rows"])
-    if a.shape[:2] != (nrows * CELL, len(COLUMNS) * CELL):
-        raise SystemExit(f"user sheet: {a.shape[1]}x{a.shape[0]}, need {len(COLUMNS) * CELL}x{nrows * CELL} "
-                         f"({len(COLUMNS)} x {nrows} cells of {CELL})")
-    al = a[..., 3]
-    if ((al > 0) & (al < 255)).any():
-        raise SystemExit("user sheet: semi-transparent pixels (binary alpha needed)")
-    m = al > 0
-    bad = _cells_apart(m, len(COLUMNS), nrows)
-    if bad:
-        raise SystemExit("user sheet: " + "; ".join(bad))
-    pal = palette(a)
-    out = a.copy()
-    for src, dst in pal.items():
-        out[(a[..., :3] == src).all(-1) & m, :3] = dst
-    cells: dict[str, dict[str, Image.Image]] = {}
-    boxes = {}
-    for r, cid in enumerate(rec["rows"]):
-        cells[cid] = {}
-        for c, pose in enumerate(COLUMNS):
-            cell = out[r * CELL:(r + 1) * CELL, c * CELL:(c + 1) * CELL]
-            ys, xs = np.where(cell[..., 3] > 0)
-            if not len(ys):
-                raise SystemExit(f"user sheet: {cid} {pose} is empty")
-            if ys.max() != FOOT:
-                raise SystemExit(f"user sheet: {cid} {pose} feet on row {ys.max()}, need {FOOT}")
-            cells[cid][pose] = Image.fromarray(np.ascontiguousarray(cell))
-            boxes[f"{cid}/{pose}"] = [int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())]
-    info = {"source_size": [int(a.shape[1]), int(a.shape[0])], "colours": len(pal),
-            "palette": [[list(s), list(d)] for s, d in sorted(pal.items())], "boxes": boxes}
-    return cells, info
+    return HG.palette(a)
 
 
 def battle_sheet(cells: dict[str, Image.Image]) -> Image.Image:
-    out = Image.new("RGBA", (3 * CELL, 2 * CELL))
+    w, h = cells["ready"].size
+    out = Image.new("RGBA", (3 * w, 2 * h))
     for i, pose in enumerate(POSES):
-        out.paste(cells[pose], ((i % 3) * CELL, (i // 3) * CELL))
+        out.paste(cells[pose], ((i % 3) * w, (i // 3) * h))
     return out
 
 
 def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tuple[dict, dict]:
+    g = info["geometry"]
     base = {"character": cid, "backend": "user", "tool": TOOL, "source": {"file": rec["file"], "sha256": rec["sha256"]},
             "recipe": f"hero_user.yaml#{rid}", "row": row, "rendered_in": rec.get("tool", "ChatGPT (interactive)"),
             "rendered": str(rec.get("rendered")), "author": rec.get("author", "user"), "refs": rec.get("refs"),
-            "source_name": rec.get("source_name"), "grid": [CELL, CELL], "bottom_row": FOOT, "faces": "left",
-            "imported": today, "approved": rec.get("approved"), "user_review": rec.get("user_review"),
+            "source_name": rec.get("source_name"), "grid": [g["cw"], g["ch"]], "bottom_row": g["foot"],
+            "faces": "left", "imported": today, "approved": rec.get("approved"), "user_review": rec.get("user_review"),
             "route": "CB: user-rendered hero class sheet (house palette map, no AI call)"}
-    cut_info = {"colours": info["colours"], "palette": info["palette"],
+    if (g["cw"], g["ch"]) != (CELL, CELL):             # pass CL (docs/CLASS_LANCE_PLAN.md 3, 4): the body anchor
+        base = {**base, "body": HG.body_xywh(g), "palette": g["palette"],
+                "route": "CL: user-rendered oversize hero class sheet (body-box anchor, lance prop; no AI call)"}
+    pal = info["palettes"][cid] if g["palette"] == "per_row" else info["palette"]
+    cut_info = {"colours": len(pal) if g["palette"] == "per_row" else info["colours"], "palette": pal,
                 "boxes": {k.split("/")[1]: v for k, v in info["boxes"].items() if k.startswith(f"{cid}/")}}
-    battle = {**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES),
-              "cut": {**cut_info, "boxes": {p: b for p, b in cut_info["boxes"].items() if p in POSES}}}
-    kneel = {**base, "sheet": "battle_kneel", "foot_row": FOOT,
-             "cut": {**cut_info, "boxes": {"kneel": cut_info["boxes"]["kneel"]}}}
+    prop = g["prop"]
+
+    def with_prop(m: dict, poses) -> dict:
+        if not prop:
+            return m
+        lines = prop["lines"][cid]
+        return {**m, "prop": {"kind": prop["kind"], "radius": prop["radius"], "head_len": HG.HL.head_len(prop, cid),
+                              "colours": prop["colours"][cid],
+                              "shaft_colours": (prop.get("shaft_colours") or {}).get(cid),
+                              "lines": {p: lines[p] for p in poses}},
+                "cut": {**m["cut"], "lance_px": {p: info["lance_px"][f"{cid}/{p}"] for p in poses}}}
+    battle = with_prop({**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES),
+                        "cut": {**cut_info, "boxes": {p: b for p, b in cut_info["boxes"].items() if p in POSES}}},
+                       POSES)
+    kneel = with_prop({**base, "sheet": "battle_kneel", "foot_row": g["foot"],
+                       "cut": {**cut_info, "boxes": {"kneel": cut_info["boxes"]["kneel"]}}}, ("kneel",))
     return battle, kneel
 
 
@@ -219,9 +174,15 @@ def check(meta: dict, gen: Path | None = None) -> str | None:
         _, rec, _ = recipe_of(str(cid), gen)
         if meta.get("source") != {"file": rec["file"], "sha256": rec["sha256"]}:
             return "the recipe's source / sha256 differ from the approved json"
-        cells, _ = cut(rec, gen)
+        cells, info = cut(rec, gen)
     except SystemExit as e:
         return str(e)
+    g = info["geometry"]
+    if [meta.get("grid"), meta.get("bottom_row"), meta.get("body")] != \
+            [[g["cw"], g["ch"]], g["foot"], HG.body_xywh(g) if "body" in meta or g["prop"] else None]:
+        return "the json's grid / bottom_row / body differ from the recipe"       # pass CL: the anchor
+    if g["prop"] and any(meta["prop"]["lines"][p] != g["prop"]["lines"][cid][p] for p in meta["prop"]["lines"]):
+        return "the json's lance lines differ from the recipe"
     want = np.asarray(files_of(cells[cid])[sheet])
     p = gen / "approved" / str(cid) / f"{sheet}.png"
     if not p.is_file():
@@ -237,18 +198,23 @@ def review(rid: str, out: Path | None = None) -> list[Path]:
     rec = recipe(rid)
     cells, info = cut(rec)
     k, sw = 4, 40
-    h = len(rec["rows"]) * CELL * k
-    sheet = Image.new("RGBA", (len(COLUMNS) * CELL * k, h + 2 * sw + 8), (60, 60, 70, 255))
+    cw, ch = cells[rec["rows"][0]]["ready"].size
+    h = len(rec["rows"]) * ch * k
+    sheet = Image.new("RGBA", (len(COLUMNS) * cw * k, h + 2 * sw + 8), (60, 60, 70, 255))
     for r, cid in enumerate(rec["rows"]):
         for c, pose in enumerate(COLUMNS):
-            sheet.alpha_composite(cells[cid][pose].resize((CELL * k, CELL * k), Image.Resampling.NEAREST),
-                                  (c * CELL * k, r * CELL * k))
+            sheet.alpha_composite(cells[cid][pose].resize((cw * k, ch * k), Image.Resampling.NEAREST),
+                                  (c * cw * k, r * ch * k))
     for i, (src, dst) in enumerate(info["palette"]):          # the colour map: source (top) -> house colour (below)
         sheet.paste((*src, 255), (i * (sw + 4), h + 4, i * (sw + 4) + sw, h + 4 + sw))
         sheet.paste((*dst, 255), (i * (sw + 4), h + 4 + sw, i * (sw + 4) + sw, h + 4 + 2 * sw))
     sheet.save(p := out / f"{rid}_import_x4.png")
     (q := out / f"{rid}_import.json").write_text(json.dumps(info, indent=2) + "\n")
-    return [p, q]
+    if not info["geometry"]["prop"]:
+        return [p, q]
+    from gen import hero_user_lance as HL                  # pass CL 4.2 item 7: the lance mask and the body box
+    HL.review_sheet(source(rec), rec, info["geometry"]).save(o := out / f"{rid}_lance_x4.png")
+    return [p, q, o]
 
 
 def main(argv: list[str] | None = None) -> int:

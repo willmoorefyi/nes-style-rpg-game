@@ -5,6 +5,7 @@
 import { Graphics, Sprite, type Container, type Texture } from 'pixi.js';
 import type { Character } from '../../entities/Character.js';
 import { characterAtlas } from '../../rendering/CharacterAtlas.js';
+import { setHeroBody } from './heroBody.js';
 
 /** Party battle art (80x80 native at 2x): feet line per slot on the background's battle plain
  *  (docs/ART_BATTLE_PLAN.md: every actor's feet at y 360-745, B13), and x per slot (a slight diagonal). */
@@ -13,9 +14,11 @@ export const PARTY_X = [1380, 1425, 1470, 1515];
 const PLACEHOLDER_SIZE = 64;
 const PLACEHOLDER_COLORS = [0x4488ff, 0xff4444, 0x44ff44, 0xffff44];
 
-/** Screen position (top-left) for a party battle sprite whose feet are on `art.footRow`. */
-export function partySpritePosition(i: number, art: { footRow: number; scale: number }): { x: number; y: number } {
-  return { x: PARTY_X[i], y: PARTY_FEET_Y[i] - (art.footRow + 1) * art.scale };
+/** Screen position (top-left) for a party battle sprite whose feet are on `art.footRow`. Pass CL
+ *  (docs/CLASS_LANCE_PLAN.md 7.1): an oversize hero is placed by its body box, so the body lands where an 80 x 80
+ *  hero's cell does and the lance overhangs up and to the left. */
+export function partySpritePosition(i: number, art: { footRow: number; scale: number; body?: { x: number } }): { x: number; y: number } {
+  return { x: PARTY_X[i] - (art.body?.x ?? 0) * art.scale, y: PARTY_FEET_Y[i] - (art.footRow + 1) * art.scale };
 }
 
 /** Party member i's sprite and its pose textures (null for the placeholder box). */
@@ -25,6 +28,7 @@ export function buildPartySprite(char: Character, i: number): { sprite: Containe
     const sprite = new Sprite(art.frames[0]);
     const pos = partySpritePosition(i, art);
     sprite.position.set(pos.x, pos.y);
+    setHeroBody(sprite, art);
     return { sprite, frames: art.frames };
   }
   const g = new Graphics();

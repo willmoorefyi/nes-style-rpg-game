@@ -1,0 +1,320 @@
+{
+  "character": "landsknecht",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/landsknecht/battle_2026-11-26.png",
+    "sha256": "e2ecbd916b7cbdaa7d351a58cf5ff26c025e51ba7f7b8c986053047d1199ca4e"
+  },
+  "recipe": "hero_user.yaml#landsknecht_dragoon",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt_landsknecht_dragoon.txt": "eb5745333f6489d8474b384492e752d6dbd0afa65368e6368ac0964d4a5e7637"
+  },
+  "source_name": "landsknecht_dragoon_sprite_sheet.png",
+  "grid": [
+    160,
+    144
+  ],
+  "bottom_row": 140,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-26",
+  "user_review": "a new character class ... the 'landsneckt' and 'dragoon' ... import and verify the character renders correctly with the unique overall sprite size (delivered as final; used as rendered)",
+  "route": "CL: user-rendered oversize hero class sheet (body-box anchor, lance prop; no AI call)",
+  "body": [
+    72,
+    64,
+    80,
+    80
+  ],
+  "palette": "per_row",
+  "sheet": "battle_kneel",
+  "foot_row": 140,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          25,
+          25,
+          34
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          48,
+          40,
+          48
+        ],
+        [
+          49,
+          41,
+          49
+        ]
+      ],
+      [
+        [
+          67,
+          59,
+          64
+        ],
+        [
+          66,
+          57,
+          66
+        ]
+      ],
+      [
+        [
+          75,
+          87,
+          112
+        ],
+        [
+          74,
+          90,
+          115
+        ]
+      ],
+      [
+        [
+          78,
+          53,
+          43
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          87,
+          63,
+          36
+        ],
+        [
+          90,
+          66,
+          33
+        ]
+      ],
+      [
+        [
+          104,
+          121,
+          152
+        ],
+        [
+          107,
+          123,
+          148
+        ]
+      ],
+      [
+        [
+          118,
+          80,
+          57
+        ],
+        [
+          115,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          155,
+          98,
+          31
+        ],
+        [
+          156,
+          99,
+          33
+        ]
+      ],
+      [
+        [
+          164,
+          113,
+          73
+        ],
+        [
+          165,
+          115,
+          74
+        ]
+      ],
+      [
+        [
+          174,
+          184,
+          196
+        ],
+        [
+          173,
+          181,
+          198
+        ]
+      ],
+      [
+        [
+          215,
+          142,
+          98
+        ],
+        [
+          214,
+          140,
+          99
+        ]
+      ],
+      [
+        [
+          216,
+          150,
+          36
+        ],
+        [
+          214,
+          148,
+          33
+        ]
+      ],
+      [
+        [
+          217,
+          210,
+          190
+        ],
+        [
+          214,
+          214,
+          189
+        ]
+      ],
+      [
+        [
+          242,
+          191,
+          83
+        ],
+        [
+          239,
+          189,
+          82
+        ]
+      ],
+      [
+        [
+          245,
+          189,
+          144
+        ],
+        [
+          247,
+          189,
+          148
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        18,
+        46,
+        141,
+        141
+      ]
+    },
+    "lance_px": {
+      "kneel": 519
+    }
+  },
+  "prop": {
+    "kind": "lance",
+    "radius": {
+      "shaft": 2.1,
+      "head": 6.0
+    },
+    "head_len": 18.0,
+    "colours": [
+      [
+        25,
+        25,
+        34
+      ],
+      [
+        75,
+        87,
+        112
+      ],
+      [
+        118,
+        80,
+        57
+      ],
+      [
+        174,
+        184,
+        196
+      ],
+      [
+        217,
+        210,
+        190
+      ]
+    ],
+    "shaft_colours": [
+      [
+        25,
+        25,
+        34
+      ],
+      [
+        118,
+        80,
+        57
+      ],
+      [
+        78,
+        53,
+        43
+      ],
+      [
+        87,
+        63,
+        36
+      ],
+      [
+        48,
+        40,
+        48
+      ]
+    ],
+    "lines": {
+      "kneel": [
+        [
+          17.6,
+          46.4
+        ],
+        [
+          121.9,
+          140.0
+        ]
+      ]
+    }
+  }
+}

@@ -19,3 +19,54 @@ barbarian_berserker:
   source_name: barbarian_berserker_sprite_sheet.png
   approved: "2026-11-26"
   user_review: "The first instance of my new heroes is ready (delivered as final; used as rendered)"
+# Pass CL (docs/CLASS_LANCE_PLAN.md 4): the landsknecht / dragoon pair, 160 x 144 cells, the body in the 80 x 80 box
+# at x 72-151, y 64-143 (feet on row 140), the lance free to leave it. One 16-colour house palette per class row (the
+# render has 16 + 16). Lance lines tip -> butt (the butt: where the lance's visible end is; in ready the near fist hides
+# it), measured by a straight-line fit of the out-of-box pixels and checked by eye on 5x gridded cells.
+landsknecht_dragoon:
+  file: user_art/landsknecht/battle_2026-11-26.png
+  sha256: e2ecbd916b7cbdaa7d351a58cf5ff26c025e51ba7f7b8c986053047d1199ca4e
+  rows: [landsknecht, dragoon]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  cell: [160, 144]
+  foot_row: 140
+  body_box: [72, 64, 151, 143]
+  palette: per_row
+  prop:
+    kind: lance
+    radius: {shaft: 2.1, head: 6.0}          # px from the line at 45 deg (1.5 level or upright); the head is wider
+    head_len: {landsknecht: 18, dragoon: 28}  # tip to the end of the blade and its fittings
+    colours:
+      landsknecht: [[25, 25, 34], [75, 87, 112], [118, 80, 57], [174, 184, 196], [217, 210, 190]]
+      dragoon: [[16, 25, 30], [60, 99, 115], [71, 56, 50], [134, 166, 166], [167, 123, 57], [215, 220, 209],
+                [219, 181, 100], [240, 212, 144]]
+    shaft_colours:                            # beyond the head: ink, wood and the shaft's shades (not the steel)
+      landsknecht: [[25, 25, 34], [118, 80, 57], [78, 53, 43], [87, 63, 36], [48, 40, 48]]   # + the shaft's shades over the doublet
+      dragoon: [[16, 25, 30], [71, 56, 50], [167, 123, 57], [37, 45, 55]]                 # + its shade over the cuirass
+    lines:
+      landsknecht:
+        ready: [[36.2, 22.8], [119.0, 113.8]]   # through the near fist and across the doublet to the far fist
+        attack: [[4, 112], [143, 112]]
+        cast: [[86, 1], [86, 140]]
+        hurt: [[145.9, 18.9], [63.9, 130.9]]
+        down: [[2, 138], [141, 138]]
+        victory: [[95, 1], [95, 140]]
+        kneel: [[17.6, 46.4], [121.9, 140.0]]
+      dragoon:
+        ready: [[21.0, 28.0], [114.0, 121.0]]   # through the near gauntlet and across the cuirass to the far one
+        attack: [[12.0, 106.8], [151.0, 107.5]]
+        cast: [[86, 140], [86, 1]]
+        hurt: [[154.4, 26.3], [64.0, 132.0]]
+        down: [[2.0, 137.8], [146.0, 138.3]]
+        victory: [[133.2, 1.0], [132.6, 140.0]]
+        kneel: [[4.1, 43.9], [106.2, 140.2]]
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt_landsknecht_dragoon.txt: eb5745333f6489d8474b384492e752d6dbd0afa65368e6368ac0964d4a5e7637
+  source_name: landsknecht_dragoon_sprite_sheet.png
+  approved: "2026-11-26"
+  user_review: "a new character class ... the 'landsneckt' and 'dragoon' ... import and verify the character renders correctly with the unique overall sprite size (delivered as final; used as rendered)"

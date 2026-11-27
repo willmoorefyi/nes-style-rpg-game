@@ -7,6 +7,7 @@ import { GAME_WIDTH, FONT_SIZE, SCREEN_MARGIN, LINE_HEIGHT } from '../../core/La
 
 /** Default name per base class; NameEntryGrid's uniqueDefaultName adds 2, 3... for repeats. */
 export const DEFAULT_NAMES: Record<string, string> = {
+  landsknecht: 'LANZ',   // pass CL
   warrior: 'FGHTR',
   thief: 'THIEF',
   monk: 'MONK',

@@ -133,8 +133,18 @@ describe('asset coverage (run `npm run assets` after adding content)', () => {
       const classIds = new Set(classes.map((c) => c.id));
       for (const id of Object.keys(battleAtlas.sheets)) expect(classIds.has(id), id).toBe(true);
       const png = readFileSync(join(assets, 'sprites/battle-characters-ai.png'));
+      // pass CL (docs/CLASS_LANCE_PLAN.md 3.1): the main file holds the main-page (80 x 80) sheets; an oversize page
+      // is listed in `pages` with its size, and every listed page file exists at that size
+      const sheets = battleAtlas.sheets as Record<string, { page?: number }>;
+      const mainRows = Object.values(sheets).filter((s) => !s.page).length;
       expect(png.readUInt32BE(16)).toBe(battleAtlas.cell[0] * battleAtlas.scale * battleAtlas.poses.length);
-      expect(png.readUInt32BE(20)).toBe(battleAtlas.cell[1] * battleAtlas.scale * Object.keys(battleAtlas.sheets).length);
+      expect(png.readUInt32BE(20)).toBe(battleAtlas.cell[1] * battleAtlas.scale * mainRows);
+      const pages = (battleAtlas as { pages?: { file: string; w: number; h: number }[] }).pages ?? [];
+      for (const p of pages) {
+        const f = readFileSync(join(assets, 'sprites', p.file));
+        expect([f.readUInt32BE(16), f.readUInt32BE(20)], p.file).toEqual([p.w, p.h]);
+      }
+      for (const s of Object.values(sheets)) if (s.page) expect(pages[s.page], `page ${s.page}`).toBeDefined();
     });
   });
 

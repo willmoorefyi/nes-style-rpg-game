@@ -16,6 +16,7 @@ import { bodyBox, createEmitter, seededRng, stepAlpha, type Emitter, type FxBox 
 import { effectIdFor, type FxEffect } from './fxDefs.js';
 import { FxBatch, ScreenTint } from './fxRender.js';
 import type { FxSource } from './fxSource.js';
+import { heroBounds, heroLocalBounds } from '../heroBody.js';
 import type { ActionFx, ActionFxContext, FxCueId, FxCuePoint } from './index.js';
 
 /** Frames between the starts of an all-target effect on consecutive targets. */
@@ -146,7 +147,7 @@ export class BattleActionFx implements ActionFx {
   private box(sprite: Container): FxBox {
     const c = colossusAt(sprite);
     if (c) return bodyBox(c.effectBox());             // a colossus: its synthetic body box at the core (layer space)
-    const b = sprite.getBounds();
+    const b = heroBounds(sprite);                   // pass CL: an oversize hero's body box
     const tl = this.layers.fx.spell.toLocal({ x: b.x, y: b.y });
     return bodyBox({ x: tl.x, y: tl.y, width: b.width, height: b.height });
   }
@@ -154,7 +155,7 @@ export class BattleActionFx implements ActionFx {
   /** A point of a sprite (fractions of its local bounds) as an empty box in the effect layer's space: every anchor of
    *  an empty box is the point itself. */
   private point(sprite: Container, at: FxCuePoint): FxBox {
-    const b = sprite.getLocalBounds();
+    const b = heroLocalBounds(sprite);
     const p = this.layers.fx.spell.toLocal(sprite.toGlobal({ x: b.x + b.width * at.x, y: b.y + b.height * at.y }));
     return { x: p.x, y: p.y, w: 0, h: 0 };
   }

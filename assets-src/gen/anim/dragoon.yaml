@@ -1,0 +1,30 @@
+# Puppet joints for the dragoon (assets-src/gen/puppet.py + puppet_lance.py; pass CL, docs/CLASS_LANCE_PLAN.md 5).
+# Native px on approved/dragoon/battle.png cells (160 x 144, the user's render, every pose faces left, the body in the
+# 80 x 80 box x 72-151, y 64-143; n = near/viewer-side limb, f = far limb). No `tip`: the lance is a prop (its lines are
+# in the approved json, from hero_user.yaml), held at hand_n (the grip) and redrawn or carried by puppet_lance.py.
+# Marked on 6x gridded body crops. The in-betweens use the keys whole (puppet_lance.RIGID): the joints place the
+# hip cut and the near fist (the grip) only.
+robed: false
+attack_hand: n
+cast_hand: f
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [111, 98], crown: [116, 74], chest: [116, 105], hip: [116, 116],
+     sh_n: [106, 101], el_n: [97, 107], hand_n: [94, 100],
+     sh_f: [126, 99], el_f: [130, 110], hand_f: [119, 116],
+     hip_n: [106, 119], knee_n: [98, 127], foot_n: [95, 137], hip_f: [123, 119], knee_f: [128, 129], foot_f: [131, 137]}
+  attack:
+    {neck: [108, 98], crown: [114, 76], chest: [112, 104], hip: [117, 116],
+     sh_n: [101, 101], el_n: [91, 105], hand_n: [78, 107],
+     sh_f: [127, 97], el_f: [134, 102], hand_f: [126, 107],
+     hip_n: [109, 118], knee_n: [101, 127], foot_n: [96, 137], hip_f: [126, 118], knee_f: [136, 129], foot_f: [139, 137]}
+  cast:
+    {neck: [110, 103], crown: [112, 84], chest: [117, 108], hip: [120, 118],
+     sh_n: [102, 107], el_n: [94, 110], hand_n: [86, 106],
+     sh_f: [127, 106], el_f: [136, 102], hand_f: [137, 92],
+     hip_n: [112, 121], knee_n: [108, 131], foot_n: [112, 137], hip_f: [128, 121], knee_f: [140, 131], foot_f: [144, 137]}
+# pass CL 6: the user's KNEEL column as the key, bridged on the body; the lance carried (grip: the near fist on the key)
+# review round 3 (the last): kneel_in1 (a spur and a smear at the gauntlet) and kneel_in2 (the front foot detached)
+# still failed, so they fall back to their keys (ready, the kneel key): the kneel pops from ready to the key
+kneel: {source: user, grip: [84, 116], alias_frames: [kneel_in1, kneel_in2]}

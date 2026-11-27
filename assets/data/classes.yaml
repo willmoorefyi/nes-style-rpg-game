@@ -223,6 +223,32 @@
   hitPercent: { base: 10, growth: 3 }
   magicDefense: { base: 15, growth: 3 }
 
+# ═══ LANDSKNECHT (pass CL, docs/CLASS_LANCE_PLAN.md) ═══
+# The user's lance class pair (the battle art is the one oversize hero sheet: 160 x 144 cells, the body anchored in an
+# 80 x 80 box). A shallow copy of the warrior (tests/data/lanceClass.test.ts pins the copy); no spear item exists yet,
+# so it equips the warrior's list.
+- id: landsknecht
+  name: Landsknecht
+  abbr: LKN
+  baseStats:
+    hp: 35
+    strength: 20
+    agility: 5
+    intelligence: 1
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 13
+    strength: 4
+    agility: 1
+    intelligence: 0
+    vitality: 3
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield]
+  spellLevels: { white: 0, black: 0 }
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+
 # ═══════════════════════════════════
 # UPGRADED CLASSES (Phase 16)
 # ═══════════════════════════════════
@@ -456,6 +482,38 @@
   name: Berserker
   abbr: BSK
   upgradeFrom: barbarian
+  baseStats:
+    hp: 42
+    strength: 24
+    agility: 6
+    intelligence: 2
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 16
+    strength: 5
+    agility: 1
+    intelligence: 1
+    vitality: 4
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
+  spellLevels: { white: 3, black: 0 }
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+  spellCharges:
+    - [10, [1]]
+    - [15, [2, 1]]
+    - [20, [3, 2, 1]]
+    - [30, [5, 4, 3]]
+    - [40, [7, 6, 5]]
+    - [50, [9, 8, 7]]
+
+# ═══ DRAGOON (upgraded Landsknecht; pass CL) ═══
+# A shallow copy of the knight (its white magic L1-3 included; a classic dragoon has none: for the user to rule).
+- id: dragoon
+  name: Dragoon
+  abbr: DRG
+  upgradeFrom: landsknecht
   baseStats:
     hp: 42
     strength: 24

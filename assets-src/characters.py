@@ -779,6 +779,14 @@ ROSTER: dict[str, Look] = {
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),
+    # pass CL (docs/CLASS_LANCE_PLAN.md D-CL10): 1x legacy looks of the lance pair (no 1x spear exists, so the
+    # nearest weapon): the landsknecht's ochre doublet and feathered beret, the dragoon's dark teal armour, gold trim
+    "landsknecht": Look(hair=(27, 20, 8), hair_style="short", outfit="coat", cloth=(26, 18, 5), trim=(10, 6, 4),
+                        pants=(26, 18, 5), boots=(12, 8, 5), gear="feather", gear_color=(9, 11, 17),
+                        gear_color2=(27, 26, 23), weapon="sword"),
+    "dragoon": Look(hair=(27, 22, 12), hair_style="short", outfit="armor", cloth=(5, 9, 11), trim=(26, 20, 9),
+                    pants=(5, 8, 9), boots=(5, 8, 9), gear="plume_helm", gear_color=(5, 9, 11),
+                    gear_color2=(26, 20, 9), weapon="sword"),
     "knight": Look(hair=(26, 22, 8), hair_style="short", outfit="armor", cloth=(18, 20, 27), trim=(27, 22, 6),
                    pants=(10, 12, 18), boots=(10, 11, 15), gear="plume_helm", gear_color=(18, 20, 27),
                    gear_color2=(28, 29, 31), weapon="sword", shield=True),

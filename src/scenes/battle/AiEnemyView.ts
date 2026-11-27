@@ -16,6 +16,7 @@ import type { FxCuePoint } from './fx/index.js';
 import { glintTip } from './glintPoint.js';
 import { readPixels, type Pixels } from './fx/texturePixels.js';
 import { kneelSinkPx } from './enemyOffsets.js';
+import { heroBounds } from './heroBody.js';
 
 /** The heavy attack's red pulse during its held telegraph (actorTint `pulse`), on for 4 frames, off for 4; an enemy's
  *  `pulseTint` replaces it (the pale lich takes a lighter one, so it does not turn muddy). */
@@ -89,7 +90,7 @@ export class AiEnemyView {
     const b = this.base[i];
     const e = this.enemies[i];
     if (!target || !f || !box || !b || e?.attack === 'ranged' || layoutSizeOfArt(e?.size, f) === 'titan') return { travel: 0, rise: 0 };
-    const t = target.getBounds();
+    const t = heroBounds(target);                    // pass CL: an oversize hero's body, not its lance's cell
     // the target's box in the actors layer's space (a running screen shake moves the layer, not the home positions);
     // toLocal reads the layer's current transform (its cached worldTransform lags a move made since the last render,
     // e.g. the bestiary's centring shift)

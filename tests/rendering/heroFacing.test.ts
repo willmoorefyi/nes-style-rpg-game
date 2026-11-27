@@ -8,10 +8,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { readRgbaPng, type RgbaImage } from '../helpers/pngAlpha.js';
+import { cellRect, pageFile, sheetPage, type PagedBattleMeta } from '../../src/rendering/battleAtlasPages.js';
 
 interface FacingFix { pose: string; mirror: 'figure' | 'head'; box?: number[]; sum?: number }
 interface BattleMeta { grid: [number, number]; layout: [number, number]; poses: string[]; face_fix?: { pose: string } | { pose: string }[]; facing_fix?: FacingFix[] }
-interface HeroAtlas { cell: [number, number]; scale: number; footRow: number; poses: string[]; sheets: Record<string, { row: number }> }
+type HeroAtlas = PagedBattleMeta;
 
 const APPROVED = 'assets-src/gen/approved';
 const atlasMeta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json', 'utf8')) as HeroAtlas;
@@ -36,14 +37,21 @@ function px(img: RgbaImage, x: number, y: number): number {
 function approvedCell(img: RgbaImage, meta: BattleMeta, pose: string): Cell {
   const i = meta.poses.indexOf(pose);
   const cols = meta.layout[0];
-  const ox = (i % cols) * GW, oy = Math.floor(i / cols) * GH;
-  return Array.from({ length: GH }, (_, y) => Array.from({ length: GW }, (_, x) => px(img, ox + x, oy + y)));
+  const [gw, gh] = meta.grid;                        // pass CL: an oversize sheet's own cell
+  const ox = (i % cols) * gw, oy = Math.floor(i / cols) * gh;
+  return Array.from({ length: gh }, (_, y) => Array.from({ length: gw }, (_, x) => px(img, ox + x, oy + y)));
 }
 
+/** Pass CL (docs/CLASS_LANCE_PLAN.md 3.1): each class's cell on its own page (battleAtlasPages.cellRect). */
+const pages = new Map<number, RgbaImage>([[0, atlas]]);
 function atlasCell(cid: string, pose: string): Cell {
-  const s = atlasMeta.scale, col = atlasMeta.poses.indexOf(pose), row = atlasMeta.sheets[cid].row;
-  return Array.from({ length: GH }, (_, y) => Array.from({ length: GW },
-    (_, x) => px(atlas, (col * GW + x) * s, (row * GH + y) * s)));
+  const s = atlasMeta.scale, col = atlasMeta.poses.indexOf(pose);
+  const page = sheetPage(atlasMeta, cid);
+  if (!pages.has(page)) pages.set(page, readRgbaPng(`assets/sprites/${pageFile(atlasMeta, page, 'battle-characters-ai.png')}`));
+  const img = pages.get(page)!;
+  const r = cellRect(atlasMeta, cid, col);
+  return Array.from({ length: r.h / s }, (_, y) => Array.from({ length: r.w / s },
+    (_, x) => px(img, r.x + x * s, r.y + y * s)));
 }
 
 function bbox(c: Cell): [number, number, number, number] {
@@ -81,7 +89,7 @@ function faceFixPoses(meta: BattleMeta): Set<string> {
 describe('pass HF: hero battle facing fixes in the committed atlas', () => {
   it('every hero class has an approved battle sheet and json', () => {
     expect(classes.length).toBe(12);
-    expect(userClasses).toEqual(['barbarian', 'berserker']);
+    expect(userClasses).toEqual(['barbarian', 'berserker', 'dragoon', 'landsknecht']);
     for (const cid of allClasses) expect(existsSync(`${APPROVED}/${cid}/battle.json`)).toBe(true);
     expect(readdirSync(APPROVED).filter(d => existsSync(`${APPROVED}/${d}/battle.json`)).sort()).toEqual(allClasses);
   });

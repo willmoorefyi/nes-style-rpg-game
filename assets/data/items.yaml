@@ -7,6 +7,7 @@
     attack: 5
   price: 5
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -50,6 +51,7 @@
     attack: 9
   price: 10
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -64,6 +66,7 @@
     attack: 15
   price: 550
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -78,6 +81,7 @@
     attack: 9
   price: 10
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - white_mage
@@ -91,6 +95,7 @@
     attack: 16
   price: 550
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   hit: 5
@@ -115,6 +120,7 @@
     attack: 13
   price: 300
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -128,6 +134,7 @@
     attack: 23
   price: 4000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -157,6 +164,7 @@
     attack: 22
   price: 4500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   bonusVsFamily: giant
@@ -170,6 +178,7 @@
     attack: 18
   price: 2500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - white_mage
@@ -197,6 +206,7 @@
     attack: 26
   price: 10000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   element: fire
@@ -211,6 +221,7 @@
     attack: 26
   price: 10000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   element: ice
@@ -224,6 +235,7 @@
     attack: 26
   price: 10000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -239,6 +251,7 @@
     attack: 56
   price: 0
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -258,6 +271,7 @@
     defense: 1
   price: 10
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -288,6 +302,7 @@
     defense: 4
   price: 50
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -303,6 +318,7 @@
     defense: 4
   price: 50
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -315,6 +331,7 @@
     defense: 15
   price: 80
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -328,6 +345,7 @@
     defense: 24
   price: 800
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -340,6 +358,7 @@
     defense: 34
   price: 7500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -352,6 +371,7 @@
     defense: 18
   price: 3500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -365,6 +385,7 @@
     defense: 42
   price: 0
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -378,6 +399,7 @@
     defense: 2
   price: 15
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -391,6 +413,7 @@
     defense: 4
   price: 100
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 0
@@ -403,6 +426,7 @@
     defense: 8
   price: 2500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -416,6 +440,7 @@
     defense: 1
   price: 80
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -433,6 +458,7 @@
     defense: 3
   price: 100
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 3
@@ -445,6 +471,7 @@
     defense: 6
   price: 2500
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 3
@@ -535,6 +562,7 @@
     defense: 10
   price: 1200
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -553,6 +581,7 @@
     attack: 20
   price: 3000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -567,6 +596,7 @@
     defense: 16
   price: 4000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -585,6 +615,7 @@
     attack: 24
   price: 8000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -645,6 +676,7 @@
     attack: 30
   price: 15000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -658,6 +690,7 @@
     attack: 24
   price: 14000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - white_mage
@@ -686,6 +719,7 @@
     defense: 38
   price: 20000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -698,6 +732,7 @@
     defense: 22
   price: 15000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -716,6 +751,7 @@
     defense: 12
   price: 16000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 0
@@ -728,6 +764,7 @@
     defense: 8
   price: 9000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 3
@@ -740,6 +777,7 @@
     attack: 34
   price: 30000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -753,6 +791,7 @@
     attack: 32
   price: 28000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -777,6 +816,7 @@
     defense: 40
   price: 40000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   slot: armor
@@ -789,6 +829,7 @@
     defense: 30
   price: 30000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - thief
@@ -807,6 +848,7 @@
     defense: 14
   price: 25000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   - red_mage
@@ -820,6 +862,7 @@
     defense: 10
   price: 20000
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   weight: 3
@@ -832,6 +875,7 @@
     attack: 45
   price: 0
   usableBy:
+  - landsknecht
   - warrior
   - barbarian
   element: holy

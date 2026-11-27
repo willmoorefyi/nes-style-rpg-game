@@ -34,6 +34,12 @@ export function readPixels(tex: Texture): Pixels | null {
 
 const heads = new WeakMap<Texture, { x: number; y: number } | null>();
 
+/** Pass CL (docs/CLASS_LANCE_PLAN.md 7.2): a frame whose head is known (an oversize hero's body head, the lance left
+ *  out, recorded by the atlas build) answers `headOf` without a pixel scan. Texture px. */
+export function setKnownHead(tex: Texture, head: { x: number; y: number } | null): void {
+  heads.set(tex, head);
+}
+
 /** The topmost opaque row's centre, in texture px (the head the overlays and icons sit on), or null. Cached. */
 export function headOf(tex: Texture, read: (t: Texture) => Pixels | null = readPixels): { x: number; y: number } | null {
   if (heads.has(tex)) return heads.get(tex) ?? null;

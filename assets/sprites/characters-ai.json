@@ -331,11 +331,21 @@
     "berserker": {
       "x": 336,
       "y": 3456
+    },
+    "dragoon": {
+      "x": 336,
+      "y": 3456
+    },
+    "landsknecht": {
+      "x": 0,
+      "y": 6528
     }
   },
   "fallbacks": {},
   "aliases": {
     "barbarian": "warrior",
-    "berserker": "knight"
+    "berserker": "knight",
+    "dragoon": "knight",
+    "landsknecht": "warrior"
   }
 }

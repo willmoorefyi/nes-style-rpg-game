@@ -22,6 +22,7 @@ import { stoneTextures } from './stoneTextures.js';
 import { headOf } from './texturePixels.js';
 import type { StatusFx } from './index.js';
 import { colossusAt, colossusStatusAnchor } from '../colossus/colossusProxy.js';
+import { heroBounds } from '../heroBody.js';
 
 /** Frames an overlay takes to fade out after its status ends. */
 export const STATUS_FADE_FRAMES = 12;
@@ -200,7 +201,7 @@ export class BattleStatusFx implements StatusFx {
   private anchorOf(sprite: Container, side: 'party' | 'enemy'): StatusAnchor {
     const c = colossusAt(sprite);
     if (c) return colossusStatusAnchor(c);           // the head anchor's row, inside y 140-760 (CHAOS_FORMS_PLAN 4.4)
-    const b = sprite.getBounds();
+    const b = heroBounds(sprite);                   // pass CL: an oversize hero's body box (its head: the known head)
     const tl = this.layers.fx.status.toLocal({ x: b.x, y: b.y });
     const box: FxBox = { x: tl.x + b.width * 0.15, y: tl.y + b.height * 0.33, w: b.width * 0.7, h: b.height * 0.62 };
     const h = sprite instanceof Sprite ? headOf(stoneTextures.coloured(sprite.texture)) : null;

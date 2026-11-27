@@ -101,6 +101,10 @@ def build_battle_ai() -> None:
         print("battle_ai: no approved sheets")
         return
     from gen import puppet as PU, puppet_kneel as PK
+    # pass CL (docs/CLASS_LANCE_PLAN.md 3): an oversize sheet (another grid) goes on its own page; the main file is
+    # built from the 80 x 80 sheets exactly as before
+    big = [(m, s) for m, s in entries if m["grid"] != [80, 80]]
+    entries = [(m, s) for m, s in entries if m["grid"] == [80, 80]]
     gw, gh = entries[0][0]["grid"]
     poses = entries[0][0]["poses"]
     # in-between poses (puppet.py, from gen/anim/<id>.yaml); a class without joints repeats its nearest keyframe
@@ -120,9 +124,21 @@ def build_battle_ai() -> None:
         for i, pose in enumerate(all_poses):
             atlas.paste(frames[pose], (i * gw, row * gh))
         sheets[meta["character"]] = {"row": row, "inbetweens": bool(tween)}
-    scaled(atlas, AI_SCALE).save(out / "battle-characters-ai.png")
+    main = scaled(atlas, AI_SCALE)
+    main.save(out / "battle-characters-ai.png")
+    extra = {}
+    if big:
+        from gen import battle_atlas as BA
+        pages, sheets_big = BA.build_pages(big, all_poses, AI_SCALE)
+        for i, (img, _) in enumerate(pages, start=1):
+            img.save(out / f"battle-characters-ai-{i}.png")
+        sheets.update(sheets_big)
+        extra = {"pages": [{"file": "battle-characters-ai.png", "w": main.width, "h": main.height}] +
+                 [{"file": f"battle-characters-ai-{i}.png", "w": img.width, "h": img.height}
+                  for i, (img, _) in enumerate(pages, start=1)]}
     (out / "battle-characters-ai.json").write_text(json.dumps({
         "cell": [gw, gh], "scale": AI_SCALE, "footRow": entries[0][0]["bottom_row"], "poses": all_poses, "sheets": sheets,
+        **extra,
     }, indent=2) + "\n")
     print(f"battle_ai: {len(entries)} approved sheet(s); in-betweens for {[c for c, v in sheets.items() if v['inbetweens']]}")
 

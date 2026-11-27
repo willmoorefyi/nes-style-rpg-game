@@ -4,3 +4,5 @@
 # (3 x 3 of 48 x 96, the NPC pack format) is approved: an alias with its own approved field sheet is refused.
 barbarian: warrior   # temporary until the user renders the barbarian's field walk sheet
 berserker: knight    # temporary until the user renders the berserker's field walk sheet
+landsknecht: warrior # pass CL: temporary until the user renders the landsknecht's field walk sheet
+dragoon: knight      # pass CL: temporary until the user renders the dragoon's field walk sheet

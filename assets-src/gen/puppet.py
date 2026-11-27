@@ -279,9 +279,10 @@ def outline(img: Image.Image) -> Image.Image:
 
 
 def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src: dict[str, str], default: str,
-           z: list[str], robed: bool, size=(80, 80), masks: dict | None = None) -> Image.Image:
+           z: list[str], robed: bool, size=(80, 80), masks: dict | None = None, ink: bool = True) -> Image.Image:
     """Pose every part (taken from its source keyframe) onto the target joints and composite back to front.
-    `masks`: {source pose: head mask} of facing_fix head mirrors (segment's `head`)."""
+    `masks`: {source pose: head mask} of facing_fix head mirrors (segment's `head`). `ink=False` (pass CL's hands
+    layer, puppet_lance.py) skips the outline pass; `size` is the cell (width, height)."""
     names = list(PARTS)
     labels: dict[str, np.ndarray] = {}
     out = np.zeros((size[1], size[0], 4), np.uint8)
@@ -307,7 +308,7 @@ def render(target: dict, sources: dict[str, tuple[Image.Image, dict]], part_src:
         hit = np.zeros_like(ok)
         hit[ok] = lab[sy[ok], sx[ok]] == names.index(part)
         out[hit] = arr[sy[hit], sx[hit]]
-    return outline(Image.fromarray(out, "RGBA"))
+    return outline(Image.fromarray(out, "RGBA")) if ink else Image.fromarray(out, "RGBA")
 
 
 # ───────── in-between targets (relative to each character's own keyframes) ─────────
@@ -415,11 +416,20 @@ def battle_targets(cfg: dict) -> dict[str, tuple[dict, dict[str, str]]]:
     return t
 
 
+def is_lance(cid: str) -> bool:
+    """Pass CL: the class's approved battle.json carries a lance prop (an oversize user sheet)."""
+    p = APPROVED / cid / "battle.json"
+    return p.exists() and (json.loads(p.read_text()).get("prop") or {}).get("kind") == "lance"
+
+
 def battle_inbetweens(cid: str, cfg: dict | None = None) -> dict[str, Image.Image]:
     """The eight in-between frames of `cid` (empty dict when it has no joint file)."""
     cfg = cfg or load_cfg(cid)
     if not cfg or "battle" not in cfg:
         return {}
+    if is_lance(cid):                                 # pass CL (docs/CLASS_LANCE_PLAN.md 5): the rigid lance prop
+        from gen import puppet_lance as PL
+        return PL.inbetweens(cid, cfg)
     from gen.puppet_facing import swap_z
     frames = battle_sheet_frames(cid)
     masks = facing_masks(cid)
@@ -573,11 +583,16 @@ def review(cid: str, out: Path) -> dict:
     frames = battle_sheet_frames(cid)
     new = battle_inbetweens(cid, cfg)
     allf = {**frames, **{n: new.get(n, frames[SOURCE[n]]) for n in INBETWEENS}}   # alias_frames: the key
-    rep = {n: check(new[n], frames[SOURCE[n]]) for n in new}
+    if is_lance(cid):                                 # pass CL: the body check on the body, plus the lance checks
+        from gen import puppet_lance as PL
+        rep = PL.review_checks(cid, cfg, new)
+    else:
+        rep = {n: check(new[n], frames[SOURCE[n]]) for n in new}
     # keyframes with their joints, so the marking can be checked by eye
     marked = []
+    cw, ch = frames["ready"].size
     for k in KEYFRAMES:
-        im = frames[k].resize((320, 320), Image.Resampling.NEAREST)
+        im = frames[k].resize((cw * 4, ch * 4), Image.Resampling.NEAREST)
         d = ImageDraw.Draw(im)
         j = cfg["battle"][k]
         for p in PARTS:
@@ -589,10 +604,11 @@ def review(cid: str, out: Path) -> dict:
                 d.ellipse([j[n][0] * 4 - 3, j[n][1] * 4 - 3, j[n][0] * 4 + 3, j[n][1] * 4 + 3], fill=(0, 255, 0, 255))
         marked.append(im)
     seq = _strip([allf[n] for n in ATTACK_SEQ + CAST_SEQ[1:5]] + [allf["idle_b"]], 4)
-    sheet = Image.new("RGBA", (max(seq.width, 3 * 330), 330 + seq.height), (40, 40, 48, 255))
+    pw, ph = cw * 4 + 10, ch * 4 + 10
+    sheet = Image.new("RGBA", (max(seq.width, 3 * pw), ph + seq.height), (40, 40, 48, 255))
     for i, im in enumerate(marked):
-        sheet.alpha_composite(im, (i * 330, 0))
-    sheet.alpha_composite(seq, (0, 330))
+        sheet.alpha_composite(im, (i * pw, 0))
+    sheet.alpha_composite(seq, (0, ph))
     sheet.save(out / f"{cid}_battle.png")
     _gif([allf[n] for n in ATTACK_SEQ], out / f"{cid}_attack.gif", 90)
     _gif([allf[n] for n in CAST_SEQ], out / f"{cid}_cast.gif", 110)

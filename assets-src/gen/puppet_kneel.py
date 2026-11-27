@@ -58,6 +58,9 @@ def make(cfg: dict, frames: dict, bottom: int, cid: str | None = None) -> dict:
     if is_ai(cfg):
         if not cid:
             raise ValueError("kneel source ai needs the class id")
+        if PU.is_lance(cid):                          # pass CL (docs/CLASS_LANCE_PLAN.md 6): bridged on the body
+            from gen.kneel_lance import hero_frames as lance_frames
+            return lance_frames(cid, cfg, frames, bottom)
         from gen.kneel_source_ai import hero_frames   # pass KT D-KT1 / D-KT2
         return hero_frames(cid, cfg, frames, bottom)
     front = (cfg.get("front_far_arm") or {}).get("ready", True)
@@ -112,7 +115,7 @@ def rot_check(name: str, rots: dict) -> list[str]:
 
 
 def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, palette: set,
-                 ring_ref: Image.Image | None = None) -> list[str]:
+                 ring_ref: Image.Image | None = None, max_pieces: int = 2) -> list[str]:
     """K-ground, K-fit, binary alpha, palette, magenta, pieces <= 2, ring within 0.08 of ready. The bottom-2-rows
     contact rule applies to the held frames (kneel, kneel_b); the 4-frame transitions only touch the ground row."""
     from gen.pixelize import components
@@ -135,8 +138,8 @@ def frame_checks(name: str, img: Image.Image, ready: Image.Image, bottom: int, p
     if any(c[0] > 200 and c[2] > 200 and c[1] < 80 for c in cols):
         out.append(f"{name}: magenta pixels")
     n = components(solid)[1]
-    if n > 2:
-        out.append(f"{name}: {n} pieces > 2")
+    if n > max_pieces:
+        out.append(f"{name}: {n} pieces > {max_pieces}")
     ring, ring_r = PU._second_ring(img), PU._second_ring(ring_ref or ready)   # KT: a key-drawn frame vs the key
     if abs(ring - ring_r) > 0.08:
         out.append(f"{name}: ring {ring:.2f} not within 0.08 of ready {ring_r:.2f}")
@@ -150,20 +153,23 @@ def old_columns(cid: str) -> list[str]:
     meta = json.loads(ATLAS.with_suffix(".json").read_text())
     if cid not in meta["sheets"]:
         return [f"{cid}: not in the committed atlas"]
-    sc, (gw, gh) = meta["scale"], meta["cell"]
-    atlas = np.asarray(Image.open(ATLAS.with_suffix(".png")).convert("RGBA"))[::sc, ::sc]
+    from gen import battle_atlas as BA                # pass CL 3.1: the class's own page and cell
+    sc = meta["scale"]
+    atlas = np.asarray(Image.open(ATLAS.parent / BA.page_file(meta, BA.sheet_page(meta, cid))).convert("RGBA"))[::sc, ::sc]
     frames, tw = PU.battle_sheet_frames(cid), PU.battle_inbetweens(cid)
-    row = meta["sheets"][cid]["row"]
     old = [p for p in meta["poses"] if p not in KNEEL_POSES]
-    bad = [p for i, p in enumerate(old) if not np.array_equal(
-        atlas[row * gh:(row + 1) * gh, i * gw:(i + 1) * gw],
-        np.asarray(tw[p] if p in tw else frames[p] if p in frames else frames[PU.SOURCE[p]]))]
+
+    def cell(p):
+        x0, y0, x1, y1 = BA.cell_box(meta, cid, p, scaled=False)
+        return atlas[y0:y1, x0:x1]
+    bad = [p for p in old if not np.array_equal(
+        cell(p), np.asarray(tw[p] if p in tw else frames[p] if p in frames else frames[PU.SOURCE[p]]))]
     return [f"{cid}: old atlas columns differ: {bad}"] if bad else []
 
 
 def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str | None = None):
     """(failures, info, made); info has the heights, the ratio and the band."""
-    made = make(cfg, frames, bottom, cid)
+    made = full = make(cfg, frames, bottom, cid)
     (lo, hi), fails = band_of(cid, cfg, frames, plan_text)
     palette = {tuple(int(v) for v in c) for f in frames.values()
                for c in np.asarray(f)[np.asarray(f)[..., 3] > 0][:, :3]}
@@ -172,11 +178,23 @@ def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str 
         import json                                       # palette (hero_user.py), recorded in the key's json
         meta = json.loads((PU.APPROVED / cid / "battle_kneel.json").read_text())
         palette |= {tuple(int(v) for v in dst) for _, dst in meta["cut"]["palette"]}
+    if "_bodies" in made:                             # pass CL 6: the K checks on the bodies, the lance by L1-L8
+        from gen import kneel_lance as KLc
+        from gen import puppet_lance as PLc
+        fails += KLc.checks(cid, made, bottom)
+        bodies = made["_bodies"]
+        frames = {**frames, "ready": bodies["ready"],
+                  "down": Image.fromarray(PLc.split(PLc.meta_of(cid), np.asarray(frames["down"].convert("RGBA")).copy(),
+                                                    PLc.meta_of(cid)["prop"]["lines"]["down"])["body"])}
+        made = {**made, **{n: (bodies[n], made[n][1], made[n][2]) for n in KNEEL_POSES}}
+        (lo, hi), _ = band_of(cid, cfg, frames, plan_text)            # the band of the bodies (reported)
+    from gen.pixelize import components
+    pieces = max(2, *(components(np.asarray(made[k][0])[..., 3] > 0)[1] for k in ("kneel",)), components(np.asarray(frames["ready"])[..., 3] > 0)[1]) if "_bodies" in full else 2
     hr, hk = height(frames["ready"]), height(made["kneel"][0])
     for n in KNEEL_POSES:
         img, rots, _ = made[n]
         ref = made["kneel"][0] if is_ai(cfg) and n != "kneel_in1" else None          # D-KT4: drawn from the key
-        fails += frame_checks(n, img, frames["ready"], bottom, palette, ref) + rot_check(n, rots)
+        fails += frame_checks(n, img, frames["ready"], bottom, palette, ref, pieces) + rot_check(n, rots)
         h = height(img)
         if n in HELD and not lo <= h <= hi and not is_ai(cfg):   # D-KT4: an AI key's band is reported only
             fails.append(f"{n}: K-height {h} outside the band {lo}-{hi}")
@@ -184,7 +202,7 @@ def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str 
             fails.append(f"{n}: K-height {h} not between kneel {hk} and ready {hr}")
     info = {"ready": hr, "down": height(frames["down"]), "kneel": hk, "kneel_b": height(made["kneel_b"][0]),
             "band": (lo, hi), "ratio": round(hk / hr, 3), "rots": made["kneel"][1]}
-    return fails, info, made
+    return fails, info, full
 
 
 def lock_path(cid: str) -> Path:
