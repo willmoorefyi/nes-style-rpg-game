@@ -1,0 +1,301 @@
+# Pass CFP (docs/CLASS_FIELD_PACKS_PLAN.md): the ChatGPT walk-sheet packs of the hero classes that have a battle sheet
+# but no field (overworld) sheet yet. gen/class_field_pack.py builds one pack per entry; the user renders the sheet in
+# ChatGPT and gen/field_user.py imports it. To add a class, add its entry (and its partner's) below and run
+#   python3 -I assets-src/gen/class_field_pack.py <id> [<partner>]
+# Keys: name, tier (base | enhanced), partner (the other class of the pair, naming this one back), battle_sheet (~
+# expanded; relative = from assets-src/gen), row (0 = base, 1 = enhanced), cell [w, h] of the battle sheet, body_box
+# [x0, y0, x1, y1] inside the cell (exclusive end) or null, poses (design poses: ready attack cast hurt down victory
+# kneel), weapon_view (a pose whose whole cell is also shown, or null), stand_in (a hero with an approved 3 x 3 field
+# sheet: the pose / grid reference), look (the character as it reads at field size), carry (how the weapon is carried
+# while walking; it must stay inside the 48 x 96 cell and touch the body).
+defaults:
+  walk_reference: boy          # approved/<id>/field.png: the foot-alternation reference (the user-approved PT boy)
+  height: 88                   # drawn px, head (or helmet) top near row 6, soles on row 93
+  max_height: 92               # field_user.py's adult band is 84-92 (whole figure, weapon included)
+  max_width: 46                # field_user.py MAX_W
+
+barbarian:
+  name: Barbarian
+  tier: base
+  partner: berserker
+  battle_sheet: ~/temp/heroes/barbarian_berserker_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: warrior
+  look: >-
+    a young northern barbarian warrior, about 20: a stocky, muscular build; shaggy copper-orange hair to the
+    shoulders under a dented iron helmet with two short curved cream horns; a clean-shaven, eager young face; bare
+    chest crossed by a leather strap, a grey wolf-fur mantle on the shoulders; brown leather breeches, grey fur cuffs
+    at the shins, brown leather boots, leather wrist wraps; two single-handed steel battle axes with double-bitted
+    heads. Colours: copper hair, steel grey, cream horns, warm skin, two leather browns, grey fur
+  carry: >-
+    the two axes hang from his belt, one at each hip, heads down and handles up, tucked close to the legs (they swing
+    a little with the walk); in the back view the fur mantle covers the shoulders and the axe heads show at the hips
+    on both sides. The axes must touch the body and stay inside the cell
+
+berserker:
+  name: Berserker
+  tier: enhanced
+  partner: barbarian
+  battle_sheet: ~/temp/heroes/barbarian_berserker_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight
+  look: >-
+    the barbarian a few years later, now a berserker: the same horned iron helmet, the same copper-orange hair, now with
+    a full bushy copper-red beard; a broader, heavier build; bare muscular chest with a leather strap and a round iron
+    belt buckle; a heavy brown bear-fur cloak over the shoulders and back, falling to the knees; brown leather breeches,
+    grey fur cuffs at the shins, brown boots; the same two double-bitted battle axes. Colours: copper-red hair and beard,
+    steel grey, cream horns, warm skin, brown bear fur, two leather browns
+  carry: >-
+    the two axes hang from his belt, one at each hip, heads down and handles up, close to the legs; in the back view
+    the bear-fur cloak covers the back and the axe heads show at the hips on both sides. The axes must touch the body
+    and stay inside the cell
+
+hunter:
+  name: Hunter
+  tier: base
+  partner: ranger
+  battle_sheet: ~/temp/heroes/hunter_ranger_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: thief
+  look: >-
+    a young woodland hunter and trapper, about 20, a commoner, not a soldier: a lean, wiry build; short, untidy dark
+    brown hair, no headband; a sun-browned, clean-shaven young face; an oatmeal-cream linen shirt with rolled sleeves,
+    a sleeveless brown leather jerkin laced at the front, dark brown breeches, soft brown boots wrapped with cord, a
+    plain belt with a pouch and a sheathed knife, a leather bracer, a quiver of grey-fletched arrows on the back, a short
+    plain wooden bow. Colours: oatmeal cream, two leather browns, dark brown hair, grey-white fletching; no green and
+    no red (those are the Thief's)
+  carry: >-
+    the short bow is slung diagonally across his back (from the right shoulder to the left hip) together with the
+    quiver, the arrow fletching showing above the right shoulder; the hands are free and swing with the walk. In the
+    front view only the bow string across the chest and the bow tips beside the body show; in the back view the bow
+    and quiver are seen whole. Bow tips and fletching stay inside the cell and touch the body
+
+ranger:
+  name: Ranger
+  tier: enhanced
+  partner: hunter
+  battle_sheet: ~/temp/heroes/hunter_ranger_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: ninja
+  look: >-
+    the hunter a few years later, now a ranger of the wilds: the same face and dark brown hair, a steadier bearing; a
+    deep forest-green cloak with the hood DOWN (face and hair visible), fastened with a small bronze leaf clasp,
+    falling past the knees; under it a dark green-brown leather brigandine with small bronze rivets, dark breeches,
+    tall brown boots, leather bracers on both forearms, a quiver of green-fletched arrows, a long knife on the hip, a
+    tall recurved longbow of dark wood with pale tips. Colours: deep forest green and moss (darker and cooler than the
+    Thief's), dark leather brown, bronze accents, dark brown hair
+  carry: >-
+    the longbow is slung diagonally across his back over the cloak (from the right shoulder to the left hip) with the
+    quiver, the green fletching showing above the right shoulder; draw the bow a little shorter than in battle so its
+    tips stay inside the cell (no higher than 2 px above the head, within the 46 px width). The hands are free and
+    swing with the walk; the cloak sways a little. Everything touches the body
+
+landsknecht:
+  name: Landsknecht
+  tier: base
+  partner: dragoon
+  battle_sheet: ~/temp/heroes/landsknecht_dragoon_sprite_sheet.png
+  row: 0
+  cell: [160, 144]
+  body_box: [72, 64, 152, 144]
+  poses: [ready, victory]
+  weapon_view: victory
+  stand_in: warrior
+  look: >-
+    a young Renaissance mercenary pikeman, about 20, proud and a little swaggering: a sturdy, square-shouldered
+    build; short sandy-blond hair; a broad, cheerful, clean-shaven face; a doublet with big puffed and slashed sleeves
+    and slashed breeches in mustard-ochre with slate-blue linings and stripes; striped hose; a wide floppy slate-blue
+    beret tilted to one side with one long cream feather; a plain steel breastplate; a leather belt with a short broad
+    sword on the hip; flat wide-toed leather shoes; an ash-wood pike with a leaf-shaped steel head. Colours: mustard
+    ochre, slate blue, cream, steel grey, two leather browns, sandy blond
+  carry: >-
+    the pike is carried UPRIGHT in his right hand at his side (front and back views: a thin vertical shaft beside the
+    body, its butt at the feet line, the hand gripping it at waist height) or, in the side view, sloped back over his
+    shoulder. In the field it is drawn MUCH SHORTER than in battle: its tip no higher than 2 px above the top of the
+    beret's feather, so the whole figure stays at most 92 px tall and inside the 48 x 96 cell (there is no larger
+    field cell). The shaft is 2 px thick with a 1 px outline and touches the hand. The arm holding it does not swing;
+    the other arm swings with the walk
+
+dragoon:
+  name: Dragoon
+  tier: enhanced
+  partner: landsknecht
+  battle_sheet: ~/temp/heroes/landsknecht_dragoon_sprite_sheet.png
+  row: 1
+  cell: [160, 144]
+  body_box: [72, 64, 152, 144]
+  poses: [ready, victory]
+  weapon_view: victory
+  stand_in: knight
+  look: >-
+    the landsknecht a few years later, now a dragoon, a dragon knight: the same face and sandy-blond hair, now with a
+    little stubble; full dragon-styled plate armour in deep teal-blue scale with dark slate undersides and brass-gold
+    trim: a helm shaped like a dragon's head with two swept-back horns and a crest of fins, its open face framed by the
+    dragon's jaw so his face stays visible; scale-plate pauldrons like folded wings, a scaled breastplate, clawed
+    gauntlets, plated greaves, a short tattered dark cape; a dragon lance with a long barbed blade and a brass socket.
+    Colours: deep teal-blue, dark slate, brass gold, steel, sandy blond, warm skin
+  carry: >-
+    the lance is carried UPRIGHT in his right hand at his side (front and back views: a thin vertical shaft beside the
+    body, its butt at the feet line) or, in the side view, sloped back over his shoulder. In the field it is drawn MUCH
+    SHORTER than in battle: its tip no higher than 2 px above the top of the helm's horns, so the whole figure stays at
+    most 92 px tall and inside the 48 x 96 cell (there is no larger field cell). The shaft is 2 px thick with a 1 px
+    outline and touches the hand. The arm holding it does not swing; the other arm swings with the walk
+
+legionnaire:
+  name: Legionnaire
+  tier: base
+  partner: centurion
+  battle_sheet: ~/temp/heroes/legionnaire_centurion_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: warrior
+  look: >-
+    a young Roman legionary, about 20: a solid, compact build; short-cropped dark brown hair; a clean-shaven face; a
+    polished iron Gallic helmet with a brass brow ridge, a deep neck guard and cheek guards framing the visible face;
+    lorica segmentata (banded steel plate on the torso and shoulders); a madder-red tunic at the upper arms and as a
+    short skirt above the knee; a belt with an apron of leather straps studded with brass; bare shins; laced leather
+    sandal-boots; a tall curved madder-red scutum with a brass rim, a round brass boss and the yellow
+    wings-and-thunderbolts emblem; a gladius on the right hip. Colours: madder red, steel grey, brass, cream-yellow,
+    two leather browns, dark brown hair, warm skin
+  carry: >-
+    the scutum is held on his LEFT arm: in the front view it stands beside his left side (the viewer's right), its
+    face toward the viewer; in the back view its back (the leather-covered wood and the grip) is on the viewer's left;
+    in the side view facing left it is on the near arm, in front of the body, covering the torso from shoulder to knee.
+    Draw it smaller than in battle, about half his height, so the figure stays within 46 px wide. The gladius hangs at
+    the right hip. Shield and sword touch the body
+
+centurion:
+  name: Centurion
+  tier: enhanced
+  partner: legionnaire
+  battle_sheet: ~/temp/heroes/legionnaire_centurion_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight
+  look: >-
+    the legionnaire a few years later, now a centurion: the same face and cropped dark hair, now with short stubble, an upright, commanding
+    bearing; a silvered helmet with the centurion's TRANSVERSE crest of red horsehair running side to side (ear to ear:
+    wide in the front and back views, seen edge-on as a narrow upright fan in the side view), keeping the cheek guards;
+    a mail shirt over the red tunic, a harness of small round silver and gold medals on the chest; bronze greaves; a
+    short dark red cloak pinned at the right shoulder; the strap apron with silver studs; sandal-boots; the gladius on
+    the LEFT hip; a deep red scutum with a silver rim, a silver boss and a gold laurel wreath. Colours: madder and dark
+    red, silver, gold, bronze, steel-grey mail, two leather browns
+  carry: >-
+    the scutum is held on his LEFT arm (front view: beside his left side, the viewer's right, face toward the viewer;
+    back view: its back on the viewer's left; side view facing left: on the near arm in front of the body), drawn about
+    half his height so the figure stays within 46 px wide; the gladius at the left hip; the short knotted vine staff
+    (vitis) in his right hand, held upright and short, touching the hand. The crest counts in the 92 px height cap.
+    Everything touches the body
+
+cleric:
+  name: Cleric
+  tier: base
+  partner: paladin
+  battle_sheet: ~/temp/heroes/cleric_paladin_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: white_mage
+  look: >-
+    a young battle priest, about 20: a sturdy build; short, tousled brown hair, no helmet; a clean-shaven, earnest
+    young face; a steel chainmail hauberk with a mail coif lowered round the neck, mail sleeves, a long white tabard
+    with a gold cross on the chest falling to the knees, a brown leather belt with a pouch, steel greaves over brown
+    leather boots; a steel war hammer with a wooden haft; a round steel shield with a gold cross. Colours: steel grey,
+    white and cream, gold, two leather browns, brown hair, warm skin
+  carry: >-
+    the war hammer hangs at his right hip from the belt, head down and haft up, close to the leg; the round shield is
+    held on his LEFT arm (front view: beside his left side, the viewer's right, its gold cross toward the viewer; back
+    view: its back on the viewer's left; side view facing left: on the near arm, in front of the body), drawn small
+    enough that the figure stays within 46 px wide. Hammer and shield touch the body
+
+paladin:
+  name: Paladin
+  tier: enhanced
+  partner: cleric
+  battle_sheet: ~/temp/heroes/cleric_paladin_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: white_wizard
+  look: >-
+    the cleric a few years later, now a paladin, a holy knight: the same face and brown hair, a little stubble, a calm,
+    resolute bearing; a thin gold circlet on the brow, no helmet; full white-and-silver plate armour with gold trim, a
+    white tabard with a gold cross over the breastplate, a cream cape with a gold lining falling to the calves; a
+    longsword with a gold cross-guard; a white kite shield with a gold rim and a gold cross. Colours: white, silver
+    steel, gold, cream, brown hair, warm skin
+  carry: >-
+    the longsword is sheathed at his left hip in a white-and-gold scabbard, the hilt by his hand, the scabbard angled
+    back (not touching the ground); the kite shield is held on his LEFT arm (front view: beside his left side, the
+    viewer's right, its cross toward the viewer; back view: its back on the viewer's left, over the cape; side view
+    facing left: on the near arm, in front of the body), drawn about half his height so the figure stays within 46 px
+    wide. The cape sways a little with the walk. Sword, shield and cape touch the body
+
+ronin:
+  name: Ronin
+  tier: base
+  partner: samurai
+  battle_sheet: ~/temp/heroes/ronin_samurai_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: thief
+  look: >-
+    a young wandering swordsman, a ronin, about 20: a lean build; shaggy black hair under a wide, shallow conical straw
+    hat (kasa) that shades the eyes; a clean-shaven, quiet young face; a worn, faded grey kimono jacket over a dark
+    under-robe, a dark sash (obi), loose grey hakama trousers, white tabi socks and straw sandals; a katana in a black
+    scabbard. Colours: faded grey and charcoal, straw gold, black hair, steel, warm skin, white socks
+  carry: >-
+    the katana stays sheathed in its black scabbard, thrust through the sash at his LEFT hip, the hilt forward and up,
+    the scabbard angled back behind him; the hands are free and swing with the walk. The straw hat is at most 40 px
+    wide so the figure stays within 46 px. Hat and sword touch the body
+
+samurai:
+  name: Samurai
+  tier: enhanced
+  partner: ronin
+  battle_sheet: ~/temp/heroes/ronin_samurai_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: ninja
+  look: >-
+    the ronin a few years later, now a samurai in full armour: the same lean build and black hair (a little showing at
+    the back of the helmet); full red-and-black lacquered armour (o-yoroi) of laced lamellar plates: a horned black
+    kabuto helmet with a gold crescent crest (maedate), a red demon face mask (menpo) over the lower face so only the
+    eyes show, broad lamellar shoulder guards (sode), a laced breastplate, a skirt of lamellar plates (kusazuri),
+    armoured sleeves and shin guards, dark hakama, white tabi socks and sandals; a katana. Colours: lacquer red, black,
+    gold, dark navy, steel, warm skin
+  carry: >-
+    the katana stays sheathed in its black scabbard, thrust through the sash at his LEFT hip, the hilt forward and up,
+    the scabbard angled back behind him; the hands are free and swing with the walk. The gold crescent crest counts in
+    the 92 px height cap and the shoulder guards stay within 46 px wide. Crest and sword touch the body
