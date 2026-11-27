@@ -3478,3 +3478,18 @@
   gold: 0
   enemies: [wolf, wolf, wolf, wolf]
   background: assets/backgrounds/grassland.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11): the legionnaire / centurion class pair (user-rendered battle art). LEGN
+# is weak so it kneels; KNT is the like-for-like control for CENT. ?mute=1&scenario=cb_legion (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_legion
+  name: Legionnaire and Centurion (pass CB preview)
+  party:
+    - { class: legionnaire, name: LEGN, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: centurion, name: CENT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: legionnaire, name: LEGN2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: knight, name: KNT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/grassland.webp

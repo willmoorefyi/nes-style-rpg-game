@@ -106,3 +106,20 @@ dark_fighter_death_knight:
   source_name: dark_fighter_death_knight_sprite_sheet.png
   approved: "2026-11-26"
   user_review: "The 'dark fighter' / 'death knight' combination. These are standard frames with 1 exception - ... use the picture from the file 'Death Knight's Leftward Sword Thrust.png' in the 'attack' pose for the death knight. ... Use that sprite for the death knight's 'attack'."
+legionnaire_centurion:
+  file: user_art/legionnaire/battle_2026-11-26.png
+  sha256: dba05ca2ac1c16cb5684722697f2f3ecf1a2c796f2ad566ede6e3222c11f10a6
+  rows: [legionnaire, centurion]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row, none shared (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: legionnaire_centurion_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "the 'legionnaire' / 'centurion' ... another warrior / knight copy for now (delivered as final; used as rendered)"

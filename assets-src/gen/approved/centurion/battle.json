@@ -1,0 +1,278 @@
+{
+  "character": "centurion",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/legionnaire/battle_2026-11-26.png",
+    "sha256": "dba05ca2ac1c16cb5684722697f2f3ecf1a2c796f2ad566ede6e3222c11f10a6"
+  },
+  "recipe": "hero_user.yaml#legionnaire_centurion",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "legionnaire_centurion_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "the 'legionnaire' / 'centurion' ... another warrior / knight copy for now (delivered as final; used as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          23,
+          19,
+          25
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          57,
+          45,
+          54
+        ],
+        [
+          57,
+          41,
+          57
+        ]
+      ],
+      [
+        [
+          84,
+          56,
+          43
+        ],
+        [
+          82,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          99,
+          30,
+          39
+        ],
+        [
+          99,
+          33,
+          41
+        ]
+      ],
+      [
+        [
+          121,
+          121,
+          130
+        ],
+        [
+          123,
+          123,
+          132
+        ]
+      ],
+      [
+        [
+          128,
+          83,
+          55
+        ],
+        [
+          132,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          149,
+          42,
+          36
+        ],
+        [
+          148,
+          41,
+          33
+        ]
+      ],
+      [
+        [
+          168,
+          174,
+          185
+        ],
+        [
+          165,
+          173,
+          181
+        ]
+      ],
+      [
+        [
+          170,
+          115,
+          80
+        ],
+        [
+          173,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          173,
+          116,
+          48
+        ],
+        [
+          173,
+          115,
+          49
+        ]
+      ],
+      [
+        [
+          189,
+          71,
+          52
+        ],
+        [
+          189,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          214,
+          161,
+          64
+        ],
+        [
+          214,
+          165,
+          66
+        ]
+      ],
+      [
+        [
+          223,
+          156,
+          112
+        ],
+        [
+          222,
+          156,
+          115
+        ]
+      ],
+      [
+        [
+          229,
+          224,
+          220
+        ],
+        [
+          231,
+          222,
+          222
+        ]
+      ],
+      [
+        [
+          242,
+          209,
+          137
+        ],
+        [
+          239,
+          206,
+          140
+        ]
+      ],
+      [
+        [
+          247,
+          194,
+          154
+        ],
+        [
+          247,
+          198,
+          156
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        6,
+        2,
+        75,
+        76
+      ],
+      "attack": [
+        1,
+        2,
+        78,
+        76
+      ],
+      "cast": [
+        12,
+        0,
+        68,
+        76
+      ],
+      "hurt": [
+        11,
+        4,
+        70,
+        76
+      ],
+      "down": [
+        1,
+        33,
+        78,
+        76
+      ],
+      "victory": [
+        16,
+        0,
+        63,
+        76
+      ]
+    }
+  }
+}

@@ -274,6 +274,31 @@
   hitPercent: { base: 10, growth: 3 }
   magicDefense: { base: 15, growth: 3 }
 
+# ═══ LEGIONNAIRE (pass CB, docs/CLASS_BARBARIAN_PLAN.md 11) ═══
+# A shallow copy of the warrior (user request); every number is the warrior's (tests pin the copy).
+- id: legionnaire
+  name: Legionnaire
+  abbr: LGN
+  baseStats:
+    hp: 35
+    strength: 20
+    agility: 5
+    intelligence: 1
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 13
+    strength: 4
+    agility: 1
+    intelligence: 0
+    vitality: 3
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield]
+  spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+
 # ═══════════════════════════════════
 # UPGRADED CLASSES (Phase 16)
 # ═══════════════════════════════════
@@ -590,6 +615,40 @@
   spellLevels: { white: 3, black: 0 }
   hitPercent: { base: 10, growth: 3 }
   magicDefense: { base: 15, growth: 3 }
+  spellCharges:
+    - [10, [1]]
+    - [15, [2, 1]]
+    - [20, [3, 2, 1]]
+    - [30, [5, 4, 3]]
+    - [40, [7, 6, 5]]
+    - [50, [9, 8, 7]]
+
+# ═══ CENTURION (upgraded Legionnaire; pass CB) ═══
+# A shallow copy of the knight (its spells and equipment included, pending the user's ruling).
+- id: centurion
+  name: Centurion
+  abbr: CEN
+  upgradeFrom: legionnaire
+  baseStats:
+    hp: 42
+    strength: 24
+    agility: 6
+    intelligence: 2
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 16
+    strength: 5
+    agility: 1
+    intelligence: 1
+    vitality: 4
+    luck: 1
+  usableEquipment: [sword, axe, hammer, heavy_armor, shield, knight_armor]
+  spellLevels: { white: 3, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 10, growth: 3 }
+  magicDefense: { base: 15, growth: 3 }
+  # charges per spell level L1..L8 from each character level until the next row (FF1-style, T4 §1.4)
   spellCharges:
     - [10, [1]]
     - [15, [2, 1]]

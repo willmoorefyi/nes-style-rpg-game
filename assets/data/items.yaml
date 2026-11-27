@@ -10,6 +10,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -55,6 +56,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - red_mage
@@ -71,6 +73,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - red_mage
@@ -87,6 +90,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - white_mage
   hit: 0
@@ -102,6 +106,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   hit: 5
   crit: 7
@@ -128,6 +133,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   hit: 10
@@ -143,6 +149,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   bonusVsFamily: undead
@@ -174,6 +181,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   bonusVsFamily: giant
   hit: 10
@@ -189,6 +197,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - white_mage
   bonusVsFamily: undead
@@ -218,6 +227,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   element: fire
   bonusVsFamily: undead
@@ -234,6 +244,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   element: ice
   hit: 10
@@ -249,6 +260,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   element: lightning
@@ -266,6 +278,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -287,6 +300,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -319,6 +333,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -336,6 +351,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 8
@@ -350,6 +366,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   slot: armor
@@ -365,6 +382,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 23
@@ -379,6 +397,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 33
@@ -393,6 +412,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   slot: armor
@@ -408,6 +428,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 10
@@ -423,6 +444,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   weight: 0
@@ -438,6 +460,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 0
 - id: mythril_shield
@@ -452,6 +475,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   weight: 0
@@ -467,6 +491,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -486,6 +511,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 3
 - id: mythril_helm
@@ -500,6 +526,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 3
 - id: potion
@@ -592,6 +619,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -612,6 +640,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - red_mage
@@ -628,6 +657,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -648,6 +678,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - red_mage
@@ -710,6 +741,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   hit: 10
@@ -725,6 +757,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - white_mage
   element: lightning
@@ -755,6 +788,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 30
@@ -769,6 +803,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -789,6 +824,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 0
 - id: opal_helm
@@ -803,6 +839,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 3
 # B7 Gaia: 34 / 42 / 14 / 10
@@ -817,6 +854,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   hit: 10
@@ -832,6 +870,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   hit: 10
@@ -858,6 +897,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   slot: armor
   weight: 28
@@ -872,6 +912,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - thief
   - monk
@@ -892,6 +933,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   - red_mage
   weight: 0
@@ -907,6 +949,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   weight: 3
 # Found: the optional S31, Smyth forges the adamant (WORLD_PLAN 3.1, open question 8)
@@ -921,6 +964,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - legionnaire
   - barbarian
   element: holy
   hit: 15

@@ -1,7 +1,8 @@
 """The cut of a user-rendered hero class sheet (gen/hero_user.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 3.2, and pass CL's
 oversize cells, docs/CLASS_LANCE_PLAN.md 4). The recipe's geometry: `cell` (default 80 x 80), `foot_row` (76), `body_box`
-(inclusive, default the whole cell), `palette` (`sheet`: one house palette for the sheet, the CB rule; `per_row`: one
-per class row) and `prop` (pass CL: `kind: lance`, its lines, radius, head length and colours, gen/hero_user_lance.py).
+(inclusive, default the whole cell), `palette` (`sheet`: one house palette for the sheet, the CB rule; `rows`: one per
+class row, applied to that row only, CB A1, docs/CLASS_BARBARIAN_PLAN.md 11; `per_row` is pass CL's name for the same
+rule, kept so the CL / CD-K recipes and their approved jsons stay as approved) and `prop` (pass CL: `kind: lance`, its lines, radius, head length and colours, gen/hero_user_lance.py).
 Without the CL keys the cut is pass CB's, byte for byte. Fail closed: every refusal is a SystemExit naming the rule.
 """
 from __future__ import annotations
@@ -14,6 +15,8 @@ from gen import pixelize as PX
 
 CELL, FOOT, COLOURS = 80, 76, 16
 COLUMNS = ("ready", "attack", "cast", "hurt", "down", "victory", "kneel")
+ROW_PALETTES = ("rows", "per_row")                     # one rule, two spellings (A1 / CL)
+PALETTES = ("sheet",) + ROW_PALETTES
 
 
 def geometry(rec: dict) -> dict:
@@ -22,8 +25,8 @@ def geometry(rec: dict) -> dict:
     foot = int(rec.get("foot_row", FOOT))
     body = tuple(int(v) for v in rec.get("body_box", (0, 0, cw - 1, ch - 1)))
     mode = rec.get("palette", "sheet")
-    if mode not in ("sheet", "per_row"):
-        raise SystemExit(f"palette must be sheet or per_row, not {mode!r}")
+    if mode not in PALETTES:
+        raise SystemExit(f"palette must be one of {list(PALETTES)}, not {mode!r}")
     x0, y0, x1, y1 = body
     if (cw, ch) != (CELL, CELL):
         if (x1 - x0 + 1, y1 - y0 + 1) != (CELL, CELL):
@@ -121,8 +124,15 @@ def cut(rec: dict, a: np.ndarray, gen=None) -> tuple[dict[str, dict[str, Image.I
     bad = cells_apart(m, len(COLUMNS), len(rows), cw, ch)
     if bad:
         raise SystemExit("user sheet: " + "; ".join(bad))
-    pals = {cid: palette(a[r * ch:(r + 1) * ch], f"user sheet row {cid}") for r, cid in enumerate(rows)} \
-        if g["palette"] == "per_row" else dict.fromkeys(rows, palette(a))
+    if g["palette"] in ROW_PALETTES:                   # A1 / CL: each class row's own 16 colours
+        pals = {}
+        for r, cid in enumerate(rows):
+            try:
+                pals[cid] = palette(a[r * ch:(r + 1) * ch])
+            except SystemExit as e:
+                raise SystemExit(f"{cid}: {e}") from None
+    else:
+        pals = dict.fromkeys(rows, palette(a))
     out = a.copy()
     for r, cid in enumerate(rows):
         band, mb = a[r * ch:(r + 1) * ch], m[r * ch:(r + 1) * ch]

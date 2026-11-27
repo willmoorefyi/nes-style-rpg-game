@@ -2,9 +2,10 @@
 interactive image UI, e.g. ChatGPT, from the class pack ~/temp/ff-game/class_pack) as the approved battle sheets of
 its classes. The render is the approved design; the import only checks and splits it: a grid of 80 x 80 cells, one
 row per class (base, then enhanced), seven columns READY, ATTACK, CAST, HURT, DOWN, VICTORY, KNEEL, binary alpha,
-every figure inside its cell, its feet on row 76, every pose facing left. One house palette for the sheet: at most 16
-colours, each snapped to 15 bits (PX.snap15), the darkest PX.OUTLINE, one-to-one. No pixel is moved, added or
-removed. Per class: approved/<class>/battle.png (3 x 2: ready, attack, cast / hurt, down, victory) and
+every figure inside its cell, its feet on row 76, every pose facing left. One house palette for the sheet (or, with
+the recipe's `palette: rows`, one per class row, each applied to its own row only; plan 11; pass CL's `per_row` is the
+same rule under its first name, hero_user_grid.ROW_PALETTES): at most 16 colours, each snapped to 15 bits
+(PX.snap15), the darkest PX.OUTLINE, one-to-one. No pixel is moved, added or removed. Per class: approved/<class>/battle.png (3 x 2: ready, attack, cast / hurt, down, victory) and
 battle_kneel.png (the kneel key), with their jsons. Recipes: gen/hero_user.yaml; the renders: gen/user_art/<id>/.
 
   python3 -I assets-src/gen/hero_user.py cut <recipe> [--out DIR]   # measures + review page
@@ -35,6 +36,7 @@ TOOL = "assets-src/gen/hero_user.py"
 CELL, FOOT, COLOURS, COLUMNS = HG.CELL, HG.FOOT, HG.COLOURS, HG.COLUMNS
 POSES = COLUMNS[:6]                                    # battle.png, 3 x 2 (puppet._cells order)
 REVIEW = Path.home() / "temp/ff-game/class_pack/review/import"
+PALETTES = HG.PALETTES                                 # docs/CLASS_BARBARIAN_PLAN.md 11 (A1): sheet | rows (| per_row)
 
 
 def recipes(path: Path | None = None) -> dict:
@@ -52,6 +54,8 @@ def recipe(rid: str, path: Path | None = None) -> dict:
     rows = rec.get("rows") or []
     if not rows or len(set(rows)) != len(rows):
         raise SystemExit(f"{rid}: rows must name each class once")
+    if rec.get("palette", "sheet") not in PALETTES:
+        raise SystemExit(f"{rid}: palette must be one of {list(PALETTES)}")
     return rec
 
 
@@ -104,8 +108,9 @@ def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tu
     rp = {k.split("/")[1]: v for k, v in (rec.get("replace") or {}).items() if k.startswith(f"{cid}/")}
     if rp:                                             # pass CD-K: a pose replaced by a separate user render
         base = {**base, "replace": rp}
-    pal = info["palettes"][cid] if g["palette"] == "per_row" else info["palette"]
-    cut_info = {"colours": len(pal) if g["palette"] == "per_row" else info["colours"], "palette": pal,
+    per_row = g["palette"] in HG.ROW_PALETTES          # A1: a class's files carry only its own row's map
+    pal = info["palettes"][cid] if per_row else info["palette"]
+    cut_info = {"colours": len(pal) if per_row else info["colours"], "palette": pal,
                 "boxes": {k.split("/")[1]: v for k, v in info["boxes"].items() if k.startswith(f"{cid}/")}}
     prop = g["prop"]
 
@@ -209,15 +214,18 @@ def review(rid: str, out: Path | None = None) -> list[Path]:
     k, sw = 4, 40
     cw, ch = (max(c["ready"].size[i] for c in cells.values()) for i in (0, 1))   # the widest class cell (pass CD-K)
     h = len(rec["rows"]) * ch * k
-    sheet = Image.new("RGBA", (len(COLUMNS) * cw * k, h + 2 * sw + 8), (60, 60, 70, 255))
+    strips = list(info["palettes"].values()) if info["geometry"]["palette"] in HG.ROW_PALETTES else [info["palette"]]
+    sheet = Image.new("RGBA", (len(COLUMNS) * cw * k, h + len(strips) * (2 * sw + 8)), (60, 60, 70, 255))
     for r, cid in enumerate(rec["rows"]):
         for c, pose in enumerate(COLUMNS):
             im = cells[cid][pose]
             sheet.alpha_composite(im.resize((im.width * k, im.height * k), Image.Resampling.NEAREST),
                                   (c * cw * k, r * ch * k))
-    for i, (src, dst) in enumerate(info["palette"]):          # the colour map: source (top) -> house colour (below)
-        sheet.paste((*src, 255), (i * (sw + 4), h + 4, i * (sw + 4) + sw, h + 4 + sw))
-        sheet.paste((*dst, 255), (i * (sw + 4), h + 4 + sw, i * (sw + 4) + sw, h + 4 + 2 * sw))
+    for j, strip in enumerate(strips):                      # the colour map per strip: source (top) -> house (below)
+        y = h + j * (2 * sw + 8) + 4
+        for i, (src, dst) in enumerate(strip):
+            sheet.paste((*src, 255), (i * (sw + 4), y, i * (sw + 4) + sw, y + sw))
+            sheet.paste((*dst, 255), (i * (sw + 4), y + sw, i * (sw + 4) + sw, y + 2 * sw))
     sheet.save(p := out / f"{rid}_import_x4.png")
     (q := out / f"{rid}_import.json").write_text(json.dumps(info, indent=2) + "\n")
     if not info["geometry"]["prop"]:

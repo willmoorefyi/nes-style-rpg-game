@@ -8,3 +8,5 @@ landsknecht: warrior # pass CL: temporary until the user renders the landsknecht
 dragoon: knight      # pass CL: temporary until the user renders the dragoon's field walk sheet
 dark_fighter_hero: warrior # pass CD-K: temporary until the user renders the dark fighter's field walk sheet
 death_knight_hero: knight  # pass CD-K: temporary until the user renders the death knight's field walk sheet
+legionnaire: warrior # temporary until the user renders the legionnaire's field walk sheet
+centurion: knight    # temporary until the user renders the centurion's field walk sheet

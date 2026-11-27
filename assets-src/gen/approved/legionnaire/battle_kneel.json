@@ -1,0 +1,237 @@
+{
+  "character": "legionnaire",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/legionnaire/battle_2026-11-26.png",
+    "sha256": "dba05ca2ac1c16cb5684722697f2f3ecf1a2c796f2ad566ede6e3222c11f10a6"
+  },
+  "recipe": "hero_user.yaml#legionnaire_centurion",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "legionnaire_centurion_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "the 'legionnaire' / 'centurion' ... another warrior / knight copy for now (delivered as final; used as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          23,
+          19,
+          24
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          56,
+          44,
+          53
+        ],
+        [
+          57,
+          41,
+          49
+        ]
+      ],
+      [
+        [
+          83,
+          54,
+          43
+        ],
+        [
+          82,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          104,
+          30,
+          35
+        ],
+        [
+          107,
+          33,
+          33
+        ]
+      ],
+      [
+        [
+          117,
+          116,
+          122
+        ],
+        [
+          115,
+          115,
+          123
+        ]
+      ],
+      [
+        [
+          129,
+          82,
+          56
+        ],
+        [
+          132,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          161,
+          46,
+          37
+        ],
+        [
+          165,
+          49,
+          33
+        ]
+      ],
+      [
+        [
+          164,
+          171,
+          182
+        ],
+        [
+          165,
+          173,
+          181
+        ]
+      ],
+      [
+        [
+          171,
+          115,
+          80
+        ],
+        [
+          173,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          183,
+          123,
+          45
+        ],
+        [
+          181,
+          123,
+          41
+        ]
+      ],
+      [
+        [
+          200,
+          75,
+          53
+        ],
+        [
+          198,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          221,
+          152,
+          108
+        ],
+        [
+          222,
+          148,
+          107
+        ]
+      ],
+      [
+        [
+          226,
+          166,
+          56
+        ],
+        [
+          222,
+          165,
+          57
+        ]
+      ],
+      [
+        [
+          229,
+          224,
+          217
+        ],
+        [
+          231,
+          222,
+          214
+        ]
+      ],
+      [
+        [
+          247,
+          195,
+          155
+        ],
+        [
+          247,
+          198,
+          156
+        ]
+      ],
+      [
+        [
+          248,
+          215,
+          123
+        ],
+        [
+          247,
+          214,
+          123
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        2,
+        16,
+        78,
+        76
+      ]
+    }
+  }
+}
