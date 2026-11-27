@@ -223,3 +223,36 @@ table, the `kneel: {source: user}` kind in the kneel note, the field alias, and 
   123/123 (ai 123, user 0, ...)`; battle_ai / field_ai / characters identical under PYTHONHASHSEED 0 / 1; rowdiff: the
   12 old rows identical by class, `characters-ai.png` byte-equal to mainline, `monsters-ai*` unchanged; `npm run
   quest -- --strict` OK.
+
+## 11. Amendment A1 (pass CB-2: hunter -> ranger, legionnaire -> centurion): a palette per class row
+
+The two next user renders (`~/temp/heroes/hunter_ranger_sprite_sheet.png`, `legionnaire_centurion_sprite_sheet.png`;
+560x160, binary alpha, feet on row 76, every pose facing left) have **32 colours per sheet: 16 per row, no colour
+shared between the rows** (the class pack's prompt asks for "at most 16 colours per row"). 3.2 step 6 refuses them.
+
+- A recipe may say `palette: rows` (default `sheet`, today's rule, so the barbarian / berserker import is unchanged
+  byte for byte). With `rows`, step 6 runs **per class row**: that row's opaque colours, <= 16, each `PX.snap15`, the
+  row's darkest -> `PX.OUTLINE`, one-to-one on the final colours within the row. Each row's map recolours **only
+  that row's slice** (`out[r * 80:(r + 1) * 80]`), so a source colour that appears in both rows is mapped by each row's
+  own rule (e.g. a dark that is the outline in one row and a shade in the other) and needs no refusal. Final colours
+  **may repeat across rows** (measured: hunter / ranger share 1, the outline; legionnaire / centurion share 6): there is
+  no cross-row uniqueness check. A refusal in `rows` mode names its class row (`ranger: 17 colours ...`). Any other
+  `palette` value is refused by `recipe()`.
+- Measures: `info["palette"]` stays the sheet map for `sheet`; for `rows` it is `{class: [[src, dst], ...]}`, and each
+  class's jsons record their own row's map in `cut.palette` (the field `puppet_kneel` already reads) and their own
+  row's count in `cut.colours` (16), so a class's files carry only its own colours. The review page draws one swatch
+  strip per row (its canvas grows by one strip height per row). The module docstring and the AGENTS.md row say so.
+- `hero_user.py`'s interfaces (`recipe`, `cut`, `approve`, `check`, `review`, `metas`, the CLI) keep their signatures;
+  only `palette()` gains an optional row selection internally. The other agent's `class-lance` branch extends the same
+  file; this change is one recipe key and the palette step.
+- Selftest (`selftest_hero_user.py`; `render()` gains per-row colour lists): a synthetic render with 16 disjoint
+  colours per row is refused with `sheet` and imported with `rows` (each class's json lists only its row's colours,
+  the darkest of each row -> PX.OUTLINE); a `rows` render whose rows share a colour that is the darkest of only one
+  row maps it per row (outline in that row, its own shade in the other); a row with 17 colours is refused with `rows`
+  naming the row; an unknown `palette` value is refused. **Barbarian JSON gate:** `metas()` run on the real
+  barbarian_berserker `cut()` equals the four committed jsons (all keys but `imported`), and `check` re-imports the
+  four pngs byte for byte.
+- Everything else of the pass (classes, rigs, kneel `source: user`, field aliases, tests, gates, reviews) follows
+  sections 2-9 per class pair: hunter (HNT) / ranger (RNG) copy thief / ninja (field alias thief / ninja); legionnaire
+  (LGN) / centurion (CEN) copy warrior / knight (field alias warrior / knight). Each pair has its own branch from
+  `class-barbarian` (bfc71d03): `class-hunter`, `class-legion`; this amendment's commit is cherry-picked onto both.
