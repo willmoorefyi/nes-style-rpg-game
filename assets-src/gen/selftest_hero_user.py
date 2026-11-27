@@ -250,6 +250,17 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
     dots = {c: (opaque(c, False), opaque(c, True)) for c in ("hunter", "ranger") if (PU.ANIM / f"{c}.yaml").is_file()}
     check(all(k > d for off, on in dots.values() for d, k in zip(off, on)),   # hunter / ranger only, where they exist
           f"CB A3: keep_specks keeps the dotted string in atk_mid / atk_follow (opaque px off / on {dots})")
+    # plan 14 (A4): a drawn key's held frames skip the contact share (not the lowest row)
+    wide = np.zeros((80, 80, 4), np.uint8)
+    wide[60:77, 10:60] = (120, 120, 120, 255)
+    narrow = np.zeros((80, 80, 4), np.uint8)
+    narrow[60:75, 10:60] = (120, 120, 120, 255)
+    narrow[75:77, 20:22] = (120, 120, 120, 255)             # a 2-px foot on the feet rows
+    high = np.roll(narrow, -1, axis=0)                       # lowest row 75
+    W, N, H = (Image.fromarray(x) for x in (wide, narrow, high))
+    share = lambda img, ref: [f for f in PK.frame_checks("kneel", img, W, 76, pal, ref) if "K-ground" in f]
+    check(bool(share(N, None)) and not share(N, N) and bool(share(H, None)) and bool(share(H, H)),
+          "CB A4: a drawn key's held frame skips the contact share, never the lowest row on 76")
     # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
     rec = HU2.recipe("barbarian_berserker")
     _, binfo = HU2.cut(rec)
