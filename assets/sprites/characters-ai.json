@@ -331,11 +331,21 @@
     "berserker": {
       "x": 336,
       "y": 3456
+    },
+    "hunter": {
+      "x": 1008,
+      "y": 5760
+    },
+    "ranger": {
+      "x": 1008,
+      "y": 4224
     }
   },
   "fallbacks": {},
   "aliases": {
     "barbarian": "warrior",
-    "berserker": "knight"
+    "berserker": "knight",
+    "hunter": "thief",
+    "ranger": "ninja"
   }
 }

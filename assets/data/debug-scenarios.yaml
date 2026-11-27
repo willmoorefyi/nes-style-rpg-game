@@ -3393,3 +3393,17 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/grassland.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11): the hunter / ranger class pair (user-rendered battle art). HUNT is weak so
+# it kneels; NIN is the like-for-like control for RANG. ?mute=1&scenario=cb_hunters (&kneel=loop, &enemyAnim=loop).
+- id: cb_hunters
+  name: Hunter and Ranger (pass CB preview)
+  party:
+    - { class: hunter, name: HUNT, level: 10, equipment: [rapier, leather_armor], spells: [], hp: 15 }
+    - { class: ranger, name: RANG, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: hunter, name: HUNT2, level: 10, equipment: [rapier, leather_armor], spells: [] }
+    - { class: ninja, name: NIN, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

@@ -86,7 +86,7 @@ describe('pass CB: barbarian / berserker battle art', () => {
   }
 
   it('field art: TEMPORARY aliases barbarian -> warrior, berserker -> knight (no own field sheet yet), 1x looks exist', () => {
-    expect(field.aliases).toEqual({ barbarian: 'warrior', berserker: 'knight' });
+    expect(field.aliases).toMatchObject({ barbarian: 'warrior', berserker: 'knight' });
     expect(field.sheets.barbarian).toEqual(field.sheets.warrior);
     expect(field.sheets.berserker).toEqual(field.sheets.knight);
     for (const cid of PAIR) expect(legacy.sheets[cid], cid).toBeDefined();

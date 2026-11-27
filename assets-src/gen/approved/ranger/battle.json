@@ -1,0 +1,278 @@
+{
+  "character": "ranger",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/hunter/battle_2026-11-26.png",
+    "sha256": "29f1cce175a67d7467449edaf2dcace9a68fed789e443132df89bb0666aa2a7a"
+  },
+  "recipe": "hero_user.yaml#hunter_ranger",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-26",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "hunter_ranger_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "the 'hunter' / 'ranger' combo ... a shallow copy of the 'thief' / 'ninja' class (delivered as final; used as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          21,
+          23,
+          23
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          37,
+          51,
+          41
+        ],
+        [
+          33,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          40,
+          40,
+          34
+        ],
+        [
+          41,
+          41,
+          33
+        ]
+      ],
+      [
+        [
+          57,
+          74,
+          52
+        ],
+        [
+          57,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          70,
+          49,
+          41
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          86,
+          99,
+          68
+        ],
+        [
+          82,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          102,
+          72,
+          55
+        ],
+        [
+          99,
+          74,
+          57
+        ]
+      ],
+      [
+        [
+          120,
+          131,
+          71
+        ],
+        [
+          123,
+          132,
+          74
+        ]
+      ],
+      [
+        [
+          142,
+          104,
+          71
+        ],
+        [
+          140,
+          107,
+          74
+        ]
+      ],
+      [
+        [
+          166,
+          169,
+          162
+        ],
+        [
+          165,
+          173,
+          165
+        ]
+      ],
+      [
+        [
+          171,
+          118,
+          86
+        ],
+        [
+          173,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          180,
+          140,
+          79
+        ],
+        [
+          181,
+          140,
+          82
+        ]
+      ],
+      [
+        [
+          195,
+          200,
+          99
+        ],
+        [
+          198,
+          198,
+          99
+        ]
+      ],
+      [
+        [
+          204,
+          149,
+          105
+        ],
+        [
+          206,
+          148,
+          107
+        ]
+      ],
+      [
+        [
+          217,
+          194,
+          152
+        ],
+        [
+          214,
+          198,
+          148
+        ]
+      ],
+      [
+        [
+          240,
+          189,
+          139
+        ],
+        [
+          239,
+          189,
+          140
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        11,
+        6,
+        71,
+        76
+      ],
+      "attack": [
+        1,
+        1,
+        78,
+        76
+      ],
+      "cast": [
+        8,
+        1,
+        72,
+        76
+      ],
+      "hurt": [
+        7,
+        7,
+        74,
+        76
+      ],
+      "down": [
+        1,
+        40,
+        78,
+        76
+      ],
+      "victory": [
+        3,
+        0,
+        76,
+        76
+      ]
+    }
+  }
+}
