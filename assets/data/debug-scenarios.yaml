@@ -3393,3 +3393,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/grassland.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-14): the ronin / samurai class pair (user-rendered battle art). RONIN is
+# weak so it kneels; NIN is the like-for-like control for SAMU. ?mute=1&scenario=cb_ronin (&kneel=loop,
+# &enemyAnim=loop).
+- id: cb_ronin
+  name: Ronin and Samurai (pass CB preview)
+  party:
+    - { class: ronin, name: RONIN, level: 10, equipment: [rapier, leather_armor], spells: [], hp: 15 }
+    - { class: samurai, name: SAMU, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: ronin, name: RONIN2, level: 10, equipment: [rapier, leather_armor], spells: [] }
+    - { class: ninja, name: NIN, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

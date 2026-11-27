@@ -775,7 +775,13 @@ ROSTER: dict[str, Look] = {
     # plain helm (no horned 1x gear exists), a sword as the nearest 1x weapon; the berserker bearded)
     "barbarian": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(14, 9, 5), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), weapon="sword"),
+    # pass CB (plan 11-14): the ronin in a grey kimono under a straw hat (the round_hat gear) with a sword (no 1x
+    # katana); the samurai in red-and-black armour with the plain helm
+    "ronin": Look(hair=(4, 3, 4), hair_style="long", outfit="tunic", cloth=(11, 11, 11), trim=(6, 6, 8),
+                  pants=(12, 11, 10), boots=(26, 24, 20), gear="round_hat", gear_color=(24, 19, 10), weapon="sword"),
     # Upgraded classes
+    "samurai": Look(hair=(4, 3, 4), hair_style="short", outfit="armor", cloth=(20, 4, 4), trim=(6, 5, 7),
+                    pants=(7, 6, 9), boots=(26, 24, 20), gear="helm", gear_color=(8, 6, 8), weapon="sword"),
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),

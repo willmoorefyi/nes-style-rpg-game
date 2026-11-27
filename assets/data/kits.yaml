@@ -14,6 +14,7 @@ start:
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
+  ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
   white_mage: { gear: [hammer, cloth], spells: [cure] }
   black_mage: { gear: [small_knife, cloth], spells: [fire] }
@@ -22,6 +23,7 @@ lv2:
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
+  ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
   white_mage: { gear: [hammer, cloth], spells: [cure] }
   black_mage: { gear: [small_knife, cloth], spells: [fire, lit] }
@@ -30,6 +32,7 @@ arrive:
   warrior: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
@@ -38,6 +41,7 @@ full:
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
@@ -46,6 +50,7 @@ naked:
   warrior: { gear: [], spells: [] }
   barbarian: { gear: [], spells: [] }
   thief: { gear: [], spells: [] }
+  ronin: { gear: [], spells: [] }
   monk: { gear: [], spells: [] }
   white_mage: { gear: [], spells: [] }
   black_mage: { gear: [], spells: [] }
@@ -63,6 +68,7 @@ w_s1: &w_s1
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
@@ -72,6 +78,7 @@ w_pravoka: &w_t2
   warrior: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   thief: { gear: [short_sword, leather_armor, cap], spells: [] }
+  ronin: { gear: [short_sword, leather_armor, cap], spells: [] }
   monk: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
   black_mage: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
@@ -85,6 +92,7 @@ w_elfheim: &w_t3
   warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   thief: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
+  ronin: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
   black_mage: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
@@ -102,6 +110,7 @@ w_melmond: &w_t4
   warrior: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [scimitar, gold_armlet, cap], spells: [] }
+  ronin: { gear: [scimitar, gold_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
   black_mage: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
@@ -114,6 +123,7 @@ w_crescent: &w_t5
   warrior: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [falchion, gold_armlet, cap], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, gold_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
@@ -127,6 +137,7 @@ w_onrac: &w_t6
   warrior: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   barbarian: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   thief: { gear: [rune_knife, opal_armlet, cap], spells: [] }
+  ronin: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   white_mage: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
@@ -134,6 +145,7 @@ w_onrac: &w_t6
   knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   berserker: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   ninja: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
+  samurai: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   white_wizard: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_wizard: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
@@ -148,6 +160,7 @@ w_gaia: &w_t7
   warrior: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   barbarian: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   thief: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
+  ronin: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   monk: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   white_mage: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
@@ -155,6 +168,7 @@ w_gaia: &w_t7
   knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   berserker: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   ninja: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
+  samurai: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   white_wizard: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_wizard: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }

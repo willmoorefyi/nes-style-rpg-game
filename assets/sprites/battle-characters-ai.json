@@ -66,20 +66,28 @@
       "row": 9,
       "inbetweens": true
     },
-    "thief": {
+    "ronin": {
       "row": 10,
       "inbetweens": true
     },
-    "warrior": {
+    "samurai": {
       "row": 11,
       "inbetweens": true
     },
-    "white_mage": {
+    "thief": {
       "row": 12,
       "inbetweens": true
     },
-    "white_wizard": {
+    "warrior": {
       "row": 13,
+      "inbetweens": true
+    },
+    "white_mage": {
+      "row": 14,
+      "inbetweens": true
+    },
+    "white_wizard": {
+      "row": 15,
       "inbetweens": true
     }
   }

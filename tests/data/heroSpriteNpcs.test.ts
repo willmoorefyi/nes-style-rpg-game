@@ -29,8 +29,8 @@ function users(dir: string): string[] {
 }
 
 describe('PT: hero sheets are for the party', () => {
-  it('reads the 14 hero classes from classes.yaml (pass CB: + barbarian, berserker)', () => {
-    expect(classes).toHaveLength(14);
+  it('reads the 16 hero classes from classes.yaml (pass CB: + barbarian, berserker, ronin, samurai)', () => {
+    expect(classes).toHaveLength(16);
   });
 
   for (const dir of ['assets-src/maps', 'assets/maps/ai']) {

@@ -10,6 +10,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -53,6 +54,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - red_mage
   hit: 5
   crit: 4
@@ -67,6 +69,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - red_mage
   hit: 10
   crit: 6
@@ -144,6 +147,7 @@
   price: 800
   usableBy:
   - thief
+  - ronin
   - black_mage
   - red_mage
   bonusVsFamily: undead
@@ -242,6 +246,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -261,6 +266,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -291,6 +297,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - red_mage
   slot: armor
@@ -419,6 +426,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -538,6 +546,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -556,6 +565,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - red_mage
   hit: 5
   crit: 10
@@ -570,6 +580,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -588,6 +599,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - red_mage
   hit: 10
   crit: 14
@@ -674,6 +686,7 @@
   price: 12000
   usableBy:
   - thief
+  - ronin
   - black_mage
   - red_mage
   hit: 10
@@ -701,6 +714,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
@@ -756,6 +770,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   hit: 10
   crit: 24
 - id: dragon_claw
@@ -792,6 +807,7 @@
   - warrior
   - barbarian
   - thief
+  - ronin
   - monk
   - white_mage
   - black_mage
