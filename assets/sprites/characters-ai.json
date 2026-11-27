@@ -332,6 +332,14 @@
       "x": 336,
       "y": 3456
     },
+    "centurion": {
+      "x": 336,
+      "y": 3456
+    },
+    "cleric": {
+      "x": 336,
+      "y": 6528
+    },
     "dark_fighter_hero": {
       "x": 0,
       "y": 6528
@@ -344,18 +352,50 @@
       "x": 336,
       "y": 3456
     },
+    "hunter": {
+      "x": 1008,
+      "y": 5760
+    },
     "landsknecht": {
       "x": 0,
       "y": 6528
+    },
+    "legionnaire": {
+      "x": 0,
+      "y": 6528
+    },
+    "paladin": {
+      "x": 672,
+      "y": 6528
+    },
+    "ranger": {
+      "x": 1008,
+      "y": 4224
+    },
+    "ronin": {
+      "x": 1008,
+      "y": 5760
+    },
+    "samurai": {
+      "x": 1008,
+      "y": 4224
     }
   },
   "fallbacks": {},
   "aliases": {
     "barbarian": "warrior",
     "berserker": "knight",
+    "centurion": "knight",
+    "cleric": "white_mage",
     "dark_fighter_hero": "warrior",
     "death_knight_hero": "knight",
     "dragoon": "knight",
-    "landsknecht": "warrior"
+    "hunter": "thief",
+    "landsknecht": "warrior",
+    "legionnaire": "warrior",
+    "paladin": "white_wizard",
+    "ranger": "ninja",
+    "ronin": "thief",
+    "samurai": "ninja"
   }
 }

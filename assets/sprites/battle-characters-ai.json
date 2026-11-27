@@ -42,48 +42,80 @@
       "row": 3,
       "inbetweens": true
     },
-    "dark_fighter_hero": {
+    "centurion": {
       "row": 4,
       "inbetweens": true
     },
-    "knight": {
+    "cleric": {
       "row": 5,
       "inbetweens": true
     },
-    "master": {
+    "dark_fighter_hero": {
       "row": 6,
       "inbetweens": true
     },
-    "monk": {
+    "hunter": {
       "row": 7,
       "inbetweens": true
     },
-    "ninja": {
+    "knight": {
       "row": 8,
       "inbetweens": true
     },
-    "red_mage": {
+    "legionnaire": {
       "row": 9,
       "inbetweens": true
     },
-    "red_wizard": {
+    "master": {
       "row": 10,
       "inbetweens": true
     },
-    "thief": {
+    "monk": {
       "row": 11,
       "inbetweens": true
     },
-    "warrior": {
+    "ninja": {
       "row": 12,
       "inbetweens": true
     },
-    "white_mage": {
+    "paladin": {
       "row": 13,
       "inbetweens": true
     },
-    "white_wizard": {
+    "ranger": {
       "row": 14,
+      "inbetweens": true
+    },
+    "red_mage": {
+      "row": 15,
+      "inbetweens": true
+    },
+    "red_wizard": {
+      "row": 16,
+      "inbetweens": true
+    },
+    "ronin": {
+      "row": 17,
+      "inbetweens": true
+    },
+    "samurai": {
+      "row": 18,
+      "inbetweens": true
+    },
+    "thief": {
+      "row": 19,
+      "inbetweens": true
+    },
+    "warrior": {
+      "row": 20,
+      "inbetweens": true
+    },
+    "white_mage": {
+      "row": 21,
+      "inbetweens": true
+    },
+    "white_wizard": {
+      "row": 22,
       "inbetweens": true
     },
     "dragoon": {
@@ -379,7 +411,7 @@
     {
       "file": "battle-characters-ai.png",
       "w": 2880,
-      "h": 2400
+      "h": 3680
     },
     {
       "file": "battle-characters-ai-1.png",
