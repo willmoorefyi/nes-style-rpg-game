@@ -775,7 +775,13 @@ ROSTER: dict[str, Look] = {
     # plain helm (no horned 1x gear exists), a sword as the nearest 1x weapon; the berserker bearded)
     "barbarian": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(14, 9, 5), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), weapon="sword"),
+    # pass CB (plan 11-13): the cleric in steel over a white tabard (plain helm-less hair, the hammer as a staff-like
+    # 1x weapon is not drawn: rod); the paladin in white-and-gold plate with a sword and shield
+    "cleric": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(29, 28, 26), trim=(26, 22, 8),
+                   pants=(12, 8, 5), boots=(12, 8, 5), weapon="rod", weapon_color=(22, 22, 26), shield=True),
     # Upgraded classes
+    "paladin": Look(hair=(15, 9, 4), hair_style="short", outfit="armor", cloth=(30, 30, 29), trim=(28, 22, 6),
+                    pants=(26, 26, 27), boots=(24, 24, 26), weapon="sword", shield=True, cape=(28, 24, 12)),
     "berserker": Look(hair=(22, 11, 4), hair_style="spiky", outfit="tunic", cloth=(11, 7, 4), trim=(20, 20, 23),
                       pants=(12, 8, 5), boots=(9, 7, 6), gear="helm", gear_color=(20, 20, 23), beard=(22, 11, 4),
                       weapon="sword"),

@@ -331,11 +331,21 @@
     "berserker": {
       "x": 336,
       "y": 3456
+    },
+    "cleric": {
+      "x": 336,
+      "y": 6528
+    },
+    "paladin": {
+      "x": 672,
+      "y": 6528
     }
   },
   "fallbacks": {},
   "aliases": {
     "barbarian": "warrior",
-    "berserker": "knight"
+    "berserker": "knight",
+    "cleric": "white_mage",
+    "paladin": "white_wizard"
   }
 }

@@ -19,3 +19,20 @@ barbarian_berserker:
   source_name: barbarian_berserker_sprite_sheet.png
   approved: "2026-11-26"
   user_review: "The first instance of my new heroes is ready (delivered as final; used as rendered)"
+cleric_paladin:
+  file: user_art/cleric/battle_2026-11-26.png
+  sha256: f50c624f6df1c56645f29cf3ee18a4ef076ae2b85f0c91a6ae5ee643981ad388
+  rows: [cleric, paladin]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row, none shared (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-26"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: cleric_paladin_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "the cleric / paladin combo (copy of the white mage) (delivered as final; the CAST sparkle kept as rendered)"

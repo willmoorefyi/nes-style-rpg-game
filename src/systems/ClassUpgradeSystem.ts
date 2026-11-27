@@ -11,6 +11,7 @@ export const CLASS_UPGRADES: Record<string, string> = {
   black_mage: 'black_wizard',
   red_mage: 'red_wizard',
   barbarian: 'berserker', // pass CB (docs/CLASS_BARBARIAN_PLAN.md D-CB3)
+  cleric: 'paladin', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
 };
 
 /** Set of upgraded class IDs for quick lookup */
