@@ -485,23 +485,23 @@ are only the shop prices; chest items keep theirs.
 | `hand_axe` | hand_axe | 16/5/7 | **16/5/7** | 550 → 550 | Fi Kn Ni | - → - |
 | `iron_nunchaku` | iron_nunchuck | 16/0/9 | **16/0/9** | 200 → 200 | Ni BB Ma | - → - |
 | `iron_sword` | non-FF1 | 13/10/10 | **13/10/10** | 300 → 300 | Fi Kn RM RW | - → - |
-| `mythril_sword` | silver_sword | 23/15/17 | **23/15/17** | 4000 → 4000 | Fi Kn Ni RM RW | - → - |
-| `mythril_knife` | silver_knife | 10/15/16 | **10/15/16** | 800 → 800 | Fi Kn Th Ni RM RW BM BW | - → - |
-| `great_axe` | great_axe | 22/5/14 | **22/5/14** | 4500 → 4500 | Fi Kn Ni | - → - |
-| `mythril_hammer` | silver_hammer | 12/5/18 | **12/5/18** | 2500 → 2500 | Fi Kn Ni WM WW | - → - |
-| `power_staff` | power_staff | 12/0/28 | **12/0/28** | 1000 → 1000 | Fi Kn Ni BB Ma WM WW BM BW | - → - |
-| `flame_sword` | flame_sword | 26/20/20 | **26/20/20** | 10000 → 10000 | Fi Kn Ni RM RW | element=fire,bonusVsFamily=undead → element fire, bonusVsFamily undead |
-| `ice_brand` | ice_sword | 29/25/21 | **29/25/21** | 10000 → 10000 | Fi Kn Ni RM RW | element=ice → element ice |
-| `coral_sword` | coral_sword | 19/15/25 | **19/15/25** | 10000 → 10000 | Fi Kn Th Ni RM RW | bonusVsFamily=aquatic → bonusVsFamily aquatic |
-| `masamune` | masmune | 56/50/40 | **56/50/40** | 0 → 0 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `mythril_sword` | silver_sword | 23/10/12 | **23/15/17** | 4000 → 4000 | Fi Kn Ni RM RW | bonusVsFamily=undead → - |
+| `mythril_knife` | silver_knife | 15/10/12 | **10/15/16** | 800 → 800 | Fi Kn Th Ni RM RW BM BW | bonusVsFamily=undead → - |
+| `great_axe` | great_axe | 22/10/14 | **22/5/14** | 4500 → 4500 | Fi Kn Ni | bonusVsFamily=giant → - |
+| `mythril_hammer` | silver_hammer | 18/10/12 | **12/5/18** | 2500 → 2500 | Fi Kn Ni WM WW | bonusVsFamily=undead → - |
+| `power_staff` | power_staff | 12/10/10 | **12/0/28** | 1000 → 1000 | Fi Kn Ni BB Ma WM WW BM BW | - → - |
+| `flame_sword` | flame_sword | 26/10/16 | **26/20/20** | 10000 → 10000 | Fi Kn Ni RM RW | element=fire,bonusVsFamily=undead → element fire, bonusVsFamily undead |
+| `ice_brand` | ice_sword | 26/10/16 | **29/25/21** | 10000 → 10000 | Fi Kn Ni RM RW | element=ice → element ice |
+| `coral_sword` | coral_sword | 26/10/16 | **19/15/25** | 10000 → 10000 | Fi Kn Th Ni RM RW | element=lightning,bonusVsFamily=aquatic → bonusVsFamily aquatic |
+| `masamune` | masmune | 56/10/20 | **56/50/40** | 0 → 0 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | bonusVsFamily=dragon → - |
 | `cloth` | cloth | 1/2 | **1/2** | 10 → 10 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
 | `robe` | non-FF1 | 2/2 | **2/2** | 20 → 20 | RM RW WM WW BM BW | - → - |
 | `leather_armor` | wooden_armor | 4/8 | **4/8** | 50 → 50 | Fi Kn Th Ni BB Ma RM RW | - → - |
 | `wooden_armor` | wooden_armor | 4/8 | **4/8** | 50 → 50 | Fi Kn Th Ni BB Ma RM RW | - → - |
 | `chain_mail` | chain_armor | 15/15 | **15/15** | 80 → 80 | Fi Kn Ni RM RW | - → - |
 | `iron_armor` | iron_armor | 24/23 | **24/23** | 800 → 800 | Fi Kn Ni | - → - |
-| `mythril_armor` | steel_armor | 34/33 | **34/33** | 45000 → 45000 | Fi Kn | - → - |
-| `mythril_mail` | silver_armor | 18/8 | **18/8** | 7500 → 7500 | Fi Kn Ni RM RW | - → - |
+| `mythril_armor` | steel_armor | 34/33 | **34/33** | 7500 → 45000 | Fi Kn | - → - |
+| `mythril_mail` | silver_armor | 18/8 | **18/8** | 3500 → 7500 | Fi Kn Ni RM RW | - → - |
 | `dragon_armor` | dragon_armor | 42/10 | **42/10** | 0 → 0 | Kn | - → resist fire+ice+lightning |
 | `wooden_shield` | wooden_shield | 2/0 | **2/0** | 15 → 15 | Fi Kn Ni | - → - |
 | `iron_shield` | iron_shield | 4/0 | **4/0** | 100 → 100 | Fi Kn Ni | - → - |
@@ -509,61 +509,45 @@ are only the shop prices; chest items keep theirs.
 | `cap` | cap | 1/1 | **1/1** | 80 → 80 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
 | `iron_helm` | wooden_helmet | 3/3 | **3/3** | 100 → 100 | Fi Kn Ni | - → - |
 | `mythril_helm` | silver_helmet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni | - → - |
-| `large_dagger` | large_dagger | 7/10/10 | **7/10/10** | 175 → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
-| `iron_staff` | iron_staff | 14/0/11 | **14/0/11** | 200 → 200 | Fi Kn Ni BB Ma | - → - |
-| `sabre` | sabre | 13/5/12 | **13/5/12** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
-| `long_sword` | long_sword | 20/10/13 | **20/10/13** | 1500 → 1500 | Fi Kn Ni RM RW | - → - |
-| `silver_axe` | silver_axe | 25/10/19 | **25/10/19** | 4500 → 4500 | Fi Kn Ni | - → - |
-| `copper_bracelet` | copper_bracelet | 4/1 | **4/1** | 1000 → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `buckler` | buckler | 2/0 | **2/0** | 2500 → 2500 | Fi Kn Th Ni RM RW | - → - |
-| `great_helm` | iron_helmet | 5/5 | **5/5** | 450 → 450 | Fi Kn Ni | - → - |
-| `gloves` | gloves | 1/1 | **1/1** | 60 → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `copper_gauntlet` | copper_gauntlet | 2/3 | **2/3** | 200 → 200 | Fi Kn Ni | - → - |
-| `iron_gauntlet` | iron_gauntlet | 4/5 | **4/5** | 750 → 750 | Fi Kn Ni | - → - |
-| `silver_gauntlet` | silver_gauntlet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni RW | - → - |
-| `zeus_gauntlet` | zeus_gauntlet | 6/3 | **6/3** | 15000 → 15000 | Kn Ni RW | - → battleSpell lit2 |
-| `power_gauntlet` | power_gauntlet | 6/3 | **6/3** | 10000 → 10000 | Kn Ni RW | - → battleSpell sabr |
-| `opal_gauntlet` | opal_gauntlet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
-| `pro_ring` | proring | 8/1 | **8/1** | 20000 → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
-| `silver_armlet` | silver_bracelet | 15/1 | **15/1** | 5000 → 5000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `scimitar` | scimitar | 10/10/8 | **10/10/8** | 200 → 200 | Fi Kn Th Ni RM RW | - → - |
-| `gold_armlet` | gold_bracelet | 24/1 | **24/1** | 50000 → 50000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `falchion` | falchon | 15/10/15 | **15/10/15** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
-| `cat_claw` | catclaw | 22/35/35 | **22/35/35** | 65000 → 65000 | Kn Ni RW BW | - → - |
-| `wizard_staff` | wizard_staff | 15/15/33 | **15/15/33** | 5000 → 5000 | BW | - → battleSpell conf |
+| `silver_armlet` | silver_bracelet | 10/1 | **15/1** | 1200 → 5000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `scimitar` | scimitar | 20/5/10 | **10/10/8** | 3000 → 200 | Fi Kn Th Ni RM RW | - → - |
+| `gold_armlet` | gold_bracelet | 16/1 | **24/1** | 4000 → 50000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `falchion` | falchon | 24/10/14 | **15/10/15** | 8000 → 450 | Fi Kn Th Ni RM RW | - → - |
+| `cat_claw` | catclaw | 22/10/16 | **22/35/35** | 6500 → 65000 | Kn Ni RW BW | - → - |
+| `wizard_staff` | wizard_staff | 18/5/10 | **15/15/33** | 5000 → 5000 | BW | - → battleSpell conf |
 | `white_robe` | white_shirt | 24/2 | **24/2** | 9000 → 9000 | WW | - → battleSpell inv2, resist fire+death |
 | `black_robe` | black_shirt | 24/2 | **24/2** | 9000 → 9000 | BW | - → battleSpell ice2, resist ice+time |
-| `sun_blade` | sun_sword | 32/30/24 | **32/30/24** | 15000 → 15000 | Fi Kn Ni RM RW | bonusVsFamily=undead → bonusVsFamily undead |
-| `thor_hammer` | thors_hammer | 18/15/36 | **18/15/36** | 14000 → 14000 | Kn Ni WW | - → battleSpell lit2 |
-| `rune_knife` | non-FF1 | 18/15/27 | **18/15/27** | 12000 → 12000 | Th Ni RM RW BM BW | bonusVsFamily=magical → bonusVsFamily magical |
-| `opal_armor` | opal_armor | 42/10 | **42/10** | 20000 → 20000 | Kn | - → resist lightning |
-| `opal_armlet` | opal_bracelet | 34/1 | **34/1** | 15000 → 15000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `aegis_shield` | aegis_shield | 16/0 | **16/0** | 16000 → 16000 | Kn | - → resist poison_stone |
+| `sun_blade` | sun_sword | 30/10/16 | **32/30/24** | 15000 → 15000 | Fi Kn Ni RM RW | - → bonusVsFamily undead |
+| `thor_hammer` | thors_hammer | 24/10/14 | **18/15/36** | 14000 → 14000 | Kn Ni WW | element=lightning → battleSpell lit2 |
+| `rune_knife` | non-FF1 | 26/10/18 | **18/15/27** | 12000 → 12000 | Th Ni RM RW BM BW | - → bonusVsFamily magical |
+| `opal_armor` | opal_armor | 38/30 | **42/10** | 20000 → 20000 | Kn | - → resist lightning |
+| `opal_armlet` | opal_bracelet | 22/1 | **34/1** | 15000 → 15000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `aegis_shield` | aegis_shield | 12/0 | **16/0** | 16000 → 16000 | Kn | - → resist poison_stone |
 | `opal_helm` | opal_helmet | 8/3 | **8/3** | 9000 → 9000 | Kn | - → - |
-| `defender` | defense | 30/35/32 | **30/35/32** | 30000 → 30000 | Kn Ni RW | - → battleSpell ruse |
-| `vorpal_sword` | vorpal | 24/25/34 | **24/25/34** | 28000 → 28000 | Kn Ni RW | - → - |
-| `dragon_claw` | non-FF1 | 30/35/35 | **30/35/35** | 26000 → 26000 | Kn Ni RW BW | bonusVsFamily=dragon → bonusVsFamily dragon |
-| `diamond_armor` | opal_armor | 42/10 | **42/10** | 40000 → 40000 | Kn | - → resist lightning |
-| `diamond_armlet` | opal_bracelet | 34/1 | **34/1** | 30000 → 30000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `diamond_shield` | opal_shield | 16/0 | **16/0** | 25000 → 25000 | Kn | - → resist lightning |
-| `diamond_helm` | opal_helmet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
-| `excalibur` | xcalber | 45/35/39 | **45/35/39** | 0 → 0 | Kn | bonusVsFamily=all → bonusVsFamily all |
-| `large_dagger` | large_dagger | 7/10/10 | **7/10/10** | 175 → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
-| `iron_staff` | iron_staff | 14/0/11 | **14/0/11** | 200 → 200 | Fi Kn Ni BB Ma | - → - |
-| `sabre` | sabre | 13/5/12 | **13/5/12** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
-| `long_sword` | long_sword | 20/10/13 | **20/10/13** | 1500 → 1500 | Fi Kn Ni RM RW | - → - |
-| `silver_axe` | silver_axe | 25/10/19 | **25/10/19** | 4500 → 4500 | Fi Kn Ni | - → - |
-| `copper_bracelet` | copper_bracelet | 4/1 | **4/1** | 1000 → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `buckler` | buckler | 2/0 | **2/0** | 2500 → 2500 | Fi Kn Th Ni RM RW | - → - |
-| `great_helm` | iron_helmet | 5/5 | **5/5** | 450 → 450 | Fi Kn Ni | - → - |
-| `gloves` | gloves | 1/1 | **1/1** | 60 → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `copper_gauntlet` | copper_gauntlet | 2/3 | **2/3** | 200 → 200 | Fi Kn Ni | - → - |
-| `iron_gauntlet` | iron_gauntlet | 4/5 | **4/5** | 750 → 750 | Fi Kn Ni | - → - |
-| `silver_gauntlet` | silver_gauntlet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni RW | - → - |
-| `zeus_gauntlet` | zeus_gauntlet | 6/3 | **6/3** | 15000 → 15000 | Kn Ni RW | - → battleSpell lit2 |
-| `power_gauntlet` | power_gauntlet | 6/3 | **6/3** | 10000 → 10000 | Kn Ni RW | - → battleSpell sabr |
-| `opal_gauntlet` | opal_gauntlet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
-| `pro_ring` | proring | 8/1 | **8/1** | 20000 → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
+| `defender` | defense | 34/10/18 | **30/35/32** | 30000 → 30000 | Kn Ni RW | - → battleSpell ruse |
+| `vorpal_sword` | vorpal | 32/10/24 | **24/25/34** | 28000 → 28000 | Kn Ni RW | - → - |
+| `dragon_claw` | non-FF1 | 30/10/20 | **30/35/35** | 26000 → 26000 | Kn Ni RW BW | - → bonusVsFamily dragon |
+| `diamond_armor` | opal_armor | 40/28 | **42/10** | 40000 → 40000 | Kn | - → resist lightning |
+| `diamond_armlet` | opal_bracelet | 30/1 | **34/1** | 30000 → 30000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `diamond_shield` | opal_shield | 14/0 | **16/0** | 25000 → 25000 | Kn | - → resist lightning |
+| `diamond_helm` | opal_helmet | 10/3 | **8/3** | 20000 → 20000 | Kn | - → - |
+| `excalibur` | xcalber | 45/15/20 | **45/35/39** | 0 → 0 | Kn | element=holy → bonusVsFamily all |
+| `large_dagger` | large_dagger | new | **7/10/10** | - → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
+| `iron_staff` | iron_staff | new | **14/0/11** | - → 200 | Fi Kn Ni BB Ma | - → - |
+| `sabre` | sabre | new | **13/5/12** | - → 450 | Fi Kn Th Ni RM RW | - → - |
+| `long_sword` | long_sword | new | **20/10/13** | - → 1500 | Fi Kn Ni RM RW | - → - |
+| `silver_axe` | silver_axe | new | **25/10/19** | - → 4500 | Fi Kn Ni | - → - |
+| `copper_bracelet` | copper_bracelet | new | **4/1** | - → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `buckler` | buckler | new | **2/0** | - → 2500 | Fi Kn Th Ni RM RW | - → - |
+| `great_helm` | iron_helmet | new | **5/5** | - → 450 | Fi Kn Ni | - → - |
+| `gloves` | gloves | new | **1/1** | - → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `copper_gauntlet` | copper_gauntlet | new | **2/3** | - → 200 | Fi Kn Ni | - → - |
+| `iron_gauntlet` | iron_gauntlet | new | **4/5** | - → 750 | Fi Kn Ni | - → - |
+| `silver_gauntlet` | silver_gauntlet | new | **6/3** | - → 2500 | Fi Kn Ni RW | - → - |
+| `zeus_gauntlet` | zeus_gauntlet | new | **6/3** | - → 15000 | Kn Ni RW | - → battleSpell lit2 |
+| `power_gauntlet` | power_gauntlet | new | **6/3** | - → 10000 | Kn Ni RW | - → battleSpell sabr |
+| `opal_gauntlet` | opal_gauntlet | new | **8/3** | - → 20000 | Kn | - → - |
+| `pro_ring` | proring | new | **8/1** | - → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
 
 ## Appendix B: the kits (from `kits.py`; *italic* = `found`; every clone row = its template)
 
