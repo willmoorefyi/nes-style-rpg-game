@@ -111,12 +111,13 @@ def _lance(g: dict, cid: str, pose: str, src: np.ndarray) -> np.ndarray | None:
 
 def airborne(rec: dict) -> dict[str, int]:
     """Plan 18 (A7): the recipe's `airborne: {<class>/<pose>: <lowest body row>}`, cells drawn off the ground (a
-    diving attack); validated (ready and kneel stay on the feet row: their in-betweens and the kneel bridge need it)."""
+    diving attack; plan 19, A8: a levitating ready); validated (the kneel key stays on the feet row: it is the kneel
+    bridge's ground)."""
     raw = rec.get("airborne") or {}
     for k, v in raw.items():
         cid, _, pose = str(k).partition("/")
-        if cid not in rec["rows"] or pose not in COLUMNS or pose in ("ready", "kneel"):
-            raise SystemExit(f"user sheet: airborne {k}: not a <row class>/<pose> of the recipe (ready, kneel refused)")
+        if cid not in rec["rows"] or pose not in COLUMNS or pose == "kneel":
+            raise SystemExit(f"user sheet: airborne {k}: not a <row class>/<pose> of the recipe (kneel refused)")
         if not isinstance(v, int) or isinstance(v, bool) or v < 0:
             raise SystemExit(f"user sheet: airborne {k}: {v!r} is not a row (an integer >= 0)")
     return dict(raw)

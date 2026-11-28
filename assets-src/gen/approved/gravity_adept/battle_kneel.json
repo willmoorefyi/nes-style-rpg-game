@@ -1,0 +1,237 @@
+{
+  "character": "gravity_adept",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/gravity_adept/battle_2026-11-27.png",
+    "sha256": "ee96340b6edd4d687d4e64f938eb511327ab4b2bb615ec7a69b2cd89e3e76ab1"
+  },
+  "recipe": "hero_user.yaml#gravity_adept_void_walker",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "gravity_adept_voidwalker_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-28",
+  "approved": "2026-11-27",
+  "user_review": "gravity adept and void walker are in - let's have them be a black mage / black wizard copy (delivered as final; the purple ring and wave pulses, the floating rocks, the dropped gadgets, the orbit rings, the crystal shards, the black-hole orb and the levitating READY kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          23,
+          25,
+          39
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          39,
+          40,
+          56
+        ],
+        [
+          41,
+          41,
+          57
+        ]
+      ],
+      [
+        [
+          59,
+          37,
+          138
+        ],
+        [
+          57,
+          33,
+          140
+        ]
+      ],
+      [
+        [
+          59,
+          64,
+          85
+        ],
+        [
+          57,
+          66,
+          82
+        ]
+      ],
+      [
+        [
+          88,
+          97,
+          120
+        ],
+        [
+          90,
+          99,
+          123
+        ]
+      ],
+      [
+        [
+          104,
+          70,
+          216
+        ],
+        [
+          107,
+          74,
+          214
+        ]
+      ],
+      [
+        [
+          133,
+          143,
+          165
+        ],
+        [
+          132,
+          140,
+          165
+        ]
+      ],
+      [
+        [
+          156,
+          103,
+          97
+        ],
+        [
+          156,
+          107,
+          99
+        ]
+      ],
+      [
+        [
+          158,
+          66,
+          31
+        ],
+        [
+          156,
+          66,
+          33
+        ]
+      ],
+      [
+        [
+          166,
+          148,
+          255
+        ],
+        [
+          165,
+          148,
+          255
+        ]
+      ],
+      [
+        [
+          181,
+          191,
+          202
+        ],
+        [
+          181,
+          189,
+          206
+        ]
+      ],
+      [
+        [
+          212,
+          155,
+          136
+        ],
+        [
+          214,
+          156,
+          140
+        ]
+      ],
+      [
+        [
+          217,
+          221,
+          225
+        ],
+        [
+          214,
+          222,
+          222
+        ]
+      ],
+      [
+        [
+          238,
+          137,
+          58
+        ],
+        [
+          239,
+          140,
+          57
+        ]
+      ],
+      [
+        [
+          241,
+          197,
+          168
+        ],
+        [
+          239,
+          198,
+          165
+        ]
+      ],
+      [
+        [
+          248,
+          245,
+          239
+        ],
+        [
+          247,
+          247,
+          239
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        2,
+        25,
+        70,
+        76
+      ]
+    }
+  }
+}

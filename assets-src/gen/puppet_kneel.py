@@ -44,6 +44,14 @@ def bottom_row(cid: str) -> int:
     return int(json.loads((PU.APPROVED / cid / "battle.json").read_text())["bottom_row"])
 
 
+def ready_ground(cid: str, bottom: int) -> int:
+    """Plan 19 (A8): the row kneel_in1 ends on, ready's (the bridge keeps the source's lowest row): the battle.json's
+    `airborne.ready` when ready levitates, else the feet row."""
+    p = PU.APPROVED / cid / "battle.json"
+    air = json.loads(p.read_text()).get("airborne") if p.is_file() else None
+    return int((air or {}).get("ready", bottom))
+
+
 KEY_SOURCES = ("ai", "user")             # pass CB (docs/CLASS_BARBARIAN_PLAN.md 4): a drawn key, AI or the user's
 
 
@@ -198,7 +206,8 @@ def check_frames(cid: str, cfg: dict, frames: dict, bottom: int, plan_text: str 
     for n in KNEEL_POSES:
         img, rots, _ = made[n]
         ref = made["kneel"][0] if is_ai(cfg) and n != "kneel_in1" else None          # D-KT4: drawn from the key
-        fails += frame_checks(n, img, frames["ready"], bottom, palette, ref, pieces) + rot_check(n, rots)
+        ground = ready_ground(cid, bottom) if n == "kneel_in1" else bottom   # plan 19 (A8): a levitating ready
+        fails += frame_checks(n, img, frames["ready"], ground, palette, ref, pieces) + rot_check(n, rots)
         h = height(img)
         if n in HELD and not lo <= h <= hi and not is_ai(cfg):   # D-KT4: an AI key's band is reported only
             fails.append(f"{n}: K-height {h} outside the band {lo}-{hi}")

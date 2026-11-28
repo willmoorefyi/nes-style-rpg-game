@@ -565,6 +565,16 @@
       "row": 7,
       "page": 4,
       "inbetweens": false
+    },
+    "gravity_adept": {
+      "row": 8,
+      "page": 4,
+      "inbetweens": false
+    },
+    "void_walker": {
+      "row": 9,
+      "page": 4,
+      "inbetweens": false
     }
   },
   "pages": [
@@ -591,7 +601,7 @@
     {
       "file": "battle-characters-ai-4.png",
       "w": 2880,
-      "h": 1280
+      "h": 1600
     }
   ]
 }

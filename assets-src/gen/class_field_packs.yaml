@@ -947,3 +947,41 @@ sky_captain:
     the sabre is sheathed at his left hip, hilt forward, close to the body; the mechanical wings stay folded on his
     back in every view so the figure stays within 46 px wide and under the 92 px cap. Everything stays inside the
     48 x 96 cell
+
+gravity_adept:
+  name: Gravity Adept
+  tier: base
+  partner: void_walker
+  battle_sheet: ~/temp/heroes/gravity_adept_voidwalker_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: black_mage
+  look: >-
+    a young white-haired scientist: short white hair; a pale face behind a thin violet visor; a light grey-white suit
+    with violet piping, grey gloves and boots. Colours: white, light grey, violet, a purple glow
+  carry: >-
+    the gravity gun is holstered at his right hip, close to the leg; the ring device is strapped flat on his back, its
+    rim behind the shoulders; both hands are free. Everything touches the body and stays inside the 48 x 96 cell, one
+    connected piece
+
+void_walker:
+  name: Void Walker
+  tier: enhanced
+  partner: gravity_adept
+  battle_sheet: ~/temp/heroes/gravity_adept_voidwalker_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: white_wizard   # black_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the gravity adept become a void walker: long white hair; a dark navy suit with violet seams and a high collar, dark
+    boots. Colours: white hair, pale skin, dark navy, violet
+  carry: >-
+    no orbiting rings or floating shards in the field (a field sheet must be one connected piece): a single thin violet
+    ring sits flat on the back, touching the shoulders; both hands are free. Everything stays inside the 46 px width and
+    the 48 x 96 cell

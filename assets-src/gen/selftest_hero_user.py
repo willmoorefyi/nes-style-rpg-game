@@ -356,10 +356,37 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
     check("feet on row 73" in air(None) and air({"airborne": {"syn_plus/attack": 73}}) == "",
           "CB A7: a cell 3 px off the ground is refused, and taken with airborne {syn_plus/attack: 73}")
     check(all("airborne" in air({"airborne": bad}) for bad in (
-        {"nope/attack": 73}, {"syn_plus/dance": 73}, {"syn_plus/ready": 73}, {"syn_plus/kneel": 73},
+        {"nope/attack": 73}, {"syn_plus/dance": 73}, {"syn_plus/kneel": 73},
         {"syn_plus/attack": True}, {"syn_plus/attack": "73"}, {"syn_plus/attack": -1}, {"syn_plus/attack": 76},
-        {"syn_plus/attack": 80})), "CB A7: airborne refuses an unknown class or pose, ready / kneel, a non-integer or "
+        {"syn_plus/attack": 80})), "CB A7: airborne refuses an unknown class or pose, kneel, a non-integer or "
           "a bool, a negative row and a row on or below the feet row")
+    # plan 19 (A8): a levitating ready
+    floaty = render()
+    floaty[80:160, 0:80] = np.roll(floaty[80:160, 0:80].copy(), -3, axis=0)     # syn_plus / ready, 3 px up
+    check("feet on row 73" in air(None, floaty) and air({"airborne": {"syn_plus/ready": 73}}, floaty) == ""
+          and "airborne" in air({"airborne": {"syn_plus/kneel": 73}}, floaty),
+          "CB A8: a levitating ready is refused without the key and taken with airborne {syn_plus/ready: 73}; kneel "
+          "stays refused")
+    from gen import puppet_kneel as PKa
+    with tempfile.TemporaryDirectory() as t9:
+        appr = Path(t9)
+        for c, meta in (("air_c", {"bottom_row": 76, "airborne": {"ready": 73}}), ("flat_c", {"bottom_row": 76}),
+                        ("atk_c", {"bottom_row": 76, "airborne": {"attack": 73}})):
+            (appr / c).mkdir()
+            (appr / c / "battle.json").write_text(json.dumps(meta))
+        old_appr = PUm.APPROVED
+        PUm.APPROVED = appr
+        try:
+            grounds = [PKa.ready_ground(c, 76) for c in ("air_c", "flat_c", "atk_c", "missing_c")]
+        finally:
+            PUm.APPROVED = old_appr
+    lifted_in1 = np.zeros((80, 80, 4), np.uint8)
+    lifted_in1[40:74, 20:50] = (*PX.OUTLINE, 255)                    # lowest row 73
+    kfail = lambda b: [f for f in PK.frame_checks("kneel_in1", Image.fromarray(lifted_in1), Image.fromarray(lifted_in1),
+                                                  b, {tuple(PX.OUTLINE)}) if "K-ground" in f]
+    check(grounds == [73, 76, 76, 76] and not kfail(73) and bool(kfail(76)) and bool(kfail(74)),
+          "CB A8: ready_ground reads battle.json airborne.ready (73), else the feet row; kneel_in1's K-ground passes "
+          "on that row and fails on 76 or 74")
     check("need 74 (airborne)" in air({"airborne": {"syn_plus/attack": 74}})
           and "feet on row 76, need 73" in air({"airborne": {"syn_base/attack": 73}}),
           "CB A7: a wrong recorded row is refused, and so is a listed cell that stands on the ground")

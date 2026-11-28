@@ -812,3 +812,17 @@ assume it stands on the feet row.
   76; an aliased frame is ready's, 74). The void walker's kneel is `source: user`, so its held frames are drawn from
   the key and skip the contact share. The pair goes on page 4 after the witch hunter, the diver, the dancer and the
   aeronaut.
+
+### 19.1 Gravity adept / void walker result (2026-11-28, branch class-copynote, thirteenth commit)
+
+User (verbatim): "gravity adept and void walker are in - let's have them be a black mage / black wizard copy". Exact
+copies of black_mage -> black_wizard with `copyOf`: `gravity_adept` (GRV, default name GRAV) -> `void_walker` (VOI).
+On page 4 (10 rows, 2880 x 1600; 2496 px left). Field alias black_mage / black_wizard (temporary); walk-sheet pack
+entries (the gravity gun holstered, the ring device on the back; the void walker's orbit rings and shards omitted in
+the field, a single ring on the back, so the sheet is one connected piece; stand-in white_wizard). A8: the recipe's
+`airborne: {void_walker/ready: 74}`; ready and the frames drawn from it (idle_b, atk_wind1, atk_wind2, cast_gather)
+and kneel_in1 end on row 74, the rest on 76 (pinned in gravityArt.test.ts); the kneel check passes with kneel_in1 on
+74. Every battle in-between shows its key (each re-render gained 7-14 specks at the floating pieces); `fx_colours`:
+the purple ramps (the dark purple is a suit colour too: the art test allows the gravity adept 3 seam px and 1 lost
+floor px). Image review: round 1 **APPROVE** both (the descent from the floating kneel_in1 to the landed kneel_in2
+reads as landing).

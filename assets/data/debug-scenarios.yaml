@@ -3777,3 +3777,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the gravity adept / void walker class pair (user-rendered
+# battle art; copies of the black_mage / black_wizard). GRAV is weak so it kneels; BWIZ is the like-for-like control.
+# ?mute=1&scenario=cb_gravity (&kneel=loop, &enemyAnim=loop).
+- id: cb_gravity
+  name: Gravity Adept and Void Walker (pass CB preview)
+  party:
+    - { class: gravity_adept, name: GRAV, level: 10, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }], hp: 10 }
+    - { class: void_walker, name: VOID, level: 30, equipment: [rune_knife, black_robe, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: gravity_adept, name: GRAV2, level: 10, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+    - { class: black_wizard, name: BWIZ, level: 30, equipment: [rune_knife, black_robe, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

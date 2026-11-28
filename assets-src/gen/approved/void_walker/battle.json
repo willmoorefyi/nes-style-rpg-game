@@ -1,0 +1,281 @@
+{
+  "character": "void_walker",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/gravity_adept/battle_2026-11-27.png",
+    "sha256": "ee96340b6edd4d687d4e64f938eb511327ab4b2bb615ec7a69b2cd89e3e76ab1"
+  },
+  "recipe": "hero_user.yaml#gravity_adept_void_walker",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "gravity_adept_voidwalker_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-28",
+  "approved": "2026-11-27",
+  "user_review": "gravity adept and void walker are in - let's have them be a black mage / black wizard copy (delivered as final; the purple ring and wave pulses, the floating rocks, the dropped gadgets, the orbit rings, the crystal shards, the black-hole orb and the levitating READY kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "airborne": {
+    "ready": 74
+  },
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          9,
+          9,
+          22
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          23,
+          24,
+          40
+        ],
+        [
+          24,
+          24,
+          41
+        ]
+      ],
+      [
+        [
+          32,
+          35,
+          61
+        ],
+        [
+          33,
+          33,
+          57
+        ]
+      ],
+      [
+        [
+          41,
+          50,
+          87
+        ],
+        [
+          41,
+          49,
+          90
+        ]
+      ],
+      [
+        [
+          48,
+          35,
+          102
+        ],
+        [
+          49,
+          33,
+          99
+        ]
+      ],
+      [
+        [
+          67,
+          81,
+          123
+        ],
+        [
+          66,
+          82,
+          123
+        ]
+      ],
+      [
+        [
+          77,
+          49,
+          169
+        ],
+        [
+          74,
+          49,
+          173
+        ]
+      ],
+      [
+        [
+          110,
+          125,
+          168
+        ],
+        [
+          107,
+          123,
+          165
+        ]
+      ],
+      [
+        [
+          121,
+          87,
+          238
+        ],
+        [
+          123,
+          90,
+          239
+        ]
+      ],
+      [
+        [
+          132,
+          92,
+          100
+        ],
+        [
+          132,
+          90,
+          99
+        ]
+      ],
+      [
+        [
+          157,
+          169,
+          201
+        ],
+        [
+          156,
+          173,
+          198
+        ]
+      ],
+      [
+        [
+          180,
+          132,
+          128
+        ],
+        [
+          181,
+          132,
+          132
+        ]
+      ],
+      [
+        [
+          182,
+          163,
+          255
+        ],
+        [
+          181,
+          165,
+          255
+        ]
+      ],
+      [
+        [
+          216,
+          221,
+          241
+        ],
+        [
+          214,
+          222,
+          239
+        ]
+      ],
+      [
+        [
+          223,
+          178,
+          161
+        ],
+        [
+          222,
+          181,
+          165
+        ]
+      ],
+      [
+        [
+          251,
+          251,
+          255
+        ],
+        [
+          255,
+          255,
+          255
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        12,
+        4,
+        67,
+        74
+      ],
+      "attack": [
+        1,
+        12,
+        78,
+        76
+      ],
+      "cast": [
+        12,
+        0,
+        67,
+        76
+      ],
+      "hurt": [
+        7,
+        9,
+        72,
+        76
+      ],
+      "down": [
+        1,
+        48,
+        78,
+        76
+      ],
+      "victory": [
+        13,
+        0,
+        66,
+        76
+      ]
+    }
+  }
+}

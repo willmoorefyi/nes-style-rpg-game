@@ -451,3 +451,21 @@ aeronaut_sky_captain:
   source_name: aeronaut_sky_captain_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "next I've added the new classes 'aeronaut' and 'sky captain'. Let's have him be another thief / ninja for now. (delivered as final; the flare sparkle, the grapple hook on the ground, the airborne jet lunge with its thruster flames, the smoke puffs and the flares kept as rendered)"
+gravity_adept_void_walker:
+  file: user_art/gravity_adept/battle_2026-11-27.png
+  sha256: ee96340b6edd4d687d4e64f938eb511327ab4b2bb615ec7a69b2cd89e3e76ab1
+  rows: [gravity_adept, void_walker]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  airborne: {void_walker/ready: 74}   # plan 19 (A8): the void walker levitates 2 px in READY
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: gravity_adept_voidwalker_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "gravity adept and void walker are in - let's have them be a black mage / black wizard copy (delivered as final; the purple ring and wave pulses, the floating rocks, the dropped gadgets, the orbit rings, the crystal shards, the black-hole orb and the levitating READY kept as rendered)"

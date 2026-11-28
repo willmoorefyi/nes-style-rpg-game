@@ -13,6 +13,7 @@ export const CLASS_UPGRADES: Record<string, string> = {
   black_mage: 'black_wizard',
   red_mage: 'red_wizard',
   barbarian: 'berserker', // pass CB (docs/CLASS_BARBARIAN_PLAN.md D-CB3)
+  gravity_adept: 'void_walker', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   aeronaut: 'sky_captain', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   dancer_hero: 'blade_dancer', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   diver: 'abyssal_knight', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)

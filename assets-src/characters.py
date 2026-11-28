@@ -858,7 +858,13 @@ ROSTER: dict[str, Look] = {
     # the sky captain in an officer's cap and a navy coat with brass wings and a sabre
     "aeronaut": Look(hair=(12, 8, 5), hair_style="short", outfit="coat", cloth=(15, 10, 6), trim=(29, 29, 28),
                      pants=(10, 8, 6), boots=(9, 6, 4), gear="hood", gear_color=(15, 10, 6)),
+    # pass CB (plan 11-19): the gravity adept, a white-haired scientist in a light suit with a visor and a gravity
+    # gun; the void walker in a dark suit (his orbit rings and shards are battle art only)
+    "gravity_adept": Look(hair=(28, 28, 28), hair_style="short", outfit="coat", cloth=(26, 27, 29), trim=(13, 9, 27),
+                          pants=(20, 21, 24), boots=(8, 9, 11)),
     # Upgraded classes
+    "void_walker": Look(hair=(28, 28, 28), hair_style="long", outfit="robe", cloth=(5, 6, 11), trim=(15, 11, 29),
+                        boots=(4, 4, 6)),
     "sky_captain": Look(hair=(12, 8, 5), hair_style="short", outfit="coat", cloth=(5, 7, 14), trim=(26, 20, 8),
                         pants=(5, 6, 10), boots=(5, 5, 6), gear="round_hat", gear_color=(5, 7, 14), weapon="sword"),
     "blade_dancer": Look(hair=(9, 5, 4), hair_style="long", outfit="dress", cloth=(4, 12, 13), trim=(29, 18, 6),

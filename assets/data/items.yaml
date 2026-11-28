@@ -29,6 +29,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -66,6 +67,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -250,6 +252,7 @@
   - hunter
   - ronin
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -311,6 +314,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -411,6 +415,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -452,6 +457,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -473,6 +479,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -719,6 +726,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -870,6 +878,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -938,6 +947,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -1000,6 +1010,7 @@
   price: 5000
   usableBy:
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -1031,6 +1042,7 @@
   price: 9000
   usableBy:
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   slot: armor
@@ -1095,6 +1107,7 @@
   - hunter
   - ronin
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -1151,6 +1164,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage
@@ -1302,6 +1316,7 @@
   - clockmaker
   - cleric
   - black_mage
+  - gravity_adept
   - warlock
   - shaman
   - red_mage

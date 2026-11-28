@@ -48,3 +48,5 @@ dancer_hero: monk   # temporary until the user renders the dancer's field walk s
 blade_dancer: master   # temporary until the user renders the blade dancer's field walk sheet
 aeronaut: thief   # temporary until the user renders the aeronaut's field walk sheet
 sky_captain: ninja   # temporary until the user renders the sky captain's field walk sheet
+gravity_adept: black_mage   # temporary until the user renders the gravity adept's field walk sheet
+void_walker: black_wizard   # temporary until the user renders the void walker's field walk sheet

@@ -408,6 +408,10 @@
       "x": 1008,
       "y": 5760
     },
+    "gravity_adept": {
+      "x": 336,
+      "y": 0
+    },
     "hunter": {
       "x": 1008,
       "y": 5760
@@ -500,6 +504,10 @@
       "x": 672,
       "y": 4992
     },
+    "void_walker": {
+      "x": 672,
+      "y": 0
+    },
     "warlock": {
       "x": 336,
       "y": 0
@@ -532,6 +540,7 @@
     "druid": "black_wizard",
     "duelist": "ninja",
     "fencer": "thief",
+    "gravity_adept": "black_mage",
     "hunter": "thief",
     "inquisitor": "master",
     "landsknecht": "warrior",
@@ -555,6 +564,7 @@
     "tinker": "monk",
     "valkyrie": "knight",
     "virtuoso": "red_wizard",
+    "void_walker": "black_wizard",
     "warlock": "black_mage",
     "witch_hunter": "monk"
   }

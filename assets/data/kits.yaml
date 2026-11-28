@@ -33,6 +33,7 @@ start:
   clockmaker: { gear: [hammer, cloth], spells: [cure] }
   cleric: { gear: [hammer, cloth], spells: [cure] }
   black_mage: { gear: [small_knife, cloth], spells: [fire] }
+  gravity_adept: { gear: [small_knife, cloth], spells: [fire] }
   warlock: { gear: [small_knife, cloth], spells: [fire] }
   shaman: { gear: [small_knife, cloth], spells: [fire] }
   red_mage: { gear: [rapier, cloth], spells: [] }
@@ -63,6 +64,7 @@ lv2:
   clockmaker: { gear: [hammer, cloth], spells: [cure] }
   cleric: { gear: [hammer, cloth], spells: [cure] }
   black_mage: { gear: [small_knife, cloth], spells: [fire, lit] }
+  gravity_adept: { gear: [small_knife, cloth], spells: [fire, lit] }
   warlock: { gear: [small_knife, cloth], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth], spells: [] }
@@ -93,6 +95,7 @@ arrive:
   clockmaker: { gear: [hammer, cloth, cap], spells: [cure] }
   cleric: { gear: [hammer, cloth, cap], spells: [cure] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
+  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth, cap], spells: [] }
@@ -123,6 +126,7 @@ full:
   clockmaker: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   cleric: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
+  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
@@ -153,6 +157,7 @@ naked:
   clockmaker: { gear: [], spells: [] }
   cleric: { gear: [], spells: [] }
   black_mage: { gear: [], spells: [] }
+  gravity_adept: { gear: [], spells: [] }
   warlock: { gear: [], spells: [] }
   shaman: { gear: [], spells: [] }
   red_mage: { gear: [], spells: [] }
@@ -192,6 +197,7 @@ w_s1: &w_s1
   clockmaker: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   cleric: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
   black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
+  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
@@ -223,6 +229,7 @@ w_pravoka: &w_t2
   clockmaker: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
   cleric: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
   black_mage: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
+  gravity_adept: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   warlock: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   shaman: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   red_mage: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
@@ -258,6 +265,7 @@ w_elfheim: &w_t3
   clockmaker: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
   cleric: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
   black_mage: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
   warlock: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
@@ -297,6 +305,7 @@ w_melmond: &w_t4
   clockmaker: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
   cleric: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
   black_mage: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   warlock: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
@@ -331,6 +340,7 @@ w_crescent: &w_t5
   clockmaker: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   cleric: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   warlock: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -366,6 +376,7 @@ w_onrac: &w_t6
   clockmaker: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   cleric: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   warlock: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -395,6 +406,7 @@ w_onrac: &w_t6
   chronomancer: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   paladin: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_wizard: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   necromancer: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -431,6 +443,7 @@ w_gaia: &w_t7
   clockmaker: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   cleric: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_mage: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   warlock: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -460,6 +473,7 @@ w_gaia: &w_t7
   chronomancer: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   paladin: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
   black_wizard: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   necromancer: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
