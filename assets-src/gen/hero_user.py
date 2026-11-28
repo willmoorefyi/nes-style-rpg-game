@@ -124,7 +124,8 @@ def metas(cid: str, rid: str, rec: dict, row: int, info: dict, today: str) -> tu
                               "shaft_colours": (prop.get("shaft_colours") or {}).get(cid),
                               "lines": {p: lines[p] for p in have}},
                 "cut": {**m["cut"], "lance_px": {p: info["lance_px"][f"{cid}/{p}"] for p in have}}}
-    battle = with_prop({**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES),
+    air = {k.split("/")[1]: v for k, v in HG.airborne(rec).items() if k.startswith(f"{cid}/")}   # plan 18 (A7)
+    battle = with_prop({**base, "sheet": "battle", "layout": [3, 2], "poses": list(POSES), **({"airborne": air} if air else {}),
                         "cut": {**cut_info, "boxes": {p: b for p, b in cut_info["boxes"].items() if p in POSES}}},
                        POSES)
     kneel = with_prop({**base, "sheet": "battle_kneel", "foot_row": g["foot"],
@@ -195,6 +196,8 @@ def check(meta: dict, gen: Path | None = None) -> str | None:
     if [meta.get("grid"), meta.get("bottom_row"), meta.get("body")] != \
             [[g["cw"], g["ch"]], g["foot"], HG.body_xywh(g) if anchored(g) else None]:
         return "the json's grid / bottom_row / body differ from the recipe"       # pass CL: the anchor
+    if sheet == "battle" and meta.get("airborne") != ({k.split("/")[1]: v for k, v in HG.airborne(rec).items() if k.startswith(f"{cid}/")} or None):
+        return "the json's airborne differs from the recipe"                      # plan 18 (A7)
     if g["prop"] and any(meta["prop"]["lines"][p] != g["prop"]["lines"][cid].get(p) for p in meta["prop"]["lines"]):
         return "the json's lance lines differ from the recipe"
     want = np.asarray(files_of(cells[cid])[sheet])

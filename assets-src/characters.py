@@ -818,7 +818,15 @@ ROSTER: dict[str, Look] = {
     "arquebusier": Look(hair=(8, 5, 3), hair_style="short", outfit="tunic", cloth=(10, 7, 5), trim=(26, 18, 5),
                         pants=(10, 7, 5), boots=(5, 5, 6), gear="helm", gear_color=(20, 20, 22), weapon="spear",
                         weapon_color=(14, 9, 5)),
+    # pass CB (plan 11-18): the shieldmaiden, a blond braid under a nasal helm, mail and fur, a spear and a round
+    # shield; the valkyrie in a winged helm and silver armour with a cape (her wings are battle art only)
+    "shieldmaiden": Look(hair=(28, 22, 10), hair_style="long", outfit="armor", cloth=(14, 9, 5), trim=(18, 18, 20),
+                         pants=(14, 9, 5), boots=(12, 8, 5), gear="helm", gear_color=(18, 18, 20), weapon="spear",
+                         shield=True),
     # Upgraded classes
+    "valkyrie": Look(hair=(26, 18, 8), hair_style="long", outfit="armor", cloth=(26, 27, 29), trim=(20, 22, 26),
+                     pants=(14, 20, 26), boots=(22, 23, 26), gear="helm", gear_color=(26, 27, 29), weapon="spear",
+                     shield=True, cape=(14, 20, 26)),
     "rifleman": Look(hair=(8, 5, 3), hair_style="short", outfit="armor", cloth=(10, 7, 5), trim=(23, 16, 7),
                      pants=(8, 8, 9), boots=(5, 5, 6), gear="helm", gear_color=(17, 17, 18), weapon="spear",
                      weapon_color=(18, 18, 19)),

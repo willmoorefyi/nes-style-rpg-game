@@ -647,3 +647,16 @@ lowest row is not the feet row.
   the build and recorded in the art test (if one lands on 76 the test pins 76; an `alias_frames` entry would be
   recorded the same way). The byte gate's base is the branch's previous commit (the arquebusier's): the main / -1 /
   -2 pages byte-equal and page 3's 12 rows already there byte-equal.
+
+### 18.1 Shieldmaiden / valkyrie result (2026-11-27, branch class-copynote, third commit)
+
+User (verbatim): "I've copied in another class, this time the 'Shieldmaiden' and 'vakyrie' classes - copies of the
+fighter / knight." Exact copies of warrior -> knight with `copyOf`: `shieldmaiden` (SHD, default name MAIDN) ->
+`valkyrie` (VAL). On page 3 (14 rows, 2880 x 2240; 1856 px left, 11 more rows). Field alias warrior / knight
+(temporary); walk-sheet pack entries (the spear upright, the round shield on the arm, the valkyrie's wings folded
+within 46 px). A7: the recipe's `airborne: {valkyrie/attack: 73}`; the valkyrie's battle.json records it; her attack
+key, atk_mid and atk_follow end on row 73 (measured, pinned in shieldmaidenArt.test.ts); in battle the dive is drawn as
+rendered (screenshot `~/temp/ff-game/class_pack/shieldmaiden/after/battle_valkyrie_dive.png`). No `fx_colours` (no
+light un-inked edges). Image review: round 1 ITERATE (the shieldmaiden's atk_wind2 broke the spear shaft below the
+hand: the raise is halved; the valkyrie's breath and gathers dragged the wing outline: her in-betweens are her keys,
+held or shifted whole); round 2 **APPROVE** both.

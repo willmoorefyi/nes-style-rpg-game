@@ -109,6 +109,19 @@ def _lance(g: dict, cid: str, pose: str, src: np.ndarray) -> np.ndarray | None:
     return m
 
 
+def airborne(rec: dict) -> dict[str, int]:
+    """Plan 18 (A7): the recipe's `airborne: {<class>/<pose>: <lowest body row>}`, cells drawn off the ground (a
+    diving attack); validated (ready and kneel stay on the feet row: their in-betweens and the kneel bridge need it)."""
+    raw = rec.get("airborne") or {}
+    for k, v in raw.items():
+        cid, _, pose = str(k).partition("/")
+        if cid not in rec["rows"] or pose not in COLUMNS or pose in ("ready", "kneel"):
+            raise SystemExit(f"user sheet: airborne {k}: not a <row class>/<pose> of the recipe (ready, kneel refused)")
+        if not isinstance(v, int) or isinstance(v, bool) or v < 0:
+            raise SystemExit(f"user sheet: airborne {k}: {v!r} is not a row (an integer >= 0)")
+    return dict(raw)
+
+
 def cut(rec: dict, a: np.ndarray, gen=None) -> tuple[dict[str, dict[str, Image.Image]], dict]:
     """{class: {pose: cell}} for every row of the recipe (the seven columns), and the import measures. `gen`: the
     generator folder of the recipe's replacement renders (pass CD-K)."""
@@ -139,6 +152,7 @@ def cut(rec: dict, a: np.ndarray, gen=None) -> tuple[dict[str, dict[str, Image.I
         for src, dst in pals[cid].items():
             out[r * ch:(r + 1) * ch][(band[..., :3] == src).all(-1) & mb, :3] = dst
     allow = rec.get("allow_outside") or {}
+    air = airborne(rec)                                  # plan 18 (A7)
     cells: dict[str, dict[str, Image.Image]] = {}
     boxes, lance_px, geoms = {}, {}, {}
     from gen import hero_user_replace as HR
@@ -158,9 +172,12 @@ def cut(rec: dict, a: np.ndarray, gen=None) -> tuple[dict[str, dict[str, Image.I
             if not len(ys):
                 raise SystemExit(f"user sheet: {cid} {pose} is empty")
             by = np.where(body.any(1))[0]
-            if not len(by) or by.max() != gr["foot"]:
+            need = air.get(f"{cid}/{pose}", gr["foot"])
+            if f"{cid}/{pose}" in air and need >= gr["foot"]:
+                raise SystemExit(f"user sheet: airborne {cid}/{pose}: row {need} is not above the feet row {gr['foot']}")
+            if not len(by) or by.max() != need:
                 raise SystemExit(f"user sheet: {cid} {pose} feet on row {by.max() if len(by) else None}, "
-                                 f"need {gr['foot']}")
+                                 f"need {need}" + (" (airborne)" if need != gr["foot"] else ""))
             outside = body.copy()
             outside[y0:y1 + 1, x0:x1 + 1] = False
             ok = allow.get(f"{cid}/{pose}")

@@ -1,0 +1,28 @@
+# Puppet animation joints for the valkyrie (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/valkyrie/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). tip = the spear point in the near hand (ready, attack, cast). The wings overlap the spear and the body, so the in-betweens stay on their keys (tweaks with no joint motion but a head bob and whole-figure steps); the attack key is the airborne dive (plan 18: its lowest row is 73, so atk_mid / atk_follow are airborne too). part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the loose feathers and glints of the render survive the cut
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [42, 26], crown: [42, 8], chest: [42, 38], hip: [42, 56], sh_n: [32, 36], el_n: [30, 42], hand_n: [28, 44], tip: [5, 25], weapon_hand: n, sh_f: [54, 36], el_f: [58, 44], hand_f: [56, 48], hip_n: [34, 60], knee_n: [30, 68], foot_n: [26, 75], hip_f: [52, 60], knee_f: [56, 68], foot_f: [58, 75]}
+  attack:
+    {neck: [40, 36], crown: [36, 26], chest: [46, 42], hip: [52, 52], sh_n: [36, 44], el_n: [30, 46], hand_n: [22, 48], tip: [2, 69], weapon_hand: n, sh_f: [56, 40], el_f: [60, 46], hand_f: [62, 50], hip_n: [44, 56], knee_n: [50, 62], foot_n: [52, 66], hip_f: [60, 56], knee_f: [66, 64], foot_f: [72, 73]}
+  cast:
+    {neck: [42, 32], crown: [42, 20], chest: [42, 44], hip: [42, 58], sh_n: [32, 38], el_n: [30, 32], hand_n: [26, 24], tip: [24, 1], weapon_hand: n, sh_f: [52, 38], el_f: [56, 46], hand_f: [54, 50], hip_n: [34, 62], knee_n: [30, 68], foot_n: [26, 75], hip_f: [52, 62], knee_f: [52, 68], foot_f: [52, 75]}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -1], hand_n: [0, -1], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [0, -1]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-5, -3], hand_n: [-2, -1], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0], tip: [-6, -15]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-8, -5], hand_n: [-5, -4], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0], tip: [-8, -20]}
+  atk_mid: {neck: [-0.8, 3.6], crown: [-2.6, 7.2], chest: [1.9, 0.9], hip: [4.6, -2.7], sh_n: [1.9, 2.7], el_n: [-3.5, -0.45], hand_n: [-4.85, 0], sh_f: [1, 0.9], el_f: [1, 0], hand_f: [2.8, 0], hip_n: [4.6, -2.7], knee_n: [10, -3.6], foot_n: [12.7, -4.05], hip_f: [3.7, -2.7], knee_f: [5.05, -2.7], foot_f: [7.3, -0.9], tip: [-4.85, 0]}
+  atk_follow: {neck: [-0.5, 2.5], crown: [-1.5, 4.5], chest: [1, 1], hip: [2.5, -1], sh_n: [1, 2], el_n: [-1, -3], hand_n: [-2, -6], sh_f: [0.5, 1], el_f: [0.5, 0.5], hand_f: [1.5, 0.5], hip_n: [2.5, -1], knee_n: [5, -1.5], foot_n: [6.5, -2.25], hip_f: [2, -1], knee_f: [2.5, -1], foot_f: [3.5, -0.5], tip: [-3, 10]}
+  cast_gather: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [-1, -3], hand_n: [-8, -2], sh_f: [0, -1], el_f: [2, -3], hand_f: [13, 3], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [-8, -2]}
+  cast_rise: {neck: [0, 3], crown: [0, 6], chest: [0, 3], hip: [0, 1], sh_n: [0, 1], el_n: [0, -5], hand_n: [-1, -10], sh_f: [-1, 1], el_f: [-1, 1], hand_f: [-1, 1], hip_n: [0, 1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 1], knee_f: [-2, 0], foot_f: [-3, 0], tip: [-1, -10]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 3], hand_n: [1, 6], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0], tip: [1, 6]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

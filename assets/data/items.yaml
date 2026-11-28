@@ -10,6 +10,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -72,6 +73,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -94,6 +96,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -116,6 +119,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - white_mage
@@ -133,6 +137,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   hit: 5
@@ -161,6 +166,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -179,6 +185,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -220,6 +227,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   bonusVsFamily: giant
@@ -236,6 +244,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - white_mage
@@ -272,6 +281,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   element: fire
@@ -289,6 +299,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   element: ice
@@ -305,6 +316,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -325,6 +337,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -356,6 +369,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -403,6 +417,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -427,6 +442,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -442,6 +458,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -460,6 +477,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -475,6 +493,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -490,6 +509,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -508,6 +528,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -524,6 +545,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -542,6 +564,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 0
@@ -557,6 +580,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -575,6 +599,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -604,6 +629,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 3
@@ -619,6 +645,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 3
@@ -712,6 +739,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -742,6 +770,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -764,6 +793,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -794,6 +824,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -870,6 +901,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -888,6 +920,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - white_mage
@@ -927,6 +960,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -942,6 +976,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -972,6 +1007,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 0
@@ -987,6 +1023,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 3
@@ -1002,6 +1039,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -1020,6 +1058,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -1051,6 +1090,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   slot: armor
@@ -1066,6 +1106,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - thief
@@ -1096,6 +1137,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   - red_mage
@@ -1114,6 +1156,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   weight: 3
@@ -1129,6 +1172,7 @@
   - dark_fighter_hero
   - landsknecht
   - warrior
+  - shieldmaiden
   - legionnaire
   - barbarian
   element: holy

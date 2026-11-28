@@ -28,3 +28,5 @@ scholar_hero: red_mage # temporary until the user renders the scholar's field wa
 sage_hero: red_wizard  # temporary until the user renders the sage's field walk sheet
 arquebusier: thief   # temporary until the user renders the arquebusier's field walk sheet
 rifleman: ninja      # temporary until the user renders the rifleman's field walk sheet
+shieldmaiden: warrior # temporary until the user renders the shieldmaiden's field walk sheet
+valkyrie: knight      # temporary until the user renders the valkyrie's field walk sheet

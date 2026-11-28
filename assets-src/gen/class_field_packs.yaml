@@ -559,3 +559,45 @@ rifleman:
     the rifle with its bayonet is slung on his back on a strap over the right shoulder beside the brass tank, muzzle up
     behind the left shoulder, never above the 92 px cap; both hands are free. The rifle and the tank touch the body and
     stay inside the 48 x 96 cell
+
+shieldmaiden:
+  name: Shieldmaiden
+  tier: base
+  partner: valkyrie
+  battle_sheet: ~/temp/heroes/shieldmaiden_valkyrie_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: warrior
+  look: >-
+    a young Norse shieldmaiden, about 20: a long blond braid over the shoulder under a steel nasal helm; a fair face;
+    a steel mail shirt over a brown leather tunic with a fur collar, brown trousers wrapped at the shins, brown boots.
+    Colours: blond, fair skin, steel grey, brown leather, a pale cream for the shield's face
+  carry: >-
+    the spear is held upright in her right hand (the hand toward the viewer's left in the front view), its butt near
+    the ground beside the foot and its point level with the helm, never above the 92 px cap; the round wooden shield
+    with a steel boss is strapped on her left forearm against the side so it never hides the face. The spear and the
+    shield touch the body and stay inside the 48 x 96 cell
+
+valkyrie:
+  name: Valkyrie
+  tier: enhanced
+  partner: shieldmaiden
+  battle_sheet: ~/temp/heroes/shieldmaiden_valkyrie_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight
+  look: >-
+    the shieldmaiden become a valkyrie: brown hair under a silver helm with small white wings at its sides; polished
+    silver plate with a pale blue skirt and a cape; two white feathered wings on her back, folded close behind the
+    shoulders so the whole figure stays within 46 px wide. Colours: brown hair, fair skin, silver, white, pale blue
+  carry: >-
+    the spear is held upright in her right hand (the hand toward the viewer's left in the front view), its butt near
+    the ground beside the foot and its point level with the helm, never above the 92 px cap; the round silver shield is
+    on her left forearm against the side; the wings stay folded behind her in every view. The spear, the shield and the
+    wings stay inside the 48 x 96 cell

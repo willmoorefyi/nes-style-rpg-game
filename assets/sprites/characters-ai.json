@@ -420,9 +420,17 @@
       "x": 336,
       "y": 0
     },
+    "shieldmaiden": {
+      "x": 0,
+      "y": 6528
+    },
     "summoner": {
       "x": 1008,
       "y": 3840
+    },
+    "valkyrie": {
+      "x": 336,
+      "y": 3456
     },
     "warlock": {
       "x": 336,
@@ -455,7 +463,9 @@
     "samurai": "ninja",
     "scholar_hero": "red_mage",
     "shaman": "black_mage",
+    "shieldmaiden": "warrior",
     "summoner": "master",
+    "valkyrie": "knight",
     "warlock": "black_mage"
   }
 }

@@ -344,6 +344,34 @@ def run_hero_user(check: Callable[[bool, str], None]) -> None:
               "list, a duplicate and a colour not in the sheet")
     if (PU.ANIM / "landsknecht.yaml").is_file():
         check("rigid" in fx_cfg("landsknecht", [[0, 0, 0]]), "CB A6: load_cfg refuses fx_colours on a rigid / lance class")
+    # plan 18 (A7): an airborne key pose (the valkyrie's diving attack)
+    lifted = render()
+    cell = lifted[80:160, 80:160].copy()                 # syn_plus / attack, lifted 3 px off the feet row
+    lifted[80:160, 80:160] = np.roll(cell, -3, axis=0)
+
+    def air(over: dict | None, a=None) -> str:
+        with tempfile.TemporaryDirectory() as t7:
+            r7 = tree(Path(t7), lifted if a is None else a, over)
+            return refused(lambda: HU.cut(r7, Path(t7) / "gen"))
+    check("feet on row 73" in air(None) and air({"airborne": {"syn_plus/attack": 73}}) == "",
+          "CB A7: a cell 3 px off the ground is refused, and taken with airborne {syn_plus/attack: 73}")
+    check(all("airborne" in air({"airborne": bad}) for bad in (
+        {"nope/attack": 73}, {"syn_plus/dance": 73}, {"syn_plus/ready": 73}, {"syn_plus/kneel": 73},
+        {"syn_plus/attack": True}, {"syn_plus/attack": "73"}, {"syn_plus/attack": -1}, {"syn_plus/attack": 76},
+        {"syn_plus/attack": 80})), "CB A7: airborne refuses an unknown class or pose, ready / kneel, a non-integer or "
+          "a bool, a negative row and a row on or below the feet row")
+    check("need 74 (airborne)" in air({"airborne": {"syn_plus/attack": 74}})
+          and "feet on row 76, need 73" in air({"airborne": {"syn_base/attack": 73}}),
+          "CB A7: a wrong recorded row is refused, and so is a listed cell that stands on the ground")
+    with tempfile.TemporaryDirectory() as t8:
+        r8 = tree(Path(t8), lifted, {"airborne": {"syn_plus/attack": 73}})
+        HU.approve("syn", Path(t8) / "gen" / "approved", "2026-11-27")
+        m8 = {c: json.loads((Path(t8) / "gen" / "approved" / c / "battle.json").read_text()) for c in ("syn_base", "syn_plus")}
+        k8 = json.loads((Path(t8) / "gen" / "approved" / "syn_plus" / "battle_kneel.json").read_text())
+        check(m8["syn_plus"].get("airborne") == {"attack": 73} and "airborne" not in m8["syn_base"] and "airborne" not in k8
+              and HU.check(m8["syn_plus"], Path(t8) / "gen") is None
+              and "airborne" in (HU.check({**m8["syn_plus"], "airborne": None}, Path(t8) / "gen") or ""),
+              "CB A7: only the listed class's battle.json records airborne (not the kneel json), and check() compares it")
     # plan 11: the barbarian JSON gate: metas() on today's cut equals the committed jsons (all keys but `imported`)
     rec = HU2.recipe("barbarian_berserker")
     _, binfo = HU2.cut(rec)

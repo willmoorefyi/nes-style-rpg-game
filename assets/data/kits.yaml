@@ -14,6 +14,7 @@ start:
   dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
@@ -34,6 +35,7 @@ lv2:
   dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
@@ -54,6 +56,7 @@ arrive:
   dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   legionnaire: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
@@ -74,6 +77,7 @@ full:
   dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+  shieldmaiden: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
@@ -94,6 +98,7 @@ naked:
   dark_fighter_hero: { gear: [], spells: [] }
   landsknecht: { gear: [], spells: [] }
   warrior: { gear: [], spells: [] }
+  shieldmaiden: { gear: [], spells: [] }
   legionnaire: { gear: [], spells: [] }
   barbarian: { gear: [], spells: [] }
   thief: { gear: [], spells: [] }
@@ -123,6 +128,7 @@ w_s1: &w_s1
   dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
+  shieldmaiden: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
@@ -144,6 +150,7 @@ w_pravoka: &w_t2
   dark_fighter_hero: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   landsknecht: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   warrior: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
+  shieldmaiden: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   legionnaire: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   thief: { gear: [short_sword, leather_armor, cap], spells: [] }
@@ -169,6 +176,7 @@ w_elfheim: &w_t3
   dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   thief: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
@@ -198,6 +206,7 @@ w_melmond: &w_t4
   dark_fighter_hero: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   landsknecht: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   warrior: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   legionnaire: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [scimitar, gold_armlet, cap], spells: [] }
@@ -222,6 +231,7 @@ w_crescent: &w_t5
   dark_fighter_hero: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   landsknecht: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   warrior: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
+  shieldmaiden: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   legionnaire: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [falchion, gold_armlet, cap], spells: [] }
@@ -247,6 +257,7 @@ w_onrac: &w_t6
   dark_fighter_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   landsknecht: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   warrior: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
+  shieldmaiden: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   legionnaire: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   barbarian: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   thief: { gear: [rune_knife, opal_armlet, cap], spells: [] }
@@ -266,6 +277,7 @@ w_onrac: &w_t6
   death_knight_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   dragoon: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   centurion: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   berserker: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   ninja: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
@@ -292,6 +304,7 @@ w_gaia: &w_t7
   dark_fighter_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   landsknecht: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   warrior: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
+  shieldmaiden: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   legionnaire: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   barbarian: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   thief: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
@@ -311,6 +324,7 @@ w_gaia: &w_t7
   death_knight_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   dragoon: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   centurion: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   berserker: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   ninja: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
