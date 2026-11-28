@@ -641,3 +641,13 @@ Re-measured inside their bounds (names updated): Garland's sensible Lv2 lv2 kit 
 Lv2 400 G kit 62 % (55-75), the Trial guardian at Lv27 91.75 % (>= 85), Chaos's median 10 rounds ([8, 15]) and
 command phase 99.3 % (>= 95); the other region bounds kept with their new values in the names. The tests that passed
 unchanged (zones, fieldPacing, economy, questCurve and the act-1 helpers) were not re-measured.
+
+### Integrator gates (run on `equip-ff1` at 3cb57012, as the coordinator asked)
+
+- `npm run quest -- --strict --mutate --jobs 6`: OK, mutations OK (68 gate rows, 114 elements), 117 jobs on 6 workers,
+  wall 1120 s (21 min with the strict proofs), cache stored `4efecb61aefd`.
+- `npm run quest -- --strict --only c --from-reset`: OK, 195 reset states (32 stage entries, 3 NW2 v4 saves, 160
+  samples), 5272790 states, 631 s.
+- `npm run test:full`: 478 files, 11503 passed / 2 skipped, 184 s; `questMutateWorld: cache hit 4efecb61aefd (audit
+  182 s)`.
+- `git status`: clean.
