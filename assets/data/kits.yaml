@@ -30,6 +30,7 @@ start:
   warlock: { gear: [small_knife, cloth], spells: [fire] }
   shaman: { gear: [small_knife, cloth], spells: [fire] }
   red_mage: { gear: [rapier, cloth], spells: [] }
+  apothecary: { gear: [rapier, cloth], spells: [] }
   bard: { gear: [rapier, cloth], spells: [] }
   scholar_hero: { gear: [rapier, cloth], spells: [] }
   rune_knight: { gear: [rapier, cloth], spells: [] }
@@ -53,6 +54,7 @@ lv2:
   warlock: { gear: [small_knife, cloth], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth], spells: [] }
+  apothecary: { gear: [rapier, cloth], spells: [] }
   bard: { gear: [rapier, cloth], spells: [] }
   scholar_hero: { gear: [rapier, cloth], spells: [] }
   rune_knight: { gear: [rapier, cloth], spells: [] }
@@ -76,6 +78,7 @@ arrive:
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth, cap], spells: [] }
+  apothecary: { gear: [rapier, cloth, cap], spells: [] }
   bard: { gear: [rapier, cloth, cap], spells: [] }
   scholar_hero: { gear: [rapier, cloth, cap], spells: [] }
   rune_knight: { gear: [rapier, cloth, cap], spells: [] }
@@ -99,6 +102,7 @@ full:
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
+  apothecary: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   bard: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   scholar_hero: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   rune_knight: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
@@ -122,6 +126,7 @@ naked:
   warlock: { gear: [], spells: [] }
   shaman: { gear: [], spells: [] }
   red_mage: { gear: [], spells: [] }
+  apothecary: { gear: [], spells: [] }
   bard: { gear: [], spells: [] }
   scholar_hero: { gear: [], spells: [] }
   rune_knight: { gear: [], spells: [] }
@@ -154,6 +159,7 @@ w_s1: &w_s1
   warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
+  apothecary: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   bard: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   scholar_hero: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
   rune_knight: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
@@ -178,6 +184,7 @@ w_pravoka: &w_t2
   warlock: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   shaman: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
   red_mage: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
+  apothecary: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
   bard: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
   scholar_hero: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
   rune_knight: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
@@ -206,6 +213,7 @@ w_elfheim: &w_t3
   warlock: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
   rune_knight: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
@@ -238,6 +246,7 @@ w_melmond: &w_t4
   warlock: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
+  apothecary: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
   bard: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
   rune_knight: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
@@ -265,6 +274,7 @@ w_crescent: &w_t5
   warlock: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   rune_knight: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -293,6 +303,7 @@ w_onrac: &w_t6
   warlock: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   rune_knight: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -315,6 +326,7 @@ w_onrac: &w_t6
   necromancer: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   mystic_warrior: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -344,6 +356,7 @@ w_gaia: &w_t7
   warlock: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   rune_knight: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -366,6 +379,7 @@ w_gaia: &w_t7
   necromancer: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   mystic_warrior: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }

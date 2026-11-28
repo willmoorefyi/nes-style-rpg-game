@@ -324,6 +324,10 @@
       "x": 0,
       "y": 6912
     },
+    "apothecary": {
+      "x": 336,
+      "y": 4992
+    },
     "arquebusier": {
       "x": 1008,
       "y": 5760
@@ -400,6 +404,10 @@
       "x": 672,
       "y": 6528
     },
+    "plague_doctor": {
+      "x": 672,
+      "y": 4992
+    },
     "ranger": {
       "x": 1008,
       "y": 4224
@@ -455,6 +463,7 @@
   },
   "fallbacks": {},
   "aliases": {
+    "apothecary": "red_mage",
     "arquebusier": "thief",
     "barbarian": "warrior",
     "bard": "red_mage",
@@ -474,6 +483,7 @@
     "mystic_warrior": "red_wizard",
     "necromancer": "black_wizard",
     "paladin": "white_wizard",
+    "plague_doctor": "red_wizard",
     "ranger": "ninja",
     "rifleman": "ninja",
     "ronin": "thief",

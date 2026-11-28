@@ -1,0 +1,237 @@
+{
+  "character": "apothecary",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/apothecary/battle_2026-11-27.png",
+    "sha256": "14c9c974952320bee01c2de854f59c494f7621ac92d290dd63e398e5175f3033"
+  },
+  "recipe": "hero_user.yaml#apothecary_plague_doctor",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "apothecary_plague_doctor_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've also queued up the 'apothecary' / 'plague doctor' character class - add as a replica of the red mage / red wizard (delivered as final; the slash arc, the sparkles, the green miasma wisps and the hat and cane lying apart in DOWN kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          24,
+          25,
+          26
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          32,
+          54,
+          39
+        ],
+        [
+          33,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          51,
+          39,
+          34
+        ],
+        [
+          49,
+          41,
+          33
+        ]
+      ],
+      [
+        [
+          61,
+          80,
+          54
+        ],
+        [
+          57,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          77,
+          52,
+          37
+        ],
+        [
+          74,
+          49,
+          33
+        ]
+      ],
+      [
+        [
+          100,
+          116,
+          82
+        ],
+        [
+          99,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          105,
+          75,
+          51
+        ],
+        [
+          107,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          119,
+          97,
+          139
+        ],
+        [
+          115,
+          99,
+          140
+        ]
+      ],
+      [
+        [
+          135,
+          95,
+          63
+        ],
+        [
+          132,
+          99,
+          66
+        ]
+      ],
+      [
+        [
+          147,
+          149,
+          160
+        ],
+        [
+          148,
+          148,
+          156
+        ]
+      ],
+      [
+        [
+          169,
+          215,
+          188
+        ],
+        [
+          173,
+          214,
+          189
+        ]
+      ],
+      [
+        [
+          170,
+          124,
+          81
+        ],
+        [
+          173,
+          123,
+          82
+        ]
+      ],
+      [
+        [
+          206,
+          154,
+          110
+        ],
+        [
+          206,
+          156,
+          107
+        ]
+      ],
+      [
+        [
+          233,
+          178,
+          134
+        ],
+        [
+          231,
+          181,
+          132
+        ]
+      ],
+      [
+        [
+          244,
+          222,
+          192
+        ],
+        [
+          247,
+          222,
+          189
+        ]
+      ],
+      [
+        [
+          246,
+          227,
+          157
+        ],
+        [
+          247,
+          231,
+          156
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        10,
+        14,
+        72,
+        76
+      ]
+    }
+  }
+}

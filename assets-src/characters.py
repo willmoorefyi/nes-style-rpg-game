@@ -831,7 +831,13 @@ ROSTER: dict[str, Look] = {
     # burgundy coat and cape with a rapier and a parrying dagger
     "fencer": Look(hair=(9, 6, 4), hair_style="short", outfit="tunic", cloth=(14, 9, 6), trim=(28, 28, 27),
                    pants=(16, 9, 5), boots=(11, 7, 4), weapon="rapier"),
+    # pass CB (plan 11-18): the apothecary, a young herbalist in a leather apron with vials; the plague doctor in a
+    # beaked mask, a top hat and a long coat with a cane
+    "apothecary": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(12, 14, 9), trim=(20, 13, 7),
+                       pants=(10, 7, 5), boots=(11, 7, 4)),
     # Upgraded classes
+    "plague_doctor": Look(hair=(4, 4, 4), hair_style="short", outfit="robe", cloth=(4, 4, 4), trim=(9, 7, 5),
+                          boots=(4, 4, 4), gear="round_hat", gear_color=(4, 4, 4), weapon="staff", weapon_color=(9, 7, 5)),
     "duelist": Look(hair=(9, 6, 4), hair_style="long", outfit="coat", cloth=(11, 4, 7), trim=(26, 26, 27),
                     pants=(5, 4, 5), boots=(4, 4, 5), weapon="rapier", cape=(11, 4, 7)),
     "virtuoso": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(4, 10, 11), trim=(27, 21, 7),

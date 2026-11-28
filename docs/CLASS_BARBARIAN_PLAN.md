@@ -685,3 +685,14 @@ shows its key exactly (`alias_frames`: all eight; a shifted or re-rendered key g
 and hilt tips), the fallback the coordinator allowed for the thin blades. The atlas records `inbetweens: false` for
 both (the overflow-page test now reads it from the rig). Image review: round 1 **APPROVE** both (the kneel bridge keeps
 the blades straight, unbroken and un-inked).
+
+### 18.4 Apothecary / plague doctor result (2026-11-27, branch class-copynote, sixth commit)
+
+User (verbatim): "I've also queued up the 'apothecary' / 'plague doctor' character class - add as a replica of the
+red mage / red wizard". Exact copies of red_mage -> red_wizard with `copyOf`: `apothecary` (APO, default name APOTH)
+-> `plague_doctor` (PLG). On page 3 (20 rows, 2880 x 3200; 896 px left, 5 more rows). Field alias red_mage /
+red_wizard (temporary); walk-sheet pack entries (the satchel and vials at the belt; the plague doctor's cane in hand).
+The in-betweens are the keys held or shifted whole; `alias_frames` for the frames whose re-render gained 1-23 outline
+specks (the plague doctor all eight); `fx_colours` for the sparkles, the lantern glow and the miasma wisp's olive.
+Image review: round 1 apothecary **APPROVE**, plague doctor ITERATE (the kneel bridge re-inked the wisp's olive tip:
+the olive added to `fx_colours`); round 2 plague doctor **APPROVE**.

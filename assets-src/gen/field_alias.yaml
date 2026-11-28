@@ -34,3 +34,5 @@ bard: red_mage   # temporary until the user renders the bard's field walk sheet
 virtuoso: red_wizard   # temporary until the user renders the virtuoso's field walk sheet
 fencer: thief   # temporary until the user renders the fencer's field walk sheet
 duelist: ninja   # temporary until the user renders the duelist's field walk sheet
+apothecary: red_mage   # temporary until the user renders the apothecary's field walk sheet
+plague_doctor: red_wizard   # temporary until the user renders the plague doctor's field walk sheet

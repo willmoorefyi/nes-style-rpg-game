@@ -3672,3 +3672,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the apothecary / plague doctor class pair (user-rendered
+# battle art; copies of the red_mage / red_wizard). APOTH is weak so it kneels; RDWZ is the like-for-like control.
+# ?mute=1&scenario=cb_apothecaries (&kneel=loop, &enemyAnim=loop).
+- id: cb_apothecaries
+  name: Apothecary and Plague Doctor (pass CB preview)
+  party:
+    - { class: apothecary, name: APOTH, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: plague_doctor, name: PLAGU, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: apothecary, name: APOTH2, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp
