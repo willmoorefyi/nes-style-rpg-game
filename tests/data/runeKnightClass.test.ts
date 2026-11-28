@@ -40,7 +40,7 @@ describe('pass CB: rune_knight / mystic_warrior are a shallow copy of red_mage /
     for (const c of CLASSES) expect(classLabel(c), c.id).toHaveLength(3);
     const base = ClassRegistry.getAll().filter((c) => !c.upgradeFrom).map((c) => c.id);
     expect(base).toEqual(['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage', 'barbarian', 'landsknecht',
-      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard']);   // the base classes in merge order (pass CB: + bard)
+      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard', 'fencer']);   // the base classes in merge order (pass CB: + fencer)
     expect(DEFAULT_NAMES.rune_knight).toBe('RUNE');
   });
 

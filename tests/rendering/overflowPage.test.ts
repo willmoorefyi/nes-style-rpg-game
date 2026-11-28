@@ -14,6 +14,9 @@ const meta = JSON.parse(readFileSync('assets/sprites/battle-characters-ai.json',
 };
 const overflow = (parse(readFileSync('assets-src/gen/battle_pages.yaml', 'utf8')) as { overflow?: string[][] }).overflow ?? [];
 const KEYS = ['ready', 'attack', 'cast', 'hurt', 'down', 'victory'];
+/** A class has generated in-betweens unless its rig aliases all eight to their keys (the fencer's 1 px blades). */
+const generated = (cid: string) => ((parse(readFileSync(`assets-src/gen/anim/${cid}.yaml`, 'utf8')) as
+  { alias_frames?: string[] }).alias_frames ?? []).length < 8;
 const px = (img: RgbaImage, x: number, y: number) => {
   const i = (y * img.width + x) * 4;
   return img.data[i + 3] ? `${img.data[i]},${img.data[i + 1]},${img.data[i + 2]}` : '0';
@@ -27,7 +30,7 @@ describe('pass CB A5: overflow pages of 80 x 80 hero classes', () => {
       expect(pages.size, list.join(' ')).toBe(1);
       const page = [...pages][0]!;
       expect(page).toBeGreaterThan(0);
-      list.forEach((cid, row) => expect(meta.sheets[cid]).toEqual({ row, page, inbetweens: true }));
+      list.forEach((cid, row) => expect(meta.sheets[cid]).toEqual({ row, page, inbetweens: generated(cid) }));
       const on = Object.keys(meta.sheets).filter((c) => meta.sheets[c].page === page);
       expect(on.sort()).toEqual([...list].sort());
       const p = meta.pages[page];

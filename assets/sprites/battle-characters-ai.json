@@ -485,6 +485,16 @@
       "row": 15,
       "page": 3,
       "inbetweens": true
+    },
+    "fencer": {
+      "row": 16,
+      "page": 3,
+      "inbetweens": false
+    },
+    "duelist": {
+      "row": 17,
+      "page": 3,
+      "inbetweens": false
     }
   },
   "pages": [
@@ -506,7 +516,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 2560
+      "h": 2880
     }
   ]
 }

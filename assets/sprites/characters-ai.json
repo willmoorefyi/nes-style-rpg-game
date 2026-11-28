@@ -368,6 +368,14 @@
       "x": 672,
       "y": 0
     },
+    "duelist": {
+      "x": 1008,
+      "y": 4224
+    },
+    "fencer": {
+      "x": 1008,
+      "y": 5760
+    },
     "hunter": {
       "x": 1008,
       "y": 5760
@@ -458,6 +466,8 @@
     "death_knight_hero": "knight",
     "dragoon": "knight",
     "druid": "black_wizard",
+    "duelist": "ninja",
+    "fencer": "thief",
     "hunter": "thief",
     "landsknecht": "warrior",
     "legionnaire": "warrior",

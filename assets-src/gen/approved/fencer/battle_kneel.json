@@ -1,0 +1,237 @@
+{
+  "character": "fencer",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/fencer/battle_2026-11-27.png",
+    "sha256": "ee3d81e9659a82f44f2b5d3bbbb1507aa1a1b7f50189b8fbdbcb14728962a6b5"
+  },
+  "recipe": "hero_user.yaml#fencer_duelist",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "fencer_duelist_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "next queue fencer / duelist - a copy of thief / ninja (delivered as final; the thin rapier blades, the parrying dagger glint and the dropped dagger kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          25,
+          22,
+          27
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          52,
+          41,
+          42
+        ],
+        [
+          49,
+          41,
+          41
+        ]
+      ],
+      [
+        [
+          72,
+          71,
+          78
+        ],
+        [
+          74,
+          74,
+          74
+        ]
+      ],
+      [
+        [
+          80,
+          56,
+          46
+        ],
+        [
+          82,
+          57,
+          49
+        ]
+      ],
+      [
+        [
+          103,
+          103,
+          113
+        ],
+        [
+          107,
+          107,
+          115
+        ]
+      ],
+      [
+        [
+          108,
+          71,
+          53
+        ],
+        [
+          107,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          139,
+          86,
+          58
+        ],
+        [
+          140,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          143,
+          139,
+          144
+        ],
+        [
+          140,
+          140,
+          148
+        ]
+      ],
+      [
+        [
+          164,
+          104,
+          69
+        ],
+        [
+          165,
+          107,
+          66
+        ]
+      ],
+      [
+        [
+          170,
+          166,
+          168
+        ],
+        [
+          173,
+          165,
+          165
+        ]
+      ],
+      [
+        [
+          193,
+          132,
+          88
+        ],
+        [
+          189,
+          132,
+          90
+        ]
+      ],
+      [
+        [
+          204,
+          202,
+          206
+        ],
+        [
+          206,
+          206,
+          206
+        ]
+      ],
+      [
+        [
+          212,
+          160,
+          125
+        ],
+        [
+          214,
+          156,
+          123
+        ]
+      ],
+      [
+        [
+          232,
+          227,
+          225
+        ],
+        [
+          231,
+          231,
+          222
+        ]
+      ],
+      [
+        [
+          240,
+          196,
+          155
+        ],
+        [
+          239,
+          198,
+          156
+        ]
+      ],
+      [
+        [
+          255,
+          245,
+          220
+        ],
+        [
+          255,
+          247,
+          222
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        1,
+        21,
+        78,
+        76
+      ]
+    }
+  }
+}

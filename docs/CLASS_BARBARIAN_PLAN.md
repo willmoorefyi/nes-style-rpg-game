@@ -673,3 +673,15 @@ notes and arcs. The instrument is held across the body by both hands, so the in-
 shifted whole. Image review: round 1 ITERATE (the head bob tore the scarf / the harp rail; a held key gained outline
 specks) -> `alias_frames` for the frames that show their key (bard idle_b, cast_gather, cast_rise, cast_release;
 virtuoso idle_b, cast_gather); round 2 **APPROVE** both (note: no idle breath).
+
+### 18.3 Fencer / duelist result (2026-11-27, branch class-copynote, fifth commit)
+
+User (verbatim): "next queue fencer / duelist - a copy of thief / ninja". Exact copies of thief -> ninja with
+`copyOf`: `fencer` (FEN, default name FENC) -> `duelist` (DUE). On page 3 (18 rows, 2880 x 2880; 1216 px left, 7 more
+rows). Field alias thief / ninja (temporary); walk-sheet pack entries (the rapier sheathed at the hip, the duelist's
+parrying dagger at the other hip). The rapier blades are 1 px pale lines without ink, broken into segments in places:
+`fx_colours` for the blade and glint colours (so the kneel bridge's reink leaves them), and every battle in-between
+shows its key exactly (`alias_frames`: all eight; a shifted or re-rendered key gained 3-14 outline specks at the hair
+and hilt tips), the fallback the coordinator allowed for the thin blades. The atlas records `inbetweens: false` for
+both (the overflow-page test now reads it from the rig). Image review: round 1 **APPROVE** both (the kneel bridge keeps
+the blades straight, unbroken and un-inked).

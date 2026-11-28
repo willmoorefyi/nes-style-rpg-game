@@ -638,3 +638,41 @@ virtuoso:
   carry: >-
     a small golden harp is carried at his left side under the arm, held against the hip so it never hides the face;
     the free right hand hangs by the coat. The harp touches the body and stays inside the 48 x 96 cell
+
+fencer:
+  name: Fencer
+  tier: base
+  partner: duelist
+  battle_sheet: ~/temp/heroes/fencer_duelist_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: thief
+  look: >-
+    a young fencer, about 20: tousled dark brown hair; a fair face; a musketeer-style brown leather doublet with a
+    white lace collar and steel-grey sleeves, a brown sash, puffed rust-brown breeches, grey stockings and brown boots.
+    Colours: dark brown hair, fair skin, brown leather, white lace, steel grey, rust brown
+  carry: >-
+    the rapier with its swept steel hilt is sheathed at his left hip on the belt, hilt forward, the thin scabbard
+    angled back close to the leg; both hands are free. The rapier touches the body and stays inside the 48 x 96 cell
+
+duelist:
+  name: Duelist
+  tier: enhanced
+  partner: fencer
+  battle_sheet: ~/temp/heroes/fencer_duelist_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: ninja
+  look: >-
+    the fencer grown into a duelist: long dark brown hair to the shoulders; a long burgundy coat with a white lace
+    collar and steel buttons over dark trousers and black boots; a short burgundy cape. Colours: dark brown hair, fair
+    skin, burgundy, white lace, steel grey, black
+  carry: >-
+    the rapier is sheathed at his left hip, hilt forward, and the parrying dagger at his right hip, both close to the
+    body; the cape hangs behind. The blades touch the body and stay inside the 48 x 96 cell

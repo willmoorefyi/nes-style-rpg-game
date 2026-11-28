@@ -3657,3 +3657,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the fencer / duelist class pair (user-rendered
+# battle art; copies of the thief / ninja). FENC is weak so it kneels; NIN is the like-for-like control.
+# ?mute=1&scenario=cb_fencers (&kneel=loop, &enemyAnim=loop).
+- id: cb_fencers
+  name: Fencer and Duelist (pass CB preview)
+  party:
+    - { class: fencer, name: FENC, level: 10, equipment: [rapier, leather_armor], spells: [], hp: 15 }
+    - { class: duelist, name: DUEL, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: fencer, name: FENC2, level: 10, equipment: [rapier, leather_armor], spells: [] }
+    - { class: ninja, name: NIN, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

@@ -32,3 +32,5 @@ shieldmaiden: warrior # temporary until the user renders the shieldmaiden's fiel
 valkyrie: knight      # temporary until the user renders the valkyrie's field walk sheet
 bard: red_mage   # temporary until the user renders the bard's field walk sheet
 virtuoso: red_wizard   # temporary until the user renders the virtuoso's field walk sheet
+fencer: thief   # temporary until the user renders the fencer's field walk sheet
+duelist: ninja   # temporary until the user renders the duelist's field walk sheet

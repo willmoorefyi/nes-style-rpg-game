@@ -827,7 +827,13 @@ ROSTER: dict[str, Look] = {
     # circlet and a teal-and-gold coat with a golden harp
     "bard": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(8, 14, 13), trim=(29, 15, 18),
                  pants=(26, 20, 7), boots=(12, 8, 5), gear="feather", gear_color=(8, 14, 13), gear_color2=(29, 15, 18)),
+    # pass CB (plan 11-18): the fencer, a musketeer-style doublet with a lace collar and a rapier; the duelist in a
+    # burgundy coat and cape with a rapier and a parrying dagger
+    "fencer": Look(hair=(9, 6, 4), hair_style="short", outfit="tunic", cloth=(14, 9, 6), trim=(28, 28, 27),
+                   pants=(16, 9, 5), boots=(11, 7, 4), weapon="rapier"),
     # Upgraded classes
+    "duelist": Look(hair=(9, 6, 4), hair_style="long", outfit="coat", cloth=(11, 4, 7), trim=(26, 26, 27),
+                    pants=(5, 4, 5), boots=(4, 4, 5), weapon="rapier", cape=(11, 4, 7)),
     "virtuoso": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(4, 10, 11), trim=(27, 21, 7),
                      pants=(6, 6, 7), boots=(4, 4, 5), gear="crown", gear_color=(27, 21, 7)),
     "valkyrie": Look(hair=(26, 18, 8), hair_style="long", outfit="armor", cloth=(26, 27, 29), trim=(20, 22, 26),
