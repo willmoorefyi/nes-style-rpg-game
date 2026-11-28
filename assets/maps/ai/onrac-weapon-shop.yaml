@@ -18,7 +18,7 @@ npcs:
   x: 7
   y: 4
   sprite: merchant
-  dialog: [Harpoon steel and storm-forged blades. In Onrac a weapon has to cut through ice first.]
+  dialog: [No steel for sale. The smiths sailed with the fleet.]
   shopId: onrac_weapon
 transitions:
 - {x: 3, y: 8, targetMap: onrac, targetEntrance: weapon_shop}

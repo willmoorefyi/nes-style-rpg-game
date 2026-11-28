@@ -66,7 +66,7 @@ def build() -> Floor:
     f.npcs += [
         chest("b3_berth", "cabin", "a Cabin", 4, 23),
         chest("b3_niche", "aegis_shield", "an Aegis Shield", 4, 20),
-        chest("b3_vestry", "hi_potion", "a Hi-Potion", 39, 5),
+        chest("b3_vestry_armor", "diamond_armor", "Diamond Armor", 39, 5),
         {"id": "wat_d_echo", "sprite": "old_man", "tint": "#9cc4d4", "x": 22, "y": 7, "dialog": talk(
             ["A priest in a robe of sea-silk stands by the font. You can see the pillars through him.",
              "\"Up is the sea folk's grotto, the last dry rooms. They will tell you what they know, if you ask "

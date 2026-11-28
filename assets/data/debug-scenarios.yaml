@@ -24,7 +24,7 @@
     - class: thief
       name: THIEF
       level: 3
-      equipment: [short_sword, leather_armor, cap]
+      equipment: [falchion, leather_armor, cap]
       spells: []
     - class: white_mage
       name: W.MAG
@@ -1665,7 +1665,7 @@
   background: assets/backgrounds/shoreline.webp
   party:
     - { class: warrior, name: WAR, level: 4, equipment: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-    - { class: thief, name: THF, level: 4, equipment: [short_sword, leather_armor, cap], spells: [] }
+    - { class: thief, name: THF, level: 4, equipment: [falchion, leather_armor, cap], spells: [] }
     - { class: white_mage, name: WHM, level: 4, equipment: [hammer, robe, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }] }
     - { class: black_mage, name: BLM, level: 4, equipment: [staff, robe, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }] }
   items: { potion: 3 }
@@ -1746,7 +1746,7 @@
     - { type: ship, map: overworld, at: a1_s_pravoka_ship }
   party:
     - { class: warrior, name: WAR, level: 5, equipment: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-    - { class: thief, name: THF, level: 5, equipment: [short_sword, leather_armor, cap], spells: [] }
+    - { class: thief, name: THF, level: 5, equipment: [falchion, leather_armor, cap], spells: [] }
     - { class: white_mage, name: WHM, level: 5, equipment: [hammer, robe, cap], spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }] }
     - { class: black_mage, name: BLM, level: 5, equipment: [staff, robe, cap], spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }] }
   items: { lute: 1, potion: 5 }
@@ -2083,9 +2083,9 @@
   party: &w_s17_party
     - { class: warrior, name: WAR, level: 22, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 22, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 22, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 22, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 22, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 22, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }, { id: ice2, level: 4 }] }
   items: { potion: 6, levistone: 1, canoe: 1, lute: 1 }
   gold: 4000
@@ -2170,9 +2170,9 @@
   party:
     - { class: warrior, name: WAR, level: 21, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 21, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 21, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 21, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: ice2, level: 4 }, { id: fast, level: 4 }] }
   items: { potion: 8, hi_potion: 4, ether: 2, canoe: 1, lute: 1 }
   gold: 5000
@@ -2183,9 +2183,9 @@
   party:
     - { class: warrior, name: WAR, level: 23, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 23, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 23, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 23, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 23, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 23, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: ice2, level: 4 }, { id: fast, level: 4 }] }
   items: { potion: 3 }
   gold: 0
@@ -2212,10 +2212,10 @@
   party:
     - { class: warrior, name: WAR, level: 21, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 21, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 },
                  { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 21, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 21, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 },
                  { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
   items: { potion: 6, hi_potion: 3, canoe: 1, lute: 1 }
@@ -2235,10 +2235,10 @@
   party:
     - { class: warrior, name: WAR, level: 21, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 21, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 21, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 },
                  { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 21, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 21, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 },
                  { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
   items: { potion: 6, hi_potion: 3, canoe: 1, lute: 1 }
@@ -2250,10 +2250,10 @@
   party:
     - { class: warrior, name: WAR, level: 22, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 22, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 22, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 22, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: ruse, level: 1 }, { id: invs, level: 2 }, { id: cure2, level: 3 }, { id: heal, level: 3 },
                  { id: pure, level: 4 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 22, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 22, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: lit, level: 1 }, { id: slep, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 },
                  { id: lit2, level: 3 }, { id: fast, level: 4 }, { id: ice2, level: 4 }] }
   items: { potion: 3 }
@@ -2278,9 +2278,9 @@
   party:
     - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 24, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }, { id: ice2, level: 4 }] }
   items: { potion: 8, hi_potion: 4, canoe: 1, lute: 1 }
   gold: 6000
@@ -2301,11 +2301,11 @@
           EARTH_CRYSTAL_LIT, CANOE_GIVEN, FIRE_CRYSTAL_LIT, EVIL_EYE_DEFEATED, AIRSHIP_RAISED, ORD_O_THRONE,
           ORDEALS_GUARD_DEFEATED]
   party: &w_s19_party
-    - { class: warrior, name: WAR, level: 25, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
+    - { class: warrior, name: WAR, level: 25, equipment: [sun_blade, diamond_armlet, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 25, equipment: [rune_knife, opal_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 25, equipment: [thor_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 25, equipment: [rune_knife, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 25, equipment: [rune_knife, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: fir2, level: 3 }, { id: ice2, level: 4 }] }
   items: { potion: 8, hi_potion: 4, ordeal_seal: 1, canoe: 1, lute: 1 }
   gold: 8000
@@ -2388,9 +2388,9 @@
   party: &wat_o_party
     - { class: warrior, name: WAR, level: 25, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 25, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 25, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 25, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: ice2, level: 4 }] }
   flags: [GOT_LUTE]
   items: { lute: 1, canoe: 1, hi_potion: 4, ether: 2, phoenix_down: 2 }
@@ -2444,9 +2444,9 @@
   party:
     - { class: warrior, name: WAR, level: 25, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 25, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, white_robe, cap],
+    - { class: white_mage, name: WHM, level: 25, equipment: [mythril_hammer, gold_armlet, cap],
         spells: [{ id: cure, level: 1 }, { id: cure2, level: 3 }, { id: heal, level: 3 }, { id: cure3, level: 5 }, { id: life, level: 5 }] }
-    - { class: black_mage, name: BLM, level: 25, equipment: [wizard_staff, black_robe, cap],
+    - { class: black_mage, name: BLM, level: 25, equipment: [power_staff, gold_armlet, cap],
         spells: [{ id: fire, level: 1 }, { id: ice, level: 2 }, { id: fir2, level: 3 }, { id: lit2, level: 3 }, { id: ice2, level: 4 }] }
   items: { lute: 1, mystic_key: 1, rod: 1, canoe: 1, potion: 10, hi_potion: 4, ether: 2, phoenix_down: 2 }
   gold: 12000
@@ -3207,8 +3207,8 @@
   party:
     - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
-    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, gold_armlet, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [power_staff, gold_armlet, cap], spells: [] }
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
@@ -3224,8 +3224,8 @@
   party:
     - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
-    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, gold_armlet, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [power_staff, gold_armlet, cap], spells: [] }
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
@@ -3239,8 +3239,8 @@
   party:
     - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
-    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, gold_armlet, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [power_staff, gold_armlet, cap], spells: [] }
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
@@ -3256,8 +3256,8 @@
   party: &wr_party
     - { class: warrior, name: WAR, level: 24, equipment: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
     - { class: thief, name: THF, level: 24, equipment: [falchion, gold_armlet, cap], spells: [] }
-    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, white_robe, cap], spells: [] }
-    - { class: black_mage, name: BLM, level: 24, equipment: [wizard_staff, black_robe, cap], spells: [] }
+    - { class: white_mage, name: WHM, level: 24, equipment: [mythril_hammer, gold_armlet, cap], spells: [] }
+    - { class: black_mage, name: BLM, level: 24, equipment: [power_staff, gold_armlet, cap], spells: [] }
   items: { potion: 8, canoe: 1, lute: 1 }
   gold: 6000
   enemies: []
@@ -3560,9 +3560,9 @@
   name: Beastmaster and Summoner (pass CB preview)
   party:
     - { class: beastmaster, name: BEAST, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
-    - { class: summoner, name: SUMMN, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: summoner, name: SUMMN, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
     - { class: beastmaster, name: BEAST2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
-    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3589,10 +3589,10 @@
 - id: cb_runeknights
   name: Rune Knight and Mystic Warrior (pass CB preview)
   party:
-    - { class: rune_knight, name: RUNE, level: 10, equipment: [rapier, leather_armor, wooden_shield, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
-    - { class: mystic_warrior, name: MYSTC, level: 30, equipment: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [{ id: fire, level: 1 }] }
-    - { class: rune_knight, name: RUNE2, level: 10, equipment: [rapier, leather_armor, wooden_shield, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
-    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: rune_knight, name: RUNE, level: 10, equipment: [rapier, leather_armor, buckler, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: mystic_warrior, name: MYSTC, level: 30, equipment: [mythril_sword, mythril_mail, buckler, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: rune_knight, name: RUNE2, level: 10, equipment: [rapier, leather_armor, buckler, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, buckler, cap], spells: [{ id: fire, level: 1 }] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3605,9 +3605,9 @@
   name: Scholar and Sage (pass CB preview)
   party:
     - { class: scholar_hero, name: SCHLR, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
-    - { class: sage_hero, name: SAGE, level: 30, equipment: [wizard_staff, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: sage_hero, name: SAGE, level: 30, equipment: [falchion, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
     - { class: scholar_hero, name: SCHLR2, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
-    - { class: red_wizard, name: RDWZ, level: 30, equipment: [wizard_staff, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [falchion, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3695,9 +3695,9 @@
   name: Tinker and Machinist (pass CB preview)
   party:
     - { class: tinker, name: TINKR, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
-    - { class: machinist, name: MACH, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: machinist, name: MACH, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
     - { class: tinker, name: TINKR2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
-    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3725,9 +3725,9 @@
   name: Witch Hunter and Inquisitor (pass CB preview)
   party:
     - { class: witch_hunter, name: WITCH, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
-    - { class: inquisitor, name: INQU, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: inquisitor, name: INQU, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
     - { class: witch_hunter, name: WITCH2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
-    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3755,9 +3755,9 @@
   name: Dancer and Blade Dancer (pass CB preview)
   party:
     - { class: dancer_hero, name: DANCR, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
-    - { class: blade_dancer, name: BLADE, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: blade_dancer, name: BLADE, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
     - { class: dancer_hero, name: DANCR2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
-    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [iron_nunchaku, opal_armlet, cap], spells: [] }
   items: { potion: 3 }
   gold: 0
   enemies: [goblin, goblin, wolf]
@@ -3792,3 +3792,36 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass EQ (docs/EQUIP_FF1_PLAN.md 9.4): the hands slot, the FF1 shops and worn-item spells. ?mute=1&scenario=eq_*
+- id: eq_pravoka_armor
+  name: EQ - Pravoka armour shop (Gloves, the fifth slot)
+  mode: field
+  map: pravoka-armor-shop
+  entrance: door
+  party:
+    - { class: warrior, name: FGHTR, level: 4, equipment: [hand_axe, chain_mail], spells: [] }
+    - { class: thief, name: THIEF, level: 4, equipment: [scimitar, leather_armor], spells: [] }
+    - { class: white_mage, name: W.MAG, level: 4, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: black_mage, name: B.MAG, level: 4, equipment: [small_knife, cloth], spells: [{ id: fire, level: 1 }] }
+  items: { gloves: 1, potion: 2 }
+  gold: 2000
+  enemies: []
+- id: eq_closed_onrac
+  name: EQ - Onrac's closed weapon shop
+  mode: field
+  map: onrac-weapon-shop
+  entrance: door
+  party:
+    - { class: knight, name: KNGHT, level: 25, equipment: [ice_brand, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  items: {}
+  gold: 50000
+  enemies: []
+- id: eq_items
+  name: EQ - worn items cast their spells (Zeus Gauntlet, Power Gauntlet, White Shirt, Defender)
+  party:
+    - { class: knight, name: KNGHT, level: 28, equipment: [defender, opal_armor, aegis_shield, opal_helm, zeus_gauntlet], spells: [] }
+    - { class: white_wizard, name: W.WIZ, level: 28, equipment: [thor_hammer, white_robe, cap, pro_ring], spells: [{ id: cure2, level: 3 }] }
+  items: {}
+  gold: 0
+  enemies: [ice_gigas]

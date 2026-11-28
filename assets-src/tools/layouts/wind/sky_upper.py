@@ -94,7 +94,7 @@ for x in (18, 30):
     f4.deco([["brazier"]], x, 13)                # the furnaces of the middle hall
 f4.deco([["tpillar_broken_top"], ["tpillar_broken_bottom"]], 22, 6)
 f4.npcs += [
-    chest("bay_north", "hi_potion", "a Hi-Potion", 20, 1),
+    chest("bay_north_claw", "dragon_claw", "a Dragon Claw", 20, 1),
     chest("bay_east", "diamond_shield", "a Diamond Shield", 42, 6),
     chest("bay_south_east", "cabin", "a Cabin", 42, 24),
     {"id": "wnd_ancient_stoker", "sprite": "robot_ancient", "x": 31, "y": 13, "dialog": [   # AR-N3: flavour only

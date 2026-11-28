@@ -49,13 +49,13 @@ npcs:
   chestItem: phoenix_down
   chestFlag: CHEST_FIR_D2_B3_DRAIN
   dialog: [You found a Phoenix Down!]
-- id: chest_fir_d2_b3_niche
+- id: chest_fir_d2_b3_niche_gauntlet
   sprite: chest
   x: 38
   y: 8
-  chestItem: hi_potion
-  chestFlag: CHEST_FIR_D2_B3_NICHE
-  dialog: [You found a Hi-Potion!]
+  chestItem: silver_gauntlet
+  chestFlag: CHEST_FIR_D2_B3_NICHE_GAUNTLET
+  dialog: [You found a Silver Gauntlet!]
 - id: fir_d2_stone
   sprite: chest
   tint: '#b8d8ff'

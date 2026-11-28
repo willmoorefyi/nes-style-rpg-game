@@ -13,7 +13,8 @@ import { ItemSelectionUI } from '../../ui/ItemSelectionUI.js';
 import { ItemEffects } from '../../systems/ItemEffects.js';
 import { ItemRegistry } from '../../data/ItemRegistry.js';
 import { mostHurtMemberId } from './BattleFieldTargeting.js';
-import type { Inventory } from '../../entities/Inventory.js';
+import { Inventory } from '../../entities/Inventory.js';
+import { wornCastCommand, wornSpellItems } from '../../battle/itemCast.js';
 
 /** U14: a spell level with charges left and a learned spell. */
 function hasCastableSpell(actor: Character): boolean {
@@ -32,8 +33,12 @@ export function canOpenSpells(actor: Character): boolean {
 /** The battle item list's filter (`ItemSelectionUI`): a consumable that is not a camp item (BA-4). */
 const battleUsable = (id: string): boolean => ItemRegistry.getItem(id)?.type === 'consumable' && !ItemEffects.isPartyItem(id);
 
-/** U14: whether the bag holds a battle-usable consumable not already spoken for this round (`reserved`, B5). */
-export function canOpenItems(inventory: Inventory | undefined, reserved: (id: string) => number): boolean {
+/**
+ * U14: whether the bag holds a battle-usable consumable not already spoken for this round (`reserved`, B5), or the
+ * actor wears an item that casts a spell (pass EQ 7.3).
+ */
+export function canOpenItems(inventory: Inventory | undefined, reserved: (id: string) => number, actor?: Character): boolean {
+  if (actor && wornSpellItems(actor).length > 0) return true;
   return !!inventory && inventory.getAll().some(e => e.quantity - reserved(e.itemId) > 0 && battleUsable(e.itemId));
 }
 
@@ -108,10 +113,11 @@ export class BattleListMenus {
     this.host.setState('spell_ui');
   }
 
-  showItems(): void {
+  showItems(actor?: Character): void {
     const { battle, config } = this.host;
     const inventory = config.inventory;
-    if (!inventory) {
+    const worn = actor ? wornSpellItems(actor) : [];
+    if (!inventory && worn.length === 0) {
       this.host.showNotice('No items available.');
       return;
     }
@@ -121,7 +127,13 @@ export class BattleListMenus {
       this.host.submit(createItemCommand(actorId, targetId, itemId));
     };
     this.itemUI = new ItemSelectionUI({
-      inventory,
+      inventory: inventory ?? new Inventory(),
+      worn: worn.map((i) => i.id),
+      onWorn: (id) => {
+        const item = worn.find((i) => i.id === id)!;
+        this.closeItems();
+        this.host.submit(wornCastCommand(actorId, item, this.host.spells.find((s) => s.id === item.battleSpell)));
+      },
       partyMembers: config.party.map((c, i) => ({ name: c.name, id: `party_${i}` })),
       contentX: this.host.listWindow.contentX,
       contentY: this.host.listWindow.contentY,
@@ -129,7 +141,7 @@ export class BattleListMenus {
       // BA-4: Tent and Cabin are camp items; they are not listed in battle
       isUsable: battleUsable,
       // B5: what the members before this one queued this round is already spoken for
-      quantityOf: (id) => inventory.getQuantity(id) - battle.reservedItems(id),
+      quantityOf: (id) => (inventory?.getQuantity(id) ?? 0) - battle.reservedItems(id),
       // the no-target fallback uses the item on the actor (never a name as a target id)
       onSelect: (result) => submit(result.itemId, actorId),
       onCancel: () => {

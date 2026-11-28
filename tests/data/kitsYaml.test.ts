@@ -5,9 +5,13 @@
 import { describe, it, expect } from 'vitest';
 import { FULL_KIT, KITS, START_KIT, UPGRADED_PARTY, ZONE_TABLES, bossWinRate, floorRun, makeMember, makeParty } from '../helpers/balanceData.js';
 
-/** The literals balanceData.ts held before F0. */
+/**
+ * The literals balanceData.ts held before F0, as pass EQ (docs/EQUIP_FF1_PLAN.md D-EQ12) changed them: FF1 Cornelia
+ * sells no Wooden Shield and no Cap, so the Fighter starts without the shield and `full` keeps the temple chest's one
+ * Cap on the Fighter as `found`.
+ */
 const OLD_START = {
-  warrior: { gear: ['rapier', 'leather_armor', 'wooden_shield'], spells: [] },
+  warrior: { gear: ['rapier', 'leather_armor'], spells: [] },
   thief: { gear: ['rapier', 'leather_armor'], spells: [] },
   monk: { gear: ['wooden_nunchaku', 'cloth'], spells: [] },
   white_mage: { gear: ['hammer', 'cloth'], spells: ['cure'] },
@@ -15,19 +19,19 @@ const OLD_START = {
   red_mage: { gear: ['rapier', 'cloth'], spells: [] },
 };
 const OLD_FULL = {
-  warrior: { gear: ['rapier', 'chain_mail', 'wooden_shield', 'cap'], spells: [] },
-  thief: { gear: ['rapier', 'leather_armor', 'cap'], spells: [] },
-  white_mage: { gear: ['hammer', 'cloth', 'cap'], spells: ['cure', 'ruse'] },
-  black_mage: { gear: ['small_knife', 'cloth', 'cap'], spells: ['fire', 'lit', 'slep'] },
+  warrior: { gear: ['rapier', 'chain_mail'], found: ['cap'], spells: [] },
+  thief: { gear: ['rapier', 'leather_armor'], spells: [] },
+  white_mage: { gear: ['hammer', 'cloth'], spells: ['cure', 'ruse'] },
+  black_mage: { gear: ['small_knife', 'cloth'], spells: ['fire', 'lit', 'slep'] },
 };
 const BASE = ['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage'];
 
 describe('kits.yaml', () => {
-  it('start: the 6 base classes equal the old literals', () => {
+  it('start: the 6 base classes equal the literals (pass EQ: no Wooden Shield)', () => {
     for (const cls of BASE) expect(START_KIT[cls], cls).toEqual(OLD_START[cls as keyof typeof OLD_START]);
   });
 
-  it('full: the 4 party classes equal the old literals', () => {
+  it('full: the 4 party classes equal the literals (pass EQ: the temple Cap on the Fighter only)', () => {
     for (const cls of Object.keys(OLD_FULL)) expect(FULL_KIT[cls], cls).toEqual(OLD_FULL[cls as keyof typeof OLD_FULL]);
   });
 
@@ -59,6 +63,6 @@ describe('pass W balance helpers (QUEST_PLAN 4.4: bossWinRate, floorRun)', () =>
 
   it('the upgraded party equips the late kits', () => {
     expect(makeParty(30, 'w_s28', true, UPGRADED_PARTY).map((c) => c.getEquipped('weapon')?.id))
-      .toEqual(['defender', 'vorpal_sword', 'thor_hammer', 'rune_knife']);
+      .toEqual(['dragon_claw', 'defender', 'thor_hammer', 'cat_claw']);   // pass EQ: FF1 jobs, rank ATK, hit, crit
   });
 });

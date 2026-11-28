@@ -142,7 +142,7 @@ npcs:
   sprite: dwarf_trader
   x: 33
   y: 6
-  dialog: ['Rope, lamps, tonics! Everything a body needs underground.']
+  dialog: [Store's shut. Every rope and lamp went down the canal works.]
   shopId: dwarf_item
 transitions:
 - {x: 19, y: 29, targetMap: overworld, targetEntrance: ert_dwarf}

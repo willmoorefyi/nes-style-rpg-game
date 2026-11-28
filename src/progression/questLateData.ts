@@ -64,6 +64,7 @@ export interface GeoData {
 
 export interface KitClass {
   gear: string[];
+  found?: string[];   // chest gear (pass EQ D-EQ11): free, so `kitPrice` never counts it
   spells: string[];
 }
 
@@ -194,7 +195,7 @@ export function lateOf(ctx: QuestContext): LateData {
   return d;
 }
 
-/** The 4-member gear price of a kit (W1-F's figure: w_s1 520, w_pravoka 1725; spells are not counted), or null for
+/** The 4-member gear price of a kit (`gear` only: pass EQ's found gear is free; w_s1 185, w_pravoka 1890; no spells), or null for
  *  an unknown kit. */
 export function kitPrice(data: LateData, kit: string | null): number | null {
   const k = kit ? data.kits.get(kit) : undefined;

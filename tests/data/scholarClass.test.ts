@@ -64,7 +64,7 @@ describe('pass CB: scholar_hero / sage_hero are a shallow copy of red_mage / red
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('scholar_hero'))).toHaveLength(29);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('scholar_hero'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: scholar_hero = red_mage in every kit, sage_hero = red_wizard wherever a red_wizard row exists (D-CB6)', () => {

@@ -44,10 +44,10 @@ describe('questLate: the constants mirror the game', () => {
     expect(START_GOLD).toBe(STARTING_GOLD);
   });
 
-  it('kitPrice is W1-F\'s 4-member (W / T / WM / BM) figure: w_s1 520, w_pravoka 1725', () => {
+  it('kitPrice is W1-F\'s 4-member (W / T / WM / BM) figure of `gear` (pass EQ: found gear is free): w_s1 185, w_pravoka 1890', () => {
     const data = loadLateData();
-    expect(kitPrice(data, 'w_s1')).toBe(520);
-    expect(kitPrice(data, 'w_pravoka')).toBe(1725);
+    expect(kitPrice(data, 'w_s1')).toBe(185);
+    expect(kitPrice(data, 'w_pravoka')).toBe(1890);
     expect(kitPrice(data, 'no_such_kit')).toBeNull();
   });
 });

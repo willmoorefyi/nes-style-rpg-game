@@ -7,7 +7,7 @@ import type { EnemyInstance } from './BattleStateMachine.js';
  * `DamageFormula` read these. Missing data fields default to 0, except enemy hits (1) and crit (1).
  */
 
-const ARMOUR_SLOTS: EquipmentSlot[] = ['armor', 'shield', 'helmet'];
+const ARMOUR_SLOTS: EquipmentSlot[] = ['armor', 'shield', 'helmet', 'hands'];
 /** FF1 base evade before agility and armour weight. */
 export const BASE_EVADE = 48;
 

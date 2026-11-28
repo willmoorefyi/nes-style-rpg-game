@@ -1,4 +1,4 @@
-import type { EquipmentSlot, ItemData } from '../types/index.js';
+import type { CharacterClassData, EquipmentSlot, ItemData } from '../types/index.js';
 import type { Character } from './Character.js';
 import type { Inventory } from './Inventory.js';
 import { cantCarryText } from '../systems/pickupText.js';
@@ -10,6 +10,11 @@ import { cantCarryText } from '../systems/pickupText.js';
 export function slotOf(item: ItemData): EquipmentSlot | null {
   if (item.type !== 'weapon' && item.type !== 'armor') return null;
   return item.slot ?? (item.type === 'weapon' ? 'weapon' : 'armor');
+}
+
+/** The class id an item's `usableBy` is read for: a copy class equips as its classic source (pass EQ D-EQ4). */
+export function equipClassOf(c: Pick<CharacterClassData, 'id' | 'copyOf'>): string {
+  return c.copyOf ?? c.id;
 }
 
 /** Shown when an item doesn't fit the member or the slot. */

@@ -13,7 +13,7 @@ import { CANT_EQUIP_TEXT, equipFromBag } from '../entities/EquipmentRules.js';
 import { partyAbsorb, partyAttack, withEquipped, type MemberView } from '../battle/CombatStats.js';
 import { GAME_WIDTH, SCREEN_MARGIN } from '../core/LayoutConstants.js';
 
-const SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
+const SLOTS: EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet', 'hands'];
 const TOP_HEIGHT = 300;
 const MEMBER_HELP = 'Choose whose equipment to change.';
 const ITEM_Y = SCREEN_MARGIN + TOP_HEIGHT + SCREEN_MARGIN;

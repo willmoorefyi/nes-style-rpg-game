@@ -63,7 +63,7 @@ describe('pass CB: gravity_adept / void_walker are a shallow copy of black_mage 
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('gravity_adept'))).toHaveLength(15);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('gravity_adept'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: gravity_adept = black_mage in every kit, void_walker = black_wizard wherever a black_wizard row exists (D-CB6)', () => {

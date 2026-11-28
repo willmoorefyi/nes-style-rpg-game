@@ -63,7 +63,7 @@ describe('pass CB: apothecary / plague_doctor are a shallow copy of red_mage / r
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('apothecary'))).toHaveLength(29);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('apothecary'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: apothecary = red_mage in every kit, plague_doctor = red_wizard wherever a red_wizard row exists (D-CB6)', () => {

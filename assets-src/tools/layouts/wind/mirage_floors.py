@@ -114,7 +114,7 @@ f2.wall([["torch"]], 9, 20)
 f2.npcs += [
     chest("north_spur", "ether", "an Ether", 10, 3),
     chest("north_wing", "diamond_armlet", "a Diamond Armlet", 37, 5),
-    chest("south_nook", "hi_potion", "a Hi-Potion", 36, 28),
+    chest("south_nook_hammer", "thor_hammer", "a Thor Hammer", 36, 28),
 ]
 f2.write("Mirage Tower 2F: two half-floors joined by a bronze bridge over the open shaft; a cracked span drops to 1F.",
          {"arrival": [4, 26], "well": [6, 6], "up": [28, 22]})

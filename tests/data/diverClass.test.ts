@@ -63,7 +63,7 @@ describe('pass CB: diver / abyssal_knight are a shallow copy of warrior / knight
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('diver'))).toHaveLength(44);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('diver'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: diver = warrior in every kit, abyssal_knight = knight wherever a knight row exists (D-CB6)', () => {

@@ -52,13 +52,13 @@ npcs:
   chestItem: aegis_shield
   chestFlag: CHEST_WAT_D_B3_NICHE
   dialog: [You found an Aegis Shield!]
-- id: chest_wat_d_b3_vestry
+- id: chest_wat_d_b3_vestry_armor
   sprite: chest
   x: 39
   y: 5
-  chestItem: hi_potion
-  chestFlag: CHEST_WAT_D_B3_VESTRY
-  dialog: [You found a Hi-Potion!]
+  chestItem: diamond_armor
+  chestFlag: CHEST_WAT_D_B3_VESTRY_ARMOR
+  dialog: [You found Diamond Armor!]
 - id: wat_d_echo
   sprite: old_man
   tint: '#9cc4d4'

@@ -49,13 +49,13 @@ npcs:
   chestItem: diamond_armlet
   chestFlag: CHEST_WND_D1_NORTH_WING
   dialog: [You found a Diamond Armlet!]
-- id: chest_south_nook
+- id: chest_south_nook_hammer
   sprite: chest
   x: 36
   y: 28
-  chestItem: hi_potion
-  chestFlag: CHEST_WND_D1_SOUTH_NOOK
-  dialog: [You found a Hi-Potion!]
+  chestItem: thor_hammer
+  chestFlag: CHEST_WND_D1_SOUTH_NOOK_HAMMER
+  dialog: [You found a Thor Hammer!]
 transitions:
 - {x: 5, y: 26, targetMap: mirage-1f, targetEntrance: up}
 - {x: 6, y: 26, targetMap: mirage-1f, targetEntrance: up}

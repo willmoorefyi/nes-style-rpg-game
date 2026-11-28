@@ -6,4 +6,5 @@ export const SLOT_LABELS: Readonly<Record<EquipmentSlot, string>> = {
   armor: 'Body',
   shield: 'Shield',
   helmet: 'Helmet',
+  hands: 'Hands',
 };

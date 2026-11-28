@@ -64,8 +64,8 @@ def build() -> Path:
         {"condition": "TITAN_FED", "text": ["He's gone into his hole, snoring. The coast beyond the range is yours."]},
         {"text": ["Don't wake him, friend. He only eats stones, but he likes the burning kind best.",
                   "The thing that rules the Cavern of Earth is said to keep such a stone."]}]})
-    r.npcs.append({"id": "chest_ert_o_tunnel", "sprite": "chest", "x": 4, "y": 18, "chestItem": "hi_potion",
-                   "chestFlag": "CHEST_ERT_O_TUNNEL", "dialog": ["You found a Hi-Potion!"]})
+    r.npcs.append({"id": "chest_ert_o_tunnel_axe", "sprite": "chest", "x": 4, "y": 18, "chestItem": "great_axe",
+                   "chestFlag": "CHEST_ERT_O_TUNNEL_AXE", "dialog": ["You found a Great Axe!"]})
     r.transitions += [{"x": 31, "y": y, "targetMap": "overworld", "targetEntrance": "ert_giant"} for y in (9, 10)]
     r.transitions += [{"x": 0, "y": y, "targetMap": "overworld", "targetEntrance": "ert_giant_west"} for y in (11, 12)]
     return r.write(NOTE, {"arrival": [30, 9], "west": [1, 11]}, kits=KITS, mats=MATS, trim=None,

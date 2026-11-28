@@ -190,6 +190,7 @@ export class ItemMenuScene implements Scene {
         if (yes) {
           const result = ItemEffects.applyPartyItemEffect(itemId, this.game.party.all, this.game.inventory);
           this.resultText.text = result.message;
+          if (result.success && ItemEffects.offersSave(itemId)) this.game.scenes.push('saveMenu');
         }
         this.backToItems();
       },

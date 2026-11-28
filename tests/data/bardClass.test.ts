@@ -63,7 +63,7 @@ describe('pass CB: bard / virtuoso are a shallow copy of red_mage / red_wizard',
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('bard'))).toHaveLength(29);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('bard'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: bard = red_mage in every kit, virtuoso = red_wizard wherever a red_wizard row exists (D-CB6)', () => {

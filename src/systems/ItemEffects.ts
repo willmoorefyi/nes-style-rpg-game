@@ -11,7 +11,7 @@ export interface ItemEffectResult {
 export class ItemEffects {
   /** Check if an item is a party-wide consumable (skip target selection) */
   static isPartyItem(itemId: string): boolean {
-    return itemId === 'tent' || itemId === 'cabin';
+    return itemId === 'tent' || itemId === 'cabin' || itemId === 'house';
   }
 
   /** Check if an item revives a fallen member (its targets are the KO'd, not the living) */
@@ -19,7 +19,12 @@ export class ItemEffects {
     return itemId === 'phoenix_down';
   }
 
-  /** Apply a party-wide item effect (tent/cabin). Consumes the item. */
+  /** FF1's HOUSE (pass EQ D-EQ13): the Cabin's rest, then the game offers a save. */
+  static offersSave(itemId: string): boolean {
+    return itemId === 'house';
+  }
+
+  /** Apply a party-wide item effect (tent / cabin / house). Consumes the item. */
   static applyPartyItemEffect(
     itemId: string,
     party: readonly Character[],
@@ -42,7 +47,7 @@ export class ItemEffects {
       return { success: true, message: 'The party rests in the tent.' };
     }
 
-    if (itemId === 'cabin') {
+    if (itemId === 'cabin' || itemId === 'house') {
       for (const member of resting) {
         member.currentHp = member.maxHp;
         for (let lvl = 1; lvl <= 8; lvl++) {
@@ -50,7 +55,7 @@ export class ItemEffects {
         }
       }
       inventory.remove(itemId);
-      return { success: true, message: 'The party rests in the cabin.' };
+      return { success: true, message: `The party rests in the ${itemId}.` };
     }
 
     return { success: false, message: 'Cannot use this item' };

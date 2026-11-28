@@ -302,26 +302,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   return data as unknown as import('../types/index.js').CharacterClassData;
 }
 
-const VALID_ITEM_TYPES = ['weapon', 'armor', 'consumable', 'key'];
-
-export function validateItemData(data: unknown): import('../types/index.js').ItemData {
-  assertObject('ItemData', data);
-  assertString('ItemData.id', data.id);
-  assertString('ItemData.name', data.name);
-  assertString('ItemData.type', data.type);
-  if (!VALID_ITEM_TYPES.includes(data.type as string)) {
-    throw new ValidationError(`ItemData.type: expected one of ${VALID_ITEM_TYPES.join(', ')}, got ${data.type}`);
-  }
-  assertObject('ItemData.stats', data.stats);
-  assertNumber('ItemData.price', data.price);
-  assertArray('ItemData.usableBy', data.usableBy);
-  (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
-  assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
-  if (data.description !== undefined) assertString('ItemData.description', data.description);
-  if (data.prompt !== undefined) assertString('ItemData.prompt', data.prompt);
-  if (data.plural !== undefined) assertString('ItemData.plural', data.plural);
-  return data as unknown as import('../types/index.js').ItemData;
-}
+export { validateItemData } from './schemaValidationItems.js';
 
 const VALID_SPELL_TYPES = ['white', 'black'];
 const VALID_TARGETING = ['single', 'all', 'self', 'single_ally', 'all_allies'];
@@ -360,6 +341,7 @@ export function validateShopData(data: unknown): ShopData {
   if (data.innPrice !== undefined) {
     assertNumber('ShopData.innPrice', data.innPrice);
   }
+  if (data.closed !== undefined) assertType('ShopData.closed', data.closed, 'boolean');
   return data as unknown as ShopData;
 }
 

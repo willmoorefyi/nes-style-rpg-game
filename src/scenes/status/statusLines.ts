@@ -8,7 +8,7 @@ import {
   partyAbsorb, partyAttack, partyEvade, partyHitPercent, partyHits, partyMagicDefense,
 } from '../../battle/CombatStats.js';
 
-const EQUIPMENT_SLOTS: readonly EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet'];
+const EQUIPMENT_SLOTS: readonly EquipmentSlot[] = ['weapon', 'armor', 'shield', 'helmet', 'hands'];
 
 /** The footer: how to move between members and leave (E8). */
 export const STATUS_FOOTER = '←/→ Member   X Back';

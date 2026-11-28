@@ -16,17 +16,17 @@ const FIGHT = ['piscodemon', 'piscodemon', 'piscodemon'];
 const N = 400;
 
 describe('w_elf_d: the Marsh Cave guard (S5, kit w_s5)', () => {
-  it('sensible Lv9 wins 75-95 % (measured 83.5)', () => {
+  it('sensible Lv9 wins 75-95 % (measured EQ 86.25, was 83.5)', () => {
     const r = bossWinRate(FIGHT, 9, 'w_s5', 'sensible', N);
     expect(r).toBeGreaterThanOrEqual(0.75);
     expect(r).toBeLessThanOrEqual(0.95);
   });
 
-  it('sensible Lv7 wins at most 60 % (measured 53.5)', () => {
+  it('sensible Lv7 wins at most 60 % (measured EQ 56.5, was 53.5)', () => {
     expect(bossWinRate(FIGHT, 7, 'w_s5', 'sensible', N)).toBeLessThanOrEqual(0.6);
   });
 
-  it('sensible Lv11, the band top, wins >= 90 % (measured 99.8)', () => {
+  it('sensible Lv11, the band top, wins >= 90 % (measured EQ 99, was 99.8)', () => {
     expect(bossWinRate(FIGHT, 11, 'w_s5', 'sensible', N)).toBeGreaterThanOrEqual(0.9);
   });
 });

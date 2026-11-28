@@ -63,7 +63,7 @@ describe('pass CB: fencer / duelist are a shallow copy of thief / ninja', () => 
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('fencer'))).toHaveLength(16);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('fencer'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: fencer = thief in every kit, duelist = ninja wherever a ninja row exists (D-CB6)', () => {

@@ -68,7 +68,7 @@ describe('pass CL: landsknecht / dragoon are a shallow copy of warrior / knight'
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => lan.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => drg.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('landsknecht'))).toHaveLength(44);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('landsknecht'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: landsknecht = warrior in every kit, dragoon = knight wherever a knight row exists', () => {

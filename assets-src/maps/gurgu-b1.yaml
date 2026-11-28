@@ -149,13 +149,13 @@ npcs:
   chestItem: ether
   chestFlag: CHEST_FIR_D1_RIM_NORTH
   dialog: [You found an Ether!]
-- id: chest_rim_northwest
+- id: chest_rim_northwest_gauntlet
   sprite: chest
   x: 10
   y: 4
-  chestItem: hi_potion
-  chestFlag: CHEST_FIR_D1_RIM_NORTHWEST
-  dialog: [You found a Hi-Potion!]
+  chestItem: silver_gauntlet
+  chestFlag: CHEST_FIR_D1_RIM_NORTHWEST_GAUNTLET
+  dialog: [You found a Silver Gauntlet!]
 - id: chest_rim_southwest
   sprite: chest
   x: 9

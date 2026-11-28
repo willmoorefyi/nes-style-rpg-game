@@ -147,7 +147,7 @@ f2.npcs += [
     chest("ring_west", "ether", "an Ether", 7, 30),
     chest("ring_east", "phoenix_down", "a Phoenix Down", 32, 30),
     chest("hall_west", "opal_armlet", "an Opal Armlet", 5, 5),
-    chest("hall_east", "hi_potion", "a Hi-Potion", 34, 5),
+    chest("hall_east_zeus", "zeus_gauntlet", "a Zeus Gauntlet", 34, 5),
 ]
 f2.write("Citadel of Trials 2F: the start ring round the pad lattice; two pads lead into the north hall.\n" + NOTE,
          {"arrival": [19, 28], "up": [19, 4], "ring": [21, 28], "hall_west": [6, 10], "hall_east": [33, 10]},
@@ -175,7 +175,7 @@ for x in (16, 24):
     f3.pillar(x, 14)
 f3.wall([["banner"]], 8, 3)
 f3.npcs += [
-    chest("niche_west", "hi_potion", "a Hi-Potion", 12, 19),
+    chest("niche_west_gauntlet", "iron_gauntlet", "an Iron Gauntlet", 12, 19),
     chest("niche_east", "ether", "an Ether", 22, 19),
     chest("landing", "aegis_shield", "an Aegis Shield", 32, 9),
     # the keeper of the trial, a robed mummy, kneels before the dragon's bones; talking to it starts the fight

@@ -121,7 +121,7 @@ f2.npcs += [
          ["A second acolyte kneels at the end of the west arm, its forehead to the floor.",
           "The kneeling acolyte has lifted its head toward the north arm."]),
     chest("cross_west", "soft", "a Soft", 3, 28),
-    chest("cross_east", "hi_potion", "a Hi-Potion", 33, 28),
+    chest("cross_east_ring", "pro_ring", "a ProRing", 33, 28),
     chest("cross_east_vestibule", "ether", "an Ether", 41, 26),
     chest("cross_south", "phoenix_down", "a Phoenix Down", 30, 38),
 ]

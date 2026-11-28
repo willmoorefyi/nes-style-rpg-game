@@ -65,7 +65,7 @@ npcs:
   x: 4
   y: 3
   sprite: merchant
-  dialog: [Tonics and remedies. The herbs come from the dwarves now; ours won't grow.]
+  dialog: ['The shelves are bare. The rot took the herbs, and the dwarves'' cart stopped coming.']
   shopId: melmond_item
 transitions:
 - {x: 2, y: 7, targetMap: melmond, targetEntrance: item_shop}

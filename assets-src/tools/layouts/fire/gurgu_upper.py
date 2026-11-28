@@ -56,7 +56,7 @@ b1.deco([["skulls"]], 5, 22)
 b1.deco([["tpillar_broken_top"], ["tpillar_broken_bottom"]], 33, 21)
 b1.npcs += [
     chest("rim_north", "ether", "an Ether", 24, 3),
-    chest("rim_northwest", "hi_potion", "a Hi-Potion", 10, 4),
+    chest("rim_northwest_gauntlet", "silver_gauntlet", "a Silver Gauntlet", 10, 4),
     chest("rim_southwest", "phoenix_down", "a Phoenix Down", 9, 31),
 ]
 b1.write("Gurgu Volcano B1: the caldera rim, walked round a sheer crater; stairs down on its east and west sides.",

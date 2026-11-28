@@ -26,7 +26,14 @@ export interface ItemSelectionConfig {
    * round); it drives the "x N" label, and an item at 0 is not listed. Default: the inventory count.
    */
   quantityOf?: (itemId: string) => number;
+  /** Worn items that cast a spell (pass EQ 7.3), listed after the consumables as "<name> (worn)". */
+  worn?: string[];
+  /** A worn row was picked. */
+  onWorn?: (itemId: string) => void;
 }
+
+/** The value of a worn row in the menu (consumables use their item id). */
+const WORN = 'worn:';
 
 export class ItemSelectionUI extends Container {
   private config: ItemSelectionConfig;
@@ -41,16 +48,17 @@ export class ItemSelectionUI extends Container {
   private showItemMenu(): void {
     const { contentX, contentY, eventBus, onCancel } = this.config;
     const consumables = this.listedItems();
+    const worn = this.config.worn ?? [];
 
-    if (consumables.length === 0) {
+    if (consumables.length === 0 && worn.length === 0) {
       onCancel();
       return;
     }
 
-    const items: MenuItem[] = consumables.map(entry => {
+    const items: MenuItem[] = [...consumables.map(entry => {
       const item = ItemRegistry.getItem(entry.itemId);
       return { label: `${item?.name ?? entry.itemId} x${entry.quantity}`, value: entry.itemId };
-    });
+    }), ...worn.map((id) => ({ label: `${ItemRegistry.getItem(id)?.name ?? id} (worn)`, value: `${WORN}${id}` }))];
 
     this.itemMenu = new Menu({
       items,
@@ -58,7 +66,10 @@ export class ItemSelectionUI extends Container {
       y: contentY,
       maxVisible: 4,
       onSelect: (item) => {
-        if (this.config.onNeedTarget) {
+        if (item.value.startsWith(WORN)) {
+          this.config.onWorn?.(item.value.slice(WORN.length));
+          this.cleanup();
+        } else if (this.config.onNeedTarget) {
           this.config.onNeedTarget(item.value);
         } else {
           // Fallback: no target
@@ -85,12 +96,12 @@ export class ItemSelectionUI extends Container {
   }
 
   hasNoItems(): boolean {
-    return this.listedItems().length === 0;
+    return this.listedItems().length === 0 && (this.config.worn ?? []).length === 0;
   }
 
-  /** The item ids in the menu, in order. */
+  /** The item ids in the menu, in order (worn rows last, as `worn:<id>`). */
   get listedItemIds(): string[] {
-    return this.listedItems().map(entry => entry.itemId);
+    return [...this.listedItems().map(entry => entry.itemId), ...(this.config.worn ?? []).map((id) => `${WORN}${id}`)];
   }
 
   private listedItems(): Array<{ itemId: string; quantity: number }> {

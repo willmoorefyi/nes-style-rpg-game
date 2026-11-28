@@ -701,6 +701,8 @@ ground curve, which uses the stages' `grind`.
 
 ### 3.6 Level, gear and magic bands (replaces QUEST 6.1)
 
+> **Superseded for the shops by pass EQ** (docs/EQUIP_FF1_PLAN.md D-EQ14, user ruling 2026-11-27: "map to FF1 exactly"): every shop sells NES FF1's inventory at NES prices, the gear caps below no longer hold (Steel Armor at Melmond, a Gold Bracelet at Gaia, no arms at Onrac), and the spell shops follow FF1's levels. The level bands and inn prices stand.
+
 The caps are the highest stats sold. Found gear may exceed them by at most 1 band, as in pass Q.
 
 | Band | Town | Party level | Magic sold | Weapon atk | Body def | Shield def | Helm def | Inn | Clinic (per level of each fallen member) |

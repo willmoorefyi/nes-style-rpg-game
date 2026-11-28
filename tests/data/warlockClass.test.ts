@@ -63,7 +63,7 @@ describe('pass CB: warlock / necromancer are a shallow copy of black_mage / blac
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('warlock'))).toHaveLength(15);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('warlock'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: warlock = black_mage in every kit, necromancer = black_wizard wherever a black_wizard row exists (D-CB6)', () => {

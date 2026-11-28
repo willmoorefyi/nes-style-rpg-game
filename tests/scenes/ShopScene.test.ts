@@ -357,7 +357,10 @@ describe('MS-5: shop layout, quantity total, result line and cursor', () => {
       const { scene, tap, party, inventory } = await buyWeapon('small_knife', 1,
         (p) => wield(p, ['rapier', 'rapier', 'staff', 'staff']));
       const rows = scene.equipPromptRows;
-      expect(rows.slice(0, 4).every((r) => r.enabled && /-\d+$/.test(r.label))).toBe(true);
+      // pass EQ: FF1's jobs keep the Small Knife off the White Mage (her row is disabled)
+      const able = rows.slice(0, 4).filter((r) => r.enabled);
+      expect(able.length).toBe(3);
+      expect(able.every((r) => /-\d+$/.test(r.label))).toBe(true);
       tap('confirm');
       expect(scene.equipPromptRows).toEqual([]);
       expect(inventory.getQuantity('small_knife')).toBe(1);

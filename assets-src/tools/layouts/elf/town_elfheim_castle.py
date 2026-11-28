@@ -149,7 +149,7 @@ def vault() -> Path:
     r.objects += [{"type": "barrel", "x": 10, "y": 8}, {"type": "crate", "x": 1, "y": 8}]
     r.wall([["torch"]], 3, 2)
     r.wall([["torch"]], 8, 2)
-    r.npcs += [chest("tnt", "tnt", "the TNT", 8, 6), chest("ether", "ether", "an Ether", 2, 6),
+    r.npcs += [chest("tnt", "tnt", "the TNT", 8, 6), chest("ether_gauntlet", "copper_gauntlet", "a Copper Gauntlet", 2, 6),
                chest("phoenix", "phoenix_down", "a Phoenix Down", 9, 8)]
     return r.write(note("the elven vault under the hall: the old treasury, a few chests left",
                         "a heap of old elven gold no one has counted; a cushion for a crown that went to the war",

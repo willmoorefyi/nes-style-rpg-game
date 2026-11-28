@@ -9,8 +9,8 @@ import { validateItemData } from '../../src/core/schemaValidation.js';
 const items = parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../assets/data/items.yaml'), 'utf-8')) as Array<ItemData & { element?: string }>;  // `element`: data only (weapons), not on ItemData
 
 describe('MS-7: every item has a real description', () => {
-  it('covers all 43 items', () => {
-    expect(items).toHaveLength(81);
+  it('covers all 98 items (pass EQ: + 17)', () => {
+    expect(items).toHaveLength(98);
   });
 
   it.each(items.map((i) => [i.id, i] as const))('%s: a non-empty description that is not its name', (_id, item) => {
@@ -49,11 +49,11 @@ describe('MS-7: every item has a real description', () => {
     expect(item.description?.toLowerCase()).toContain(item.element!.toLowerCase());
   });
 
-  it('the elemental swords name their element: Flame Sword fire, Ice Brand ice, Coral Sword lightning', () => {
+  it('the elemental swords name their element: Flame Sword fire, Ice Brand ice; the Coral Sword names its sea foes (pass EQ: no element in FF1)', () => {
     const byId = new Map(items.map((i) => [i.id, i]));
     expect(byId.get('flame_sword')!.description).toMatch(/\bfire\b/i);
     expect(byId.get('ice_brand')!.description).toMatch(/\bice\b/i);
-    expect(byId.get('coral_sword')!.description).toMatch(/\blightning\b/i);
+    expect(byId.get('coral_sword')!.description).toMatch(/\bsea foes\b/i);
   });
 
   it('consumables give their numbers: the Potion restores 30 HP, the Hi-Potion 120', () => {

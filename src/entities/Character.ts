@@ -2,7 +2,7 @@ import type { CharacterClassData, CharacterSaveData, EquipmentSlot, ItemData, St
 import { ClassRegistry } from '../data/ClassRegistry.js';
 import { ItemRegistry } from '../data/ItemRegistry.js';
 import { StatusTracker, type StatusEffect } from '../battle/StatusEffects.js';
-import { slotOf } from './EquipmentRules.js';
+import { equipClassOf, slotOf } from './EquipmentRules.js';
 import { maxChargesFor, SPELL_LEVELS } from './SpellCharges.js';
 import { levelForXp, MAX_LEVEL, xpToReach } from './ExperienceTable.js';
 import { partyAttack } from '../battle/CombatStats.js';
@@ -39,6 +39,7 @@ export class Character {
     this.equipment.set('armor', null);
     this.equipment.set('shield', null);
     this.equipment.set('helmet', null);
+    this.equipment.set('hands', null);
     this._currentHp = data.currentHp ?? this.maxHp;
     // a new character starts rested: full charges for its level (a save overwrites these in fromJSON)
     this.restoreAllCharges();
@@ -84,10 +85,15 @@ export class Character {
     return this.equipment.get(slot) ?? null;
   }
 
-  /** True if this class may use the item; an upgraded class (Knight) keeps its base class's gear. */
+  /**
+   * True if this class may use the item: `usableBy` names FF1's 12 classic classes (pass EQ D-EQ3), a copy class
+   * equips as its `copyOf` source (D-EQ4), and an upgraded class also keeps its base class's gear.
+   */
   canEquip(item: ItemData): boolean {
-    const { id, upgradeFrom } = this.classData;
-    return item.usableBy.includes(id) || (!!upgradeFrom && item.usableBy.includes(upgradeFrom));
+    const { upgradeFrom } = this.classData;
+    const base = upgradeFrom ? ClassRegistry.getClass(upgradeFrom) : undefined;
+    const inherited = base ? equipClassOf(base) : upgradeFrom;
+    return item.usableBy.includes(equipClassOf(this.classData)) || (!!inherited && item.usableBy.includes(inherited));
   }
 
   /** True if this class may use the item and the item fits `slot` (a cap is never body armour). */
@@ -203,8 +209,11 @@ export class Character {
     this.tempResist.add(element);
   }
 
+  /** A battle resistance (AFIR, ARUB, WALL) or one of the worn armour's FF1 resistances (pass EQ 7.2). */
   hasTempResist(element: string): boolean {
-    return this.tempResist.has(element);
+    if (this.tempResist.has(element)) return true;
+    for (const item of this.equipment.values()) if (item?.resist?.includes(element)) return true;
+    return false;
   }
 
   /** Clear all battle-only state (buffs, temp resistances) — called on battle end */

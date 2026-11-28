@@ -34,13 +34,13 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
-- id: chest_bay_north
+- id: chest_bay_north_claw
   sprite: chest
   x: 20
   y: 1
-  chestItem: hi_potion
-  chestFlag: CHEST_WND_D2_BAY_NORTH
-  dialog: [You found a Hi-Potion!]
+  chestItem: dragon_claw
+  chestFlag: CHEST_WND_D2_BAY_NORTH_CLAW
+  dialog: [You found a Dragon Claw!]
 - id: chest_bay_east
   sprite: chest
   x: 42

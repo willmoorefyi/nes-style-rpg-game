@@ -63,7 +63,7 @@ describe('pass CB: beastmaster / summoner are a shallow copy of monk / master', 
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('beastmaster'))).toHaveLength(14);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('beastmaster'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: beastmaster = monk in every kit, summoner = master wherever a master row exists (D-CB6)', () => {
@@ -82,12 +82,12 @@ describe('pass CB: beastmaster / summoner are a shallow copy of monk / master', 
 
   it('a summoner with its gear survives a save round trip', () => {
     const c = new Character({ name: 'ENH', classData: ClassRegistry.getClass('summoner')!, level: 30 });
-    const sword = ItemRegistry.getItem('cat_claw')!;
+    const sword = ItemRegistry.getItem('iron_nunchaku')!;   // pass EQ: Cat Claw is FF1's (Kn Ni RW BW)
     expect(c.canEquip(sword)).toBe(true);
     c.equip('weapon', sword);
     const back = Character.fromJSON(JSON.parse(JSON.stringify(c.toJSON())))!;
     expect(back.classData.id).toBe('summoner');
     expect(back.level).toBe(30);
-    expect(back.getEquipped('weapon')?.id).toBe('cat_claw');
+    expect(back.getEquipped('weapon')?.id).toBe('iron_nunchaku');
   });
 });

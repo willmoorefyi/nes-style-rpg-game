@@ -69,8 +69,8 @@ def build() -> list[Path]:
     r.one("plant", 7, 2)
     r.thing("barrel", 7, 6)
     r.thing("crate", 6, 6)
-    MEL.keeper(r, "item-shop", "merchant", 4, 3, ["Tonics and remedies. The herbs come from the dwarves now; ours "
-               "won't grow."], "melmond_item")
+    MEL.keeper(r, "item-shop", "merchant", 4, 3, ["The shelves are bare. The rot took the herbs, and the dwarves' cart "
+               "stopped coming."], "melmond_item")   # closed (pass EQ D-EQ8)
     out.append(r.save(note("an item shop with a counter from wall to wall before shelves of jars", "a barrel "
                            "and a crate side by side by the east wall; a single potted plant on the keeper's side"),
                       {"floor": wood(1.05), "in_wall_face": {"from": STONE_FACE, "shade": 1.05}}, music=SHOP))

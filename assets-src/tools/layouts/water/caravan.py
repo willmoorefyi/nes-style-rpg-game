@@ -4,7 +4,7 @@
 
 One outdoor map, 26x18: a hollow in the dunes walled by wind-cut rock, entered from the tent on the overworld
 (`wat_caravan`). Three tents, a cook fire, a spring pool under two trees, and the trader's awning on the east side,
-where the bottle is sold (S22: `takeGold` 40000, `giftItem: fairy_bottle`; INT tuned the price by proof (d3)). Five
+where the bottle is sold (S22: `takeGold` 50000, `giftItem: fairy_bottle`; NES FF1's price, pass EQ R4). Five
 people: the trader, the caravan master (hints at Gaia), a scout (hints at the waterfall), a drover and the cook.
 """
 from __future__ import annotations
@@ -19,7 +19,7 @@ from kit import landmark_parts  # noqa: E402
 
 MAP, W, H = "caravan-camp", 26, 18
 GAP = (12, 13)                                   # the way out on the bottom row, back to the tent on the dunes
-BOTTLE_PRICE = 40000                             # INT, by proof (d3): FF1's price; 46 % of the rushing curve's gold at S22
+BOTTLE_PRICE = 50000                             # NES FF1's price (pass EQ R4; was 40000, the remake price)
 HEADER = """Concept: the caravan's winter camp in a hollow of the dunes, sheltered by wind-cut rock: three tents, a cook
   fire, a spring pool under two trees, and the trader's awning where the glowing bottle is sold.
 Distinct: a spring pool with trees inside the rock ring; the trader's awning behind a row of crates; a cook fire

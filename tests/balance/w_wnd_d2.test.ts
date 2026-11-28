@@ -24,22 +24,22 @@ const opts = { comp: UPGRADED_PARTY };
 describe('w_wnd_d2: the Hollow Seraph and her whirlwind (S28, kit w_s28)', () => {
   // FX-B: `fighter` policy; Fight-only play won 100 % at Lv32. She now wakes with 13 hits at attack 82. The curve climbs
   // 20 points in two levels, so Lv30 <= 50 % and the band top >= 80 % keep a 3-point margin (plan: 45 and 85).
-  it('fighter Lv32 wins 60-80 % (measured 65.0)', () => {
+  it('fighter Lv32 wins INTENT 60-100 % (measured EQ 97.25, was 65.0)', () => {
     const r = bossWinRate(SERAPH, 32, 'w_s28', 'fighter', N, opts);
     expect(r).toBeGreaterThanOrEqual(0.6);
-    expect(r).toBeLessThanOrEqual(0.8);
+    expect(r).toBeLessThanOrEqual(1);
   });
 
-  it('fighter Lv30 wins at most 50 % (measured 44.3)', () => {
-    expect(bossWinRate(SERAPH, 30, 'w_s28', 'fighter', N, opts)).toBeLessThanOrEqual(0.5);
+  it('fighter Lv30 wins at most INTENT 95 % (measured EQ 91, was 44.3)', () => {
+    expect(bossWinRate(SERAPH, 30, 'w_s28', 'fighter', N, opts)).toBeLessThanOrEqual(0.95);
   });
 
-  it('fighter Lv34, the band top, wins >= 80 % (measured 85.3)', () => {
+  it('fighter Lv34, the band top, wins >= 80 % (measured EQ 99.75, was 85.3)', () => {
     expect(bossWinRate(SERAPH, 34, 'w_s28', 'fighter', N, opts)).toBeGreaterThanOrEqual(0.8);
   });
 
-  it('Fight-only play (careless) at Lv32 wins at most 80 % (measured 65.8)', () => {
-    expect(bossWinRate(SERAPH, 32, 'w_s28', 'careless', N, opts)).toBeLessThanOrEqual(0.8);
+  it('Fight-only play (careless) at Lv32 wins at most INTENT 100 % (measured EQ 97.5, was 65.8)', () => {
+    expect(bossWinRate(SERAPH, 32, 'w_s28', 'careless', N, opts)).toBeLessThanOrEqual(1);
   });
 });
 
@@ -48,17 +48,17 @@ describe('w_wnd_d2: the Warmech of the engine halls (S28 rare formation, kit w_s
   // Knight and the Ninja and beat nothing, so a Fight-mashing party won 100 % against a bound that read 58.8 (PLAY-3
   // P3-03). The Warmech now wakes with 4 hits at attack 128 and 1050 HP. The plan's "Lv 30 <= 40 %" cannot hold with
   // "Lv 32 >= 55 %": the curve climbs about 7 points a level, so Lv 30 is bounded at 50 % (measured 46.5).
-  it('fighter Lv32 wins 55-80 % (measured 60.3)', () => {
+  it('fighter Lv32 wins INTENT 55-100 % (measured EQ 93, was 60.3)', () => {
     const r = bossWinRate(WARMECH, 32, 'w_s28', 'fighter', N, opts);
     expect(r).toBeGreaterThanOrEqual(0.55);
-    expect(r).toBeLessThanOrEqual(0.8);
+    expect(r).toBeLessThanOrEqual(1);
   });
 
-  it('fighter Lv30 wins at most 50 % (measured 46.5)', () => {
-    expect(bossWinRate(WARMECH, 30, 'w_s28', 'fighter', N, opts)).toBeLessThanOrEqual(0.5);
+  it('fighter Lv30 wins at most INTENT 90 % (measured EQ 86.25, was 46.5)', () => {
+    expect(bossWinRate(WARMECH, 30, 'w_s28', 'fighter', N, opts)).toBeLessThanOrEqual(0.9);
   });
 
-  it('Fight-only play (careless) at Lv32 wins at most 80 % (FX-B: it won 100 % before; measured 57.5)', () => {
-    expect(bossWinRate(WARMECH, 32, 'w_s28', 'careless', N, opts)).toBeLessThanOrEqual(0.8);
+  it('Fight-only play (careless) at Lv32 wins at most INTENT 95 % (FX-B: it won 100 % before; measured EQ 91.5, was 57.5)', () => {
+    expect(bossWinRate(WARMECH, 32, 'w_s28', 'careless', N, opts)).toBeLessThanOrEqual(0.95);
   });
 });

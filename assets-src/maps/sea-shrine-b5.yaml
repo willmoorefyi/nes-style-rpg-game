@@ -190,13 +190,13 @@ npcs:
   chestItem: diamond_shield
   chestFlag: CHEST_WAT_D_B5_NICHE_W
   dialog: [You found a Diamond Shield!]
-- id: chest_wat_d_b5_niche_e
+- id: chest_wat_d_b5_niche_e_opal
   sprite: chest
   x: 28
   y: 27
-  chestItem: hi_potion
-  chestFlag: CHEST_WAT_D_B5_NICHE_E
-  dialog: [You found a Hi-Potion!]
+  chestItem: opal_gauntlet
+  chestFlag: CHEST_WAT_D_B5_NICHE_E_OPAL
+  dialog: [You found an Opal Gauntlet!]
 - id: wat_d_sovereign
   sprite: king
   tint: '#3d6f78'

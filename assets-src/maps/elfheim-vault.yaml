@@ -83,13 +83,13 @@ npcs:
   chestItem: tnt
   chestFlag: CHEST_ELF_T_TNT
   dialog: [You found the TNT!]
-- id: chest_elf_t_ether
+- id: chest_elf_t_ether_gauntlet
   sprite: chest
   x: 2
   y: 6
-  chestItem: ether
-  chestFlag: CHEST_ELF_T_ETHER
-  dialog: [You found an Ether!]
+  chestItem: copper_gauntlet
+  chestFlag: CHEST_ELF_T_ETHER_GAUNTLET
+  dialog: [You found a Copper Gauntlet!]
 - id: chest_elf_t_phoenix
   sprite: chest
   x: 9

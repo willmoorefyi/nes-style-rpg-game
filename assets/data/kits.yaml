@@ -7,17 +7,19 @@
 #         mages and a Warrior would pass 400 G.
 # lv2:    what the pass-F gold buys by whole-party Lv 2 (§3.2): the start kit + LIT for the Black Mage (100 G);
 #         the balance tests add 2 potions (120 G), 220 G of the median 246 G in hand.
-# arrive: the lv2 kit + a Cap for every class (the party arriving at Garland after the temple run; + 2 potions).
-# full:   + chain mail, caps, LIT, SLEP, RUSE (the balance tests add 3 potions).
+# arrive: the lv2 kit + the temple chest's Cap on the warrior (`found`; the party arriving at Garland after the
+#         temple run; + 2 potions). Pass EQ (R1): FF1 Cornelia sells no Wooden Shield and no Cap.
+# full:   + chain mail, the temple Cap (warrior), LIT, SLEP, RUSE (the balance tests add 3 potions).
+# `found` (pass EQ D-EQ11): chest gear equipped after `gear`, replacing its slot's item; never priced.
 # naked:  no gear and no spells.
 start:
-  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  diver: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
+  dark_fighter_hero: { gear: [rapier, leather_armor], spells: [] }
+  landsknecht: { gear: [rapier, leather_armor], spells: [] }
+  warrior: { gear: [rapier, leather_armor], spells: [] }
+  diver: { gear: [rapier, leather_armor], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor], spells: [] }
+  legionnaire: { gear: [rapier, leather_armor], spells: [] }
+  barbarian: { gear: [rapier, leather_armor], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
   aeronaut: { gear: [rapier, leather_armor], spells: [] }
   fencer: { gear: [rapier, leather_armor], spells: [] }
@@ -42,13 +44,13 @@ start:
   scholar_hero: { gear: [rapier, cloth], spells: [] }
   rune_knight: { gear: [rapier, cloth], spells: [] }
 lv2:
-  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  landsknecht: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  warrior: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  diver: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
-  barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
+  dark_fighter_hero: { gear: [rapier, leather_armor], spells: [] }
+  landsknecht: { gear: [rapier, leather_armor], spells: [] }
+  warrior: { gear: [rapier, leather_armor], spells: [] }
+  diver: { gear: [rapier, leather_armor], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor], spells: [] }
+  legionnaire: { gear: [rapier, leather_armor], spells: [] }
+  barbarian: { gear: [rapier, leather_armor], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
   aeronaut: { gear: [rapier, leather_armor], spells: [] }
   fencer: { gear: [rapier, leather_armor], spells: [] }
@@ -73,67 +75,67 @@ lv2:
   scholar_hero: { gear: [rapier, cloth], spells: [] }
   rune_knight: { gear: [rapier, cloth], spells: [] }
 arrive:
-  dark_fighter_hero: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  landsknecht: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  warrior: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  diver: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  shieldmaiden: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  legionnaire: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  barbarian: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
-  thief: { gear: [rapier, leather_armor, cap], spells: [] }
-  aeronaut: { gear: [rapier, leather_armor, cap], spells: [] }
-  fencer: { gear: [rapier, leather_armor, cap], spells: [] }
-  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
-  hunter: { gear: [rapier, leather_armor, cap], spells: [] }
-  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
-  monk: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
-  dancer_hero: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
-  witch_hunter: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
-  tinker: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
-  beastmaster: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
-  white_mage: { gear: [hammer, cloth, cap], spells: [cure] }
-  clockmaker: { gear: [hammer, cloth, cap], spells: [cure] }
-  cleric: { gear: [hammer, cloth, cap], spells: [cure] }
-  black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
-  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
-  warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
-  shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit] }
-  red_mage: { gear: [rapier, cloth, cap], spells: [] }
-  apothecary: { gear: [rapier, cloth, cap], spells: [] }
-  bard: { gear: [rapier, cloth, cap], spells: [] }
-  scholar_hero: { gear: [rapier, cloth, cap], spells: [] }
-  rune_knight: { gear: [rapier, cloth, cap], spells: [] }
+  dark_fighter_hero: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  landsknecht: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  warrior: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  diver: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  shieldmaiden: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  legionnaire: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  barbarian: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  thief: { gear: [rapier, leather_armor], spells: [] }
+  aeronaut: { gear: [rapier, leather_armor], spells: [] }
+  fencer: { gear: [rapier, leather_armor], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor], spells: [] }
+  hunter: { gear: [rapier, leather_armor], spells: [] }
+  ronin: { gear: [rapier, leather_armor], spells: [] }
+  monk: { gear: [wooden_nunchaku, cloth], spells: [] }
+  dancer_hero: { gear: [wooden_nunchaku, cloth], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, cloth], spells: [] }
+  tinker: { gear: [wooden_nunchaku, cloth], spells: [] }
+  beastmaster: { gear: [wooden_nunchaku, cloth], spells: [] }
+  white_mage: { gear: [hammer, cloth], spells: [cure] }
+  clockmaker: { gear: [hammer, cloth], spells: [cure] }
+  cleric: { gear: [hammer, cloth], spells: [cure] }
+  black_mage: { gear: [small_knife, cloth], spells: [fire, lit] }
+  gravity_adept: { gear: [small_knife, cloth], spells: [fire, lit] }
+  warlock: { gear: [small_knife, cloth], spells: [fire, lit] }
+  shaman: { gear: [small_knife, cloth], spells: [fire, lit] }
+  red_mage: { gear: [rapier, cloth], spells: [] }
+  apothecary: { gear: [rapier, cloth], spells: [] }
+  bard: { gear: [rapier, cloth], spells: [] }
+  scholar_hero: { gear: [rapier, cloth], spells: [] }
+  rune_knight: { gear: [rapier, cloth], spells: [] }
 full:
-  dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  diver: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  shieldmaiden: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  thief: { gear: [rapier, leather_armor, cap], spells: [] }
-  aeronaut: { gear: [rapier, leather_armor, cap], spells: [] }
-  fencer: { gear: [rapier, leather_armor, cap], spells: [] }
-  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
-  hunter: { gear: [rapier, leather_armor, cap], spells: [] }
-  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
-  monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  dancer_hero: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  witch_hunter: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  tinker: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  beastmaster: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  clockmaker: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  cleric: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  apothecary: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  bard: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  scholar_hero: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  rune_knight: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
+  dark_fighter_hero: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  landsknecht: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  warrior: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  diver: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  shieldmaiden: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  legionnaire: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  barbarian: { gear: [rapier, chain_mail], found: [cap], spells: [] }
+  thief: { gear: [rapier, leather_armor], spells: [] }
+  aeronaut: { gear: [rapier, leather_armor], spells: [] }
+  fencer: { gear: [rapier, leather_armor], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor], spells: [] }
+  hunter: { gear: [rapier, leather_armor], spells: [] }
+  ronin: { gear: [rapier, leather_armor], spells: [] }
+  monk: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  dancer_hero: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  tinker: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  beastmaster: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  white_mage: { gear: [hammer, cloth], spells: [cure, ruse] }
+  clockmaker: { gear: [hammer, cloth], spells: [cure, ruse] }
+  cleric: { gear: [hammer, cloth], spells: [cure, ruse] }
+  black_mage: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
+  gravity_adept: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
+  warlock: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
+  shaman: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
+  red_mage: { gear: [rapier, leather_armor], spells: [cure, fire] }
+  apothecary: { gear: [rapier, leather_armor], spells: [cure, fire] }
+  bard: { gear: [rapier, leather_armor], spells: [cure, fire] }
+  scholar_hero: { gear: [rapier, leather_armor], spells: [cure, fire] }
+  rune_knight: { gear: [rapier, leather_armor], spells: [cure, fire] }
 naked:
   dark_fighter_hero: { gear: [], spells: [] }
   landsknecht: { gear: [], spells: [] }
@@ -169,325 +171,1164 @@ naked:
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # W1-F owns every `w_*` town and stage kit; others send a kit change to the integrator.
 # === W1-F (pass W: owned by W1-F) ===
-# Pass W kits (docs/WORLD_PLAN.md 3.4-3.6, QUEST_PLAN 4.4): one tier per band town (`w_<town>`: what the party
-# buys there, with the spells sold up to that band), and the stage kits `w_s<n>` as aliases of the tier their
-# band shops at (the stage at its boss, or at its end). L5 black and L6-L8 spells come with W1-G and are not in
-# any kit yet. The 4-member price of a town kit drives proof (f). INT may tune the kits (5.5).
-# B1 Cornelia: the act-1 shops (the `full` gear with a Cap each)
-w_s1: &w_s1
-  dark_fighter_hero: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  landsknecht: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  warrior: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  diver: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  shieldmaiden: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
-  thief: { gear: [rapier, leather_armor, cap], spells: [] }
-  aeronaut: { gear: [rapier, leather_armor, cap], spells: [] }
-  fencer: { gear: [rapier, leather_armor, cap], spells: [] }
-  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
-  hunter: { gear: [rapier, leather_armor, cap], spells: [] }
-  ronin: { gear: [rapier, leather_armor, cap], spells: [] }
-  monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  dancer_hero: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  witch_hunter: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  tinker: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  beastmaster: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
-  white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  clockmaker: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  cleric: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
-  black_mage: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  gravity_adept: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  warlock: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  shaman: { gear: [small_knife, cloth, cap], spells: [fire, lit, slep] }
-  red_mage: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  apothecary: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  bard: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  scholar_hero: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
-  rune_knight: { gear: [rapier, leather_armor, cap], spells: [cure, fire] }
+# Pass EQ kits (docs/EQUIP_FF1_PLAN.md 6, D-EQ11): `gear` is what the party buys, the best shop gear sold up to
+# the tier's town (every stage of a tier has the tier town's gear); `found` lists the chest items that beat it,
+# found on a map of the stage or an ancestor (copies counted), equipped after `gear` in their slot. The 4-member
+# price of `gear` (W / T / WM / BM) drives proofs (d) and (f). A clone row equals its `copyOf` source's row.
+# Generated from the plan's rule; tests/data/kitSources.test.ts checks it.
+# B1 Cornelia
+w_s1: &a_s1
+  dark_fighter_hero: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  landsknecht: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  warrior: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  diver: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  shieldmaiden: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  legionnaire: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  barbarian: { gear: [rapier, chain_mail], found: [iron_helm], spells: [] }
+  thief: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  aeronaut: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  fencer: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  hunter: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  ronin: { gear: [rapier, leather_armor], found: [cap], spells: [] }
+  monk: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  dancer_hero: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  tinker: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  beastmaster: { gear: [wooden_nunchaku, leather_armor], spells: [] }
+  white_mage: { gear: [hammer, cloth], found: [robe], spells: [cure, ruse] }
+  clockmaker: { gear: [hammer, cloth], found: [robe], spells: [cure, ruse] }
+  cleric: { gear: [hammer, cloth], found: [robe], spells: [cure, ruse] }
+  black_mage: { gear: [staff, cloth], spells: [fire, lit, slep] }
+  gravity_adept: { gear: [staff, cloth], spells: [fire, lit, slep] }
+  warlock: { gear: [staff, cloth], spells: [fire, lit, slep] }
+  shaman: { gear: [staff, cloth], spells: [fire, lit, slep] }
+  red_mage: { gear: [rapier, chain_mail], spells: [cure, fire] }
+  apothecary: { gear: [rapier, chain_mail], spells: [cure, fire] }
+  bard: { gear: [rapier, chain_mail], spells: [cure, fire] }
+  scholar_hero: { gear: [rapier, chain_mail], spells: [cure, fire] }
+  rune_knight: { gear: [rapier, chain_mail], spells: [cure, fire] }
 # B2 Pravoka
-w_pravoka: &w_t2
-  dark_fighter_hero: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  landsknecht: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  warrior: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  diver: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  shieldmaiden: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  legionnaire: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  barbarian: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
-  thief: { gear: [short_sword, leather_armor, cap], spells: [] }
-  aeronaut: { gear: [short_sword, leather_armor, cap], spells: [] }
-  fencer: { gear: [short_sword, leather_armor, cap], spells: [] }
-  arquebusier: { gear: [short_sword, leather_armor, cap], spells: [] }
-  hunter: { gear: [short_sword, leather_armor, cap], spells: [] }
-  ronin: { gear: [short_sword, leather_armor, cap], spells: [] }
-  monk: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
-  dancer_hero: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
-  witch_hunter: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
-  tinker: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
-  beastmaster: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
-  white_mage: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
-  clockmaker: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
-  cleric: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
-  black_mage: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
-  gravity_adept: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
-  warlock: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
-  shaman: { gear: [staff, robe, cap], spells: [fire, lit, slep, ice] }
-  red_mage: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-  apothecary: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-  bard: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-  scholar_hero: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-  rune_knight: { gear: [short_sword, chain_mail, wooden_shield, cap], spells: [cure, fire, ice] }
-# PT-2 (docs/PLAYTEST_ELFHEIM_PLAN.md): Pravoka's shops are shut until Bikke is beaten, so S2 fights in Cornelia's
-# kit (flagged to the integrator: W1-F owns the w_* kits)
-w_s2: *w_s1
-w_s3: *w_t2
-# B3 Elfheim (the dwarf hall sells items only)
-w_elfheim: &w_t3
-  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
-  thief: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  aeronaut: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  fencer: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  arquebusier: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  hunter: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  ronin: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
-  monk: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
-  dancer_hero: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
-  witch_hunter: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
-  tinker: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
-  beastmaster: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
-  white_mage: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
-  clockmaker: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
-  cleric: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
-  black_mage: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
-  gravity_adept: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
-  warlock: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
-  shaman: { gear: [mythril_knife, silver_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2] }
-  red_mage: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
-  apothecary: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
-  bard: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
-  scholar_hero: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
-  rune_knight: { gear: [mythril_sword, mythril_mail, wooden_shield, cap], spells: [cure, fire, ice, cure2, fir2] }
-w_dwarf: *w_t3
-w_s4: *w_t3
-w_s5: *w_t3
-w_s6: *w_t3
-w_s7: *w_t3
-w_s8: *w_t3
-w_s9: *w_t3
-w_s10: *w_t3
+w_pravoka: &a_pravoka
+  dark_fighter_hero: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  landsknecht: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  warrior: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  diver: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  shieldmaiden: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  legionnaire: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  barbarian: { gear: [hand_axe, iron_armor, wooden_shield, gloves], spells: [] }
+  thief: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  aeronaut: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  fencer: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  arquebusier: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  hunter: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  ronin: { gear: [scimitar, leather_armor, gloves], spells: [] }
+  monk: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  dancer_hero: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  tinker: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  beastmaster: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  white_mage: { gear: [hammer, cloth, gloves], spells: [cure, ruse, invs] }
+  clockmaker: { gear: [hammer, cloth, gloves], spells: [cure, ruse, invs] }
+  cleric: { gear: [hammer, cloth, gloves], spells: [cure, ruse, invs] }
+  black_mage: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  gravity_adept: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  warlock: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  shaman: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  red_mage: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  apothecary: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  bard: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  scholar_hero: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  rune_knight: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+w_s2: *a_s1
+w_s3: &a_s3
+  dark_fighter_hero: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  landsknecht: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  warrior: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  diver: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  shieldmaiden: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  legionnaire: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  barbarian: { gear: [hand_axe, iron_armor, wooden_shield, gloves], found: [iron_helm], spells: [] }
+  thief: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  aeronaut: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  fencer: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  arquebusier: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  hunter: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  ronin: { gear: [scimitar, leather_armor, gloves], found: [cap], spells: [] }
+  monk: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  dancer_hero: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  tinker: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  beastmaster: { gear: [wooden_nunchaku, leather_armor, gloves], spells: [] }
+  white_mage: { gear: [hammer, cloth, gloves], found: [robe], spells: [cure, ruse, invs] }
+  clockmaker: { gear: [hammer, cloth, gloves], found: [robe], spells: [cure, ruse, invs] }
+  cleric: { gear: [hammer, cloth, gloves], found: [robe], spells: [cure, ruse, invs] }
+  black_mage: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  gravity_adept: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  warlock: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  shaman: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
+  red_mage: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  apothecary: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  bard: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  scholar_hero: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  rune_knight: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+# B3 Elfheim (the dwarf hall sells nothing: closed)
+w_elfheim: &a_elfheim
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  thief: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  aeronaut: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  fencer: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  arquebusier: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  hunter: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  ronin: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  monk: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  tinker: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  beastmaster: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  clockmaker: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  cleric: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  rune_knight: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+w_dwarf: *a_elfheim
+w_s4: &a_s4
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], spells: [] }
+  thief: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  aeronaut: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  fencer: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  arquebusier: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  hunter: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  ronin: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  monk: { gear: [iron_nunchaku, copper_bracelet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [iron_nunchaku, copper_bracelet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [iron_nunchaku, copper_bracelet, cap, gloves], spells: [] }
+  tinker: { gear: [iron_nunchaku, copper_bracelet, cap, gloves], spells: [] }
+  beastmaster: { gear: [iron_nunchaku, copper_bracelet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  clockmaker: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  cleric: { gear: [hammer, copper_bracelet, cap, gloves], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  rune_knight: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+w_s5: &a_s5
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [mythril_helm], spells: [] }
+  thief: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  aeronaut: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  fencer: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  arquebusier: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  hunter: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  ronin: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  monk: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  tinker: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  beastmaster: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  clockmaker: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  cleric: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  rune_knight: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+w_s6: &a_s6
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm], spells: [] }
+  thief: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  aeronaut: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  fencer: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  arquebusier: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  hunter: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  ronin: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  monk: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  tinker: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  beastmaster: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  clockmaker: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  cleric: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  rune_knight: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+w_s7: *a_s6
+w_s8: *a_s6
+w_s9: &a_s9
+  dark_fighter_hero: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  landsknecht: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  warrior: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  diver: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm, gloves], found: [gold_armlet, mythril_helm, copper_gauntlet], spells: [] }
+  thief: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  aeronaut: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  fencer: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  arquebusier: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  hunter: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  ronin: { gear: [sabre, copper_bracelet, cap, gloves], spells: [] }
+  monk: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  tinker: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  beastmaster: { gear: [copper_bracelet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  clockmaker: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  cleric: { gear: [hammer, copper_bracelet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal] }
+  black_mage: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  gravity_adept: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
+  red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  rune_knight: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+w_s10: *a_s9
 # B4 Melmond
-w_melmond: &w_t4
-  dark_fighter_hero: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  landsknecht: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  warrior: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  diver: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  shieldmaiden: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  legionnaire: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  barbarian: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  thief: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  aeronaut: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  fencer: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  arquebusier: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  hunter: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  ronin: { gear: [scimitar, gold_armlet, cap], spells: [] }
-  monk: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
-  dancer_hero: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
-  witch_hunter: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
-  tinker: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
-  beastmaster: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
-  white_mage: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
-  clockmaker: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
-  cleric: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
-  black_mage: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  gravity_adept: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  warlock: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  shaman: { gear: [mythril_knife, gold_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_mage: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
-  apothecary: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
-  bard: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
-  scholar_hero: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
-  rune_knight: { gear: [mythril_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast] }
-w_s11: *w_t4
-w_s12: *w_t4
-w_s13: *w_t4
+w_melmond: &a_melmond
+  dark_fighter_hero: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  landsknecht: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  warrior: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  diver: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  legionnaire: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  barbarian: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, cap, gloves], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure] }
+  clockmaker: { gear: [hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure] }
+  cleric: { gear: [hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure] }
+  black_mage: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  apothecary: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  bard: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  scholar_hero: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  rune_knight: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+w_s11: &a_s11
+  dark_fighter_hero: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  landsknecht: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  warrior: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  diver: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  shieldmaiden: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  legionnaire: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  barbarian: { gear: [mythril_sword, mythril_armor, iron_shield, great_helm, iron_gauntlet], found: [mythril_helm], spells: [] }
+  thief: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, cap, gloves], found: [gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [hammer, silver_armlet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal, pure] }
+  clockmaker: { gear: [hammer, silver_armlet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal, pure] }
+  cleric: { gear: [hammer, silver_armlet, cap, gloves], found: [power_staff], spells: [cure, ruse, invs, cure2, heal, pure] }
+  black_mage: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  apothecary: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  bard: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  scholar_hero: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  rune_knight: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+w_s12: *a_s11
+w_s13: *a_s11
 # B5 Crescent Lake
-w_crescent: &w_t5
-  dark_fighter_hero: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  landsknecht: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  warrior: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  diver: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  shieldmaiden: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  legionnaire: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  barbarian: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
-  thief: { gear: [falchion, gold_armlet, cap], spells: [] }
-  aeronaut: { gear: [falchion, gold_armlet, cap], spells: [] }
-  fencer: { gear: [falchion, gold_armlet, cap], spells: [] }
-  arquebusier: { gear: [falchion, gold_armlet, cap], spells: [] }
-  hunter: { gear: [falchion, gold_armlet, cap], spells: [] }
-  ronin: { gear: [falchion, gold_armlet, cap], spells: [] }
-  monk: { gear: [cat_claw, gold_armlet, cap], spells: [] }
-  dancer_hero: { gear: [cat_claw, gold_armlet, cap], spells: [] }
-  witch_hunter: { gear: [cat_claw, gold_armlet, cap], spells: [] }
-  tinker: { gear: [cat_claw, gold_armlet, cap], spells: [] }
-  beastmaster: { gear: [cat_claw, gold_armlet, cap], spells: [] }
-  white_mage: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  clockmaker: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  cleric: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  black_mage: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  gravity_adept: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  warlock: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  shaman: { gear: [wizard_staff, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_mage: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  apothecary: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  bard: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  scholar_hero: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  rune_knight: { gear: [coral_sword, mythril_mail, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-w_s14: *w_t5
-w_s15: *w_t5
-w_s16: *w_t5
-w_s17: *w_t5
-# B6 Onrac; with the upgraded classes from here on (S19 and later)
-w_onrac: &w_t6
-  dark_fighter_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  landsknecht: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  warrior: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  diver: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  shieldmaiden: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  legionnaire: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  barbarian: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
-  thief: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  aeronaut: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  fencer: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  arquebusier: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  hunter: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  ronin: { gear: [rune_knife, opal_armlet, cap], spells: [] }
-  monk: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  dancer_hero: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  witch_hunter: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  tinker: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  beastmaster: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  white_mage: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  clockmaker: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  cleric: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  black_mage: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  gravity_adept: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  warlock: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  shaman: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_mage: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  apothecary: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  bard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  scholar_hero: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  rune_knight: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  death_knight_hero: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  dragoon: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  abyssal_knight: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  valkyrie: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  centurion: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  berserker: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
-  ninja: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  sky_captain: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  duelist: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  rifleman: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  ranger: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  samurai: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
-  master: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  blade_dancer: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  inquisitor: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  machinist: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  summoner: { gear: [cat_claw, opal_armlet, cap], spells: [] }
-  white_wizard: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  chronomancer: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  paladin: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  black_wizard: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  void_walker: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  necromancer: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  druid: { gear: [rune_knife, black_robe, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_wizard: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  plague_doctor: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  virtuoso: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  sage_hero: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  mystic_warrior: { gear: [sun_blade, opal_armlet, mythril_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-w_s18: *w_t6
-w_s19: *w_t6
-w_s20: *w_t6
-w_s21: *w_t6
-w_s22: *w_t6
+w_crescent: &a_crescent
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s14: &a_s14
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s15: &a_s15
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [sun_blade, opal_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s16: &a_s16
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s17: *a_s16
+# B6 Onrac (no arms shop: Crescent's gear); the upgraded classes from S19 on
+w_onrac: &a_onrac
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], spells: [fire, ice, fir2] }
+  master: { gear: [silver_armlet, cap, gloves], spells: [] }
+  blade_dancer: { gear: [silver_armlet, cap, gloves], spells: [] }
+  inquisitor: { gear: [silver_armlet, cap, gloves], spells: [] }
+  machinist: { gear: [silver_armlet, cap, gloves], spells: [] }
+  summoner: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_wizard: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s18: &a_s18
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [gold_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [gold_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [gold_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s19: &a_s19
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [opal_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, diamond_armlet, aegis_shield, opal_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, opal_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [silver_armlet, cap, gloves], spells: [] }
+  blade_dancer: { gear: [silver_armlet, cap, gloves], spells: [] }
+  inquisitor: { gear: [silver_armlet, cap, gloves], spells: [] }
+  machinist: { gear: [silver_armlet, cap, gloves], spells: [] }
+  summoner: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_wizard: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, silver_armlet, cap, gloves], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s20: &a_s20
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [silver_armlet, cap, gloves], spells: [] }
+  blade_dancer: { gear: [silver_armlet, cap, gloves], spells: [] }
+  inquisitor: { gear: [silver_armlet, cap, gloves], spells: [] }
+  machinist: { gear: [silver_armlet, cap, gloves], spells: [] }
+  summoner: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_wizard: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s21: &a_s21
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet], spells: [] }
+  thief: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  aeronaut: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  fencer: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  arquebusier: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  hunter: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  ronin: { gear: [falchion, silver_armlet, buckler, cap, gloves], found: [rune_knife, gold_armlet], spells: [] }
+  monk: { gear: [silver_armlet, cap, gloves], spells: [] }
+  dancer_hero: { gear: [silver_armlet, cap, gloves], spells: [] }
+  witch_hunter: { gear: [silver_armlet, cap, gloves], spells: [] }
+  tinker: { gear: [silver_armlet, cap, gloves], spells: [] }
+  beastmaster: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_mage: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, iron_armor, mythril_shield, mythril_helm, silver_gauntlet], found: [flame_sword, gold_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [silver_armlet, cap, gloves], spells: [] }
+  blade_dancer: { gear: [silver_armlet, cap, gloves], spells: [] }
+  inquisitor: { gear: [silver_armlet, cap, gloves], spells: [] }
+  machinist: { gear: [silver_armlet, cap, gloves], spells: [] }
+  summoner: { gear: [silver_armlet, cap, gloves], spells: [] }
+  white_wizard: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, silver_armlet, cap, gloves], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s22: *a_s20
 # B7 Gaia (Lufenia sells magic only)
-w_gaia: &w_t7
-  dark_fighter_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  landsknecht: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  warrior: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  diver: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  shieldmaiden: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  legionnaire: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  barbarian: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
-  thief: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  aeronaut: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  fencer: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  arquebusier: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  hunter: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  ronin: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
-  monk: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  dancer_hero: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  witch_hunter: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  tinker: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  beastmaster: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  white_mage: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  clockmaker: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  cleric: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  black_mage: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  gravity_adept: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  warlock: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  shaman: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_mage: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  apothecary: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  bard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  scholar_hero: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  rune_knight: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  death_knight_hero: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  dragoon: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  abyssal_knight: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  valkyrie: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  centurion: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  berserker: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
-  ninja: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  sky_captain: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  duelist: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  rifleman: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  ranger: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  samurai: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
-  master: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  blade_dancer: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  inquisitor: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  machinist: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  summoner: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
-  white_wizard: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  chronomancer: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  paladin: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
-  black_wizard: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  void_walker: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  necromancer: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  druid: { gear: [rune_knife, diamond_armlet, cap], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
-  red_wizard: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  plague_doctor: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  virtuoso: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  sage_hero: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-  mystic_warrior: { gear: [defender, diamond_armlet, diamond_shield, cap], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
-w_lufenia: *w_t7
-w_s23: *w_t7
-w_s24: *w_t7
-w_s25: *w_t7
-w_s26: *w_t7
-w_s27: *w_t7
-w_s28: *w_t7
-w_s29: *w_t7
-w_s30: *w_t7
+w_gaia: &a_gaia
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_lufenia: *a_gaia
+w_s23: &a_s23
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, opal_armlet, opal_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s24: &a_s24
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, opal_armlet], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [flame_sword, diamond_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s25: *a_s24
+w_s26: *a_s24
+w_s27: &a_s27
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s28: &a_s28
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [ice_brand, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [defender, diamond_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s29: &a_s29
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+w_s30: &a_s30
+  dark_fighter_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  landsknecht: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  warrior: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  diver: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  shieldmaiden: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  legionnaire: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  barbarian: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armlet], spells: [] }
+  thief: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  aeronaut: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  fencer: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  hunter: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  ronin: { gear: [falchion, gold_armlet, buckler, cap, pro_ring], found: [coral_sword, diamond_armlet], spells: [] }
+  monk: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  dancer_hero: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  witch_hunter: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  tinker: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  beastmaster: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_mage: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  clockmaker: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  cleric: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_mage: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  gravity_adept: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  rune_knight: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  death_knight_hero: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  dragoon: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  abyssal_knight: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  valkyrie: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  centurion: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  berserker: { gear: [silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring], found: [masamune, diamond_armor, aegis_shield, diamond_helm], spells: [cure, cure2] }
+  ninja: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  sky_captain: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  duelist: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  rifleman: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  ranger: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  samurai: { gear: [silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring], found: [sun_blade, diamond_armlet], spells: [fire, ice, fir2] }
+  master: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  blade_dancer: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  inquisitor: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  machinist: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  summoner: { gear: [gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [] }
+  white_wizard: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  chronomancer: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  paladin: { gear: [mythril_hammer, gold_armlet, cap, pro_ring], found: [thor_hammer, diamond_armlet], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
+  black_wizard: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  void_walker: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
+  red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  mystic_warrior: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
 # === end W1-F ===

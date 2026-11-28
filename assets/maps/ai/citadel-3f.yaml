@@ -26,13 +26,13 @@ collision: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 npcs:
-- id: chest_niche_west
+- id: chest_niche_west_gauntlet
   sprite: chest
   x: 12
   y: 19
-  chestItem: hi_potion
-  chestFlag: CHEST_ORD_O_NICHE_WEST
-  dialog: [You found a Hi-Potion!]
+  chestItem: iron_gauntlet
+  chestFlag: CHEST_ORD_O_NICHE_WEST_GAUNTLET
+  dialog: [You found an Iron Gauntlet!]
 - id: chest_niche_east
   sprite: chest
   x: 22

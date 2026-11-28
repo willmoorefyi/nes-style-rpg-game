@@ -150,13 +150,13 @@ npcs:
     text: ['He''s gone into his hole, snoring. The coast beyond the range is yours.']
   - text: ['Don''t wake him, friend. He only eats stones, but he likes the burning kind best.', The thing that rules the Cavern of Earth is said
         to keep such a stone.]
-- id: chest_ert_o_tunnel
+- id: chest_ert_o_tunnel_axe
   sprite: chest
   x: 4
   y: 18
-  chestItem: hi_potion
-  chestFlag: CHEST_ERT_O_TUNNEL
-  dialog: [You found a Hi-Potion!]
+  chestItem: great_axe
+  chestFlag: CHEST_ERT_O_TUNNEL_AXE
+  dialog: [You found a Great Axe!]
 transitions:
 - {x: 31, y: 9, targetMap: overworld, targetEntrance: ert_giant}
 - {x: 31, y: 10, targetMap: overworld, targetEntrance: ert_giant}

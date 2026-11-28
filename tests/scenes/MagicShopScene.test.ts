@@ -46,7 +46,8 @@ describe('MagicShopScene prices', () => {
     scene.enter();
     const labels = visibleLabels(scene.container);
     // columns: `Name  L1  100G` (E2)
-    expect(labels.some((l) => /^ICE +L2 +400G$/.test(l))).toBe(true);
+    // pass EQ: FF1's Elfland sells L3 and L4 black magic
+    expect(labels.some((l) => /^SLP2 +L4 +4000G$/.test(l))).toBe(true);
     expect(labels.some((l) => /^FIR2 +L3 +1500G$/.test(l))).toBe(true);
   });
 });

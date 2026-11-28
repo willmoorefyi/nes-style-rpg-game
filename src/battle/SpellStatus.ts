@@ -49,11 +49,15 @@ export function protectCategoryOf(spell: SpellData): ProtectCategory | null {
   return PROTECT_OF_STATUS[spell.effect.replace('status_', '') as StatusEffect] ?? null;
 }
 
-/** An enemy whose `protect` covers the spell (heroes have no protections yet). */
+/**
+ * An enemy whose `protect` covers the spell, or a hero who resists its category: worn armour (the ProRing vs death,
+ * the Aegis vs stone) or a battle resistance such as WALL's (pass EQ 7.2, FF1).
+ */
 export function isProtected(t: SpellTarget, spell: SpellData): boolean {
-  if (!('data' in t) || !t.data.protect) return false;
   const category = protectCategoryOf(spell);
-  return category !== null && t.data.protect.includes(category);
+  if (category === null) return false;
+  if (!('data' in t)) return t.hasTempResist(category);
+  return !!t.data.protect && t.data.protect.includes(category);
 }
 
 /**
