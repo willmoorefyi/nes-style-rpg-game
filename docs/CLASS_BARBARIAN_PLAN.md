@@ -826,3 +826,35 @@ and kneel_in1 end on row 74, the rest on 76 (pinned in gravityArt.test.ts); the 
 the purple ramps (the dark purple is a suit colour too: the art test allows the gravity adept 3 seam px and 1 lost
 floor px). Image review: round 1 **APPROVE** both (the descent from the floating kneel_in1 to the landed kneel_in2
 reads as landing).
+
+### 19.2 Automaton / android result (2026-11-28, branch from mainline a192fe00)
+
+Exact copies of red_mage -> red_wizard with `copyOf`: `automaton` (AUT, default name GEARS) -> `android` (AND); plain
+ids (the words appear only in prose: the Waterfall Cave's robot is `robot_ancient`, the Sky Castle's `robot_sentry`;
+`tests/rendering/automatonArt.test.ts` checks their field sheets stay their own). The user's ChatGPT render
+(`~/temp/heroes/automaton_android_sprite.png`, 2060 x 763, soft alpha) came at the wrong size; the main session
+downscaled it to the house 560 x 160 grid (per-figure components, an art px of 4.63 / 4.5 render px for row 1 / 2,
+the majority colour per art cell on a 16-colour palette per row, a 1-px dark outline), and that file is the tracked
+render (`gen/user_art/automaton/battle_2026-11-27.png`; the original's sha256 is in the recipe). The importer took it
+unchanged (`palette: rows`, 16 colours each). On page 4 after the void walker (`battle_pages.yaml`'s second
+overflow list; 12 rows, 2880 x 1920; the pages' earlier rows byte-identical). Field alias red_mage / red_wizard (temporary); walk-sheet pack entries
+(the spear upright in the right hand; the android's stand-in is the knight, as for the sage).
+
+**Equipment by `copyOf` (pass EQ D-EQ4):** the pair has **no `usableBy` rows** in items.yaml; it equips as its
+`copyOf` source through mainline's `equipClassOf` (the FF1 lists of the red mage / red wizard). Its kits.yaml rows
+equal the red mage's / red wizard's (`kitSources.test.ts`); `ff1Items.test.ts` counts 50 copy classes. Spell learners
+come from `spellLevels` as before (the magic shop lines gain AUT).
+
+Kept as rendered: the steam puff (automaton ATTACK), the lime sparks (CAST, HURT), the flying spring and gear
+(automaton HURT), the lime hexagon shield (android CAST); the wind-up key is body (it rides with the torso by
+`part_boxes`). `fx_colours` (A6): the two lime glows of each row (automaton (132, 189, 0), (173, 255, 8); android
+(165, 231, 0), (198, 247, 57)); they are also the eyes, the chest core and the android's hood trim, but no frame drawn
+from ready shows an un-inked lime edge (0 over ready's 0). The android's kneel_in2 has 1 px less lime in rows 72-76
+than the key (the stretch lifts the spear blade; kneel_b keeps all 8), allowed in the art test. Rigs: key-based tweaks
+(each in-between = its key + a small offset). Image review: automaton round 1 ITERATE (atk_mid's arm slid behind the
+far pauldron; cast_rise squashed the sparks onto the helm), round 2 **APPROVE**; android round 1 ITERATE (the
+wind-ups rotated the spear and parted the blade from the hand), round 2 ITERATE (the drawn-back hand carried the blade
+over the hood; cast_gather swung the far forearm out over the cape), round 3 **APPROVE** (the wind-ups slide the spear
+at ready's angle with the hand only; cast_gather is ready with the head bob, so the shield arm pops at cast_rise as the
+keys draw it). No frame aliased. The automaton's kneel key is under its reported band (49 against 51-61; reported,
+not a gate).

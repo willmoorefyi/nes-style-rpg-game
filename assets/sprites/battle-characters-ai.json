@@ -575,6 +575,16 @@
       "row": 9,
       "page": 4,
       "inbetweens": false
+    },
+    "automaton": {
+      "row": 10,
+      "page": 4,
+      "inbetweens": true
+    },
+    "android": {
+      "row": 11,
+      "page": 4,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -601,7 +611,7 @@
     {
       "file": "battle-characters-ai-4.png",
       "w": 2880,
-      "h": 1600
+      "h": 1920
     }
   ]
 }

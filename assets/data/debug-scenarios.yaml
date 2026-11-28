@@ -3825,3 +3825,18 @@
   items: {}
   gold: 0
   enemies: [ice_gigas]
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the automaton / android class pair (user-rendered battle art; copies
+# of the red_mage / red_wizard). GEARS is weak so it kneels; RDWZ is the like-for-like control.
+# ?mute=1&scenario=cb_automatons (&kneel=loop, &enemyAnim=loop).
+- id: cb_automatons
+  name: Automaton and Android (pass CB preview)
+  party:
+    - { class: automaton, name: GEARS, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: android, name: ANDRD, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: automaton, name: GEARS2, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

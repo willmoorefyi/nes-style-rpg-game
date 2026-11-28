@@ -985,3 +985,46 @@ void_walker:
     no orbiting rings or floating shards in the field (a field sheet must be one connected piece): a single thin violet
     ring sits flat on the back, touching the shoulders; both hands are free. Everything stays inside the 46 px width and
     the 48 x 96 cell
+
+automaton:
+  name: Automaton
+  tier: base
+  partner: android
+  battle_sheet: ~/temp/heroes/automaton_android_560x160.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: red_mage
+  look: >-
+    a clockwork soldier of riveted brass: a round brass helm with a tall spike and an open grille, a shadowed face
+    with two lime-green glowing eyes, a lime core glowing in the chest, segmented brass plates on the arms and legs, a
+    short dark olive cape behind, and a large brass wind-up key standing out of the back. Colours: brass gold, dark
+    brown, olive, small lime glows
+  carry: >-
+    a brass spear is held upright in his right hand (the hand toward the viewer's left in the front view), its foot near
+    the ground beside the foot and its head level with the helm's spike, never above the 92 px cap; in the back view the
+    spear is in the same hand and the wind-up key faces the viewer; in the side view facing left it is held in front of
+    the body, upright. The spear touches the hand and stays inside the 48 x 96 cell
+
+android:
+  name: Android
+  tier: enhanced
+  partner: automaton
+  battle_sheet: ~/temp/heroes/automaton_android_560x160.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight   # red_wizard's field sheet carries head_from / row_from fixes the pack reader refuses
+  look: >-
+    the automaton refined into a slender android: a smooth white face with lime-green eyes under a deep dark green
+    hood edged in lime, a white jointed body with grey seams and small lime lights at the chest and joints, a long dark
+    green cape lined in lime. Colours: white, grey, dark green, bright lime
+  carry: >-
+    a spear with a lime crystal blade is held upright in his right hand (the hand toward the viewer's left in the front
+    view), its foot near the ground beside the foot and its blade level with the hood, never above the 92 px cap; in
+    the back view the spear is in the same hand; in the side view facing left it is held in front of the body, upright.
+    The spear touches the hand and stays inside the 48 x 96 cell

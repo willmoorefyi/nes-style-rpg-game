@@ -1,0 +1,278 @@
+{
+  "character": "android",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/automaton/battle_2026-11-27.png",
+    "sha256": "9d7ceb701fc0cdea8b5b2cdaddcc5b5a40858727955334892b755b9920c13763"
+  },
+  "recipe": "hero_user.yaml#automaton_android",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "538c4fc4ff88cbba9537d0eab81654b1c87360704cc2d20e0a1b7ee7f80a909a",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "automaton_android_560x160.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "automaton / android: an exact data copy of the red mage / red wizard with the user's battle sheet (the brief as relayed by the main session; delivered as final; the steam puff, the lime sparks, the flying spring and gear, the hexagon shield and the wind-up key kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          4,
+          4,
+          4
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          10,
+          21,
+          11
+        ],
+        [
+          8,
+          24,
+          8
+        ]
+      ],
+      [
+        [
+          22,
+          44,
+          22
+        ],
+        [
+          24,
+          41,
+          24
+        ]
+      ],
+      [
+        [
+          26,
+          27,
+          23
+        ],
+        [
+          24,
+          24,
+          24
+        ]
+      ],
+      [
+        [
+          32,
+          61,
+          25
+        ],
+        [
+          33,
+          57,
+          24
+        ]
+      ],
+      [
+        [
+          55,
+          51,
+          48
+        ],
+        [
+          57,
+          49,
+          49
+        ]
+      ],
+      [
+        [
+          61,
+          99,
+          38
+        ],
+        [
+          57,
+          99,
+          41
+        ]
+      ],
+      [
+        [
+          64,
+          74,
+          50
+        ],
+        [
+          66,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          94,
+          100,
+          75
+        ],
+        [
+          90,
+          99,
+          74
+        ]
+      ],
+      [
+        [
+          123,
+          129,
+          89
+        ],
+        [
+          123,
+          132,
+          90
+        ]
+      ],
+      [
+        [
+          166,
+          234,
+          1
+        ],
+        [
+          165,
+          231,
+          0
+        ]
+      ],
+      [
+        [
+          198,
+          249,
+          57
+        ],
+        [
+          198,
+          247,
+          57
+        ]
+      ],
+      [
+        [
+          205,
+          203,
+          143
+        ],
+        [
+          206,
+          206,
+          140
+        ]
+      ],
+      [
+        [
+          242,
+          248,
+          169
+        ],
+        [
+          239,
+          247,
+          173
+        ]
+      ],
+      [
+        [
+          251,
+          250,
+          245
+        ],
+        [
+          255,
+          247,
+          247
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        10,
+        14,
+        63,
+        76
+      ],
+      "attack": [
+        0,
+        19,
+        79,
+        76
+      ],
+      "cast": [
+        17,
+        3,
+        65,
+        76
+      ],
+      "hurt": [
+        6,
+        14,
+        58,
+        76
+      ],
+      "down": [
+        0,
+        47,
+        76,
+        76
+      ],
+      "victory": [
+        10,
+        0,
+        74,
+        76
+      ]
+    }
+  }
+}

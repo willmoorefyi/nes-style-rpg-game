@@ -862,7 +862,17 @@ ROSTER: dict[str, Look] = {
     # gun; the void walker in a dark suit (his orbit rings and shards are battle art only)
     "gravity_adept": Look(hair=(28, 28, 28), hair_style="short", outfit="coat", cloth=(26, 27, 29), trim=(13, 9, 27),
                           pants=(20, 21, 24), boots=(8, 9, 11)),
+    # pass CB (plan 11-18): the automaton, a brass clockwork soldier (spiked brass helm, shadowed face with lime eyes,
+    # a wind-up key on the back) with a brass spear; the android, a white figure in a dark green hood and cape with a
+    # lime-bladed spear
+    "automaton": Look(hair=None, hair_style="bald", outfit="armor", cloth=(26, 20, 8), trim=(11, 6, 3),
+                      pants=(22, 16, 6), boots=(18, 12, 5), gear="helm", gear_color=(26, 20, 8), shadow_face=True,
+                      weapon="spear", weapon_color=(26, 20, 8), cape=(8, 10, 4)),
     # Upgraded classes
+    "android": Look(skin=_skin((12, 12, 11), (16, 16, 15), (20, 20, 19), (24, 24, 23), (28, 28, 27), (31, 31, 30)),
+                    hair=None, hair_style="bald", outfit="tunic", cloth=(29, 29, 28), trim=(20, 29, 0),
+                    pants=(26, 26, 24), boots=(7, 7, 7), gear="hood", gear_color=(4, 9, 4), weapon="spear",
+                    weapon_color=(20, 29, 0), cape=(4, 9, 4)),
     "void_walker": Look(hair=(28, 28, 28), hair_style="long", outfit="robe", cloth=(5, 6, 11), trim=(15, 11, 29),
                         boots=(4, 4, 6)),
     "sky_captain": Look(hair=(12, 8, 5), hair_style="short", outfit="coat", cloth=(5, 7, 14), trim=(26, 20, 8),

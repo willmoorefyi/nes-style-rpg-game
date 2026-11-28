@@ -469,3 +469,21 @@ gravity_adept_void_walker:
   source_name: gravity_adept_voidwalker_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "gravity adept and void walker are in - let's have them be a black mage / black wizard copy (delivered as final; the purple ring and wave pulses, the floating rocks, the dropped gadgets, the orbit rings, the crystal shards, the black-hole orb and the levitating READY kept as rendered)"
+automaton_android:
+  file: user_art/automaton/battle_2026-11-27.png
+  sha256: 9d7ceb701fc0cdea8b5b2cdaddcc5b5a40858727955334892b755b9920c13763
+  rows: [automaton, android]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: 538c4fc4ff88cbba9537d0eab81654b1c87360704cc2d20e0a1b7ee7f80a909a
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  # downscaled by the main session from the original render automaton_android_sprite.png (2060 x 763, soft alpha, sha256 71648ef4aca430b45eea7a23509599cbf7017dc1bb8ab0e4449181bedb684ff8): per-figure components, majority colour per art cell (4.63 / 4.5 render px), 16 colours per row, 1-px outline
+  source_name: automaton_android_560x160.png
+  approved: "2026-11-27"
+  user_review: "automaton / android: an exact data copy of the red mage / red wizard with the user's battle sheet (the brief as relayed by the main session; delivered as final; the steam puff, the lime sparks, the flying spring and gear, the hexagon shield and the wind-up key kept as rendered)"

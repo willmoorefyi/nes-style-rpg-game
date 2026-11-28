@@ -50,3 +50,5 @@ aeronaut: thief   # temporary until the user renders the aeronaut's field walk s
 sky_captain: ninja   # temporary until the user renders the sky captain's field walk sheet
 gravity_adept: black_mage   # temporary until the user renders the gravity adept's field walk sheet
 void_walker: black_wizard   # temporary until the user renders the void walker's field walk sheet
+automaton: red_mage    # temporary until the user renders the automaton's field walk sheet
+android: red_wizard    # temporary until the user renders the android's field walk sheet

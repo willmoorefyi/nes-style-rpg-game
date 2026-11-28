@@ -39,6 +39,7 @@ start:
   warlock: { gear: [small_knife, cloth], spells: [fire] }
   shaman: { gear: [small_knife, cloth], spells: [fire] }
   red_mage: { gear: [rapier, cloth], spells: [] }
+  automaton: { gear: [rapier, cloth], spells: [] }
   apothecary: { gear: [rapier, cloth], spells: [] }
   bard: { gear: [rapier, cloth], spells: [] }
   scholar_hero: { gear: [rapier, cloth], spells: [] }
@@ -70,6 +71,7 @@ lv2:
   warlock: { gear: [small_knife, cloth], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth], spells: [] }
+  automaton: { gear: [rapier, cloth], spells: [] }
   apothecary: { gear: [rapier, cloth], spells: [] }
   bard: { gear: [rapier, cloth], spells: [] }
   scholar_hero: { gear: [rapier, cloth], spells: [] }
@@ -101,6 +103,7 @@ arrive:
   warlock: { gear: [small_knife, cloth], spells: [fire, lit] }
   shaman: { gear: [small_knife, cloth], spells: [fire, lit] }
   red_mage: { gear: [rapier, cloth], spells: [] }
+  automaton: { gear: [rapier, cloth], spells: [] }
   apothecary: { gear: [rapier, cloth], spells: [] }
   bard: { gear: [rapier, cloth], spells: [] }
   scholar_hero: { gear: [rapier, cloth], spells: [] }
@@ -132,6 +135,7 @@ full:
   warlock: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
   shaman: { gear: [small_knife, cloth], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, leather_armor], spells: [cure, fire] }
+  automaton: { gear: [rapier, leather_armor], spells: [cure, fire] }
   apothecary: { gear: [rapier, leather_armor], spells: [cure, fire] }
   bard: { gear: [rapier, leather_armor], spells: [cure, fire] }
   scholar_hero: { gear: [rapier, leather_armor], spells: [cure, fire] }
@@ -163,6 +167,7 @@ naked:
   warlock: { gear: [], spells: [] }
   shaman: { gear: [], spells: [] }
   red_mage: { gear: [], spells: [] }
+  automaton: { gear: [], spells: [] }
   apothecary: { gear: [], spells: [] }
   bard: { gear: [], spells: [] }
   scholar_hero: { gear: [], spells: [] }
@@ -204,6 +209,7 @@ w_s1: &a_s1
   warlock: { gear: [staff, cloth], spells: [fire, lit, slep] }
   shaman: { gear: [staff, cloth], spells: [fire, lit, slep] }
   red_mage: { gear: [rapier, chain_mail], spells: [cure, fire] }
+  automaton: { gear: [rapier, chain_mail], spells: [cure, fire] }
   apothecary: { gear: [rapier, chain_mail], spells: [cure, fire] }
   bard: { gear: [rapier, chain_mail], spells: [cure, fire] }
   scholar_hero: { gear: [rapier, chain_mail], spells: [cure, fire] }
@@ -236,6 +242,7 @@ w_pravoka: &a_pravoka
   warlock: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
   shaman: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
   red_mage: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  automaton: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   apothecary: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   bard: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   scholar_hero: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
@@ -268,6 +275,7 @@ w_s3: &a_s3
   warlock: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
   shaman: { gear: [staff, cloth, gloves], spells: [fire, lit, slep, ice] }
   red_mage: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
+  automaton: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   apothecary: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   bard: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
   scholar_hero: { gear: [short_sword, chain_mail, gloves], spells: [cure, fire, ice] }
@@ -300,6 +308,7 @@ w_elfheim: &a_elfheim
   warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  automaton: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
@@ -332,6 +341,7 @@ w_s4: &a_s4
   warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  automaton: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
@@ -363,6 +373,7 @@ w_s5: &a_s5
   warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  automaton: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
@@ -394,6 +405,7 @@ w_s6: &a_s6
   warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  automaton: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
@@ -427,6 +439,7 @@ w_s9: &a_s9
   warlock: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   shaman: { gear: [large_dagger, copper_bracelet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2] }
   red_mage: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
+  automaton: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   apothecary: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   bard: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
   scholar_hero: { gear: [mythril_sword, chain_mail, cap, gloves], spells: [cure, fire, ice, cure2, fir2] }
@@ -460,6 +473,7 @@ w_melmond: &a_melmond
   warlock: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  automaton: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   apothecary: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   bard: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   scholar_hero: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
@@ -491,6 +505,7 @@ w_s11: &a_s11
   warlock: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [large_dagger, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
+  automaton: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   apothecary: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   bard: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
   scholar_hero: { gear: [mythril_sword, silver_armlet, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast] }
@@ -525,6 +540,7 @@ w_crescent: &a_crescent
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -556,6 +572,7 @@ w_s14: &a_s14
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -587,6 +604,7 @@ w_s15: &a_s15
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -618,6 +636,7 @@ w_s16: &a_s16
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -651,6 +670,7 @@ w_onrac: &a_onrac
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -681,6 +701,7 @@ w_onrac: &a_onrac
   necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [mythril_knife, silver_armlet, cap, gloves], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -712,6 +733,7 @@ w_s18: &a_s18
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -743,6 +765,7 @@ w_s19: &a_s19
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -773,6 +796,7 @@ w_s19: &a_s19
   necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, gold_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -804,6 +828,7 @@ w_s20: &a_s20
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -834,6 +859,7 @@ w_s20: &a_s20
   necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [wizard_staff, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -865,6 +891,7 @@ w_s21: &a_s21
   warlock: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, gloves], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -895,6 +922,7 @@ w_s21: &a_s21
   necromancer: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [mythril_knife, silver_armlet, cap, gloves], found: [rune_knife, black_robe], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, mythril_mail, buckler, cap, silver_gauntlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -928,6 +956,7 @@ w_gaia: &a_gaia
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -958,6 +987,7 @@ w_gaia: &a_gaia
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -990,6 +1020,7 @@ w_s23: &a_s23
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1020,6 +1051,7 @@ w_s23: &a_s23
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1051,6 +1083,7 @@ w_s24: &a_s24
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [power_staff], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1081,6 +1114,7 @@ w_s24: &a_s24
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1114,6 +1148,7 @@ w_s27: &a_s27
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1144,6 +1179,7 @@ w_s27: &a_s27
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1175,6 +1211,7 @@ w_s28: &a_s28
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [flame_sword], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1205,6 +1242,7 @@ w_s28: &a_s28
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1236,6 +1274,7 @@ w_s29: &a_s29
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [ice_brand, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1266,6 +1305,7 @@ w_s29: &a_s29
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1297,6 +1337,7 @@ w_s30: &a_s30
   warlock: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   shaman: { gear: [mythril_knife, gold_armlet, cap, pro_ring], found: [rune_knife, opal_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_mage: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  automaton: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   apothecary: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   bard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   scholar_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [sun_blade, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
@@ -1327,6 +1368,7 @@ w_s30: &a_s30
   necromancer: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   druid: { gear: [cat_claw, gold_armlet, cap, pro_ring], found: [dragon_claw, diamond_armlet], spells: [fire, lit, slep, ice, fir2, lit2, fast, ice2] }
   red_wizard: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
+  android: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   plague_doctor: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   virtuoso: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }
   sage_hero: { gear: [mythril_sword, gold_armlet, buckler, cap, pro_ring], found: [defender, opal_armlet], spells: [cure, fire, ice, cure2, fir2, fast, cure3] }

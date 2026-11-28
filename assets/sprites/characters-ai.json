@@ -332,6 +332,10 @@
       "x": 1008,
       "y": 5760
     },
+    "android": {
+      "x": 672,
+      "y": 4992
+    },
     "apothecary": {
       "x": 336,
       "y": 4992
@@ -339,6 +343,10 @@
     "arquebusier": {
       "x": 1008,
       "y": 5760
+    },
+    "automaton": {
+      "x": 336,
+      "y": 4992
     },
     "barbarian": {
       "x": 0,
@@ -521,8 +529,10 @@
   "aliases": {
     "abyssal_knight": "knight",
     "aeronaut": "thief",
+    "android": "red_wizard",
     "apothecary": "red_mage",
     "arquebusier": "thief",
+    "automaton": "red_mage",
     "barbarian": "warrior",
     "bard": "red_mage",
     "beastmaster": "monk",

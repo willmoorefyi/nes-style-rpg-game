@@ -54,8 +54,8 @@ describe('EQ: FF1 gear (Appendix A)', () => {
   it('every copy class equips exactly its copyOf source\'s gear, in both tiers', () => {
     const gear = ITEMS.filter((i) => i.type === 'weapon' || i.type === 'armor');
     const copies = CLASSES.filter((c) => c.copyOf);
-    expect(copies).toHaveLength(48);   // INT equip: 24 base and 24 upgraded copies (the 12 pass-CB pairs merged)
-    expect(copies.filter((c) => c.upgradeFrom)).toHaveLength(24);
+    expect(copies).toHaveLength(50);   // INT equip: 24 base and 24 upgraded copies (the 12 pass-CB pairs merged); pass CB: + automaton / android, 25 + 25
+    expect(copies.filter((c) => c.upgradeFrom)).toHaveLength(25);
     for (const c of copies) {
       const a = new Character({ name: 'A', classData: ClassRegistry.getClass(c.id)! });
       const b = new Character({ name: 'B', classData: ClassRegistry.getClass(c.copyOf!)! });
