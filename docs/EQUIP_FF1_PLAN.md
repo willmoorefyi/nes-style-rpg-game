@@ -73,13 +73,14 @@ The scratch scripts that derive this plan's tables are `/tmp/equip-plan/spec.py`
 | D-EQ8 | **Shops FF1 lacks are kept but closed:** `melmond_item`, `dwarf_item`, `onrac_weapon`, `onrac_armor`. Each record stays, with `inventory: []` and `closed: true`. The keeper keeps its `shopId` and says a closed line. `openShopScene` opens nothing for a closed shop. Why closed rather than removed: the maps, `townTargets.ts`, `quest.yaml` `towns` (the dwarf town), gate row GT-42 and proofs (e) / (f) all stay valid, with no `--mutate` re-proof of a gate row. Removing the buildings is a follow-up. |
 | D-EQ9 | **Hi-Potion, Ether and Phoenix Down leave every shop (R1).** Chests keep them (35 / 29 / 25 today, less the 17 swaps of 4.2). |
 | D-EQ10 | **Obtainability.** Every weapon, armour and consumable is sold by an open shop, or held by a chest or a gift on a compiled map, or forged (`excalibur`). No chest is added. An existing hi_potion / ether chest gets new contents and a new id (so a new `CHEST_*` flag): a save that opened it sees it closed again and finds the new item. The pinned chest counts and the layout geometry stay as they are. |
-| D-EQ11 | **Kits.** A kit row becomes `{ gear, found?, spells }`. `gear` is what the party buys: the best shop gear the class may use, sold up to its tier's town, one item per slot. A stage kit's `gear` equals its tier's town kit `gear`, row by row. `found` lists chest items that beat that gear. They are equipped after `gear` and replace the item in their slot. A found item must sit in a chest on a map of the stage or of an ancestor (`after`, transitively, with `maps` globs). It is given to no more members than there are such chests, in the order W, T, WM, BM, Mo, RM (and Kn, Ni, WW, BW, Ma, RW for the promoted rows). The new `kitSources.test.ts` enforces the rule. `kitPrice` sums `gear` only, so found gear costs nothing. A Monk / Master takes no weapon when 2 × the band's low level ≥ the weapon's ATK (unarmed is better). Spells stay as they are; every kit spell is still sold by its band. The tier of each stage is today's alias: S1-S2 cornelia, S3 pravoka, S4-S10 elfheim, S11-S13 melmond, S14-S17 crescent, S18-S22 onrac, S23-S30 gaia. |
+| D-EQ11 | **Kits.** A kit row becomes `{ gear, found?, spells }`. `gear` is what the party buys: the best shop gear the class may use, sold up to its tier's town, one item per slot. **Best** is the first by rank: weapons by ATK, then hit, then crit (higher first); armour by DEF (higher first), then weight (lower first); then the id. A stage kit's `gear` equals its tier's town kit `gear`, row by row. The one exception is the Monk / Master weapon, judged by each kit's own band low level (below). `found` lists chest items that rank strictly before that slot's `gear` item (e.g. `gold_armlet` 24 / 1 before `iron_armor` 24 / 23). They are equipped after `gear` and replace the item in their slot. A found item must sit in a chest on a map of the stage or of an ancestor (`after`, transitively, with `maps` globs). It is given to no more members than there are such chests, in the order W, T, WM, BM, Mo, RM. The promoted rows (Kn, Ni, WW, BW, Ma, RW, from S19 on) are a second party and draw from their own copy of the same chest pool, because a kit describes one party at a time. The new `kitSources.test.ts` enforces the rule. `kitPrice` sums `gear` only, so found gear costs nothing. A Monk / Master takes no weapon when 2 × the band's low level ≥ the weapon's ATK (unarmed is better). Spells stay as they are; every kit spell is still sold by its band. The tier of each stage is today's alias: S1-S2 cornelia, S3 pravoka, S4-S10 elfheim, S11-S13 melmond, S14-S17 crescent, S18-S22 onrac, S23-S30 gaia. |
 | D-EQ12 | **Act 1 (R1).** Cornelia sells Cloth, Wooden (`leather_armor`) and Chain Armor only. The kits `start`, `lv2`, `arrive` and `full` lose `wooden_shield`. Their caps are replaced: `arrive` / `full` keep one `cap` (the temple chest) on the warrior, as `found`. `fieldCampaign.SHOPPING` drops its four caps. The balance tests are re-measured (section 9.2). |
 | D-EQ13 | **HOUSE** is a new consumable `house` (3000 G; sold at Elfheim, Crescent, Onrac and Gaia). It gives a full rest like the Cabin, then opens `saveMenu`, as FF1's HOUSE does. The camp rules apply. `ItemEffects.isPartyItem` gains `house`. |
 | D-EQ14 | **WORLD_PLAN 3.6's band caps are retired** (`gearBands.test.ts`): FF1 sells Steel Armor at Melmond, gold bracelets at Gaia and nothing at Onrac. `tests/data/ff1Shops.test.ts` pins the exact FF1 table instead. `gearBands.test.ts` keeps its kit and key-item parts; its `FOUND` list becomes every chest-only gear item. WORLD_PLAN 3.6 gets a "superseded" note. |
+| D-EQ18 | **Debug scenarios.** A scenario item the new jobs refuse is replaced by the best item (D-EQ11 rank) of the same slot that the class may use and whose ATK / DEF is at most the refused item's; with none, it is dropped (`/tmp/equip-plan/scenarios.py`: 55 entries, e.g. white_mage `white_robe` → `gold_armlet`, black_mage `wizard_staff` → `power_staff`). `crossFileValidation`'s scenario-gear check uses `canEquip`'s rule (`copyOf`, then `upgradeFrom`). |
 | D-EQ15 | **Effects (R5.5), in section 7:** the FF1 attack bonus, armour `resist`, and worn-item `battleSpell` in the battle Item command. |
-| D-EQ16 | **Test-first, green commits.** Each tranche adds its failing tests (section 9.1) before the change. Each commit passes `npm run build` and `npm run test:fast`. |
-| D-EQ17 | **Balance.** Every balance bound is re-measured and rewritten ≥ 3 points (rounds: ≥ 2) from its new measured value, with old → new in the test name (AGENTS.md). No enemy, formula (beyond section 7), `grind` or step-mean factor changes. A bound whose *intent* breaks is reported to the user with the numbers in the EQ result: a boss leaving its band in `questCurve.test.ts`, Garland's sensible-Lv2 window, or the Chaos win rate. The implementer does not silently retune. |
+| D-EQ16 | **Test-first, green commits.** Each tranche adds its failing tests (section 9.1) before the change. Each commit passes `npm run build` and `npm run test:fast`. Items, shops, chests, kits and debug scenarios read each other, so they land in one data tranche (T2). |
+| D-EQ17 | **Balance.** Every balance bound is re-measured and rewritten ≥ 3 points (rounds: ≥ 2) from its new measured value, with old → new in the test name (AGENTS.md). No enemy, formula (beyond section 7), `grind` or step-mean factor changes. A bound whose *intent* breaks is reported to the user with the numbers in the EQ result: a boss leaving its band in `questCurve.test.ts`, Garland's sensible-Lv2 window, or the Chaos win rate. The implementer does not silently retune. **Procedure (the user asked for an implementation):** the commit rewrites such a bound to its measured value by the 3-point rule, names it "INTENT" in the test name (old → new), and lists it in the EQ result and the final report for the user to decide on. Only a failing verifier proof ((a)-(h) of `quest --strict`) stops the tranche. |
 
 ## 3. Items (`assets/data/items.yaml`)
 
@@ -118,9 +119,13 @@ Wooden Helmet is `iron_helm` (DEF 3 / WT 3, 100 G). Stats, prices and jobs are i
 | diamond_shield (Opal Shield) | resist lightning |
 | aegis_shield | resist poison_stone (FF1: stone) |
 | pro_ring | resist death |
+| rune_knife (non-FF1, 3.3) | strong vs magical |
+| dragon_claw (non-FF1, 3.3) | strong vs dragon |
 
 These effects go: the extra slayers (mythril_sword, mythril_knife and mythril_hammer vs undead, great_axe vs giant,
 masamune vs dragon) and the elements FF1 lacks (coral_sword and thor_hammer lightning, excalibur holy).
+
+The descriptions of the items with effects: "Fire blade, strong vs undead. ATK 26, hit +20.", "Ice blade of frozen steel. ATK 29, hit +25.", "Coral blade, strong vs sea foes. ATK 19, hit +15.", "Shines like noon, strong vs undead. ATK 32, hit +30.", "The holy sword, strong vs all. ATK 45, hit +35.", "Use: RUSE. ATK 30, hit +35.", "Use: LIT2. ATK 18, hit +15.", "Use: CONF. ATK 15, hit +15.", "Use: INV2. Wards fire, death. DEF 24, evade -2.", "Use: ICE2. Wards ice, time. DEF 24, evade -2.", "Opal plate. Wards lightning. DEF 42, evade -10.", "Dragon scale. Wards fire, ice, lightning. DEF 42, evade -10.", "Polished bronze. Wards stone. DEF 16.", "A ring that wards death. DEF 8, evade -1." (all under 60 characters).
 
 FF1 items with item spells that the game does not have stay out of scope: Heal Staff, Mage Staff, Light Axe, Bane
 Sword, Heal Helmet. They would be new chest items (follow-up 12.2).
@@ -187,8 +192,10 @@ keep is S6, and its chests are not behind a key door).
 
 Every changed map is regenerated by its script and compiled with `build_map.py <ids>`. It must pass
 `build_map.py --check-determinism <id>`, and a second run of the scripts must leave `git diff --exit-code
-assets-src/maps` clean. The world map is not touched. Region tests that pin a swapped chest are updated; find them with
-`grep -rn "<old id>" tests`.
+assets-src/maps` clean. The world map is not touched. Region tests that pin a swapped chest are updated. Find them with `grep -rn "<old id>" tests` and by item, e.g.
+`elf_t_town.test.ts:149` pins the vault's chests as `['ether', 'phoenix_down', 'tnt']`. C8's `hall_east` is also a pad
+and an entrance on citadel-2f (`citadel.py` lines 140 and 153, pinned in `ord_o_sites.test.ts`), so only the chest's
+id changes and `ff1Chests.test.ts`'s "old id gone" check looks at chest NPCs only.
 
 ## 5. Shops (`assets/data/shops.yaml`), exactly FF1 (`/tmp/equip-plan/shops_new.py`)
 
@@ -249,10 +256,12 @@ The Bottle: `water/caravan.py` `BOTTLE_PRICE = 50000`. Then `caravan-camp` is re
     - crescent 216841 ≥ 39335
     - onrac 612329 ≥ 39335
     - gaia 579716 ≥ 145495
+    - dwarf S10 46664 ≥ 4558
     - lufenia 921043 ≥ 145495
   - `walled` (computed in `kits.py`): only crescent (78670 > S11's 66355) and gaia (290990 > S18 / S20 / S22's 78670),
     as today.
   - (f): crescent 13169 < 31468; gaia 98095 < 116396 (33.7 %).
+  - (d3): the Bottle's 50000 at S22 is at most 80 % of the ground gold at S22's start (612329).
 - **The readers of kits** apply `found` after `gear`, so each found item replaces its slot's item:
   - `tests/helpers/balanceData.ts` (`makeParty`, `makeMember`, `kitCost`: gear only)
   - `src/systems/debugParty.ts` `kitMember` (`equipment: [...gear, ...found]`)
@@ -272,7 +281,8 @@ holds:
 - `weapon.element` is a weakness of the target (`target.data.weakness`, or `elementalProfile.weaknesses`)
 
 When `strong`, the attacker's numbers get `attack + 4` and `hitPercent + 40` before `physicalAttack`. The hit count is
-taken from the raised hit% (FF1: hits = 1 + ⌊hit% / 32⌋), as FF1 does. `FAMILY_BONUS` (×1.5) is deleted. Unarmed
+taken from the raised hit%: the bonus path computes hits = 1 + ⌊(partyHitPercent + 40) / 32⌋ itself and does not call
+`partyHits()`. `FAMILY_BONUS` (×1.5) is deleted. Unarmed
 attacks have no weapon, so no bonus.
 
 ### 7.2 Armour resistances
@@ -289,9 +299,14 @@ attacks have no weapon, so no bonus.
 
 ### 7.3 Item-use spells
 
-`ItemData.battleSpell?: string` is a spells.yaml id. In battle, the Item list (`BattleListMenus`, 181 lines) adds one
-row per worn item with a `battleSpell`, labelled "<name> (worn)", after the consumables. Choosing it builds
-`{ type: 'item', itemId, viaWorn: true }` with no target step: every item spell is `all`, `all_allies` or `self`
+`ItemData.battleSpell?: string` is a spells.yaml id. In battle:
+
+- The Item command opens when the actor has a usable consumable **or** wears a `battleSpell` item
+  (`BattleListMenus.canOpenItems`, which `BattleScene` line 303 reads).
+- `ItemSelectionUI` takes the actor's worn rows as a second input. It lists them after the consumables as
+  "<name> (worn)", and `hasNoItems()` counts them.
+- Selecting a worn row builds `{ type: 'item', itemId, viaWorn: true, targetId: <actor id> }` (the actor is the
+  target, so `executeItemCommand`'s target check passes), with no target step: every item spell is `all`, `all_allies` or `self`
 (RUSE, LIT2, CONF, INV2, ICE2, SABR). `BattleStateMachine.executeItemCommand` (572 / 592 lines) hands a worn item to a
 new `src/battle/itemCast.ts` (under 250 lines). That checks the actor still wears it and casts the spell through
 `SpellExecutor` with `viaItem: true`. Then:
@@ -308,15 +323,15 @@ new `src/battle/itemCast.ts` (under 250 lines). That checks the actor still wear
 
 | file | change |
 |---|---|
-| `src/types/index.ts` (424 / 442) | `EquipmentSlot` + `hands`; `ItemData.battleSpell?`, `resist?`; `ShopData.closed?`; `CharacterClassData.copyOf?` (843cb6fc's line); `CharacterSaveData.equipment: Partial<Record<...>>`; `BattleCommand.viaWorn?` (BattleCommands). About +8 lines. |
+| `src/types/index.ts` (435 / 442 on mainline) | `EquipmentSlot` + `hands`; `ItemData.element?`, `battleSpell?`, `resist?`; `ShopData.closed?`; `CharacterClassData.copyOf?` (843cb6fc's 2 lines); `CharacterSaveData.equipment: Partial<Record<...>>`. Budget +6 lines (to 441), with trailing comments, not doc blocks. `BattleCommand.viaWorn?` goes in `src/battle/BattleCommands.ts`. |
 | `src/entities/Character.ts` (270) | `hands` in the constructor; `canEquip` by `copyOf` (D-EQ4); `hasTempResist` + worn `resist`. A worn-item helper goes to `EquipmentRules.ts` if the file grows past 280. |
 | `src/battle/CombatStats.ts`, `PhysicalAttack.ts` | `ARMOUR_SLOTS`; the 7.1 bonus |
-| `src/battle/SpellStatus.ts`, `SpellExecutor.ts`, `BattleStateMachine.ts`, new `itemCast.ts`; `src/scenes/battle/BattleListMenus.ts` | 7.2 / 7.3 |
+| `src/battle/SpellStatus.ts`, `SpellExecutor.ts`, `BattleStateMachine.ts`, `BattleCommands.ts`, new `itemCast.ts`; `src/scenes/battle/BattleListMenus.ts`, `src/ui/ItemSelectionUI.ts`, `src/scenes/BattleScene.ts` (the Item command's enable) | 7.2 / 7.3 |
 | `src/ui/labels.ts`, `src/scenes/EquipScene.ts`, `src/scenes/status/statusLines.ts` | the fifth row. The slot window (300 px: 24 + 5 × 36 = 204 px) and Status's 480 px column fit it. A test checks that the widest label, "Hands: Silver Gauntlet", fits the slot window. If not, the window widens toward x 1032. |
-| `src/core/schemaValidation.ts` (380) | `slot` ∈ 5 values on gear, `battleSpell`, `resist`, `ShopData.closed`, the `copyOf` assert. If it grows past 390, the item checks move to a new `schemaValidationItems.ts`. |
+| `src/core/schemaValidation.ts` (396 on mainline), new `src/core/schemaValidationItems.ts` | `validateItemData` moves to the new file (under 250 lines), which adds `slot` ∈ 5 values, `bonusVsFamily`, `element`, `battleSpell` and `resist`; schemaValidation re-exports it. schemaValidation keeps `ShopData.closed` and the `copyOf` assert. That makes about 380 lines. |
 | `src/systems/ItemEffects.ts`, `src/scenes/ItemMenuScene.ts` | `house` |
 | `src/scenes/exploration/FieldSystems.ts` | the closed-shop guard |
-| `src/systems/debugParty.ts`, `tests/helpers/balanceData.ts`, `src/progression/questLateData.ts` | kit `found` (D-EQ11); `kitPrice` counts `gear` only (no code change: it already reads `gear`) |
+| `src/systems/debugParty.ts`, `tests/helpers/balanceData.ts`, `tests/balance/questCurve.test.ts`, `src/progression/questLateData.ts` | kit `found` (D-EQ11); `kitPrice` counts `gear` only (no logic change: it already reads `gear`; its doc comment's figures are updated) |
 | data | `items.yaml` (Appendix A + 3.1-3.4; every copy id out of `usableBy`), `shops.yaml` (5), `kits.yaml` (6), `classes.yaml` (`copyOf` lines), `debug-scenarios.yaml` (9.4) |
 | layout scripts | 4.2 and 5 (the closed lines, `BOTTLE_PRICE`); their regenerated sources and compiled maps |
 | docs | AGENTS.md (the `hands` slot, `copyOf` for equipment, kit `found`, the FF1 shop table pointer), WORLD_PLAN 3.6 note, this plan's "EQ result" |
@@ -337,12 +352,12 @@ integrator's `--mutate` refills it.
 | `tests/data/ff1Shops.test.ts` | Every shop equals section 5 (order too). Every sold item has its NES price (a literal table). Every spell is sold exactly once. `closed` ⇔ empty. Bottle 50000. | T3 |
 | `tests/data/obtainability.test.ts` | Every gear / consumable item is sold, chested, gifted or forged (Smyth's `give_item`). It passes on mainline and guards T3. | T2 |
 | `tests/data/ff1Chests.test.ts` | C1-C17: the item at the map and cell, the new chest id and flag, the old id gone. | T3 |
-| `tests/data/kitSources.test.ts` | D-EQ11: gear sold up to the tier; stage gear = its tier's town gear; found by ancestry with copies; every row equips; `walled(crescent)` and `walled(gaia)` true, no other town walled. | T4 |
+| `tests/data/kitSources.test.ts` | D-EQ11: gear sold up to the tier and best by rank; stage gear = its tier's town gear (the Monk / Master weapon judged per kit); found ranks strictly before its slot's gear; found by ancestry with copies (base and promoted rows on separate pools); every row equips; `walled(crescent)` and `walled(gaia)` true, no other town walled. | T4 |
 | `tests/scenes/closedShop.test.ts` | `openShopScene` registers and pushes nothing for a closed shop, and still opens an open one. | T3 |
 | `tests/systems/houseItem.test.ts` | Full rest, the fallen stay fallen, consumed, the camp rule, `saveMenu` pushed. | T2 |
 | `tests/battle/ff1Bonus.test.ts` | A Flame Sword vs an undead (family) and vs a fire-weak enemy gets +4 / +40 (seeded: exact hit% and attack into `physicalAttack`). A Mythril Sword vs undead gets nothing. Excalibur vs anything gets the bonus. Unarmed gets none. | T5 |
 | `tests/battle/armourResist.test.ts` | A ProRing blocks RUB / XXXX (`status_death`). Dragon Armor reduces FIR2 damage like AFIR. The Aegis blocks a stone spell. Without them, no effect. | T5 |
-| `tests/battle/itemCast.test.ts` | The Zeus Gauntlet worn: the Item list shows "Zeus Gauntlet (worn)"; the cast hits all enemies with LIT2 and uses no charge, even silenced; the gauntlet stays. A copy in the bag but not worn is not listed. Defender casts RUSE on its wearer. | T5 |
+| `tests/battle/itemCast.test.ts` | With no consumables in the bag and the Zeus Gauntlet worn, the Item command is enabled and lists it. The Zeus Gauntlet worn: the Item list shows "Zeus Gauntlet (worn)"; the cast hits all enemies with LIT2 and uses no charge, even silenced; the gauntlet stays. A copy in the bag but not worn is not listed. Defender casts RUSE on its wearer. | T5 |
 
 ### 9.2 Tests that change
 
@@ -353,8 +368,7 @@ integrator's `--mutate` refills it.
   - `descriptions.test.ts` (81 → 98 items; Coral Sword no longer lightning)
   - `crossFileValidation.test.ts` (`battleSpell` → spells, `resist` values)
   - the 12 `*Class.test.ts` (`usableBy` counts → `canEquip` counts)
-  - `rosterData.test.ts` if it reads items
-  - `assetCoverage` (no item art)
+  - `chestText.test.ts`, `pickupText.test.ts` (the new pickup names)
 - **Progression:** `questLate.test.ts` (`kitPrice` w_s1 520 → 185, w_pravoka 1725 → 1890)
 - **Region tests:**
   - the chest pins of 4.2
@@ -363,7 +377,7 @@ integrator's `--mutate` refills it.
 - **Scenes and battle:**
   - `ShopScene`, `ShopDetailPanel`, `ShopComparison`, `EquipScene`, `StatusScene`, `ItemSelectionUI`, `BattleScene`
     tests that read changed shop lists or item stats
-  - `CombatStats.test.ts` (the ×1.5 family test → the 7.1 rule)
+  - `FAMILY_BONUS` has no test on mainline; `ff1Bonus.test.ts` is its only coverage
 - **Balance (re-measured, D-EQ17):**
   - `garland`, `fieldPacing`, `economy`, `fieldCampaign.ts`, `zones`
   - `w_a1_t`, `w_elf_d`, `w_elf_o`, `w_ert_d`, `w_fir_d1`, `w_fir_d2`, `w_ord_o`, `w_wat_d`, `w_wnd_d2`, `w_pst`
@@ -412,17 +426,15 @@ The check list:
 |---|---|---|
 | T0 | this plan | - |
 | T1 | the `hands` slot: types, Character, CombatStats, labels, Equip / Status UI, the schema slot check, the save round trip; tests 9.1 rows 1-3 | build, fast |
-| T2 | `copyOf` (843cb6fc's lines) and `canEquip` by `copyOf`; items.yaml regenerated (Appendix A, the 17 new items, effects as data, descriptions, NES prices of sold items, no copy ids); the House; `obtainability` (with a `PENDING_T3` list of the new items not yet sold); the class-copy and description tests | build, fast |
-| T3 | shops (5), closed shops, the Bottle, chest swaps C1-C17 (scripts, maps), `ff1Shops` / `ff1Chests` / `closedShop`, `gearBands` rewrite, the region pins | build, fast, `quest --strict`, maps |
-| T4 | kits (6, `found`), `kitSources`, `questLate`, the readers; the balance re-measure of 9.2 | build, fast, `quest --strict` |
-| T5 | 7.1-7.3 and their tests; balance re-measured again where they move it | build, fast |
-| T6 | the debug scenarios, the browser check, docs, the EQ result (measured (d) / (f), every re-measured bound old → new, the gates' times) | all of 9.3, the integrator gates at the end |
-
-T3 and T4 can land as one commit if a red state between them can't be avoided: `gearBands`' kit part reads the
-shops, so new shops with old kits fail.
+| T2 | the data tranche: `copyOf` (843cb6fc's lines) and `canEquip` by `copyOf`; `schemaValidationItems.ts`; items.yaml regenerated (Appendix A, the 17 new items, effect fields as data, descriptions, NES prices, no copy ids); the House; shops (5) and closed shops; the Bottle; chest swaps C1-C17 (scripts, maps); kits (6, `found`) and their readers; the debug-scenario migration (D-EQ18); tests 9.1 (`ff1Items`, `ff1Shops`, `obtainability`, `ff1Chests`, `closedShop`, `houseItem`, `kitSources`) and every 9.2 data / region / scene test; `gearBands` rewrite; the balance re-measure (D-EQ17) | build, fast, `quest --strict`, maps |
+| T3 | mechanics 7.1-7.3 and their tests; the balance re-measured again where they move it | build, fast, `quest --strict` |
+| T4 | the debug scenarios of 9.4, the browser check, docs, the EQ result (measured (d) / (f), every re-measured bound old → new, the INTENT list, the gates' times) | all of 9.3; the integrator gates at the end, on `equip-ff1` itself, as the coordinator asked |
 
 ## 11. Risks
 
+- **R-1b, the hero protections of 7.2.** `isProtected` reading `hasTempResist` also lets the temporary resistances
+  of AFIR, AICE and WALL block status spells cast at heroes (WALL adds `status`, `poison_stone`, `death` and `time`).
+  That is FF1's rule, but it moves the late balance; `armourResist.test.ts` covers WALL vs a status spell too.
 - **R-1, balance moves a lot.** FF1 hit% on late weapons (masamune hit 50, defender 35 ...) adds about one hit per
   attack. The armlets grow (34 vs 22). The S18-S22 stage kits lose today's Gurgu / Onrac gear (ancestry, D-EQ11). Boss
   bands in `questCurve.test.ts` and the region boss tests may move both ways. Re-measure per D-EQ17. A broken intent is
@@ -430,8 +442,8 @@ shops, so new shops with old kits fail.
 - **R-2, act 1.** No Wooden Shield or Cap in Cornelia moves Garland (the most-tuned fight). Same rule.
 - **R-3, merge with class-copynote.** `classes.yaml` (identical `copyOf` hunks merge cleanly) and `items.yaml`
   `usableBy` (their copy ids conflict with this pass's 12-id lists; resolution: drop theirs).
-- **R-4, file ceilings.** `SpellExecutor` 311 / 314, `BattleStateMachine` 572 / 592, `types/index.ts` 424 / 442,
-  `schemaValidation` 380. The extractions are named in 7.3 and 8.
+- **R-4, file ceilings.** `SpellExecutor` 311 / 314, `BattleStateMachine` 572 / 592, `types/index.ts` 435 / 442
+  (441 after T2), `schemaValidation` 396 (about 380 after the T2 move). The extractions are named in 7.3 and 8.
 - **R-5, saves.** Old saves load with Hands empty. Their opened swapped chests reappear closed, a free item.
 - **R-6, the mutation cache misses.** No gate row or `nonLoadBearing` changes. If `--mutate` reports an uncaught
   element, the batch stops and it is reported.
@@ -459,8 +471,8 @@ defaults, each named in its decision and reversible:
 
 ## Appendix A: every gear item, was → new
 
-Stats are ATK / hit / crit for weapons and DEF / weight for armour. Jobs use FF1 codes for the 12 classic ids.
-Prices are only the shop prices; chest items keep theirs.
+Stats are ATK / hit / crit for weapons and DEF / weight for armour. Jobs use FF1 codes for the 12 classic ids. Prices
+are only the shop prices; chest items keep theirs.
 
 | id | FF1 | was ATK/hit/crit or DEF/WT | new | price | FF1 jobs (12 classic ids) | effects was → new |
 |---|---|---|---|---|---|---|
@@ -473,23 +485,23 @@ Prices are only the shop prices; chest items keep theirs.
 | `hand_axe` | hand_axe | 16/5/7 | **16/5/7** | 550 → 550 | Fi Kn Ni | - → - |
 | `iron_nunchaku` | iron_nunchuck | 16/0/9 | **16/0/9** | 200 → 200 | Ni BB Ma | - → - |
 | `iron_sword` | non-FF1 | 13/10/10 | **13/10/10** | 300 → 300 | Fi Kn RM RW | - → - |
-| `mythril_sword` | silver_sword | 23/10/12 | **23/15/17** | 4000 → 4000 | Fi Kn Ni RM RW | bonusVsFamily=undead → - |
-| `mythril_knife` | silver_knife | 15/10/12 | **10/15/16** | 800 → 800 | Fi Kn Th Ni RM RW BM BW | bonusVsFamily=undead → - |
-| `great_axe` | great_axe | 22/10/14 | **22/5/14** | 4500 → 4500 | Fi Kn Ni | bonusVsFamily=giant → - |
-| `mythril_hammer` | silver_hammer | 18/10/12 | **12/5/18** | 2500 → 2500 | Fi Kn Ni WM WW | bonusVsFamily=undead → - |
-| `power_staff` | power_staff | 12/10/10 | **12/0/28** | 1000 → 1000 | Fi Kn Ni BB Ma WM WW BM BW | - → - |
-| `flame_sword` | flame_sword | 26/10/16 | **26/20/20** | 10000 → 10000 | Fi Kn Ni RM RW | element=fire,bonusVsFamily=undead → element fire, bonusVsFamily undead |
-| `ice_brand` | ice_sword | 26/10/16 | **29/25/21** | 10000 → 10000 | Fi Kn Ni RM RW | element=ice → element ice |
-| `coral_sword` | coral_sword | 26/10/16 | **19/15/25** | 10000 → 10000 | Fi Kn Th Ni RM RW | element=lightning,bonusVsFamily=aquatic → bonusVsFamily aquatic |
-| `masamune` | masmune | 56/10/20 | **56/50/40** | 0 → 0 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | bonusVsFamily=dragon → - |
+| `mythril_sword` | silver_sword | 23/15/17 | **23/15/17** | 4000 → 4000 | Fi Kn Ni RM RW | - → - |
+| `mythril_knife` | silver_knife | 10/15/16 | **10/15/16** | 800 → 800 | Fi Kn Th Ni RM RW BM BW | - → - |
+| `great_axe` | great_axe | 22/5/14 | **22/5/14** | 4500 → 4500 | Fi Kn Ni | - → - |
+| `mythril_hammer` | silver_hammer | 12/5/18 | **12/5/18** | 2500 → 2500 | Fi Kn Ni WM WW | - → - |
+| `power_staff` | power_staff | 12/0/28 | **12/0/28** | 1000 → 1000 | Fi Kn Ni BB Ma WM WW BM BW | - → - |
+| `flame_sword` | flame_sword | 26/20/20 | **26/20/20** | 10000 → 10000 | Fi Kn Ni RM RW | element=fire,bonusVsFamily=undead → element fire, bonusVsFamily undead |
+| `ice_brand` | ice_sword | 29/25/21 | **29/25/21** | 10000 → 10000 | Fi Kn Ni RM RW | element=ice → element ice |
+| `coral_sword` | coral_sword | 19/15/25 | **19/15/25** | 10000 → 10000 | Fi Kn Th Ni RM RW | bonusVsFamily=aquatic → bonusVsFamily aquatic |
+| `masamune` | masmune | 56/50/40 | **56/50/40** | 0 → 0 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
 | `cloth` | cloth | 1/2 | **1/2** | 10 → 10 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
 | `robe` | non-FF1 | 2/2 | **2/2** | 20 → 20 | RM RW WM WW BM BW | - → - |
 | `leather_armor` | wooden_armor | 4/8 | **4/8** | 50 → 50 | Fi Kn Th Ni BB Ma RM RW | - → - |
 | `wooden_armor` | wooden_armor | 4/8 | **4/8** | 50 → 50 | Fi Kn Th Ni BB Ma RM RW | - → - |
 | `chain_mail` | chain_armor | 15/15 | **15/15** | 80 → 80 | Fi Kn Ni RM RW | - → - |
 | `iron_armor` | iron_armor | 24/23 | **24/23** | 800 → 800 | Fi Kn Ni | - → - |
-| `mythril_armor` | steel_armor | 34/33 | **34/33** | 7500 → 45000 | Fi Kn | - → - |
-| `mythril_mail` | silver_armor | 18/8 | **18/8** | 3500 → 7500 | Fi Kn Ni RM RW | - → - |
+| `mythril_armor` | steel_armor | 34/33 | **34/33** | 45000 → 45000 | Fi Kn | - → - |
+| `mythril_mail` | silver_armor | 18/8 | **18/8** | 7500 → 7500 | Fi Kn Ni RM RW | - → - |
 | `dragon_armor` | dragon_armor | 42/10 | **42/10** | 0 → 0 | Kn | - → resist fire+ice+lightning |
 | `wooden_shield` | wooden_shield | 2/0 | **2/0** | 15 → 15 | Fi Kn Ni | - → - |
 | `iron_shield` | iron_shield | 4/0 | **4/0** | 100 → 100 | Fi Kn Ni | - → - |
@@ -497,45 +509,61 @@ Prices are only the shop prices; chest items keep theirs.
 | `cap` | cap | 1/1 | **1/1** | 80 → 80 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
 | `iron_helm` | wooden_helmet | 3/3 | **3/3** | 100 → 100 | Fi Kn Ni | - → - |
 | `mythril_helm` | silver_helmet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni | - → - |
-| `silver_armlet` | silver_bracelet | 10/1 | **15/1** | 1200 → 5000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `scimitar` | scimitar | 20/5/10 | **10/10/8** | 3000 → 200 | Fi Kn Th Ni RM RW | - → - |
-| `gold_armlet` | gold_bracelet | 16/1 | **24/1** | 4000 → 50000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `falchion` | falchon | 24/10/14 | **15/10/15** | 8000 → 450 | Fi Kn Th Ni RM RW | - → - |
-| `cat_claw` | catclaw | 22/10/16 | **22/35/35** | 6500 → 65000 | Kn Ni RW BW | - → - |
-| `wizard_staff` | wizard_staff | 18/5/10 | **15/15/33** | 5000 → 5000 | BW | - → battleSpell conf |
+| `large_dagger` | large_dagger | 7/10/10 | **7/10/10** | 175 → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
+| `iron_staff` | iron_staff | 14/0/11 | **14/0/11** | 200 → 200 | Fi Kn Ni BB Ma | - → - |
+| `sabre` | sabre | 13/5/12 | **13/5/12** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
+| `long_sword` | long_sword | 20/10/13 | **20/10/13** | 1500 → 1500 | Fi Kn Ni RM RW | - → - |
+| `silver_axe` | silver_axe | 25/10/19 | **25/10/19** | 4500 → 4500 | Fi Kn Ni | - → - |
+| `copper_bracelet` | copper_bracelet | 4/1 | **4/1** | 1000 → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `buckler` | buckler | 2/0 | **2/0** | 2500 → 2500 | Fi Kn Th Ni RM RW | - → - |
+| `great_helm` | iron_helmet | 5/5 | **5/5** | 450 → 450 | Fi Kn Ni | - → - |
+| `gloves` | gloves | 1/1 | **1/1** | 60 → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `copper_gauntlet` | copper_gauntlet | 2/3 | **2/3** | 200 → 200 | Fi Kn Ni | - → - |
+| `iron_gauntlet` | iron_gauntlet | 4/5 | **4/5** | 750 → 750 | Fi Kn Ni | - → - |
+| `silver_gauntlet` | silver_gauntlet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni RW | - → - |
+| `zeus_gauntlet` | zeus_gauntlet | 6/3 | **6/3** | 15000 → 15000 | Kn Ni RW | - → battleSpell lit2 |
+| `power_gauntlet` | power_gauntlet | 6/3 | **6/3** | 10000 → 10000 | Kn Ni RW | - → battleSpell sabr |
+| `opal_gauntlet` | opal_gauntlet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
+| `pro_ring` | proring | 8/1 | **8/1** | 20000 → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
+| `silver_armlet` | silver_bracelet | 15/1 | **15/1** | 5000 → 5000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `scimitar` | scimitar | 10/10/8 | **10/10/8** | 200 → 200 | Fi Kn Th Ni RM RW | - → - |
+| `gold_armlet` | gold_bracelet | 24/1 | **24/1** | 50000 → 50000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `falchion` | falchon | 15/10/15 | **15/10/15** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
+| `cat_claw` | catclaw | 22/35/35 | **22/35/35** | 65000 → 65000 | Kn Ni RW BW | - → - |
+| `wizard_staff` | wizard_staff | 15/15/33 | **15/15/33** | 5000 → 5000 | BW | - → battleSpell conf |
 | `white_robe` | white_shirt | 24/2 | **24/2** | 9000 → 9000 | WW | - → battleSpell inv2, resist fire+death |
 | `black_robe` | black_shirt | 24/2 | **24/2** | 9000 → 9000 | BW | - → battleSpell ice2, resist ice+time |
-| `sun_blade` | sun_sword | 30/10/16 | **32/30/24** | 15000 → 15000 | Fi Kn Ni RM RW | - → bonusVsFamily undead |
-| `thor_hammer` | thors_hammer | 24/10/14 | **18/15/36** | 14000 → 14000 | Kn Ni WW | element=lightning → battleSpell lit2 |
-| `rune_knife` | non-FF1 | 26/10/18 | **18/15/27** | 12000 → 12000 | Th Ni RM RW BM BW | - → - |
-| `opal_armor` | opal_armor | 38/30 | **42/10** | 20000 → 20000 | Kn | - → resist lightning |
-| `opal_armlet` | opal_bracelet | 22/1 | **34/1** | 15000 → 15000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `aegis_shield` | aegis_shield | 12/0 | **16/0** | 16000 → 16000 | Kn | - → resist poison_stone |
+| `sun_blade` | sun_sword | 32/30/24 | **32/30/24** | 15000 → 15000 | Fi Kn Ni RM RW | bonusVsFamily=undead → bonusVsFamily undead |
+| `thor_hammer` | thors_hammer | 18/15/36 | **18/15/36** | 14000 → 14000 | Kn Ni WW | - → battleSpell lit2 |
+| `rune_knife` | non-FF1 | 18/15/27 | **18/15/27** | 12000 → 12000 | Th Ni RM RW BM BW | bonusVsFamily=magical → bonusVsFamily magical |
+| `opal_armor` | opal_armor | 42/10 | **42/10** | 20000 → 20000 | Kn | - → resist lightning |
+| `opal_armlet` | opal_bracelet | 34/1 | **34/1** | 15000 → 15000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `aegis_shield` | aegis_shield | 16/0 | **16/0** | 16000 → 16000 | Kn | - → resist poison_stone |
 | `opal_helm` | opal_helmet | 8/3 | **8/3** | 9000 → 9000 | Kn | - → - |
-| `defender` | defense | 34/10/18 | **30/35/32** | 30000 → 30000 | Kn Ni RW | - → battleSpell ruse |
-| `vorpal_sword` | vorpal | 32/10/24 | **24/25/34** | 28000 → 28000 | Kn Ni RW | - → - |
-| `dragon_claw` | non-FF1 | 30/10/20 | **30/35/35** | 26000 → 26000 | Kn Ni RW BW | - → - |
-| `diamond_armor` | opal_armor | 40/28 | **42/10** | 40000 → 40000 | Kn | - → resist lightning |
-| `diamond_armlet` | opal_bracelet | 30/1 | **34/1** | 30000 → 30000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `diamond_shield` | opal_shield | 14/0 | **16/0** | 25000 → 25000 | Kn | - → resist lightning |
-| `diamond_helm` | opal_helmet | 10/3 | **8/3** | 20000 → 20000 | Kn | - → - |
-| `excalibur` | xcalber | 45/15/20 | **45/35/39** | 0 → 0 | Kn | element=holy → bonusVsFamily all |
-| `large_dagger` | large_dagger | new | **7/10/10** | - → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
-| `iron_staff` | iron_staff | new | **14/0/11** | - → 200 | Fi Kn Ni BB Ma | - → - |
-| `sabre` | sabre | new | **13/5/12** | - → 450 | Fi Kn Th Ni RM RW | - → - |
-| `long_sword` | long_sword | new | **20/10/13** | - → 1500 | Fi Kn Ni RM RW | - → - |
-| `silver_axe` | silver_axe | new | **25/10/19** | - → 4500 | Fi Kn Ni | - → - |
-| `copper_bracelet` | copper_bracelet | new | **4/1** | - → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `buckler` | buckler | new | **2/0** | - → 2500 | Fi Kn Th Ni RM RW | - → - |
-| `great_helm` | iron_helmet | new | **5/5** | - → 450 | Fi Kn Ni | - → - |
-| `gloves` | gloves | new | **1/1** | - → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
-| `copper_gauntlet` | copper_gauntlet | new | **2/3** | - → 200 | Fi Kn Ni | - → - |
-| `iron_gauntlet` | iron_gauntlet | new | **4/5** | - → 750 | Fi Kn Ni | - → - |
-| `silver_gauntlet` | silver_gauntlet | new | **6/3** | - → 2500 | Fi Kn Ni RW | - → - |
-| `zeus_gauntlet` | zeus_gauntlet | new | **6/3** | - → 15000 | Kn Ni RW | - → battleSpell lit2 |
-| `power_gauntlet` | power_gauntlet | new | **6/3** | - → 10000 | Kn Ni RW | - → battleSpell sabr |
-| `opal_gauntlet` | opal_gauntlet | new | **8/3** | - → 20000 | Kn | - → - |
-| `pro_ring` | proring | new | **8/1** | - → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
+| `defender` | defense | 30/35/32 | **30/35/32** | 30000 → 30000 | Kn Ni RW | - → battleSpell ruse |
+| `vorpal_sword` | vorpal | 24/25/34 | **24/25/34** | 28000 → 28000 | Kn Ni RW | - → - |
+| `dragon_claw` | non-FF1 | 30/35/35 | **30/35/35** | 26000 → 26000 | Kn Ni RW BW | bonusVsFamily=dragon → bonusVsFamily dragon |
+| `diamond_armor` | opal_armor | 42/10 | **42/10** | 40000 → 40000 | Kn | - → resist lightning |
+| `diamond_armlet` | opal_bracelet | 34/1 | **34/1** | 30000 → 30000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `diamond_shield` | opal_shield | 16/0 | **16/0** | 25000 → 25000 | Kn | - → resist lightning |
+| `diamond_helm` | opal_helmet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
+| `excalibur` | xcalber | 45/35/39 | **45/35/39** | 0 → 0 | Kn | bonusVsFamily=all → bonusVsFamily all |
+| `large_dagger` | large_dagger | 7/10/10 | **7/10/10** | 175 → 175 | Fi Kn Th Ni RM RW BM BW | - → - |
+| `iron_staff` | iron_staff | 14/0/11 | **14/0/11** | 200 → 200 | Fi Kn Ni BB Ma | - → - |
+| `sabre` | sabre | 13/5/12 | **13/5/12** | 450 → 450 | Fi Kn Th Ni RM RW | - → - |
+| `long_sword` | long_sword | 20/10/13 | **20/10/13** | 1500 → 1500 | Fi Kn Ni RM RW | - → - |
+| `silver_axe` | silver_axe | 25/10/19 | **25/10/19** | 4500 → 4500 | Fi Kn Ni | - → - |
+| `copper_bracelet` | copper_bracelet | 4/1 | **4/1** | 1000 → 1000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `buckler` | buckler | 2/0 | **2/0** | 2500 → 2500 | Fi Kn Th Ni RM RW | - → - |
+| `great_helm` | iron_helmet | 5/5 | **5/5** | 450 → 450 | Fi Kn Ni | - → - |
+| `gloves` | gloves | 1/1 | **1/1** | 60 → 60 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → - |
+| `copper_gauntlet` | copper_gauntlet | 2/3 | **2/3** | 200 → 200 | Fi Kn Ni | - → - |
+| `iron_gauntlet` | iron_gauntlet | 4/5 | **4/5** | 750 → 750 | Fi Kn Ni | - → - |
+| `silver_gauntlet` | silver_gauntlet | 6/3 | **6/3** | 2500 → 2500 | Fi Kn Ni RW | - → - |
+| `zeus_gauntlet` | zeus_gauntlet | 6/3 | **6/3** | 15000 → 15000 | Kn Ni RW | - → battleSpell lit2 |
+| `power_gauntlet` | power_gauntlet | 6/3 | **6/3** | 10000 → 10000 | Kn Ni RW | - → battleSpell sabr |
+| `opal_gauntlet` | opal_gauntlet | 8/3 | **8/3** | 20000 → 20000 | Kn | - → - |
+| `pro_ring` | proring | 8/1 | **8/1** | 20000 → 20000 | Fi Kn Th Ni BB Ma RM RW WM WW BM BW | - → resist death |
 
 ## Appendix B: the kits (from `kits.py`; *italic* = `found`; every clone row = its template)
 
@@ -576,6 +604,6 @@ Prices are only the shop prices; chest items keep theirs.
 | w_s25 | = above | | | | | | | | | | | |
 | w_s26 | = above | | | | | | | | | | | |
 | w_s27 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *ice_brand*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *opal_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring | mythril_sword, gold_armlet, buckler, cap, pro_ring, *flame_sword* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *defender*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *ice_brand*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *flame_sword* |
-| w_s28 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *ice_brand*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *flame_sword* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *defender*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *dragon_claw*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* |
-| w_s29 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *defender*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *dragon_claw*, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* |
+| w_s28 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *ice_brand*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *flame_sword* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *dragon_claw*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *defender*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* |
+| w_s29 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *dragon_claw*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *defender*, *opal_armlet* |
 | w_s30 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *masamune*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *sun_blade*, *opal_armlet* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *masamune*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *dragon_claw*, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *defender*, *opal_armlet* |
