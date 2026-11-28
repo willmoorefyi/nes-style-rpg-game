@@ -3732,3 +3732,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the diver / abyssal knight class pair (user-rendered
+# battle art; copies of the warrior / knight). DIVER is weak so it kneels; KNGT is the like-for-like control.
+# ?mute=1&scenario=cb_divers (&kneel=loop, &enemyAnim=loop).
+- id: cb_divers
+  name: Diver and Abyssal Knight (pass CB preview)
+  party:
+    - { class: diver, name: DIVER, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [], hp: 20 }
+    - { class: abyssal_knight, name: ABYSS, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+    - { class: diver, name: DIVER2, level: 10, equipment: [rapier, leather_armor, wooden_shield], spells: [] }
+    - { class: knight, name: KNGT, level: 30, equipment: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

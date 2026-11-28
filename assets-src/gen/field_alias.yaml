@@ -42,3 +42,5 @@ clockmaker: white_mage   # temporary until the user renders the clockmaker's fie
 chronomancer: white_wizard   # temporary until the user renders the chronomancer's field walk sheet
 witch_hunter: monk   # temporary until the user renders the witch hunter's field walk sheet
 inquisitor: master   # temporary until the user renders the inquisitor's field walk sheet
+diver: warrior   # temporary until the user renders the diver's field walk sheet
+abyssal_knight: knight   # temporary until the user renders the abyssal knight's field walk sheet

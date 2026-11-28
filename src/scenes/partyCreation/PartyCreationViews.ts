@@ -16,6 +16,7 @@ export const DEFAULT_NAMES: Record<string, string> = {
   black_mage: 'B.MAG',
   red_mage: 'R.MAG',
   barbarian: 'BARB',
+  diver: 'DIVER',
   witch_hunter: 'WITCH',
   clockmaker: 'CLOCK',
   tinker: 'TINKR',

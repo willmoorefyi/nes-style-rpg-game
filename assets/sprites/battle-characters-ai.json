@@ -535,6 +535,16 @@
       "row": 1,
       "page": 4,
       "inbetweens": true
+    },
+    "diver": {
+      "row": 2,
+      "page": 4,
+      "inbetweens": true
+    },
+    "abyssal_knight": {
+      "row": 3,
+      "page": 4,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -561,7 +571,7 @@
     {
       "file": "battle-characters-ai-4.png",
       "w": 2880,
-      "h": 320
+      "h": 640
     }
   ]
 }

@@ -1,0 +1,278 @@
+{
+  "character": "diver",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/diver/battle_2026-11-27.png",
+    "sha256": "adc2aab5f23994d641b6b48abd1c06be6cf14fbacdcd78bf793d14061e662821"
+  },
+  "recipe": "hero_user.yaml#diver_abyssal_knight",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "diver_abyssal_knight_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "next queued up class is the diver / abyssal knight class. They can be a shallow copy of the warrior / knight (delivered as final; the harpoon in flight, the bubbles, the knocked-away gun, the harpoon on the ground, the cyan glow arcs and the anchor kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          24,
+          25,
+          28
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          49,
+          91,
+          96
+        ],
+        [
+          49,
+          90,
+          99
+        ]
+      ],
+      [
+        [
+          51,
+          41,
+          34
+        ],
+        [
+          49,
+          41,
+          33
+        ]
+      ],
+      [
+        [
+          75,
+          80,
+          86
+        ],
+        [
+          74,
+          82,
+          82
+        ]
+      ],
+      [
+        [
+          80,
+          56,
+          44
+        ],
+        [
+          82,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          108,
+          182,
+          180
+        ],
+        [
+          107,
+          181,
+          181
+        ]
+      ],
+      [
+        [
+          110,
+          78,
+          52
+        ],
+        [
+          107,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          119,
+          125,
+          128
+        ],
+        [
+          115,
+          123,
+          132
+        ]
+      ],
+      [
+        [
+          141,
+          103,
+          63
+        ],
+        [
+          140,
+          107,
+          66
+        ]
+      ],
+      [
+        [
+          171,
+          166,
+          161
+        ],
+        [
+          173,
+          165,
+          165
+        ]
+      ],
+      [
+        [
+          175,
+          137,
+          81
+        ],
+        [
+          173,
+          140,
+          82
+        ]
+      ],
+      [
+        [
+          180,
+          135,
+          108
+        ],
+        [
+          181,
+          132,
+          107
+        ]
+      ],
+      [
+        [
+          211,
+          171,
+          103
+        ],
+        [
+          214,
+          173,
+          107
+        ]
+      ],
+      [
+        [
+          217,
+          247,
+          238
+        ],
+        [
+          214,
+          247,
+          239
+        ]
+      ],
+      [
+        [
+          227,
+          198,
+          154
+        ],
+        [
+          231,
+          198,
+          156
+        ]
+      ],
+      [
+        [
+          240,
+          221,
+          187
+        ],
+        [
+          239,
+          222,
+          189
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        15,
+        6,
+        66,
+        76
+      ],
+      "attack": [
+        1,
+        7,
+        78,
+        76
+      ],
+      "cast": [
+        18,
+        1,
+        64,
+        76
+      ],
+      "hurt": [
+        1,
+        5,
+        78,
+        76
+      ],
+      "down": [
+        1,
+        40,
+        78,
+        76
+      ],
+      "victory": [
+        15,
+        0,
+        67,
+        76
+      ]
+    }
+  }
+}

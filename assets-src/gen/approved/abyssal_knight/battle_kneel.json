@@ -1,0 +1,237 @@
+{
+  "character": "abyssal_knight",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/diver/battle_2026-11-27.png",
+    "sha256": "adc2aab5f23994d641b6b48abd1c06be6cf14fbacdcd78bf793d14061e662821"
+  },
+  "recipe": "hero_user.yaml#diver_abyssal_knight",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "diver_abyssal_knight_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "next queued up class is the diver / abyssal knight class. They can be a shallow copy of the warrior / knight (delivered as final; the harpoon in flight, the bubbles, the knocked-away gun, the harpoon on the ground, the cyan glow arcs and the anchor kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          22,
+          30,
+          29
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          43,
+          98,
+          97
+        ],
+        [
+          41,
+          99,
+          99
+        ]
+      ],
+      [
+        [
+          44,
+          48,
+          39
+        ],
+        [
+          41,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          61,
+          74,
+          52
+        ],
+        [
+          57,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          77,
+          150,
+          145
+        ],
+        [
+          74,
+          148,
+          148
+        ]
+      ],
+      [
+        [
+          79,
+          59,
+          49
+        ],
+        [
+          82,
+          57,
+          49
+        ]
+      ],
+      [
+        [
+          82,
+          100,
+          73
+        ],
+        [
+          82,
+          99,
+          74
+        ]
+      ],
+      [
+        [
+          112,
+          128,
+          99
+        ],
+        [
+          115,
+          132,
+          99
+        ]
+      ],
+      [
+        [
+          113,
+          210,
+          202
+        ],
+        [
+          115,
+          214,
+          206
+        ]
+      ],
+      [
+        [
+          117,
+          84,
+          56
+        ],
+        [
+          115,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          137,
+          147,
+          149
+        ],
+        [
+          140,
+          148,
+          148
+        ]
+      ],
+      [
+        [
+          154,
+          118,
+          79
+        ],
+        [
+          156,
+          115,
+          82
+        ]
+      ],
+      [
+        [
+          196,
+          154,
+          98
+        ],
+        [
+          198,
+          156,
+          99
+        ]
+      ],
+      [
+        [
+          205,
+          255,
+          240
+        ],
+        [
+          206,
+          255,
+          239
+        ]
+      ],
+      [
+        [
+          229,
+          187,
+          141
+        ],
+        [
+          231,
+          189,
+          140
+        ]
+      ],
+      [
+        [
+          239,
+          221,
+          190
+        ],
+        [
+          239,
+          222,
+          189
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        7,
+        13,
+        74,
+        76
+      ]
+    }
+  }
+}

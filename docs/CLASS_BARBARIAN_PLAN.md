@@ -738,3 +738,53 @@ Field alias monk / master (temporary); walk-sheet pack entries (the crossbow slu
 in hand, its flame inside the 92 px cap). `fx_colours`: the blue coat specks and the orange torch flames. The
 in-betweens are the keys held or shifted whole (the witch hunter's cast frames aliased to the cast key). Image
 review: round 1 **APPROVE** both.
+
+### 18.8 Diver / abyssal knight result (2026-11-28, branch class-copynote, tenth commit)
+
+User (verbatim): "next queued up class is the diver / abyssal knight class. They can be a shallow copy of the warrior /
+knight". Exact copies of warrior -> knight with `copyOf`: `diver` (DIV, default name DIVER) -> `abyssal_knight` (ABY).
+On page 4 (4 rows, 2880 x 640). Field alias warrior / knight (temporary); walk-sheet pack entries (the harpoon gun
+slung, the air tanks on the back; the drill lance upright, shortened under the 92 px cap, the lure inside the cell).
+No border exemption was needed (the cells touch row 0 only and none crosses a border). `fx_colours`: the bubbles and
+the cyan glows. The in-betweens are the keys held or shifted whole (the drill lance stays rigid); the abyssal knight's
+speckled frames aliased. Image review: round 1 **APPROVE** both.
+
+## 19. Amendment A8 (gravity adept / void walker): an airborne READY
+
+User: the gravity adept / void walker, copies of the black mage / black wizard. The void walker's READY levitates:
+its lowest opaque row is 74, not 76 (every other cell of the sheet is on 76). It is kept floating as drawn. A7
+(section 18) refuses `ready` in `airborne`, because the in-betweens drawn from ready and the kneel bridge's first frame
+assume it stands on the feet row.
+
+- **Data:** the recipe's `airborne` may list `<class>/ready` (`shieldmaiden_valkyrie`'s form): `gravity_adept_void_walker`
+  gets `airborne: {void_walker/ready: 74}`. `kneel` stays refused (the kneel key is the bridge's ground).
+- **Importer (`hero_user_grid.airborne`):** `ready` leaves the refused set; every other A7 rule is unchanged (the
+  recorded row must equal the cell's lowest body row, an int in [0, feet row), not a bool).
+- **Anchor (unchanged, stated):** the hero is still placed by the class's `footRow` (76): the atlas, the battle layout
+  (`partySpritePosition`), the lunge and the party-creation preview never read a frame's lowest pixel (checked for A7).
+  So READY floats 2 px as drawn, and so do the in-betweens drawn from it (idle_b, atk_wind1, atk_wind2, cast_gather:
+  the idle breath floats with it); the attack and cast keys and their in-betweens stand on 76 as drawn. No key is moved.
+- **Kneel bridge:** `kneel_in1` is ready squashed toward the key, its bottom rows kept row for row (`keep_bot`), so it
+  ends on ready's row (74): it is the descent's first step, and `kneel_in2` (from the key) lands on 76. The kneel
+  checks (`puppet_kneel.check_frames` -> `frame_checks`' K-ground) expect `kneel_in1`'s lowest row on ready's recorded
+  airborne row instead of the feet row; `kneel_in2`, `kneel` and `kneel_b` keep the feet row. The class's
+  `battle.json` `airborne` (A7) is the source (`{ready: 74}`); `puppet_kneel` reads it.
+- **Scope (byte-identical claim):** no other recipe lists `ready`, so every other class's cells and kneel checks are
+  unchanged (the byte gate against the branch's previous commit; page 3 and page 4's existing rows byte-equal).
+- **Tests:**
+  - `selftest_hero_user.py`: the A7 case "ready refused" becomes "ready accepted, kneel refused"; a synthetic sheet
+    with a lifted ready imports with `airborne: {<c>/ready: 73}` and is refused without it.
+  - `selftest_hero_user.py` / `puppet_kneel`: on that synthetic class, `frame_checks` for `kneel_in1` passes with the
+    lowest row on 73 and fails on 76 or 74 (the expected row comes from `airborne`); an unlisted class still expects 76.
+  - `tests/rendering/gravityArt.test.ts`: the void walker's ready, idle_b, atk_wind1, atk_wind2, cast_gather and
+    kneel_in1 end on row 74 (measured, pinned); the attack and cast keys and their in-betweens, kneel_in2, kneel and
+    kneel_b on 76.
+  - The browser check shows the floating idle and the kneel (screenshot to `~/temp/ff-game/class_pack/gravity/`).
+- **Momus OKAY 4/5 (2026-11-28); notes taken:** `check_frames(cid, ...)` reads `battle.json` `airborne.ready` and
+  passes it as `bottom` for `kneel_in1`'s `frame_checks` (K-ground and K-fit agree); the selftest calls
+  `check_frames` on a synthetic class in a temporary approved tree. The floating start is kept by
+  `kneel_bridge.remap_rows`, which anchors the resized rows on the source's own lowest row (not by `keep_bot`). The
+  rows of the frames drawn from ready are measured after the build and pinned (a frame that lands on 76 is pinned at
+  76; an aliased frame is ready's, 74). The void walker's kneel is `source: user`, so its held frames are drawn from
+  the key and skip the contact share. The pair goes on page 4 after the witch hunter, the diver, the dancer and the
+  aeronaut.

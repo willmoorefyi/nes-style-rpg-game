@@ -832,3 +832,42 @@ inquisitor:
     a heavier crossbow is slung on his back; a burning torch is held upright in his right hand (the hand toward the
     viewer's left in the front view), its flame no higher than the top of the head, inside the 92 px cap. The torch
     touches the hand and everything stays inside the 48 x 96 cell
+
+diver:
+  name: Diver
+  tier: base
+  partner: abyssal_knight
+  battle_sheet: ~/temp/heroes/diver_abyssal_knight_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: warrior
+  look: >-
+    a deep-sea diver: a round brass diving helmet with three small glass ports; a patched canvas diving suit with
+    brass collar bolts and leather straps, heavy weighted boots. Colours: brass, canvas tan, brown leather, dark grey
+  carry: >-
+    two small air tanks are strapped on his back; the harpoon gun is slung on his back on a strap over the right
+    shoulder, its barrel up behind the left shoulder, never above the 92 px cap; both hands are free. Everything touches
+    the body and stays inside the 48 x 96 cell
+
+abyssal_knight:
+  name: Abyssal Knight
+  tier: enhanced
+  partner: diver
+  battle_sheet: ~/temp/heroes/diver_abyssal_knight_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: knight
+  look: >-
+    the diver become an abyssal knight: a dark teal helm with a small anglerfish lure hanging in front of the visor,
+    glowing cyan; barnacled dark teal plate armour; a ragged green kelp mantle over the shoulders. Colours: dark teal,
+    sea green, cyan glow, bone white barnacles
+  carry: >-
+    the spiral drill lance is carried upright in his right hand (the hand toward the viewer's left in the front view),
+    shortened so its point stays level with the helm, never above the 92 px cap, its butt near the ground beside the
+    foot; the lure stays inside the cell above the helm. Everything stays inside the 48 x 96 cell

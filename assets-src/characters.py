@@ -847,7 +847,14 @@ ROSTER: dict[str, Look] = {
     # inquisitor in black plate with a red sash, a heavy crossbow and a torch
     "witch_hunter": Look(hair=(10, 7, 5), hair_style="short", outfit="coat", cloth=(8, 7, 7), trim=(20, 16, 9),
                          pants=(6, 6, 6), boots=(5, 5, 5), gear="round_hat", gear_color=(6, 5, 5)),
+    # pass CB (plan 11-18): the diver in a brass diving helmet and a canvas suit with an air tank and a harpoon gun;
+    # the abyssal knight in barnacled armour with a kelp mantle and a drill lance
+    "diver": Look(hair=None, hair_style="bald", outfit="armor", cloth=(20, 17, 12), trim=(23, 16, 6),
+                  pants=(20, 17, 12), boots=(10, 8, 6), gear="helm", gear_color=(23, 16, 6), weapon="spear"),
     # Upgraded classes
+    "abyssal_knight": Look(hair=None, hair_style="bald", outfit="armor", cloth=(6, 11, 12), trim=(12, 22, 20),
+                           pants=(6, 11, 12), boots=(5, 7, 8), gear="helm", gear_color=(8, 14, 15), weapon="spear",
+                           cape=(5, 12, 8)),
     "inquisitor": Look(hair=(10, 7, 5), hair_style="short", outfit="armor", cloth=(5, 5, 6), trim=(22, 4, 4),
                        pants=(5, 5, 6), boots=(4, 4, 5), gear="helm", gear_color=(6, 6, 7)),
     "chronomancer": Look(hair=(26, 26, 26), hair_style="long", outfit="robe", cloth=(6, 6, 12), trim=(27, 21, 8),
