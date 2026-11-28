@@ -423,8 +423,9 @@ export class BattleStateMachine {
     const spell = cmd.spellId ? this.spells.find(s => s.id === cmd.spellId) : undefined;
     if (cmd.spellId) Object.assign(result, { spellId: cmd.spellId, spellName: spell?.name ?? cmd.spellId });
     if (spell?.targeting === 'all') result.allTargets = true;
-    if (cmd.type === 'magic' && silenced) result.silenced = true;
+    if (cmd.type === 'magic' && silenced && !cmd.viaItem) result.silenced = true;   // a worn item's cast is never silenced (EQ)
     if (cmd.itemId) Object.assign(result, { itemId: cmd.itemId, itemName: ItemRegistry.getItem(cmd.itemId)?.name ?? cmd.itemId });
+    if (cmd.viaItem) result.itemName = ItemRegistry.getItem(cmd.viaItem)?.name ?? cmd.viaItem;
 
     return result;
   }

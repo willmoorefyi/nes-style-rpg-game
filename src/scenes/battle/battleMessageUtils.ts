@@ -8,7 +8,8 @@ import type { NextActionInfo } from '../../battle/BattleStateMachine.js';
 export function formatAnnouncement(info: Omit<NextActionInfo, 'actorId'>): string {
   switch (info.actionType) {
     case 'fight': return `${info.actorName} attacks ${info.targetName ?? 'enemy'}!`;
-    case 'magic': return `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
+    case 'magic': return info.itemName ? `${info.actorName} uses the ${info.itemName}: ${info.spellName ?? 'spell'}!`   // a worn item (EQ)
+      : `${info.actorName} ${info.silenced ? 'tries to cast' : 'casts'} ${info.spellName ?? 'spell'}!`;
     case 'item': return `${info.actorName} uses ${info.itemName ?? 'an item'}!`;
     case 'run': return `${info.actorName} tries to run!`;
     case 'slam': return `${info.actorName} slams down!`;

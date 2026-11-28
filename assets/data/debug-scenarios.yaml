@@ -3641,9 +3641,7 @@
   name: EQ - worn items cast their spells (Zeus Gauntlet, Power Gauntlet, White Shirt, Defender)
   party:
     - { class: knight, name: KNGHT, level: 28, equipment: [defender, opal_armor, aegis_shield, opal_helm, zeus_gauntlet], spells: [] }
-    - { class: ninja, name: NINJA, level: 28, equipment: [vorpal_sword, opal_armlet, buckler, cap, power_gauntlet], spells: [] }
     - { class: white_wizard, name: W.WIZ, level: 28, equipment: [thor_hammer, white_robe, cap, pro_ring], spells: [{ id: cure2, level: 3 }] }
-    - { class: black_wizard, name: B.WIZ, level: 28, equipment: [wizard_staff, black_robe, cap, gloves], spells: [{ id: fir2, level: 3 }] }
   items: {}
   gold: 0
-  enemies: [goblin, goblin, wolf]
+  enemies: [ice_gigas]

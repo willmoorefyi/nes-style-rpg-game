@@ -26,5 +26,5 @@ export function emitActionSounds(info: NextActionInfo, result: ActionResult,
   emit: (event: ActionSound, data: GameEvents['battleHit']) => void): void {
   if (result.missed) emit('battleMiss', {});
   else if (info.actionType === 'fight' && result.damageEvents.some(e => !e.isHeal && e.damage > 0)) emit('battleHit', {});
-  if (info.actionType === 'magic' && result.messages.some(m => m.text.startsWith(`${info.actorName} casts `))) emit('spellCast', {});
+  if (info.actionType === 'magic' && result.messages.some(m => m.text.startsWith(`${info.actorName} casts `) || m.text.startsWith(`${info.actorName} uses the `))) emit('spellCast', {});
 }

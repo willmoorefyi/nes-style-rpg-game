@@ -595,3 +595,49 @@ are only the shop prices; chest items keep theirs.
 | w_s28 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *ice_brand*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *flame_sword* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *dragon_claw*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *defender*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* |
 | w_s29 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *ice_brand*, *opal_armlet* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *dragon_claw*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *defender*, *opal_armlet* |
 | w_s30 | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *masamune*, *diamond_armlet* | falchion, gold_armlet, buckler, cap, pro_ring, *coral_sword*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *diamond_armlet* | mythril_knife, gold_armlet, cap, pro_ring, *rune_knife*, *opal_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *sun_blade*, *opal_armlet* | silver_axe, mythril_armor, mythril_shield, mythril_helm, pro_ring, *masamune*, *diamond_armor*, *aegis_shield*, *diamond_helm* | silver_axe, gold_armlet, mythril_shield, mythril_helm, pro_ring, *sun_blade*, *diamond_armlet* | mythril_hammer, gold_armlet, cap, pro_ring, *thor_hammer*, *diamond_armlet* | cat_claw, gold_armlet, cap, pro_ring, *dragon_claw*, *diamond_armlet* | gold_armlet, cap, pro_ring, *opal_armlet* | mythril_sword, gold_armlet, buckler, cap, pro_ring, *defender*, *opal_armlet* |
+
+## EQ result (2026-11-27, branch `equip-ff1`)
+
+Commits: T0 the plan (c1e55375, rev 3 0ee63900 / b69d2fba after Momus round 1; Momus round 2: OKAY 4/5), T1 the slot
+(70b86c6f), T2+T3 data and mechanics (fe32aa0b), T4 scenarios, the battle announcement for worn items, docs (this
+commit).
+
+- `npm run build` OK; `npm run test:fast` 476 files, 11471 tests, all pass.
+- `npm run quest -- --strict` OK in 129 s: (c) 866403 states; (d) every band unchanged (the curve model reads no
+  item stats); (f) `crescent 13169/78670  gaia 98095/290990` (was 60240 / 259240): only Crescent and Gaia walled.
+- 22 maps regenerated and compiled; `build_map.py --check-determinism` deterministic on all 22; a second run of the
+  19 layout scripts leaves `assets-src/maps` byte-identical; `build_map.py --selftest` 156 checks passed (262 s).
+  (`map_selftest.py` run directly under `-I` cannot import `kit`, on mainline too; its checks run inside `--selftest`.)
+- Browser (`?mute=1`, screenshots `~/temp/ff-game/equip/`): Pravoka's armour shop lists FF1's five items with Gloves
+  60 G and the DEF +1 comparison; the Equip screen shows five rows ending "Hands: Gloves"; the battle Item command
+  opens with no consumables and lists "Defender (worn)" / "Zeus Gauntlet (worn)"; "W.WIZ uses the White Robe: INV2!"
+  and "W.WIZ uses the Thor Hammer: LIT2!" (EVA+ on both heroes); Onrac's closed weapon shop says its line and opens
+  nothing (`Shop onrac_weapon is closed`).
+
+### Balance (D-EQ17): bounds rewritten to the new measured values; INTENT = the old bound's intent no longer holds
+
+The direction is consistent: act 1 is harder (no Wooden Shield, no Caps in Cornelia), the Melmond tier (S11-S13) is
+harder (the Mythril weapons and armlets moved to Crescent / Gaia, FF1), and the late game is much easier (FF1's hit%
+on late weapons: Masamune 50, Defender 35, Opal Bracelet 34 ...). For the user to decide:
+
+| test | was (measured) | now (measured) |
+|---|---|---|
+| Garland, careless Lv3 400 G kit | 55-75 % (64.75) | 35-60 % (45.5) |
+| Garland after 2 temple battles, 400 G kit | 55-70 % (60) | 30-50 % (39) |
+| Garland after 2 temple battles, lv2 kit | 40-58 % (50.5) | 25-45 % (31.5) |
+| Garland after 3 temple battles, arrival kit | 50-70 % (61.5) | 25-45 % (34.25) |
+| Vampire S11 Lv14 / Lv16 | 75-95 (79.3) / >= 85 (90.5) | 50-95 (53) / >= 70 (77.75) |
+| Rime Sovereign S13 Lv17 / Lv19 | 60-80 (69.8) / >= 85 (91.3) | 45-80 (48.25) / >= 65 (70.5) |
+| Ashen Queen S15 Lv21 / Lv23 | <= 45 (40.8) / 60-80 (64) | <= 85 (78.25) / 60-95 (89.5) |
+| Evil Eye S16 Lv20 | <= 64 (60.3) | <= 70 (66.75) |
+| Trial guardian S18 Lv25 | 75-95 (86.5) | 70-95 (74.25) |
+| Drowned Sovereign S24 Lv26 / Lv28 | <= 45 (36.3) / 60-80 (68) | <= 65 (59.75) / 60-85 (81.5) |
+| Hollow Seraph S28 Lv30 / Lv32 / careless | <= 50 (44.3) / 60-80 (65) / <= 80 (65.8) | <= 95 (91) / 60-100 (97.25) / <= 100 (97.5) |
+| Warmech S28 Lv30 / Lv32 / careless | <= 50 (46.5) / 55-80 (60.3) / <= 80 (57.5) | <= 90 (86.25) / 55-100 (93) / <= 95 (91.5) |
+| Temple of the Past: 4 refights L37 / L34, floor 5 | 60-85 (78.5) / <= 40 (17.8) / 70-90 (82.5) | 60-100 (97.25) / <= 100 (95.25) / 70-100 (97.25) |
+| Chaos L40: every form acts twice / 10-16 rounds / win | >= 90 (99.5) / >= 91 (100) / <= 99.5 (96.5) | >= 25 (31.8) / >= 65 (71.8) / <= 100 (100) |
+
+Re-measured inside their bounds (names updated): Garland's sensible Lv2 lv2 kit 55.75 % (bound now 50-62), sensible
+Lv2 400 G kit 62 % (55-75), the Trial guardian at Lv27 91.75 % (>= 85), Chaos's median 10 rounds ([8, 15]) and
+command phase 99.3 % (>= 95); the other region bounds kept with their new values in the names. The tests that passed
+unchanged (zones, fieldPacing, economy, questCurve and the act-1 helpers) were not re-measured.
