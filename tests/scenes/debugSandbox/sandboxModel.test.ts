@@ -43,7 +43,7 @@ describe('sandbox model: cycling', () => {
     seen.clear();
     for (let i = 0; i < N; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
     expect(seen.size).toBe(N);
-    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer', 'mystic_warrior', 'sage_hero', 'rifleman', 'valkyrie', 'virtuoso', 'duelist', 'plague_doctor', 'machinist', 'chronomancer', 'inquisitor', 'abyssal_knight']));
+    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer', 'mystic_warrior', 'sage_hero', 'rifleman', 'valkyrie', 'virtuoso', 'duelist', 'plague_doctor', 'machinist', 'chronomancer', 'inquisitor', 'abyssal_knight', 'blade_dancer']));
   });
 
   it('turning promoted off demotes a promoted member to its base class', () => {

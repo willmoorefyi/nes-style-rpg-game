@@ -3747,3 +3747,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the dancer / blade dancer class pair (user-rendered
+# battle art; copies of the monk / master). DANCR is weak so it kneels; MSTR is the like-for-like control.
+# ?mute=1&scenario=cb_dancers (&kneel=loop, &enemyAnim=loop).
+- id: cb_dancers
+  name: Dancer and Blade Dancer (pass CB preview)
+  party:
+    - { class: dancer_hero, name: DANCR, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
+    - { class: blade_dancer, name: BLADE, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: dancer_hero, name: DANCR2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

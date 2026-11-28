@@ -545,6 +545,16 @@
       "row": 3,
       "page": 4,
       "inbetweens": true
+    },
+    "dancer_hero": {
+      "row": 4,
+      "page": 4,
+      "inbetweens": false
+    },
+    "blade_dancer": {
+      "row": 5,
+      "page": 4,
+      "inbetweens": false
     }
   },
   "pages": [
@@ -571,7 +581,7 @@
     {
       "file": "battle-characters-ai-4.png",
       "w": 2880,
-      "h": 640
+      "h": 960
     }
   ]
 }

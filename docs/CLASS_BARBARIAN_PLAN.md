@@ -749,6 +749,17 @@ No border exemption was needed (the cells touch row 0 only and none crosses a bo
 the cyan glows. The in-betweens are the keys held or shifted whole (the drill lance stays rigid); the abyssal knight's
 speckled frames aliased. Image review: round 1 **APPROVE** both.
 
+### 18.9 Dancer / blade dancer result (2026-11-28, branch class-copynote, eleventh commit)
+
+User (verbatim): "next for classes add the dancer / blade dancer as a monk copy class". Exact copies of monk ->
+master with `copyOf`: `dancer_hero` (Dancer, DNC, default name DANCR; `dancer` is Arylon the NPC dancer, whose field
+sheet stays her own, pinned in dancerArt.test.ts) -> `blade_dancer` (Blade Dancer, BLD). On page 4 (6 rows, 2880 x
+960). Field alias monk / master (temporary); walk-sheet pack entries (the ribbons held close; the sabres sheathed at
+the hips; the braid and ribbons inside 46 px). The long ribbons and the thin sabre blades reach the cell edges: every
+battle in-between shows its key exactly (each re-render gained 3-78 outline specks at the ribbon and blade tips); no
+`fx_colours` (no clear effect colour: the light edges include skin). No border exemption was needed. Image review:
+round 1 **APPROVE** both (the kneel bridge keeps the ribbons and blades unbroken).
+
 ## 19. Amendment A8 (gravity adept / void walker): an airborne READY
 
 User: the gravity adept / void walker, copies of the black mage / black wizard. The void walker's READY levitates:

@@ -20,6 +20,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -46,6 +47,7 @@
   price: 10
   usableBy:
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -71,6 +73,7 @@
   - scholar_hero
   - rune_knight
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -177,6 +180,7 @@
   price: 200
   usableBy:
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -394,6 +398,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -433,6 +438,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -491,6 +497,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -696,6 +703,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -845,6 +853,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -910,6 +919,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -963,6 +973,7 @@
   price: 6500
   usableBy:
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -1118,6 +1129,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -1222,6 +1234,7 @@
   price: 26000
   usableBy:
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster
@@ -1265,6 +1278,7 @@
   - hunter
   - ronin
   - monk
+  - dancer_hero
   - witch_hunter
   - tinker
   - beastmaster

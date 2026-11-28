@@ -416,3 +416,20 @@ diver_abyssal_knight:
   source_name: diver_abyssal_knight_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "next queued up class is the diver / abyssal knight class. They can be a shallow copy of the warrior / knight (delivered as final; the harpoon in flight, the bubbles, the knocked-away gun, the harpoon on the ground, the cyan glow arcs and the anchor kept as rendered)"
+dancer_hero_blade_dancer:
+  file: user_art/dancer_hero/battle_2026-11-27.png
+  sha256: 7f5fec97a9317bcf6e3bea34aaef650f55736d03361863d019cace36d03da24b
+  rows: [dancer_hero, blade_dancer]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: dancer_blade_dancer_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "next for classes add the dancer / blade dancer as a monk copy class (delivered as final; the long ribbons, the petal specks, the thin sabre blades, the cape and the slash arcs kept as rendered)"

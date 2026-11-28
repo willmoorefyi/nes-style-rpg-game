@@ -871,3 +871,40 @@ abyssal_knight:
     the spiral drill lance is carried upright in his right hand (the hand toward the viewer's left in the front view),
     shortened so its point stays level with the helm, never above the 92 px cap, its butt near the ground beside the
     foot; the lure stays inside the cell above the helm. Everything stays inside the 48 x 96 cell
+
+dancer_hero:
+  name: Dancer
+  tier: base
+  partner: blade_dancer
+  battle_sheet: ~/temp/heroes/dancer_blade_dancer_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: monk
+  look: >-
+    a young dancer, about 18: long dark hair in a single braid; a bright face; a teal-and-orange dancer's outfit, a
+    short teal top with an orange sash, loose teal trousers gathered at the ankles, soft slippers; gold bangles.
+    Colours: dark hair, warm skin, teal, orange, gold
+  carry: >-
+    two long teal ribbons are held close in her hands and wrapped once round the wrists, their ends hanging by the
+    hips; the braid hangs down the back. The ribbons and the braid stay inside the 46 px width and the 48 x 96 cell
+
+blade_dancer:
+  name: Blade Dancer
+  tier: enhanced
+  partner: dancer_hero
+  battle_sheet: ~/temp/heroes/dancer_blade_dancer_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: master
+  look: >-
+    the dancer become a blade dancer: long dark hair in a braid; a dark teal outfit with gold trim, an orange sash and
+    a short orange cape. Colours: dark hair, warm skin, dark teal, orange, gold, steel
+  carry: >-
+    two curved sabres are sheathed at her hips, one on each side, hilts forward, close to the body; the cape hangs
+    behind. Everything stays inside the 46 px width and the 48 x 96 cell

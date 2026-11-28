@@ -851,7 +851,12 @@ ROSTER: dict[str, Look] = {
     # the abyssal knight in barnacled armour with a kelp mantle and a drill lance
     "diver": Look(hair=None, hair_style="bald", outfit="armor", cloth=(20, 17, 12), trim=(23, 16, 6),
                   pants=(20, 17, 12), boots=(10, 8, 6), gear="helm", gear_color=(23, 16, 6), weapon="spear"),
+    # pass CB (plan 11-18): the dancer (hero id dancer_hero; "dancer" is the NPC Arylon) in a teal-and-orange
+    # outfit with long ribbons; the blade dancer with two curved sabres and an orange cape
+    "dancer_hero": Look(hair=(9, 5, 4), hair_style="long", outfit="dress", cloth=(4, 14, 14), trim=(29, 18, 6)),
     # Upgraded classes
+    "blade_dancer": Look(hair=(9, 5, 4), hair_style="long", outfit="dress", cloth=(4, 12, 13), trim=(29, 18, 6),
+                         weapon="sword", cape=(28, 14, 5)),
     "abyssal_knight": Look(hair=None, hair_style="bald", outfit="armor", cloth=(6, 11, 12), trim=(12, 22, 20),
                            pants=(6, 11, 12), boots=(5, 7, 8), gear="helm", gear_color=(8, 14, 15), weapon="spear",
                            cape=(5, 12, 8)),

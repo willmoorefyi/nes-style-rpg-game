@@ -40,7 +40,7 @@ describe('pass CB: arquebusier / rifleman are a shallow copy of thief / ninja', 
     for (const c of CLASSES) expect(classLabel(c), c.id).toHaveLength(3);
     const base = ClassRegistry.getAll().filter((c) => !c.upgradeFrom).map((c) => c.id);
     expect(base).toEqual(['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage', 'barbarian', 'landsknecht',
-      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard', 'fencer', 'apothecary', 'tinker', 'clockmaker', 'witch_hunter', 'diver']);   // the base classes in merge order (pass CB: + diver)
+      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard', 'fencer', 'apothecary', 'tinker', 'clockmaker', 'witch_hunter', 'diver', 'dancer_hero']);   // the base classes in merge order (pass CB: + dancer_hero)
     expect(DEFAULT_NAMES.arquebusier).toBe('ARQB');
   });
 

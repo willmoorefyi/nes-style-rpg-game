@@ -352,6 +352,10 @@
       "x": 336,
       "y": 3456
     },
+    "blade_dancer": {
+      "x": 1008,
+      "y": 3840
+    },
     "centurion": {
       "x": 336,
       "y": 3456
@@ -367,6 +371,10 @@
     "clockmaker": {
       "x": 336,
       "y": 6528
+    },
+    "dancer_hero": {
+      "x": 672,
+      "y": 4224
     },
     "dark_fighter_hero": {
       "x": 0,
@@ -502,10 +510,12 @@
     "bard": "red_mage",
     "beastmaster": "monk",
     "berserker": "knight",
+    "blade_dancer": "master",
     "centurion": "knight",
     "chronomancer": "white_wizard",
     "cleric": "white_mage",
     "clockmaker": "white_mage",
+    "dancer_hero": "monk",
     "dark_fighter_hero": "warrior",
     "death_knight_hero": "knight",
     "diver": "warrior",
