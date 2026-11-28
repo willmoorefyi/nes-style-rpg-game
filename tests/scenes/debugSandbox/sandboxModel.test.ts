@@ -43,7 +43,7 @@ describe('sandbox model: cycling', () => {
     seen.clear();
     for (let i = 0; i < N; i++) { seen.add(c.party[0]); c = cycleClass(DATA, c, 0, 1); }
     expect(seen.size).toBe(N);
-    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer', 'mystic_warrior', 'sage_hero', 'rifleman', 'valkyrie']));
+    expect(DATA.classes.promoted).toEqual(expect.arrayContaining(['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard', 'berserker', 'centurion', 'ranger', 'paladin', 'samurai', 'summoner', 'necromancer', 'mystic_warrior', 'sage_hero', 'rifleman', 'valkyrie', 'virtuoso']));
   });
 
   it('turning promoted off demotes a promoted member to its base class', () => {
@@ -108,7 +108,7 @@ describe('sandbox model: deep link and stored config', () => {
 
   it('unknown ids log and fall back', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const c = parseDeepLink(DATA, '?sandbox=nowhere&party=warrior,bard&enemies=goblin,yeti', ENEMY_IDS)!;
+    const c = parseDeepLink(DATA, '?sandbox=nowhere&party=warrior,no_such_class&enemies=goblin,yeti', ENEMY_IDS)!;
     expect(c.level).toBe(DATA.levels[0].id);
     expect(c.party).toEqual(['warrior', DATA.party[1], DATA.party[2], DATA.party[3]]);
     expect(enemiesOf(DATA, c)).toEqual(['goblin']);

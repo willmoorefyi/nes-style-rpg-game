@@ -660,3 +660,16 @@ rendered (screenshot `~/temp/ff-game/class_pack/shieldmaiden/after/battle_valkyr
 light un-inked edges). Image review: round 1 ITERATE (the shieldmaiden's atk_wind2 broke the spear shaft below the
 hand: the raise is halved; the valkyrie's breath and gathers dragged the wing outline: her in-betweens are her keys,
 held or shifted whole); round 2 **APPROVE** both.
+
+### 18.2 Bard / virtuoso result (2026-11-27, branch class-copynote, fourth commit)
+
+User (verbatim): "let's add another class - the 'bard' / 'virtuoso'. For now have them be a red mage copy". Exact
+copies of red_mage -> red_wizard with `copyOf`: `bard` (BRD, default name BARD) -> `virtuoso` (VIR). No clash (no NPC
+sheet or sprite of either name; the debug sandbox's unknown-id example used `bard` and now uses `no_such_class`). On
+page 3 (16 rows, 2880 x 2560; 1536 px left, 9 more rows). Field alias red_mage / red_wizard (temporary); walk-sheet
+pack entries (the lute slung on the back, the harp at the side; the virtuoso's stand-in is the knight). The 21st base
+class overflowed the 800 px class window: the menu shows `CLASS_ROWS` = 20 rows and scrolls. `fx_colours`: the pink
+notes and arcs. The instrument is held across the body by both hands, so the in-betweens are the keys held or
+shifted whole. Image review: round 1 ITERATE (the head bob tore the scarf / the harp rail; a held key gained outline
+specks) -> `alias_frames` for the frames that show their key (bard idle_b, cast_gather, cast_rise, cast_release;
+virtuoso idle_b, cast_gather); round 2 **APPROVE** both (note: no idle breath).

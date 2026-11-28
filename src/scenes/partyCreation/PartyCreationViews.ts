@@ -16,6 +16,7 @@ export const DEFAULT_NAMES: Record<string, string> = {
   black_mage: 'B.MAG',
   red_mage: 'R.MAG',
   barbarian: 'BARB',
+  bard: 'BARD',
   shieldmaiden: 'MAIDN',
   arquebusier: 'ARQB',
   scholar_hero: 'SCHLR',
@@ -89,6 +90,9 @@ export function buildPartySummary(classes: readonly CharacterClassData[], names:
 export interface PreviewAnchor { body: { x: number; w: number }; footRow: number; scale: number; top?: number }
 
 /** The 80 x 80 preview's feet row (native) and scale: an oversize preview stands on the same feet line. */
+/** The class menu's visible rows: its 800 px window less the padding holds 20 lines of 36 px; more classes scroll. */
+export const CLASS_ROWS = 20;
+
 const PREVIEW_FOOT = 76;
 const PREVIEW_SCALE = 2;
 

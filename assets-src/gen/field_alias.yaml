@@ -30,3 +30,5 @@ arquebusier: thief   # temporary until the user renders the arquebusier's field 
 rifleman: ninja      # temporary until the user renders the rifleman's field walk sheet
 shieldmaiden: warrior # temporary until the user renders the shieldmaiden's field walk sheet
 valkyrie: knight      # temporary until the user renders the valkyrie's field walk sheet
+bard: red_mage   # temporary until the user renders the bard's field walk sheet
+virtuoso: red_wizard   # temporary until the user renders the virtuoso's field walk sheet

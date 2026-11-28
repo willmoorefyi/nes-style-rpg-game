@@ -5,7 +5,7 @@ import { Window } from '../ui/Window.js';
 import { Menu } from '../ui/Menu.js';
 import type { NameEntryGrid } from '../ui/NameEntryGrid.js';
 import { ConfirmBox } from '../ui/ConfirmBox.js';
-import { buildClassPreview, buildSlotDisplay, type SlotStrip } from './partyCreation/PartyCreationViews.js';
+import { buildClassPreview, buildSlotDisplay, CLASS_ROWS, type SlotStrip } from './partyCreation/PartyCreationViews.js';
 import { buildConfirmStep, buildNameStep } from './partyCreation/PartyCreationSteps.js';
 import { OpeningSequence } from './partyCreation/OpeningSequence.js';
 import { ClassRegistry } from '../data/ClassRegistry.js';
@@ -125,7 +125,7 @@ export class PartyCreationScene implements Scene {
       items: this.baseClasses.map((c) => ({ label: c.name, value: c.id })),
       x: menuWindow.contentX,
       y: menuWindow.contentY,
-      lineHeight: MENU_LINE_HEIGHT,
+      lineHeight: MENU_LINE_HEIGHT, maxVisible: CLASS_ROWS,
       initialIndex: this.classCursor,
       onSelect: (item) => this.onClassSelect(item.value),
       onCancel: () => this.onBack(),

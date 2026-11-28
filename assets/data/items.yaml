@@ -25,6 +25,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -56,6 +57,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   - monk
@@ -81,6 +83,7 @@
   - hunter
   - ronin
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 5
@@ -104,6 +107,7 @@
   - hunter
   - ronin
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -170,6 +174,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -189,6 +194,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   bonusVsFamily: undead
@@ -211,6 +217,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   bonusVsFamily: undead
@@ -266,6 +273,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -320,6 +328,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   element: lightning
@@ -352,6 +361,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   bonusVsFamily: dragon
@@ -384,6 +394,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -402,6 +413,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -427,6 +439,7 @@
   - monk
   - beastmaster
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -462,6 +475,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -513,6 +527,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -549,6 +564,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   weight: 0
@@ -584,6 +600,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   weight: 0
@@ -614,6 +631,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   weight: 1
@@ -754,6 +772,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -778,6 +797,7 @@
   - hunter
   - ronin
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 5
@@ -808,6 +828,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -832,6 +853,7 @@
   - hunter
   - ronin
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -860,6 +882,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 5
@@ -905,6 +928,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -945,6 +969,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -991,6 +1016,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -1043,6 +1069,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   hit: 10
@@ -1121,6 +1148,7 @@
   - warlock
   - shaman
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   slot: armor
@@ -1141,6 +1169,7 @@
   - legionnaire
   - barbarian
   - red_mage
+  - bard
   - scholar_hero
   - rune_knight
   weight: 0

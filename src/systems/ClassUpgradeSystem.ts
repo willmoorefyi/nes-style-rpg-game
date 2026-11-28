@@ -13,6 +13,7 @@ export const CLASS_UPGRADES: Record<string, string> = {
   black_mage: 'black_wizard',
   red_mage: 'red_wizard',
   barbarian: 'berserker', // pass CB (docs/CLASS_BARBARIAN_PLAN.md D-CB3)
+  bard: 'virtuoso', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   shieldmaiden: 'valkyrie', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   arquebusier: 'rifleman', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   scholar_hero: 'sage_hero', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)

@@ -3642,3 +3642,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the bard / virtuoso class pair (user-rendered
+# battle art; copies of the red_mage / red_wizard). BARD is weak so it kneels; RDWZ is the like-for-like control.
+# ?mute=1&scenario=cb_bards (&kneel=loop, &enemyAnim=loop).
+- id: cb_bards
+  name: Bard and Virtuoso (pass CB preview)
+  party:
+    - { class: bard, name: BARD, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }], hp: 10 }
+    - { class: virtuoso, name: VIRT, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: bard, name: BARD2, level: 10, equipment: [rapier, leather_armor, cap], spells: [{ id: cure, level: 1 }, { id: fire, level: 1 }] }
+    - { class: red_wizard, name: RDWZ, level: 30, equipment: [mythril_sword, mythril_mail, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

@@ -1,0 +1,32 @@
+# Puppet animation joints for the bard (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/bard/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). The lute is held across the body by both hands, so the in-betweens stay on their keys (tweaks with no joint motion but a head bob and whole-figure steps); the floating music notes and the sound-wave arcs ride with their keys. part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the floating notes and the sound-wave arcs survive the cut
+fx_colours: [[165, 57, 99], [239, 123, 148]]   # plan 16 (A6): the pink music notes and sound-wave arcs, drawn without ink
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [40, 30], crown: [40, 12], chest: [40, 40], hip: [40, 56], sh_n: [30, 36], el_n: [26, 42], hand_n: [28, 44], sh_f: [50, 36], el_f: [54, 40], hand_f: [50, 44], hip_n: [32, 60], knee_n: [28, 66], foot_n: [24, 75], hip_f: [50, 60], knee_f: [52, 66], foot_f: [54, 75]}
+  attack:
+    {neck: [42, 30], crown: [42, 14], chest: [40, 40], hip: [44, 56], sh_n: [30, 36], el_n: [24, 38], hand_n: [22, 40], sh_f: [52, 36], el_f: [58, 38], hand_f: [64, 36], hip_n: [34, 60], knee_n: [28, 68], foot_n: [22, 75], hip_f: [56, 60], knee_f: [64, 68], foot_f: [70, 75]}
+  cast:
+    {neck: [42, 30], crown: [42, 14], chest: [42, 40], hip: [42, 56], sh_n: [32, 32], el_n: [26, 26], hand_n: [22, 18], sh_f: [52, 34], el_f: [58, 32], hand_f: [60, 30], hip_n: [34, 60], knee_n: [32, 68], foot_n: [28, 75], hip_f: [50, 60], knee_f: [50, 68], foot_f: [52, 75]}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -1], hand_n: [0, -1], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-7, -3], hand_n: [0, -1], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-10, -5], hand_n: [-3, -4], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0]}
+  atk_mid: {neck: [1, -0.9], crown: [1, 0], chest: [0.1, -0.9], hip: [1.9, -0.9], sh_n: [0.1, -0.9], el_n: [-5.3, -4.05], hand_n: [-3.95, -3.6], sh_f: [1, -0.9], el_f: [1.9, -1.8], hand_f: [6.4, -4.5], hip_n: [1, -0.9], knee_n: [1, 0], foot_n: [0.1, 0], hip_f: [2.8, -0.9], knee_f: [5.95, 0], foot_f: [8.2, 0]}
+  atk_follow: {neck: [0.5, 0], crown: [0.5, 0.5], chest: [0, 0], hip: [1, 0], sh_n: [0, 0], el_n: [-1, -3], hand_n: [-2, -6], sh_f: [0.5, 0], el_f: [1, -0.5], hand_f: [3.5, -2], hip_n: [0.5, 0], knee_n: [0, 0.5], foot_n: [-0.5, 0], hip_f: [1.5, 0], knee_f: [3, 0.5], foot_f: [4, 0]}
+  cast_gather: {neck: [0, 0], crown: [0, 0], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [-1, -3], hand_n: [-6, -4], sh_f: [0, -1], el_f: [2, -3], hand_f: [9, -3], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0]}
+  cast_rise: {neck: [1, 0], crown: [1, 1], chest: [1, 0], hip: [1, 0], sh_n: [1, -2], el_n: [0, -8], hand_n: [-3, -13], sh_f: [1, -1], el_f: [2, -4], hand_f: [5, -7], hip_n: [1, 0], knee_n: [2, 1], foot_n: [2, 0], hip_f: [0, 0], knee_f: [-1, 1], foot_f: [-1, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 3], hand_n: [1, 6], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+# image review round 1 (2026-11-27): the head bob tore the instrument / scarf, and a held key gained outline
+# specks: these frames show their key exactly
+alias_frames: [idle_b, cast_gather, cast_rise, cast_release]
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

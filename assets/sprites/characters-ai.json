@@ -332,6 +332,10 @@
       "x": 0,
       "y": 6528
     },
+    "bard": {
+      "x": 336,
+      "y": 4992
+    },
     "beastmaster": {
       "x": 672,
       "y": 4224
@@ -432,6 +436,10 @@
       "x": 336,
       "y": 3456
     },
+    "virtuoso": {
+      "x": 672,
+      "y": 4992
+    },
     "warlock": {
       "x": 336,
       "y": 0
@@ -441,6 +449,7 @@
   "aliases": {
     "arquebusier": "thief",
     "barbarian": "warrior",
+    "bard": "red_mage",
     "beastmaster": "monk",
     "berserker": "knight",
     "centurion": "knight",
@@ -466,6 +475,7 @@
     "shieldmaiden": "warrior",
     "summoner": "master",
     "valkyrie": "knight",
+    "virtuoso": "red_wizard",
     "warlock": "black_mage"
   }
 }

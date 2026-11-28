@@ -823,7 +823,13 @@ ROSTER: dict[str, Look] = {
     "shieldmaiden": Look(hair=(28, 22, 10), hair_style="long", outfit="armor", cloth=(14, 9, 5), trim=(18, 18, 20),
                          pants=(14, 9, 5), boots=(12, 8, 5), gear="helm", gear_color=(18, 18, 20), weapon="spear",
                          shield=True),
+    # pass CB (plan 11-18): the bard in a teal feathered cap with a pink scarf and a lute; the virtuoso in a gold
+    # circlet and a teal-and-gold coat with a golden harp
+    "bard": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(8, 14, 13), trim=(29, 15, 18),
+                 pants=(26, 20, 7), boots=(12, 8, 5), gear="feather", gear_color=(8, 14, 13), gear_color2=(29, 15, 18)),
     # Upgraded classes
+    "virtuoso": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(4, 10, 11), trim=(27, 21, 7),
+                     pants=(6, 6, 7), boots=(4, 4, 5), gear="crown", gear_color=(27, 21, 7)),
     "valkyrie": Look(hair=(26, 18, 8), hair_style="long", outfit="armor", cloth=(26, 27, 29), trim=(20, 22, 26),
                      pants=(14, 20, 26), boots=(22, 23, 26), gear="helm", gear_color=(26, 27, 29), weapon="spear",
                      shield=True, cape=(14, 20, 26)),
