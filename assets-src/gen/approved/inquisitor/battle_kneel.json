@@ -1,0 +1,237 @@
+{
+  "character": "inquisitor",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/witch_hunter/battle_2026-11-27.png",
+    "sha256": "9101fb57541f516852c0c66bb258301abd234683f199f80c4504e3085adf3c62"
+  },
+  "recipe": "hero_user.yaml#witch_hunter_inquisitor",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "witch_hunter_inquisitor_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've added yet another class, the witch hunter / inquisitor combo. Have them be a copy of the monk for now. (delivered as final; the crossbow bolts, the ward sigil and droplets, the hat lying apart in DOWN, the blue sparkle specks and the torch flames kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          20,
+          19,
+          24
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          36,
+          33,
+          41
+        ],
+        [
+          33,
+          33,
+          41
+        ]
+      ],
+      [
+        [
+          54,
+          49,
+          55
+        ],
+        [
+          57,
+          49,
+          57
+        ]
+      ],
+      [
+        [
+          76,
+          72,
+          80
+        ],
+        [
+          74,
+          74,
+          82
+        ]
+      ],
+      [
+        [
+          105,
+          75,
+          62
+        ],
+        [
+          107,
+          74,
+          66
+        ]
+      ],
+      [
+        [
+          110,
+          107,
+          116
+        ],
+        [
+          107,
+          107,
+          115
+        ]
+      ],
+      [
+        [
+          135,
+          42,
+          50
+        ],
+        [
+          132,
+          41,
+          49
+        ]
+      ],
+      [
+        [
+          154,
+          151,
+          157
+        ],
+        [
+          156,
+          148,
+          156
+        ]
+      ],
+      [
+        [
+          167,
+          118,
+          88
+        ],
+        [
+          165,
+          115,
+          90
+        ]
+      ],
+      [
+        [
+          197,
+          72,
+          68
+        ],
+        [
+          198,
+          74,
+          66
+        ]
+      ],
+      [
+        [
+          204,
+          189,
+          186
+        ],
+        [
+          206,
+          189,
+          189
+        ]
+      ],
+      [
+        [
+          225,
+          167,
+          130
+        ],
+        [
+          222,
+          165,
+          132
+        ]
+      ],
+      [
+        [
+          238,
+          120,
+          44
+        ],
+        [
+          239,
+          123,
+          41
+        ]
+      ],
+      [
+        [
+          240,
+          191,
+          157
+        ],
+        [
+          239,
+          189,
+          156
+        ]
+      ],
+      [
+        [
+          245,
+          236,
+          228
+        ],
+        [
+          247,
+          239,
+          231
+        ]
+      ],
+      [
+        [
+          247,
+          200,
+          81
+        ],
+        [
+          247,
+          198,
+          82
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        4,
+        24,
+        78,
+        76
+      ]
+    }
+  }
+}

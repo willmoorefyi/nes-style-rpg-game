@@ -40,3 +40,5 @@ tinker: monk   # temporary until the user renders the tinker's field walk sheet
 machinist: master   # temporary until the user renders the machinist's field walk sheet
 clockmaker: white_mage   # temporary until the user renders the clockmaker's field walk sheet
 chronomancer: white_wizard   # temporary until the user renders the chronomancer's field walk sheet
+witch_hunter: monk   # temporary until the user renders the witch hunter's field walk sheet
+inquisitor: master   # temporary until the user renders the inquisitor's field walk sheet

@@ -23,6 +23,7 @@ start:
   hunter: { gear: [rapier, leather_armor], spells: [] }
   ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, cloth], spells: [] }
   tinker: { gear: [wooden_nunchaku, cloth], spells: [] }
   beastmaster: { gear: [wooden_nunchaku, cloth], spells: [] }
   white_mage: { gear: [hammer, cloth], spells: [cure] }
@@ -49,6 +50,7 @@ lv2:
   hunter: { gear: [rapier, leather_armor], spells: [] }
   ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, cloth], spells: [] }
   tinker: { gear: [wooden_nunchaku, cloth], spells: [] }
   beastmaster: { gear: [wooden_nunchaku, cloth], spells: [] }
   white_mage: { gear: [hammer, cloth], spells: [cure] }
@@ -75,6 +77,7 @@ arrive:
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
   tinker: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
   beastmaster: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure] }
@@ -101,6 +104,7 @@ full:
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   tinker: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   beastmaster: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
@@ -127,6 +131,7 @@ naked:
   hunter: { gear: [], spells: [] }
   ronin: { gear: [], spells: [] }
   monk: { gear: [], spells: [] }
+  witch_hunter: { gear: [], spells: [] }
   tinker: { gear: [], spells: [] }
   beastmaster: { gear: [], spells: [] }
   white_mage: { gear: [], spells: [] }
@@ -162,6 +167,7 @@ w_s1: &w_s1
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
+  witch_hunter: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   tinker: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   beastmaster: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, cloth, cap], spells: [cure, ruse] }
@@ -189,6 +195,7 @@ w_pravoka: &w_t2
   hunter: { gear: [short_sword, leather_armor, cap], spells: [] }
   ronin: { gear: [short_sword, leather_armor, cap], spells: [] }
   monk: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
+  witch_hunter: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
   tinker: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
   beastmaster: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
   white_mage: { gear: [hammer, robe, cap], spells: [cure, ruse, invs] }
@@ -220,6 +227,7 @@ w_elfheim: &w_t3
   hunter: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   ronin: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
+  witch_hunter: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
   tinker: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
   beastmaster: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, silver_armlet, cap], spells: [cure, ruse, invs, cure2, heal] }
@@ -255,6 +263,7 @@ w_melmond: &w_t4
   hunter: { gear: [scimitar, gold_armlet, cap], spells: [] }
   ronin: { gear: [scimitar, gold_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
+  witch_hunter: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
   tinker: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
   beastmaster: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, gold_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure] }
@@ -285,6 +294,7 @@ w_crescent: &w_t5
   hunter: { gear: [falchion, gold_armlet, cap], spells: [] }
   ronin: { gear: [falchion, gold_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, gold_armlet, cap], spells: [] }
+  witch_hunter: { gear: [cat_claw, gold_armlet, cap], spells: [] }
   tinker: { gear: [cat_claw, gold_armlet, cap], spells: [] }
   beastmaster: { gear: [cat_claw, gold_armlet, cap], spells: [] }
   white_mage: { gear: [mythril_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
@@ -316,6 +326,7 @@ w_onrac: &w_t6
   hunter: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   ronin: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, opal_armlet, cap], spells: [] }
+  witch_hunter: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   tinker: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   beastmaster: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   white_mage: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
@@ -341,6 +352,7 @@ w_onrac: &w_t6
   ranger: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   samurai: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [cat_claw, opal_armlet, cap], spells: [] }
+  inquisitor: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   machinist: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   summoner: { gear: [cat_claw, opal_armlet, cap], spells: [] }
   white_wizard: { gear: [thor_hammer, white_robe, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
@@ -373,6 +385,7 @@ w_gaia: &w_t7
   hunter: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   ronin: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   monk: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
+  witch_hunter: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   tinker: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   beastmaster: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   white_mage: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }
@@ -398,6 +411,7 @@ w_gaia: &w_t7
   ranger: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   samurai: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
+  inquisitor: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   machinist: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   summoner: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
   white_wizard: { gear: [thor_hammer, diamond_armlet, cap], spells: [cure, ruse, invs, cure2, heal, pure, cure3, life] }

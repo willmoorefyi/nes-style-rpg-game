@@ -382,3 +382,20 @@ clockmaker_chronomancer:
   source_name: clockmaker_chronomancer_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "I've also added the 'clockmaker' / 'Chronomancer' classes as well, let's have them be a shallow copy of the white mage. (delivered as final; the watch chain, the floating clock faces and gears, the motion arcs, the swing streaks and the staff lying apart kept as rendered)"
+witch_hunter_inquisitor:
+  file: user_art/witch_hunter/battle_2026-11-27.png
+  sha256: 9101fb57541f516852c0c66bb258301abd234683f199f80c4504e3085adf3c62
+  rows: [witch_hunter, inquisitor]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: witch_hunter_inquisitor_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "I've added yet another class, the witch hunter / inquisitor combo. Have them be a copy of the monk for now. (delivered as final; the crossbow bolts, the ward sigil and droplets, the hat lying apart in DOWN, the blue sparkle specks and the torch flames kept as rendered)"

@@ -3717,3 +3717,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the witch hunter / inquisitor class pair (user-rendered
+# battle art; copies of the monk / master). WITCH is weak so it kneels; MSTR is the like-for-like control.
+# ?mute=1&scenario=cb_witchhunters (&kneel=loop, &enemyAnim=loop).
+- id: cb_witchhunters
+  name: Witch Hunter and Inquisitor (pass CB preview)
+  party:
+    - { class: witch_hunter, name: WITCH, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
+    - { class: inquisitor, name: INQU, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: witch_hunter, name: WITCH2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

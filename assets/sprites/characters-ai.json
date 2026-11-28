@@ -392,6 +392,10 @@
       "x": 1008,
       "y": 5760
     },
+    "inquisitor": {
+      "x": 1008,
+      "y": 3840
+    },
     "landsknecht": {
       "x": 0,
       "y": 6528
@@ -475,6 +479,10 @@
     "warlock": {
       "x": 336,
       "y": 0
+    },
+    "witch_hunter": {
+      "x": 672,
+      "y": 4224
     }
   },
   "fallbacks": {},
@@ -496,6 +504,7 @@
     "duelist": "ninja",
     "fencer": "thief",
     "hunter": "thief",
+    "inquisitor": "master",
     "landsknecht": "warrior",
     "legionnaire": "warrior",
     "machinist": "master",
@@ -516,6 +525,7 @@
     "tinker": "monk",
     "valkyrie": "knight",
     "virtuoso": "red_wizard",
-    "warlock": "black_mage"
+    "warlock": "black_mage",
+    "witch_hunter": "monk"
   }
 }

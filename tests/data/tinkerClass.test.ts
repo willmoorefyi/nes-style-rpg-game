@@ -40,7 +40,7 @@ describe('pass CB: tinker / machinist are a shallow copy of monk / master', () =
     for (const c of CLASSES) expect(classLabel(c), c.id).toHaveLength(3);
     const base = ClassRegistry.getAll().filter((c) => !c.upgradeFrom).map((c) => c.id);
     expect(base).toEqual(['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage', 'barbarian', 'landsknecht',
-      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard', 'fencer', 'apothecary', 'tinker', 'clockmaker']);   // the base classes in merge order (pass CB: + clockmaker)
+      'dark_fighter_hero', 'legionnaire', 'hunter', 'cleric', 'ronin', 'shaman', 'beastmaster', 'warlock', 'rune_knight', 'scholar_hero', 'arquebusier', 'shieldmaiden', 'bard', 'fencer', 'apothecary', 'tinker', 'clockmaker', 'witch_hunter']);   // the base classes in merge order (pass CB: + witch_hunter)
     expect(DEFAULT_NAMES.tinker).toBe('TINKR');
   });
 

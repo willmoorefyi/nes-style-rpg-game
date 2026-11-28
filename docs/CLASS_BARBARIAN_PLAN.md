@@ -726,3 +726,15 @@ bridge knobs cannot confine the dropped rows to the lower robe (`keep_top` / `ke
 kneel bridge has no alias fallback, so the round 2 settings stay: the clocks, gear, hands and staff ring keep their
 shapes and the swap is 0.59; kneel_in1 (60 ms) fragments the buckle, kept as a known note for the user. Note for the `equip-ff1` merge: every copy class still carries its own copied `usableEquipment` and its
 items' `usableBy` entries; `copyOf` names its source so a later pass can derive them.
+
+### 18.7 Witch hunter / inquisitor result (2026-11-27, branch class-copynote, ninth commit)
+
+User (verbatim): "I've added yet another class, the witch hunter / inquisitor combo. Have them be a copy of the monk
+for now." Exact copies of monk -> master with `copyOf`: `witch_hunter` (HUN, default name WITCH; HUN sits near the
+hunter's HNT, the coordinator's pick) -> `inquisitor` (INQ). Page 3 is full (24 rows, 3840 / 4096), so the pair opens
+a second overflow list, page 4 (`battle-characters-ai-4.png`, 2880 x 320 with this pair); A5 already supports several
+lists, and the runtime loads every listed page (battle screenshot `witchhunter/after/battle_cb_witchhunters_page4.png`).
+Field alias monk / master (temporary); walk-sheet pack entries (the crossbow slung on the back; the inquisitor's torch
+in hand, its flame inside the 92 px cap). `fx_colours`: the blue coat specks and the orange torch flames. The
+in-betweens are the keys held or shifted whole (the witch hunter's cast frames aliased to the cast key). Image
+review: round 1 **APPROVE** both.

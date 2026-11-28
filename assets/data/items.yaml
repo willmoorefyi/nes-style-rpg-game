@@ -19,6 +19,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -44,6 +45,7 @@
   price: 10
   usableBy:
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   hit: 0
@@ -68,6 +70,7 @@
   - scholar_hero
   - rune_knight
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   hit: 0
@@ -169,6 +172,7 @@
   price: 200
   usableBy:
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   hit: 0
@@ -377,6 +381,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -414,6 +419,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -470,6 +476,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - red_mage
@@ -664,6 +671,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -809,6 +817,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -871,6 +880,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -922,6 +932,7 @@
   price: 6500
   usableBy:
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   hit: 10
@@ -1072,6 +1083,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage
@@ -1171,6 +1183,7 @@
   price: 26000
   usableBy:
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   hit: 10
@@ -1211,6 +1224,7 @@
   - hunter
   - ronin
   - monk
+  - witch_hunter
   - tinker
   - beastmaster
   - white_mage

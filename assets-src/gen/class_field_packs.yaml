@@ -794,3 +794,41 @@ chronomancer:
     the front view), its foot near the ground beside the foot and its hourglass level with the head, never above the
     92 px cap; in the back view the staff is in the same hand; in the side view facing left it is held in front of the
     body, upright. The staff touches the hand and stays inside the 48 x 96 cell
+
+witch_hunter:
+  name: Witch Hunter
+  tier: base
+  partner: inquisitor
+  battle_sheet: ~/temp/heroes/witch_hunter_inquisitor_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: monk
+  look: >-
+    a young witch hunter, about 22: dark hair under a wide-brimmed black hat with a silver buckle; a grim young face; a
+    long dark coat with a silver-trimmed collar over a leather vest, dark trousers and tall boots; a small vial on the
+    belt. Colours: black, dark grey, brown leather, silver, a pale blue glint
+  carry: >-
+    the hand crossbow is slung on his back on a strap over the right shoulder, its stock behind the left shoulder,
+    never above the 92 px cap; both hands are free. The crossbow touches the body and stays inside the 48 x 96 cell
+
+inquisitor:
+  name: Inquisitor
+  tier: enhanced
+  partner: witch_hunter
+  battle_sheet: ~/temp/heroes/witch_hunter_inquisitor_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: master
+  look: >-
+    the witch hunter become an inquisitor: black steel plate with a red sash bearing a white sigil, a dark cloak,
+    black gauntlets and boots. Colours: black steel, red, white, warm orange for the torch
+  carry: >-
+    a heavier crossbow is slung on his back; a burning torch is held upright in his right hand (the hand toward the
+    viewer's left in the front view), its flame no higher than the top of the head, inside the 92 px cap. The torch
+    touches the hand and everything stays inside the 48 x 96 cell
