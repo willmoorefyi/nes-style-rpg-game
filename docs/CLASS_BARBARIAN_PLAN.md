@@ -549,3 +549,50 @@ gather raises it 1 px straight up; the sage's sparks and ring gained an ink ring
 scholar **APPROVE**, sage ITERATE (a shoulder seam in idle_b: the breath moves the head only); round 3 sage ITERATE
 (the wrist tore in atk_mid) -> section 5 fallback `alias_frames: [atk_mid]` for the sage. Minor notes kept: the
 kneel bridge slides the book on the ground 3 / 5 px between kneel_in2 and the key (a 60 ms frame).
+
+## 17. Copy note on the class pick screen (`copyOf`, branch class-copynote)
+
+User (verbatim): "I think at some point for the 'classic' mode we should note these characters are copies of base
+classes. Can you add that to the character selection screen where appropriate?"
+
+- **Data:** an optional `copyOf: <class id>` on every pass-CB / CL / CD-K copy class in `assets/data/classes.yaml`:
+  24 classes (12 base, 12 enhanced). Base: barbarian, landsknecht, dark_fighter_hero, legionnaire -> warrior; hunter,
+  ronin -> thief; beastmaster -> monk; cleric -> white_mage; shaman, warlock -> black_mage; rune_knight, scholar_hero
+  -> red_mage. Enhanced: berserker, dragoon, death_knight_hero, centurion -> knight; ranger, samurai -> ninja;
+  summoner -> master; paladin -> white_wizard; druid, necromancer -> black_wizard; mystic_warrior, sage_hero ->
+  red_wizard. The 12 classic classes have none. `CharacterClassData.copyOf?: string` (`src/types/index.ts`, 435 ->
+  437 lines, ceiling 442).
+- **Validation (`src/core/schemaValidation.ts`):** `validateCharacterClassData` checks `copyOf` is a non-empty string
+  when present. A new `validateClassCopies(classes)`, called by `DataLoader.loadClasses` after the per-record checks,
+  throws (naming the class) when `copyOf`: names no class; names itself; names a class that has a `copyOf` (only an
+  original can be copied); crosses tiers (a base copy of an upgraded class or the reverse: `upgradeFrom` present on
+  one and not the other); or, for an upgraded copy, does not match its base's (`copyOf` of its `upgradeFrom` must be
+  the `upgradeFrom` of its `copyOf`: berserker -> knight because barbarian -> warrior and knight upgrades warrior).
+- **UI (`src/scenes/partyCreation/PartyCreationViews.ts`):** `buildClassPreview(cls, pose, anchor, copyName?)` writes
+  `Plays as: <name>` (the original's `name`, the same full-name text as the panel's first line) on the panel's second
+  line, which is blank today, so no line, the pose or the panel moves. `PartyCreationScene.updatePreview` passes
+  `ClassRegistry.getClass(cls.copyOf)?.name` (nothing for an original; an unknown id cannot reach here, the loader
+  refuses it). Only the pick screen describes a class before it is picked (the slot strip, the name and confirm steps
+  show picked classes; the debug sandbox is dev-only; battle and menus are not touched).
+- **Tests:**
+  - `tests/core/schemaValidation.test.ts`: `copyOf` must be a string; `validateClassCopies` accepts the real classes
+    and refuses each case above (unknown, self, copy of a copy, cross-tier, upgraded copy not matching its base's).
+  - `tests/scenes/PartyCreationScene.test.ts` (or a new `classCopyNote.test.ts`): the preview of a copy class (e.g.
+    the hunter) has the line `Plays as: Thief` as its second line; an original (the thief) has a blank second line;
+    the line count and the pose's position are the same for both.
+  - `tests/data/actOneBalance.test.ts`: the copy test reads `copyOf` instead of its own `COPY_OF` table: every base
+    class but the 6 originals has a `copyOf`, every upgraded class but the 6 originals' upgrades has one, and every
+    copy's rule fields equal its original's (both tiers), its start kit and every kit table row (base) equal its
+    original's.
+- **Browser check:** `?mute=1`, the pick screen on a copy class and on an original, screenshots in
+  `~/temp/ff-game/class_pack/copynote/`.
+- AGENTS.md: the Key Interfaces line on `CharacterClassData.abbr` also names `copyOf`.
+- **Momus OKAY 4/5 (2026-11-27); notes taken:** the game has no separate "classic" mode (every new class is a copy
+  today), so the note always shows; when a class stops being a copy, its `copyOf` is removed and the note goes with
+  it. The enhanced classes' `copyOf` never reaches the screen (the pick screen lists base classes only); it feeds the
+  validation and the balance test. `PartyCreationScene.ts` is at 250 lines: the change edits the `updatePreview` call
+  line in place (line-neutral). `validateClassCopies` lives in a new `src/core/schemaValidationClasses.ts` (under
+  250), so `schemaValidation.ts` gains only the one `copyOf` string check. A `tests/core/DataLoader.test.ts` case
+  pins that `loadClasses` runs the cross-check (an unknown `copyOf` is refused), and `crossFileValidation.test.ts`
+  checks every `copyOf` names a class. The longest note, "Plays as: Black Wizard" for a future upgraded pick, is 22
+  characters; "Plays as: White Mage" (20) fits the 600 px panel at the 24 px font.

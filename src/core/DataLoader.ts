@@ -7,6 +7,7 @@ import type {
   SpellData,
   MapData,
 } from '../types/index.js';
+import { validateClassCopies } from './schemaValidationClasses.js';
 import { validateEnemyData, validateMapData, validateShopData, validateCharacterClassData, validateItemData, validateSpellData } from './schemaValidation.js';
 import { validateSpellEffects, validateStatusVisuals } from './schemaValidationFx.js';
 import type { SpellEffectsData, StatusVisualsData } from '../types/fxData.js';
@@ -18,13 +19,15 @@ export class DataLoader {
   async loadClasses(path: string): Promise<CharacterClassData[]> {
     const data = await this.assets.loadYaml<unknown[]>(path);
     this.assertArray(data, 'CharacterClassData');
-    return data.map((item, i) => {
+    const classes = data.map((item, i) => {
       try {
         return validateCharacterClassData(item);
       } catch (e) {
         throw new Error(`CharacterClassData[${i}]: ${(e as Error).message}`);
       }
     });
+    validateClassCopies(classes);   // plan 17: copyOf names an original of the same tier
+    return classes;
   }
 
   async loadEnemies(path: string): Promise<EnemyData[]> {

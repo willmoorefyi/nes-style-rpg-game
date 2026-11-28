@@ -164,7 +164,7 @@ export class PartyCreationScene implements Scene {
     const art = characterAtlas.getBattleFrames(cls.id);
     const pose = art?.frames[0] ?? null;
     const anchor = art?.body ? { body: art.body, footRow: art.footRow, scale: art.scale, top: art.top } : null;   // oversize
-    this.previewDisplay.addChild(buildClassPreview(cls, pose, anchor));
+    this.previewDisplay.addChild(buildClassPreview(cls, pose, anchor, cls.copyOf ? ClassRegistry.getClass(cls.copyOf)?.name : undefined));
   }
 
   update(dt: number): void {

@@ -94,13 +94,14 @@ const PREVIEW_SCALE = 2;
  *  80 x 80 class's pose stays at the content's top-left; an oversize class (`anchor`: a lance or a thrust past its
  *  body box) is centred by its body box in the panel, its feet on the 80 x 80 preview's feet line, so the overhanging
  *  weapon never pushes the figure aside (play-test note, pass CD-K); a weapon that would rise over the stat lines
- *  (`top`: the art's highest opaque row) lowers the figure instead. */
+ *  (`top`: the art's highest opaque row) lowers the figure instead. A copy class (`copyOf`, plan 17) names the classic
+ *  class it plays as (`copyName`) on the second line, blank for an original. */
 export function buildClassPreview(cls: CharacterClassData, pose: Texture | null = null,
-  anchor: PreviewAnchor | null = null): Window {
+  anchor: PreviewAnchor | null = null, copyName?: string): Window {
   const win = new Window({ x: 0, y: 0, width: 600, height: 800 });
   const lines = [
     cls.name,
-    '',
+    copyName ? `Plays as: ${copyName}` : '',
     `HP:${cls.baseStats.hp}  STR:${cls.baseStats.strength}`,
     `AGI:${cls.baseStats.agility} INT:${cls.baseStats.intelligence}`,
     `VIT:${cls.baseStats.vitality} LCK:${cls.baseStats.luck}`,

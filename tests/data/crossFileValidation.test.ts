@@ -27,7 +27,7 @@ const spells: Array<{ id: string; name: string; element: string; effect: string 
 const enemies: Array<{ id: string; weakness?: string; resist?: string; sprite?: string; size?: EnemySizeClass }> = parse(
   readFileSync(join(dataDir, 'enemies.yaml'), 'utf-8')
 );
-const classes: Array<{ id: string; upgradeFrom?: string }> = parse(
+const classes: Array<{ id: string; upgradeFrom?: string; copyOf?: string }> = parse(
   readFileSync(join(dataDir, 'classes.yaml'), 'utf-8')
 );
 const shops: Array<{ id: string; type: string; inventory: string[] }> = parse(
@@ -256,6 +256,14 @@ describe('Cross-file data validation', () => {
     it('map files have no duplicate IDs', () => {
       expect(findDuplicates(maps)).toEqual([]);
     });
+  });
+
+  // (h2) copyOf (plan 17) references a class (the loader's validateClassCopies checks the rest)
+  describe('Class copyOf → classes', () => {
+    const ids = new Set(classes.map((c) => c.id));
+    for (const c of classes.filter((x) => x.copyOf)) {
+      it(`${c.id} copyOf "${c.copyOf}" exists`, () => expect(ids.has(c.copyOf!)).toBe(true));
+    }
   });
 
   // (h) upgradeFrom references valid base classes

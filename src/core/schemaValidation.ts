@@ -287,6 +287,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
   assertString('CharacterClassData.id', data.id);
   assertString('CharacterClassData.name', data.name);
   if (data.abbr !== undefined) assertString('CharacterClassData.abbr', data.abbr);
+  if (data.copyOf !== undefined) assertString('CharacterClassData.copyOf', data.copyOf);
   validateStatBlock('CharacterClassData.baseStats', data.baseStats);
   validateStatBlock('CharacterClassData.statGrowth', data.statGrowth);
   assertArray('CharacterClassData.usableEquipment', data.usableEquipment);

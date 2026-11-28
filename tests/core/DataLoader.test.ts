@@ -21,6 +21,18 @@ describe('DataLoader', () => {
     expect(result).toEqual(classData);
   });
 
+  it('runs the copyOf cross-check (plan 17): a copy of an unknown class is refused', async () => {
+    const cls = (id: string, copyOf?: string) => ({
+      id, name: id, ...(copyOf ? { copyOf } : {}),
+      baseStats: { hp: 1, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 },
+      statGrowth: { hp: 1, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 },
+      usableEquipment: [], spellLevels: { white: 0, black: 0 },
+    });
+    await expect(new DataLoader(mockAssetLoader([cls('warrior'), cls('barbarian', 'warrior')])).loadClasses('c.yaml'))
+      .resolves.toHaveLength(2);
+    await expect(new DataLoader(mockAssetLoader([cls('barbarian', 'nope')])).loadClasses('c.yaml')).rejects.toThrow('names no class');
+  });
+
   it('should throw on invalid class data', async () => {
     const loader = new DataLoader(mockAssetLoader({ invalid: true }));
     

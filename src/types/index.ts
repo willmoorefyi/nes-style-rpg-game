@@ -44,6 +44,8 @@ export interface CharacterClassData {
   usableEquipment: string[];
   spellLevels: { white: number; black: number };
   upgradeFrom?: string;
+  /** The classic class this one is an exact copy of; the pick screen says "Plays as" its name. */
+  copyOf?: string;
   /** FF1 hit%: `base + growth * (level - 1)` (plus the weapon's `hit`); missing means 0. */
   hitPercent?: ClassGrowth;
   /** Magic defence against enemy spells: `base + growth * (level - 1)`; missing means 0. */

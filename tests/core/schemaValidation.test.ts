@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { parse } from 'yaml';
 import {
   validateCharacterClassData, validateEnemyData, validateItemData, validateMapData, validateSpellData,
 } from '../../src/core/schemaValidation.js';
+import { validateClassCopies } from '../../src/core/schemaValidationClasses.js';
 
 describe('schemaValidation', () => {
   describe('validateEnemyData', () => {
@@ -284,5 +287,39 @@ describe('schemaValidation: MapData.wrap', () => {
     expect(() => validateMapData(map(150, 144, 16, { wrap: true }))).toThrow(/whole chunks/);
     expect(() => validateMapData({ ...map(144, 144, 16), art: undefined, wrap: true })).toThrow(/streamed/);
     expect(() => validateMapData(map(144, 144, 16, { wrap: 'yes' }))).toThrow(/MapData.wrap/);
+  });
+});
+
+describe('plan 17: copyOf', () => {
+  const cls = (id: string, extra: Record<string, unknown> = {}) => ({
+    id, name: id, baseStats: { hp: 1, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 },
+    statGrowth: { hp: 1, strength: 1, agility: 1, intelligence: 1, vitality: 1, luck: 1 }, usableEquipment: [],
+    spellLevels: { white: 0, black: 0 }, ...extra,
+  });
+  const set = (...c: ReturnType<typeof cls>[]) => c.map((x) => validateCharacterClassData(x));
+
+  it('copyOf must be a string', () => {
+    expect(() => validateCharacterClassData(cls('a', { copyOf: 3 }))).toThrow('copyOf');
+    expect(validateCharacterClassData(cls('a', { copyOf: 'b' })).copyOf).toBe('b');
+  });
+
+  it('validateClassCopies takes an original of the same tier, its upgrade matching its base\'s', () => {
+    expect(() => validateClassCopies(set(cls('w'), cls('k', { upgradeFrom: 'w' }), cls('b', { copyOf: 'w' }),
+      cls('z', { upgradeFrom: 'b', copyOf: 'k' })))).not.toThrow();
+  });
+
+  it('refuses an unknown class, itself, a copy of a copy, a cross-tier copy and an upgrade not matching its base', () => {
+    expect(() => validateClassCopies(set(cls('b', { copyOf: 'nope' })))).toThrow('names no class');
+    expect(() => validateClassCopies(set(cls('b', { copyOf: 'b' })))).toThrow('itself');
+    expect(() => validateClassCopies(set(cls('w'), cls('b', { copyOf: 'w' }), cls('c', { copyOf: 'b' })))).toThrow('a copy itself');
+    expect(() => validateClassCopies(set(cls('w'), cls('k', { upgradeFrom: 'w' }), cls('b', { copyOf: 'k' })))).toThrow('other tier');
+    expect(() => validateClassCopies(set(cls('w'), cls('t'), cls('k', { upgradeFrom: 'w' }), cls('n', { upgradeFrom: 't' }),
+      cls('b', { copyOf: 't' }), cls('z', { upgradeFrom: 'b', copyOf: 'k' })))).toThrow('does not match its base');
+  });
+
+  it('the real classes pass', () => {
+    const real = (parse(readFileSync('assets/data/classes.yaml', 'utf-8')) as unknown[]).map((c) => validateCharacterClassData(c));
+    expect(() => validateClassCopies(real)).not.toThrow();
+    expect(real.filter((c) => c.copyOf)).toHaveLength(24);
   });
 });

@@ -22,11 +22,10 @@ const isBodyArmour = (id: string) => slotOf(item(id)) === 'armor';
 const baseClasses = CLASSES.filter((c) => !c.upgradeFrom).map((c) => c.id);
 /** The 6 classes of the classic game; every other base class is an exact copy of one (pass CB, plan 15.3). */
 const ORIGINAL = ['warrior', 'thief', 'monk', 'white_mage', 'black_mage', 'red_mage'];
-const COPY_OF: Record<string, string> = {
-  barbarian: 'warrior', landsknecht: 'warrior', dark_fighter_hero: 'warrior', legionnaire: 'warrior', hunter: 'thief',
-  cleric: 'white_mage', ronin: 'thief', shaman: 'black_mage', beastmaster: 'monk', warlock: 'black_mage',
-  rune_knight: 'red_mage', scholar_hero: 'red_mage',
-};
+/** Their 6 upgrades; every other upgraded class is a copy of one. */
+const ORIGINAL_UP = ['knight', 'ninja', 'master', 'white_wizard', 'black_wizard', 'red_wizard'];
+/** Each copy class and the original it copies, read from classes.yaml's `copyOf` (plan 17). */
+const COPY_OF = Object.fromEntries(CLASSES.filter((c) => c.copyOf).map((c) => [c.id, c.copyOf!]));
 
 describe('T4d Cornelia shops (FF1 Coneria lists)', () => {
   it('sell a body armour that both mages can wear (EB-7: Cloth)', () => {
@@ -92,14 +91,17 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
     expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
   });
 
-  it('every other base class is a copy of an original one: the same rules and the same kit in every kit table', () => {
-    expect(Object.keys(COPY_OF).sort()).toEqual(baseClasses.filter((c) => !ORIGINAL.includes(c)).sort());
+  it('every other class is a copy (copyOf) of an original one: the same rules and the same kit in every kit table', () => {
+    const upgraded = CLASSES.filter((c) => c.upgradeFrom).map((c) => c.id);
+    expect(Object.keys(COPY_OF).sort()).toEqual([...baseClasses.filter((c) => !ORIGINAL.includes(c)),
+      ...upgraded.filter((c) => !ORIGINAL_UP.includes(c))].sort());
+    for (const c of [...ORIGINAL, ...ORIGINAL_UP]) expect(COPY_OF[c], c).toBeUndefined();
     const byId = new Map(CLASSES.map((c) => [c.id, c]));
     for (const [copy, of] of Object.entries(COPY_OF)) {
       const a = byId.get(copy)!, b = byId.get(of)!;
       for (const k of ['baseStats', 'statGrowth', 'usableEquipment', 'spellLevels', 'hitPercent', 'magicDefense',
         'spellCharges', 'unarmedMartial'] as const) expect(a[k], `${copy} ${k}`).toEqual(b[k]);
-      expect(START_KIT[copy], copy).toEqual(START_KIT[of]);
+      if (!byId.get(copy)!.upgradeFrom) expect(START_KIT[copy], copy).toEqual(START_KIT[of]);
       for (const [name, kit] of Object.entries(KITS)) if (kit[of]) expect(kit[copy], `${name} ${copy}`).toEqual(kit[of]);
     }
   });
