@@ -1,0 +1,237 @@
+{
+  "character": "sky_captain",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/aeronaut/battle_2026-11-27.png",
+    "sha256": "d6340478975fe97fe9ad621f98fbc55b6a21a1cb237a62b3ef8f6e92870cc603"
+  },
+  "recipe": "hero_user.yaml#aeronaut_sky_captain",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "aeronaut_sky_captain_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-28",
+  "approved": "2026-11-27",
+  "user_review": "next I've added the new classes 'aeronaut' and 'sky captain'. Let's have him be another thief / ninja for now. (delivered as final; the flare sparkle, the grapple hook on the ground, the airborne jet lunge with its thruster flames, the smoke puffs and the flares kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          20,
+          24,
+          33
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          37,
+          41,
+          54
+        ],
+        [
+          33,
+          41,
+          57
+        ]
+      ],
+      [
+        [
+          55,
+          62,
+          75
+        ],
+        [
+          57,
+          66,
+          74
+        ]
+      ],
+      [
+        [
+          75,
+          88,
+          102
+        ],
+        [
+          74,
+          90,
+          99
+        ]
+      ],
+      [
+        [
+          87,
+          59,
+          46
+        ],
+        [
+          90,
+          57,
+          49
+        ]
+      ],
+      [
+        [
+          107,
+          123,
+          139
+        ],
+        [
+          107,
+          123,
+          140
+        ]
+      ],
+      [
+        [
+          119,
+          82,
+          55
+        ],
+        [
+          115,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          155,
+          167,
+          174
+        ],
+        [
+          156,
+          165,
+          173
+        ]
+      ],
+      [
+        [
+          165,
+          112,
+          54
+        ],
+        [
+          165,
+          115,
+          57
+        ]
+      ],
+      [
+        [
+          205,
+          141,
+          93
+        ],
+        [
+          206,
+          140,
+          90
+        ]
+      ],
+      [
+        [
+          211,
+          155,
+          75
+        ],
+        [
+          214,
+          156,
+          74
+        ]
+      ],
+      [
+        [
+          213,
+          90,
+          41
+        ],
+        [
+          214,
+          90,
+          41
+        ]
+      ],
+      [
+        [
+          240,
+          187,
+          141
+        ],
+        [
+          239,
+          189,
+          140
+        ]
+      ],
+      [
+        [
+          244,
+          198,
+          114
+        ],
+        [
+          247,
+          198,
+          115
+        ]
+      ],
+      [
+        [
+          244,
+          238,
+          226
+        ],
+        [
+          247,
+          239,
+          222
+        ]
+      ],
+      [
+        [
+          255,
+          145,
+          67
+        ],
+        [
+          255,
+          148,
+          66
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        7,
+        12,
+        73,
+        76
+      ]
+    }
+  }
+}

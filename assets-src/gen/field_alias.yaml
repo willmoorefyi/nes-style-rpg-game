@@ -46,3 +46,5 @@ diver: warrior   # temporary until the user renders the diver's field walk sheet
 abyssal_knight: knight   # temporary until the user renders the abyssal knight's field walk sheet
 dancer_hero: monk   # temporary until the user renders the dancer's field walk sheet
 blade_dancer: master   # temporary until the user renders the blade dancer's field walk sheet
+aeronaut: thief   # temporary until the user renders the aeronaut's field walk sheet
+sky_captain: ninja   # temporary until the user renders the sky captain's field walk sheet

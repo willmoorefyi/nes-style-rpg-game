@@ -5,4 +5,4 @@
 # class, an id listed twice, a page over 4096 px.
 overflow:
   - [shaman, druid, beastmaster, summoner, warlock, necromancer, rune_knight, mystic_warrior, scholar_hero, sage_hero, arquebusier, rifleman, shieldmaiden, valkyrie, bard, virtuoso, fencer, duelist, apothecary, plague_doctor, tinker, machinist, clockmaker, chronomancer]
-  - [witch_hunter, inquisitor, diver, abyssal_knight, dancer_hero, blade_dancer]   # page 4: page 3 is full (24 rows, 3840 / 4096)
+  - [witch_hunter, inquisitor, diver, abyssal_knight, dancer_hero, blade_dancer, aeronaut, sky_captain]   # page 4: page 3 is full (24 rows, 3840 / 4096)

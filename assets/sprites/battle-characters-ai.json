@@ -555,6 +555,16 @@
       "row": 5,
       "page": 4,
       "inbetweens": false
+    },
+    "aeronaut": {
+      "row": 6,
+      "page": 4,
+      "inbetweens": true
+    },
+    "sky_captain": {
+      "row": 7,
+      "page": 4,
+      "inbetweens": false
     }
   },
   "pages": [
@@ -581,7 +591,7 @@
     {
       "file": "battle-characters-ai-4.png",
       "w": 2880,
-      "h": 960
+      "h": 1280
     }
   ]
 }

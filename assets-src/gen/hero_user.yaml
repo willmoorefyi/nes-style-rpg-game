@@ -433,3 +433,21 @@ dancer_hero_blade_dancer:
   source_name: dancer_blade_dancer_sprite_sheet.png
   approved: "2026-11-27"
   user_review: "next for classes add the dancer / blade dancer as a monk copy class (delivered as final; the long ribbons, the petal specks, the thin sabre blades, the cape and the slash arcs kept as rendered)"
+aeronaut_sky_captain:
+  file: user_art/aeronaut/battle_2026-11-27.png
+  sha256: d6340478975fe97fe9ad621f98fbc55b6a21a1cb237a62b3ef8f6e92870cc603
+  rows: [aeronaut, sky_captain]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  airborne: {sky_captain/attack: 73}   # plan 18 (A7): the jet-boosted lunge, drawn 3 px off the ground
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: aeronaut_sky_captain_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "next I've added the new classes 'aeronaut' and 'sky captain'. Let's have him be another thief / ninja for now. (delivered as final; the flare sparkle, the grapple hook on the ground, the airborne jet lunge with its thruster flames, the smoke puffs and the flares kept as rendered)"

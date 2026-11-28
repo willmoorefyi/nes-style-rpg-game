@@ -760,6 +760,19 @@ battle in-between shows its key exactly (each re-render gained 3-78 outline spec
 `fx_colours` (no clear effect colour: the light edges include skin). No border exemption was needed. Image review:
 round 1 **APPROVE** both (the kneel bridge keeps the ribbons and blades unbroken).
 
+### 18.10 Aeronaut / sky captain result (2026-11-28, branch class-copynote, twelfth commit)
+
+User (verbatim): "next I've added the new classes 'aeronaut' and 'sky captain'. Let's have him be another thief /
+ninja for now." Exact copies of thief -> ninja with `copyOf`: `aeronaut` (AER, default name AERO) -> `sky_captain`
+(SKY). On page 4 (8 rows, 2880 x 1280). Field alias thief / ninja (temporary); walk-sheet pack entries (the grapple gun
+holstered; the sky captain's wings folded within 46 px). A7: the recipe's `airborne: {sky_captain/attack: 73}` (the
+jet-boosted lunge); his attack key, atk_mid and atk_follow end on row 73 (pinned in aeronautArt.test.ts). The
+in-betweens are the keys held or shifted whole (the speckled frames aliased; the sky captain all eight).
+`fx_colours`: the flare, the thruster flames and the sky captain's grey smoke (a coat colour too: kneel_in1 leaves 2
+un-inked grey edge px, allowed in the art test). Image review: round 1 aeronaut **APPROVE**, sky captain ITERATE (the
+kneel bridge's width squash thinned the sabre and re-inked the smoke wisp: `width: false`, the smoke grey added to
+`fx_colours`); round 2 sky captain **APPROVE**.
+
 ## 19. Amendment A8 (gravity adept / void walker): an airborne READY
 
 User: the gravity adept / void walker, copies of the black mage / black wizard. The void walker's READY levitates:

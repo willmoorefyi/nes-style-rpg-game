@@ -48,10 +48,10 @@ describe('debug-sandbox.yaml (docs/FEEDBACK_PLAN_2026-11-14.md §3.8)', () => {
     }
   });
 
-  it('the classes are the 28 base classes and, index for index, their 28 upgrades (the class batch: + barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric, ronin, shaman, beastmaster, warlock, rune_knight, scholar_hero, arquebusier, shieldmaiden, bard, fencer, apothecary, tinker, clockmaker, witch_hunter, diver, dancer_hero)', () => {
+  it('the classes are the 29 base classes and, index for index, their 29 upgrades (the class batch: + barbarian, landsknecht, dark fighter, legionnaire, hunter, cleric, ronin, shaman, beastmaster, warlock, rune_knight, scholar_hero, arquebusier, shieldmaiden, bard, fencer, apothecary, tinker, clockmaker, witch_hunter, diver, dancer_hero, aeronaut)', () => {
     const byId = new Map(CLASSES.map((c) => [c.id, c]));
-    expect(DATA.classes.base).toHaveLength(28);
-    expect(DATA.classes.promoted).toHaveLength(28);
+    expect(DATA.classes.base).toHaveLength(29);
+    expect(DATA.classes.promoted).toHaveLength(29);
     DATA.classes.base.forEach((b, i) => {
       expect(byId.get(b)?.upgradeFrom, b).toBeUndefined();
       expect(byId.get(DATA.classes.promoted[i])?.upgradeFrom, DATA.classes.promoted[i]).toBe(b);

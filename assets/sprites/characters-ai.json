@@ -328,6 +328,10 @@
       "x": 336,
       "y": 3456
     },
+    "aeronaut": {
+      "x": 1008,
+      "y": 5760
+    },
     "apothecary": {
       "x": 336,
       "y": 4992
@@ -476,6 +480,10 @@
       "x": 0,
       "y": 6528
     },
+    "sky_captain": {
+      "x": 1008,
+      "y": 4224
+    },
     "summoner": {
       "x": 1008,
       "y": 3840
@@ -504,6 +512,7 @@
   "fallbacks": {},
   "aliases": {
     "abyssal_knight": "knight",
+    "aeronaut": "thief",
     "apothecary": "red_mage",
     "arquebusier": "thief",
     "barbarian": "warrior",
@@ -541,6 +550,7 @@
     "scholar_hero": "red_mage",
     "shaman": "black_mage",
     "shieldmaiden": "warrior",
+    "sky_captain": "ninja",
     "summoner": "master",
     "tinker": "monk",
     "valkyrie": "knight",

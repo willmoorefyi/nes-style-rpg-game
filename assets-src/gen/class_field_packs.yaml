@@ -908,3 +908,42 @@ blade_dancer:
   carry: >-
     two curved sabres are sheathed at her hips, one on each side, hilts forward, close to the body; the cape hangs
     behind. Everything stays inside the 46 px width and the 48 x 96 cell
+
+aeronaut:
+  name: Aeronaut
+  tier: base
+  partner: sky_captain
+  battle_sheet: ~/temp/heroes/aeronaut_sky_captain_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: thief
+  look: >-
+    a young aeronaut, about 20: a brown leather flying cap with ear flaps and brass goggles; a bright face; a long white
+    scarf; a brown leather flying jacket over a pale shirt, brown trousers and boots. Colours: brown leather, brass,
+    white, a warm orange for the flare
+  carry: >-
+    the grappling-hook gun is holstered at his right hip, close to the leg; the scarf hangs down the back; both hands
+    are free. Everything touches the body and stays inside the 48 x 96 cell
+
+sky_captain:
+  name: Sky Captain
+  tier: enhanced
+  partner: aeronaut
+  battle_sheet: ~/temp/heroes/aeronaut_sky_captain_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: ninja
+  look: >-
+    the aeronaut become a sky captain: an officer's peaked cap with a gold badge; a navy long coat with gold buttons and
+    epaulettes, dark trousers, tall boots; brass mechanical wings folded tight on his back. Colours: navy, gold, brass,
+    dark grey
+  carry: >-
+    the sabre is sheathed at his left hip, hilt forward, close to the body; the mechanical wings stay folded on his
+    back in every view so the figure stays within 46 px wide and under the 92 px cap. Everything stays inside the
+    48 x 96 cell

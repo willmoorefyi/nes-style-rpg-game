@@ -3762,3 +3762,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the aeronaut / sky captain class pair (user-rendered
+# battle art; copies of the thief / ninja). AERO is weak so it kneels; NIN is the like-for-like control.
+# ?mute=1&scenario=cb_aeronauts (&kneel=loop, &enemyAnim=loop).
+- id: cb_aeronauts
+  name: Aeronaut and Sky Captain (pass CB preview)
+  party:
+    - { class: aeronaut, name: AERO, level: 10, equipment: [rapier, leather_armor], spells: [], hp: 15 }
+    - { class: sky_captain, name: CAPT, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+    - { class: aeronaut, name: AERO2, level: 10, equipment: [rapier, leather_armor], spells: [] }
+    - { class: ninja, name: NIN, level: 30, equipment: [rune_knife, opal_armlet, cap], spells: [{ id: fire, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp
