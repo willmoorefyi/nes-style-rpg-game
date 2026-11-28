@@ -17,6 +17,7 @@ start:
   legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor], spells: [] }
   hunter: { gear: [rapier, leather_armor], spells: [] }
   ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
@@ -36,6 +37,7 @@ lv2:
   legionnaire: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield], spells: [] }
   thief: { gear: [rapier, leather_armor], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor], spells: [] }
   hunter: { gear: [rapier, leather_armor], spells: [] }
   ronin: { gear: [rapier, leather_armor], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth], spells: [] }
@@ -55,6 +57,7 @@ arrive:
   legionnaire: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, leather_armor, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, cloth, cap], spells: [] }
@@ -74,6 +77,7 @@ full:
   legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
@@ -93,6 +97,7 @@ naked:
   legionnaire: { gear: [], spells: [] }
   barbarian: { gear: [], spells: [] }
   thief: { gear: [], spells: [] }
+  arquebusier: { gear: [], spells: [] }
   hunter: { gear: [], spells: [] }
   ronin: { gear: [], spells: [] }
   monk: { gear: [], spells: [] }
@@ -121,6 +126,7 @@ w_s1: &w_s1
   legionnaire: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   barbarian: { gear: [rapier, chain_mail, wooden_shield, cap], spells: [] }
   thief: { gear: [rapier, leather_armor, cap], spells: [] }
+  arquebusier: { gear: [rapier, leather_armor, cap], spells: [] }
   hunter: { gear: [rapier, leather_armor, cap], spells: [] }
   ronin: { gear: [rapier, leather_armor, cap], spells: [] }
   monk: { gear: [wooden_nunchaku, leather_armor, cap], spells: [] }
@@ -141,6 +147,7 @@ w_pravoka: &w_t2
   legionnaire: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [hand_axe, chain_mail, iron_shield, iron_helm], spells: [] }
   thief: { gear: [short_sword, leather_armor, cap], spells: [] }
+  arquebusier: { gear: [short_sword, leather_armor, cap], spells: [] }
   hunter: { gear: [short_sword, leather_armor, cap], spells: [] }
   ronin: { gear: [short_sword, leather_armor, cap], spells: [] }
   monk: { gear: [iron_nunchaku, leather_armor, cap], spells: [] }
@@ -165,6 +172,7 @@ w_elfheim: &w_t3
   legionnaire: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   barbarian: { gear: [mythril_sword, iron_armor, iron_shield, iron_helm], spells: [] }
   thief: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
+  arquebusier: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   hunter: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   ronin: { gear: [mythril_knife, silver_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, silver_armlet, cap], spells: [] }
@@ -193,6 +201,7 @@ w_melmond: &w_t4
   legionnaire: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [mythril_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [scimitar, gold_armlet, cap], spells: [] }
+  arquebusier: { gear: [scimitar, gold_armlet, cap], spells: [] }
   hunter: { gear: [scimitar, gold_armlet, cap], spells: [] }
   ronin: { gear: [scimitar, gold_armlet, cap], spells: [] }
   monk: { gear: [iron_nunchaku, gold_armlet, cap], spells: [] }
@@ -216,6 +225,7 @@ w_crescent: &w_t5
   legionnaire: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   barbarian: { gear: [flame_sword, mythril_armor, mythril_shield, mythril_helm], spells: [] }
   thief: { gear: [falchion, gold_armlet, cap], spells: [] }
+  arquebusier: { gear: [falchion, gold_armlet, cap], spells: [] }
   hunter: { gear: [falchion, gold_armlet, cap], spells: [] }
   ronin: { gear: [falchion, gold_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, gold_armlet, cap], spells: [] }
@@ -240,6 +250,7 @@ w_onrac: &w_t6
   legionnaire: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   barbarian: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [] }
   thief: { gear: [rune_knife, opal_armlet, cap], spells: [] }
+  arquebusier: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   hunter: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   ronin: { gear: [rune_knife, opal_armlet, cap], spells: [] }
   monk: { gear: [cat_claw, opal_armlet, cap], spells: [] }
@@ -258,6 +269,7 @@ w_onrac: &w_t6
   centurion: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   berserker: { gear: [sun_blade, opal_armor, aegis_shield, opal_helm], spells: [cure, cure2] }
   ninja: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
+  rifleman: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   ranger: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   samurai: { gear: [rune_knife, opal_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [cat_claw, opal_armlet, cap], spells: [] }
@@ -283,6 +295,7 @@ w_gaia: &w_t7
   legionnaire: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   barbarian: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [] }
   thief: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
+  arquebusier: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   hunter: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   ronin: { gear: [vorpal_sword, diamond_armlet, cap], spells: [] }
   monk: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }
@@ -301,6 +314,7 @@ w_gaia: &w_t7
   centurion: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   berserker: { gear: [defender, diamond_armor, diamond_shield, diamond_helm], spells: [cure, cure2] }
   ninja: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
+  rifleman: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   ranger: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   samurai: { gear: [vorpal_sword, diamond_armlet, cap], spells: [fire, ice, fir2] }
   master: { gear: [dragon_claw, diamond_armlet, cap], spells: [] }

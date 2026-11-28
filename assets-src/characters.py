@@ -813,7 +813,15 @@ ROSTER: dict[str, Look] = {
     # and a gold coat with a book; the sage (sage_hero), a white-bearded elder in a teal hat and robe with a gold staff
     "scholar_hero": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(24, 18, 8), trim=(14, 9, 5),
                          pants=(10, 7, 5), boots=(12, 8, 5), gear="hood", gear_color=(4, 10, 11)),
+    # pass CB (plan 11-17): the arquebusier in a steel morion with a gold plume and a striped doublet, a matchlock;
+    # the rifleman in a steel helmet with goggles, plate and leather, a rifle with a bayonet
+    "arquebusier": Look(hair=(8, 5, 3), hair_style="short", outfit="tunic", cloth=(10, 7, 5), trim=(26, 18, 5),
+                        pants=(10, 7, 5), boots=(5, 5, 6), gear="helm", gear_color=(20, 20, 22), weapon="spear",
+                        weapon_color=(14, 9, 5)),
     # Upgraded classes
+    "rifleman": Look(hair=(8, 5, 3), hair_style="short", outfit="armor", cloth=(10, 7, 5), trim=(23, 16, 7),
+                     pants=(8, 8, 9), boots=(5, 5, 6), gear="helm", gear_color=(17, 17, 18), weapon="spear",
+                     weapon_color=(18, 18, 19)),
     "sage_hero": Look(hair=(29, 29, 28), hair_style="long", beard=(29, 29, 28), outfit="robe", cloth=(4, 10, 11),
                       trim=(28, 22, 10), boots=(12, 8, 5), gear="hood", gear_color=(4, 10, 11), weapon="staff",
                       weapon_color=(28, 22, 10)),

@@ -596,3 +596,54 @@ classes. Can you add that to the character selection screen where appropriate?"
   pins that `loadClasses` runs the cross-check (an unknown `copyOf` is refused), and `crossFileValidation.test.ts`
   checks every `copyOf` names a class. The longest note, "Plays as: Black Wizard" for a future upgraded pick, is 22
   characters; "Plays as: White Mage" (20) fits the 600 px panel at the 24 px font.
+
+### 17.1 Arquebusier / rifleman result (2026-11-27, branch class-copynote, second commit)
+
+User (verbatim): "another new class, this time the 'arquebusier' and the 'rifleman' - these should be copies of the
+thief for now". Exact copies of thief -> ninja with `copyOf: thief` / `ninja`: `arquebusier` (ARQ, default name
+ARQB) -> `rifleman` (RFL). On page 3 (12 rows, 2880 x 1920; 2176 px left, 13 more rows). Field alias thief / ninja
+(temporary); walk-sheet pack entries (the gun slung on the back). `fx_colours` (A6): the muzzle flashes (and the
+rifleman's tracer); the arquebusier's flash gold is its doublet trim too (a 1 px trim seam in atk_wind1, the art test
+allows ready + 1). Image review: round 1 ITERATE (see-through slits between the gun arm and the body in both atk_mid:
+atk_mid is the attack key 1 px back, no arm rotation); round 2 rifleman **APPROVE**, arquebusier ITERATE (a slit down
+the raised forearm in cast_release: cast_release is the cast key, cast_rise drops the hand 2 px evenly); round 3
+arquebusier **APPROVE** (2 px pinholes left in cast_rise, minor).
+
+## 18. Amendment A7 (shieldmaiden / valkyrie): an airborne key pose
+
+User: the shieldmaiden / valkyrie, copies of the warrior / knight. The valkyrie's ATTACK is an airborne diving thrust:
+its lowest opaque row is 73, not the feet row 76 (every other cell of the sheet is on 76). It is kept airborne as
+drawn. The importer refuses it today: `hero_user_grid.cut` raises "feet on row 73, need 76" for every cell whose body's
+lowest row is not the feet row.
+
+- **Data:** a recipe key `airborne: {<class>/<pose>: <lowest row>}` in `gen/hero_user.yaml`, like `allow_outside`:
+  `shieldmaiden_valkyrie` gets `airborne: {valkyrie/attack: 73}`. The value is the cell's measured lowest opaque row,
+  recorded exactly.
+- **Importer (`hero_user_grid.cut`):** for a listed cell the feet gate checks the lowest body row equals the recorded
+  value instead of the feet row. Refused (SystemExit naming the cell): a key whose class is not one of the recipe's
+  rows or whose pose is not one of the 7 columns; a value that is not an integer in [0, foot row); a listed cell whose
+  lowest row differs from the value (the render changed). Every unlisted cell keeps the feet-row gate. The cell is
+  copied as drawn, in its 80 x 80 cell: nothing is shifted or re-anchored, since the atlas, the battle layout
+  (`partySpritePosition`: the class's `footRow`) and the lunge place a hero by its cell, never by a frame's lowest
+  pixel. So the dive is drawn 3 px above the ground, and atk_mid / atk_follow (from the attack key) stay airborne.
+  The kneel bridge and its checks use ready and the kneel key only (both on 76).
+- **Recorded:** the class's `battle.json` gains `airborne: {attack: 73}` (only when the recipe lists the class), so
+  the importer's metas check and the art test read it.
+- **Scope:** recipes without the key import exactly as today (every committed `battle.json` and atlas byte-identical
+  but the new classes'; the byte gate of plan 16 against mainline 9b07bab7 and page 3's existing rows).
+- **Tests:**
+  - `selftest_hero_user.py`: a synthetic sheet with one cell lifted 3 px is refused without the key and accepted with
+    `airborne: {<c>/attack: 73}`; refused with an unknown class, an unknown pose, a value of 76 or more or not an
+    integer, and a wrong value (74); an unlisted lifted cell is still refused.
+  - `tests/rendering/shieldmaidenArt.test.ts`: every key cell's lowest row is 76 but the valkyrie's attack at 73
+    (from `battle.json` `airborne`); the valkyrie's atk_mid and atk_follow are airborne too (lowest row < 76), her
+    atk_wind1 / atk_wind2 / idle_b are on 76.
+  - The browser check shows the dive in battle (screenshot to `~/temp/ff-game/class_pack/shieldmaiden/`).
+- **Momus OKAY 4/5 (2026-11-27); notes taken:** `ready` and `kneel` cannot be airborne (refused: the in-betweens of
+  ready and the kneel bridge rely on them standing on the feet row). The value is an `int` (a YAML bool refused) in
+  [0, the row's own foot row), measured on the body rows (as the gate measures, props excluded). `hero_user.check`
+  compares the battle json's `airborne` with the recipe's (missing / stale fails), and only `battle.json` gets the
+  field (not the shared base, so `battle_kneel.json` is unchanged). The atk_mid / atk_follow rows are measured after
+  the build and recorded in the art test (if one lands on 76 the test pins 76; an `alias_frames` entry would be
+  recorded the same way). The byte gate's base is the branch's previous commit (the arquebusier's): the main / -1 /
+  -2 pages byte-equal and page 3's 12 rows already there byte-equal.

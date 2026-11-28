@@ -8,8 +8,8 @@
 # levels:      id, name, level (the party's level), kit, items, gold, formations (enemy-id lists, at most 9 each),
 #              optional background and enemyAi (per enemy id, as in debug-scenarios.yaml).
 classes:
-  base: [warrior, thief, monk, white_mage, black_mage, red_mage, barbarian, landsknecht, dark_fighter_hero, legionnaire, hunter, cleric, ronin, shaman, beastmaster, warlock, rune_knight, scholar_hero]
-  promoted: [knight, ninja, master, white_wizard, black_wizard, red_wizard, berserker, dragoon, death_knight_hero, centurion, ranger, paladin, samurai, druid, summoner, necromancer, mystic_warrior, sage_hero]
+  base: [warrior, thief, monk, white_mage, black_mage, red_mage, barbarian, landsknecht, dark_fighter_hero, legionnaire, hunter, cleric, ronin, shaman, beastmaster, warlock, rune_knight, scholar_hero, arquebusier]
+  promoted: [knight, ninja, master, white_wizard, black_wizard, red_wizard, berserker, dragoon, death_knight_hero, centurion, ranger, paladin, samurai, druid, summoner, necromancer, mystic_warrior, sage_hero, rifleman]
 kits: [naked, start, lv2, arrive, full]
 backgrounds: [grassland, forest, dark_forest, ruined_forest, temple, evil_temple, abandoned_castle, cave, desert,
   shoreline, ocean, river, marsh, swamp, waterfall]

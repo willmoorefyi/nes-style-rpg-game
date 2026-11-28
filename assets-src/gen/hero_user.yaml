@@ -261,3 +261,21 @@ scholar_hero_sage_hero:
   source_name: scholar_sage_sprite_sheet.png   # hero ids scholar_hero / sage_hero: approved/scholar is the townsfolk NPC
   approved: "2026-11-27"
   user_review: "I've now added the 'scholar' / 'sage' character class, a shallow copy of the red mage / red wizard for classic. (delivered as final; the thrown potion and sparks, the magnifier, the rune ring, the floating book, the loose pages and the books on the ground kept as rendered)"
+arquebusier_rifleman:
+  file: user_art/arquebusier/battle_2026-11-27.png
+  sha256: e39e0e91481f78eb072bcc6e66ed45fa1951db0445677be9b79eefd260c58ed1
+  rows: [arquebusier, rifleman]
+  columns: [ready, attack, cast, hurt, down, victory, kneel]
+  faces: left
+  palette: rows                  # 16 colours per row (docs/CLASS_BARBARIAN_PLAN.md 11)
+  tool: ChatGPT (interactive)
+  rendered: "2026-11-27"
+  author: user
+  refs:
+    pack: ~/temp/ff-game/class_pack
+    prompt.txt: c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f
+    prompt_arquebusier_rifleman.txt: 7342b213a20823a096223e194629a35b135814072a66b386f4aa5add6dde9d09
+    class_reference_native_560x160.png: de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd
+  source_name: arquebusier_rifleman_sprite_sheet.png
+  approved: "2026-11-27"
+  user_review: "another new class, this time the 'arquebusier' and the 'rifleman' - these should be copies of the thief for now (delivered as final; the muzzle flash, the smoke, the tracer, the steam puffs and the helmet lying apart in DOWN kept as rendered)"

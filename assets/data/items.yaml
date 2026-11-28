@@ -13,6 +13,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -74,6 +75,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - red_mage
@@ -95,6 +97,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - red_mage
@@ -194,6 +197,7 @@
   price: 800
   usableBy:
   - thief
+  - arquebusier
   - hunter
   - ronin
   - black_mage
@@ -324,6 +328,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -354,6 +359,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -400,6 +406,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -571,6 +578,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -707,6 +715,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -736,6 +745,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - red_mage
@@ -757,6 +767,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -786,6 +797,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - red_mage
@@ -893,6 +905,7 @@
   price: 12000
   usableBy:
   - thief
+  - arquebusier
   - hunter
   - ronin
   - black_mage
@@ -932,6 +945,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk
@@ -1009,6 +1023,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   hit: 10
@@ -1054,6 +1069,7 @@
   - legionnaire
   - barbarian
   - thief
+  - arquebusier
   - hunter
   - ronin
   - monk

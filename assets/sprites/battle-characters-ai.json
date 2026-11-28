@@ -455,6 +455,16 @@
       "row": 9,
       "page": 3,
       "inbetweens": true
+    },
+    "arquebusier": {
+      "row": 10,
+      "page": 3,
+      "inbetweens": true
+    },
+    "rifleman": {
+      "row": 11,
+      "page": 3,
+      "inbetweens": true
     }
   },
   "pages": [
@@ -476,7 +486,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 1600
+      "h": 1920
     }
   ]
 }

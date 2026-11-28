@@ -324,6 +324,10 @@
       "x": 0,
       "y": 6912
     },
+    "arquebusier": {
+      "x": 1008,
+      "y": 5760
+    },
     "barbarian": {
       "x": 0,
       "y": 6528
@@ -388,6 +392,10 @@
       "x": 1008,
       "y": 4224
     },
+    "rifleman": {
+      "x": 1008,
+      "y": 4224
+    },
     "ronin": {
       "x": 1008,
       "y": 5760
@@ -423,6 +431,7 @@
   },
   "fallbacks": {},
   "aliases": {
+    "arquebusier": "thief",
     "barbarian": "warrior",
     "beastmaster": "monk",
     "berserker": "knight",
@@ -439,6 +448,7 @@
     "necromancer": "black_wizard",
     "paladin": "white_wizard",
     "ranger": "ninja",
+    "rifleman": "ninja",
     "ronin": "thief",
     "rune_knight": "red_mage",
     "sage_hero": "red_wizard",

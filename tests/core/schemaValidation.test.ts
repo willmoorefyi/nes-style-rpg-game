@@ -320,6 +320,6 @@ describe('plan 17: copyOf', () => {
   it('the real classes pass', () => {
     const real = (parse(readFileSync('assets/data/classes.yaml', 'utf-8')) as unknown[]).map((c) => validateCharacterClassData(c));
     expect(() => validateClassCopies(real)).not.toThrow();
-    expect(real.filter((c) => c.copyOf)).toHaveLength(24);
+    expect(real.filter((c) => c.copyOf)).toHaveLength(real.length - 12);   // every class but the 12 classic ones
   });
 });

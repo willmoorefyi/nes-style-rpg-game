@@ -518,3 +518,44 @@ sage_hero:
     left in the front view), its foot near the ground beside the foot and its head level with the hat, never above the
     92 px cap; in the back view the staff is in the same hand; in the side view facing left it is held in front of the
     body, upright. The staff touches the hand and stays inside the 48 x 96 cell
+
+arquebusier:
+  name: Arquebusier
+  tier: base
+  partner: rifleman
+  battle_sheet: ~/temp/heroes/arquebusier_rifleman_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: thief
+  look: >-
+    a young Renaissance gunner, about 20: dark brown hair under a polished steel morion helmet with a curved gold
+    plume; a striped black-and-gold doublet with puffed sleeves and slashed red-brown lining, a steel gorget, dark
+    breeches, pale grey stockings and black shoes; a powder flask and a match cord at the belt. Colours: dark brown
+    hair, fair skin, steel grey, black, warm gold, dark red-brown
+  carry: >-
+    the long matchlock arquebus is slung on his back on a strap over the right shoulder, muzzle up behind the left
+    shoulder, never above the 92 px cap; both hands are free. The arquebus touches the body and stays inside the 48 x 96
+    cell
+
+rifleman:
+  name: Rifleman
+  tier: enhanced
+  partner: arquebusier
+  battle_sheet: ~/temp/heroes/arquebusier_rifleman_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: ninja
+  look: >-
+    the arquebusier grown into a rifleman: dark brown hair under a steel helmet with brass goggles on the brim; steel
+    shoulder plates over a brown leather coat with brass buckles and straps, dark trousers, tall brown boots; a small
+    brass tank on his back. Colours: dark brown hair, fair skin, steel grey, brown leather, brass gold
+  carry: >-
+    the rifle with its bayonet is slung on his back on a strap over the right shoulder beside the brass tank, muzzle up
+    behind the left shoulder, never above the 92 px cap; both hands are free. The rifle and the tank touch the body and
+    stay inside the 48 x 96 cell

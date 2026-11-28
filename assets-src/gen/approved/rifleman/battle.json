@@ -1,0 +1,279 @@
+{
+  "character": "rifleman",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/arquebusier/battle_2026-11-27.png",
+    "sha256": "e39e0e91481f78eb072bcc6e66ed45fa1951db0445677be9b79eefd260c58ed1"
+  },
+  "recipe": "hero_user.yaml#arquebusier_rifleman",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "prompt_arquebusier_rifleman.txt": "7342b213a20823a096223e194629a35b135814072a66b386f4aa5add6dde9d09",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "arquebusier_rifleman_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "another new class, this time the 'arquebusier' and the 'rifleman' - these should be copies of the thief for now (delivered as final; the muzzle flash, the smoke, the tracer, the steam puffs and the helmet lying apart in DOWN kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle",
+  "layout": [
+    3,
+    2
+  ],
+  "poses": [
+    "ready",
+    "attack",
+    "cast",
+    "hurt",
+    "down",
+    "victory"
+  ],
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          24,
+          24,
+          28
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          44,
+          43,
+          48
+        ],
+        [
+          41,
+          41,
+          49
+        ]
+      ],
+      [
+        [
+          69,
+          71,
+          79
+        ],
+        [
+          66,
+          74,
+          82
+        ]
+      ],
+      [
+        [
+          77,
+          50,
+          39
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          98,
+          59,
+          60
+        ],
+        [
+          99,
+          57,
+          57
+        ]
+      ],
+      [
+        [
+          104,
+          107,
+          119
+        ],
+        [
+          107,
+          107,
+          115
+        ]
+      ],
+      [
+        [
+          120,
+          84,
+          58
+        ],
+        [
+          123,
+          82,
+          57
+        ]
+      ],
+      [
+        [
+          145,
+          99,
+          41
+        ],
+        [
+          148,
+          99,
+          41
+        ]
+      ],
+      [
+        [
+          152,
+          154,
+          164
+        ],
+        [
+          148,
+          156,
+          165
+        ]
+      ],
+      [
+        [
+          166,
+          117,
+          76
+        ],
+        [
+          165,
+          115,
+          74
+        ]
+      ],
+      [
+        [
+          192,
+          133,
+          56
+        ],
+        [
+          189,
+          132,
+          57
+        ]
+      ],
+      [
+        [
+          207,
+          146,
+          103
+        ],
+        [
+          206,
+          148,
+          107
+        ]
+      ],
+      [
+        [
+          209,
+          203,
+          208
+        ],
+        [
+          206,
+          206,
+          206
+        ]
+      ],
+      [
+        [
+          239,
+          189,
+          146
+        ],
+        [
+          239,
+          189,
+          148
+        ]
+      ],
+      [
+        [
+          244,
+          233,
+          220
+        ],
+        [
+          247,
+          231,
+          222
+        ]
+      ],
+      [
+        [
+          247,
+          191,
+          86
+        ],
+        [
+          247,
+          189,
+          82
+        ]
+      ]
+    ],
+    "boxes": {
+      "ready": [
+        10,
+        6,
+        72,
+        76
+      ],
+      "attack": [
+        1,
+        7,
+        78,
+        76
+      ],
+      "cast": [
+        17,
+        0,
+        65,
+        76
+      ],
+      "hurt": [
+        8,
+        3,
+        73,
+        76
+      ],
+      "down": [
+        1,
+        43,
+        78,
+        76
+      ],
+      "victory": [
+        1,
+        0,
+        78,
+        76
+      ]
+    }
+  }
+}

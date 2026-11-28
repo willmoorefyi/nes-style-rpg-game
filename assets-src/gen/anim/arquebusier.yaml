@@ -1,0 +1,29 @@
+# Puppet animation joints for the arquebusier (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/arquebusier/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). tip = the arquebus muzzle (ready, attack; the attack's muzzle flash and smoke puff ride with it); in the cast key the arquebus stands upright in the near hand and rides with the torso. part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the muzzle flash, the smoke and the match glow survive the cut
+fx_colours: [[214, 148, 41], [247, 198, 82]]   # plan 16 (A6): the muzzle flash (its gold is the doublet trim too), drawn without ink
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [48, 30], crown: [50, 8], chest: [48, 40], hip: [48, 54], sh_n: [42, 36], el_n: [38, 42], hand_n: [36, 42], tip: [12, 22], weapon_hand: n, sh_f: [58, 36], el_f: [62, 44], hand_f: [54, 48], hip_n: [42, 58], knee_n: [38, 66], foot_n: [34, 75], hip_f: [58, 58], knee_f: [62, 66], foot_f: [64, 75], part_boxes: {weapon: [[10, 20, 40, 48]]}}
+  attack:
+    {neck: [52, 30], crown: [54, 10], chest: [54, 40], hip: [56, 52], sh_n: [48, 36], el_n: [42, 38], hand_n: [36, 36], tip: [4, 33], weapon_hand: n, sh_f: [64, 36], el_f: [66, 44], hand_f: [66, 50], hip_n: [48, 56], knee_n: [44, 66], foot_n: [38, 75], hip_f: [64, 56], knee_f: [70, 66], foot_f: [72, 75], part_boxes: {weapon: [[1, 17, 44, 40]]}}
+  cast:
+    {neck: [46, 28], crown: [46, 10], chest: [44, 36], hip: [44, 52], sh_n: [34, 30], el_n: [30, 18], hand_n: [26, 6], sh_f: [54, 34], el_f: [56, 42], hand_f: [48, 46], hip_n: [38, 58], knee_n: [36, 66], foot_n: [32, 75], hip_f: [50, 58], knee_f: [52, 66], foot_f: [52, 75], part_boxes: {torso: [[16, 12, 30, 77]], farm_n: [[22, 0, 32, 12]]}}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, 0], crown: [0, 0], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -1], hand_n: [0, -1], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [0, -1]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-7, -3], hand_n: [-2, -4], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0], tip: [-7, -19]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-9, -6], hand_n: [-3, -8], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0], tip: [-7, -25]}
+  atk_mid: {neck: [1.9, -0.9], crown: [1.9, 0], chest: [2.8, -0.9], hip: [3.7, -1.8], sh_n: [2.8, -0.9], el_n: [-2.6, -4.05], hand_n: [-3.05, -5.4], sh_f: [2.8, -0.9], el_f: [1.9, -0.9], hand_f: [5.5, 0], hip_n: [2.8, -1.8], knee_n: [3.7, -0.9], foot_n: [2.8, 0], hip_f: [2.8, -1.8], knee_f: [4.15, -0.9], foot_f: [4.6, 0], tip: [-3.05, -5.4]}
+  atk_follow: {neck: [1, 0], crown: [1, 0.5], chest: [1.5, 0], hip: [2, -0.5], sh_n: [1.5, 0], el_n: [-2, -2], hand_n: [-3, -5], sh_f: [1.5, 0], el_f: [1, 0], hand_f: [3, 0.5], hip_n: [1.5, -0.5], knee_n: [1.5, 0], foot_n: [1, 0], hip_f: [1.5, -0.5], knee_f: [2, 0], foot_f: [2, 0], tip: [-16, -13]}
+  cast_gather: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [-1, -4], hand_n: [-6, -7], sh_f: [0, -1], el_f: [2, -3], hand_f: [5, 1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0], tip: [-6, -7]}
+  cast_rise: {neck: [-1, -1], crown: [-2, 1], chest: [-2, -2], hip: [-2, -1], sh_n: [-4, -3], el_n: [-4, -10], hand_n: [-5, -16], sh_f: [-2, -1], el_f: [-3, -1], hand_f: [-3, -1], hip_n: [-2, 0], knee_n: [-1, 0], foot_n: [-1, 0], hip_f: [-4, 0], knee_f: [-5, 0], foot_f: [-6, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 3], hand_n: [1, 6], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+kneel: {source: user, bridge: {keep_top: 0.42, keep_bot: 0.2}}

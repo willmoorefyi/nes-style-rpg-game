@@ -26,3 +26,5 @@ rune_knight: red_mage # temporary until the user renders the rune knight's field
 mystic_warrior: red_wizard # temporary until the user renders the mystic warrior's field walk sheet
 scholar_hero: red_mage # temporary until the user renders the scholar's field walk sheet
 sage_hero: red_wizard  # temporary until the user renders the sage's field walk sheet
+arquebusier: thief   # temporary until the user renders the arquebusier's field walk sheet
+rifleman: ninja      # temporary until the user renders the rifleman's field walk sheet
