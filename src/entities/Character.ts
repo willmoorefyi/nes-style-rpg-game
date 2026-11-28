@@ -39,6 +39,7 @@ export class Character {
     this.equipment.set('armor', null);
     this.equipment.set('shield', null);
     this.equipment.set('helmet', null);
+    this.equipment.set('hands', null);
     this._currentHp = data.currentHp ?? this.maxHp;
     // a new character starts rested: full charges for its level (a save overwrites these in fromJSON)
     this.restoreAllCharges();

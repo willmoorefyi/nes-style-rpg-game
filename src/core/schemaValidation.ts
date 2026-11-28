@@ -302,6 +302,7 @@ export function validateCharacterClassData(data: unknown): import('../types/inde
 }
 
 const VALID_ITEM_TYPES = ['weapon', 'armor', 'consumable', 'key'];
+const VALID_SLOTS = ['weapon', 'armor', 'shield', 'helmet', 'hands'];
 
 export function validateItemData(data: unknown): import('../types/index.js').ItemData {
   assertObject('ItemData', data);
@@ -316,6 +317,9 @@ export function validateItemData(data: unknown): import('../types/index.js').Ite
   assertArray('ItemData.usableBy', data.usableBy);
   (data.usableBy as unknown[]).forEach((e, i) => assertString(`ItemData.usableBy[${i}]`, e));
   assertOptionalNumbers('ItemData', data, ['hit', 'crit', 'weight']);
+  if (data.slot !== undefined && !VALID_SLOTS.includes(data.slot as string)) {
+    throw new ValidationError(`ItemData.slot: expected one of ${VALID_SLOTS.join(', ')}, got ${data.slot}`);
+  }
   if (data.description !== undefined) assertString('ItemData.description', data.description);
   if (data.prompt !== undefined) assertString('ItemData.prompt', data.prompt);
   if (data.plural !== undefined) assertString('ItemData.plural', data.plural);

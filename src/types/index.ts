@@ -403,7 +403,8 @@ export interface KeyItemGate extends RequiredFlagsField {
   permanent: boolean;
 }
 
-export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet';
+/** FF1's weapon and four armour slots; `hands` is the glove slot (gloves, gauntlets, the ProRing; pass EQ). */
+export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet' | 'hands';
 
 // Save/Load types
 export interface CharacterSaveData {
@@ -412,7 +413,8 @@ export interface CharacterSaveData {
   level: number;
   xp: number;
   currentHp: number;
-  equipment: Record<EquipmentSlot, string | null>;
+  /** Every slot `toJSON` writes; a save from before pass EQ has no `hands` (it loads empty). */
+  equipment: Partial<Record<EquipmentSlot, string | null>>;
   spellCharges: number[];
   learnedSpells: Array<{ spellId: string; level: number }>;
   statusEffects?: Array<{ effect: string; duration: number }>;
