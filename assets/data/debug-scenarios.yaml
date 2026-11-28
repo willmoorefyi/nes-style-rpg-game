@@ -3687,3 +3687,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the tinker / machinist class pair (user-rendered
+# battle art; copies of the monk / master). TINKR is weak so it kneels; MSTR is the like-for-like control.
+# ?mute=1&scenario=cb_tinkers (&kneel=loop, &enemyAnim=loop).
+- id: cb_tinkers
+  name: Tinker and Machinist (pass CB preview)
+  party:
+    - { class: tinker, name: TINKR, level: 10, equipment: [wooden_nunchaku, cloth], spells: [], hp: 15 }
+    - { class: machinist, name: MACH, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+    - { class: tinker, name: TINKR2, level: 10, equipment: [wooden_nunchaku, cloth], spells: [] }
+    - { class: master, name: MSTR, level: 30, equipment: [cat_claw, opal_armlet, cap], spells: [] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

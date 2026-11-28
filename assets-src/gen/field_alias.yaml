@@ -36,3 +36,5 @@ fencer: thief   # temporary until the user renders the fencer's field walk sheet
 duelist: ninja   # temporary until the user renders the duelist's field walk sheet
 apothecary: red_mage   # temporary until the user renders the apothecary's field walk sheet
 plague_doctor: red_wizard   # temporary until the user renders the plague doctor's field walk sheet
+tinker: monk   # temporary until the user renders the tinker's field walk sheet
+machinist: master   # temporary until the user renders the machinist's field walk sheet

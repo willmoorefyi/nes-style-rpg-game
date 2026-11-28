@@ -835,7 +835,13 @@ ROSTER: dict[str, Look] = {
     # beaked mask, a top hat and a long coat with a cane
     "apothecary": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(12, 14, 9), trim=(20, 13, 7),
                        pants=(10, 7, 5), boots=(11, 7, 4)),
+    # pass CB (plan 11-18): the tinker in goggles and overalls with a big wrench; the machinist in a steampunk
+    # harness with mechanical arms (battle art only), a hammer and a glowing tank
+    "tinker": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(8, 12, 16), trim=(22, 17, 10),
+                   pants=(8, 12, 16), boots=(10, 7, 5), gear="headband", gear_color=(22, 17, 10)),
     # Upgraded classes
+    "machinist": Look(hair=(10, 7, 5), hair_style="short", outfit="armor", cloth=(14, 10, 7), trim=(23, 17, 8),
+                      pants=(8, 8, 9), boots=(8, 6, 5), gear="headband", gear_color=(23, 17, 8)),
     "plague_doctor": Look(hair=(4, 4, 4), hair_style="short", outfit="robe", cloth=(4, 4, 4), trim=(9, 7, 5),
                           boots=(4, 4, 4), gear="round_hat", gear_color=(4, 4, 4), weapon="staff", weapon_color=(9, 7, 5)),
     "duelist": Look(hair=(9, 6, 4), hair_style="long", outfit="coat", cloth=(11, 4, 7), trim=(26, 26, 27),

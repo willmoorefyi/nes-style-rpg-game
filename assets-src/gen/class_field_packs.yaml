@@ -716,3 +716,42 @@ plague_doctor:
     a black cane with a brass head is held upright in his right hand (the hand toward the viewer's left in the front
     view), its tip near the ground beside the foot, its head at the hip; the lantern hangs at his left hip. The cane
     touches the hand and everything stays inside the 48 x 96 cell, the hat under the 92 px cap
+
+tinker:
+  name: Tinker
+  tier: base
+  partner: machinist
+  battle_sheet: ~/temp/heroes/tinker_machinist_sprite_sheet.png
+  row: 0
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: monk
+  look: >-
+    a young tinker, about 18: messy brown hair with brass goggles pushed up on the forehead; a cheerful face; blue
+    work overalls over a pale shirt with rolled sleeves, a brown tool belt, brown work boots. Colours: brown hair,
+    fair skin, denim blue, brass, brown leather
+  carry: >-
+    a big steel wrench hangs from the tool belt at his left hip, head down, close to the leg; a small hammer sits in a
+    loop at the right hip; both hands are free. The tools touch the body and stay inside the 48 x 96 cell
+
+machinist:
+  name: Machinist
+  tier: enhanced
+  partner: tinker
+  battle_sheet: ~/temp/heroes/tinker_machinist_sprite_sheet.png
+  row: 1
+  cell: [80, 80]
+  body_box: null
+  poses: [ready, victory]
+  weapon_view: null
+  stand_in: master
+  look: >-
+    the tinker grown into a machinist: brown hair and goggles; a brown leather steampunk harness with brass fittings
+    over a dark shirt, dark trousers, heavy boots; a small glowing orange tank on his back; two thin articulated
+    mechanical arms folded tight on his back, their claws tucked behind the shoulders. Colours: brown leather, brass,
+    dark grey, a warm orange glow
+  carry: >-
+    a hammer hangs at his left hip; the mechanical arms stay folded on his back in every view so the figure stays
+    within 46 px wide and under the 92 px cap; both hands are free. Everything stays inside the 48 x 96 cell

@@ -696,3 +696,16 @@ The in-betweens are the keys held or shifted whole; `alias_frames` for the frame
 specks (the plague doctor all eight); `fx_colours` for the sparkles, the lantern glow and the miasma wisp's olive.
 Image review: round 1 apothecary **APPROVE**, plague doctor ITERATE (the kneel bridge re-inked the wisp's olive tip:
 the olive added to `fx_colours`); round 2 plague doctor **APPROVE**.
+
+### 18.5 Tinker / machinist result (2026-11-27, branch class-copynote, seventh commit)
+
+User (verbatim): "I've also added the tinker / machinist characters now, we can make them a copy of the black belt /
+monk for now". Exact copies of monk -> master with `copyOf` (the unarmed martial rule included): `tinker` (TNK,
+default name TINKR) -> `machinist` (MCH). On page 3 (22 rows, 2880 x 3520; 576 px left, 3 more rows). Field alias
+monk / master (temporary); walk-sheet pack entries (the wrench and hammer at the belt; the machinist's mechanical arms
+folded on the back). The thin mechanical arms are rigid props: the in-betweens are the keys held or shifted whole
+(the cast frames aliased to the cast key, whose re-render gained 31 / 58 px); `fx_colours` for the arcs and sparks.
+No border exemption was needed (the sheet's cells touch row 0 only, as earlier sheets do, and no cell crosses a
+border). Image review: round 1 machinist **APPROVE**, tinker ITERATE (the kneel bridge's width squash crushed the
+wrench on the floor: `kneel.bridge.width: false`); round 2 ITERATE (the bridge's centre shift still pushed the jaw into the cell edge and a seam tore the hair: `u: [0.35, 0.15]`, `keep_top: 0.48`, `shear: false`); round 3 tinker **APPROVE**. The balance test's unarmed-martial
+list now derives from `copyOf`.

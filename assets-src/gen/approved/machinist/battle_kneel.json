@@ -1,0 +1,237 @@
+{
+  "character": "machinist",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/tinker/battle_2026-11-27.png",
+    "sha256": "0c227fbd203c8dd275013324e7fff1ea78e477dd8579c46406ad34c8ec034ba7"
+  },
+  "recipe": "hero_user.yaml#tinker_machinist",
+  "row": 1,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "tinker_machinist_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've also added the tinker / machinist characters now, we can make them a copy of the black belt / monk for now (delivered as final; the swing arcs, the flying bolts, the clockwork robots, the sparks, the steam puff and the thin mechanical arms kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          25,
+          22,
+          25
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          55,
+          41,
+          37
+        ],
+        [
+          57,
+          41,
+          33
+        ]
+      ],
+      [
+        [
+          75,
+          80,
+          88
+        ],
+        [
+          74,
+          82,
+          90
+        ]
+      ],
+      [
+        [
+          83,
+          57,
+          44
+        ],
+        [
+          82,
+          57,
+          41
+        ]
+      ],
+      [
+        [
+          99,
+          130,
+          90
+        ],
+        [
+          99,
+          132,
+          90
+        ]
+      ],
+      [
+        [
+          117,
+          81,
+          64
+        ],
+        [
+          115,
+          82,
+          66
+        ]
+      ],
+      [
+        [
+          133,
+          135,
+          139
+        ],
+        [
+          132,
+          132,
+          140
+        ]
+      ],
+      [
+        [
+          147,
+          101,
+          59
+        ],
+        [
+          148,
+          99,
+          57
+        ]
+      ],
+      [
+        [
+          184,
+          128,
+          85
+        ],
+        [
+          181,
+          132,
+          82
+        ]
+      ],
+      [
+        [
+          184,
+          135,
+          67
+        ],
+        [
+          181,
+          132,
+          66
+        ]
+      ],
+      [
+        [
+          200,
+          199,
+          190
+        ],
+        [
+          198,
+          198,
+          189
+        ]
+      ],
+      [
+        [
+          216,
+          170,
+          86
+        ],
+        [
+          214,
+          173,
+          82
+        ]
+      ],
+      [
+        [
+          228,
+          171,
+          123
+        ],
+        [
+          231,
+          173,
+          123
+        ]
+      ],
+      [
+        [
+          236,
+          99,
+          40
+        ],
+        [
+          239,
+          99,
+          41
+        ]
+      ],
+      [
+        [
+          242,
+          203,
+          120
+        ],
+        [
+          239,
+          206,
+          123
+        ]
+      ],
+      [
+        [
+          245,
+          213,
+          164
+        ],
+        [
+          247,
+          214,
+          165
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        1,
+        15,
+        78,
+        76
+      ]
+    }
+  }
+}

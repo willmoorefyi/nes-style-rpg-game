@@ -1,0 +1,31 @@
+# Puppet animation joints for the tinker (assets-src/gen/puppet.py; pass CB, docs/CLASS_BARBARIAN_PLAN.md 5, 11-13).
+# Native px on approved/tinker/battle.png cells (80x80, the user's render, every pose faces left; n = near / viewer-side
+# limb, f = far limb). The wrench and the swing arcs overlap the body, so the in-betweens are the keys held or shifted whole; the joints only label the parts; the arcs, bolts and the clockwork robot ride with their keys. part_boxes ([x0, y0, x1, y1), half-open): pixels that ride with one part.
+# Marked on 10x gridded cells.
+robed: false
+attack_hand: n
+cast_hand: n
+keep_specks: true   # plan 13 (A3): the detached pieces of the render survive the cut
+fx_colours: [[181, 140, 82], [247, 231, 206]]   # plan 16 (A6): the swing arcs and the bolt glints, drawn without ink
+front_far_arm: {ready: true, attack: true, cast: true}
+battle:
+  ready:
+    {neck: [46, 28], crown: [46, 8], chest: [46, 40], hip: [46, 56], sh_n: [38, 34], el_n: [34, 42], hand_n: [30, 44], sh_f: [56, 34], el_f: [60, 42], hand_f: [58, 48], hip_n: [38, 60], knee_n: [36, 68], foot_n: [34, 75], hip_f: [54, 60], knee_f: [58, 68], foot_f: [60, 75]}
+  attack:
+    {neck: [46, 28], crown: [46, 8], chest: [48, 40], hip: [50, 56], sh_n: [40, 34], el_n: [32, 34], hand_n: [24, 34], sh_f: [58, 34], el_f: [62, 42], hand_f: [60, 48], hip_n: [42, 60], knee_n: [38, 68], foot_n: [34, 75], hip_f: [58, 60], knee_f: [64, 68], foot_f: [70, 75]}
+  cast:
+    {neck: [46, 28], crown: [46, 8], chest: [46, 40], hip: [46, 56], sh_n: [38, 32], el_n: [32, 26], hand_n: [26, 18], sh_f: [56, 34], el_f: [60, 42], hand_f: [58, 48], hip_n: [38, 60], knee_n: [36, 68], foot_n: [34, 75], hip_f: [54, 60], knee_f: [58, 68], foot_f: [60, 75]}
+# tweaks (round 0, the hunter / legion lessons): the frames that blend two keys stay on one key with
+# a small offset (key + delta - the generic target).
+tweaks:
+  idle_b: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [0, -1], hand_n: [0, -1], sh_f: [0, -1], el_f: [0, -1], hand_f: [0, -1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0]}
+  atk_wind1: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [1, 0], sh_n: [1, 0], el_n: [-7, -1], hand_n: [-6, 1], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [1, 0], knee_n: [1, 0], foot_n: [1, 0], hip_f: [1, 0], knee_f: [1, 0], foot_f: [1, 0]}
+  atk_wind2: {neck: [0, -2], crown: [0, -2], chest: [0, -2], hip: [0, -2], sh_n: [0, -2], el_n: [-10, -3], hand_n: [-9, -2], sh_f: [0, -2], el_f: [0, -2], hand_f: [0, -2], hip_n: [0, -2], knee_n: [2, -2], foot_n: [2, 0], hip_f: [0, -2], knee_f: [1, -2], foot_f: [2, 0]}
+  atk_mid: {neck: [0.1, -0.9], crown: [0.1, -0.9], chest: [1, -0.9], hip: [1.9, -0.9], sh_n: [1, -0.9], el_n: [-5.3, -4.95], hand_n: [-6.65, -5.4], sh_f: [1, -0.9], el_f: [1, -0.9], hand_f: [1, -0.9], hip_n: [1.9, -0.9], knee_n: [1.9, -0.9], foot_n: [1, 0], hip_f: [1.9, -0.9], knee_f: [3.25, -0.9], foot_f: [5.5, 0]}
+  atk_follow: {neck: [0, 0], crown: [0, 0], chest: [0.5, 0], hip: [1, 0], sh_n: [0.5, 0], el_n: [-1, -3], hand_n: [-2, -6], sh_f: [0.5, 0], el_f: [0.5, 0], hand_f: [0.5, 0], hip_n: [1, 0], knee_n: [0.5, 0], foot_n: [0, 0], hip_f: [1, 0], knee_f: [1.5, 0], foot_f: [2.5, 0]}
+  cast_gather: {neck: [0, -1], crown: [0, -1], chest: [0, -1], hip: [0, -1], sh_n: [0, -1], el_n: [-1, -3], hand_n: [-10, -4], sh_f: [0, -1], el_f: [2, -3], hand_f: [11, 1], hip_n: [0, -1], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, -1], knee_f: [0, 0], foot_f: [0, 0]}
+  cast_rise: {neck: [0, 0], crown: [0, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, -1], el_n: [-1, -8], hand_n: [-2, -13], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+  cast_release: {neck: [1, 0], crown: [1, 0], chest: [0, 0], hip: [0, 0], sh_n: [0, 0], el_n: [-1, 3], hand_n: [1, 6], sh_f: [0, 0], el_f: [0, 0], hand_f: [0, 0], hip_n: [0, 0], knee_n: [0, 0], foot_n: [0, 0], hip_f: [0, 0], knee_f: [0, 0], foot_f: [0, 0]}
+# the cast frames show the cast key exactly (a re-render of it gained 31 / 58 outline px)
+alias_frames: [cast_rise, cast_release]
+kneel: {source: user, bridge: {u: [0.35, 0.15], keep_top: 0.48, keep_bot: 0.2, width: false, shear: false}}   # the wrench on the floor keeps its jaw (no width squash)

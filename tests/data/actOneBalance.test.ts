@@ -180,8 +180,8 @@ describe('T4d spells and classes', () => {
     expect(warrior.hitPercent).toEqual({ base: 10, growth: 3 });
   });
 
-  it('marks exactly the Monk and the Master (and the pass-CB copies, the Beastmaster and the Summoner) as unarmed martial classes (data, not code)', () => {
-    expect(CLASSES.filter((c) => c.unarmedMartial === true).map((c) => c.id).sort()).toEqual(['beastmaster', 'master', 'monk', 'summoner']);
+  it('marks exactly the Monk and the Master (and their pass-CB copies, by copyOf) as unarmed martial classes (data, not code)', () => {
+    expect(CLASSES.filter((c) => c.unarmedMartial === true).map((c) => c.id).sort()).toEqual(CLASSES.filter((c) => ['monk', 'master'].includes(c.copyOf ?? c.id)).map((c) => c.id).sort());   // the monk, the master and their copies (copyOf)
   });
 
   it('has a power or an accuracy for every damage and status spell', () => {

@@ -392,6 +392,10 @@
       "x": 0,
       "y": 6528
     },
+    "machinist": {
+      "x": 1008,
+      "y": 3840
+    },
     "mystic_warrior": {
       "x": 672,
       "y": 4992
@@ -448,6 +452,10 @@
       "x": 1008,
       "y": 3840
     },
+    "tinker": {
+      "x": 672,
+      "y": 4224
+    },
     "valkyrie": {
       "x": 336,
       "y": 3456
@@ -480,6 +488,7 @@
     "hunter": "thief",
     "landsknecht": "warrior",
     "legionnaire": "warrior",
+    "machinist": "master",
     "mystic_warrior": "red_wizard",
     "necromancer": "black_wizard",
     "paladin": "white_wizard",
@@ -494,6 +503,7 @@
     "shaman": "black_mage",
     "shieldmaiden": "warrior",
     "summoner": "master",
+    "tinker": "monk",
     "valkyrie": "knight",
     "virtuoso": "red_wizard",
     "warlock": "black_mage"

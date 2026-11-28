@@ -764,6 +764,34 @@
     - [40, [9, 9, 9, 8, 7, 6, 5]]
     - [50, [9, 9, 9, 9, 9, 8, 7]]
 
+# ═══ TINKER (pass CB, docs/CLASS_BARBARIAN_PLAN.md 11) ═══
+# A shallow copy of the monk (user request); every number is the monk's (tests pin the copy).
+- id: tinker
+  name: Tinker
+  abbr: TNK
+  copyOf: monk   # an exact copy: the pick screen says "Plays as" its name (plan 17)
+  baseStats:
+    hp: 33
+    strength: 15
+    agility: 8
+    intelligence: 3
+    vitality: 10
+    luck: 5
+  statGrowth:
+    hp: 12
+    strength: 4
+    agility: 2
+    intelligence: 0
+    vitality: 3
+    luck: 1
+  usableEquipment: [nunchaku, light_armor]
+  spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 3 }
+  magicDefense: { base: 10, growth: 4 }
+  # FF1 martial arts: unarmed attack STR/2 + 2 x level with double hits; absorb >= level without body armour
+  unarmedMartial: true
+
 # ═══════════════════════════════════
 # UPGRADED CLASSES (Phase 16)
 # ═══════════════════════════════════
@@ -1643,3 +1671,32 @@
     - [30, [9, 8, 7, 6, 5, 4, 3]]
     - [40, [9, 9, 9, 8, 7, 6, 5]]
     - [50, [9, 9, 9, 9, 9, 8, 7]]
+
+# ═══ MACHINIST (upgraded Tinker; pass CB) ═══
+# A shallow copy of the master (its spells and equipment included, pending the user's ruling).
+- id: machinist
+  name: Machinist
+  abbr: MCH
+  upgradeFrom: tinker
+  copyOf: master   # an exact copy: the pick screen says "Plays as" its name (plan 17)
+  baseStats:
+    hp: 40
+    strength: 18
+    agility: 10
+    intelligence: 4
+    vitality: 12
+    luck: 6
+  statGrowth:
+    hp: 14
+    strength: 5
+    agility: 2
+    intelligence: 0
+    vitality: 4
+    luck: 1
+  usableEquipment: [nunchaku, light_armor]
+  spellLevels: { white: 0, black: 0 }
+  # FF1 hit% and magic defence: base + growth * (level - 1) (T4 §1.4)
+  hitPercent: { base: 5, growth: 3 }
+  magicDefense: { base: 10, growth: 4 }
+  # FF1 martial arts: unarmed attack STR/2 + 2 x level with double hits; absorb >= level without body armour
+  unarmedMartial: true
