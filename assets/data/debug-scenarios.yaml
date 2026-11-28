@@ -3702,3 +3702,18 @@
   gold: 0
   enemies: [goblin, goblin, wolf]
   background: assets/backgrounds/forest.webp
+
+# Pass CB (docs/CLASS_BARBARIAN_PLAN.md 11-18): the clockmaker / chronomancer class pair (user-rendered
+# battle art; copies of the white_mage / white_wizard). CLOCK is weak so it kneels; WWIZ is the like-for-like control.
+# ?mute=1&scenario=cb_clockmakers (&kneel=loop, &enemyAnim=loop).
+- id: cb_clockmakers
+  name: Clockmaker and Chronomancer (pass CB preview)
+  party:
+    - { class: clockmaker, name: CLOCK, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }], hp: 12 }
+    - { class: chronomancer, name: CHRON, level: 30, equipment: [thor_hammer, white_robe, cap], spells: [{ id: cure, level: 1 }] }
+    - { class: clockmaker, name: CLOCK2, level: 10, equipment: [hammer, cloth], spells: [{ id: cure, level: 1 }] }
+    - { class: white_wizard, name: WWIZ, level: 30, equipment: [thor_hammer, white_robe, cap], spells: [{ id: cure, level: 1 }] }
+  items: { potion: 3 }
+  gold: 0
+  enemies: [goblin, goblin, wolf]
+  background: assets/backgrounds/forest.webp

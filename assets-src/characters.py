@@ -839,7 +839,13 @@ ROSTER: dict[str, Look] = {
     # harness with mechanical arms (battle art only), a hammer and a glowing tank
     "tinker": Look(hair=(14, 9, 5), hair_style="short", outfit="tunic", cloth=(8, 12, 16), trim=(22, 17, 10),
                    pants=(8, 12, 16), boots=(10, 7, 5), gear="headband", gear_color=(22, 17, 10)),
+    # pass CB (plan 11-18): the clockmaker in goggles and a brown waistcoat with a pocket watch on a chain; the
+    # chronomancer in a dark robe with gold trim and an hourglass staff
+    "clockmaker": Look(hair=(14, 9, 5), hair_style="short", outfit="coat", cloth=(14, 9, 5), trim=(26, 20, 9),
+                       pants=(9, 8, 8), boots=(10, 7, 5), gear="headband", gear_color=(26, 20, 9)),
     # Upgraded classes
+    "chronomancer": Look(hair=(26, 26, 26), hair_style="long", outfit="robe", cloth=(6, 6, 12), trim=(27, 21, 8),
+                         boots=(5, 5, 6), weapon="staff", weapon_color=(27, 21, 8)),
     "machinist": Look(hair=(10, 7, 5), hair_style="short", outfit="armor", cloth=(14, 10, 7), trim=(23, 17, 8),
                       pants=(8, 8, 9), boots=(8, 6, 5), gear="headband", gear_color=(23, 17, 8)),
     "plague_doctor": Look(hair=(4, 4, 4), hair_style="short", outfit="robe", cloth=(4, 4, 4), trim=(9, 7, 5),

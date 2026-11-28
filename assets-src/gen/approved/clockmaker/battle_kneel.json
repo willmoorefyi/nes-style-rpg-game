@@ -1,0 +1,237 @@
+{
+  "character": "clockmaker",
+  "backend": "user",
+  "tool": "assets-src/gen/hero_user.py",
+  "source": {
+    "file": "user_art/clockmaker/battle_2026-11-27.png",
+    "sha256": "4b688087bb5d9adff5b717c53d6c31784d091c2a700bfa0a76226d198e0b63e2"
+  },
+  "recipe": "hero_user.yaml#clockmaker_chronomancer",
+  "row": 0,
+  "rendered_in": "ChatGPT (interactive)",
+  "rendered": "2026-11-27",
+  "author": "user",
+  "refs": {
+    "pack": "~/temp/ff-game/class_pack",
+    "prompt.txt": "c46c0db46bd6b383de8b8eead1721bfbfcd2ef928c7b449fda46d51766d7945f",
+    "class_reference_native_560x160.png": "de12f2fbb4a878a6f034dea877dcf2a315e5d07eb4019a3ff7ab7f6a154c46bd"
+  },
+  "source_name": "clockmaker_chronomancer_sprite_sheet.png",
+  "grid": [
+    80,
+    80
+  ],
+  "bottom_row": 76,
+  "faces": "left",
+  "imported": "2026-11-27",
+  "approved": "2026-11-27",
+  "user_review": "I've also added the 'clockmaker' / 'Chronomancer' classes as well, let's have them be a shallow copy of the white mage. (delivered as final; the watch chain, the floating clock faces and gears, the motion arcs, the swing streaks and the staff lying apart kept as rendered)",
+  "route": "CB: user-rendered hero class sheet (house palette map, no AI call)",
+  "sheet": "battle_kneel",
+  "foot_row": 76,
+  "cut": {
+    "colours": 16,
+    "palette": [
+      [
+        [
+          25,
+          24,
+          30
+        ],
+        [
+          6,
+          4,
+          10
+        ]
+      ],
+      [
+        [
+          48,
+          42,
+          45
+        ],
+        [
+          49,
+          41,
+          41
+        ]
+      ],
+      [
+        [
+          73,
+          53,
+          43
+        ],
+        [
+          74,
+          49,
+          41
+        ]
+      ],
+      [
+        [
+          99,
+          96,
+          117
+        ],
+        [
+          99,
+          99,
+          115
+        ]
+      ],
+      [
+        [
+          103,
+          73,
+          49
+        ],
+        [
+          107,
+          74,
+          49
+        ]
+      ],
+      [
+        [
+          112,
+          84,
+          74
+        ],
+        [
+          115,
+          82,
+          74
+        ]
+      ],
+      [
+        [
+          139,
+          98,
+          57
+        ],
+        [
+          140,
+          99,
+          57
+        ]
+      ],
+      [
+        [
+          140,
+          136,
+          159
+        ],
+        [
+          140,
+          140,
+          156
+        ]
+      ],
+      [
+        [
+          169,
+          121,
+          92
+        ],
+        [
+          173,
+          123,
+          90
+        ]
+      ],
+      [
+        [
+          180,
+          132,
+          67
+        ],
+        [
+          181,
+          132,
+          66
+        ]
+      ],
+      [
+        [
+          185,
+          181,
+          204
+        ],
+        [
+          181,
+          181,
+          206
+        ]
+      ],
+      [
+        [
+          210,
+          164,
+          84
+        ],
+        [
+          214,
+          165,
+          82
+        ]
+      ],
+      [
+        [
+          212,
+          155,
+          116
+        ],
+        [
+          214,
+          156,
+          115
+        ]
+      ],
+      [
+        [
+          230,
+          199,
+          126
+        ],
+        [
+          231,
+          198,
+          123
+        ]
+      ],
+      [
+        [
+          241,
+          197,
+          161
+        ],
+        [
+          239,
+          198,
+          165
+        ]
+      ],
+      [
+        [
+          242,
+          239,
+          243
+        ],
+        [
+          239,
+          239,
+          247
+        ]
+      ]
+    ],
+    "boxes": {
+      "kneel": [
+        11,
+        24,
+        71,
+        76
+      ]
+    }
+  }
+}

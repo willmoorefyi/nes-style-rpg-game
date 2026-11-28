@@ -515,6 +515,16 @@
       "row": 21,
       "page": 3,
       "inbetweens": true
+    },
+    "clockmaker": {
+      "row": 22,
+      "page": 3,
+      "inbetweens": true
+    },
+    "chronomancer": {
+      "row": 23,
+      "page": 3,
+      "inbetweens": false
     }
   },
   "pages": [
@@ -536,7 +546,7 @@
     {
       "file": "battle-characters-ai-3.png",
       "w": 2880,
-      "h": 3520
+      "h": 3840
     }
   ]
 }

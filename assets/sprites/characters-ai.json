@@ -352,7 +352,15 @@
       "x": 336,
       "y": 3456
     },
+    "chronomancer": {
+      "x": 672,
+      "y": 6528
+    },
     "cleric": {
+      "x": 336,
+      "y": 6528
+    },
+    "clockmaker": {
       "x": 336,
       "y": 6528
     },
@@ -478,7 +486,9 @@
     "beastmaster": "monk",
     "berserker": "knight",
     "centurion": "knight",
+    "chronomancer": "white_wizard",
     "cleric": "white_mage",
+    "clockmaker": "white_mage",
     "dark_fighter_hero": "warrior",
     "death_knight_hero": "knight",
     "dragoon": "knight",

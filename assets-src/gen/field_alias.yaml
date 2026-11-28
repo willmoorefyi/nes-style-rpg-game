@@ -38,3 +38,5 @@ apothecary: red_mage   # temporary until the user renders the apothecary's field
 plague_doctor: red_wizard   # temporary until the user renders the plague doctor's field walk sheet
 tinker: monk   # temporary until the user renders the tinker's field walk sheet
 machinist: master   # temporary until the user renders the machinist's field walk sheet
+clockmaker: white_mage   # temporary until the user renders the clockmaker's field walk sheet
+chronomancer: white_wizard   # temporary until the user renders the chronomancer's field walk sheet

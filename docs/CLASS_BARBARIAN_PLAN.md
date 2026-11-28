@@ -709,3 +709,20 @@ No border exemption was needed (the sheet's cells touch row 0 only, as earlier s
 border). Image review: round 1 machinist **APPROVE**, tinker ITERATE (the kneel bridge's width squash crushed the
 wrench on the floor: `kneel.bridge.width: false`); round 2 ITERATE (the bridge's centre shift still pushed the jaw into the cell edge and a seam tore the hair: `u: [0.35, 0.15]`, `keep_top: 0.48`, `shear: false`); round 3 tinker **APPROVE**. The balance test's unarmed-martial
 list now derives from `copyOf`.
+
+### 18.6 Clockmaker / chronomancer result (2026-11-27, branch class-copynote, eighth commit)
+
+User (verbatim): "I've also added the 'clockmaker' / 'Chronomancer' classes as well, let's have them be a shallow
+copy of the white mage." Exact copies of white_mage -> white_wizard with `copyOf`: `clockmaker` (CLK, default name
+CLOCK) -> `chronomancer` (CHR). Page 3's last pair (24 rows, 2880 x 3840; 256 px under the cap): the next pairs go on
+a page 4. Field alias white_mage / white_wizard (temporary); walk-sheet pack entries (the pocket watch on its chain at
+the belt; the chronomancer's hourglass staff upright). The in-betweens are the keys held or shifted whole (the 1 px
+watch chain stays unbroken); `alias_frames` for the frames whose re-render gained 3-9 specks (the chronomancer all
+eight); `fx_colours` for the pale clock faces and arcs. Image review: round 1 clockmaker **APPROVE** (an optional 1 px
+chain link lost in kneel_in1), chronomancer ITERATE (the kneel bridge's width change distorted the floating clocks,
+the gear and the staff ring: `width: false`, `shear: false`, `u: [0.35, 0.15]`, `keep_top: 0.48`); round 2 ITERATE (kneel_in1's squash dropped rows through the gold belt buckle); round 3 ITERATE
+(a smaller squash above the belt flattened both hands and left the in1 -> in2 swap at 0.74 of the motion). The
+bridge knobs cannot confine the dropped rows to the lower robe (`keep_top` / `keep_bot` are each < 0.5), and the
+kneel bridge has no alias fallback, so the round 2 settings stay: the clocks, gear, hands and staff ring keep their
+shapes and the swap is 0.59; kneel_in1 (60 ms) fragments the buckle, kept as a known note for the user. Note for the `equip-ff1` merge: every copy class still carries its own copied `usableEquipment` and its
+items' `usableBy` entries; `copyOf` names its source so a later pass can derive them.

@@ -13,6 +13,7 @@ export const CLASS_UPGRADES: Record<string, string> = {
   black_mage: 'black_wizard',
   red_mage: 'red_wizard',
   barbarian: 'berserker', // pass CB (docs/CLASS_BARBARIAN_PLAN.md D-CB3)
+  clockmaker: 'chronomancer', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   tinker: 'machinist', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   apothecary: 'plague_doctor', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
   fencer: 'duelist', // pass CB (docs/CLASS_BARBARIAN_PLAN.md 11)
