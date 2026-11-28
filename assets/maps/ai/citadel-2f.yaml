@@ -58,13 +58,13 @@ npcs:
   chestItem: opal_armlet
   chestFlag: CHEST_ORD_O_HALL_WEST
   dialog: [You found an Opal Armlet!]
-- id: chest_hall_east
+- id: chest_hall_east_zeus
   sprite: chest
   x: 34
   y: 5
-  chestItem: hi_potion
-  chestFlag: CHEST_ORD_O_HALL_EAST
-  dialog: [You found a Hi-Potion!]
+  chestItem: zeus_gauntlet
+  chestFlag: CHEST_ORD_O_HALL_EAST_ZEUS
+  dialog: [You found a Zeus Gauntlet!]
 transitions:
 - {x: 19, y: 29, targetMap: citadel-1f, targetEntrance: up}
 - {x: 20, y: 29, targetMap: citadel-1f, targetEntrance: up}

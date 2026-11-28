@@ -64,7 +64,7 @@ def build() -> Floor:
     f.deco([["tpillar_broken_top"], ["tpillar_broken_bottom"]], 15, 4)
     f.deco([["tpillar_broken_top"], ["tpillar_broken_bottom"]], 24, 4)
     f.npcs += [
-        chest("b1_west", "hi_potion", "a Hi-Potion", 4, 8),
+        chest("b1_west_sword", "iron_sword", "an Iron Sword", 4, 8),
         chest("b1_east", "antidote", "an Antidote", 35, 8),
         {"id": "elf_d_fenwarden", "sprite": "guard", "tint": "#7f9a6a", "x": 22, "y": 24, "dialog": talk(
             ["Fenwarden Ysolde: Keep to the planks. The brown shoals look like firm ground, and they eat your boots "

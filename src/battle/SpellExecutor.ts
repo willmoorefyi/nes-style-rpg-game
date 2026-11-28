@@ -1,4 +1,5 @@
 import type { Character } from '../entities/Character.js';
+import { castLine, chargeStops, silenceStops } from './itemCast.js';
 import type { EnemyInstance } from './BattleStateMachine.js';
 import type { SpellData } from '../types/index.js';
 import type { BattleCommand } from './BattleCommands.js';
@@ -77,27 +78,17 @@ export class SpellExecutor {
     if (!caster) return;
     const casterName = isEnemy ? (caster as EnemyInstance).displayName : (caster as Character).name;
 
-    // B8: a silenced caster (either side) loses the turn and spends nothing
-    if ((isEnemy ? (caster as EnemyInstance).status : (caster as Character).statusTracker).has('silence')) {
-      this.deps.addMessage(`${casterName} is silenced!`);
-      return;
-    }
+    // B8: a silenced caster (either side) loses the turn and spends nothing; a worn item's cast is not silenced (EQ)
+    if (silenceStops(caster, casterName, cmd, isEnemy, (t) => this.deps.addMessage(t))) return;
     // B4: a single-ally spell (not a revive) at an ally who fell before it went off is not cast
     const ally = spell.targeting === 'single_ally' && spell.effect !== 'revive' && cmd.targetId ? this.allyById(cmd.targetId, isEnemy) : null;
     if (ally && ally.hp <= 0) {
       this.deps.addMessage(`${ally.name} has fallen. No effect!`);
       return;
     }
-    if (!isEnemy) {
-      const char = caster as Character;
-      if (!char.hasCharges(spell.level)) {
-        this.deps.addMessage(`${char.name} has no charges!`);
-        return;
-      }
-      char.useCharge(spell.level);
-    }
+    if (chargeStops(caster, spell, cmd, isEnemy, (t) => this.deps.addMessage(t))) return;
 
-    this.deps.addMessage(`${casterName} casts ${spell.name}!`);
+    this.deps.addMessage(castLine(casterName, spell, cmd));
     if (castLateSpell(this.deps, cmd, spell, isEnemy)) return; // L5-L8 effects (spellEffectsLate.ts)
 
     // Handle different spell effects

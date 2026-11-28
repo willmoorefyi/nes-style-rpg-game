@@ -347,17 +347,17 @@ integrator's `--mutate` refills it.
 |---|---|---|
 | `tests/entities/handsSlot.test.ts` | Covers: hands null on a new Character; equip / unequip; `canEquipIn('hands')` (and a cap refused there); absorb +DEF, evade −weight; the Monk rule with gloves; `toJSON` 5 slots; a 4-slot v5 save loads through `SaveManager.load` with hands null; `equipFromBag` swaps gloves | T1 |
 | `tests/scenes/equipHands.test.ts` | Equip: 5 rows in order and the preview. Status: a "Hands:" line. The shop comparison shows the gloves' DEF +1. The label fits. | T1 |
-| `tests/core/schemaValidationEq.test.ts` | Rejects a bad slot, a bad `battleSpell` / `resist` type and a bad `closed`. Accepts `copyOf`. | T1 / T2 |
+| `tests/core/schemaValidationEq.test.ts` | Rejects a bad slot (T1); the `battleSpell` / `resist` / `closed` types are covered by `ff1Items` and `ff1Shops` (T2). | T1 |
 | `tests/data/ff1Items.test.ts` | Every Appendix A row's stats, price, jobs and effects. No copy id in any `usableBy`. Every copy class `canEquip`s exactly its `copyOf` source's items (both tiers). Cat Claw: Kn Ni RW BW. | T2 |
-| `tests/data/ff1Shops.test.ts` | Every shop equals section 5 (order too). Every sold item has its NES price (a literal table). Every spell is sold exactly once. `closed` ⇔ empty. Bottle 50000. | T3 |
+| `tests/data/ff1Shops.test.ts` | Every shop equals section 5 (order too). Every sold item has its NES price (a literal table). Every spell is sold exactly once. `closed` ⇔ empty. Bottle 50000. | T2 |
 | `tests/data/obtainability.test.ts` | Every gear / consumable item is sold, chested, gifted or forged (Smyth's `give_item`). It passes on mainline and guards T3. | T2 |
-| `tests/data/ff1Chests.test.ts` | C1-C17: the item at the map and cell, the new chest id and flag, the old id gone. | T3 |
-| `tests/data/kitSources.test.ts` | D-EQ11: gear sold up to the tier and best by rank; stage gear = its tier's town gear (the Monk / Master weapon judged per kit); found ranks strictly before its slot's gear; found by ancestry with copies (base and promoted rows on separate pools); every row equips; `walled(crescent)` and `walled(gaia)` true, no other town walled. | T4 |
-| `tests/scenes/closedShop.test.ts` | `openShopScene` registers and pushes nothing for a closed shop, and still opens an open one. | T3 |
+| `tests/data/ff1Chests.test.ts` | C1-C17: the item at the map and cell, the new chest id and flag, the old id gone. | T2 |
+| `tests/data/kitSources.test.ts` | D-EQ11: gear sold up to the tier and best by rank; stage gear = its tier's town gear (the Monk / Master weapon judged per kit); found ranks strictly before its slot's gear; found by ancestry with copies (base and promoted rows on separate pools); every row equips; `walled(crescent)` and `walled(gaia)` true, no other town walled. | T2 |
+| `tests/scenes/closedShop.test.ts` | `openShopScene` registers and pushes nothing for a closed shop, and still opens an open one. | T2 |
 | `tests/systems/houseItem.test.ts` | Full rest, the fallen stay fallen, consumed, the camp rule, `saveMenu` pushed. | T2 |
-| `tests/battle/ff1Bonus.test.ts` | A Flame Sword vs an undead (family) and vs a fire-weak enemy gets +4 / +40 (seeded: exact hit% and attack into `physicalAttack`). A Mythril Sword vs undead gets nothing. Excalibur vs anything gets the bonus. Unarmed gets none. | T5 |
-| `tests/battle/armourResist.test.ts` | A ProRing blocks RUB / XXXX (`status_death`). Dragon Armor reduces FIR2 damage like AFIR. The Aegis blocks a stone spell. Without them, no effect. | T5 |
-| `tests/battle/itemCast.test.ts` | With no consumables in the bag and the Zeus Gauntlet worn, the Item command is enabled and lists it. The Zeus Gauntlet worn: the Item list shows "Zeus Gauntlet (worn)"; the cast hits all enemies with LIT2 and uses no charge, even silenced; the gauntlet stays. A copy in the bag but not worn is not listed. Defender casts RUSE on its wearer. | T5 |
+| `tests/battle/ff1Bonus.test.ts` | A Flame Sword vs an undead (family) and vs a fire-weak enemy gets +4 / +40 (seeded: exact hit% and attack into `physicalAttack`). A Mythril Sword vs undead gets nothing. Excalibur vs anything gets the bonus. Unarmed gets none. | T3 |
+| `tests/battle/armourResist.test.ts` | A ProRing blocks RUB / XXXX (`status_death`). Dragon Armor reduces FIR2 damage like AFIR. The Aegis blocks a stone spell. Without them, no effect. | T3 |
+| `tests/battle/itemCast.test.ts` | With no consumables in the bag and the Zeus Gauntlet worn, the Item command is enabled and lists it. The Zeus Gauntlet worn: the Item list shows "Zeus Gauntlet (worn)"; the cast hits all enemies with LIT2 and uses no charge, even silenced; the gauntlet stays. A copy in the bag but not worn is not listed. Defender casts RUSE on its wearer. | T3 |
 
 ### 9.2 Tests that change
 
@@ -428,6 +428,10 @@ The check list:
 | T1 | the `hands` slot: types, Character, CombatStats, labels, Equip / Status UI, the schema slot check, the save round trip; tests 9.1 rows 1-3 | build, fast |
 | T2 | the data tranche: `copyOf` (843cb6fc's lines) and `canEquip` by `copyOf`; `schemaValidationItems.ts`; items.yaml regenerated (Appendix A, the 17 new items, effect fields as data, descriptions, NES prices, no copy ids); the House; shops (5) and closed shops; the Bottle; chest swaps C1-C17 (scripts, maps); kits (6, `found`) and their readers; the debug-scenario migration (D-EQ18); tests 9.1 (`ff1Items`, `ff1Shops`, `obtainability`, `ff1Chests`, `closedShop`, `houseItem`, `kitSources`) and every 9.2 data / region / scene test; `gearBands` rewrite; the balance re-measure (D-EQ17) | build, fast, `quest --strict`, maps |
 | T3 | mechanics 7.1-7.3 and their tests; the balance re-measured again where they move it | build, fast, `quest --strict` |
+
+As built, T2 and T3 landed as one commit: the balance re-measure is the long part of both, and measuring once on the
+final rules (instead of on T2's and again on T3's) gives the same end state with half the runs. The 7.3 route is a
+`magic` command with `viaItem` (`itemCast.wornCastCommand`), which needs no change to `executeItemCommand`.
 | T4 | the debug scenarios of 9.4, the browser check, docs, the EQ result (measured (d) / (f), every re-measured bound old → new, the INTENT list, the gates' times) | all of 9.3; the integrator gates at the end, on `equip-ff1` itself, as the coordinator asked |
 
 ## 11. Risks

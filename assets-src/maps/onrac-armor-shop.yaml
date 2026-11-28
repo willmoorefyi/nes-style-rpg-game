@@ -62,7 +62,7 @@ npcs:
   x: 6
   y: 4
   sprite: merchant
-  dialog: ['Opal mail, lined with sealskin. Keeps out a blade and the north wind both.']
+  dialog: [The racks are empty. Not a scrap of mail left in Onrac.]
   shopId: onrac_armor
 transitions:
 - {x: 8, y: 8, targetMap: onrac, targetEntrance: armor_shop}

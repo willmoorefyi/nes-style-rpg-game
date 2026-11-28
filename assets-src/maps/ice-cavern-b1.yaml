@@ -199,13 +199,13 @@ objects:
   x: 26
   y: 26
 npcs:
-- id: chest_fir_d2_b1_grotto
+- id: chest_fir_d2_b1_grotto_sword
   sprite: chest
   x: 2
   y: 4
-  chestItem: hi_potion
-  chestFlag: CHEST_FIR_D2_B1_GROTTO
-  dialog: [You found a Hi-Potion!]
+  chestItem: flame_sword
+  chestFlag: CHEST_FIR_D2_B1_GROTTO_SWORD
+  dialog: [You found a Flame Sword!]
 - id: chest_fir_d2_b1_pool
   sprite: chest
   x: 37

@@ -475,9 +475,11 @@ describe('debug scenarios', () => {
         const item = byId.get(id);
         expect(item, `item ${id}`).toBeDefined();
         if (!item) continue;
-        // an upgraded class keeps its base class's gear (Character.canEquip)
-        const base = classes.find((c) => c.id === m.class)?.upgradeFrom;
-        const usable = item.usableBy.includes(m.class) || (!!base && item.usableBy.includes(base));
+        // Character.canEquip: a copy class equips as its copyOf source, an upgraded class keeps its base class's gear
+        const cls = classes.find((c) => c.id === m.class);
+        const base = classes.find((c) => c.id === cls?.upgradeFrom);
+        const eq = (c: typeof cls) => (c ? (c as { copyOf?: string }).copyOf ?? c.id : undefined);
+        const usable = item.usableBy.includes(eq(cls)!) || (!!base && item.usableBy.includes(eq(base)!));
         expect(usable, `${m.name} (${m.class}) can't use ${id}`).toBe(true);
         const slot = item.slot ?? (item.type === 'weapon' ? 'weapon' : 'armor');
         expect(slots.has(slot), `${m.name} has two items for ${slot}`).toBe(false);

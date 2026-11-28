@@ -44,6 +44,8 @@ export interface CharacterClassData {
   usableEquipment: string[];
   spellLevels: { white: number; black: number };
   upgradeFrom?: string;
+  /** The classic class this one is an exact copy of; the pick screen says "Plays as" its name. */
+  copyOf?: string;
   /** FF1 hit%: `base + growth * (level - 1)` (plus the weapon's `hit`); missing means 0. */
   hitPercent?: ClassGrowth;
   /** Magic defence against enemy spells: `base + growth * (level - 1)`; missing means 0. */
@@ -142,8 +144,11 @@ export interface ItemData {
   price: number;
   usableBy: string[];
   slot?: EquipmentSlot;
-  /** Extra damage multiplier vs enemies with this family (e.g., 'undead' for Silver Sword) */
+  /** FF1 "strong against" an enemy family (or `all`), or `element` vs a weakness: attack +4, hit% +40 (EQ 7.1). */
   bonusVsFamily?: string;
+  element?: string;
+  battleSpell?: string;   // a spell the worn item casts from the battle Item command, free (EQ 7.3)
+  resist?: string[];   // elements / protection categories the worn item resists (EQ 7.2)
   /** Weapon hit% bonus (FF1); missing means 0. */
   hit?: number;
   /** Weapon critical chance out of 200; missing means 0. */
@@ -166,6 +171,7 @@ export interface ShopData {
   name: string;
   inventory: string[];
   innPrice?: number;
+  closed?: boolean;   // a shop FF1 lacks (EQ D-EQ8): its keeper stays, it sells nothing and never opens
 }
 
 export type SpellType = 'white' | 'black';
@@ -403,8 +409,7 @@ export interface KeyItemGate extends RequiredFlagsField {
   permanent: boolean;
 }
 
-/** FF1's weapon and four armour slots; `hands` is the glove slot (gloves, gauntlets, the ProRing; pass EQ). */
-export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet' | 'hands';
+export type EquipmentSlot = 'weapon' | 'armor' | 'shield' | 'helmet' | 'hands';   // hands: FF1's glove slot (pass EQ)
 
 // Save/Load types
 export interface CharacterSaveData {
@@ -413,8 +418,7 @@ export interface CharacterSaveData {
   level: number;
   xp: number;
   currentHp: number;
-  /** Every slot `toJSON` writes; a save from before pass EQ has no `hands` (it loads empty). */
-  equipment: Partial<Record<EquipmentSlot, string | null>>;
+  equipment: Partial<Record<EquipmentSlot, string | null>>;   // a save from before pass EQ has no `hands`
   spellCharges: number[];
   learnedSpells: Array<{ spellId: string; level: number }>;
   statusEffects?: Array<{ effect: string; duration: number }>;

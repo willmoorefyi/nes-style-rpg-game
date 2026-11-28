@@ -146,7 +146,7 @@ describe('Elfheim: the prince and the vault (S8, S9)', () => {
 
   it('the vault holds the TNT (CHEST_ELF_T_TNT) and two band chests', () => {
     const chests = vault.npcs.filter((n) => n.chestItem);
-    expect(chests.map((c) => c.chestItem).sort()).toEqual(['ether', 'phoenix_down', 'tnt']);
+    expect(chests.map((c) => c.chestItem).sort()).toEqual(['copper_gauntlet', 'phoenix_down', 'tnt']   /* pass EQ C11: FF1 Elf Castle's Copper Gauntlet */);
     expect(chests.find((c) => c.chestItem === 'tnt')!.chestFlag).toBe('CHEST_ELF_T_TNT');
   });
 });

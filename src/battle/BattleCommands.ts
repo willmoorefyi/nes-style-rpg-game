@@ -9,6 +9,8 @@ export interface BattleCommand {
   itemId?: string;
   /** No menu was shown: the member's turn is certain to be lost (play-test item 3); it never executes. */
   skip?: boolean;
+  /** A `magic` command cast by this worn item (FF1 item use, pass EQ 7.3: free, not stopped by silence). */
+  viaItem?: string;
 }
 
 export function createSpellCommand(actorId: string, targetId: string | undefined, spellId: string): BattleCommand {

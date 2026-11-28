@@ -59,7 +59,7 @@ for x, y in [(16, 22), (24, 22), (24, 15)]:
 for x in (13, 26):
     f1.statue(x, 29)
 f1.npcs += [
-    chest("berth_north", "hi_potion", "a Hi-Potion", 20, 1),
+    chest("berth_north_ring", "pro_ring", "a ProRing", 20, 1),
     chest("berth_west", "phoenix_down", "a Phoenix Down", 1, 18),
     chest("berth_southeast", "ether", "an Ether", 38, 26),
 ]
@@ -104,7 +104,7 @@ for x, y in [(4, 25), (10, 25), (34, 25), (42, 25), (17, 13), (23, 13)]:
 f2.npcs += [
     chest("bridge_south", "diamond_helm", "a Diamond Helm", 22, 31),
     chest("bridge_west", "cabin", "a Cabin", 10, 18),
-    chest("bridge_east", "hi_potion", "a Hi-Potion", 41, 14),
+    chest("bridge_east_opal", "opal_gauntlet", "an Opal Gauntlet", 41, 14),
 ]
 f2.npcs.append({"id": "wnd_sentry_east", "sprite": "robot_sentry", "x": 41, "y": 30, "dialog": [  # AR: flavour only
     "Rust has fused the sentry's joints. Somewhere inside it a gear ticks once, and stops."]})

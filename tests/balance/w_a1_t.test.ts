@@ -17,15 +17,15 @@ const FIGHT = Array<string>(9).fill('pirate');
 const N = 400;
 
 describe('w_a1_t: Bikke\'s nine pirates (S2, kit w_s2)', () => {
-  it('sensible Lv4 wins >= 95 % (measured 100.0)', () => {
+  it('sensible Lv4 wins >= 95 % (measured EQ 100, was 100.0)', () => {
     expect(bossWinRate(FIGHT, 4, 'w_s2', 'sensible', N)).toBeGreaterThanOrEqual(0.95);
   });
 
-  it('careless Lv4 wins >= 85 % (measured 100.0)', () => {
+  it('careless Lv4 wins >= 85 % (measured EQ 100, was 100.0)', () => {
     expect(bossWinRate(FIGHT, 4, 'w_s2', 'careless', N)).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('sensible Lv3, the band\'s low end, wins >= 95 % (measured 100.0)', () => {
+  it('sensible Lv3, the band\'s low end, wins >= 95 % (measured EQ 100, was 100.0)', () => {
     expect(bossWinRate(FIGHT, 3, 'w_s2', 'sensible', N)).toBeGreaterThanOrEqual(0.95);
   });
 });

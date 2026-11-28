@@ -68,7 +68,7 @@ describe('pass CD-K: dark_fighter_hero / death_knight_hero are a shallow copy of
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => lan.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => drg.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('dark_fighter_hero'))).toHaveLength(44);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('dark_fighter_hero'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: dark_fighter_hero = warrior in every kit, death_knight_hero = knight wherever a knight row exists', () => {

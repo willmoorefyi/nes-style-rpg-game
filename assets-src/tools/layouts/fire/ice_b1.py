@@ -62,7 +62,7 @@ def build() -> Floor:
     f.deco([["skulls"]], 25, 5)
     f.deco([["fallen_l", "fallen_r"]], 12, 27)
     f.npcs += [
-        chest("b1_grotto", "hi_potion", "a Hi-Potion", 2, 4),
+        chest("b1_grotto_sword", "flame_sword", "a Flame Sword", 2, 4),
         chest("b1_pool", "ether", "an Ether", 37, 13),
         chest("b1_pocket", "cabin", "a Cabin", 2, 31),
         {"id": "fir_d2_cutter", "sprite": "farmer", "tint": "#c8dcec", "x": 17, "y": 26, "dialog": talk(

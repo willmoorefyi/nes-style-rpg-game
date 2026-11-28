@@ -16,17 +16,17 @@ const FIGHT = ['astos', 'gargoyle', 'gargoyle', 'gargoyle'];
 const N = 400;
 
 describe('w_elf_o: Astos and the sentinels (S6, kit w_s6)', () => {
-  it('sensible Lv11 wins 65-85 % (measured 78.5)', () => {
+  it('sensible Lv11 wins 65-85 % (measured EQ 72.75, was 78.5)', () => {
     const r = bossWinRate(FIGHT, 11, 'w_s6', 'sensible', N);
     expect(r).toBeGreaterThanOrEqual(0.65);
     expect(r).toBeLessThanOrEqual(0.85);
   });
 
-  it('sensible Lv9 wins at most 50 % (measured 27.3)', () => {
+  it('sensible Lv9 wins at most 50 % (measured EQ 39.25, was 27.3)', () => {
     expect(bossWinRate(FIGHT, 9, 'w_s6', 'sensible', N)).toBeLessThanOrEqual(0.5);
   });
 
-  it('sensible Lv13, the band top, wins >= 85 % (measured 95.0)', () => {
+  it('sensible Lv13, the band top, wins >= 85 % (measured EQ 97.25, was 95.0)', () => {
     expect(bossWinRate(FIGHT, 13, 'w_s6', 'sensible', N)).toBeGreaterThanOrEqual(0.85);
   });
 });

@@ -63,7 +63,7 @@ describe('pass CB: cleric / paladin are a shallow copy of white_mage / white_wiz
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('cleric'))).toHaveLength(15);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('cleric'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: cleric = white_mage in every kit, paladin = white_wizard wherever a white_wizard row exists (D-CB6)', () => {

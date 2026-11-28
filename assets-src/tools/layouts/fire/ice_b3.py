@@ -57,7 +57,7 @@ def build() -> Floor:
     f.npcs += [
         chest("b3_cleft", "opal_helm", "an Opal Helm", 2, 1),
         chest("b3_drain", "phoenix_down", "a Phoenix Down", 20, 32),
-        chest("b3_niche", "hi_potion", "a Hi-Potion", 38, 8),
+        chest("b3_niche_gauntlet", "silver_gauntlet", "a Silver Gauntlet", 38, 8),
         {"id": "fir_d2_stone", "sprite": "chest", "tint": "#b8d8ff", "x": STONE[0], "y": STONE[1],
          "hideIf": DONE,
          "dialog": ["On the plinth a grey stone the size of a fist hangs a finger's width above the ice, turning "

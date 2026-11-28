@@ -26,7 +26,6 @@ export const START_GOLD = 400;
 /** The rest of the full kit, in buying order (about 700 G at FF1 prices, Cap 80 G). */
 export const SHOPPING: Array<{ who: string; item?: string; spell?: string }> = [
   { who: 'black_mage', spell: 'lit' },
-  { who: 'warrior', item: 'cap' }, { who: 'thief', item: 'cap' }, { who: 'white_mage', item: 'cap' }, { who: 'black_mage', item: 'cap' },
   { who: 'warrior', item: 'chain_mail' },
   { who: 'black_mage', spell: 'slep' },
   { who: 'white_mage', spell: 'ruse' },

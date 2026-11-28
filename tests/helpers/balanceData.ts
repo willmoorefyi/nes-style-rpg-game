@@ -32,7 +32,8 @@ export const classOf = (id: string): CharacterClassData => byId(CLASSES, id, 'cl
 /** A fresh copy for one battle. */
 export const enemyCopy = (id: string): EnemyData => structuredClone(enemy(id));
 
-export interface Kit { gear: string[]; spells: string[] }
+/** `found` (pass EQ D-EQ11): chest items equipped after `gear`, each replacing its slot's item; never priced. */
+export interface Kit { gear: string[]; found?: string[]; spells: string[] }
 
 /** assets/data/kits.yaml: kit name -> class id -> gear and spells (F0 of docs/FEEDBACK_PLAN_2026-11-14.md). */
 export const KITS = read<Record<string, Record<string, Kit>>>('kits.yaml');
@@ -57,7 +58,7 @@ export function kitCost(kit: Kit, spellCost: (s: SpellData) => number): number {
 /** A character of `cls` at `level`, wearing `gear` (the real equip rules: throws if refused) and knowing `spells`. */
 export function makeMember(cls: string, level: number, kit: Kit, index = 0): Character {
   const c = new Character({ name: `${cls}${index}`, classData: classOf(cls), level });
-  for (const id of kit.gear) {
+  for (const id of [...kit.gear, ...(kit.found ?? [])]) {
     const it = item(id);
     const slot = slotOf(it);
     if (!slot || c.equip(slot, it) === false) throw new Error(`${cls} cannot equip ${id}`);
@@ -82,7 +83,7 @@ export function makeParty(level: number, kit: KitName | string, withSpells: bool
   return comp.map((cls, i) => {
     const k = KITS[kit]?.[cls];
     if (!k) throw new Error(`kits.yaml has no ${kit}.${cls}`);
-    return makeMember(cls, level, { gear: k.gear, spells: withSpells ? k.spells : [] }, i);
+    return makeMember(cls, level, { gear: k.gear, found: k.found, spells: withSpells ? k.spells : [] }, i);
   });
 }
 

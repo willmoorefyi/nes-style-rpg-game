@@ -53,7 +53,7 @@ describe('pickupText (U9)', () => {
   describe('plurals', () => {
     const real = (id: string) => ItemRegistry.getItem(id)!;
 
-    it('every item sold in a shop has the plural that reads right', () => {
+    it('every item sold in a shop or found in a chest has the plural that reads right', () => {
       const expected: Record<string, string> = {
         wooden_nunchaku: 'Wooden Nunchaku', small_knife: 'Small Knives', staff: 'Staffs', rapier: 'Rapiers',
         hammer: 'Hammers', cloth: 'Cloth', leather_armor: 'Leather Armor', chain_mail: 'Chain Mail',
@@ -72,8 +72,15 @@ describe('pickupText (U9)', () => {
         opal_armor: 'Opal Armor', opal_armlet: 'Opal Armlets', aegis_shield: 'Aegis Shields', opal_helm: 'Opal Helms',
         defender: 'Defenders', vorpal_sword: 'Vorpal Swords', dragon_claw: 'Dragon Claws', diamond_armor: 'Diamond Armor',
         diamond_armlet: 'Diamond Armlets', diamond_shield: 'Diamond Shields', diamond_helm: 'Diamond Helms',
+        // pass EQ (docs/EQUIP_FF1_PLAN.md 3.1): FF1's shop items and the hand slot
+        large_dagger: 'Large Daggers', iron_staff: 'Iron Staffs', sabre: 'Sabres', long_sword: 'Long Swords',
+        silver_axe: 'Silver Axes', copper_bracelet: 'Copper Bracelets', buckler: 'Bucklers', great_helm: 'Great Helms',
+        gloves: 'Gloves', copper_gauntlet: 'Copper Gauntlets', iron_gauntlet: 'Iron Gauntlets',
+        silver_gauntlet: 'Silver Gauntlets', zeus_gauntlet: 'Zeus Gauntlets', power_gauntlet: 'Power Gauntlets',
+        opal_gauntlet: 'Opal Gauntlets', pro_ring: 'ProRings', house: 'Houses',
       };
-      const sold = new Set(SHOPS.filter((s) => s.type !== 'magic').flatMap((s) => s.inventory));
+      // pass EQ: much of the gear left the shops for chests (FF1), so every non-key item the old lists named is checked
+      const sold = new Set([...SHOPS.filter((s) => s.type !== 'magic').flatMap((s) => s.inventory), ...Object.keys(expected)]);
       expect([...sold].sort()).toEqual(Object.keys(expected).sort());
       for (const id of sold) expect(`${id}: ${pluralName(real(id))}`).toBe(`${id}: ${expected[id]}`);
     });

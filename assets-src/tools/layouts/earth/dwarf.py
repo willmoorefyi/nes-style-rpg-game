@@ -4,7 +4,7 @@ where Nerrick keeps the canal plans, the store), the way out to the overworld (`
 
 Nerrick takes the TNT through his cutscene `ert_canal_blast` (CANAL_OPEN); Smyth forges `excalibur` from `adamant`
 (`ert_smyth_forge`, S31, optional). Thirteen dwarves talk, nine change their lines on CANAL_OPEN, two are hint NPCs
-(`canal`, `Melmond`); the store keeper sells `dwarf_item` across a wall-to-wall counter. Pass DW: every dwarf wears
+(`canal`, `Melmond`); the store keeper stands behind a wall-to-wall counter (`dwarf_item`, closed by pass EQ: FF1 has no shop here). Pass DW: every dwarf wears
 one of the dwarf field sheets (`dwarf_*`, gen/npc_field_dw.py), untinted.
 
   python3 -I assets-src/tools/layouts/earth/dwarf.py
@@ -136,7 +136,8 @@ def build() -> Path:
         OPEN, say("From the ridge I watched the water run through. White foam, then calm. Beautiful."),
         say("I keep watch on the ridge. Nothing moves on the Aldi I don't see.")))
     r.npcs.append({"id": "dwarf-item-keeper", "sprite": "dwarf_trader", "x": 33, "y": 6,
-                   "dialog": ["Rope, lamps, tonics! Everything a body needs underground."], "shopId": "dwarf_item"})
+                   "dialog": ["Store's shut. Every rope and lamp went down the canal works."],
+                   "shopId": "dwarf_item"})   # closed (pass EQ D-EQ8)
     staff = [[x, y] for y in range(4, 7) for x in range(28, 38)]
     r.transitions += [{"x": x, "y": 29, "targetMap": "overworld", "targetEntrance": "ert_dwarf"} for x in (19, 20)]
     return r.write(NOTE, {"arrival": [19, 28]}, kits=KITS, mats=MATS, trim=None,

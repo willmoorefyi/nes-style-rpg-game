@@ -170,13 +170,13 @@ npcs:
   chestItem: ether
   chestFlag: CHEST_WAT_O_FALLS_WEST
   dialog: [You found an Ether!]
-- id: chest_wat_o_falls_east
+- id: chest_wat_o_falls_east_knife
   sprite: chest
   x: 27
   y: 6
-  chestItem: hi_potion
-  chestFlag: CHEST_WAT_O_FALLS_EAST
-  dialog: [You found a Hi-Potion!]
+  chestItem: rune_knife
+  chestFlag: CHEST_WAT_O_FALLS_EAST_KNIFE
+  dialog: [You found a Rune Knife!]
 transitions:
 - {x: 14, y: 21, targetMap: overworld, targetEntrance: wat_waterfall}
 - {x: 15, y: 21, targetMap: overworld, targetEntrance: wat_waterfall}

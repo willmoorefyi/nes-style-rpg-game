@@ -37,8 +37,8 @@ describe('FX-E hints', () => {
     expect(flat(map.inspect)).toMatch(/one way/);
   });
 
-  it('P2-09: the bottle is a single sale, still 40000 G, still flagged', () => {
+  it('P2-09: the bottle is a single sale, 50000 G (NES FF1, pass EQ R4), still flagged', () => {
     const trader = load('caravan-camp').npcs.find((n) => n.id === 'trader');
-    expect(trader).toMatchObject({ takeGold: 40000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT' });
+    expect(trader).toMatchObject({ takeGold: 50000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT' });
   });
 });

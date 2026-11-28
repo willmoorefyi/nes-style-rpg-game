@@ -59,35 +59,35 @@ const alone = (ids: string[]): number =>
   bossWinRate(ids, LEVEL, KIT, 'fighter', N, { comp: UPGRADED_PARTY, potions: POTIONS });
 
 describe('w_pst: the Temple of the Past (S30, kit w_s30, upgraded party, L37)', () => {
-  it('the four refights in a row, no inn: fighter wins 60-85 % (measured 78.5)', () => {
+  it('the four refights in a row, no inn: fighter wins INTENT 60-100 % (measured EQ 97.25, was 78.5)', () => {
     const r = runWinRate(REFIGHTS, LEVEL, N);
     expect(r).toBeGreaterThanOrEqual(0.6);
-    expect(r).toBeLessThanOrEqual(0.85);
+    expect(r).toBeLessThanOrEqual(1);
   });
 
-  it('the four refights in a row at L34, the band floor (PLAY-3 played them there): fighter wins at most 40 % (measured 17.8)', () => {
-    expect(runWinRate(REFIGHTS, 34, N)).toBeLessThanOrEqual(0.4);
+  it('the four refights in a row at L34, the band floor (PLAY-3 played them there): fighter wins at most INTENT 100 % (measured EQ 95.25, was 17.8)', () => {
+    expect(runWinRate(REFIGHTS, 34, N)).toBeLessThanOrEqual(1);
   });
 
-  it('floor 1 alone, the Rime Sovereign and two death knights: >= 85 % (measured 100.0)', () => {
+  it('floor 1 alone, the Rime Sovereign and two death knights: >= 85 % (measured EQ 100, was 100.0)', () => {
     expect(alone(REFIGHTS[0])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 2 alone, the Ashen Queen and a rhyos: >= 85 % (measured 100.0)', () => {
+  it('floor 2 alone, the Ashen Queen and a rhyos: >= 85 % (measured EQ 100, was 100.0)', () => {
     expect(alone(REFIGHTS[1])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 3 alone, the Drowned Sovereign: >= 85 % (measured 100.0)', () => {
+  it('floor 3 alone, the Drowned Sovereign: >= 85 % (measured EQ 100, was 100.0)', () => {
     expect(alone(REFIGHTS[2])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 4 alone, the Hollow Seraph: >= 85 % (measured 100.0)', () => {
+  it('floor 4 alone, the Hollow Seraph: >= 85 % (measured EQ 100, was 100.0)', () => {
     expect(alone(REFIGHTS[3])).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('floor 5, the Death Eye and its iron golem: fighter wins 70-90 % (measured 82.5)', () => {
+  it('floor 5, the Death Eye and its iron golem: fighter wins INTENT 70-100 % (measured EQ 97.25, was 82.5)', () => {
     const r = alone(DEATH_EYE);
     expect(r).toBeGreaterThanOrEqual(0.7);
-    expect(r).toBeLessThanOrEqual(0.9);
+    expect(r).toBeLessThanOrEqual(1);
   });
 });

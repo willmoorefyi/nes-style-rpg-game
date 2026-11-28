@@ -67,8 +67,8 @@ def build() -> Room:
     r.npcs += [
         {"id": "chest_wat_o_falls_west", "sprite": "chest", "x": 2, "y": 4, "chestItem": "ether",
          "chestFlag": "CHEST_WAT_O_FALLS_WEST", "dialog": ["You found an Ether!"]},
-        {"id": "chest_wat_o_falls_east", "sprite": "chest", "x": 27, "y": 6, "chestItem": "hi_potion",
-         "chestFlag": "CHEST_WAT_O_FALLS_EAST", "dialog": ["You found a Hi-Potion!"]},
+        {"id": "chest_wat_o_falls_east_knife", "sprite": "chest", "x": 27, "y": 6, "chestItem": "rune_knife",
+         "chestFlag": "CHEST_WAT_O_FALLS_EAST_KNIFE", "dialog": ["You found a Rune Knife!"]},
     ]
     r.deco([["map_table_l", "map_table_r"]], 10, 4)          # the automaton's workbench
     r.deco([["lectern"]], 18, 4)

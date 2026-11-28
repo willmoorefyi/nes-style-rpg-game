@@ -87,7 +87,9 @@ All shared types live in `src/types/index.ts`. Key ones:
 - `BattleSceneDeps` — decoupled battle scene dependencies
 - `BattleCommand` — fight/magic/item/run commands
 - `ElementalProfile` — per-enemy elemental weaknesses and resistances
-- `EquipmentSlot` — weapon, armor, shield, helmet
+- `EquipmentSlot` — weapon, armor, shield, helmet, hands (pass EQ: FF1's glove slot, gloves / gauntlets / ProRing; label "Hands"; a save from before it loads with Hands empty, no `SAVE_VERSION` change)
+- Equipment (pass EQ, `docs/EQUIP_FF1_PLAN.md`): every gear item has NES FF1 stats, prices and job lists. `usableBy` names only FF1's 12 classic classes (warrior, knight, thief, ninja, monk, master, red_mage, red_wizard, white_mage, white_wizard, black_mage, black_wizard); a copy class equips as its `copyOf` source (`EquipmentRules.equipClassOf`, used by `Character.canEquip`), so never add a copy id to `usableBy`. FF1 effects: `bonusVsFamily` (a family or `all`) and `element` give attack +4 / hit% +40 (`PhysicalAttack.strongAgainst`); `resist` (elements or protection categories) works through `Character.hasTempResist`; `battleSpell` is cast free from the battle Item command while worn (`src/battle/itemCast.ts`, "<name> (worn)" rows)
+- Shops (pass EQ, user ruling 2026-11-27): every shop sells exactly NES FF1's inventory, pinned by `tests/data/ff1Shops.test.ts` / `ff1Tables.ts`; the shops FF1 lacks (`melmond_item`, `dwarf_item`, `onrac_weapon`, `onrac_armor`) are `closed: true` with an empty inventory (the keeper talks, nothing opens). `tests/data/obtainability.test.ts` fails on any item no shop, chest, gift or cutscene gives. Kit rows are `{ gear, found?, spells }`: `gear` is bought (priced by `kitPrice`), `found` is chest gear equipped after it (`tests/data/kitSources.test.ts`)
 
 ### Data Flow
 
@@ -124,9 +126,9 @@ YAML files (assets/data/*.yaml, assets/maps/*.yaml)
 ### File Size Guidelines
 
 - Source files should stay under 250 lines. If a file grows beyond this, decompose it.
-- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 581 / 590 (at WR) (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 424 / 442, `SpellExecutor.ts` 311 / 314, `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
+- Known exceptions being monitored (current lines / ceiling, measured at pass W INT; the TS ceilings are pinned by `tests/data/fileCeilings.test.ts`): `ExplorationScene.ts` 581 / 590 (at WR) (pass W moved its vehicles and NPC actions into `src/scenes/exploration/FieldVehicles.ts` and `FieldNpcActions.ts`), `BattleStateMachine.ts` 566 / 592, `BattleScene.ts` 541 / 594, `src/types/index.ts` 441 / 442 (pass EQ), `SpellExecutor.ts` 302 / 314 (pass EQ), `BattleAnimationController.ts` 304 / 308, `Character.ts` 270, and the Python `layouts/castle.py` 360 / 360 and `layouts/cornelia.py` 323 / 355. `castle.py` is at its ceiling, so a change there must extract code first or be line-neutral.
 - Pass W: every file of `src/progression/`, the field rules (`src/systems/fieldRules*.ts`), `src/types/quest.ts`, `src/core/schemaValidationQuest.ts`, `FieldVehicles.ts`, `FieldNpcActions.ts`, the `layouts/world*.py` files and every `.py` under the region directories (`a1`, `elf`, `earth`, `fire`, `ordeal`, `water`, `wind`, `past`) stay under 250 lines, with no exceptions (`tests/data/questCeilings.test.ts`, which finds new files as they land).
-- Also over 250 and not split: `src/core/schemaValidation.ts` (380), and the tools `build_map.py`, `kit.py`, `map_selftest.py` and `stage_backgrounds.py` (255).
+- Also over 250 and not split: `src/core/schemaValidation.ts` (379; pass EQ moved `validateItemData` to `schemaValidationItems.ts`), and the tools `build_map.py`, `kit.py`, `map_selftest.py` and `stage_backgrounds.py` (255).
 - `BattleScene.ts` was decomposed from 1,169 lines to ~508 lines by extracting 6 modules into `src/scenes/battle/`. This is the model for future decomposition.
 
 ---

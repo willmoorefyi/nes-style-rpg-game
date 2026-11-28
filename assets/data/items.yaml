@@ -1,30 +1,20 @@
 - id: small_knife
   name: Small Knife
   plural: Small Knives
-  description: "A light blade any class can use. ATK 5, hit +10."
+  description: "A light blade. ATK 5, hit +10."
   type: weapon
   stats:
     attack: 5
   price: 5
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
-  - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
+  - black_mage
+  - black_wizard
   hit: 10
   crit: 2
 - id: wooden_nunchaku
@@ -36,28 +26,30 @@
     attack: 12
   price: 10
   usableBy:
+  - ninja
   - monk
-  - beastmaster
+  - master
   hit: 0
   crit: 1
 - id: staff
   name: Staff
-  description: "A plain wooden staff for mages and monks. ATK 6."
+  description: "A plain wooden staff. ATK 6."
   type: weapon
   stats:
     attack: 6
   price: 5
   usableBy:
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
-  - red_mage
-  - scholar_hero
-  - rune_knight
+  - warrior
+  - knight
+  - ninja
   - monk
-  - beastmaster
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   hit: 0
   crit: 3
 - id: rapier
@@ -68,17 +60,12 @@
     attack: 9
   price: 10
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
   hit: 5
   crit: 4
 - id: short_sword
@@ -89,34 +76,26 @@
     attack: 15
   price: 550
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  - thief
-  - hunter
-  - ronin
+  - knight
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
   hit: 10
   crit: 6
 - id: hammer
   name: Hammer
-  description: "A blunt hammer for warriors and white mages. ATK 9."
+  description: "A blunt iron hammer. ATK 9."
   type: weapon
   stats:
     attack: 9
   price: 10
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   - white_mage
-  - cleric
+  - white_wizard
   hit: 0
   crit: 5
 - id: hand_axe
@@ -127,11 +106,9 @@
     attack: 16
   price: 550
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   hit: 5
   crit: 7
 - id: iron_nunchaku
@@ -143,8 +120,9 @@
     attack: 16
   price: 200
   usableBy:
+  - ninja
   - monk
-  - beastmaster
+  - master
   hit: 0
   crit: 9
 - id: iron_sword
@@ -155,356 +133,307 @@
     attack: 13
   price: 300
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
   hit: 10
   crit: 10
 - id: mythril_sword
   name: Mythril Sword
-  description: "Mythril blade, strong against undead. ATK 23, hit +10."
+  description: "A mythril blade. ATK 23, hit +15."
   type: weapon
   stats:
     attack: 23
   price: 4000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  bonusVsFamily: undead
-  hit: 10
-  crit: 12
+  - red_wizard
+  hit: 15
+  crit: 17
 - id: mythril_knife
   name: Mythril Knife
   plural: Mythril Knives
-  description: "Mythril dagger, strong against undead. ATK 15, hit +10."
+  description: "A mythril dagger. ATK 10, hit +15."
   type: weapon
   stats:
-    attack: 15
+    attack: 10
   price: 800
   usableBy:
+  - warrior
+  - knight
   - thief
-  - hunter
-  - ronin
-  - black_mage
-  - warlock
-  - shaman
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  bonusVsFamily: undead
-  hit: 10
-  crit: 12
+  - red_wizard
+  - black_mage
+  - black_wizard
+  hit: 15
+  crit: 16
 - id: great_axe
   name: Great Axe
-  description: "A huge axe, strong against giants. ATK 22, hit +10."
+  description: "A huge two-handed axe. ATK 22, hit +5."
   type: weapon
   stats:
     attack: 22
   price: 4500
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  bonusVsFamily: giant
-  hit: 10
+  - knight
+  - ninja
+  hit: 5
   crit: 14
 - id: mythril_hammer
   name: Mythril Hammer
-  description: "Mythril hammer, strong against undead. ATK 18, hit +10."
+  description: "A mythril hammer. ATK 12, hit +5."
   type: weapon
   stats:
-    attack: 18
+    attack: 12
   price: 2500
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   - white_mage
-  - cleric
-  bonusVsFamily: undead
-  hit: 10
-  crit: 12
+  - white_wizard
+  hit: 5
+  crit: 18
 - id: power_staff
   name: Power Staff
-  description: "A staff with a weighted head. ATK 12, hit +10."
+  description: "A staff with a weighted head. ATK 12."
   type: weapon
   stats:
     attack: 12
   price: 1000
   usableBy:
+  - warrior
+  - knight
+  - ninja
+  - monk
+  - master
   - white_mage
-  - cleric
+  - white_wizard
   - black_mage
-  - warlock
-  - shaman
-  - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 10
-  crit: 10
+  - black_wizard
+  hit: 0
+  crit: 28
 - id: flame_sword
   name: Flame Sword
-  description: "Fire blade, strong against undead. ATK 26, hit +10."
+  description: "Fire blade, strong vs undead. ATK 26, hit +20."
   type: weapon
   stats:
     attack: 26
   price: 10000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
+  - red_mage
+  - red_wizard
+  hit: 20
+  crit: 20
   element: fire
   bonusVsFamily: undead
-  hit: 10
-  crit: 16
 - id: ice_brand
   name: Ice Brand
-  description: "Ice blade of frozen steel. ATK 26, hit +10."
+  description: "Ice blade of frozen steel. ATK 29, hit +25."
   type: weapon
   stats:
-    attack: 26
+    attack: 29
   price: 10000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
+  - red_mage
+  - red_wizard
+  hit: 25
+  crit: 21
   element: ice
-  hit: 10
-  crit: 16
 - id: coral_sword
   name: Coral Sword
-  description: "Lightning blade, strong against sea foes. ATK 26, hit +10."
+  description: "Coral blade, strong vs sea foes. ATK 19, hit +15."
   type: weapon
   stats:
-    attack: 26
+    attack: 19
   price: 10000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - thief
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  element: lightning
+  - red_wizard
+  hit: 15
+  crit: 25
   bonusVsFamily: aquatic
-  hit: 10
-  crit: 16
 - id: masamune
   name: Masamune
-  description: "The legendary blade. Anyone can wield it. ATK 56, hit +10."
+  description: "The legendary blade. Anyone can wield it. ATK 56, hit +50."
   type: weapon
   stats:
     attack: 56
   price: 0
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
-  bonusVsFamily: dragon
-  hit: 10
-  crit: 20
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
+  hit: 50
+  crit: 40
 - id: cloth
   name: Cloth
   plural: Cloth
-  description: "Simple clothes any class can wear. DEF 1, evade -2."
+  description: "Simple clothes. DEF 1, evade -2."
   type: armor
+  slot: armor
   stats:
     defense: 1
   price: 10
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 2
 - id: robe
   name: Robe
   description: "A mage's robe. DEF 2, evade -2."
   type: armor
+  slot: armor
   stats:
     defense: 2
   price: 20
   usableBy:
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 2
 - id: leather_armor
   name: Leather Armor
   description: "Hardened leather. DEF 4, evade -8."
   type: armor
+  slot: armor
   stats:
     defense: 4
   price: 50
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
   weight: 8
 - id: wooden_armor
   name: Wooden Armor
   description: "Plates of hard wood. DEF 4, evade -8."
   type: armor
+  slot: armor
   stats:
     defense: 4
   price: 50
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
   weight: 8
 - id: chain_mail
   name: Chain Mail
   description: "Linked iron rings. DEF 15, evade -15."
   type: armor
+  slot: armor
   stats:
     defense: 15
   price: 80
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
   weight: 15
 - id: iron_armor
   name: Iron Armor
-  description: "Full iron plate. DEF 24, heavy: evade -23."
+  description: "Full iron plate. DEF 24, evade -23."
   type: armor
+  slot: armor
   stats:
     defense: 24
   price: 800
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
+  - knight
+  - ninja
   weight: 23
 - id: mythril_armor
   name: Mythril Armor
-  description: "Mythril plate. DEF 34, heavy: evade -33."
+  description: "Heavy steel plate. DEF 34, evade -33."
   type: armor
+  slot: armor
   stats:
     defense: 34
-  price: 7500
+  price: 45000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
+  - knight
   weight: 33
 - id: mythril_mail
   name: Mythril Mail
   description: "Light mythril links. DEF 18, evade -8."
   type: armor
+  slot: armor
   stats:
     defense: 18
-  price: 3500
+  price: 7500
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
   weight: 8
 - id: dragon_armor
   name: Dragon Armor
-  description: "Armour of dragon scale. DEF 42, evade -10."
+  description: "Dragon scale. Wards fire, ice, lightning. DEF 42, evade -10."
   type: armor
+  slot: armor
   stats:
     defense: 42
   price: 0
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
+  - knight
   weight: 10
+  resist: [fire, ice, lightning]
 - id: wooden_shield
   name: Wooden Shield
   description: "A round wooden shield. DEF 2."
@@ -514,14 +443,9 @@
     defense: 2
   price: 15
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  - red_mage
-  - scholar_hero
-  - rune_knight
+  - knight
+  - ninja
   weight: 0
 - id: iron_shield
   name: Iron Shield
@@ -532,11 +456,9 @@
     defense: 4
   price: 100
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   weight: 0
 - id: mythril_shield
   name: Mythril Shield
@@ -547,57 +469,44 @@
     defense: 8
   price: 2500
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
-  - red_mage
-  - scholar_hero
-  - rune_knight
+  - knight
+  - ninja
   weight: 0
 - id: cap
   name: Cap
-  description: "A leather cap any class can wear. DEF 1, evade -1."
+  description: "A leather cap. DEF 1, evade -1."
   type: armor
   slot: helmet
   stats:
     defense: 1
   price: 80
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 1
 - id: iron_helm
   name: Iron Helm
-  description: "An iron helmet. DEF 3, evade -3."
+  description: "A plain helmet. DEF 3, evade -3."
   type: armor
   slot: helmet
   stats:
     defense: 3
   price: 100
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   weight: 3
 - id: mythril_helm
   name: Mythril Helm
@@ -608,12 +517,264 @@
     defense: 6
   price: 2500
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
+  - ninja
   weight: 3
+# Pass EQ (docs/EQUIP_FF1_PLAN.md 3.1): the FF1 shop items the game lacked, the hand slot and the House
+- id: large_dagger
+  name: Large Dagger
+  description: "A long dagger. ATK 7, hit +10."
+  type: weapon
+  stats:
+    attack: 7
+  price: 175
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - red_mage
+  - red_wizard
+  - black_mage
+  - black_wizard
+  hit: 10
+  crit: 10
+- id: iron_staff
+  name: Iron Staff
+  description: "An iron-shod staff. ATK 14."
+  type: weapon
+  stats:
+    attack: 14
+  price: 200
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  - monk
+  - master
+  hit: 0
+  crit: 11
+- id: sabre
+  name: Sabre
+  description: "A light curved sword. ATK 13, hit +5."
+  type: weapon
+  stats:
+    attack: 13
+  price: 450
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - red_mage
+  - red_wizard
+  hit: 5
+  crit: 12
+- id: long_sword
+  name: Long Sword
+  description: "A long knightly sword. ATK 20, hit +10."
+  type: weapon
+  stats:
+    attack: 20
+  price: 1500
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  - red_mage
+  - red_wizard
+  hit: 10
+  crit: 13
+- id: silver_axe
+  name: Silver Axe
+  description: "A silver war axe. ATK 25, hit +10."
+  type: weapon
+  stats:
+    attack: 25
+  price: 4500
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  hit: 10
+  crit: 19
+- id: copper_bracelet
+  name: Copper Bracelet
+  description: "A copper band. DEF 4, evade -1."
+  type: armor
+  slot: armor
+  stats:
+    defense: 4
+  price: 1000
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
+  weight: 1
+- id: buckler
+  name: Buckler
+  description: "A small round shield. DEF 2."
+  type: armor
+  slot: shield
+  stats:
+    defense: 2
+  price: 2500
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - red_mage
+  - red_wizard
+  weight: 0
+- id: great_helm
+  name: Great Helm
+  description: "A heavy iron helmet. DEF 5, evade -5."
+  type: armor
+  slot: helmet
+  stats:
+    defense: 5
+  price: 450
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  weight: 5
+- id: gloves
+  name: Gloves
+  plural: Gloves
+  description: "Leather gloves. DEF 1, evade -1."
+  type: armor
+  slot: hands
+  stats:
+    defense: 1
+  price: 60
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
+  weight: 1
+- id: copper_gauntlet
+  name: Copper Gauntlet
+  description: "Copper gauntlets. DEF 2, evade -3."
+  type: armor
+  slot: hands
+  stats:
+    defense: 2
+  price: 200
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  weight: 3
+- id: iron_gauntlet
+  name: Iron Gauntlet
+  description: "Iron gauntlets. DEF 4, evade -5."
+  type: armor
+  slot: hands
+  stats:
+    defense: 4
+  price: 750
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  weight: 5
+- id: silver_gauntlet
+  name: Silver Gauntlet
+  description: "Silver gauntlets. DEF 6, evade -3."
+  type: armor
+  slot: hands
+  stats:
+    defense: 6
+  price: 2500
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  - red_wizard
+  weight: 3
+- id: zeus_gauntlet
+  name: Zeus Gauntlet
+  description: "Use: LIT2. DEF 6, evade -3."
+  type: armor
+  slot: hands
+  stats:
+    defense: 6
+  price: 15000
+  usableBy:
+  - knight
+  - ninja
+  - red_wizard
+  weight: 3
+  battleSpell: lit2
+- id: power_gauntlet
+  name: Power Gauntlet
+  description: "Use: SABR. DEF 6, evade -3."
+  type: armor
+  slot: hands
+  stats:
+    defense: 6
+  price: 10000
+  usableBy:
+  - knight
+  - ninja
+  - red_wizard
+  weight: 3
+  battleSpell: sabr
+- id: opal_gauntlet
+  name: Opal Gauntlet
+  description: "Opal gauntlets. DEF 8, evade -3."
+  type: armor
+  slot: hands
+  stats:
+    defense: 8
+  price: 20000
+  usableBy:
+  - knight
+  weight: 3
+- id: pro_ring
+  name: ProRing
+  description: "A ring that wards death. DEF 8, evade -1."
+  type: armor
+  slot: hands
+  stats:
+    defense: 8
+  price: 20000
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
+  weight: 1
+  resist: [death]
 - id: potion
   name: Potion
   description: "Restores 30 HP to one ally."
@@ -674,6 +835,14 @@
   stats: {}
   price: 250
   usableBy: []
+- id: house
+  name: House
+  description: "Party rests: full HP and charges, then save. World map only."
+  prompt: "Rest in the House? (HP and charges fully restored, then save)"
+  type: consumable
+  stats: {}
+  price: 3000
+  usableBy: []
 - id: lute
   name: Lute
   description: "The princess's lute. Its song may open the way."
@@ -692,275 +861,233 @@
 # ═══ PASS W ANCHORS (docs/WORLD_PLAN.md 5.1, 5.5) ═══
 # Each tranche adds its records only between its own pair of lines, so the merges never conflict. W1-F adds the key items and the late gear.
 # === W1-F (pass W: owned by W1-F) ===
-# Gear by band (docs/WORLD_PLAN.md 3.6; caps: weapon atk / body / shield / helm def). B3 Elfheim: 23 / 24 / 4 / 3
+# The pass W late gear (WORLD_PLAN 3.6, its band caps retired by pass EQ: every gear item has NES FF1 stats and jobs,
+# docs/EQUIP_FF1_PLAN.md Appendix A; shops sell FF1's lists, the rest is found in chests). First used at B3 Elfheim
 - id: silver_armlet
   name: Silver Armlet
-  description: "A silver band worn in place of armour. DEF 10, evade -1."
+  description: "A silver band. DEF 15, evade -1."
   type: armor
-  stats:
-    defense: 10
-  price: 1200
-  usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - thief
-  - hunter
-  - ronin
-  - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
-  - red_mage
-  - scholar_hero
-  - rune_knight
   slot: armor
+  stats:
+    defense: 15
+  price: 5000
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 1
-# B4 Melmond: 23 / 34 / 8 / 6
+# B4 Melmond (pass W tier)
 - id: scimitar
   name: Scimitar
-  description: "A curved desert blade. ATK 20, hit +5."
+  description: "A curved desert blade. ATK 10, hit +10."
   type: weapon
   stats:
-    attack: 20
-  price: 3000
+    attack: 10
+  price: 200
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 5
-  crit: 10
+  - red_wizard
+  hit: 10
+  crit: 8
 - id: gold_armlet
   name: Gold Armlet
-  description: "A gold band set with wards. DEF 16, evade -1."
+  description: "A gold band. DEF 24, evade -1."
   type: armor
-  stats:
-    defense: 16
-  price: 4000
-  usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - thief
-  - hunter
-  - ronin
-  - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
-  - red_mage
-  - scholar_hero
-  - rune_knight
   slot: armor
+  stats:
+    defense: 24
+  price: 50000
+  usableBy:
+  - warrior
+  - knight
+  - thief
+  - ninja
+  - monk
+  - master
+  - red_mage
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 1
-# B5 Crescent Lake: 26 / 34 / 8 / 6
+# B5 Crescent Lake (pass W tier)
 - id: falchion
   name: Falchion
-  description: "A broad, quick blade. ATK 24, hit +10."
+  description: "A broad, quick blade. ATK 15, hit +10."
   type: weapon
   stats:
-    attack: 24
-  price: 8000
+    attack: 15
+  price: 450
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
+  - red_wizard
   hit: 10
-  crit: 14
+  crit: 15
 - id: cat_claw
   name: Cat Claw
-  description: "Monk claws of tempered steel. ATK 22, hit +10."
+  description: "Steel claws. ATK 22, hit +35."
   type: weapon
   stats:
     attack: 22
-  price: 6500
+  price: 65000
   usableBy:
-  - monk
-  - beastmaster
-  hit: 10
-  crit: 16
+  - knight
+  - ninja
+  - red_wizard
+  - black_wizard
+  hit: 35
+  crit: 35
 - id: wizard_staff
   name: Wizard Staff
-  description: "A staff that hums with power. ATK 18, hit +5."
+  description: "Use: CONF. ATK 15, hit +15."
+  type: weapon
+  stats:
+    attack: 15
+  price: 5000
+  usableBy:
+  - black_wizard
+  hit: 15
+  crit: 33
+  battleSpell: conf
+- id: white_robe
+  name: White Robe
+  description: "Use: INV2. Wards fire, death. DEF 24, evade -2."
+  type: armor
+  slot: armor
+  stats:
+    defense: 24
+  price: 9000
+  usableBy:
+  - white_wizard
+  weight: 2
+  battleSpell: inv2
+  resist: [fire, death]
+- id: black_robe
+  name: Black Robe
+  description: "Use: ICE2. Wards ice, time. DEF 24, evade -2."
+  type: armor
+  slot: armor
+  stats:
+    defense: 24
+  price: 9000
+  usableBy:
+  - black_wizard
+  weight: 2
+  battleSpell: ice2
+  resist: [ice, time]
+# B6 Onrac (pass W tier)
+- id: sun_blade
+  name: Sun Blade
+  description: "Shines like noon, strong vs undead. ATK 32, hit +30."
+  type: weapon
+  stats:
+    attack: 32
+  price: 15000
+  usableBy:
+  - warrior
+  - knight
+  - ninja
+  - red_mage
+  - red_wizard
+  hit: 30
+  crit: 24
+  bonusVsFamily: undead
+- id: thor_hammer
+  name: Thor Hammer
+  description: "Use: LIT2. ATK 18, hit +15."
   type: weapon
   stats:
     attack: 18
-  price: 5000
-  usableBy:
-  - black_mage
-  - warlock
-  - shaman
-  - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 5
-  crit: 10
-- id: white_robe
-  name: White Robe
-  description: "A robe woven with white wards. DEF 24, evade -2."
-  type: armor
-  stats:
-    defense: 24
-  price: 9000
-  usableBy:
-  - white_mage
-  - cleric
-  slot: armor
-  weight: 2
-- id: black_robe
-  name: Black Robe
-  description: "A robe woven with black wards. DEF 24, evade -2."
-  type: armor
-  stats:
-    defense: 24
-  price: 9000
-  usableBy:
-  - black_mage
-  - warlock
-  - shaman
-  slot: armor
-  weight: 2
-# B6 Onrac: 30 / 38 / 12 / 8
-- id: sun_blade
-  name: Sun Blade
-  description: "A blade that shines like noon. ATK 30, hit +10."
-  type: weapon
-  stats:
-    attack: 30
-  price: 15000
-  usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 10
-  crit: 16
-- id: thor_hammer
-  name: Thor Hammer
-  description: "A lightning hammer. ATK 24, hit +10."
-  type: weapon
-  stats:
-    attack: 24
   price: 14000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - white_mage
-  - cleric
-  element: lightning
-  hit: 10
-  crit: 14
+  - knight
+  - ninja
+  - white_wizard
+  hit: 15
+  crit: 36
+  battleSpell: lit2
 - id: rune_knife
   name: Rune Knife
   plural: Rune Knives
-  description: "A knife cut with runes. ATK 26, hit +10."
+  description: "A runed knife, strong vs mages. ATK 18, hit +15."
   type: weapon
   stats:
-    attack: 26
+    attack: 18
   price: 12000
   usableBy:
   - thief
-  - hunter
-  - ronin
-  - black_mage
-  - warlock
-  - shaman
+  - ninja
   - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 10
-  crit: 18
+  - red_wizard
+  - black_mage
+  - black_wizard
+  hit: 15
+  crit: 27
+  bonusVsFamily: magical
 - id: opal_armor
   name: Opal Armor
-  description: "Plate set with opals. DEF 38, heavy: evade -30."
+  description: "Opal plate. Wards lightning. DEF 42, evade -10."
   type: armor
+  slot: armor
   stats:
-    defense: 38
+    defense: 42
   price: 20000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
-  weight: 30
+  - knight
+  weight: 10
+  resist: [lightning]
 - id: opal_armlet
   name: Opal Armlet
-  description: "An opal band of strong wards. DEF 22, evade -1."
+  description: "An opal band. DEF 34, evade -1."
   type: armor
+  slot: armor
   stats:
-    defense: 22
+    defense: 34
   price: 15000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 1
 - id: aegis_shield
   name: Aegis Shield
-  description: "A shield of polished bronze. DEF 12."
+  description: "Polished bronze. Wards stone. DEF 16."
   type: armor
   slot: shield
   stats:
-    defense: 12
+    defense: 16
   price: 16000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
+  - knight
   weight: 0
+  resist: [poison_stone]
 - id: opal_helm
   name: Opal Helm
   description: "A helmet set with opals. DEF 8, evade -3."
@@ -970,154 +1097,121 @@
     defense: 8
   price: 9000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
+  - knight
   weight: 3
-# B7 Gaia: 34 / 42 / 14 / 10
+# B7 Gaia (pass W tier)
 - id: defender
   name: Defender
-  description: "A guardian's sword. ATK 34, hit +10."
+  description: "Use: RUSE. ATK 30, hit +35."
   type: weapon
   stats:
-    attack: 34
+    attack: 30
   price: 30000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - red_mage
-  - scholar_hero
-  - rune_knight
-  hit: 10
-  crit: 18
+  - knight
+  - ninja
+  - red_wizard
+  hit: 35
+  crit: 32
+  battleSpell: ruse
 - id: vorpal_sword
   name: Vorpal Sword
-  description: "A keen sword that finds the gaps. ATK 32, hit +10."
+  description: "A keen sword that finds the gaps. ATK 24, hit +25."
   type: weapon
   stats:
-    attack: 32
+    attack: 24
   price: 28000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - thief
-  - hunter
-  - ronin
-  hit: 10
-  crit: 24
+  - knight
+  - ninja
+  - red_wizard
+  hit: 25
+  crit: 34
 - id: dragon_claw
   name: Dragon Claw
-  description: "Monk claws of dragon bone. ATK 30, hit +10."
+  description: "Claws of dragon bone, strong vs dragons. ATK 30, hit +35."
   type: weapon
   stats:
     attack: 30
   price: 26000
   usableBy:
-  - monk
-  - beastmaster
-  hit: 10
-  crit: 20
+  - knight
+  - ninja
+  - red_wizard
+  - black_wizard
+  hit: 35
+  crit: 35
+  bonusVsFamily: dragon
 - id: diamond_armor
   name: Diamond Armor
-  description: "Plate of diamond. DEF 40, heavy: evade -28."
+  description: "Diamond plate. Wards lightning. DEF 42, evade -10."
   type: armor
+  slot: armor
   stats:
-    defense: 40
+    defense: 42
   price: 40000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  slot: armor
-  weight: 28
+  - knight
+  weight: 10
+  resist: [lightning]
 - id: diamond_armlet
   name: Diamond Armlet
-  description: "A diamond band of great wards. DEF 30, evade -1."
+  description: "A diamond band. DEF 34, evade -1."
   type: armor
+  slot: armor
   stats:
-    defense: 30
+    defense: 34
   price: 30000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
   - warrior
-  - legionnaire
-  - barbarian
+  - knight
   - thief
-  - hunter
-  - ronin
+  - ninja
   - monk
-  - beastmaster
-  - white_mage
-  - cleric
-  - black_mage
-  - warlock
-  - shaman
+  - master
   - red_mage
-  - scholar_hero
-  - rune_knight
-  slot: armor
+  - red_wizard
+  - white_mage
+  - white_wizard
+  - black_mage
+  - black_wizard
   weight: 1
 - id: diamond_shield
   name: Diamond Shield
-  description: "A shield faced with diamond. DEF 14."
+  description: "Diamond face. Wards lightning. DEF 16."
   type: armor
   slot: shield
   stats:
-    defense: 14
+    defense: 16
   price: 25000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  - red_mage
-  - scholar_hero
-  - rune_knight
+  - knight
   weight: 0
+  resist: [lightning]
 - id: diamond_helm
   name: Diamond Helm
-  description: "A helmet of diamond. DEF 10, evade -3."
+  description: "A helmet of diamond. DEF 8, evade -3."
   type: armor
   slot: helmet
   stats:
-    defense: 10
+    defense: 8
   price: 20000
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
+  - knight
   weight: 3
 # Found: the optional S31, Smyth forges the adamant (WORLD_PLAN 3.1, open question 8)
 - id: excalibur
   name: Excalibur
-  description: "The holy sword, forged of adamant. ATK 45, hit +15."
+  description: "The holy sword, strong vs all. ATK 45, hit +35."
   type: weapon
   stats:
     attack: 45
   price: 0
   usableBy:
-  - dark_fighter_hero
-  - landsknecht
-  - warrior
-  - legionnaire
-  - barbarian
-  element: holy
-  hit: 15
-  crit: 20
+  - knight
+  hit: 35
+  crit: 39
+  bonusVsFamily: all
 # The key items of WORLD_PLAN 3.1 in stage order (lute and mystic_key are above)
 - id: crown
   name: Crown

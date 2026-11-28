@@ -227,13 +227,13 @@ npcs:
   chestItem: soft
   chestFlag: CHEST_PST_CROSS_WEST
   dialog: [You found a Soft!]
-- id: chest_cross_east
+- id: chest_cross_east_ring
   sprite: chest
   x: 33
   y: 28
-  chestItem: hi_potion
-  chestFlag: CHEST_PST_CROSS_EAST
-  dialog: [You found a Hi-Potion!]
+  chestItem: pro_ring
+  chestFlag: CHEST_PST_CROSS_EAST_RING
+  dialog: [You found a ProRing!]
 - id: chest_cross_east_vestibule
   sprite: chest
   x: 41

@@ -15,8 +15,8 @@ import type { StatusEffect } from '../battle/StatusEffects.js';
 export const STATUSES: readonly StatusEffect[] = ['poison', 'stun', 'sleep', 'blind', 'silence', 'death', 'stone', 'fear'];
 export const isStatus = (s: string): s is StatusEffect => (STATUSES as readonly string[]).includes(s);
 
-/** One kit entry (`assets/data/kits.yaml`): gear and spell ids. */
-export interface Kit { gear: string[]; spells: string[] }
+/** One kit entry (`assets/data/kits.yaml`): gear, the chest gear `found` that replaces it slot by slot (pass EQ), spells. */
+export interface Kit { gear: string[]; found?: string[]; spells: string[] }
 /** kits.yaml: kit name -> class id -> kit. */
 export type Kits = Record<string, Record<string, Kit>>;
 
@@ -69,7 +69,7 @@ export function kitMember(kit: Kit, classId: string, level: number, name: string
     if (!spell) console.warn(`Debug party: unknown spell '${id}' in a kit`);
     return { id, level: spell?.level ?? 1 };
   });
-  return { class: classId, name, level, equipment: [...kit.gear], spells };
+  return { class: classId, name, level, equipment: [...kit.gear, ...(kit.found ?? [])], spells };
 }
 
 /** Build one member; null (and `console.error`) for an unknown class. Refused gear and spells warn. */

@@ -46,7 +46,7 @@ function member(cls: string, xp: number, kit: string, i: number): Character {
   const c = new Character({ name: `${cls}${i}`, classData: classOf(cls), level: levelForXp(xp), xp });
   const k = KITS[kit]?.[cls];
   if (!k) throw new Error(`kits.yaml has no ${kit}.${cls}`);
-  for (const id of k.gear) {
+  for (const id of [...k.gear, ...(k.found ?? [])]) {
     const it = item(id);
     const slot = slotOf(it);
     if (!slot || c.equip(slot, it) === false) throw new Error(`${cls} cannot equip ${id}`);

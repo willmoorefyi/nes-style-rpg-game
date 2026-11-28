@@ -49,7 +49,7 @@ def build() -> Floor:
         f.deco([["vines"]], x, 28, on_wall=True)
     f.npcs += [
         chest("b5_niche_w", "diamond_shield", "a Diamond Shield", 4, 8),
-        chest("b5_niche_e", "hi_potion", "a Hi-Potion", 28, 27),
+        chest("b5_niche_e_opal", "opal_gauntlet", "an Opal Gauntlet", 28, 27),
         {"id": "wat_d_sovereign", "sprite": "king", "tint": "#3d6f78", "x": KING[0], "y": KING[1], "hideIf": DONE,
          "dialog": ["A king sits before his throne in robes that move as if a current runs through them. A grey tablet "
                     "hangs on a chain at his breast."]},

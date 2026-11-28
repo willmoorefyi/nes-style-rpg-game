@@ -75,26 +75,26 @@ describe('Garland (360 HP, attack 9, 2 hits, 3 at <= 75 % HP; 400 seeded battles
     expect(mageSurvival('black_mage', 4243)).toBeGreaterThanOrEqual(0.9);
   });
 
-  it('a sensible Lv2 party with the lv2 kit (400 G kit + LIT + 2 potions) wins 55-75 % (new 70 %; FB-2 67.75 %; old 95.75 %), in a median of <= 9 rounds (new 9, p90 11; FB-2 10, p90 12; old 8)', () => {
+  it('a sensible Lv2 party with the lv2 kit (400 G kit + LIT + 2 potions) wins 50-62 % (EQ 55.75 %: no Wooden Shield; new 70 %; FB-2 67.75 %; old 95.75 %), in a median of <= 9 rounds (new 9, p90 11; FB-2 10, p90 12; old 8)', () => {
     const rounds: number[] = [];
     const rate = garlandWinRate(2, 'lv2', 'sensible', KIT_POTIONS.lv2, rounds);
-    expect(rate).toBeGreaterThanOrEqual(0.55);
-    expect(rate).toBeLessThanOrEqual(0.75);
+    expect(rate).toBeGreaterThanOrEqual(0.5);
+    expect(rate).toBeLessThanOrEqual(0.62);
     expect(median(rounds)).toBeLessThanOrEqual(9);
   });
 
-  it('a sensible Lv3 party with the lv2 kit wins >= 85 % (new 97.25 %; FB-2 95 %; old 100 %)', () => {
+  it('a sensible Lv3 party with the lv2 kit wins >= 85 % (EQ 91.75 %; new 97.25 %; FB-2 95 %; old 100 %)', () => {
     expect(garlandWinRate(3, 'lv2', 'sensible', KIT_POTIONS.lv2)).toBeGreaterThanOrEqual(0.85);
   });
 
-  it('a sensible Lv2 party wins 60-80 % with the 400 G kit and no potions (new 74 %; FB-2 73 %; old 96.75 %), >= 97 % with the full kit and 3 potions (100 %; old 100 %)', () => {
+  it('a sensible Lv2 party wins 55-75 % with the 400 G kit and no potions (EQ 62 %; new 74 %; FB-2 73 %; old 96.75 %), >= 97 % with the full kit and 3 potions (100 %; old 100 %)', () => {
     const rate = garlandWinRate(2, 'start', 'sensible', 0);
-    expect(rate).toBeGreaterThanOrEqual(0.6);
-    expect(rate).toBeLessThanOrEqual(0.8);
+    expect(rate).toBeGreaterThanOrEqual(0.55);
+    expect(rate).toBeLessThanOrEqual(0.75);
     expect(garlandWinRate(2, 'full', 'sensible', 3)).toBeGreaterThanOrEqual(0.97);
   });
 
-  it('a sensible Lv1 party with the 400 G kit wins <= 15 % (new 8.75 %; FB-2 7.25 %; old 36.25 %)', () => {
+  it('a sensible Lv1 party with the 400 G kit wins <= 15 % (EQ 3.25 %; new 8.75 %; FB-2 7.25 %; old 36.25 %)', () => {
     expect(garlandWinRate(1, 'start', 'sensible', 0)).toBeLessThanOrEqual(0.15);
   });
 
@@ -123,35 +123,35 @@ describe('Garland (360 HP, attack 9, 2 hits, 3 at <= 75 % HP; 400 seeded battles
     expect(garlandWinRate(1, 'start', 'careless', 0)).toBeLessThanOrEqual(0.04);
   });
 
-  it('careless play with the 400 G kit wins 5-20 % at Lv2 (new 13.75 %; FB-2 12.75 %; old 52.75 %) and 55-75 % at Lv3 (new 64.75 %; FB-2 64 %; old 92 %)', () => {
+  it('careless play with the 400 G kit wins 2-15 % at Lv2 (EQ 6.5 %; new 13.75 %; FB-2 12.75 %; old 52.75 %) and INTENT 35-60 % at Lv3 (EQ 45.5 %, was 55-75; new 64.75 %; FB-2 64 %; old 92 %)', () => {
     const l2 = garlandWinRate(2, 'start', 'careless', 0);
-    expect(l2).toBeGreaterThanOrEqual(0.05);
-    expect(l2).toBeLessThanOrEqual(0.2);
+    expect(l2).toBeGreaterThanOrEqual(0.02);
+    expect(l2).toBeLessThanOrEqual(0.15);
     const l3 = garlandWinRate(3, 'start', 'careless', 0);
-    expect(l3).toBeGreaterThanOrEqual(0.55);
-    expect(l3).toBeLessThanOrEqual(0.75);
+    expect(l3).toBeGreaterThanOrEqual(0.35);
+    expect(l3).toBeLessThanOrEqual(0.6);
   });
 
   it('sensible Lv1 play with the full kit and no potions wins >= 95 % (new 99.5 %; FB-2 99.25 %; old 100 %)', () => {
     expect(garlandWinRate(1, 'full', 'sensible', 0)).toBeGreaterThanOrEqual(0.95);
   });
 
-  it('after a temple run (2 battles, no inn, sensible) Lv2 with the 400 G kit and no potions wins 55-70 % (new 60 %; FB-2 61.25 %; old 89 %)', () => {
+  it('after a temple run (2 battles, no inn, sensible) Lv2 with the 400 G kit and no potions wins INTENT 30-50 % (EQ 39 %, was 55-70; new 60 %; FB-2 61.25 %; old 89 %)', () => {
     const rate = templeRunWinRate(2, 2, 'start', 0);
-    expect(rate).toBeGreaterThanOrEqual(0.55);
-    expect(rate).toBeLessThanOrEqual(0.7);
+    expect(rate).toBeGreaterThanOrEqual(0.3);
+    expect(rate).toBeLessThanOrEqual(0.5);
   });
 
-  it('after a temple run (2 battles) Lv2 with the lv2 kit and its 2 potions wins 40-58 % (new 50.5 %; FB-2 51.75 %; old 85.5 %)', () => {
+  it('after a temple run (2 battles) Lv2 with the lv2 kit and its 2 potions wins INTENT 25-45 % (EQ 31.5 %, was 40-58; new 50.5 %; FB-2 51.75 %; old 85.5 %)', () => {
     const rate = templeRunWinRate(2, 2, 'lv2');
-    expect(rate).toBeGreaterThanOrEqual(0.4);
-    expect(rate).toBeLessThanOrEqual(0.58);
+    expect(rate).toBeGreaterThanOrEqual(0.25);
+    expect(rate).toBeLessThanOrEqual(0.45);
   });
 
-  it('with the arrival kit (lv2 + 4 caps, 2 potions) after 3 temple battles Lv2 wins 50-70 % (new 61.5 %; FB-2 61 %; old 88 %)', () => {
+  it('with the arrival kit (lv2 + the temple Cap on the Fighter, 2 potions) after 3 temple battles Lv2 wins INTENT 25-45 % (EQ 34.25 %, was 50-70 with 4 caps; new 61.5 %; FB-2 61 %; old 88 %)', () => {
     const rate = templeRunWinRate(2, 3, 'arrive');
-    expect(rate).toBeGreaterThanOrEqual(0.5);
-    expect(rate).toBeLessThanOrEqual(0.7);
+    expect(rate).toBeGreaterThanOrEqual(0.25);
+    expect(rate).toBeLessThanOrEqual(0.45);
   });
 
   it('after a temple run with the full kit and 3 shared potions Lv2 wins >= 95 % (new 100 %; old 100 %) and Lv3 >= 95 % (100 %)', () => {

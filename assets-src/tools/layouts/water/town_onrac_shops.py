@@ -1,5 +1,5 @@
 """Onrac's five shops and the inn (docs/WORLD_PLAN.md 4.0.1, 4.6; WAT-T), each with its own counter layout; the
-keepers stand behind it and sell the `onrac_*` records (shops.yaml WAT-T anchor: B6 arms, L6 magic, inn 500).
+keepers stand behind it and sell the `onrac_*` records (pass EQ: FF1 sells no arms here, so the weapon and armour shops are closed).
 Written by `town_onrac_interiors.py`.
 """
 from __future__ import annotations
@@ -29,8 +29,7 @@ def build() -> list[Path]:
     r.one("stone_bench", 1, 3)                        # the grindstone
     r.thing("barrel", 1, 7)
     r.staff(7, 3, 9, 7)
-    ONR.keeper(r, "weapon-shop", "merchant", 7, 4, ["Harpoon steel and storm-forged blades. In Onrac a weapon has to "
-               "cut through ice first."], "onrac_weapon")
+    ONR.keeper(r, "weapon-shop", "merchant", 7, 4, ["No steel for sale. The smiths sailed with the fleet."], "onrac_weapon")   # closed (pass EQ D-EQ8)
     out.append(r.save(note("a weapon shop with its counter down the east side, the keeper's floor behind it",
                            "a counter running north to south instead of across; a grindstone by the west wall under "
                            "the harpoon racks"), {**COLD, "in_wall_face": {"from": "castle_face", "shade": 0.7}},
@@ -50,8 +49,7 @@ def build() -> list[Path]:
     r.thing("crate", 9, 7)
     r.thing("crate", 10, 7)
     r.staff(1, 3, 10, 4)
-    ONR.keeper(r, "armor-shop", "merchant", 6, 4, ["Opal mail, lined with sealskin. Keeps out a blade and the north "
-               "wind both."], "onrac_armor")
+    ONR.keeper(r, "armor-shop", "merchant", 6, 4, ["The racks are empty. Not a scrap of mail left in Onrac."], "onrac_armor")   # closed (pass EQ D-EQ8)
     out.append(r.save(note("an armour shop whose counter crosses the whole room, mail stands on the keeper's side",
                            "armour stands behind the counter against the back wall; a pair of crates just east of "
                            "the door"), {**TAR, "in_wall_face": STONE_FACE},

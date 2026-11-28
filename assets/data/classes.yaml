@@ -204,6 +204,7 @@
 - id: barbarian
   name: Barbarian
   abbr: BRB
+  copyOf: warrior   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 35
     strength: 20
@@ -230,6 +231,7 @@
 - id: landsknecht
   name: Landsknecht
   abbr: LKN
+  copyOf: warrior   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 35
     strength: 20
@@ -255,6 +257,7 @@
 - id: dark_fighter_hero
   name: Dark Fighter
   abbr: DKF
+  copyOf: warrior   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 35
     strength: 20
@@ -279,6 +282,7 @@
 - id: legionnaire
   name: Legionnaire
   abbr: LGN
+  copyOf: warrior   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 35
     strength: 20
@@ -304,6 +308,7 @@
 - id: hunter
   name: Hunter
   abbr: HNT
+  copyOf: thief   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 25
     strength: 10
@@ -329,6 +334,7 @@
 - id: cleric
   name: Cleric
   abbr: CLR
+  copyOf: white_mage   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 25
     strength: 5
@@ -373,6 +379,7 @@
 - id: ronin
   name: Ronin
   abbr: RON
+  copyOf: thief   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 25
     strength: 10
@@ -398,6 +405,7 @@
 - id: shaman
   name: Shaman
   abbr: SHM
+  copyOf: black_mage   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 25
     strength: 5
@@ -442,6 +450,7 @@
 - id: beastmaster
   name: Beastmaster
   abbr: BST
+  copyOf: monk   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 33
     strength: 15
@@ -469,6 +478,7 @@
 - id: warlock
   name: Warlock
   abbr: WLK
+  copyOf: black_mage   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 25
     strength: 5
@@ -513,6 +523,7 @@
 - id: rune_knight
   name: Rune Knight
   abbr: RKN
+  copyOf: red_mage   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 10
@@ -554,6 +565,7 @@
 - id: scholar_hero
   name: Scholar
   abbr: SCH
+  copyOf: red_mage   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 10
@@ -823,6 +835,7 @@
   name: Berserker
   abbr: BSK
   upgradeFrom: barbarian
+  copyOf: knight   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 42
     strength: 24
@@ -855,6 +868,7 @@
   name: Dragoon
   abbr: DRG
   upgradeFrom: landsknecht
+  copyOf: knight   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 42
     strength: 24
@@ -888,6 +902,7 @@
   name: Death Knight
   abbr: DKN
   upgradeFrom: dark_fighter_hero
+  copyOf: knight   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 42
     strength: 24
@@ -920,6 +935,7 @@
   name: Centurion
   abbr: CEN
   upgradeFrom: legionnaire
+  copyOf: knight   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 42
     strength: 24
@@ -954,6 +970,7 @@
   name: Ranger
   abbr: RNG
   upgradeFrom: hunter
+  copyOf: ninja   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 12
@@ -989,6 +1006,7 @@
   name: Paladin
   abbr: PAL
   upgradeFrom: cleric
+  copyOf: white_wizard   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 6
@@ -1034,6 +1052,7 @@
   name: Samurai
   abbr: SAM
   upgradeFrom: ronin
+  copyOf: ninja   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 12
@@ -1069,6 +1088,7 @@
   name: Druid
   abbr: DRU
   upgradeFrom: shaman
+  copyOf: black_wizard   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 6
@@ -1114,6 +1134,7 @@
   name: Summoner
   abbr: SUM
   upgradeFrom: beastmaster
+  copyOf: master   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 40
     strength: 18
@@ -1142,6 +1163,7 @@
   name: Necromancer
   abbr: NEC
   upgradeFrom: warlock
+  copyOf: black_wizard   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 30
     strength: 6
@@ -1187,6 +1209,7 @@
   name: Mystic Warrior
   abbr: MYS
   upgradeFrom: rune_knight
+  copyOf: red_wizard   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 36
     strength: 12
@@ -1229,6 +1252,7 @@
   name: Sage
   abbr: SAG
   upgradeFrom: scholar_hero
+  copyOf: red_wizard   # an exact copy: the pick screen says "Plays as" its name (plan 17)
   baseStats:
     hp: 36
     strength: 12

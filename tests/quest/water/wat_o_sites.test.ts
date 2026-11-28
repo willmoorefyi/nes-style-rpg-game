@@ -36,9 +36,9 @@ describe('WAT-O: the waterfall cave', () => {
     expect(script.steps.some((s) => /twin/i.test(s.text ?? ''))).toBe(true);
   });
 
-  it('its two chests hold consumables only (no key item)', () => {
+  it('its two chests hold an Ether and the Rune Knife (pass EQ C5), no key item', () => {
     const chests = cave.npcs.filter((n) => n.chestItem);
-    expect(chests.map((c) => c.chestItem).sort()).toEqual(['ether', 'hi_potion']);
+    expect(chests.map((c) => c.chestItem).sort()).toEqual(['ether', 'rune_knife']);
   });
 });
 
@@ -50,9 +50,9 @@ describe('WAT-O: the caravan camp', () => {
     expect(camp.transitions.every((t) => t.targetMap === 'overworld' && t.targetEntrance === 'wat_caravan')).toBe(true);
   });
 
-  it('the trader sells the bottle for gold (takeGold, GAP-15; INT tuned it by (d3) to 40000)', () => {
+  it('the trader sells the bottle for gold (takeGold, GAP-15; the NES price 50000, pass EQ R4)', () => {
     expect(camp.npcs.find((n) => n.id === 'trader')).toMatchObject({
-      takeGold: 40000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT',
+      takeGold: 50000, giftItem: 'fairy_bottle', giftFlag: 'WAT_O_BOTTLE_BOUGHT',
     });
   });
 });

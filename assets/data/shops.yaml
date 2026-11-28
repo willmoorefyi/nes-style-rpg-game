@@ -1,3 +1,6 @@
+# Pass EQ (docs/EQUIP_FF1_PLAN.md 5, user ruling 2026-11-27): every shop sells exactly NES FF1's inventory, in
+# FF1's order, at NES prices (tests/data/ff1Shops.test.ts); the shops FF1 lacks stay as closed records (`closed: true`).
+
 # ═══ CORNELIA SHOPS ═══
 
 # Weapon shop
@@ -10,7 +13,7 @@
 - id: cornelia_armor
   type: armor
   name: Cornelia Armor
-  inventory: [cloth, leather_armor, chain_mail, wooden_shield, cap]
+  inventory: [cloth, leather_armor, chain_mail]
 
 # Item shop
 - id: cornelia_item
@@ -28,7 +31,7 @@
 - id: cornelia_black
   type: magic
   name: Black Magic
-  inventory: [fire, lit, slep, lock]
+  inventory: [fire, slep, lock, lit]
 
 # Inn
 - id: cornelia_inn
@@ -44,15 +47,15 @@
 # === A1-O (pass W: owned by A1-O) ===
 # === end A1-O ===
 # === A1-T (pass W: owned by A1-T) ===
-# ═══ PRAVOKA SHOPS ═══ B2 (WORLD_PLAN 3.6): weapon 16, body 15, shield 4, helm 3; magic L2; inn 50. Seeded by W1-F; A1-T owns them from here on.
+# ═══ PRAVOKA SHOPS ═══ B2: NES FF1 Pravoka (pass EQ); magic L2; inn 50. A1-T owns them.
 - id: pravoka_weapon
   type: weapon
   name: Pravoka Weapons
-  inventory: [short_sword, iron_sword, hand_axe, iron_nunchaku, staff]
+  inventory: [hammer, short_sword, hand_axe, scimitar]
 - id: pravoka_armor
   type: armor
   name: Pravoka Armor
-  inventory: [robe, leather_armor, chain_mail, iron_shield, iron_helm]
+  inventory: [leather_armor, chain_mail, iron_armor, wooden_shield, gloves]
 - id: pravoka_item
   type: item
   name: Pravoka Items
@@ -74,27 +77,27 @@
 # === ELF-O (pass W: owned by ELF-O) ===
 # === end ELF-O ===
 # === ELF-T (pass W: owned by ELF-T) ===
-# ═══ ELFHEIM SHOPS ═══ B3: weapon 23, body 24, shield 4, helm 3; magic L2-L3; inn 100 (ids unchanged, moved here by W1-F). Seeded by W1-F; ELF-T owns them from here on.
+# ═══ ELFHEIM SHOPS ═══ B3: NES FF1 Elfland (pass EQ); magic L3-L4; inn 100. ELF-T owns them.
 - id: elfheim_weapon
   type: weapon
   name: Elfheim Weapons
-  inventory: [mythril_sword, mythril_knife, great_axe, mythril_hammer, iron_nunchaku, power_staff]
+  inventory: [iron_nunchaku, large_dagger, iron_staff, sabre, mythril_sword]
 - id: elfheim_armor
   type: armor
   name: Elfheim Armor
-  inventory: [iron_armor, mythril_mail, silver_armlet, iron_shield, iron_helm]
+  inventory: [iron_armor, copper_bracelet, iron_shield, cap, iron_helm]
 - id: elfheim_item
   type: item
   name: Elfheim Items
-  inventory: [potion, hi_potion, antidote, soft, tent, cabin, phoenix_down]
+  inventory: [potion, antidote, soft, cabin, house]
 - id: elfheim_white
   type: magic
   name: Elfheim White Magic
-  inventory: [lamp, mute, alit, invs, cure2, hrm2, afir, heal]
+  inventory: [cure2, hrm2, afir, heal, pure, fear, aice, amut]
 - id: elfheim_black
   type: magic
   name: Elfheim Black Magic
-  inventory: [ice, dark, tmpr, slow, fir2, hold, lit2, lok2]
+  inventory: [fir2, hold, lit2, lok2, slp2, fast, conf, ice2]
 - id: elfheim_inn
   type: inn
   name: Elfheim Inn
@@ -104,34 +107,36 @@
 # === ELF-D (pass W: owned by ELF-D) ===
 # === end ELF-D ===
 # === ERT-O (pass W: owned by ERT-O) ===
-# ═══ DWARF HALL SHOPS ═══ B3 items only (WORLD_PLAN 3.5): the B3 item list. Seeded by W1-F; ERT-O owns them from here on.
+# ═══ DWARF HALL SHOPS ═══ FF1 has no shop here: the store is closed (pass EQ D-EQ8). ERT-O owns it.
 - id: dwarf_item
   type: item
   name: Dwarf Hall Items
-  inventory: [potion, hi_potion, antidote, soft, tent, cabin, phoenix_down]
+  inventory: []
+  closed: true
 # === end ERT-O ===
 # === ERT-T (pass W: owned by ERT-T) ===
-# ═══ MELMOND SHOPS ═══ B4: weapon 23, body 34, shield 8, helm 6; magic L3-L4; inn 200 (ids unchanged, moved here by W1-F). Seeded by W1-F; ERT-T owns them from here on.
+# ═══ MELMOND SHOPS ═══ B4: NES FF1 Melmond (pass EQ; no item shop: closed); magic L5; inn 200. ERT-T owns them.
 - id: melmond_weapon
   type: weapon
   name: Melmond Weapons
-  inventory: [scimitar, mythril_sword, mythril_knife, mythril_hammer, iron_nunchaku]
+  inventory: [iron_staff, sabre, long_sword, falchion]
 - id: melmond_armor
   type: armor
   name: Melmond Armor
-  inventory: [mythril_armor, mythril_mail, gold_armlet, mythril_shield, mythril_helm]
+  inventory: [mythril_armor, silver_armlet, great_helm, copper_gauntlet, iron_gauntlet]
 - id: melmond_item
   type: item
   name: Melmond Items
-  inventory: [potion, hi_potion, antidote, soft, tent, cabin, phoenix_down, ether]
+  inventory: []
+  closed: true
 - id: melmond_white
   type: magic
   name: Melmond White Magic
-  inventory: [cure2, hrm2, afir, heal, pure, fear, aice, amut]
+  inventory: [cure3, life, hrm3, hel2]
 - id: melmond_black
   type: magic
   name: Melmond Black Magic
-  inventory: [fir2, hold, lit2, lok2, slp2, fast, conf, ice2]
+  inventory: [fir3, bane, warp, slo2]
 - id: melmond_inn
   type: inn
   name: Melmond Inn
@@ -143,27 +148,27 @@
 # === FIR-O (pass W: owned by FIR-O) ===
 # === end FIR-O ===
 # === FIR-T (pass W: owned by FIR-T) ===
-# ═══ CRESCENT SHOPS ═══ B5: weapon 26, body 34, shield 8, helm 6; magic L5; inn 300. The black L5 spells come with W1-G. Seeded by W1-F; FIR-T owns them from here on.
+# ═══ CRESCENT SHOPS ═══ B5: NES FF1 Crescent Lake (pass EQ); magic L6; inn 300. FIR-T owns them.
 - id: crescent_weapon
   type: weapon
   name: Crescent Weapons
-  inventory: [flame_sword, ice_brand, coral_sword, falchion, cat_claw, wizard_staff]
+  inventory: [mythril_knife, mythril_sword, mythril_hammer, silver_axe]
 - id: crescent_armor
   type: armor
   name: Crescent Armor
-  inventory: [mythril_armor, white_robe, black_robe, gold_armlet, mythril_shield, mythril_helm]
+  inventory: [mythril_mail, mythril_shield, buckler, mythril_helm, silver_gauntlet]
 - id: crescent_item
   type: item
   name: Crescent Items
-  inventory: [potion, hi_potion, ether, antidote, soft, phoenix_down, tent, cabin]
+  inventory: [potion, antidote, cabin, house]
 - id: crescent_white
   type: magic
   name: Crescent White Magic
-  inventory: [cure3, life, hrm3, hel2]
+  inventory: [soft, exit, fog2, inv2]
 - id: crescent_black
   type: magic
   name: Crescent Black Magic
-  inventory: [fir3, bane, warp, slo2]
+  inventory: [lit3, rub, qake, stun]
 - id: crescent_inn
   type: inn
   name: Crescent Inn
@@ -179,27 +184,29 @@
 # === WAT-O (pass W: owned by WAT-O) ===
 # === end WAT-O ===
 # === WAT-T (pass W: owned by WAT-T) ===
-# ═══ ONRAC SHOPS ═══ B6: weapon 30, body 38, shield 12, helm 8; magic L6 (W1-G); inn 500. Seeded by W1-F; WAT-T owns them from here on.
+# ═══ ONRAC SHOPS ═══ B6: NES FF1 Onrac (pass EQ; no weapon or armour shop: closed); magic L7 (half); inn 500. WAT-T owns them.
 - id: onrac_weapon
   type: weapon
   name: Onrac Weapons
-  inventory: [sun_blade, thor_hammer, rune_knife, falchion, cat_claw]
+  inventory: []
+  closed: true
 - id: onrac_armor
   type: armor
   name: Onrac Armor
-  inventory: [opal_armor, opal_armlet, white_robe, black_robe, aegis_shield, opal_helm]
+  inventory: []
+  closed: true
 - id: onrac_item
   type: item
   name: Onrac Items
-  inventory: [potion, hi_potion, ether, antidote, soft, phoenix_down, tent, cabin]
+  inventory: [potion, antidote, soft, cabin, house]
 - id: onrac_white
   type: magic
   name: Onrac White Magic
-  inventory: [soft, exit, fog2, inv2]
+  inventory: [arub, hel3]
 - id: onrac_black
   type: magic
   name: Onrac Black Magic
-  inventory: [lit3, rub, qake, stun]
+  inventory: [sabr, blnd]
 - id: onrac_inn
   type: inn
   name: Onrac Inn
@@ -209,15 +216,15 @@
 # === WAT-D (pass W: owned by WAT-D) ===
 # === end WAT-D ===
 # === WND-O (pass W: owned by WND-O) ===
-# ═══ LUFENIA SHOPS ═══ B8: magic L8 (+ L7) only (W1-G); inn 900. Seeded by W1-F; WND-O owns them from here on.
+# ═══ LUFENIA SHOPS ═══ B8: NES FF1 Lufenia (pass EQ): LIF2 and NUKE only; inn 900. WND-O owns them.
 - id: lufenia_white
   type: magic
   name: Lufenia White Magic
-  inventory: [lif2, fade, wall, xfer]
+  inventory: [lif2]
 - id: lufenia_black
   type: magic
   name: Lufenia Black Magic
-  inventory: [stop, zap, xxxx, nuke]
+  inventory: [nuke]
 - id: lufenia_inn
   type: inn
   name: Lufenia Inn
@@ -225,27 +232,27 @@
   innPrice: 900
 # === end WND-O ===
 # === WND-T (pass W: owned by WND-T) ===
-# ═══ GAIA SHOPS ═══ B7: weapon 34, body 42, shield 14, helm 10; magic L7 (W1-G); inn 700. Seeded by W1-F; WND-T owns them from here on.
+# ═══ GAIA SHOPS ═══ B7: NES FF1 Gaia (pass EQ): Cat Claw, Gold Bracelet, ProRing; magic L7 (half) + L8; inn 700. WND-T owns them.
 - id: gaia_weapon
   type: weapon
   name: Gaia Weapons
-  inventory: [defender, vorpal_sword, dragon_claw, sun_blade, thor_hammer, rune_knife]
+  inventory: [cat_claw]
 - id: gaia_armor
   type: armor
   name: Gaia Armor
-  inventory: [diamond_armor, diamond_armlet, opal_armlet, diamond_shield, diamond_helm]
+  inventory: [gold_armlet, pro_ring]
 - id: gaia_item
   type: item
   name: Gaia Items
-  inventory: [potion, hi_potion, ether, antidote, soft, phoenix_down, tent, cabin]
+  inventory: [potion, antidote, cabin, house]
 - id: gaia_white
   type: magic
   name: Gaia White Magic
-  inventory: [cur4, hrm4, arub, hel3]
+  inventory: [cur4, hrm4, fade, wall, xfer]
 - id: gaia_black
   type: magic
   name: Gaia Black Magic
-  inventory: [ice3, brak, sabr, blnd]
+  inventory: [ice3, brak, stop, zap, xxxx]
 - id: gaia_inn
   type: inn
   name: Gaia Inn

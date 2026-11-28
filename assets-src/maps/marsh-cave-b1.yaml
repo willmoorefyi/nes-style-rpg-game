@@ -170,13 +170,13 @@ objects:
   x: 23
   y: 26
 npcs:
-- id: chest_elf_d_b1_west
+- id: chest_elf_d_b1_west_sword
   sprite: chest
   x: 4
   y: 8
-  chestItem: hi_potion
-  chestFlag: CHEST_ELF_D_B1_WEST
-  dialog: [You found a Hi-Potion!]
+  chestItem: iron_sword
+  chestFlag: CHEST_ELF_D_B1_WEST_SWORD
+  dialog: [You found an Iron Sword!]
 - id: chest_elf_d_b1_east
   sprite: chest
   x: 35

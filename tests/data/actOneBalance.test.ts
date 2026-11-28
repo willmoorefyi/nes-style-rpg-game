@@ -79,7 +79,7 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
   // since any party could previously have duplicate players, so all these 'new' classes doesn't change anything with
   // balance." The pass-CB classes are exact copies (the next test pins it), so the parties are enumerated over the 6
   // original base classes only.
-  it('costs 400 G or less for every party of four different original base classes; the plan\'s party costs 370', () => {
+  it('costs 400 G or less for every party of four different original base classes; the plan\'s party costs 355 (pass EQ: 370 with the Wooden Shield)', () => {
     const cost = (cls: string) => kitCost(START_KIT[cls], spellPrice);
     let parties = 0;
     for (let a = 0; a < ORIGINAL.length; a++) for (let b = a + 1; b < ORIGINAL.length; b++)
@@ -89,7 +89,7 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
         parties++;
       }
     expect(parties).toBe(15);   // C(6, 4)
-    expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(370);
+    expect(['warrior', 'thief', 'white_mage', 'black_mage'].reduce((s, x) => s + cost(x), 0)).toBe(355);
   });
 
   it('every other base class is a copy of an original one: the same rules and the same kit in every kit table', () => {
@@ -104,14 +104,15 @@ describe('T4d starting kit (NG-5, revision 10)', () => {
     }
   });
 
-  it('pass F kits (§3.2): lv2, arrive and full cover every base class; lv2 is the start kit + LIT (100 G), arrive is lv2 + a Cap each', () => {
+  it('pass F kits (§3.2): lv2, arrive and full cover every base class; lv2 is the start kit + LIT (100 G), arrive is lv2 + the temple Cap on the Fighter (pass EQ D-EQ12)', () => {
     for (const name of ['lv2', 'arrive', 'full']) expect(Object.keys(KITS[name]).sort(), name).toEqual([...baseClasses].sort());
     const party = ['warrior', 'thief', 'white_mage', 'black_mage'];
     const total = (name: string) => party.reduce((s, x) => s + kitCost(KITS[name][x], spellPrice), 0);
-    expect(total('lv2')).toBe(470);
+    expect(total('lv2')).toBe(455);
     expect(KITS.lv2.black_mage.spells).toEqual([...START_KIT.black_mage.spells, 'lit']);
     for (const cls of baseClasses) {
-      expect(KITS.arrive[cls], cls).toEqual({ gear: [...KITS.lv2[cls].gear, 'cap'], spells: KITS.lv2[cls].spells });
+      const fighter = COPY_OF[cls] === 'warrior' || cls === 'warrior';
+      expect(KITS.arrive[cls], cls).toEqual({ gear: KITS.lv2[cls].gear, ...(fighter ? { found: ['cap'] } : {}), spells: KITS.lv2[cls].spells });
     }
   });
 });

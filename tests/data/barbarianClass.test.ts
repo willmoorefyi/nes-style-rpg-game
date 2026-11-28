@@ -62,7 +62,7 @@ describe('pass CB: barbarian / berserker are a shallow copy of warrior / knight'
     const gear = ITEMS.filter((i) => i.usableBy?.length);
     expect(gear.filter((i) => barb.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => war.canEquip(i)).map((i) => i.id));
     expect(gear.filter((i) => bers.canEquip(i)).map((i) => i.id)).toEqual(gear.filter((i) => kn.canEquip(i)).map((i) => i.id));
-    expect(ITEMS.filter((i) => i.usableBy?.includes('barbarian'))).toHaveLength(44);
+    expect(ITEMS.filter((i) => i.usableBy?.includes('barbarian'))).toHaveLength(0);   // pass EQ D-EQ4: a copy equips as its copyOf source
   });
 
   it('kits: barbarian = warrior in every kit, berserker = knight wherever a knight row exists (D-CB6)', () => {

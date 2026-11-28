@@ -300,7 +300,7 @@ export class BattleScene implements Scene {
     this.commandMenu.visible = true;
     // U14: Magic and Item are greyed for a member with nothing to cast or use (a greyed pick does nothing)
     this.commandMenu.setItemEnabled(1, canOpenSpells(actor));
-    this.commandMenu.setItemEnabled(2, canOpenItems(this.config.inventory, (id) => this.battle.reservedItems(id)));
+    this.commandMenu.setItemEnabled(2, canOpenItems(this.config.inventory, (id) => this.battle.reservedItems(id), actor));
     this.commandMenu.setIndex(0);
     this.commandGuard = COMMAND_CONFIRM_GUARD_FRAMES;
     this.uiState = 'command';
@@ -339,7 +339,7 @@ export class BattleScene implements Scene {
       this.lists.showSpells(actor);
     } else if (cmd === 'item') {
       this.clearCommandIndicator();
-      this.lists.showItems();
+      this.lists.showItems(actor);
     } else if (cmd === 'run') {
       this.battle.submitCommand({ type: 'run', actorId: this.battle.currentCommandActorId! });
       this.commandMenu.visible = false;

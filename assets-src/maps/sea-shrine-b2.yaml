@@ -180,13 +180,13 @@ npcs:
   chestItem: opal_armlet
   chestFlag: CHEST_WAT_D_B2_CELL_E
   dialog: [You found an Opal Armlet!]
-- id: chest_wat_d_b2_chapter
+- id: chest_wat_d_b2_chapter_power
   sprite: chest
   x: 24
   y: 27
-  chestItem: hi_potion
-  chestFlag: CHEST_WAT_D_B2_CHAPTER
-  dialog: [You found a Hi-Potion!]
+  chestItem: power_gauntlet
+  chestFlag: CHEST_WAT_D_B2_CHAPTER_POWER
+  dialog: [You found a Power Gauntlet!]
 - id: wat_d_brother
   sprite: mage
   tint: '#6f9aa6'

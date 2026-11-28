@@ -41,7 +41,7 @@ def build() -> Floor:
     f.npcs += [
         chest("b2_cell_w", "phoenix_down", "a Phoenix Down", 13, 2),
         chest("b2_cell_e", "opal_armlet", "an Opal Armlet", 23, 2),
-        chest("b2_chapter", "hi_potion", "a Hi-Potion", 24, 27),
+        chest("b2_chapter_power", "power_gauntlet", "a Power Gauntlet", 24, 27),
         {"id": "wat_d_brother", "sprite": "mage", "tint": "#6f9aa6", "x": 13, "y": 26, "dialog": talk(
             ["A drowned brother of the shrine reads at the chapter table. The pages do not turn; the water turns them.",
              "\"The garth was our garden. The king said the sea would tend it, and it has, better than we did.\"",
